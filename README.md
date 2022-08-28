@@ -1,26 +1,61 @@
 # Introduction
 
-jAPI (pronounced "Jay-Pee-Eye") stands for **J**SON **A**pplications
-**P**rogrammer **I**nterface, and it is just that: an API expressed purely with
-JSON. Programmers define their APIs with JSON, and interact with the API
-strictly with JSON payloads that represent familiar programming concepts like
-functions, arguments, and return values.
+JAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogrammer
+**I**nterface is an API expressed purely with JSON. Familiar API concepts, such
+as function calls and return values, are represented entirely with JSON
+payloads. Consequently, a JAPI can be served wherever JSON can be supplied,
+allowing it serve API needs across not only HTTP, but any inter-process
+communication boundary.
 
-|                                                              | RESTful | gRPC | jAPI |
+JSON payload format
+
+```
+[<message-type>, <headers>, <body>]
+```
+
+Example HTTP Usage (with `cURL`):
+
+```bash
+$ export URL=http://example.com/api/v1
+$ curl -X '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
+["function.add.output", {}, {"result": 3}]
+```
+
+Example Websocket Usage (with `python`):
+
+```python
+# japi_ws.py
+
+import sys
+import json
+from websocket import create_connection
+ws = create_connection('ws://example.com/api/v1')
+ws.send(sys.argv[1])
+print('{}'.format((ws.recv())))
+```
+
+```
+$ python japi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
+<-- ["function.add.output", {}, {"result": 3}]
+```
+
+# Motivation
+
+| Capability                                                   | RESTful | gRPC | jAPI |
 | ------------------------------------------------------------ | ------- | ---- | ---- |
 | Serve API with a transport other than HTTP                   | ❌      | ❌   | ✅   |
 | Define API decoupled from transport concepts                 | ❌      | ✅   | ✅   |
 | Consume API without any required libraries                   | ✅      | ❌   | ✅   |
+| Consume API with type-safe generated code                    | 🤔      | ✅   | ✅   |
 | Use JSON as a developer-friendly data serialization protocol | ✅      | ❌   | ✅   |
 | Use compact and efficient data serialization protocols       | 🤔      | ✅   | ✅   |
-| Consume API with type-safe generated code                    | 🤔      | ✅   | ✅   |
 | Return variable payloads according to consumer needs         | 🤔      | ❌   | ✅   |
 
-🤔 = Possible, but not consistently observed in the industry
+🤔 = Possible, but not consistently observed in practice
 
 ## Why not RESTful APIs?
 
-RESTful APIs are inherently HTTP APIs, and cannot be used with any other
+RESTful APIs are inherently HTTP APIs and cannot be used with any other
 networking transport (e.g. sockets, messaging). And unfortunately, HTTP concepts
 unnecessarily become intertwined with the API itself, which often leads to
 design inefficiencies where API design is stalled to answer HTTP-specific
@@ -72,3 +107,7 @@ But from there, consumers can also opt-in to several features including:
 Again, all of these features are opt-in client-side, provided to the consumer
 through server-side jAPI libraries (which makes these features automatic without
 any effort by the server-side implementation).
+
+# Navigation
+
+- [Specification](SPECIFICATION.md)
