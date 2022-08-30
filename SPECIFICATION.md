@@ -16,23 +16,15 @@ when discussing JSON objects.
 
 # 3 Design
 
-A JAPI consists of
+A JAPI consists of the following:
 
 1. An API description written in JSON using a JAPI-compliant schema that
    describes the various types, functions, and events of the API.
 2. JAPI-compliant JSON payloads passed between API providers and consumers that
    represent interactions with the API as described by the API description.
-3. An implementation that marshalls the JAPI-compliant JSON payloads from a
-   chosen inter-process communication boundary and uses a JAPI-compliant library
-   to route JSON payloads to handlers implementing the API description.
-
-```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
-```
+3. An API implementation on the API provider that uses a JAPI-compliant library
+   to marshall JAPI-compliant JSON payloads from/to a chosen inter-process
+   communication boundary to/from handlers in the API provider code.
 
 ## 3.1 API Description Schema
 
@@ -94,7 +86,7 @@ the API.
   },
   ...
 
-  "event.{type-name}": {
+  "event.{event-name}": {
     "doc": "",
     "fields": {
       "{field-name}"
@@ -114,9 +106,9 @@ every case.
 
 `{*-name}` indicate names that are defined by the API designer and should
 satisfy the regular expression `[a-zA-Z][a-zA-Z0-9_]*`. It is recommended that
-names for `{type-name}` follow `UpperCamelCase` formatting, `{function-name}`
-follow `lower_snake_case` formatting, and `{field-name}`/`{format-name}` follow
-`lowerCamelCase` formatting.
+names for `{type-name}`/`{event-name}`/`{error-name}` follow `UpperCamelCase`
+formatting, `{function-name}` follow `lower_snake_case` formatting, and
+`{field-name}`/`{format-name}` follow `lowerCamelCase` formatting.
 
 `{type}` indicates one of the JAPI types, defined later in this specification.
 
@@ -163,13 +155,225 @@ Example schema:
     }
   },
 
-  "event.ComputationOccurred": {
-    "doc": "Indicates to listeners that a computation recently occurred.",
+  "event.ComputationSuccessful": {
+    "doc": "Indicates to listeners that a computation recently completed successfully.",
     "fields": {
-      "lastResult": "number"
+      "lastSuccessfulResult": "number"
     }
   }
 }
 ```
 
-## 3.2
+## 3.2 JSON Payloads
+
+JSON payloads in JAPI indicate interactions with the API, such as function
+calls, function returns, or events.
+
+### 3.2.1 Basic format
+
+All JSON payloads in JAPI follow the same general format, a JSON array with 3
+elements, a string indicating the payload type, an object containing headers,
+and an object containing the primary body of data.
+
+```json
+[
+  "{payload-type}",
+  {
+    "{header-key}": "{header-value}",
+    ...
+  },
+  {
+    "{body-key}": "{body-value}"
+    ...
+  }
+]
+```
+
+`...` indicates the previous stanza of same indentation can be optionally
+repeated.
+
+`{payload-type}` is a reference to a top-level definition in the API
+description, and it establishes the format of the payload body.
+
+`{header-key}` and `{header-value}` are used to include headers in a JSON
+payload to increase expressivity when interacting with a JAPI. All instances of
+`{header-key}` are optional and not required for all payload types.
+
+`{body-key}` and `{body-value}` make up the primary body of a JAPI JSON payload.
+The specific values allowed for these placeholders is determined by the payload
+type.
+
+### 3.2.2 Function Calls
+
+```json
+[
+  "function.{function-name}",
+  {
+    "{header-key}": "{header-value}",
+    ...
+  },
+  {
+    "{body-key}": "{body-value}"
+    ...
+  }
+]
+```
+
+Example:
+
+```json
+[
+  "function.compute",
+  {},
+  {
+    "expression": {
+      "x": 1,
+      "y": 2,
+      "op": "add"
+    }
+  }
+]
+```
+
+### 3.2.3 Function Returns
+
+```json
+[
+  "function.{function-name}.output",
+  {
+    "{header-key}": "{header-value}",
+    ...
+  },
+  {
+    "{body-key}": "{body-value}"
+    ...
+  }
+]
+```
+
+Example:
+
+```json
+[
+  "function.compute.output",
+  {},
+  {
+    "result": 3
+  }
+]
+```
+
+### 3.2.3.1 Function Returns with error
+
+```json
+[
+  "error.{error-name}",
+  {
+    "{header-key}": "{header-value}",
+    ...
+  },
+  {
+    "{body-key}": "{body-value}"
+    ...
+  }
+]
+```
+
+Example:
+
+```json
+[
+  "error.CannotDivideByZero",
+  {},
+  {
+    "message": "Dividing by zero is not allowed."
+  }
+]
+```
+
+### 3.2.4 Events
+
+```json
+[
+  "event.{type-name}",
+  {
+    "{header-key}": "{header-value}",
+    ...
+  },
+  {
+    "{body-key}": "{body-value}"
+    ...
+  }
+]
+```
+
+Example:
+
+```json
+[
+  "event.ComputationSuccessful",
+  {},
+  {
+    "lastSuccessfulResult": 3
+  }
+]
+```
+
+## 3.3 Provider API Implementation
+
+The rules and execution of a JAPI are driven entirely by the implementation of
+the API provider. This implementation is responsible for moving JAPI payloads
+from/to the API provider's chosen inter-process communication (IPC) boundary
+to/from a JAPI-compliant processing library that will inspect the payload and
+route it to a proper handler in the API provider code.
+
+### 3.3.1 Function Calls
+
+For JAPIs offering functions, the JAPI provider implementation MUST set up a
+transport that allows for both receiving and returning JSON payloads to and from
+an API consumer. The full interaction will consist of the following:
+
+1. the sending of a JAPI Function Input JSON payload from a consumer that is
+   received by the provider implementation through it's chosen IPC boundary,
+2. the passing of that JSON payload to a JAPI processor for parsing and
+   validation
+3. the passing of the deserialized data from the function input payload to API
+   implementation handlers to perform a function call,
+4. the returning of the result of that function call back to the JAPI processor
+   for validation and serialization into a JAPI Function Output JSON payload,
+5. the sending of the JAPI Function Output JSON payload from the provider
+   through the IPC boundary back the consumer
+
+HTTP Example:
+
+```java
+public static void main(String[] args) {
+    var japiProcessor = new JapiProcessor(
+        (String functionName, Map<String, Object> headers, Map<String, Object> input) -> {
+            // 3. Use deserialized JAPI Function Input to start function call
+            Map<String, Object> result = switch (functionName) {
+                "add" -> add(input.get("x"), input.get("y")):
+                default -> throw new RuntimeException("No implementation found for function %s".formatted(functionName))
+            };
+
+            // 4. Return function result back the JapiProcessor for validation against the JAPI description,
+            //    and then serialization into a JAPI Function Output payload.
+        }
+    );
+
+    var app = Javalin.create().start(8080);
+    app.get("/api/v1", ctx -> {
+        // 1. Receive a JAPI Function Input JSON payload sent from its API consumer from HTTP request.
+        String inputJson = ctx.body();
+
+        // 2. Pass the received JSON payload to a JAPI library provided processor, which
+        //    will parse the JSON payload into data objects the API implementation.
+        String outputJson = japiProcessor.process(inputJson);
+
+        // 5. Send JAPI Function Output JSON payload to consumer with HTTP response body.
+        ctx.result(outputJson);
+    });
+}
+```
+
+Websocket Example
