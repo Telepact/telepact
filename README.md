@@ -7,21 +7,17 @@ payloads. Consequently, a JAPI can be served wherever JSON can be supplied,
 allowing it serve API needs across not only HTTP, but any inter-process
 communication boundary.
 
-JSON payload format
-
-```
-[<message-type>, <headers>, <body>]
-```
-
-Example HTTP Usage (with `cURL`):
+HTTP client example (with `cURL`):
 
 ```bash
 $ export URL=http://example.com/api/v1
 $ curl -X '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
 ["function.add.output", {}, {"result": 3}]
+$ curl -X '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
+["function.sub.output", {}, {"result": -1}]
 ```
 
-Example Websocket Usage (with `python`):
+Websocket client example (with `python`):
 
 ```python
 # japi_ws.py
@@ -36,7 +32,9 @@ print('{}'.format((ws.recv())))
 
 ```
 $ python japi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
-<-- ["function.add.output", {}, {"result": 3}]
+["function.add.output", {}, {"result": 3}]
+$ python japi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
+["function.add.output", {}, {"result": -1}]
 ```
 
 # Motivation
@@ -47,6 +45,7 @@ $ python japi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x":
 | Define API decoupled from transport concepts                 | ❌      | ✅   | ✅   |
 | Consume API without any required libraries                   | ✅      | ❌   | ✅   |
 | Consume API with type-safe generated code                    | 🤔      | ✅   | ✅   |
+| Serve API with type-safe generated code                      | 🤔      | ✅   | ✅   |
 | Use JSON as a developer-friendly data serialization protocol | ✅      | ❌   | ✅   |
 | Use compact and efficient data serialization protocols       | 🤔      | ✅   | ✅   |
 | Return variable payloads according to consumer needs         | 🤔      | ❌   | ✅   |
@@ -82,9 +81,9 @@ language.
 ### jAPI is portable
 
 You can offer your API anywhere a JSON payload can be supplied. That could be an
-HTTP URL, but it could also be a websocket, a topic for a message broker like
-Kafka, the browser event loop, or even simple inter-process communication
-interfaces like UNIX named pipes.
+HTTP URL, a websocket, a topic for a message broker like Kafka, the browser
+event loop, or even simple inter-process communication interfaces like UNIX
+named pipes.
 
 ### jAPI is flexible
 
@@ -105,8 +104,8 @@ But from there, consumers can also opt-in to several features including:
   performance through reduced serialization.
 
 Again, all of these features are opt-in client-side, provided to the consumer
-through server-side jAPI libraries (which makes these features automatic without
-any effort by the server-side implementation).
+through server-side jAPI libraries, which makes these features automatic without
+any effort by the server-side implementation.
 
 # Navigation
 

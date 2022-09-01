@@ -1,6 +1,6 @@
 # 1 Introduction
 
-The JSON Application Programmer Interface or JAPI ("jay-pee-eye") is an API
+The JSON Application Programming Interface or JAPI ("jay-pee-eye") is an API
 expressed and executed with JSON payloads.
 
 # 2 Conventions
@@ -21,7 +21,7 @@ A JAPI consists of the following:
 1. An API description written in JSON using a JAPI-compliant schema that
    describes the various types, functions, and events of the API.
 2. JAPI-compliant JSON payloads passed between API providers and consumers that
-   represent interactions with the API as described by the API description.
+   represent interactions with the API as defined by the API description.
 3. An API implementation on the API provider that uses a JAPI-compliant library
    to marshall JAPI-compliant JSON payloads from/to a chosen inter-process
    communication boundary to/from handlers in the API provider code.
@@ -122,7 +122,7 @@ Example schema:
   },
 
   "union.Value": {
-    "doc": "A literal number or name of a variable pointing to saved value.",
+    "doc": "A literal number or name of a variable stored in memory.",
     "format": {
       "num": "number",
       "var": "string"
@@ -145,6 +145,13 @@ Example schema:
     }
   },
 
+  "error.No": {
+    "doc": "Indicates a computation attempted to divide by zero, which is not allowed.",
+    "fields": {
+      "message": "string"
+    }
+  },
+
   "function.compute": {
     "doc": "Compute a math expression.",
     "input": {
@@ -152,13 +159,23 @@ Example schema:
     },
     "output": {
       "result": "number"
-    }
+    },
+    "error.CannotDivideByZero": {}
   },
 
-  "event.ComputationSuccessful": {
-    "doc": "Indicates to listeners that a computation recently completed successfully.",
+  "function.store": {
+    "doc": "Store a variable in memory. Overwrites any existing variables.",
+    "input": {
+      "name": "string",
+      "value": "number"
+    },
+    "output": {}
+  },
+
+  "event.NewVariableStored": {
+    "doc": "Indicates a new variable was stored in memory.",
     "fields": {
-      "lastSuccessfulResult": "number"
+      "name": "string"
     }
   }
 }
@@ -347,33 +364,95 @@ an API consumer. The full interaction will consist of the following:
 HTTP Example:
 
 ```java
-public static void main(String[] args) {
-    var japiProcessor = new JapiProcessor(
-        (String functionName, Map<String, Object> headers, Map<String, Object> input) -> {
-            // 3. Use deserialized JAPI Function Input to start function call
-            Map<String, Object> result = switch (functionName) {
-                "add" -> add(input.get("x"), input.get("y")):
-                default -> throw new RuntimeException("No implementation found for function %s".formatted(functionName))
-            };
+import io.javalin.Javalin;
+import io.github.brenbar.japi.JapiProcessor;
 
-            // 4. Return function result back the JapiProcessor for validation against the JAPI description,
-            //    and then serialization into a JAPI Function Output payload.
-        }
-    );
+public class Main {
 
-    var app = Javalin.create().start(8080);
-    app.get("/api/v1", ctx -> {
-        // 1. Receive a JAPI Function Input JSON payload sent from its API consumer from HTTP request.
-        String inputJson = ctx.body();
+    private static Map<String, Number> storedVariables = new HashMap<String, Number>();
 
-        // 2. Pass the received JSON payload to a JAPI library provided processor, which
-        //    will parse the JSON payload into data objects the API implementation.
-        String outputJson = japiProcessor.process(inputJson);
+    public static void main(String[] args) {
+        var japiProcessor = new JapiProcessor(Main::handle);
+        var app = Javalin.create().start(8080);
+        app.get("/api/v1", ctx -> {
+            // 1. Receive a JAPI Function Input JSON payload sent from its API consumer from HTTP request.
+            String inputJson = ctx.body();
 
-        // 5. Send JAPI Function Output JSON payload to consumer with HTTP response body.
-        ctx.result(outputJson);
-    });
+            // 2. Pass the received JSON payload to a JAPI processor, which
+            //    will parse the JSON payload into data objects the API implementation
+            //    can use for function calls.
+            String outputJson = japiProcessor.process(inputJson);
+
+            // 5. Send JAPI Function Output JSON payload to consumer with HTTP response body.
+            ctx.result(outputJson);
+        });
+    }
+
+    private static Map<String, Object> handle(String functionName, Map<String, Object> headers, Map<String, Object> input) {
+        // 3. Use deserialized JAPI Function Input to start function call
+        Map<String, Object> result = switch (functionName) {
+            case "compute" -> {
+                var x = getValue(input.get("x"));
+                var y = getValue(input.get("y"));
+                var op = input.get("op");
+                var result = switch (op) {
+                    case "add" -> x + y
+                    case "sub" -> x - y
+                    case "mul" -> x * y
+                    case "div" ->
+                }
+                yield Map.of("result", input.get("x") + input.get("y"));
+            }
+            default -> throw new RuntimeException("Function %s not found".formatted(functionName))
+        };
+
+        // 4. Return function result back the JapiProcessor for validation against the JAPI description,
+        //    and then serialization into a JAPI Function Output payload.
+        return result;
+    }
+
+    private static double getValue(Map<String, Object> value) {
+        var entry = value.entrySet().iterator().next();
+        var format = entry.getKey();
+        var value = entry.getValue();
+        return switch (format) {
+            case "var" -> storedVariables.get(value).doubleValue();
+            case "num" -> value.doubleValue();
+            default -> throw new RuntimeException()
+        };
+    }
 }
 ```
 
 Websocket Example
+
+```python
+import asyncio
+import websockets
+from japi import JapiProcessor
+
+def handler(function_name, headers, input):
+    if function_name == 'add':
+
+
+
+japi_processor = JapiProcessor(handler)
+
+async def setup(websocket, path):
+    if path != '/api/v1':
+        await websocket.send("invalid url")
+        return
+
+    async for input_json in websocket:
+
+        output_json = japi_processor.process(input_json)
+
+        await websocket.send(output_json)
+
+
+async def main():
+    async with websockets.serve(setup, "localhost", 8080):
+        await asyncio.Future()
+
+asyncio.run(main())
+```
