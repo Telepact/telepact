@@ -16,20 +16,20 @@ when discussing JSON objects.
 
 # 3 Design
 
-A JAPI consists of the following:
+A JAPI SHALL consist of the following:
 
-1. An API description written in JSON using a JAPI-compliant schema that
+1. A JAPI Description written in JSON using a JAPI-compliant schema that
    describes the various types, functions, and events of the API.
 2. JAPI-compliant JSON payloads passed between API providers and consumers that
-   represent interactions with the API as defined by the API description.
-3. An API implementation on the API provider that uses a JAPI-compliant library
-   to marshall JAPI-compliant JSON payloads from/to a chosen inter-process
-   communication boundary to/from handlers in the API provider code.
+   represent interactions with the API as defined by the JAPI Description.
+3. A JAPI implementation by the API provider that uses a JAPI-compliant library
+   to marshall JAPI payloads from/to a chosen inter-process communication
+   boundary to/from handlers in the API provider code.
 
-## 3.1 API Description Schema
+## 3.1 API Description
 
-The API Description Schema describes the various types, functions, and events of
-the API.
+The API Description describes the various types, functions, and events of the
+API. It MUST match the following schema:
 
 ```json
 {
@@ -101,18 +101,18 @@ the API.
 `...` indicates the previous stanza of same indentation can be optionally
 repeated.
 
-The keys `"doc"`, `"errors"`, and `"{field-name}"` can be optionally omitted in
+The keys `"doc"`, `"errors"`, and `"{field-name}"` MAY be optionally omitted in
 every case.
 
 `{*-name}` indicate names that are defined by the API designer and should
-satisfy the regular expression `[a-zA-Z][a-zA-Z0-9_]*`. It is recommended that
+satisfy the regular expression `[a-zA-Z][a-zA-Z0-9_]*`. It is RECOMMENDED that
 names for `{type-name}`/`{event-name}`/`{error-name}` follow `UpperCamelCase`
 style and `{function-name}`/`{field-name}`/`{case-name}` follow `lowerCamelCase`
 style.
 
 `{type}` indicates one of the JAPI types, defined later in this specification.
 
-Example schema:
+Example:
 
 ```json
 {
@@ -189,9 +189,12 @@ such as function calls, function returns, or emitted events.
 
 ### 3.2.0 Format
 
-All JAPI payloads follow the same general format, a JSON array with 3 elements,
-a string indicating the payload type, an object containing headers, and an
-object containing the primary body of data.
+All JAPI Payloads MUST follow the same general format of a JSON array with 3
+elements:
+
+1.  a string indicating the payload type,
+2.  an object containing headers,
+3.  an object containing the primary body of data.
 
 ```json
 [
@@ -207,7 +210,7 @@ object containing the primary body of data.
 ]
 ```
 
-`...` indicates the previous stanza of same indentation can be optionally
+`...` indicates the previous stanza of same indentation MAY be optionally
 repeated.
 
 `{payload-type}` is a reference to a top-level definition in the API
@@ -215,15 +218,15 @@ description, and it establishes the format of the payload body.
 
 `{header-key}` and `{header-value}` are used to include headers in a JSON
 payload to increase expressivity when interacting with a JAPI. All instances of
-`{header-key}` are optional and not required for all payload types.
+`{header-key}` are OPTIONAL and not required for all payload types.
 
 `{body-key}` and `{body-value}` make up the primary body of a JAPI JSON payload.
-The specific values allowed for these placeholders is determined by the payload
-type.
+The specific values allowed for these placeholders is determined by JAPI
+Description according the payload type.
 
 ### 3.2.1 Function Input JAPI Payload
 
-A Function Input JAPI payload has has `{payload-type}` of
+A Function Input JAPI payload SHALL have a `{payload-type}` of
 `function.{function-name}`, where `{function-name}` is defined in the JAPI
 Description.
 
@@ -245,7 +248,7 @@ Example:
 
 ### 3.2.2 Function Output JAPI Payload
 
-A Function Output JAPI Payload has the `{payload-type}` of
+A Function Output JAPI Payload SHALL have a `{payload-type}` of
 `function.{function-name}.result`, where `{function-name}` is defined in the
 JAPI Description.
 
@@ -263,8 +266,8 @@ Example:
 
 ### 3.2.3 Error JAPI Payload
 
-An Error JAPI Payload has the `{payload-type}` of `error.{error-name}`, where
-`{error-name}` is defined in the JAPI Description.
+An Error JAPI Payload SHALL have the `{payload-type}` of `error.{error-name}`,
+where `{error-name}` is defined in the JAPI Description.
 
 Example:
 
@@ -280,8 +283,8 @@ Example:
 
 ### 3.2.4 Event JAPI Payload
 
-An Event JAPI Payload has the `{payload-type}` of `event.{type-name}` where
-`{type-name}` is defined by the JAPI Description.
+An Event JAPI Payload SHALL have tge `{payload-type}` of `event.{type-name}`
+where `{type-name}` is defined by the JAPI Description.
 
 Example:
 
