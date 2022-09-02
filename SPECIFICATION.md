@@ -44,8 +44,8 @@ the API.
 
   "union.{type-name}": {
     "doc": "",
-    "formats": {
-      "{format-name}": "{type}",
+    "cases": {
+      "{case-name}": "{type}",
       ...
     }
   },
@@ -107,8 +107,8 @@ every case.
 `{*-name}` indicate names that are defined by the API designer and should
 satisfy the regular expression `[a-zA-Z][a-zA-Z0-9_]*`. It is recommended that
 names for `{type-name}`/`{event-name}`/`{error-name}` follow `UpperCamelCase`
-formatting, `{function-name}` follow `lower_snake_case` formatting, and
-`{field-name}`/`{format-name}` follow `lowerCamelCase` formatting.
+style and `{function-name}`/`{field-name}`/`{case-name}` follow `lowerCamelCase`
+style.
 
 `{type}` indicates one of the JAPI types, defined later in this specification.
 
@@ -145,10 +145,11 @@ Example schema:
     }
   },
 
-  "error.No": {
-    "doc": "Indicates a computation attempted to divide by zero, which is not allowed.",
+  "error.VariableNotFound": {
+    "doc": "Indicates a computation used a variable that has not been stored.",
     "fields": {
-      "message": "string"
+      "message": "string",
+      "var": "string"
     }
   },
 
@@ -181,16 +182,16 @@ Example schema:
 }
 ```
 
-## 3.2 JSON Payloads
+## 3.2 JAPI Payloads
 
-JSON payloads in JAPI indicate interactions with the API, such as function
-calls, function returns, or events.
+JAPI payloads are pure JSON payloads that indicate interactions with the API,
+such as function calls, function returns, or emitted events.
 
-### 3.2.1 Basic format
+### 3.2.0 Format
 
-All JSON payloads in JAPI follow the same general format, a JSON array with 3
-elements, a string indicating the payload type, an object containing headers,
-and an object containing the primary body of data.
+All JAPI payloads follow the same general format, a JSON array with 3 elements,
+a string indicating the payload type, an object containing headers, and an
+object containing the primary body of data.
 
 ```json
 [
@@ -220,21 +221,11 @@ payload to increase expressivity when interacting with a JAPI. All instances of
 The specific values allowed for these placeholders is determined by the payload
 type.
 
-### 3.2.2 Function Calls
+### 3.2.1 Function Input JAPI Payload
 
-```json
-[
-  "function.{function-name}",
-  {
-    "{header-key}": "{header-value}",
-    ...
-  },
-  {
-    "{body-key}": "{body-value}"
-    ...
-  }
-]
-```
+A Function Input JAPI payload has has `{payload-type}` of
+`function.{function-name}`, where `{function-name}` is defined in the JAPI
+Description.
 
 Example:
 
@@ -252,21 +243,11 @@ Example:
 ]
 ```
 
-### 3.2.3 Function Returns
+### 3.2.2 Function Output JAPI Payload
 
-```json
-[
-  "function.{function-name}.output",
-  {
-    "{header-key}": "{header-value}",
-    ...
-  },
-  {
-    "{body-key}": "{body-value}"
-    ...
-  }
-]
-```
+A Function Output JAPI Payload has the `{payload-type}` of
+`function.{function-name}.result`, where `{function-name}` is defined in the
+JAPI Description.
 
 Example:
 
@@ -280,21 +261,10 @@ Example:
 ]
 ```
 
-### 3.2.3.1 Function Returns with error
+### 3.2.3 Error JAPI Payload
 
-```json
-[
-  "error.{error-name}",
-  {
-    "{header-key}": "{header-value}",
-    ...
-  },
-  {
-    "{body-key}": "{body-value}"
-    ...
-  }
-]
-```
+An Error JAPI Payload has the `{payload-type}` of `error.{error-name}`, where
+`{error-name}` is defined in the JAPI Description.
 
 Example:
 
@@ -308,21 +278,10 @@ Example:
 ]
 ```
 
-### 3.2.4 Events
+### 3.2.4 Event JAPI Payload
 
-```json
-[
-  "event.{type-name}",
-  {
-    "{header-key}": "{header-value}",
-    ...
-  },
-  {
-    "{body-key}": "{body-value}"
-    ...
-  }
-]
-```
+An Event JAPI Payload has the `{payload-type}` of `event.{type-name}` where
+`{type-name}` is defined by the JAPI Description.
 
 Example:
 
@@ -346,20 +305,21 @@ route it to a proper handler in the API provider code.
 
 ### 3.3.1 Function Calls
 
-For JAPIs offering functions, the JAPI provider implementation MUST set up a
-transport that allows for both receiving and returning JSON payloads to and from
-an API consumer. The full interaction will consist of the following:
+For JAPI providers offering functions for consumers to invoke, the JAPI provider
+implementation MUST set up a transport that allows for both receiving and
+sending JSON payloads to and from an API consumer. The full interaction will
+consist of the following:
 
-1. the sending of a JAPI Function Input JSON payload from a consumer that is
-   received by the provider implementation through it's chosen IPC boundary,
-2. the passing of that JSON payload to a JAPI processor for parsing and
+1. the sending of a Function Input JAPI Payload from a consumer that is received
+   by the provider implementation through it's chosen IPC boundary,
+2. the passing of that JSON payload to a JAPI processor for deserialization and
    validation
-3. the passing of the deserialized data from the function input payload to API
-   implementation handlers to perform a function call,
+3. the passing of the deserialized data from the function input payload to
+   handlers implemented by the API provider to perform a function call,
 4. the returning of the result of that function call back to the JAPI processor
-   for validation and serialization into a JAPI Function Output JSON payload,
-5. the sending of the JAPI Function Output JSON payload from the provider
-   through the IPC boundary back the consumer
+   for validation and serialization into a Function Output JAPI payload
+5. the sending of that JSON payload from the provider to the consumer through
+   the IPC boundary
 
 HTTP Example:
 
@@ -369,57 +329,42 @@ import io.github.brenbar.japi.JapiProcessor;
 
 public class Main {
 
-    private static Map<String, Number> storedVariables = new HashMap<String, Number>();
-
     public static void main(String[] args) {
         var japiProcessor = new JapiProcessor(Main::handle);
         var app = Javalin.create().start(8080);
         app.get("/api/v1", ctx -> {
-            // 1. Receive a JAPI Function Input JSON payload sent from its API consumer from HTTP request.
+            // 1. Receive Function Input JAPI Payload from the consumer.
             String inputJson = ctx.body();
 
-            // 2. Pass the received JSON payload to a JAPI processor, which
-            //    will parse the JSON payload into data objects the API implementation
-            //    can use for function calls.
+            // 2. Pass the JAPI payload to a JAPI processor, which will parse
+            //    the JSON payload, validate the data against the JAPI
+            //    Description, and pass validated data provider defined handler.
             String outputJson = japiProcessor.process(inputJson);
 
-            // 5. Send JAPI Function Output JSON payload to consumer with HTTP response body.
+            // 5. Send Function Return JAPI payload to consumer.
             ctx.result(outputJson);
         });
     }
 
     private static Map<String, Object> handle(String functionName, Map<String, Object> headers, Map<String, Object> input) {
-        // 3. Use deserialized JAPI Function Input to start function call
+        // 3. Use deserialized and validated JAPI Function Input to perform
+        //    function call
         Map<String, Object> result = switch (functionName) {
             case "compute" -> {
-                var x = getValue(input.get("x"));
-                var y = getValue(input.get("y"));
-                var op = input.get("op");
-                var result = switch (op) {
-                    case "add" -> x + y
-                    case "sub" -> x - y
-                    case "mul" -> x * y
-                    case "div" ->
-                }
-                yield Map.of("result", input.get("x") + input.get("y"));
+                // TODO
+                yield Map.of("result", 0)
             }
-            default -> throw new RuntimeException("Function %s not found".formatted(functionName))
+            case "store" -> {
+                // TODO
+                yield Map.of();
+            }
+            default -> throw new RuntimeException();
         };
 
-        // 4. Return function result back the JapiProcessor for validation against the JAPI description,
-        //    and then serialization into a JAPI Function Output payload.
+        // 4. Return function result back the JapiProcessor for validation
+        //    against the JAPI description, and then serialization into a
+        //    JAPI Function Output Payload.
         return result;
-    }
-
-    private static double getValue(Map<String, Object> value) {
-        var entry = value.entrySet().iterator().next();
-        var format = entry.getKey();
-        var value = entry.getValue();
-        return switch (format) {
-            case "var" -> storedVariables.get(value).doubleValue();
-            case "num" -> value.doubleValue();
-            default -> throw new RuntimeException()
-        };
     }
 }
 ```
@@ -432,8 +377,22 @@ import websockets
 from japi import JapiProcessor
 
 def handler(function_name, headers, input):
-    if function_name == 'add':
+    # 3. Use deserialized and validated JAPI Function Input to perform
+    #    function call
+    result = {}
+    if function_name == 'compute':
+        # TODO
+        result = {
+            "result": 0
+        }
+    elif function_name == 'store':
+        # TODO
+        result = {}
 
+    # 4. Return function result back the JapiProcessor for validation
+    #    against the JAPI description, and then serialization into a
+    #    JAPI Function Output Payload.
+    return result
 
 
 japi_processor = JapiProcessor(handler)
@@ -443,10 +402,15 @@ async def setup(websocket, path):
         await websocket.send("invalid url")
         return
 
+    # 1. Receive Function Input JAPI Payload from the consumer.
     async for input_json in websocket:
 
+        # 2. Pass the JAPI payload to a JAPI processor, which will parse
+        #    the JSON payload, validate the data against the JAPI
+        #    Description, and pass validated data provider defined handler.
         output_json = japi_processor.process(input_json)
 
+        # 5. Send Function Return JAPI payload to consumer.
         await websocket.send(output_json)
 
 

@@ -1,11 +1,12 @@
 # Introduction
 
-JAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogrammer
+JAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogramming
 **I**nterface is an API expressed purely with JSON. Familiar API concepts, such
 as function calls and return values, are represented entirely with JSON
-payloads. Consequently, a JAPI can be served wherever JSON can be supplied,
-allowing it serve API needs across not only HTTP, but any inter-process
-communication boundary.
+payloads. Consequently, A JAPI can satisfy API needs across not only HTTP, but
+any inter-process communication boundary.
+
+Wherever JSON can go, a JAPI can be served 🚀
 
 HTTP client example (with `cURL`):
 
@@ -58,9 +59,8 @@ RESTful APIs are inherently HTTP APIs and cannot be used with any other
 networking transport (e.g. sockets, messaging). And unfortunately, HTTP concepts
 unnecessarily become intertwined with the API itself, which often leads to
 design inefficiencies where API design is stalled to answer HTTP-specific
-questions, such as designing the url (and whether it should have interpolated
-variables), supplying input via query parameter vs POST/PUT/PATCH body, or
-choosing the appropriate HTTP method or status code.
+questions, such as determining the right url structure, the right query
+parameters, the right HTTP method, the right HTTP status code, and many others.
 
 ## Why not gRPC?
 
@@ -69,12 +69,12 @@ RESTful APIs, cannot be used with other networking transports. Although in
 contrast to RESTful APIs, gRPC does properly decouple HTTP concepts from its API
 definitions, simplifying the API design story. gRPC also uses a more efficient
 serialization protocol than the typical RESTful API, but this protocol is used
-exclusively and is largely inaccessible to API consumers unless they fully adopt
-gRPC tooling client-side, which places an integration burden on consumers who
-are not familiar with gRPC. Consumers of gRPC APIs must use a gRPC library in a
-supported language, as well as build up tooling to generate their own client
-code if their API provider doesn't offer a client library in their programming
-language.
+exclusively and is largely inaccessible to API consumers. So in practice,
+consumers must fully adopt gRPC tooling client-side, which places an integration
+burden on consumers who are not familiar with gRPC. Consumers will be required
+to use a supported language of gRPC, and will likely need to build up tooling to
+generate their own client code if their API provider doesn't offer a readily
+accessible client library.
 
 ## Why jAPI?
 
@@ -100,8 +100,8 @@ But from there, consumers can also opt-in to several features including:
 - Type safety with client-side generated code
 - Swapping out of JSON for an efficient binary protocol to improve API speed
 - "Slicing" data returned from an API, where the consumer indicates data fields
-  that should be omitted by the API provider so as to further optimize network
-  performance through reduced serialization.
+  that should be omitted by the API provider so as to further optimize speed
+  through reduced serialization.
 
 Again, all of these features are opt-in client-side, provided to the consumer
 through server-side jAPI libraries, which makes these features automatic without
