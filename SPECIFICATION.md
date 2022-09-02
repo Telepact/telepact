@@ -310,8 +310,8 @@ route it to a proper handler in the API provider code.
 
 For JAPI providers offering functions for consumers to invoke, the JAPI provider
 implementation MUST set up a transport that allows for both receiving and
-sending JSON payloads to and from an API consumer. The full interaction will
-consist of the following:
+sending JSON payloads to and from an API consumer. The full interaction SHALL
+consist of the following steps:
 
 1. the sending of a Function Input JAPI Payload from a consumer that is received
    by the provider implementation through it's chosen IPC boundary,
