@@ -4,6 +4,7 @@ use std::{
 };
 
 use regex::Regex;
+use serde::__private::de;
 use serde_json::{from_reader, json, to_writer, Map, Value};
 
 pub trait Handler {
@@ -15,27 +16,27 @@ pub trait Handler {
     ) -> Result<Map<String, Value>, ApplicationError>;
 }
 
-struct FieldDeclaration {
-    t: TypeDeclaration,
+struct FieldDeclaration<'a> {
+    type_declaration: TypeDeclaration<'a>,
     optional: bool,
 }
 
-enum Type {
+enum Type<'a> {
     Boolean,
     Integer,
     Number,
     String,
     Array {
-        nested_type: Box<Type>,
+        nested_type: Box<Type<'a>>,
     },
     Object {
-        nested_type: Box<Type>,
+        nested_type: Box<Type<'a>>,
     },
     Struct {
-        fields: Map<String, FieldDeclaration>,
+        fields: HashMap<String, FieldDeclaration<'a>>,
     },
     Union {
-        formats: Map<String, FieldDeclaration>,
+        formats: HashMap<String, FieldDeclaration<'a>>,
     },
     Enum {
         allowed_values: Vec<String>,
@@ -43,21 +44,223 @@ enum Type {
     Any,
 }
 
-struct TypeDeclaration {
-    t: Type,
+struct TypeDeclaration<'a> {
+    t: &'a Type<'a>,
     nullable: bool,
+}
+
+enum Definition<'a> {
+    Function {
+        name: String,
+        input_fields: HashMap<String, FieldDeclaration<'a>>,
+        output_fields: HashMap<String, FieldDeclaration<'a>>,
+    },
+    Type {
+        name: String,
+        t: Type<'a>,
+    },
 }
 
 pub struct JapiDescriptionParseError {
     msg: String,
 }
 
-pub struct JapiDescription {
-    types: HashMap<String, Type>,
+pub struct JapiDescription<'a> {
+    types: HashMap<String, Type<'a>>,
+}
+
+fn split_japi_definition_name(
+    name: &String,
+) -> Result<(String, String), JapiDescriptionParseError> {
+    let def_re =
+        Regex::new(r"^(struct|union|enum|error|function|event).([a-zA-Z_]+[a-zA-Z0-9_]*)$")
+            .unwrap();
+    let def_re_captures = def_re.captures(name).unwrap();
+    let japi_keyword = def_re_captures
+        .get(1)
+        .ok_or(JapiDescriptionParseError {
+            msg: "Invalid definition".to_string(),
+        })?
+        .as_str();
+    let name = def_re_captures
+        .get(2)
+        .ok_or(JapiDescriptionParseError {
+            msg: "Invalid definition".to_string(),
+        })?
+        .as_str();
+
+    return Ok((japi_keyword.to_string(), name.to_string()));
+}
+
+fn parse_field<'a>(
+    description_root: &'a Map<String, Value>,
+    definitions: &'a mut HashMap<String, Definition<'a>>,
+    field_declaration: &'a String,
+    type_declaration_val: &'a Value,
+) -> Result<(String, FieldDeclaration<'a>), JapiDescriptionParseError> {
+    let type_declaration = type_declaration_val
+        .as_str()
+        .ok_or(JapiDescriptionParseError {
+            msg: "Type declarations should be strings".to_string(),
+        })?;
+
+    let type_def_re = Regex::new(r"^(.*)(\?)?$").unwrap();
+    let type_def_re_captures = type_def_re.captures(type_declaration).unwrap();
+
+    let type_name = type_def_re_captures
+        .get(1)
+        .ok_or(JapiDescriptionParseError {
+            msg: "Invalid function input type".to_string(),
+        })?
+        .as_str();
+
+    let nullable = type_def_re_captures.get(2).is_some();
+
+    let field_def_re = Regex::new(r"^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$").unwrap();
+    let field_def_re_captures = field_def_re.captures(field_declaration).unwrap();
+
+    let field_name = field_def_re_captures
+        .get(1)
+        .ok_or(JapiDescriptionParseError {
+            msg: "Invalid function input field".to_string(),
+        })?
+        .as_str();
+
+    let optional = field_def_re_captures.get(2).is_some();
+
+    if !definitions.contains_key(type_name) {
+        let nested_desc = description_root.get(type_name);
+        parse_def(description_root, definitions, &type_name.to_string())?;
+    }
+
+    let type_ = match definitions.get(type_name).unwrap() {
+        Definition::Function {
+            name,
+            input_fields,
+            output_fields,
+        } => todo!(),
+        Definition::Type { name, t } => t,
+    };
+
+    let type_declaration = TypeDeclaration {
+        t: type_,
+        nullable: nullable,
+    };
+
+    let field_declaration = FieldDeclaration {
+        type_declaration: type_declaration,
+        optional: optional,
+    };
+
+    return Ok((field_name.to_string(), field_declaration));
+}
+
+fn parse_def<'a>(
+    description_root: &'a Map<String, Value>,
+    definitions: &'a mut HashMap<String, Definition<'a>>,
+    def_ref: &'a String,
+) -> Result<(), JapiDescriptionParseError> {
+    let desc = description_root
+        .get(def_ref)
+        .ok_or(JapiDescriptionParseError {
+            msg: format!("Could not find definition for {}", def_ref),
+        })?;
+
+    let (japi_keyword, def_name) = split_japi_definition_name(def_ref)?;
+
+    let def = match &japi_keyword[..] {
+        "function" => {
+            let input_def = desc
+                .get("input.fields")
+                .ok_or(JapiDescriptionParseError {
+                    msg: "Function definition must have \"input.fields\" field".to_string(),
+                })?
+                .as_object()
+                .ok_or(JapiDescriptionParseError {
+                    msg: "Function definition must have \"input.fields\" field".to_string(),
+                })?;
+
+            let mut input_fields: HashMap<String, FieldDeclaration> = HashMap::new();
+            for (field_declaration, type_declaration_val) in input_def {
+                let (field_name, field_declaration) = parse_field(
+                    description_root,
+                    definitions,
+                    field_declaration,
+                    type_declaration_val,
+                )?;
+                input_fields.insert(field_name, field_declaration);
+            }
+
+            let output_def = desc
+                .get("output.fields")
+                .ok_or(JapiDescriptionParseError {
+                    msg: "Function definition must have \"output.fields\" field".to_string(),
+                })?
+                .as_object()
+                .ok_or(JapiDescriptionParseError {
+                    msg: "Function definition must have \"output.fields\" field".to_string(),
+                })?;
+
+            let mut output_fields: HashMap<String, FieldDeclaration> = HashMap::new();
+            for (field_declaration, type_declaration_val) in output_def {
+                let (field_name, field_declaration) = parse_field(
+                    description_root,
+                    definitions,
+                    field_declaration,
+                    type_declaration_val,
+                )?;
+                output_fields.insert(field_name, field_declaration);
+            }
+
+            Definition::Function {
+                name: def_name,
+                input_fields: input_fields,
+                output_fields: output_fields,
+            }
+        }
+        "struct" => {
+            let input_def = desc
+                .get("input.fields")
+                .ok_or(JapiDescriptionParseError {
+                    msg: "Function definition must have \"input.fields\" field".to_string(),
+                })?
+                .as_object()
+                .ok_or(JapiDescriptionParseError {
+                    msg: "Function definition must have \"input.fields\" field".to_string(),
+                })?;
+
+            let mut fields: HashMap<String, FieldDeclaration> = HashMap::new();
+            for (field_declaration, type_declaration_val) in input_def {
+                let (field_name, field_declaration) = parse_field(
+                    description_root,
+                    definitions,
+                    field_declaration,
+                    type_declaration_val,
+                )?;
+                fields.insert(field_name, field_declaration);
+            }
+
+            let type_ = Type::Struct { fields: fields };
+
+            Definition::Type { name: def_name, t: type_ }
+        }
+        _ => {
+            return Err(JapiDescriptionParseError {
+                msg: format!("Unrecognized japi keyword {}", japi_keyword),
+            });
+        }
+    };
+
+    definitions.insert(def_ref.to_string(), def);
+
+    return Ok(());
 }
 
 impl JapiDescription {
     pub fn new<R: Read>(japi_description_json: R) -> Result<(), crate::JapiDescriptionParseError> {
+        // Need to redo this method slightly.
+        // Need to be able to better keep track of
+
         let v: Value =
             from_reader(japi_description_json).map_err(|_| JapiDescriptionParseError {
                 msg: "Invalid JSON".to_string(),
@@ -68,6 +271,45 @@ impl JapiDescription {
         })?;
 
         let mut typeDefsInc: HashMap<String, &Value> = HashMap::new();
+        let mut functionDefsInc: HashMap<String, &Value> = HashMap::new();
+
+        let mut type_defs: HashMap<String, TypeDeclaration> = HashMap::new();
+
+        let parseDef = |def_name: &String,
+                        description_root: &Value|
+         -> Result<(), JapiDescriptionParseError> {
+            let def = description_root
+                .get(def_name)
+                .ok_or(JapiDescriptionParseError {
+                    msg: format!("Could not find definition for {}", def_name),
+                })?;
+
+            let (japi_keyword, type_name) = split_japi_definition_name(def_name)?;
+
+            match &japi_keyword[..] {
+                "function" => {
+                    let input_name = format!("{}.input", type_name);
+                    let input_def = def.get("input.fields").ok_or(JapiDescriptionParseError {
+                        msg: "Function definition must have \"input.fields\" field".to_string(),
+                    })?;
+                    typeDefsInc.insert(input_name, input_def);
+
+                    let output_name = format!("{}.output", type_name);
+                    let output_def = def.get("output.fields").ok_or(JapiDescriptionParseError {
+                        msg: "Function definition must have \"output.fields\" field".to_string(),
+                    })?;
+                    typeDefsInc.insert(output_name, output_def);
+
+                    let error_opt = def.get("output.fields");
+                    match error_opt {
+                        Some(error_def) => todo!(),
+                        None => todo!(),
+                    }
+                }
+            }
+
+            return Ok(());
+        };
 
         for (k, v) in root.iter() {
             let def_re = Regex::new(r"^([a-zA-Z0-9]+).([a-zA-Z_]+[a-zA-Z0-9_]*)$").unwrap();
@@ -84,22 +326,32 @@ impl JapiDescription {
                     msg: "".to_string(),
                 })?
                 .as_str();
-            let def = v.as_object().ok_or(JapiDescriptionParseError { msg: "All values in the JSON document root object must be objects".to_string() })?;
+            let def = v.as_object().ok_or(JapiDescriptionParseError {
+                msg: "All values in the JSON document root object must be objects".to_string(),
+            })?;
 
             match japi_keyword {
                 "function" => {
-
                     let input_name = format!("{}.input", type_name);
-                    let input_def = def.g
+                    let input_def = def.get("input.fields").ok_or(JapiDescriptionParseError {
+                        msg: "Function definition must have \"input.fields\" field".to_string(),
+                    })?;
+                    typeDefsInc.insert(input_name, input_def);
 
-                    typeDefsInc.insert(input_name, v);
+                    let output_name = format!("{}.output", type_name);
+                    let output_def = def.get("output.fields").ok_or(JapiDescriptionParseError {
+                        msg: "Function definition must have \"output.fields\" field".to_string(),
+                    })?;
+                    typeDefsInc.insert(output_name, output_def);
+
+                    let error_opt = def.get("output.fields");
+                    match error_opt {
+                        Some(error_def) => todo!(),
+                        None => todo!(),
+                    }
                 }
-                "struct" | "union" | "enum" | "error" => {
-                    
-                }
-                _ => {
-                    
-                }
+                "struct" | "union" | "enum" | "error" => {}
+                _ => {}
             }
         }
 
@@ -240,6 +492,7 @@ mod tests {
     fn check_cases() -> Result<(), Error> {
         let mut processor = JapiProcessor {
             handler: MyHandler {},
+            api_description: todo!(),
         };
 
         let cases_file = File::open("../../test/cases.txt").map_err(|_| Error {})?;
@@ -291,6 +544,7 @@ mod tests {
     fn it_works() {
         let mut processor = JapiProcessor {
             handler: MyHandler {},
+            api_description: todo!(),
         };
 
         let input_json = r#"["function.add",{},{"x":2,"y":3}]"#.as_bytes();
