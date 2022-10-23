@@ -93,7 +93,7 @@ fn parse_type<'a>(
     description_root: &'a Map<String, Value>,
     definitions: &'a mut HashMap<String, Definition<'a>>,
     type_declaration: &'a String,
-) -> Result<(String, TypeDeclaration<'a>), JapiDescriptionParseError> {
+) -> Result<TypeDeclaration<'a>, JapiDescriptionParseError> {
     let type_def_re = Regex::new(r"^((boolean|integer|number|string)|((array|object)(<(.*)>)?)|((enum|struct|union)\.([a-zA-Z_]+[a-zA-Z0-9_])*))(\?)?$").unwrap();
     let type_def_re_captures = type_def_re.captures(type_declaration).unwrap();
 
@@ -107,13 +107,10 @@ fn parse_type<'a>(
             "number" => Type::Number,
             "string" => Type::String,
         };
-        (
-            name.to_string(),
-            TypeDeclaration {
-                t: &type_,
-                nullable: is_nullable,
-            },
-        )
+        TypeDeclaration {
+            t: &type_,
+            nullable: is_nullable,
+        }
     });
 
     if standard_basic_type.is_some() {
@@ -130,16 +127,13 @@ fn parse_type<'a>(
             })
             .transpose()
             .map(|specified_type| {
-                let default_nested_type_if_not_specified = (
-                    "any".to_string(),
-                    TypeDeclaration {
-                        t: &Type::Any,
-                        nullable: false,
-                    },
-                );
+                let default_nested_type_if_not_specified = TypeDeclaration {
+                    t: &Type::Any,
+                    nullable: false,
+                };
                 specified_type.unwrap_or(default_nested_type_if_not_specified)
             })
-            .map(|(nested_type_name, nested_type_declaration)| {
+            .map(|nested_type_declaration| {
                 let type_ = match name {
                     "array" => Type::Array {
                         nested_type: nested_type_declaration,
@@ -148,13 +142,11 @@ fn parse_type<'a>(
                         nested_type: nested_type_declaration,
                     },
                 };
-                (
-                    name.to_string(),
-                    TypeDeclaration {
-                        t: &type_,
-                        nullable: is_nullable,
-                    },
-                )
+
+                TypeDeclaration {
+                    t: &type_,
+                    nullable: is_nullable,
+                }
             })
     });
 
@@ -163,32 +155,30 @@ fn parse_type<'a>(
     }
 
     let custom_type = type_def_re_captures.get(9).map(|capture| {
-        let name = capture.as_str().to_string();
-        if !definitions.contains_key(&name) {
-            parse_def(description_root, definitions, &name);
+        let _name = capture.as_str().to_string();
+        if !definitions.contains_key(&_name) {
+            parse_def(description_root, definitions, &_name);
         }
 
-        let def = definitions.get(&name).unwrap();
-        let _type = match def {
+        let def = definitions.get(&_name).unwrap();
+        match def {
             Definition::Function {
                 name,
                 input_fields,
                 output_fields,
             } => todo!(),
-            Definition::Type { name, t } => t,
-        };
-
-        (
-            name,
-            TypeDeclaration {
-                t: _type,
+            Definition::Type { name, t } => Ok(TypeDeclaration {
+                t: t,
                 nullable: is_nullable,
-            },
-        )
+            }),
+            _ => Err(JapiDescriptionParseError {
+                msg: "Could not find custom type reference".to_string(),
+            }),
+        }
     });
 
     if custom_type.is_some() {
-        return Ok(custom_type.unwrap());
+        return Ok(custom_type.unwrap()?);
     }
 
     return Err(JapiDescriptionParseError {
@@ -203,25 +193,6 @@ fn parse_field<'a>(
     type_declaration_val: &'a Value,
     is_for_union: bool,
 ) -> Result<(String, FieldDeclaration<'a>), JapiDescriptionParseError> {
-    let type_declaration = type_declaration_val
-        .as_str()
-        .ok_or(JapiDescriptionParseError {
-            msg: "Type declarations should be strings".to_string(),
-        })?;
-
-    // TODO: Need to parse generics out of this type definition
-    let type_def_re = Regex::new(r"^(.*)(\?)?$").unwrap();
-    let type_def_re_captures = type_def_re.captures(type_declaration).unwrap();
-
-    let type_name = type_def_re_captures
-        .get(1)
-        .ok_or(JapiDescriptionParseError {
-            msg: "Invalid function input type".to_string(),
-        })?
-        .as_str();
-
-    let nullable = type_def_re_captures.get(2).is_some();
-
     let field_def_re = Regex::new(r"^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$").unwrap();
     let field_def_re_captures = field_def_re.captures(field_declaration).unwrap();
 
@@ -240,24 +211,17 @@ fn parse_field<'a>(
         });
     }
 
-    if !definitions.contains_key(type_name) {
-        let nested_desc = description_root.get(type_name);
-        parse_def(description_root, definitions, &type_name.to_string())?;
-    }
+    let type_declaration_str = type_declaration_val
+        .as_str()
+        .ok_or(JapiDescriptionParseError {
+            msg: "Type declarations should be strings".to_string(),
+        })?;
 
-    let type_ = match definitions.get(type_name).unwrap() {
-        Definition::Function {
-            name,
-            input_fields,
-            output_fields,
-        } => todo!(),
-        Definition::Type { name, t } => t,
-    };
-
-    let type_declaration = TypeDeclaration {
-        t: type_,
-        nullable: nullable,
-    };
+    let type_declaration = parse_type(
+        description_root,
+        definitions,
+        &type_declaration_str.to_string(),
+    )?;
 
     let field_declaration = FieldDeclaration {
         type_declaration: type_declaration,
