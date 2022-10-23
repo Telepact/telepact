@@ -1,6 +1,7 @@
 use std::{
     collections::HashMap,
     io::{BufReader, Read, Seek, Write},
+    marker::PhantomData,
 };
 
 use regex::Regex;
@@ -17,28 +18,28 @@ pub trait Handler {
 }
 
 #[derive(Debug)]
-struct FieldDeclaration<'a> {
-    type_declaration: TypeDeclaration<'a>,
+struct FieldDeclaration<'a, 'b: 'a> {
+    type_declaration: TypeDeclaration<'a, 'b>,
     optional: bool,
 }
 
 #[derive(Debug)]
-enum Type<'a> {
+enum Type<'a, 'b: 'a> {
     Boolean,
     Integer,
     Number,
     String,
     Array {
-        nested_type: TypeDeclaration<'a>,
+        nested_type: TypeDeclaration<'a, 'b>,
     },
     Object {
-        nested_type: TypeDeclaration<'a>,
+        nested_type: TypeDeclaration<'a, 'b>,
     },
     Struct {
-        fields: HashMap<String, FieldDeclaration<'a>>,
+        fields: HashMap<String, FieldDeclaration<'a, 'b>>,
     },
     Union {
-        cases: HashMap<String, FieldDeclaration<'a>>,
+        cases: HashMap<String, FieldDeclaration<'a, 'b>>,
     },
     Enum {
         allowed_values: Vec<String>,
@@ -47,31 +48,33 @@ enum Type<'a> {
 }
 
 #[derive(Debug)]
-struct TypeDeclaration<'a> {
-    t: &'a Type<'a>,
+struct TypeDeclaration<'a, 'b: 'a> {
+    t: &'a Type<'a, 'b>,
     nullable: bool,
+    _phantom: PhantomData<&'b ()>,
 }
 
 #[derive(Debug)]
-pub enum Definition<'a> {
+pub enum Definition<'a, 'b: 'a> {
     Function {
         name: String,
-        input_fields: HashMap<String, FieldDeclaration<'a>>,
-        output_fields: HashMap<String, FieldDeclaration<'a>>,
+        input_fields: HashMap<String, FieldDeclaration<'a, 'b>>,
+        output_fields: HashMap<String, FieldDeclaration<'a, 'b>>,
     },
     Type {
         name: String,
-        t: Type<'a>,
+        t: Type<'a, 'b>,
     },
 }
 
-pub struct JapiDescriptionParseError {
+pub struct JapiDescriptionParseError<'c> {
     msg: String,
+    _marker: PhantomData<&'c ()>,
 }
 
-fn split_japi_definition_name(
-    name: &String,
-) -> Result<(String, String), JapiDescriptionParseError> {
+fn split_japi_definition_name<'a, 'c: 'a>(
+    name: &'a String,
+) -> Result<(String, String), JapiDescriptionParseError<'c>> {
     let def_re =
         Regex::new(r"^(struct|union|enum|error|function|event).([a-zA-Z_]+[a-zA-Z0-9_]*)$")
             .unwrap();
@@ -80,23 +83,25 @@ fn split_japi_definition_name(
         .get(1)
         .ok_or(JapiDescriptionParseError {
             msg: "Invalid definition".to_string(),
+            _marker: PhantomData,
         })?
         .as_str();
     let name = def_re_captures
         .get(2)
         .ok_or(JapiDescriptionParseError {
             msg: "Invalid definition".to_string(),
+            _marker: PhantomData,
         })?
         .as_str();
 
     return Ok((japi_keyword.to_string(), name.to_string()));
 }
 
-fn parse_type<'a>(
+fn parse_type<'a, 'b: 'a, 'c: 'a>(
     description_root: &'a Map<String, Value>,
-    definitions: &'a mut HashMap<String, Definition<'a>>,
+    definitions: &'a mut HashMap<String, Definition<'a, 'b>>,
     type_declaration: &'a String,
-) -> Result<TypeDeclaration<'a>, JapiDescriptionParseError> {
+) -> Result<TypeDeclaration<'a, 'b>, JapiDescriptionParseError<'c>> {
     let type_def_re = Regex::new(r"^((boolean|integer|number|string)|((array|object)(<(.*)>)?)|((enum|struct|union)\.([a-zA-Z_]+[a-zA-Z0-9_])*))(\?)?$").unwrap();
     let type_def_re_captures = type_def_re.captures(type_declaration).unwrap();
 
@@ -109,11 +114,12 @@ fn parse_type<'a>(
             "integer" => Type::Integer,
             "number" => Type::Number,
             "string" => Type::String,
-            _ => panic!()
+            _ => panic!(),
         };
         TypeDeclaration {
             t: &type_,
             nullable: is_nullable,
+            _phantom: PhantomData,
         }
     });
 
@@ -134,6 +140,7 @@ fn parse_type<'a>(
                 let default_nested_type_if_not_specified = TypeDeclaration {
                     t: &Type::Any,
                     nullable: false,
+                    _phantom: PhantomData,
                 };
                 specified_type.unwrap_or(default_nested_type_if_not_specified)
             })
@@ -150,6 +157,7 @@ fn parse_type<'a>(
                 TypeDeclaration {
                     t: &type_,
                     nullable: is_nullable,
+                    _phantom: PhantomData,
                 }
             })
     });
@@ -174,9 +182,11 @@ fn parse_type<'a>(
             Definition::Type { name, t } => Ok(TypeDeclaration {
                 t: t,
                 nullable: is_nullable,
+                _phantom: PhantomData,
             }),
             _ => Err(JapiDescriptionParseError {
                 msg: "Could not find custom type reference".to_string(),
+                _marker: PhantomData,
             }),
         }
     });
@@ -187,16 +197,17 @@ fn parse_type<'a>(
 
     return Err(JapiDescriptionParseError {
         msg: "Invalid type".to_string(),
+        _marker: PhantomData,
     });
 }
 
-fn parse_field<'a>(
+fn parse_field<'a, 'b, 'c: 'a>(
     description_root: &'a Map<String, Value>,
-    definitions: &'a mut HashMap<String, Definition<'a>>,
+    definitions: &'a mut HashMap<String, Definition<'a, 'b>>,
     field_declaration: &'a String,
     type_declaration_val: &'a Value,
     is_for_union: bool,
-) -> Result<(String, FieldDeclaration<'a>), JapiDescriptionParseError> {
+) -> Result<(String, FieldDeclaration<'a, 'b>), JapiDescriptionParseError<'c>> {
     let field_def_re = Regex::new(r"^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$").unwrap();
     let field_def_re_captures = field_def_re.captures(field_declaration).unwrap();
 
@@ -204,6 +215,7 @@ fn parse_field<'a>(
         .get(1)
         .ok_or(JapiDescriptionParseError {
             msg: "Invalid function input field".to_string(),
+            _marker: PhantomData,
         })?
         .as_str();
 
@@ -212,6 +224,7 @@ fn parse_field<'a>(
     if (optional && is_for_union) {
         return Err(JapiDescriptionParseError {
             msg: "Union keys cannot be marked as optional".to_string(),
+            _marker: PhantomData,
         });
     }
 
@@ -219,6 +232,7 @@ fn parse_field<'a>(
         .as_str()
         .ok_or(JapiDescriptionParseError {
             msg: "Type declarations should be strings".to_string(),
+            _marker: PhantomData,
         })?;
 
     let type_declaration = parse_type(
@@ -235,15 +249,16 @@ fn parse_field<'a>(
     return Ok((field_name.to_string(), field_declaration));
 }
 
-fn parse_def<'a>(
+fn parse_def<'a, 'b: 'a, 'c: 'a>(
     description_root: &'a Map<String, Value>,
-    definitions: &'a mut HashMap<String, Definition<'a>>,
+    definitions: &'b mut HashMap<String, Definition<'a, 'b>>,
     def_ref: &'a String,
-) -> Result<(), JapiDescriptionParseError> {
+) -> Result<(), JapiDescriptionParseError<'c>> {
     let desc = description_root
         .get(def_ref)
         .ok_or(JapiDescriptionParseError {
             msg: format!("Could not find definition for {}", def_ref),
+            _marker: PhantomData,
         })?;
 
     let (japi_keyword, def_name) = split_japi_definition_name(def_ref)?;
@@ -254,11 +269,13 @@ fn parse_def<'a>(
                 .get("input.fields")
                 .ok_or(JapiDescriptionParseError {
                     msg: "Function definition must have \"input.fields\" key".to_string(),
+                    _marker: PhantomData,
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
                     msg: "Function definition \"input.fields\" key must point to an object"
                         .to_string(),
+                    _marker: PhantomData,
                 })?;
 
             let mut input_fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -277,11 +294,13 @@ fn parse_def<'a>(
                 .get("output.fields")
                 .ok_or(JapiDescriptionParseError {
                     msg: "Function definition must have \"output.fields\" key".to_string(),
+                    _marker: PhantomData,
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
                     msg: "Function definition \"output.fields\" key must point to an object"
                         .to_string(),
+                    _marker: PhantomData,
                 })?;
 
             let mut output_fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -307,10 +326,12 @@ fn parse_def<'a>(
                 .get("fields")
                 .ok_or(JapiDescriptionParseError {
                     msg: "struct definition must have \"fields\" key".to_string(),
+                    _marker: PhantomData,
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
                     msg: "struct definition \"fields\" key must point to an object".to_string(),
+                    _marker: PhantomData,
                 })?;
 
             let mut fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -337,10 +358,12 @@ fn parse_def<'a>(
                 .get("cases")
                 .ok_or(JapiDescriptionParseError {
                     msg: "union definition must have \"cases\" key".to_string(),
+                    _marker: PhantomData,
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
                     msg: "union definition \"cases\" key must point to an object".to_string(),
+                    _marker: PhantomData,
                 })?;
 
             let mut fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -367,10 +390,12 @@ fn parse_def<'a>(
                 .get("values")
                 .ok_or(JapiDescriptionParseError {
                     msg: "enum definition must have \"values\" key".to_string(),
+                    _marker: PhantomData,
                 })?
                 .as_array()
                 .ok_or(JapiDescriptionParseError {
                     msg: "enum definition \"values\" key must point to an array".to_string(),
+                    _marker: PhantomData,
                 })?;
 
             let mut values: Vec<String> = Vec::new();
@@ -378,6 +403,7 @@ fn parse_def<'a>(
                 let value = value_val.as_str().ok_or(JapiDescriptionParseError {
                     msg: "enum definition \"values\" key must point to an array of strings"
                         .to_string(),
+                    _marker: PhantomData,
                 })?;
 
                 values.push(value.to_string());
@@ -395,6 +421,7 @@ fn parse_def<'a>(
         _ => {
             return Err(JapiDescriptionParseError {
                 msg: format!("Unrecognized japi keyword {}", japi_keyword),
+                _marker: PhantomData,
             });
         }
     };
@@ -404,41 +431,42 @@ fn parse_def<'a>(
     return Ok(());
 }
 
-pub fn new_japi_description<R: Read>(
-    japi_description_json: R,
-) -> Result<HashMap<String, Definition<'static>>, crate::JapiDescriptionParseError> {
+pub fn new_japi_description<'a, 'b: 'a, 'c: 'a, R: Read>(
+    definitions: &'a mut HashMap<String, Definition<'a, 'b>>,
+    japi_description_json: &'a mut R,
+) -> Result<(), crate::JapiDescriptionParseError<'c>> {
     // Need to redo this method slightly.
     // Need to be able to better keep track of
 
     let v: Value = from_reader(japi_description_json).map_err(|_| JapiDescriptionParseError {
         msg: "Invalid JSON".to_string(),
+        _marker: PhantomData,
     })?;
 
     let root = v.as_object().ok_or(JapiDescriptionParseError {
         msg: "JSON document root must be an object".to_string(),
+        _marker: PhantomData,
     })?;
-
-    let definitions: HashMap<String, Definition> = HashMap::new();
 
     for (def_ref, value) in root {
         if !definitions.contains_key(def_ref) {
-            parse_def(root, &mut definitions, def_ref);
+            parse_def(root, definitions, def_ref);
         }
     }
 
-    return Ok(definitions);
+    return Ok(());
 }
 
-pub struct JapiProcessor<'a, H: Handler> {
+pub struct JapiProcessor<'a, 'b: 'a, H: Handler> {
     handler: H,
-    api_description: HashMap<String, Definition<'a>>,
+    api_description: HashMap<String, Definition<'a, 'b>>,
 }
 
 pub struct Error {}
 
 pub struct ApplicationError {}
 
-impl<H: Handler> JapiProcessor<'_, H> {
+impl<'a, 'b: 'a, H: Handler> JapiProcessor<'a, 'b, H> {
     pub fn process<R: Read + Seek, W: Write>(
         &mut self,
         function_input_json: &mut R,
@@ -502,7 +530,8 @@ mod tests {
 
     use std::{
         fs::File,
-        io::{BufRead, Cursor}, sync::Arc,
+        io::{BufRead, Cursor},
+        sync::Arc,
     };
 
     use serde_json::{from_str, json};
@@ -647,10 +676,10 @@ mod tests {
             }
         }
         "#;
-        let res = new_japi_description(json.as_bytes());
+        let definitions: HashMap<String, Definition> = HashMap::new();
+        let res = new_japi_description(&mut definitions, &mut json.as_bytes());
         res.map(|desc| {
             println!("{:?}", desc);
         });
     }
 }
-
