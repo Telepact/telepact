@@ -1,4 +1,3 @@
-use core::num::dec2flt::parse;
 use std::{
     collections::HashMap,
     io::{BufReader, Read, Seek, Write},
@@ -17,11 +16,13 @@ pub trait Handler {
     ) -> Result<Map<String, Value>, ApplicationError>;
 }
 
+#[derive(Debug)]
 struct FieldDeclaration<'a> {
     type_declaration: TypeDeclaration<'a>,
     optional: bool,
 }
 
+#[derive(Debug)]
 enum Type<'a> {
     Boolean,
     Integer,
@@ -45,12 +46,14 @@ enum Type<'a> {
     Any,
 }
 
+#[derive(Debug)]
 struct TypeDeclaration<'a> {
     t: &'a Type<'a>,
     nullable: bool,
 }
 
-enum Definition<'a> {
+#[derive(Debug)]
+pub enum Definition<'a> {
     Function {
         name: String,
         input_fields: HashMap<String, FieldDeclaration<'a>>,
@@ -106,6 +109,7 @@ fn parse_type<'a>(
             "integer" => Type::Integer,
             "number" => Type::Number,
             "string" => Type::String,
+            _ => panic!()
         };
         TypeDeclaration {
             t: &type_,
@@ -400,7 +404,7 @@ fn parse_def<'a>(
     return Ok(());
 }
 
-pub fn newJapiDescription<R: Read>(
+pub fn new_japi_description<R: Read>(
     japi_description_json: R,
 ) -> Result<HashMap<String, Definition<'static>>, crate::JapiDescriptionParseError> {
     // Need to redo this method slightly.
@@ -425,16 +429,16 @@ pub fn newJapiDescription<R: Read>(
     return Ok(definitions);
 }
 
-pub struct JapiProcessor<H: Handler, A: Read> {
+pub struct JapiProcessor<'a, H: Handler> {
     handler: H,
-    api_description: A,
+    api_description: HashMap<String, Definition<'a>>,
 }
 
 pub struct Error {}
 
 pub struct ApplicationError {}
 
-impl<H: Handler, A: Read> JapiProcessor<H, A> {
+impl<H: Handler> JapiProcessor<'_, H> {
     pub fn process<R: Read + Seek, W: Write>(
         &mut self,
         function_input_json: &mut R,
@@ -498,7 +502,7 @@ mod tests {
 
     use std::{
         fs::File,
-        io::{BufRead, Cursor},
+        io::{BufRead, Cursor}, sync::Arc,
     };
 
     use serde_json::{from_str, json};
@@ -626,4 +630,27 @@ mod tests {
             output_json
         );
     }
+
+    #[test]
+    fn desc_loads() {
+        let ref json = r#"
+        {
+            "struct.Value": {
+                "fields": {
+                    "a": "integer
+                }
+            },
+            "function.add" : {
+                "input.fields": {
+                    "valueA": "struct.Value"
+                }
+            }
+        }
+        "#;
+        let res = new_japi_description(json.as_bytes());
+        res.map(|desc| {
+            println!("{:?}", desc);
+        });
+    }
 }
+
