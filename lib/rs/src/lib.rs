@@ -442,7 +442,7 @@ pub struct InvalidRequest {}
 
 impl<H: Handler> JapiProcessor<H> {
     pub fn process<R: Read + Seek, W: Write>(
-        &mut self,
+        &self,
         function_input_json: &mut R,
         function_output_json: &mut W,
     ) -> Result<(), crate::Error> {
@@ -469,25 +469,28 @@ impl<H: Handler> JapiProcessor<H> {
             .as_object()
             .ok_or(Error {})?;
 
-        // TODO: validate against spec
         let function_def = self
             .api_description
             .get(&format!("function.{}", function_name))
-            .ok_or(Error {  })?;
-        let input_def = match function_def {
+            .ok_or(Error {})?; // TODO: Can't just propagate error like this, need to JSON serialize it
+        let (input_def, output_def) = match function_def {
             Definition::Function {
                 name,
                 input_fields,
                 output_fields,
-            } => input_fields,
+            } => (input_fields, output_fields),
             _ => panic!(),
         };
+
+        self.validate_struct(input_def, input)?;
 
         let result = self.handler.handle(function_name, headers, input);
 
         match result {
             Ok(output) => {
-                // TODO: validate against spec
+                // TODO: Can't just propagate error like this, need to JSON serialize it
+                self.validate_struct(output_def, &output)?;
+
                 let msg_type = Value::String(format!("function.{}.output", function_name));
                 let headers = Value::Object(Map::new());
                 let body = Value::Object(output);
@@ -508,6 +511,15 @@ impl<H: Handler> JapiProcessor<H> {
         }
 
         Ok(())
+    }
+
+    fn validate_struct(
+        &self,
+        ref_struct: &HashMap<String, FieldDeclaration>,
+        actual_struct: &Map<String, Value>,
+    ) -> Result<(), crate::Error> {
+        // TODO: validate struct
+        return Ok(());
     }
 }
 
