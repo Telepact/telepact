@@ -473,7 +473,7 @@ impl<H: Handler> JapiProcessor<H> {
         let function_def = self
             .api_description
             .get(&format!("function.{}", function_name))
-            .ok_or(InvalidRequest {})?;
+            .ok_or(Error {  })?;
         let input_def = match function_def {
             Definition::Function {
                 name,
