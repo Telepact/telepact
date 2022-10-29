@@ -440,51 +440,28 @@ pub struct ApplicationError {}
 
 pub struct InvalidRequest {}
 
+type Output = Map<String, Value>;
+
+pub enum ProcessError {
+    Unknown,
+    InvalidJson,
+    JapiMessageNotArray,
+    JapiMessageArrayTooFewElements,
+    JapiMessageTypeNotString,
+    JapiMessageHeaderNotObject,
+    JapiMessageBodyNotObject,
+    FunctionInputMissingFields(Vec<String>),
+    ApplicationError(ApplicationError)
+}
+
 impl<H: Handler> JapiProcessor<H> {
     pub fn process<R: Read + Seek, W: Write>(
         &self,
         function_input_json: &mut R,
         function_output_json: &mut W,
     ) -> Result<(), crate::Error> {
-        let function_input: Value = from_reader(function_input_json).map_err(|e| Error {})?;
+        let result = self._process(function_input_json);
 
-        let payload_type = function_input
-            .get(0)
-            .ok_or(Error {})?
-            .as_str()
-            .ok_or(Error {})?;
-        let function_name_re = Regex::new(r"^function\.([a-z][a-zA-Z0-9_]*)(.input)?").unwrap();
-        let function_name_re_captures = function_name_re.captures(payload_type).unwrap();
-        let function_name = function_name_re_captures.get(1).ok_or(Error {})?.as_str();
-
-        let headers = function_input
-            .get(1)
-            .ok_or(Error {})?
-            .as_object()
-            .ok_or(Error {})?;
-
-        let input = function_input
-            .get(2)
-            .ok_or(Error {})?
-            .as_object()
-            .ok_or(Error {})?;
-
-        let function_def = self
-            .api_description
-            .get(&format!("function.{}", function_name))
-            .ok_or(Error {})?; // TODO: Can't just propagate error like this, need to JSON serialize it
-        let (input_def, output_def) = match function_def {
-            Definition::Function {
-                name,
-                input_fields,
-                output_fields,
-            } => (input_fields, output_fields),
-            _ => panic!(),
-        };
-
-        self.validate_struct(input_def, input)?;
-
-        let result = self.handler.handle(function_name, headers, input);
 
         match result {
             Ok(output) => {
@@ -513,12 +490,76 @@ impl<H: Handler> JapiProcessor<H> {
         Ok(())
     }
 
+    fn _process<R: Read + Seek>(&self, function_input_json: &mut R) -> Result<Output, ProcessError> {
+        let function_input: Value = from_reader(function_input_json).map_err(|e| ProcessError::InvalidJson)?;
+
+        let payload_type = function_input
+            .as_array()
+            .ok_or(ProcessError::JapiMessageNotArray)?
+            .get(0)
+            .ok_or(ProcessError::JapiMessageArrayTooFewElements)?
+            .as_str()
+            .ok_or(ProcessError::JapiMessageTypeNotString)?;
+        let function_name_re = Regex::new(r"^function\.([a-z][a-zA-Z0-9_]*)(.input)?").unwrap();
+        let function_name_re_captures = function_name_re.captures(payload_type).unwrap();
+        let function_name = function_name_re_captures.get(1).ok_or(Error {})?.as_str();
+
+        let headers = function_input
+            .as_array()
+            .ok_or(ProcessError::JapiMessageNotArray)?
+            .get(1)
+            .ok_or(ProcessError::JapiMessageArrayTooFewElements)?
+            .as_object()
+            .ok_or(ProcessError::JapiMessageHeaderNotObject)?;
+
+        let input = function_input
+        .as_array()
+        .ok_or(ProcessError::JapiMessageNotArray)?
+            .get(2)
+            .ok_or(ProcessError::JapiMessageArrayTooFewElements)?
+            .as_object()
+            .ok_or(ProcessError::JapiMessageBodyNotObject)?;
+
+        let function_def = self
+            .api_description
+            .get(&format!("function.{}", function_name))
+            .ok_or(ProcessError::Unknown)?;
+        let (input_def, output_def) = match function_def {
+            Definition::Function {
+                name,
+                input_fields,
+                output_fields,
+            } => (input_fields, output_fields),
+            _ => panic!(),
+        };
+
+        self.validate_struct(input_def, input)?;
+
+        let result = self.handler.handle(function_name, headers, input);
+
+        return match result {
+            Ok(o) => Ok(o),
+            Err(a) => Err(ProcessError::ApplicationError(a)),
+        }
+
+    }
+
     fn validate_struct(
         &self,
         ref_struct: &HashMap<String, FieldDeclaration>,
         actual_struct: &Map<String, Value>,
-    ) -> Result<(), crate::Error> {
+    ) -> Result<(), ProcessError> {
         // TODO: validate struct
+        let mut missing_fields: Vec<String> = Vec::new();
+        for (name, field_declaration) in ref_struct {
+            if !actual_struct.contains_key(name) {
+                missing_fields.push(name.to_string());
+            }
+        }
+
+        if !missing_fields.is_empty() {
+            return Err(Error {})
+        }
         return Ok(());
     }
 }
@@ -544,7 +585,7 @@ mod tests {
             function_name: &str,
             headers: &Map<String, Value>,
             input: &Map<String, Value>,
-        ) -> Result<Map<String, Value>, ApplicationError> {
+        ) -> Result<Output, ApplicationError> {
             return match function_name {
                 "add" => {
                     let x = input
