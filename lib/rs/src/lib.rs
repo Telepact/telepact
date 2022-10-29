@@ -441,6 +441,7 @@ pub struct ApplicationError {}
 pub struct InvalidRequest {}
 
 type Output = Map<String, Value>;
+type FunctionName = String;
 
 pub enum ProcessError {
     Unknown,
@@ -451,7 +452,7 @@ pub enum ProcessError {
     JapiMessageHeaderNotObject,
     JapiMessageBodyNotObject,
     FunctionInputMissingFields(Vec<String>),
-    ApplicationError(ApplicationError)
+    ApplicationError(ApplicationError),
 }
 
 impl<H: Handler> JapiProcessor<H> {
@@ -462,12 +463,8 @@ impl<H: Handler> JapiProcessor<H> {
     ) -> Result<(), crate::Error> {
         let result = self._process(function_input_json);
 
-
         match result {
-            Ok(output) => {
-                // TODO: Can't just propagate error like this, need to JSON serialize it
-                self.validate_struct(output_def, &output)?;
-
+            Ok((function_name, output)) => {
                 let msg_type = Value::String(format!("function.{}.output", function_name));
                 let headers = Value::Object(Map::new());
                 let body = Value::Object(output);
@@ -490,8 +487,12 @@ impl<H: Handler> JapiProcessor<H> {
         Ok(())
     }
 
-    fn _process<R: Read + Seek>(&self, function_input_json: &mut R) -> Result<Output, ProcessError> {
-        let function_input: Value = from_reader(function_input_json).map_err(|e| ProcessError::InvalidJson)?;
+    fn _process<R: Read + Seek>(
+        &self,
+        function_input_json: &mut R,
+    ) -> Result<(FunctionName, Output), ProcessError> {
+        let function_input: Value =
+            from_reader(function_input_json).map_err(|e| ProcessError::InvalidJson)?;
 
         let payload_type = function_input
             .as_array()
@@ -502,7 +503,10 @@ impl<H: Handler> JapiProcessor<H> {
             .ok_or(ProcessError::JapiMessageTypeNotString)?;
         let function_name_re = Regex::new(r"^function\.([a-z][a-zA-Z0-9_]*)(.input)?").unwrap();
         let function_name_re_captures = function_name_re.captures(payload_type).unwrap();
-        let function_name = function_name_re_captures.get(1).ok_or(Error {})?.as_str();
+        let function_name = function_name_re_captures
+            .get(1)
+            .ok_or(ProcessError::Unknown {})?
+            .as_str();
 
         let headers = function_input
             .as_array()
@@ -513,8 +517,8 @@ impl<H: Handler> JapiProcessor<H> {
             .ok_or(ProcessError::JapiMessageHeaderNotObject)?;
 
         let input = function_input
-        .as_array()
-        .ok_or(ProcessError::JapiMessageNotArray)?
+            .as_array()
+            .ok_or(ProcessError::JapiMessageNotArray)?
             .get(2)
             .ok_or(ProcessError::JapiMessageArrayTooFewElements)?
             .as_object()
@@ -538,10 +542,12 @@ impl<H: Handler> JapiProcessor<H> {
         let result = self.handler.handle(function_name, headers, input);
 
         return match result {
-            Ok(o) => Ok(o),
+            Ok(o) => {
+                self.validate_struct(output_def, &o)?;
+                Ok((function_name.to_string(), o))
+            }
             Err(a) => Err(ProcessError::ApplicationError(a)),
-        }
-
+        };
     }
 
     fn validate_struct(
@@ -558,7 +564,7 @@ impl<H: Handler> JapiProcessor<H> {
         }
 
         if !missing_fields.is_empty() {
-            return Err(Error {})
+            todo!();
         }
         return Ok(());
     }
