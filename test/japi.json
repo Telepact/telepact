@@ -1,0 +1,102 @@
+{
+  "union.Value": {
+    "formats": {
+      "bool": "boolean",
+      "nullBool": "boolean?",
+      "arrBool": "array<boolean>",
+      "arrNullBool": "array<boolean?>",
+      "objBool": "object<boolean>",
+      "objNullBool": "object<boolean?>",
+
+      "int": "integer",
+      "nullInt": "integer?",
+      "arrInt": "array<integer>",
+      "arrNullInt": "array<integer?>",
+      "objInt": "object<integer>",
+      "objNullInt": "object<integer?>",
+
+      "num": "number",
+      "nullNum": "number?",
+      "arrNum": "array<number>",
+      "arrNullNum": "array<number?>",
+      "objNum": "object<number>",
+      "objNullNum": "object<number?>",
+
+      "str": "string",
+      "nullStr": "string?",
+      "arrStr": "array<string>",
+      "arrNullStr": "array<string?>",
+      "objStr": "object<string>",
+      "objNullStr": "object<string?>",
+
+      "arr": "array",
+      "nullArr": "array?",
+      "arrArr": "array<array>",
+      "arrNullArr": "array<array?>",
+      "objArr": "object<array>",
+      "objNullArr": "object<array?>",
+
+      "obj": "object",
+      "nullObj": "object?",
+      "arrObj": "array<object>",
+      "arrNullObj": "array<object?>",
+      "objObj": "object<object>",
+      "objNullObj": "object<object?>",
+
+      "any": "any",
+      "nullAny": "any?",
+      "arrAny": "array<any>",
+      "arrNullAny": "array<any?>",
+      "objAny": "object<any>",
+      "objNullAny": "object<any?>",
+
+      "struct": "struct.StructExample",
+      "nullStruct": "struct.StructExample?",
+      "arrStruct": "array<struct.StructExample>",
+      "arrNullStruct": "array<struct.StructExample?>",
+      "objStruct": "object<struct.StructExample>",
+      "objNullStruct": "object<struct.StructExample?>",
+
+      "union": "union.UnionExample",
+      "nullUnion": "union.UnionExample?",
+      "arrUnion": "array<union.UnionExample>",
+      "arrNullUnion": "array<union.UnionExample?>",
+      "objUnion": "object<union.UnionExample>",
+      "objNullUnion": "object<union.UnionExample?>",
+
+      "enum": "enum.EnumExample",
+      "nullEnum": "enum.EnumExample?",
+      "arrEnum": "array<enum.EnumExample>",
+      "arrNullEnum": "array<enum.EnumExample?>",
+      "objEnum": "object<enum.EnumExample>",
+      "objNullEnum": "object<enum.EnumExample?>"
+    }
+  },
+
+  "struct.StructExample": {
+    "fields": {
+      "required": "boolean",
+      "optional!": "boolean"
+    }
+  },
+
+  "union.UnionExample": {
+    "cases": {
+      "first": "integer",
+      "second": "string"
+    }
+  },
+
+  "enum.EnumExample": {
+    "values": ["one", "two"]
+  },
+
+  "function.test": {
+    "input.fields": {
+      "value!": "union.Value"
+    },
+    "output.fields": {
+      "value!": "union.Value"
+    }
+  }
+}

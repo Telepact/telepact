@@ -1,12 +1,12 @@
 # Introduction
 
-JAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogramming
+jAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogramming
 **I**nterface is an API expressed purely with JSON. Familiar API concepts, such
 as function calls and return values, are represented entirely with JSON
-payloads. Consequently, A JAPI can satisfy API needs across not only HTTP, but
+payloads. Consequently, A jAPI can satisfy API needs across not only HTTP, but
 any inter-process communication boundary.
 
-Wherever JSON can go, a JAPI can be served 🚀
+Wherever JSON can go, a jAPI can be served 🚀
 
 HTTP client example (with `cURL`):
 
