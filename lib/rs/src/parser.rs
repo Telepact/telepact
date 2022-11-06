@@ -5,8 +5,8 @@ use serde_json::{from_reader, Map, Value};
 
 #[derive(Debug)]
 pub struct FieldDeclaration {
-    type_declaration: TypeDeclaration,
-    optional: bool,
+    pub type_declaration: TypeDeclaration,
+    pub optional: bool,
 }
 
 #[derive(Debug)]

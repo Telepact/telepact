@@ -52,6 +52,8 @@ pub enum ProcessError {
     JapiMessageBodyNotObject,
     FunctionInputMissingFields(Vec<String>),
     ApplicationError(ApplicationError),
+    StructMissingFields(Vec<String>),
+    StructHasExtraFields(Vec<String>)
 }
 
 impl JapiProcessor {
@@ -156,19 +158,34 @@ impl JapiProcessor {
         ref_struct: &HashMap<String, FieldDeclaration>,
         actual_struct: &Map<String, Value>,
     ) -> Result<(), ProcessError> {
-        // TODO: validate struct
         let mut missing_fields: Vec<String> = Vec::new();
         for (name, field_declaration) in ref_struct {
-            if !actual_struct.contains_key(name) {
+            if !actual_struct.contains_key(name) && !field_declaration.optional {
                 missing_fields.push(name.to_string());
             }
         }
 
         if !missing_fields.is_empty() {
-            todo!();
+            return Err(ProcessError::StructMissingFields(missing_fields));
         }
+
+        for (name, field) in actual_struct {
+            let ref_field = ref_struct.get(name).ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
+            // TODO: validate field
+        }
+
         return Ok(());
     }
+
+    fn validate_field(
+        &self,
+        ref_field: &FieldDeclaration,
+        field: &Value 
+    ) {
+        ref_field.
+    }
+
+
 }
 
 #[cfg(test)]
