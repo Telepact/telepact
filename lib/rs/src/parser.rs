@@ -52,6 +52,7 @@ pub enum Definition {
     },
 }
 
+#[derive(Debug)]
 pub struct JapiDescriptionParseError {
     pub msg: String,
 }

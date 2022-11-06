@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, io::Cursor};
 use std::fs;
 
 use japi::{self, parser::Definition, Output, ApplicationError};
@@ -31,16 +31,19 @@ fn handle(
 #[test]
 fn desc_loads() {
     let json = fs::read_to_string("../../test/japi.json").unwrap();
-    let res = japi::parser::new_japi_description(&mut json.as_bytes());
-    println!("result");
-    let defs = match res {
-        Ok(d) => d,
-        Err(e) => {
-            println!("{:?}", e.msg);
-            HashMap::new()
-        }
-    };
-    println!("{:?}", defs);
-
+    let defs = japi::parser::new_japi_description(&mut json.as_bytes()).unwrap();
     let processor = japi::JapiProcessor { handler: handle, api_description: defs };
+    let input = r#"
+    ["function.test",{"output":{"value":{"bool":false}}},{"value":{"bool":false}}]    
+    "#;
+    let expected_output = r#"
+    ["function.test.output",{},{"value":{"bool":false}}]
+    "#;
+    let mut output = Vec::new();
+    processor.process(&mut Cursor::new(input), &mut output);
+
+    assert_eq!(
+        expected_output.trim().to_string(),
+        String::from_utf8(output).unwrap()
+    )
 }
