@@ -1,6 +1,6 @@
 {
   "union.Value": {
-    "formats": {
+    "cases": {
       "bool": "boolean",
       "nullBool": "boolean?",
       "arrBool": "array<boolean>",

@@ -84,8 +84,8 @@ fn parse_type(
     definitions: &mut HashMap<String, Definition>,
     type_declaration: &'_ String,
 ) -> Result<TypeDeclaration, JapiDescriptionParseError> {
-    let type_def_re = Regex::new(r"^((boolean|integer|number|string)|((array|object)(<(.*)>)?)|((enum|struct|union)\.([a-zA-Z_]+[a-zA-Z0-9_])*))(\?)?$").unwrap();
-    let type_def_re_captures = type_def_re.captures(type_declaration).unwrap();
+    let type_def_re = Regex::new(r"^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\.([a-zA-Z_]+[a-zA-Z0-9_])*))(\?)?$").unwrap();
+    let type_def_re_captures = type_def_re.captures(type_declaration).ok_or(JapiDescriptionParseError { msg: format!("Could not parse type {}", type_declaration) })?;
 
     let is_nullable = type_def_re_captures.get(10).is_some();
 
@@ -96,6 +96,7 @@ fn parse_type(
             "integer" => Type::Integer,
             "number" => Type::Number,
             "string" => Type::String,
+            "any" => Type::Any,
             _ => panic!(),
         };
         TypeDeclaration {

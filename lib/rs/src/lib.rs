@@ -5,7 +5,7 @@ use std::{
     rc::Rc,
 };
 
-mod parser;
+pub mod parser;
 
 use parser::*;
 
@@ -22,9 +22,13 @@ pub trait Handler {
     ) -> Result<Map<String, Value>, ApplicationError>;
 }
 
-pub struct JapiProcessor<H: Handler> {
-    handler: H,
-    api_description: HashMap<String, Definition>,
+pub struct JapiProcessor {
+    pub handler: fn(
+        function_name: &str,
+        headers: &Map<String, Value>,
+        input: &Map<String, Value>,
+    ) -> Result<Map<String, Value>, ApplicationError>,
+    pub api_description: HashMap<String, Definition>,
 }
 
 pub struct JError {
@@ -35,7 +39,7 @@ pub struct ApplicationError {}
 
 pub struct InvalidRequest {}
 
-type Output = Map<String, Value>;
+pub type Output = Map<String, Value>;
 type FunctionName = String;
 
 pub enum ProcessError {
@@ -50,7 +54,7 @@ pub enum ProcessError {
     ApplicationError(ApplicationError),
 }
 
-impl<H: Handler> JapiProcessor<H> {
+impl JapiProcessor {
     pub fn process<R: Read + Seek, W: Write>(
         &self,
         function_input_json: &mut R,
@@ -136,7 +140,7 @@ impl<H: Handler> JapiProcessor<H> {
 
         self.validate_struct(input_def, input)?;
 
-        let result = self.handler.handle(function_name, headers, input);
+        let result = (self.handler)(function_name, headers, input);
 
         return match result {
             Ok(o) => {
@@ -180,51 +184,46 @@ mod tests {
 
     use super::*;
 
-    struct MyHandler {}
-
-    impl Handler for MyHandler {
-        fn handle(
-            &self,
-            function_name: &str,
-            headers: &Map<String, Value>,
-            input: &Map<String, Value>,
-        ) -> Result<Output, ApplicationError> {
-            return match function_name {
-                "add" => {
-                    let x = input
-                        .get("x")
-                        .ok_or(ApplicationError {})?
-                        .as_f64()
-                        .ok_or(ApplicationError {})?;
-                    let y = input
-                        .get("y")
-                        .ok_or(ApplicationError {})?
-                        .as_f64()
-                        .ok_or(ApplicationError {})?;
-                    let result = x + y;
-                    let output = json!({ "result": result })
+    fn handle(
+        function_name: &str,
+        headers: &Map<String, Value>,
+        input: &Map<String, Value>,
+    ) -> Result<Output, ApplicationError> {
+        return match function_name {
+            "add" => {
+                let x = input
+                    .get("x")
+                    .ok_or(ApplicationError {})?
+                    .as_f64()
+                    .ok_or(ApplicationError {})?;
+                let y = input
+                    .get("y")
+                    .ok_or(ApplicationError {})?
+                    .as_f64()
+                    .ok_or(ApplicationError {})?;
+                let result = x + y;
+                let output = json!({ "result": result })
+                    .as_object()
+                    .ok_or(ApplicationError {})?
+                    .to_owned();
+                Ok(output)
+            }
+            "test" => {
+                let output = if headers.contains_key("output") {
+                    headers["output"]
+                        .clone()
                         .as_object()
                         .ok_or(ApplicationError {})?
-                        .to_owned();
-                    Ok(output)
-                }
-                "test" => {
-                    let output = if headers.contains_key("output") {
-                        headers["output"]
-                            .clone()
-                            .as_object()
-                            .ok_or(ApplicationError {})?
-                            .to_owned()
-                    } else {
-                        json!({}).as_object().ok_or(ApplicationError {})?.to_owned()
-                    };
+                        .to_owned()
+                } else {
+                    json!({}).as_object().ok_or(ApplicationError {})?.to_owned()
+                };
 
-                    Ok(output)
-                }
-                _ => Err(ApplicationError {}),
-            };
-        }
-    }
+                Ok(output)
+            }
+            _ => Err(ApplicationError {}),
+        };
+    }    
 
     #[derive(Debug)]
     struct Error {}
@@ -232,7 +231,7 @@ mod tests {
     #[test]
     fn check_cases() -> Result<(), Error> {
         let mut processor = JapiProcessor {
-            handler: MyHandler {},
+            handler: handle,
             api_description: todo!(),
         };
 
