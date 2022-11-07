@@ -35,8 +35,8 @@ pub enum Type {
 
 #[derive(Debug)]
 pub struct TypeDeclaration {
-    t: Rc<Type>,
-    nullable: bool,
+    pub t: Rc<Type>,
+    pub nullable: bool,
 }
 
 #[derive(Debug)]
