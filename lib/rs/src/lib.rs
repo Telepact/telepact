@@ -1,8 +1,9 @@
 use std::{
+    borrow::Borrow,
     collections::HashMap,
     io::{BufReader, Read, Seek, Write},
     marker::PhantomData,
-    rc::Rc, borrow::Borrow,
+    rc::Rc,
 };
 
 pub mod parser;
@@ -54,8 +55,10 @@ pub enum ProcessError {
     ApplicationError(ApplicationError),
     StructMissingFields(Vec<String>),
     StructHasExtraFields(Vec<String>),
+    UnionDoesNotHaveOnlyOneField(Vec<String>),
+    InvalidEnumValue(String),
     FieldCannotBeNull(String),
-    FieldWasNotExpectedType(String, &'static str)
+    FieldWasNotExpectedType(String, &'static str),
 }
 
 impl JapiProcessor {
@@ -172,9 +175,35 @@ impl JapiProcessor {
         }
 
         for (name, field) in actual_struct {
-            let ref_field = ref_struct.get(name).ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
-            // TODO: validate field
+            let ref_field = ref_struct
+                .get(name)
+                .ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
+            self.validate_type(name, &ref_field.type_declaration, field)?;
         }
+
+        return Ok(());
+    }
+
+    fn validate_union(
+        &self,
+        ref_struct: &HashMap<String, FieldDeclaration>,
+        actual_struct: &Map<String, Value>,
+    ) -> Result<(), ProcessError> {
+        if actual_struct.len() != 1 {
+            let field_names: Vec<String> = actual_struct
+                .keys()
+                .into_iter()
+                .map(|s| s.to_owned())
+                .collect();
+            return Err(ProcessError::UnionDoesNotHaveOnlyOneField(field_names));
+        }
+
+        let (name, field_value) = actual_struct.iter().next().unwrap();
+
+        let ref_field = ref_struct
+            .get(name)
+            .ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
+        self.validate_type(name, &ref_field.type_declaration, field_value)?;
 
         return Ok(());
     }
@@ -183,7 +212,7 @@ impl JapiProcessor {
         &self,
         field_name: &String,
         type_declaration: &TypeDeclaration,
-        value: &Value 
+        value: &Value,
     ) -> Result<(), ProcessError> {
         match value {
             Value::Null => {
@@ -192,50 +221,130 @@ impl JapiProcessor {
                 } else {
                     Ok(())
                 }
-            },
+            }
             _ => {
                 let expected_type = &*type_declaration.t;
                 match expected_type {
-                    Type::Boolean => if !value.is_boolean() {
-                        Err(ProcessError::FieldWasNotExpectedType(field_name.to_string(), "boolean"))
-                    } else {
-                        Ok(())
-                    },
-                    Type::Integer => if !value.is_i64() {
-                        Err(ProcessError::FieldWasNotExpectedType(field_name.to_string(), "integer"))
-                    } else {
-                        Ok(())
-                    },
-                    Type::Number => if !value.is_i64() || !value.is_f64() {
-                        Err(ProcessError::FieldWasNotExpectedType(field_name.to_string(), "number"))
-                    } else {
-                        Ok(())
-                    },
-                    Type::String => if !value.is_string() {
-                        Err(ProcessError::FieldWasNotExpectedType(field_name.to_string(), "string"))
-                    } else {
-                        Ok(())
-                    },
-                    Type::Array { nested_type } => if !value.is_array() {
-                        Err(ProcessError::FieldWasNotExpectedType(field_name.to_string(), "array"))
-                    } else {
-                        let array = value.as_array().unwrap();
-                        for (i, ele) in array.iter().enumerate() {
-                            self.validate_type(&format!("{}[{}]", field_name, i), nested_type, ele)?;
+                    Type::Boolean => {
+                        if !value.is_boolean() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "boolean",
+                            ))
+                        } else {
+                            Ok(())
                         }
-                        Ok(())
-                    },
-                    Type::Object { nested_type } => todo!(),
-                    Type::Struct { fields } => todo!(),
-                    Type::Union { cases } => todo!(),
-                    Type::Enum { allowed_values } => todo!(),
+                    }
+                    Type::Integer => {
+                        if !value.is_i64() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "integer",
+                            ))
+                        } else {
+                            Ok(())
+                        }
+                    }
+                    Type::Number => {
+                        if !value.is_i64() || !value.is_f64() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "number",
+                            ))
+                        } else {
+                            Ok(())
+                        }
+                    }
+                    Type::String => {
+                        if !value.is_string() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "string",
+                            ))
+                        } else {
+                            Ok(())
+                        }
+                    }
+                    Type::Array { nested_type } => {
+                        if !value.is_array() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "array",
+                            ))
+                        } else {
+                            let array = value.as_array().unwrap();
+                            for (i, ele) in array.iter().enumerate() {
+                                self.validate_type(
+                                    &format!("{}[{}]", field_name, i),
+                                    nested_type,
+                                    ele,
+                                )?;
+                            }
+                            Ok(())
+                        }
+                    }
+                    Type::Object { nested_type } => {
+                        if !value.is_object() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "object",
+                            ))
+                        } else {
+                            let object = value.as_object().unwrap();
+                            for (object_key, object_value) in object.iter() {
+                                self.validate_type(
+                                    &format!("{}{{{}}}", field_name, object_key),
+                                    nested_type,
+                                    object_value,
+                                )?;
+                            }
+                            Ok(())
+                        }
+                    }
+                    Type::Struct { fields } => {
+                        if !value.is_object() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "struct",
+                            ))
+                        } else {
+                            let object = value.as_object().unwrap();
+                            self.validate_struct(fields, object)?;
+                            Ok(())
+                        }
+                    }
+                    Type::Union { cases } => {
+                        if !value.is_object() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "union",
+                            ))
+                        } else {
+                            let object = value.as_object().unwrap();
+                            self.validate_union(cases, object)?;
+                            Ok(())
+                        }
+                    }
+                    Type::Enum { allowed_values } => {
+                        if !value.is_string() {
+                            Err(ProcessError::FieldWasNotExpectedType(
+                                field_name.to_string(),
+                                "enum",
+                            ))
+                        } else {
+                            let enum_value = value.as_str().unwrap().to_string();
+                            if !allowed_values.contains(&enum_value) {
+                                Err(ProcessError::InvalidEnumValue(enum_value))
+                            } else {
+                                Ok(())
+                            }
+                        }
+                    }
                     Type::Any => todo!(),
                 }
             }
         }
     }
-
-
 }
 
 #[cfg(test)]
@@ -290,7 +399,7 @@ mod tests {
             }
             _ => Err(ApplicationError {}),
         };
-    }    
+    }
 
     #[derive(Debug)]
     struct Error {}
