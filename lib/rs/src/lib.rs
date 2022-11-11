@@ -59,6 +59,51 @@ pub enum ProcessError {
     InvalidEnumValue(String),
     FieldCannotBeNull(String),
     FieldWasNotExpectedType(String, &'static str),
+    NullInvalidForNonNullType(String),
+    IntegerInvalidForBooleanType(String),
+    NumberInvalidForBooleanType(String),
+    StringInvalidForBooleanType(String),
+    ArrayInvalidForBooleanType(String),
+    ObjectInvalidForBooleanType(String),
+    BooleanInvalidForIntegerType(String),
+    NumberInvalidForIntegerType(String),
+    StringInvalidForIntegerType(String),
+    ArrayInvalidForIntegerType(String),
+    ObjectInvalidForIntegerType(String),
+    BooleanInvalidForNumberType(String),
+    StringInvalidForNumberType(String),
+    ArrayInvalidForNumberType(String),
+    ObjectInvalidForNumberType(String),
+    BooleanInvalidForStringType(String),
+    IntegerInvalidForStringType(String),
+    NumberInvalidForStringType(String),
+    ArrayInvalidForStringType(String),
+    ObjectInvalidForStringType(String),
+    BooleanInvalidForArrayType(String),
+    IntegerInvalidForArrayType(String),
+    NumberInvalidForArrayType(String),
+    StringInvalidForArrayType(String),
+    ObjectInvalidForArrayType(String),
+    BooleanInvalidForObjectType(String),
+    IntegerInvalidForObjectType(String),
+    NumberInvalidForObjectType(String),
+    StringInvalidForObjectType(String),
+    ArrayInvalidForObjectType(String),
+    BooleanInvalidForStructType(String),
+    IntegerInvalidForStructType(String),
+    NumberInvalidForStructType(String),
+    StringInvalidForStructType(String),
+    ArrayInvalidForStructType(String),
+    BooleanInvalidForUnionType(String),
+    IntegerInvalidForUnionType(String),
+    NumberInvalidForUnionType(String),
+    StringInvalidForUnionType(String),
+    ArrayInvalidForUnionType(String),
+    BooleanInvalidForEnumType(String),
+    IntegerInvalidForEnumType(String),
+    NumberInvalidForEnumType(String),
+    ArrayInvalidForEnumType(String),
+    ObjectInvalidForEnumType(String),
 }
 
 impl JapiProcessor {
@@ -225,53 +270,90 @@ impl JapiProcessor {
             _ => {
                 let expected_type = &*type_declaration.t;
                 match expected_type {
-                    Type::Boolean => {
-                        if !value.is_boolean() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "boolean",
-                            ))
-                        } else {
-                            Ok(())
+                    Type::Boolean => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Ok(()),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForBooleanType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => Err(ProcessError::StringInvalidForBooleanType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForBooleanType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => Err(ProcessError::ObjectInvalidForBooleanType(
+                            field_name.to_string(),
+                        )),
+                    },
+                    Type::Integer => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForIntegerType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => {
+                            if !value.is_i64() {
+                                Err(ProcessError::NumberInvalidForIntegerType(
+                                    field_name.to_string(),
+                                ))
+                            } else {
+                                Ok(())
+                            }
                         }
-                    }
-                    Type::Integer => {
-                        if !value.is_i64() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "integer",
-                            ))
-                        } else {
-                            Ok(())
-                        }
-                    }
-                    Type::Number => {
-                        if !value.is_i64() || !value.is_f64() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "number",
-                            ))
-                        } else {
-                            Ok(())
-                        }
-                    }
-                    Type::String => {
-                        if !value.is_string() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "string",
-                            ))
-                        } else {
-                            Ok(())
-                        }
-                    }
-                    Type::Array { nested_type } => {
-                        if !value.is_array() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "array",
-                            ))
-                        } else {
+                        Value::String(_) => Err(ProcessError::StringInvalidForIntegerType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForIntegerType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => Err(ProcessError::ObjectInvalidForIntegerType(
+                            field_name.to_string(),
+                        )),
+                    },
+                    Type::Number => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForNumberType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Ok(()),
+                        Value::String(_) => Err(ProcessError::StringInvalidForNumberType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForNumberType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => Err(ProcessError::ObjectInvalidForNumberType(
+                            field_name.to_string(),
+                        )),
+                    },
+                    Type::String => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForStringType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForStringType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => Ok(()),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForStringType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => Err(ProcessError::ObjectInvalidForStringType(
+                            field_name.to_string(),
+                        )),
+                    },
+                    Type::Array { nested_type } => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForArrayType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForArrayType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => Err(ProcessError::StringInvalidForArrayType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => {
                             let array = value.as_array().unwrap();
                             for (i, ele) in array.iter().enumerate() {
                                 self.validate_type(
@@ -282,14 +364,25 @@ impl JapiProcessor {
                             }
                             Ok(())
                         }
-                    }
-                    Type::Object { nested_type } => {
-                        if !value.is_object() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "object",
-                            ))
-                        } else {
+                        Value::Object(_) => Err(ProcessError::ObjectInvalidForArrayType(
+                            field_name.to_string(),
+                        )),
+                    },
+                    Type::Object { nested_type } => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForObjectType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForObjectType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => Err(ProcessError::StringInvalidForObjectType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForObjectType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => {
                             let object = value.as_object().unwrap();
                             for (object_key, object_value) in object.iter() {
                                 self.validate_type(
@@ -300,38 +393,56 @@ impl JapiProcessor {
                             }
                             Ok(())
                         }
-                    }
-                    Type::Struct { fields } => {
-                        if !value.is_object() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "struct",
-                            ))
-                        } else {
+                    },
+                    Type::Struct { fields } => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForStructType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForStructType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => Err(ProcessError::StringInvalidForStructType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForStructType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => {
                             let object = value.as_object().unwrap();
                             self.validate_struct(fields, object)?;
                             Ok(())
                         }
-                    }
-                    Type::Union { cases } => {
-                        if !value.is_object() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "union",
-                            ))
-                        } else {
+                    },
+                    Type::Union { cases } => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForUnionType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForUnionType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => Err(ProcessError::StringInvalidForUnionType(
+                            field_name.to_string(),
+                        )),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForUnionType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => {
                             let object = value.as_object().unwrap();
                             self.validate_union(cases, object)?;
                             Ok(())
                         }
-                    }
-                    Type::Enum { allowed_values } => {
-                        if !value.is_string() {
-                            Err(ProcessError::FieldWasNotExpectedType(
-                                field_name.to_string(),
-                                "enum",
-                            ))
-                        } else {
+                    },
+                    Type::Enum { allowed_values } => match value {
+                        _ => panic!(),
+                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForEnumType(
+                            field_name.to_string(),
+                        )),
+                        Value::Number(_) => Err(ProcessError::NumberInvalidForEnumType(
+                            field_name.to_string(),
+                        )),
+                        Value::String(_) => {
                             let enum_value = value.as_str().unwrap().to_string();
                             if !allowed_values.contains(&enum_value) {
                                 Err(ProcessError::InvalidEnumValue(enum_value))
@@ -339,8 +450,14 @@ impl JapiProcessor {
                                 Ok(())
                             }
                         }
-                    }
-                    Type::Any => todo!(),
+                        Value::Array(_) => Err(ProcessError::ArrayInvalidForEnumType(
+                            field_name.to_string(),
+                        )),
+                        Value::Object(_) => Err(ProcessError::ObjectInvalidForEnumType(
+                            field_name.to_string(),
+                        )),
+                    },
+                    Type::Any => Ok(()),
                 }
             }
         }
