@@ -11,6 +11,7 @@ pub struct FieldDeclaration {
 
 #[derive(Debug)]
 pub enum Type {
+    Null,
     Boolean,
     Integer,
     Number,
@@ -98,6 +99,7 @@ fn parse_type(
     let standard_basic_type = type_def_re_captures.get(2).map(|capture| {
         let name = capture.as_str();
         let type_ = match name {
+            "null" => Type::Null,
             "boolean" => Type::Boolean,
             "integer" => Type::Integer,
             "number" => Type::Number,
