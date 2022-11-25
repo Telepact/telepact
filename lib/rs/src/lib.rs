@@ -136,14 +136,15 @@ impl JapiProcessor {
                 let (msg_type, body) = match e {
                     ProcessError::ObjectInvalidForBooleanType(field) => (
                         Value::String(format!("error._InvalidInput")),
-                        json!(
-                            {"cases": [
-                                {
-                                    "field": field,
-                                    "reason": "ObjectInvalidForBooleanType"
-                                }
-                            ]}
-                        ),
+                        self._invalid_field(&field, &"ObjectInvalidForBooleanType".to_string()),
+                    ),
+                    ProcessError::IntegerInvalidForBooleanType(field) => (
+                        Value::String(format!("error._InvalidInput")),
+                        self._invalid_field(&field, &"IntegerInvalidForBooleanType".to_string()),
+                    ),
+                    ProcessError::NumberInvalidForBooleanType(field) => (
+                        Value::String(format!("error._InvalidInput")),
+                        self._invalid_field(&field, &"NumberInvalidForBooleanType".to_string()),
                     ),
                     _ => (
                         Value::String(format!("error._ApplicationFailure")),
@@ -159,6 +160,17 @@ impl JapiProcessor {
         }
 
         Ok(())
+    }
+
+    fn _invalid_field(&self, field: &String, reason: &String) -> Value {
+        return json!(
+            {"cases": [
+                {
+                    "field": field,
+                    "reason": reason
+                }
+            ]}
+        );
     }
 
     fn _process<R: Read + Seek>(
