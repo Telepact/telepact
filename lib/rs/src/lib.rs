@@ -12,7 +12,7 @@ use parser::*;
 
 use regex::Regex;
 use serde::__private::de;
-use serde_json::{from_reader, json, to_writer, Map, Value};
+use serde_json::{from_reader, json, to_writer, Map, Value, Error};
 
 pub trait Handler {
     fn handle(
@@ -36,6 +36,7 @@ pub struct JError {
     msg: String,
 }
 
+#[derive(Debug)]
 pub struct ApplicationError {}
 
 pub struct InvalidRequest {}
@@ -43,9 +44,10 @@ pub struct InvalidRequest {}
 pub type Output = Map<String, Value>;
 type FunctionName = String;
 
+#[derive(Debug)]
 pub enum ProcessError {
     Unknown,
-    InvalidJson,
+    InvalidJson(Error),
     JapiMessageNotArray,
     JapiMessageArrayTooFewElements,
     JapiMessageTypeNotString,
@@ -131,6 +133,8 @@ impl JapiProcessor {
                 let headers = Value::Object(Map::new());
                 let body = Value::Object(Map::new());
 
+                println!("error: {:?}", e);
+
                 let japi_msg = vec![msg_type, headers, body];
 
                 to_writer(function_output_json, &japi_msg)
@@ -146,7 +150,7 @@ impl JapiProcessor {
         function_input_json: &mut R,
     ) -> Result<(FunctionName, Output), ProcessError> {
         let function_input: Value =
-            from_reader(function_input_json).map_err(|e| ProcessError::InvalidJson)?;
+            from_reader(function_input_json).map_err(|e| ProcessError::InvalidJson(e))?;
 
         let payload_type = function_input
             .as_array()
