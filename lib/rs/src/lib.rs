@@ -12,7 +12,7 @@ use parser::*;
 
 use regex::Regex;
 use serde::__private::de;
-use serde_json::{from_reader, json, to_writer, Map, Value, Error};
+use serde_json::{from_reader, json, to_writer, Error, Map, Value};
 
 pub trait Handler {
     fn handle(
@@ -129,11 +129,27 @@ impl JapiProcessor {
                     .map_err(|e| JError { msg: e.to_string() })?;
             }
             Err(e) => {
-                let msg_type = Value::String(format!("error._ApplicationFailure"));
                 let headers = Value::Object(Map::new());
-                let body = Value::Object(Map::new());
 
                 println!("error: {:?}", e);
+
+                let (msg_type, body) = match e {
+                    ProcessError::ObjectInvalidForBooleanType(field) => (
+                        Value::String(format!("error._InvalidInput")),
+                        json!(
+                            {"cases": [
+                                {
+                                    "field": field,
+                                    "reason": "ObjectInvalidForBooleanType"
+                                }
+                            ]}
+                        ),
+                    ),
+                    _ => (
+                        Value::String(format!("error._ApplicationFailure")),
+                        Value::Object(Map::new()),
+                    ),
+                };
 
                 let japi_msg = vec![msg_type, headers, body];
 
@@ -195,13 +211,13 @@ impl JapiProcessor {
             _ => panic!(),
         };
 
-        self.validate_struct(input_def, input)?;
+        self.validate_struct(&"input".to_string(), input_def, input)?;
 
         let result = (self.handler)(function_name, headers, input);
 
         return match result {
             Ok(o) => {
-                self.validate_struct(output_def, &o)?;
+                self.validate_struct(&"input".to_string(), output_def, &o)?;
                 Ok((function_name.to_string(), o))
             }
             Err(a) => Err(ProcessError::ApplicationError(a)),
@@ -210,6 +226,7 @@ impl JapiProcessor {
 
     fn validate_struct(
         &self,
+        namespace: &String,
         ref_struct: &HashMap<String, FieldDeclaration>,
         actual_struct: &Map<String, Value>,
     ) -> Result<(), ProcessError> {
@@ -228,7 +245,11 @@ impl JapiProcessor {
             let ref_field = ref_struct
                 .get(name)
                 .ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
-            self.validate_type(name, &ref_field.type_declaration, field)?;
+            self.validate_type(
+                &format!("{}.{}", namespace, name).to_string(),
+                &ref_field.type_declaration,
+                field,
+            )?;
         }
 
         return Ok(());
@@ -236,6 +257,7 @@ impl JapiProcessor {
 
     fn validate_union(
         &self,
+        namespace: &String,
         ref_struct: &HashMap<String, FieldDeclaration>,
         actual_struct: &Map<String, Value>,
     ) -> Result<(), ProcessError> {
@@ -253,7 +275,11 @@ impl JapiProcessor {
         let ref_field = ref_struct
             .get(name)
             .ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
-        self.validate_type(name, &ref_field.type_declaration, field_value)?;
+        self.validate_type(
+            &format!("{}.{}", namespace, name).to_string(),
+            &ref_field.type_declaration,
+            field_value,
+        )?;
 
         return Ok(());
     }
@@ -450,7 +476,7 @@ impl JapiProcessor {
                         )),
                         Value::Object(_) => {
                             let object = value.as_object().unwrap();
-                            self.validate_struct(fields, object)?;
+                            self.validate_struct(field_name, fields, object)?;
                             Ok(())
                         }
                         Value::Null => {
@@ -476,7 +502,7 @@ impl JapiProcessor {
                         )),
                         Value::Object(_) => {
                             let object = value.as_object().unwrap();
-                            self.validate_union(cases, object)?;
+                            self.validate_union(field_name, cases, object)?;
                             Ok(())
                         }
                         Value::Null => {
