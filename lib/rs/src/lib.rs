@@ -45,16 +45,7 @@ pub type Output = Map<String, Value>;
 type FunctionName = String;
 
 #[derive(Debug)]
-pub enum ProcessError {
-    Unknown,
-    InvalidJson(Error),
-    JapiMessageNotArray,
-    JapiMessageArrayTooFewElements,
-    JapiMessageTypeNotString,
-    JapiMessageHeaderNotObject,
-    JapiMessageBodyNotObject,
-    FunctionInputMissingFields(Vec<String>),
-    ApplicationError(ApplicationError),
+pub enum FieldError {
     StructMissingFields(Vec<String>),
     StructHasExtraFields(Vec<String>),
     UnionDoesNotHaveOnlyOneField(Vec<String>),
@@ -109,6 +100,21 @@ pub enum ProcessError {
     NonNullInvalidForNullType(String),
 }
 
+#[derive(Debug)]
+pub enum ProcessError {
+    Unknown,
+    InvalidJson(Error),
+    JapiMessageNotArray,
+    JapiMessageArrayTooFewElements,
+    JapiMessageTypeNotString,
+    JapiMessageHeaderNotObject,
+    JapiMessageBodyNotObject,
+    FunctionInputMissingFields(Vec<String>),
+    ApplicationError(ApplicationError),
+    InvalidInput(FieldError),
+    InvalidOutput(FieldError),
+}
+
 impl JapiProcessor {
     pub fn process<R: Read + Seek, W: Write>(
         &self,
@@ -134,17 +140,61 @@ impl JapiProcessor {
                 println!("error: {:?}", e);
 
                 let (msg_type, body) = match e {
-                    ProcessError::ObjectInvalidForBooleanType(field) => (
-                        Value::String(format!("error._InvalidInput")),
-                        self._invalid_field(&field, &"ObjectInvalidForBooleanType".to_string()),
-                    ),
-                    ProcessError::IntegerInvalidForBooleanType(field) => (
-                        Value::String(format!("error._InvalidInput")),
-                        self._invalid_field(&field, &"IntegerInvalidForBooleanType".to_string()),
-                    ),
-                    ProcessError::NumberInvalidForBooleanType(field) => (
-                        Value::String(format!("error._InvalidInput")),
-                        self._invalid_field(&field, &"NumberInvalidForBooleanType".to_string()),
+                    ProcessError::InvalidInput(e2) => match e2 {
+                        FieldError::IntegerInvalidForBooleanType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(
+                                &field,
+                                &"IntegerInvalidForBooleanType".to_string(),
+                            ),
+                        ),
+                        FieldError::NumberInvalidForBooleanType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForBooleanType".to_string()),
+                        ),
+                        FieldError::StringInvalidForBooleanType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForBooleanType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForBooleanType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForBooleanType".to_string()),
+                        ),
+                        FieldError::ObjectInvalidForBooleanType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ObjectInvalidForBooleanType".to_string()),
+                        ),
+                        FieldError::BooleanInvalidForIntegerType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(
+                                &field,
+                                &"BooleanInvalidForIntegerType".to_string(),
+                            ),
+                        ),
+                        FieldError::NumberInvalidForIntegerType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForIntegerType".to_string()),
+                        ),
+                        FieldError::StringInvalidForIntegerType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForIntegerType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForIntegerType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForIntegerType".to_string()),
+                        ),
+                        FieldError::ObjectInvalidForIntegerType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ObjectInvalidForIntegerType".to_string()),
+                        ),
+                        _ => (
+                            Value::String(format!("error._ApplicationFailure")),
+                            Value::Object(Map::new()),
+                        ),
+                    },
+                    ProcessError::InvalidOutput(_) => (
+                        Value::String(format!("error._InvalidOutput")),
+                        Value::Object(Map::new()),
                     ),
                     _ => (
                         Value::String(format!("error._ApplicationFailure")),
@@ -223,13 +273,15 @@ impl JapiProcessor {
             _ => panic!(),
         };
 
-        self.validate_struct(&"input".to_string(), input_def, input)?;
+        self.validate_struct(&"input".to_string(), input_def, input)
+            .map_err(|e| ProcessError::InvalidInput(e))?;
 
         let result = (self.handler)(function_name, headers, input);
 
         return match result {
             Ok(o) => {
-                self.validate_struct(&"input".to_string(), output_def, &o)?;
+                self.validate_struct(&"output".to_string(), output_def, &o)
+                    .map_err(|e| ProcessError::InvalidOutput(e))?;
                 Ok((function_name.to_string(), o))
             }
             Err(a) => Err(ProcessError::ApplicationError(a)),
@@ -241,7 +293,7 @@ impl JapiProcessor {
         namespace: &String,
         ref_struct: &HashMap<String, FieldDeclaration>,
         actual_struct: &Map<String, Value>,
-    ) -> Result<(), ProcessError> {
+    ) -> Result<(), FieldError> {
         let mut missing_fields: Vec<String> = Vec::new();
         for (name, field_declaration) in ref_struct {
             if !actual_struct.contains_key(name) && !field_declaration.optional {
@@ -250,13 +302,13 @@ impl JapiProcessor {
         }
 
         if !missing_fields.is_empty() {
-            return Err(ProcessError::StructMissingFields(missing_fields));
+            return Err(FieldError::StructMissingFields(missing_fields));
         }
 
         for (name, field) in actual_struct {
             let ref_field = ref_struct
                 .get(name)
-                .ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
+                .ok_or(FieldError::StructHasExtraFields(vec![name.to_string()]))?;
             self.validate_type(
                 &format!("{}.{}", namespace, name).to_string(),
                 &ref_field.type_declaration,
@@ -272,21 +324,21 @@ impl JapiProcessor {
         namespace: &String,
         ref_struct: &HashMap<String, FieldDeclaration>,
         actual_struct: &Map<String, Value>,
-    ) -> Result<(), ProcessError> {
+    ) -> Result<(), FieldError> {
         if actual_struct.len() != 1 {
             let field_names: Vec<String> = actual_struct
                 .keys()
                 .into_iter()
                 .map(|s| s.to_owned())
                 .collect();
-            return Err(ProcessError::UnionDoesNotHaveOnlyOneField(field_names));
+            return Err(FieldError::UnionDoesNotHaveOnlyOneField(field_names));
         }
 
         let (name, field_value) = actual_struct.iter().next().unwrap();
 
         let ref_field = ref_struct
             .get(name)
-            .ok_or(ProcessError::StructHasExtraFields(vec![name.to_string()]))?;
+            .ok_or(FieldError::StructHasExtraFields(vec![name.to_string()]))?;
         self.validate_type(
             &format!("{}.{}", namespace, name).to_string(),
             &ref_field.type_declaration,
@@ -301,11 +353,11 @@ impl JapiProcessor {
         field_name: &String,
         type_declaration: &TypeDeclaration,
         value: &Value,
-    ) -> Result<(), ProcessError> {
+    ) -> Result<(), FieldError> {
         match value {
             Value::Null => {
                 if !type_declaration.nullable {
-                    Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                    Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                 } else {
                     Ok(())
                 }
@@ -315,108 +367,108 @@ impl JapiProcessor {
                 match expected_type {
                     Type::Boolean => match value {
                         Value::Bool(_) => Ok(()),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForBooleanType(
+                        Value::Number(_) => Err(FieldError::NumberInvalidForBooleanType(
                             field_name.to_string(),
                         )),
-                        Value::String(_) => Err(ProcessError::StringInvalidForBooleanType(
+                        Value::String(_) => Err(FieldError::StringInvalidForBooleanType(
                             field_name.to_string(),
                         )),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForBooleanType(
+                        Value::Array(_) => Err(FieldError::ArrayInvalidForBooleanType(
                             field_name.to_string(),
                         )),
-                        Value::Object(_) => Err(ProcessError::ObjectInvalidForBooleanType(
+                        Value::Object(_) => Err(FieldError::ObjectInvalidForBooleanType(
                             field_name.to_string(),
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Integer => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForIntegerType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForIntegerType(
                             field_name.to_string(),
                         )),
                         Value::Number(_) => {
                             if !value.is_i64() {
-                                Err(ProcessError::NumberInvalidForIntegerType(
+                                Err(FieldError::NumberInvalidForIntegerType(
                                     field_name.to_string(),
                                 ))
                             } else {
                                 Ok(())
                             }
                         }
-                        Value::String(_) => Err(ProcessError::StringInvalidForIntegerType(
+                        Value::String(_) => Err(FieldError::StringInvalidForIntegerType(
                             field_name.to_string(),
                         )),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForIntegerType(
+                        Value::Array(_) => Err(FieldError::ArrayInvalidForIntegerType(
                             field_name.to_string(),
                         )),
-                        Value::Object(_) => Err(ProcessError::ObjectInvalidForIntegerType(
+                        Value::Object(_) => Err(FieldError::ObjectInvalidForIntegerType(
                             field_name.to_string(),
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Number => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForNumberType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForNumberType(
                             field_name.to_string(),
                         )),
                         Value::Number(_) => Ok(()),
-                        Value::String(_) => Err(ProcessError::StringInvalidForNumberType(
+                        Value::String(_) => Err(FieldError::StringInvalidForNumberType(
                             field_name.to_string(),
                         )),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForNumberType(
+                        Value::Array(_) => Err(FieldError::ArrayInvalidForNumberType(
                             field_name.to_string(),
                         )),
-                        Value::Object(_) => Err(ProcessError::ObjectInvalidForNumberType(
+                        Value::Object(_) => Err(FieldError::ObjectInvalidForNumberType(
                             field_name.to_string(),
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::String => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForStringType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForStringType(
                             field_name.to_string(),
                         )),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForStringType(
+                        Value::Number(_) => Err(FieldError::NumberInvalidForStringType(
                             field_name.to_string(),
                         )),
                         Value::String(_) => Ok(()),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForStringType(
+                        Value::Array(_) => Err(FieldError::ArrayInvalidForStringType(
                             field_name.to_string(),
                         )),
-                        Value::Object(_) => Err(ProcessError::ObjectInvalidForStringType(
+                        Value::Object(_) => Err(FieldError::ObjectInvalidForStringType(
                             field_name.to_string(),
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Array { nested_type } => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForArrayType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForArrayType(
                             field_name.to_string(),
                         )),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForArrayType(
+                        Value::Number(_) => Err(FieldError::NumberInvalidForArrayType(
                             field_name.to_string(),
                         )),
-                        Value::String(_) => Err(ProcessError::StringInvalidForArrayType(
+                        Value::String(_) => Err(FieldError::StringInvalidForArrayType(
                             field_name.to_string(),
                         )),
                         Value::Array(_) => {
@@ -430,28 +482,28 @@ impl JapiProcessor {
                             }
                             Ok(())
                         }
-                        Value::Object(_) => Err(ProcessError::ObjectInvalidForArrayType(
+                        Value::Object(_) => Err(FieldError::ObjectInvalidForArrayType(
                             field_name.to_string(),
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Object { nested_type } => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForObjectType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForObjectType(
                             field_name.to_string(),
                         )),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForObjectType(
+                        Value::Number(_) => Err(FieldError::NumberInvalidForObjectType(
                             field_name.to_string(),
                         )),
-                        Value::String(_) => Err(ProcessError::StringInvalidForObjectType(
+                        Value::String(_) => Err(FieldError::StringInvalidForObjectType(
                             field_name.to_string(),
                         )),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForObjectType(
+                        Value::Array(_) => Err(FieldError::ArrayInvalidForObjectType(
                             field_name.to_string(),
                         )),
                         Value::Object(_) => {
@@ -467,23 +519,23 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Struct { fields } => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForStructType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForStructType(
                             field_name.to_string(),
                         )),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForStructType(
+                        Value::Number(_) => Err(FieldError::NumberInvalidForStructType(
                             field_name.to_string(),
                         )),
-                        Value::String(_) => Err(ProcessError::StringInvalidForStructType(
+                        Value::String(_) => Err(FieldError::StringInvalidForStructType(
                             field_name.to_string(),
                         )),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForStructType(
+                        Value::Array(_) => Err(FieldError::ArrayInvalidForStructType(
                             field_name.to_string(),
                         )),
                         Value::Object(_) => {
@@ -493,25 +545,25 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Union { cases } => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForUnionType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForUnionType(
                             field_name.to_string(),
                         )),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForUnionType(
+                        Value::Number(_) => Err(FieldError::NumberInvalidForUnionType(
                             field_name.to_string(),
                         )),
-                        Value::String(_) => Err(ProcessError::StringInvalidForUnionType(
+                        Value::String(_) => Err(FieldError::StringInvalidForUnionType(
                             field_name.to_string(),
                         )),
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForUnionType(
-                            field_name.to_string(),
-                        )),
+                        Value::Array(_) => {
+                            Err(FieldError::ArrayInvalidForUnionType(field_name.to_string()))
+                        }
                         Value::Object(_) => {
                             let object = value.as_object().unwrap();
                             self.validate_union(field_name, cases, object)?;
@@ -519,36 +571,36 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
                         }
                     },
                     Type::Enum { allowed_values } => match value {
-                        Value::Bool(_) => Err(ProcessError::BooleanInvalidForEnumType(
+                        Value::Bool(_) => Err(FieldError::BooleanInvalidForEnumType(
                             field_name.to_string(),
                         )),
-                        Value::Number(_) => Err(ProcessError::NumberInvalidForEnumType(
-                            field_name.to_string(),
-                        )),
+                        Value::Number(_) => {
+                            Err(FieldError::NumberInvalidForEnumType(field_name.to_string()))
+                        }
                         Value::String(_) => {
                             let enum_value = value.as_str().unwrap().to_string();
                             if !allowed_values.contains(&enum_value) {
-                                Err(ProcessError::InvalidEnumValue(enum_value))
+                                Err(FieldError::InvalidEnumValue(enum_value))
                             } else {
                                 Ok(())
                             }
                         }
-                        Value::Array(_) => Err(ProcessError::ArrayInvalidForEnumType(
-                            field_name.to_string(),
-                        )),
-                        Value::Object(_) => Err(ProcessError::ObjectInvalidForEnumType(
-                            field_name.to_string(),
-                        )),
+                        Value::Array(_) => {
+                            Err(FieldError::ArrayInvalidForEnumType(field_name.to_string()))
+                        }
+                        Value::Object(_) => {
+                            Err(FieldError::ObjectInvalidForEnumType(field_name.to_string()))
+                        }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
@@ -557,7 +609,7 @@ impl JapiProcessor {
                     Type::Any => match value {
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(ProcessError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
@@ -566,7 +618,7 @@ impl JapiProcessor {
                     },
                     Type::Null => match value {
                         Value::Null => Ok(()),
-                        _ => Err(ProcessError::NonNullInvalidForNullType(
+                        _ => Err(FieldError::NonNullInvalidForNullType(
                             field_name.to_string(),
                         )),
                     },
