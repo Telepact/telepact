@@ -46,11 +46,11 @@ type FunctionName = String;
 
 #[derive(Debug)]
 pub enum FieldError {
-    StructMissingFields(Vec<String>),
-    StructHasExtraFields(Vec<String>),
-    UnionDoesNotHaveOnlyOneField(Vec<String>),
+    StructMissingFields(String, Vec<String>),
+    StructHasExtraFields(String, Vec<String>),
+    UnionDoesNotHaveOnlyOneField(String),
+    UnknownUnionField(String, String),
     InvalidEnumValue(String),
-    FieldCannotBeNull(String),
     FieldWasNotExpectedType(String, &'static str),
     NullInvalidForNonNullType(String),
     IntegerInvalidForBooleanType(String),
@@ -141,6 +141,10 @@ impl JapiProcessor {
 
                 let (msg_type, body) = match e {
                     ProcessError::InvalidInput(e2) => match e2 {
+                        FieldError::NullInvalidForNonNullType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NullInvalidForNonNullType".to_string()),
+                        ),
                         FieldError::IntegerInvalidForBooleanType(field) => (
                             Value::String(format!("error._InvalidInput")),
                             self._invalid_field(
@@ -187,6 +191,193 @@ impl JapiProcessor {
                             Value::String(format!("error._InvalidInput")),
                             self._invalid_field(&field, &"ObjectInvalidForIntegerType".to_string()),
                         ),
+                        FieldError::BooleanInvalidForNumberType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForNumberType".to_string()),
+                        ),
+                        FieldError::StringInvalidForNumberType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForNumberType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForNumberType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForNumberType".to_string()),
+                        ),
+                        FieldError::ObjectInvalidForNumberType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ObjectInvalidForNumberType".to_string()),
+                        ),
+
+                        FieldError::BooleanInvalidForStringType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForStringType".to_string()),
+                        ),
+                        FieldError::IntegerInvalidForStringType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForStringType".to_string()),
+                        ),
+                        FieldError::NumberInvalidForStringType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForStringType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForStringType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForStringType".to_string()),
+                        ),
+                        FieldError::ObjectInvalidForStringType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ObjectInvalidForStringType".to_string()),
+                        ),
+
+                        FieldError::BooleanInvalidForArrayType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForArrayType".to_string()),
+                        ),
+                        FieldError::IntegerInvalidForArrayType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForArrayType".to_string()),
+                        ),
+                        FieldError::NumberInvalidForArrayType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForArrayType".to_string()),
+                        ),
+                        FieldError::StringInvalidForArrayType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForArrayType".to_string()),
+                        ),
+                        FieldError::ObjectInvalidForArrayType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ObjectInvalidForArrayType".to_string()),
+                        ),
+
+                        FieldError::BooleanInvalidForObjectType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForObjectType".to_string()),
+                        ),
+                        FieldError::IntegerInvalidForObjectType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForObjectType".to_string()),
+                        ),
+                        FieldError::NumberInvalidForObjectType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForObjectType".to_string()),
+                        ),
+                        FieldError::StringInvalidForObjectType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForObjectType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForObjectType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForObjectType".to_string()),
+                        ),
+                        FieldError::BooleanInvalidForStructType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForStructType".to_string()),
+                        ),
+                        FieldError::IntegerInvalidForStructType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForStructType".to_string()),
+                        ),
+                        FieldError::NumberInvalidForStructType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForStructType".to_string()),
+                        ),
+                        FieldError::StringInvalidForStructType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForStructType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForStructType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForStructType".to_string()),
+                        ),
+                        FieldError::BooleanInvalidForUnionType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForUnionType".to_string()),
+                        ),
+                        FieldError::IntegerInvalidForUnionType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForUnionType".to_string()),
+                        ),
+                        FieldError::NumberInvalidForUnionType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForUnionType".to_string()),
+                        ),
+                        FieldError::StringInvalidForUnionType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"StringInvalidForUnionType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForUnionType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForUnionType".to_string()),
+                        ),
+                        FieldError::BooleanInvalidForEnumType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"BooleanInvalidForEnumType".to_string()),
+                        ),
+                        FieldError::IntegerInvalidForEnumType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForEnumType".to_string()),
+                        ),
+                        FieldError::NumberInvalidForEnumType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"NumberInvalidForEnumType".to_string()),
+                        ),
+                        FieldError::ArrayInvalidForEnumType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ArrayInvalidForEnumType".to_string()),
+                        ),
+                        FieldError::ObjectInvalidForEnumType(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"ObjectInvalidForEnumType".to_string()),
+                        ),
+                        FieldError::InvalidEnumValue(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(&field, &"UnknownEnumValue".to_string()),
+                        ),
+                        FieldError::StructMissingFields(namespace, fields) => {
+                            let errors: Vec<(String, String)> = fields
+                                .iter()
+                                .map(|f| {
+                                    (
+                                        format!("{}.{}", namespace, f),
+                                        "RequiredStructFieldMissing".to_string(),
+                                    )
+                                })
+                                .collect();
+                            (
+                                Value::String(format!("error._InvalidInput")),
+                                self._invalid_fields(errors),
+                            )
+                        }
+                        FieldError::StructHasExtraFields(namespace, fields) => {
+                            let errors: Vec<(String, String)> = fields
+                                .iter()
+                                .map(|f| {
+                                    (
+                                        format!("{}.{}", namespace, f),
+                                        "UnknownStructField".to_string(),
+                                    )
+                                })
+                                .collect();
+                            (
+                                Value::String(format!("error._InvalidInput")),
+                                self._invalid_fields(errors),
+                            )
+                        }
+                        FieldError::UnionDoesNotHaveOnlyOneField(field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(
+                                &field,
+                                &"UnionDoesNotHaveExactlyOneField".to_string(),
+                            ),
+                        ),
+                        FieldError::UnknownUnionField(namespace, field) => (
+                            Value::String(format!("error._InvalidInput")),
+                            self._invalid_field(
+                                &format!("{}.{}", namespace, field),
+                                &"UnknownUnionField".to_string(),
+                            ),
+                        ),
                         _ => (
                             Value::String(format!("error._ApplicationFailure")),
                             Value::Object(Map::new()),
@@ -213,14 +404,20 @@ impl JapiProcessor {
     }
 
     fn _invalid_field(&self, field: &String, reason: &String) -> Value {
-        return json!(
-            {"cases": [
-                {
+        return self._invalid_fields(vec![(field.to_owned(), reason.to_owned())]);
+    }
+
+    fn _invalid_fields(&self, errors: Vec<(String, String)>) -> Value {
+        let jsonErrors: Vec<Value> = errors
+            .into_iter()
+            .map(|(field, reason)| {
+                json!({
                     "field": field,
                     "reason": reason
-                }
-            ]}
-        );
+                })
+            })
+            .collect();
+        return json!({ "cases": jsonErrors });
     }
 
     fn _process<R: Read + Seek>(
@@ -302,13 +499,33 @@ impl JapiProcessor {
         }
 
         if !missing_fields.is_empty() {
-            return Err(FieldError::StructMissingFields(missing_fields));
+            return Err(FieldError::StructMissingFields(
+                namespace.to_string(),
+                missing_fields,
+            ));
+        }
+
+        let mut extra_fields: Vec<String> = Vec::new();
+        for (name, _) in actual_struct {
+            if !ref_struct.contains_key(name) {
+                extra_fields.push(name.to_string());
+            }
+        }
+
+        if !extra_fields.is_empty() {
+            return Err(FieldError::StructHasExtraFields(
+                namespace.to_string(),
+                extra_fields,
+            ));
         }
 
         for (name, field) in actual_struct {
             let ref_field = ref_struct
                 .get(name)
-                .ok_or(FieldError::StructHasExtraFields(vec![name.to_string()]))?;
+                .ok_or(FieldError::StructHasExtraFields(
+                    namespace.to_string(),
+                    vec![name.to_string()],
+                ))?;
             self.validate_type(
                 &format!("{}.{}", namespace, name).to_string(),
                 &ref_field.type_declaration,
@@ -331,14 +548,17 @@ impl JapiProcessor {
                 .into_iter()
                 .map(|s| s.to_owned())
                 .collect();
-            return Err(FieldError::UnionDoesNotHaveOnlyOneField(field_names));
+            return Err(FieldError::UnionDoesNotHaveOnlyOneField(
+                namespace.to_string(),
+            ));
         }
 
         let (name, field_value) = actual_struct.iter().next().unwrap();
 
-        let ref_field = ref_struct
-            .get(name)
-            .ok_or(FieldError::StructHasExtraFields(vec![name.to_string()]))?;
+        let ref_field = ref_struct.get(name).ok_or(FieldError::UnknownUnionField(
+            namespace.to_string(),
+            name.to_string(),
+        ))?;
         self.validate_type(
             &format!("{}.{}", namespace, name).to_string(),
             &ref_field.type_declaration,
@@ -357,7 +577,9 @@ impl JapiProcessor {
         match value {
             Value::Null => {
                 if !type_declaration.nullable {
-                    Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                    Err(FieldError::NullInvalidForNonNullType(
+                        field_name.to_string(),
+                    ))
                 } else {
                     Ok(())
                 }
@@ -381,7 +603,9 @@ impl JapiProcessor {
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -411,7 +635,9 @@ impl JapiProcessor {
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -433,7 +659,9 @@ impl JapiProcessor {
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -455,7 +683,9 @@ impl JapiProcessor {
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -487,7 +717,9 @@ impl JapiProcessor {
                         )),
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -519,7 +751,9 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -545,7 +779,9 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -571,7 +807,9 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -587,7 +825,7 @@ impl JapiProcessor {
                         Value::String(_) => {
                             let enum_value = value.as_str().unwrap().to_string();
                             if !allowed_values.contains(&enum_value) {
-                                Err(FieldError::InvalidEnumValue(enum_value))
+                                Err(FieldError::InvalidEnumValue(field_name.to_string()))
                             } else {
                                 Ok(())
                             }
@@ -600,7 +838,9 @@ impl JapiProcessor {
                         }
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
@@ -609,7 +849,9 @@ impl JapiProcessor {
                     Type::Any => match value {
                         Value::Null => {
                             if !type_declaration.nullable {
-                                Err(FieldError::FieldCannotBeNull(field_name.to_string()))
+                                Err(FieldError::NullInvalidForNonNullType(
+                                    field_name.to_string(),
+                                ))
                             } else {
                                 Ok(())
                             }
