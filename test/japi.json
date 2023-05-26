@@ -1,6 +1,7 @@
 {
-  "union.Value": {
-    "cases": {
+  "union.Value": [
+    "/// A union value demonstrating all common type permutations.",
+    {
       "bool": "boolean",
       "nullBool": "boolean?",
       "arrBool": "array<boolean>",
@@ -71,32 +72,41 @@
       "objEnum": "object<enum.EnumExample>",
       "objNullEnum": "object<enum.EnumExample?>"
     }
-  },
+  ],
 
-  "struct.StructExample": {
-    "fields": {
+  "struct.StructExample": [
+    "/// The main struct example.",
+    "///",
+    "/// The [required] field must be supplied. The optional field does not need to be supplied.",
+    {
       "required": "boolean",
       "optional!": "boolean"
     }
-  },
+  ],
 
-  "union.UnionExample": {
-    "cases": {
+  "union.UnionExample": [
+    {
       "first": "integer",
       "second": "string"
     }
-  },
+  ],
 
-  "enum.EnumExample": {
-    "values": ["one", "two"]
-  },
+  "enum.EnumExample": [
+    "/// A basic enum example",
+    "///",
+    "/// All enums are strings.",
+    ["one", "two"]
+  ],
 
-  "function.test": {
-    "input.fields": {
+  "function.test": [
+    "/// The primary function example.",
+    "///",
+    "/// The arguments is always a struct. The result is also always a struct.",
+    {
       "value!": "union.Value"
     },
-    "output.fields": {
+    {
       "value!": "union.Value"
     }
-  }
+  ]
 }

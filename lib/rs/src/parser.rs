@@ -247,15 +247,23 @@ fn parse_def(
 
     let def = match &japi_keyword[..] {
         "function" => {
-            let input_def = desc
-                .get("input.fields")
+            let def_arr: Vec<&Value> = desc
+                .as_array()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "Function definition must have \"input.fields\" key".to_string(),
+                    msg: "function definition must be an array".to_string(),
+                })?
+                .iter()
+                .filter(|e| !e.is_string())
+                .collect();
+
+            let input_def = def_arr
+                .get(0)
+                .ok_or(JapiDescriptionParseError {
+                    msg: "function definition must be an array of at least 2 object elements".to_string(),
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "Function definition \"input.fields\" key must point to an object"
-                        .to_string(),
+                    msg: "function definition must be an array where the first non-string element is an object".to_string(),
                 })?;
 
             let mut input_fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -270,15 +278,14 @@ fn parse_def(
                 input_fields.insert(field_name, field_declaration);
             }
 
-            let output_def = desc
-                .get("output.fields")
+            let output_def = def_arr
+                .get(1)
                 .ok_or(JapiDescriptionParseError {
-                    msg: "Function definition must have \"output.fields\" key".to_string(),
+                    msg: "function definition must be an array of at least 2 object elements".to_string(),
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "Function definition \"output.fields\" key must point to an object"
-                        .to_string(),
+                    msg: "function definition must be an array where the second non-string element is an object".to_string(),
                 })?;
 
             let mut output_fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -300,14 +307,23 @@ fn parse_def(
             }
         }
         "struct" => {
-            let struct_def = desc
-                .get("fields")
+            let def_arr: Vec<&Value> = desc
+                .as_array()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "struct definition must have \"fields\" key".to_string(),
+                    msg: "struct definition must be an array".to_string(),
+                })?
+                .iter()
+                .filter(|e| !e.is_string())
+                .collect();
+
+            let struct_def = def_arr
+                .get(0)
+                .ok_or(JapiDescriptionParseError {
+                    msg: "struct definition must be an array of at least one object element".to_string(),
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "struct definition \"fields\" key must point to an object".to_string(),
+                    msg: "struct definition must be an array where the first non-string element is an object".to_string(),
                 })?;
 
             let mut fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -330,14 +346,23 @@ fn parse_def(
             }
         }
         "union" => {
-            let union_def = desc
-                .get("cases")
+            let def_arr: Vec<&Value> = desc
+                .as_array()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "union definition must have \"cases\" key".to_string(),
+                    msg: "union definition must be an array".to_string(),
+                })?
+                .iter()
+                .filter(|e| !e.is_string())
+                .collect();
+
+            let union_def = def_arr
+                .get(0)
+                .ok_or(JapiDescriptionParseError {
+                    msg: "union definition must be an array of at least one object element".to_string(),
                 })?
                 .as_object()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "union definition \"cases\" key must point to an object".to_string(),
+                    msg: "union definition must be an array where the first non-string element is an object".to_string(),
                 })?;
 
             let mut fields: HashMap<String, FieldDeclaration> = HashMap::new();
@@ -360,14 +385,23 @@ fn parse_def(
             }
         }
         "enum" => {
-            let enum_def = desc
-                .get("values")
+            let def_arr: Vec<&Value> = desc
+                .as_array()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "enum definition must have \"values\" key".to_string(),
+                    msg: "enum definition must be an array".to_string(),
+                })?
+                .iter()
+                .filter(|e| !e.is_string())
+                .collect();
+
+            let enum_def = def_arr
+                .get(0)
+                .ok_or(JapiDescriptionParseError {
+                    msg: "enum definition must be an array of at least one array element".to_string(),
                 })?
                 .as_array()
                 .ok_or(JapiDescriptionParseError {
-                    msg: "enum definition \"values\" key must point to an array".to_string(),
+                    msg: "enum definition must be an array where the first non-string element is an array".to_string(),
                 })?;
 
             let mut values: Vec<String> = Vec::new();
