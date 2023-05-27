@@ -200,7 +200,7 @@ fn parse_field(
     let field_name = field_def_re_captures
         .get(1)
         .ok_or(JapiDescriptionParseError {
-            msg: "Invalid function input field".to_string(),
+            msg: "Invalid field".to_string(),
         })?
         .as_str();
 
