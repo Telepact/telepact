@@ -1,1 +1,3 @@
 .idea/
+src/test/java/io/github/brenbar/japi/Tests.java
+target/

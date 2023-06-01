@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -44,7 +46,13 @@ public class Processor {
     private static class JapiMessageTypeNotFunction extends Error {}
     private static class JapiMessageHeaderNotObject extends Error {}
     private static class JapiMessageBodyNotObject extends Error {}
-    private static class FunctionNotFound extends Error {}
+    private static class FunctionNotFound extends Error {
+        public final String functionName;
+        public FunctionNotFound(String functionName) {
+            super("Function not found: %s".formatted(functionName));
+            this.functionName = functionName;
+        }
+    }
     private static class InvalidInput extends Error {}
     private static class InvalidOutput extends Error {
         public InvalidOutput(Throwable cause) {
@@ -164,10 +172,16 @@ public class Processor {
 
     private Handler handler;
     private Map<String, Parser.Definition> apiDescription;
+    private Consumer<Throwable> onError;
 
     public Processor(Handler handler, Map<String, Parser.Definition> apiDescription) {
+        this(handler, apiDescription, (e) -> {});
+    }
+
+    public Processor(Handler handler, Map<String, Parser.Definition> apiDescription, Consumer<Throwable> onError) {
         this.handler = handler;
         this.apiDescription = apiDescription;
+        this.onError = onError;
     }
 
     public String process(String inputJson) {
@@ -198,40 +212,47 @@ public class Processor {
     public List<Object> process(List<Object> inputJsonJava) {
         var finalHeaders = new HashMap<String, Object>();
         try {
-            if (inputJsonJava.size() < 3) {
-                throw new JapiMessageArrayTooFewElements();
-            }
-
-            String messageType;
             try {
-                messageType = (String) inputJsonJava.get(0);
-            } catch (ClassCastException e) {
-                throw new JapiMessageTypeNotString();
-            }
-            var regex = Pattern.compile("^function\\.([a-z][a-zA-Z0-9_]*)(.input)?");
-            var matcher = regex.matcher(messageType);
-            if (!matcher.matches()) {
-                throw new JapiMessageTypeNotFunction();
-            }
-            var functionName = matcher.group(1);
+                if (inputJsonJava.size() < 3) {
+                    throw new JapiMessageArrayTooFewElements();
+                }
 
-            Map<String, Object> headers;
-            try {
-                headers = (Map<String, Object>) inputJsonJava.get(1);
-            } catch (ClassCastException e) {
-                throw new JapiMessageHeaderNotObject();
+                String messageType;
+                try {
+                    messageType = (String) inputJsonJava.get(0);
+                } catch (ClassCastException e) {
+                    throw new JapiMessageTypeNotString();
+                }
+                var regex = Pattern.compile("^function\\.([a-z][a-zA-Z0-9_]*)(.input)?");
+                var matcher = regex.matcher(messageType);
+                if (!matcher.matches()) {
+                    throw new JapiMessageTypeNotFunction();
+                }
+                var functionName = matcher.group(1);
+
+                Map<String, Object> headers;
+                try {
+                    headers = (Map<String, Object>) inputJsonJava.get(1);
+                } catch (ClassCastException e) {
+                    throw new JapiMessageHeaderNotObject();
+                }
+
+                Map<String, Object> messageBody;
+                try {
+                    messageBody = (Map<String, Object>) inputJsonJava.get(2);
+                } catch (ClassCastException e) {
+                    throw new JapiMessageBodyNotObject();
+                }
+
+                var output = _process(functionName, headers, messageBody);
+
+                return List.of("function.%s.output".formatted(functionName), finalHeaders, output);
+            } catch (Exception e) {
+                try {
+                    this.onError.accept(e);
+                } catch (Exception ignored) {}
+                throw e;
             }
-
-            Map<String, Object> messageBody;
-            try {
-                messageBody = (Map<String, Object>) inputJsonJava.get(2);
-            } catch (ClassCastException e) {
-                throw new JapiMessageBodyNotObject();
-            }
-
-            var output = _process(functionName, headers, messageBody);
-
-            return List.of("function.%s.output".formatted(functionName), finalHeaders, output);
         } catch (StructHasExtraFields e) {
             var messageType = "error._InvalidInput";
             var errors = e.extraFields.stream().collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "UnknownStructField"));
@@ -396,7 +417,7 @@ public class Processor {
             inputDefinition = f.inputFields();
             outputDefinition = f.outputFields();
         } else {
-            throw new Error("Unknown Process Failure");
+            throw new FunctionNotFound(functionName);
         }
 
         validateStruct("input", inputDefinition, input);
