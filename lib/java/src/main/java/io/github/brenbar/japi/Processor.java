@@ -4,28 +4,162 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Processor {
     interface Handler {
         Map<String, Object> handle(String functionName, Map<String, Object> headers, Map<String, Object> input);
     }
 
-    public static class Error extends RuntimeException {
+    private static class Error extends RuntimeException {
         public Error(String message) {
             super(message);
         }
         public Error(Throwable cause) {
             super(cause);
         }
+
+        public Error() {
+            super();
+        }
     }
 
-    public static class InvalidJson extends Error {
+    private static class InvalidJson extends Error {
         public InvalidJson(Throwable cause) {
             super(cause);
         }
+    }
+
+    private static class JapiMessageArrayTooFewElements extends Error {}
+    private static class JapiMessageNotArray extends Error {}
+    private static class JapiMessageTypeNotString extends Error {}
+    private static class JapiMessageTypeNotFunction extends Error {}
+    private static class JapiMessageHeaderNotObject extends Error {}
+    private static class JapiMessageBodyNotObject extends Error {}
+    private static class FunctionNotFound extends Error {}
+    private static class InvalidInput extends Error {}
+    private static class InvalidOutput extends Error {
+        public InvalidOutput(Throwable cause) {
+            super(cause);
+        }
+    }
+    private static class FieldError extends InvalidInput {
+    }
+
+    private static class StructMissingFields extends FieldError {
+        public final String namespace;
+        public final List<String> missingFields;
+        public StructMissingFields(String namespace, List<String> missingFields) {
+            super();
+            this.namespace = namespace;
+            this.missingFields = missingFields;
+        }
+    }
+
+    private static class StructHasExtraFields extends FieldError {
+        public final String namespace;
+        public final List<String> extraFields;
+        public StructHasExtraFields(String namespace, List<String> extraFields) {
+            super();
+            this.namespace = namespace;
+            this.extraFields = extraFields;
+        }
+    }
+
+    private static class UnionDoesNotHaveOnlyOneField extends FieldError {
+        public final String namespace;
+        public UnionDoesNotHaveOnlyOneField(String namespace) {
+            super();
+            this.namespace = namespace;
+        }
+    }
+
+    private static class UnknownUnionField extends FieldError {
+        public final String namespace;
+        public final String field;
+        public UnknownUnionField(String namespace, String field) {
+            super();
+            this.namespace = namespace;
+            this.field = field;
+        }
+    }
+
+    private static class InvalidFieldType extends FieldError {
+        public final String fieldName;
+        public final InvalidFieldTypeError error;
+        public InvalidFieldType(String fieldName, InvalidFieldTypeError error) {
+            this.fieldName = fieldName;
+            this.error = error;
+        }
+    }
+
+    public enum InvalidFieldTypeError {
+        NULL_INVALID_FOR_NON_NULL_TYPE,
+
+        NUMBER_INVALID_FOR_BOOLEAN_TYPE,
+        STRING_INVALID_FOR_BOOLEAN_TYPE,
+        ARRAY_INVALID_FOR_BOOLEAN_TYPE,
+        OBJECT_INVALID_FOR_BOOLEAN_TYPE,
+        VALUE_INVALID_FOR_BOOLEAN_TYPE,
+
+        BOOLEAN_INVALID_FOR_INTEGER_TYPE,
+        NUMBER_INVALID_FOR_INTEGER_TYPE,
+        STRING_INVALID_FOR_INTEGER_TYPE,
+        ARRAY_INVALID_FOR_INTEGER_TYPE,
+        OBJECT_INVALID_FOR_INTEGER_TYPE,
+        VALUE_INVALID_FOR_INTEGER_TYPE,
+
+        BOOLEAN_INVALID_FOR_NUMBER_TYPE,
+        STRING_INVALID_FOR_NUMBER_TYPE,
+        ARRAY_INVALID_FOR_NUMBER_TYPE,
+        OBJECT_INVALID_FOR_NUMBER_TYPE,
+        VALUE_INVALID_FOR_NUMBER_TYPE,
+
+        BOOLEAN_INVALID_FOR_STRING_TYPE,
+        NUMBER_INVALID_FOR_STRING_TYPE,
+        ARRAY_INVALID_FOR_STRING_TYPE,
+        OBJECT_INVALID_FOR_STRING_TYPE,
+        VALUE_INVALID_FOR_STRING_TYPE,
+
+        BOOLEAN_INVALID_FOR_ARRAY_TYPE,
+        NUMBER_INVALID_FOR_ARRAY_TYPE,
+        STRING_INVALID_FOR_ARRAY_TYPE,
+        OBJECT_INVALID_FOR_ARRAY_TYPE,
+        VALUE_INVALID_FOR_ARRAY_TYPE,
+
+        BOOLEAN_INVALID_FOR_OBJECT_TYPE,
+        NUMBER_INVALID_FOR_OBJECT_TYPE,
+        STRING_INVALID_FOR_OBJECT_TYPE,
+        ARRAY_INVALID_FOR_OBJECT_TYPE,
+        VALUE_INVALID_FOR_OBJECT_TYPE,
+
+        BOOLEAN_INVALID_FOR_STRUCT_TYPE,
+        NUMBER_INVALID_FOR_STRUCT_TYPE,
+        STRING_INVALID_FOR_STRUCT_TYPE,
+        ARRAY_INVALID_FOR_STRUCT_TYPE,
+        VALUE_INVALID_FOR_STRUCT_TYPE,
+
+        BOOLEAN_INVALID_FOR_UNION_TYPE,
+        NUMBER_INVALID_FOR_UNION_TYPE,
+        STRING_INVALID_FOR_UNION_TYPE,
+        ARRAY_INVALID_FOR_UNION_TYPE,
+        VALUE_INVALID_FOR_UNION_TYPE,
+
+        BOOLEAN_INVALID_FOR_ENUM_TYPE,
+        NUMBER_INVALID_FOR_ENUM_TYPE,
+        ARRAY_INVALID_FOR_ENUM_TYPE,
+        OBJECT_INVALID_FOR_ENUM_TYPE,
+        VALUE_INVALID_FOR_ENUM_TYPE,
+
+        INVALID_ENUM_VALUE,
     }
 
     private Handler handler;
@@ -37,32 +171,473 @@ public class Processor {
     }
 
     public String process(String inputJson) {
-        var result = _process(inputJson);
-    }
-
-    private record ProcessResult(String functionName, Map<String, Object> output) {}
-
-    private ProcessResult _process(String functionInputJson) {
         var objectMapper = new ObjectMapper();
-        JsonNode json;
+        JsonNode inputJsonNode;
         try {
-            json = objectMapper.readTree(functionInputJson);
+            inputJsonNode = objectMapper.readTree(inputJson);
         } catch (JsonProcessingException e) {
             throw new InvalidJson(e);
         }
 
-        List<Object> functionInput;
+        List<Object> inputJsonJava;
         try {
-            functionInput = objectMapper.convertValue(json, new TypeReference<List<Object>>() {});
+            inputJsonJava = objectMapper.convertValue(inputJsonNode, new TypeReference<List<Object>>() {});
         } catch (IllegalArgumentException e) {
+            throw new JapiMessageNotArray();
+        }
+
+        var outputJsonJava = process(inputJsonJava);
+
+        try {
+            return objectMapper.writeValueAsString(outputJsonJava);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        if (functionInput.size() != 3) {
+    public List<Object> process(List<Object> inputJsonJava) {
+        var finalHeaders = new HashMap<String, Object>();
+        try {
+            if (inputJsonJava.size() < 3) {
+                throw new JapiMessageArrayTooFewElements();
+            }
 
+            String messageType;
+            try {
+                messageType = (String) inputJsonJava.get(0);
+            } catch (ClassCastException e) {
+                throw new JapiMessageTypeNotString();
+            }
+            var regex = Pattern.compile("^function\\.([a-z][a-zA-Z0-9_]*)(.input)?");
+            var matcher = regex.matcher(messageType);
+            if (!matcher.matches()) {
+                throw new JapiMessageTypeNotFunction();
+            }
+            var functionName = matcher.group(1);
+
+            Map<String, Object> headers;
+            try {
+                headers = (Map<String, Object>) inputJsonJava.get(1);
+            } catch (ClassCastException e) {
+                throw new JapiMessageHeaderNotObject();
+            }
+
+            Map<String, Object> messageBody;
+            try {
+                messageBody = (Map<String, Object>) inputJsonJava.get(2);
+            } catch (ClassCastException e) {
+                throw new JapiMessageBodyNotObject();
+            }
+
+            var output = _process(functionName, headers, messageBody);
+
+            return List.of("function.%s.output".formatted(functionName), finalHeaders, output);
+        } catch (StructHasExtraFields e) {
+            var messageType = "error._InvalidInput";
+            var errors = e.extraFields.stream().collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "UnknownStructField"));
+            var messageBody = invalidFields(errors);
+
+            return List.of(messageType, finalHeaders, messageBody);
+
+        } catch (StructMissingFields e) {
+            var messageType = "error._InvalidInput";
+            var errors = e.missingFields.stream().collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "RequiredStructFieldMissing"));
+            var messageBody = invalidFields(errors);
+
+            return List.of(messageType, finalHeaders, messageBody);
+
+        } catch (UnknownUnionField e) {
+            var messageType = "error._InvalidInput";
+            var messageBody = invalidField("%s.%s".formatted(e.namespace, e.field), "UnknownUnionField");
+
+            return List.of(messageType, finalHeaders, messageBody);
+        } catch (UnionDoesNotHaveOnlyOneField e) {
+            var messageType = "error._InvalidInput";
+            var messageBody = invalidField(e.namespace, "UnionDoesNotHaveOnlyOneField");
+
+            return List.of(messageType, finalHeaders, messageBody);
+        } catch (InvalidFieldType e) {
+            var entry = switch (e.error) {
+                case NULL_INVALID_FOR_NON_NULL_TYPE ->
+                        Map.entry("error._InvalidInput", invalidField(e.fieldName, "NullInvalidForNonNullType"));
+
+                case NUMBER_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForBooleanType"));
+
+                case STRING_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForBooleanType"));
+
+                case ARRAY_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForBooleanType"));
+
+                case OBJECT_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForBooleanType"));
+
+                case VALUE_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForBooleanType"));
+
+                case BOOLEAN_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForIntegerType"));
+
+                case NUMBER_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForIntegerType"));
+
+                case STRING_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForIntegerType"));
+
+                case ARRAY_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForIntegerType"));
+
+                case OBJECT_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForIntegerType"));
+
+                case VALUE_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForIntegerType"));
+
+                case BOOLEAN_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForNumberType"));
+
+                case STRING_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForNumberType"));
+
+                case ARRAY_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForNumberType"));
+
+                case OBJECT_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForNumberType"));
+
+                case VALUE_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForNumberType"));
+
+                case BOOLEAN_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForStringType"));
+
+                case NUMBER_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForStringType"));
+
+                case ARRAY_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForStringType"));
+
+                case OBJECT_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForStringType"));
+
+                case VALUE_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForStringType"));
+
+                case BOOLEAN_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForArrayType"));
+
+                case NUMBER_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForArrayType"));
+
+                case STRING_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForArrayType"));
+
+                case OBJECT_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForArrayType"));
+
+                case VALUE_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForArrayType"));
+
+                case BOOLEAN_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForArrayType"));
+
+                case NUMBER_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForObjectType"));
+
+                case STRING_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForObjectType"));
+
+                case ARRAY_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForObjectType"));
+
+                case VALUE_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForObjectType"));
+
+                case BOOLEAN_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForStructType"));
+
+                case NUMBER_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForStructType"));
+
+                case STRING_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForStructType"));
+
+                case ARRAY_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForStructType"));
+
+                case VALUE_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForStructType"));
+
+                case BOOLEAN_INVALID_FOR_UNION_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForUnionType"));
+
+                case NUMBER_INVALID_FOR_UNION_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForUnionType"));
+
+                case STRING_INVALID_FOR_UNION_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForUnionType"));
+
+                case ARRAY_INVALID_FOR_UNION_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForUnionType"));
+
+                case VALUE_INVALID_FOR_UNION_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForUnionType"));
+
+                case BOOLEAN_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForEnumType"));
+
+                case NUMBER_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForEnumType"));
+
+                case ARRAY_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForEnumType"));
+
+                case OBJECT_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForEnumType"));
+
+                case VALUE_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumType"));
+
+                case INVALID_ENUM_VALUE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "InvalidEnumType"));
+
+            };
+
+            var messageType = entry.getKey();
+            var messageBody = entry.getValue();
+
+            return List.of(messageType, finalHeaders, messageBody);
+        } catch (InvalidOutput e) {
+            var messageType = "error._InvalidOutput";
+
+            return List.of(messageType, finalHeaders, Map.of());
+        } catch (InvalidInput e) {
+            var messageType = "error._InvalidInput";
+
+            return List.of(messageType, finalHeaders, Map.of());
+        } catch (Exception e) {
+            var messageType = "error._ApplicationFailure";
+
+            return List.of(messageType, finalHeaders, Map.of());
         }
 
-        var title = functionInput.get(0);
+    }
 
+    private Map<String, List<Map<String, String>>> invalidField(String field, String reason) {
+        return invalidFields(Map.of(field, reason));
+    }
+
+    private Map<String, List<Map<String, String>>> invalidFields(Map<String, String> errors) {
+        var jsonErrors = errors.entrySet().stream().map(e -> Map.of(e.getKey(), e.getValue())).collect(Collectors.toList());
+        return Map.of("cases", jsonErrors);
+    }
+
+    private Map<String, Object> _process(String functionName, Map<String, Object> headers, Map<String, Object> input) {
+        var messageType = "function.%s".formatted(functionName);
+        var functionDef = this.apiDescription.get(messageType);
+
+        Map<String, Parser.FieldDeclaration> inputDefinition;
+        Map<String, Parser.FieldDeclaration> outputDefinition;
+        if (functionDef instanceof Parser.FunctionDefinition f) {
+            inputDefinition = f.inputFields();
+            outputDefinition = f.outputFields();
+        } else {
+            throw new Error("Unknown Process Failure");
+        }
+
+        validateStruct("input", inputDefinition, input);
+
+        var output = handler.handle(functionName, headers, input);
+
+        try {
+            validateStruct("output", outputDefinition, output);
+        } catch (Exception e) {
+            throw new InvalidOutput(e);
+        }
+
+        return output;
+    }
+
+    private void validateStruct(
+            String namespace,
+            Map<String, Parser.FieldDeclaration> referenceStruct,
+            Map<String, Object> actualStruct
+    ) {
+        var missingFields = new ArrayList<String>();
+        for (Map.Entry<String, Parser.FieldDeclaration> entry : referenceStruct.entrySet()) {
+            var name = entry.getKey();
+            var fieldDeclaration = entry.getValue();
+            if (!actualStruct.containsKey(name) && !fieldDeclaration.optional()) {
+                missingFields.add(name);
+            }
+        }
+
+        if (!missingFields.isEmpty()) {
+            throw new StructMissingFields(namespace, missingFields);
+        }
+
+        var extraFields = new ArrayList<String>();
+        for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
+            var name = entry.getKey();
+            if (!referenceStruct.containsKey(name)) {
+                extraFields.add(name);
+            }
+        }
+
+        if (!extraFields.isEmpty()) {
+            throw new StructHasExtraFields(namespace, extraFields);
+        }
+
+        for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
+            var name = entry.getKey();
+            var field = entry.getValue();
+            var referenceField = referenceStruct.get(name);
+            if (referenceField == null) {
+                throw new StructHasExtraFields(namespace, List.of(name));
+            }
+
+        }
+    }
+
+    private void validateUnion(
+            String namespace,
+            Map<String, Parser.FieldDeclaration> referenceStruct,
+            Map<String, Object> actualStruct
+    ) {
+        if (actualStruct.size() != 1) {
+            throw new UnionDoesNotHaveOnlyOneField(namespace);
+        }
+
+        var entry = actualStruct.entrySet().stream().findFirst().get();
+        var name = entry.getKey();
+        var fieldValue = entry.getValue();
+
+        var referenceField = referenceStruct.get(name);
+        if (referenceField == null) {
+            throw new UnknownUnionField(namespace, name);
+        }
+
+        validateType("%s.%s".formatted(namespace, name), referenceField.typeDeclaration(), fieldValue);
+    }
+
+    private void validateType(String fieldName, Parser.TypeDeclaration typeDeclaration, Object value) {
+        if (value == null) {
+            if (!typeDeclaration.nullable()) {
+                throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE);
+            } else {
+                return;
+            }
+        } else {
+            var expectedType = typeDeclaration.type();
+            if (expectedType instanceof Parser.JsonBoolean) {
+                if (value instanceof Boolean) {
+                    return;
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_BOOLEAN_TYPE);
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_BOOLEAN_TYPE);
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_BOOLEAN_TYPE);
+                } else if (value instanceof Map) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_BOOLEAN_TYPE);
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_BOOLEAN_TYPE);
+                }
+            } else if (expectedType instanceof Parser.JsonInteger) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_INTEGER_TYPE);
+                } else if (value instanceof Number) {
+                    if (value instanceof Long || value instanceof Integer) {
+                        return;
+                    } else {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_INTEGER_TYPE);
+                    }
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_INTEGER_TYPE);
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_INTEGER_TYPE);
+                } else if (value instanceof Map) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_INTEGER_TYPE);
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_INTEGER_TYPE);
+                }
+            } else if (expectedType instanceof Parser.JsonNumber) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_NUMBER_TYPE);
+                } else if (value instanceof Number) {
+                    return;
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_NUMBER_TYPE);
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_NUMBER_TYPE);
+                } else if (value instanceof Map) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE);
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE);
+                }
+            } else if (expectedType instanceof Parser.JsonString) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRING_TYPE);
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRING_TYPE);
+                } else if (value instanceof String) {
+                    return;
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRING_TYPE);
+                } else if (value instanceof Map) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_STRING_TYPE);
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRING_TYPE);
+                }
+            } else if (expectedType instanceof Parser.JsonArray a) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ARRAY_TYPE);
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ARRAY_TYPE);
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ARRAY_TYPE);
+                } else if (value instanceof List l) {
+                    for (var i = 0; i < l.size(); i += 1) {
+                        var element = l.get(i);
+                        validateType("%s[%s]".formatted(fieldName, i), a.nestedType(), element);
+                    }
+                    return;
+                } else if (value instanceof Map) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ARRAY_TYPE);
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ARRAY_TYPE);
+                }
+            } else if (expectedType instanceof Parser.JsonObject o) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_OBJECT_TYPE);
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_OBJECT_TYPE);
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_OBJECT_TYPE);
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_OBJECT_TYPE);
+                } else if (value instanceof Map<?, ?> m) {
+                    for (Map.Entry<?, ?> entry : m.entrySet()) {
+                        var k = (String) entry.getKey();
+                        var v = entry.getValue();
+                        validateType("%s{%s}".formatted(fieldName, k), o.nestedType(), v);
+                    }
+                    return;
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_OBJECT_TYPE);
+                }
+            } else if (expectedType instanceof Parser.Struct s) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRUCT_TYPE);
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRUCT_TYPE);
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_STRUCT_TYPE);
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE);
+                } else if (value instanceof Map<?, ?> m) {
+                    for (Map.Entry<?, ?> entry : m.entrySet()) {
+                        var k = (String) entry.getKey();
+                        var v = entry.getValue();
+                        validateStruct(fieldName, s.fields(), (Map<String, Object>) m);
+                    }
+                    return;
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE);
+                }
+            } else if (expectedType instanceof Parser.Union u) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof String) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof Map<?, ?> m) {
+                    for (Map.Entry<?, ?> entry : m.entrySet()) {
+                        var k = (String) entry.getKey();
+                        var v = entry.getValue();
+                        validateUnion(fieldName, u.cases(), (Map<String, Object>) m);
+                    }
+                    return;
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_UNION_TYPE);
+                }
+            } else if (expectedType instanceof Parser.Enum e) {
+                if (value instanceof Boolean) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof Number) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof String s) {
+                    if (!e.allowedValues().contains(s)) {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.INVALID_ENUM_VALUE);
+                    } else {
+                        return;
+                    }
+                } else if (value instanceof List) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_UNION_TYPE);
+                } else if (value instanceof Map<?, ?>) {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ENUM_TYPE);
+                } else {
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_UNION_TYPE);
+                }
+            }
+
+        }
     }
 }
