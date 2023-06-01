@@ -543,11 +543,6 @@ impl JapiProcessor {
         actual_struct: &Map<String, Value>,
     ) -> Result<(), FieldError> {
         if actual_struct.len() != 1 {
-            let field_names: Vec<String> = actual_struct
-                .keys()
-                .into_iter()
-                .map(|s| s.to_owned())
-                .collect();
             return Err(FieldError::UnionDoesNotHaveOnlyOneField(
                 namespace.to_string(),
             ));
