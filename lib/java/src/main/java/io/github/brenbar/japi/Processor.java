@@ -310,11 +310,21 @@ public class Processor {
                 }
 
                 String messageType;
-                try {
-                    messageType = (String) inputJsonJava.get(0);
-                } catch (ClassCastException e) {
-                    throw new JapiMessageTypeNotString();
+                if (!inputIsMessagepack) {
+                    try {
+                        messageType = (String) inputJsonJava.get(0);
+                    } catch (ClassCastException e) {
+                        throw new JapiMessageTypeNotString();
+                    }
+                } else {
+                    try {
+                        var encodedMessageType = (Integer) inputJsonJava.get(0);
+                        messageType = binaryEncodingReversed.get(encodedMessageType);
+                    } catch (Exception e) {
+                        throw new BinaryDecodeFailure(e);
+                    }
                 }
+
                 var regex = Pattern.compile("^function\\.([a-zA-Z_][a-zA-Z0-9_]*)(.input)?");
                 var matcher = regex.matcher(messageType);
                 if (!matcher.matches()) {
@@ -380,14 +390,19 @@ public class Processor {
 
                 var output = _process(functionName, headers, messageBody);
 
+                var outputMessageType = "function.%s.output".formatted(functionName);
+
                 Object finalOutput;
+                Object finalOutputMessageType;
                 if (returnAsBinary) {
                     finalOutput = encode(finalHeaders);
+                    finalOutputMessageType = binaryEncoding.get(outputMessageType);
                 } else {
                     finalOutput = output;
+                    finalOutputMessageType = outputMessageType;
                 }
 
-                return List.of("function.%s.output".formatted(functionName), finalHeaders, finalOutput);
+                return List.of(finalOutputMessageType, finalHeaders, finalOutput);
             } catch (Exception e) {
                 try {
                     this.onError.accept(e);
