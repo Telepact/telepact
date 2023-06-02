@@ -390,7 +390,7 @@ public class Processor {
 
                 var output = _process(functionName, headers, messageBody);
 
-                var outputMessageType = "function.%s.output".formatted(functionName);
+                var outputMessageType = "function.%s".formatted(functionName);
 
                 Object finalOutput;
                 Object finalOutputMessageType;
