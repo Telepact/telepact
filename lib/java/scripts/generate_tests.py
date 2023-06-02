@@ -44,7 +44,10 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -75,6 +78,7 @@ for case in cases:
     test_file.write('''
     @Test
     public void test_{}() throws IOException {{
+        var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
         var defs = Parser.newJapiDescription(json);
         var processor = new Processor(this::handle, defs, (e) -> {{e.printStackTrace();}});
@@ -85,7 +89,9 @@ for case in cases:
         {}
         """.trim();
         var output = processor.process(input);
-        assertEquals(expectedOutput, output);
+        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
+        var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>(){{}});
+        assertEquals(expectedOutputJsonJava, outputJsonJava);
     }}
 
     '''.format(case.name, case.input, case.output)

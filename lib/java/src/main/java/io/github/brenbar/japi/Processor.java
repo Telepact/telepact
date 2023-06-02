@@ -4,13 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.sql.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -274,7 +272,7 @@ public class Processor {
             return List.of(messageType, finalHeaders, messageBody);
         } catch (UnionDoesNotHaveOnlyOneField e) {
             var messageType = "error._InvalidInput";
-            var messageBody = invalidField(e.namespace, "UnionDoesNotHaveOnlyOneField");
+            var messageBody = invalidField(e.namespace, "UnionDoesNotHaveExactlyOneField");
 
             return List.of(messageType, finalHeaders, messageBody);
         } catch (InvalidFieldType e) {
@@ -334,7 +332,7 @@ public class Processor {
 
                 case VALUE_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForArrayType"));
 
-                case BOOLEAN_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForArrayType"));
+                case BOOLEAN_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForObjectType"));
 
                 case NUMBER_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForObjectType"));
 
@@ -374,7 +372,7 @@ public class Processor {
 
                 case VALUE_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumType"));
 
-                case INVALID_ENUM_VALUE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "InvalidEnumType"));
+                case INVALID_ENUM_VALUE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "UnknownEnumValue"));
 
             };
 
@@ -403,7 +401,7 @@ public class Processor {
     }
 
     private Map<String, List<Map<String, String>>> invalidFields(Map<String, String> errors) {
-        var jsonErrors = errors.entrySet().stream().map(e -> Map.of("field", e.getKey(), "reason", e.getValue())).collect(Collectors.toList());
+        var jsonErrors = errors.entrySet().stream().map(e -> (Map<String, String>) new TreeMap<>(Map.of("field", e.getKey(), "reason", e.getValue()))).collect(Collectors.toList());
         return Map.of("cases", jsonErrors);
     }
 
@@ -611,11 +609,7 @@ public class Processor {
                 } else if (value instanceof List) {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE);
                 } else if (value instanceof Map<?, ?> m) {
-                    for (Map.Entry<?, ?> entry : m.entrySet()) {
-                        var k = (String) entry.getKey();
-                        var v = entry.getValue();
-                        validateStruct(fieldName, s.fields(), (Map<String, Object>) m);
-                    }
+                    validateStruct(fieldName, s.fields(), (Map<String, Object>) m);
                     return;
                 } else {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE);
@@ -630,20 +624,16 @@ public class Processor {
                 } else if (value instanceof List) {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_UNION_TYPE);
                 } else if (value instanceof Map<?, ?> m) {
-                    for (Map.Entry<?, ?> entry : m.entrySet()) {
-                        var k = (String) entry.getKey();
-                        var v = entry.getValue();
-                        validateUnion(fieldName, u.cases(), (Map<String, Object>) m);
-                    }
+                    validateUnion(fieldName, u.cases(), (Map<String, Object>) m);
                     return;
                 } else {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_UNION_TYPE);
                 }
             } else if (expectedType instanceof Parser.Enum e) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_UNION_TYPE);
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_TYPE);
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_UNION_TYPE);
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_TYPE);
                 } else if (value instanceof String s) {
                     if (!e.allowedValues().contains(s)) {
                         throw new InvalidFieldType(fieldName, InvalidFieldTypeError.INVALID_ENUM_VALUE);
@@ -651,11 +641,11 @@ public class Processor {
                         return;
                     }
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_UNION_TYPE);
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE);
                 } else if (value instanceof Map<?, ?>) {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ENUM_TYPE);
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_UNION_TYPE);
+                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);
                 }
             }
 
