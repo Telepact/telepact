@@ -1321,3 +1321,11 @@
 ["function.test",{"output":{"value":{"objNullEnum":{"a":"one","b":0.1}}}},{}]|["error._InvalidOutput",{},{}]
 ["function.test",{"output":{"value":{"objNullEnum":{"a":"one","b":[]}}}},{}]|["error._InvalidOutput",{},{}]
 ["function.test",{"output":{"value":{"objNullEnum":{"a":"one","b":{}}}}},{}]|["error._InvalidOutput",{},{}]
+
+"testPing"
+
+["function._ping",{},{}]|["function._ping.output",{},{}]
+
+"testCallId"
+
+["function._ping",{"_id":"abcd"},{}]|["function._ping.output",{"_id":"abcd"},{}]

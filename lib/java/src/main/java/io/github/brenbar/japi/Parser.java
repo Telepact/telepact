@@ -68,17 +68,20 @@ public class Parser {
         }
     }
 
-    public static Map<String, Definition> newJapiDescription(String japiDescriptionJson) {
+    public record ApiDescription(Map<String, Object> original, Map<String, Definition> parsed) {}
+
+    public static ApiDescription newJapiDescription(String japiDescriptionJson) {
         var definitions = new HashMap<String, Definition>();
 
         var objectMapper = new ObjectMapper();
+        Map<String, List<Object>> japiDescriptionJsonJava;
         try {
-            var japiDescriptionJsonMap = objectMapper.readValue(japiDescriptionJson, new TypeReference<Map<String, List<Object>>>(){});
+            japiDescriptionJsonJava = objectMapper.readValue(japiDescriptionJson, new TypeReference<Map<String, List<Object>>>(){});
 
-            for (var entry : japiDescriptionJsonMap.entrySet()) {
+            for (var entry : japiDescriptionJsonJava.entrySet()) {
                 var defRefName = entry.getKey();
                 if (!definitions.containsValue(defRefName)) {
-                    var def = parseDefinition(japiDescriptionJsonMap, definitions, defRefName);
+                    var def = parseDefinition(japiDescriptionJsonJava, definitions, defRefName);
                     definitions.put(defRefName, def);
                 }
             }
@@ -86,7 +89,7 @@ public class Parser {
             throw new JapiDescriptionParseError("Invalid JSON: Document root must be an object");
         }
 
-        return definitions;
+        return new ApiDescription((Map<String, Object>) (Object) japiDescriptionJsonJava, definitions);
     }
 
     private static Definition parseDefinition(Map<String, List<Object>> descriptionRoot, Map<String, Definition> definitions, String defRefName) {

@@ -169,16 +169,45 @@ public class Processor {
     }
 
     private Handler handler;
+    private Handler internalHandler;
+    private Map<String, Object> originalApiDescription;
     private Map<String, Parser.Definition> apiDescription;
     private Consumer<Throwable> onError;
 
-    public Processor(Handler handler, Map<String, Parser.Definition> apiDescription) {
-        this(handler, apiDescription, (e) -> {});
+    public Processor(Handler handler, String apiDescriptionJson) {
+        this(handler, apiDescriptionJson, (e) -> {});
     }
 
-    public Processor(Handler handler, Map<String, Parser.Definition> apiDescription, Consumer<Throwable> onError) {
+    public Processor(Handler handler, String apiDescriptionJson, Consumer<Throwable> onError) {
+        var description = Parser.newJapiDescription(apiDescriptionJson);
+        // Also add the internal api spec
+        this.apiDescription = description.parsed();
+        this.originalApiDescription = description.original();
+
+        var internalDescription = Parser.newJapiDescription("""
+        {
+          "function._ping": [
+            {},
+            {}
+          ],
+          "function._api": [
+            {},
+            {
+              "api": "object"
+            }
+          ]
+        }
+        """);
+
+        this.apiDescription.putAll(internalDescription.parsed());
+        this.originalApiDescription.putAll(internalDescription.original());
+
         this.handler = handler;
-        this.apiDescription = apiDescription;
+        this.internalHandler = (functionName, headers, input) -> switch (functionName) {
+            case "_ping" -> Map.of();
+            case "_api" -> Map.of("api", originalApiDescription);
+            default -> throw new FunctionNotFound(functionName);
+        };
         this.onError = onError;
     }
 
@@ -221,7 +250,7 @@ public class Processor {
                 } catch (ClassCastException e) {
                     throw new JapiMessageTypeNotString();
                 }
-                var regex = Pattern.compile("^function\\.([a-z][a-zA-Z0-9_]*)(.input)?");
+                var regex = Pattern.compile("^function\\.([a-zA-Z_][a-zA-Z0-9_]*)(.input)?");
                 var matcher = regex.matcher(messageType);
                 if (!matcher.matches()) {
                     throw new JapiMessageTypeNotFunction();
@@ -233,6 +262,12 @@ public class Processor {
                     headers = (Map<String, Object>) inputJsonJava.get(1);
                 } catch (ClassCastException e) {
                     throw new JapiMessageHeaderNotObject();
+                }
+
+                // Reflect call id
+                var callId = headers.get("_id");
+                if (callId != null) {
+                    finalHeaders.put("_id", callId);
                 }
 
                 Map<String, Object> messageBody;
@@ -420,7 +455,12 @@ public class Processor {
 
         validateStruct("input", inputDefinition, input);
 
-        var output = handler.handle(functionName, headers, input);
+        Map<String, Object> output;
+        if (functionName.startsWith("_")) {
+            output = internalHandler.handle(functionName, headers, input);
+        } else {
+            output = handler.handle(functionName, headers, input);
+        }
 
         try {
             validateStruct("output", outputDefinition, output);
