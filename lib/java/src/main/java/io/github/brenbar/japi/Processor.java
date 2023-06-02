@@ -403,7 +403,7 @@ public class Processor {
     }
 
     private Map<String, List<Map<String, String>>> invalidFields(Map<String, String> errors) {
-        var jsonErrors = errors.entrySet().stream().map(e -> Map.of(e.getKey(), e.getValue())).collect(Collectors.toList());
+        var jsonErrors = errors.entrySet().stream().map(e -> Map.of("field", e.getKey(), "reason", e.getValue())).collect(Collectors.toList());
         return Map.of("cases", jsonErrors);
     }
 
@@ -470,7 +470,7 @@ public class Processor {
             if (referenceField == null) {
                 throw new StructHasExtraFields(namespace, List.of(name));
             }
-
+            validateType("%s.%s".formatted(namespace, name), referenceField.typeDeclaration(), field);
         }
     }
 
