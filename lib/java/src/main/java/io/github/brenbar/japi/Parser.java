@@ -69,7 +69,7 @@ public class Parser {
     }
 
     public static Map<String, Definition> newJapiDescription(String japiDescriptionJson) {
-        var descriptions = new HashMap<String, Definition>();
+        var definitions = new HashMap<String, Definition>();
 
         var objectMapper = new ObjectMapper();
         try {
@@ -77,18 +77,19 @@ public class Parser {
 
             for (var entry : japiDescriptionJsonMap.entrySet()) {
                 var defRefName = entry.getKey();
-                if (descriptions.containsValue(defRefName)) {
-                    parseDefinition(japiDescriptionJsonMap, descriptions, defRefName);
+                if (!definitions.containsValue(defRefName)) {
+                    var def = parseDefinition(japiDescriptionJsonMap, definitions, defRefName);
+                    definitions.put(defRefName, def);
                 }
             }
         } catch (IOException e) {
             throw new JapiDescriptionParseError("Invalid JSON: Document root must be an object");
         }
 
-        return descriptions;
+        return definitions;
     }
 
-    private static void parseDefinition(Map<String, List<Object>> descriptionRoot, Map<String, Definition> definitions, String defRefName) {
+    private static Definition parseDefinition(Map<String, List<Object>> descriptionRoot, Map<String, Definition> definitions, String defRefName) {
         var description = descriptionRoot.get(defRefName);
         if (definitions == null) {
             throw new JapiDescriptionParseError("Could not find definition for %s".formatted(defRefName));
@@ -251,7 +252,7 @@ public class Parser {
             default -> throw new JapiDescriptionParseError("Unrecognized japi keyword %s".formatted(keyword));
         };
 
-        definitions.put(defRefName, def);
+        return def;
     }
 
     private static List<String> splitJapiDefinitionName(String name) {
@@ -332,7 +333,7 @@ public class Parser {
 
             TypeDeclaration nestedType;
             if (nestedName != null) {
-                nestedType = parseType(descriptionRoot, definitions, typeDeclaration);
+                nestedType = parseType(descriptionRoot, definitions, nestedName);
             } else {
                 nestedType = new TypeDeclaration(new JsonAny(), false);
             }
@@ -356,7 +357,8 @@ public class Parser {
                 throw new RuntimeException();
             }
 
-            var definition = definitions.get(name);
+            var definition = definitions.computeIfAbsent(name, (k) ->
+                    parseDefinition(descriptionRoot, definitions, typeDeclaration));
             if (definition instanceof TypeDefinition t) {
                 return new TypeDeclaration(t.type, nullable);
             } else if (definition instanceof FunctionDefinition f) {
