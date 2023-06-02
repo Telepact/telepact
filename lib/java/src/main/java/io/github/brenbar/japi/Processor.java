@@ -6,9 +6,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.msgpack.jackson.dataformat.MessagePackFactory;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Array;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -43,6 +50,12 @@ public class Processor {
     private static class JapiMessageTypeNotString extends Error {}
     private static class JapiMessageTypeNotFunction extends Error {}
     private static class JapiMessageHeaderNotObject extends Error {}
+    private static class InvalidBinaryEncoding extends Error {}
+    private static class BinaryDecodeFailure extends Error {
+        public BinaryDecodeFailure(Throwable cause) {
+            super(cause);
+        }
+    }
     private static class JapiMessageBodyNotObject extends Error {}
     private static class FunctionNotFound extends Error {
         public final String functionName;
@@ -174,6 +187,10 @@ public class Processor {
     private Map<String, Parser.Definition> apiDescription;
     private Consumer<Throwable> onError;
 
+    private Map<String, Integer> binaryEncoding;
+    private Map<Integer, String> binaryEncodingReversed;
+    private long binaryHash;
+
     public Processor(Handler handler, String apiDescriptionJson) {
         this(handler, apiDescriptionJson, (e) -> {});
     }
@@ -209,15 +226,63 @@ public class Processor {
             default -> throw new FunctionNotFound(functionName);
         };
         this.onError = onError;
+
+        // Calculate binary hash
+        var allApiDescriptionKeys = new TreeSet<String>();
+        for (var entry : apiDescription.entrySet()) {
+            allApiDescriptionKeys.add(entry.getKey());
+            if (entry.getValue() instanceof Parser.FunctionDefinition f) {
+                allApiDescriptionKeys.addAll(f.inputFields().keySet());
+                allApiDescriptionKeys.addAll(f.outputFields().keySet());
+                allApiDescriptionKeys.addAll(f.errors());
+            } else if (entry.getValue() instanceof Parser.TypeDefinition t) {
+                var type = t.type();
+                if (type instanceof Parser.Struct o) {
+                    allApiDescriptionKeys.addAll(o.fields().keySet());
+                } else if (type instanceof Parser.Union u) {
+                    allApiDescriptionKeys.addAll(u.cases().keySet());
+                } else if (type instanceof Parser.Enum e) {
+                    allApiDescriptionKeys.addAll(e.allowedValues());
+                }
+            }
+        }
+        var atomicInteger = new AtomicInteger(0);
+        this.binaryEncoding = allApiDescriptionKeys.stream().collect(Collectors.toMap(k -> k, k -> atomicInteger.getAndIncrement()));
+        this.binaryEncodingReversed = this.binaryEncoding.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+        var finalString = allApiDescriptionKeys.stream().collect(Collectors.joining("\n"));
+        try {
+            var hash = MessageDigest.getInstance("SHA-256").digest(finalString.getBytes(StandardCharsets.UTF_8));
+            var buffer = ByteBuffer.wrap(hash);
+            this.binaryHash = buffer.getLong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public String process(String inputJson) {
+    private void gatherAllApiDescriptionKeys(HashSet<String> allKeys, Map<String, Object> node) {
+        for (var entry : node.entrySet()) {
+            allKeys.add(entry.getKey());
+            if (entry.getValue() instanceof Map<?,?> m) {
+                gatherAllApiDescriptionKeys(allKeys, node);
+            }
+        }
+    }
+
+    public byte[] process(byte[] inputJson) {
         var objectMapper = new ObjectMapper();
         JsonNode inputJsonNode;
+        boolean isMessagePack = false;
         try {
             inputJsonNode = objectMapper.readTree(inputJson);
-        } catch (JsonProcessingException e) {
-            throw new InvalidJson(e);
+        } catch (IOException e) {
+            // Try msgpack
+            var msgPackMapper = new ObjectMapper(new MessagePackFactory());
+            try {
+                inputJsonNode = msgPackMapper.readTree(inputJson);
+                isMessagePack = true;
+            } catch (IOException ex) {
+                throw new InvalidJson(ex);
+            }
         }
 
         List<Object> inputJsonJava;
@@ -227,16 +292,16 @@ public class Processor {
             throw new JapiMessageNotArray();
         }
 
-        var outputJsonJava = process(inputJsonJava);
+        var outputJsonJava = process(inputJsonJava, isMessagePack);
 
         try {
-            return objectMapper.writeValueAsString(outputJsonJava);
+            return objectMapper.writeValueAsBytes(outputJsonJava);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<Object> process(List<Object> inputJsonJava) {
+    public List<Object> process(List<Object> inputJsonJava, boolean inputIsMessagepack) {
         var finalHeaders = new HashMap<String, Object>();
         try {
             try {
@@ -264,6 +329,26 @@ public class Processor {
                     throw new JapiMessageHeaderNotObject();
                 }
 
+                var returnAsBinary = false;
+
+                if (inputIsMessagepack) {
+                    var givenHash = (Long) headers.get("_bin");
+                    if (givenHash != binaryHash) {
+                        throw new InvalidBinaryEncoding();
+                    }
+
+                    finalHeaders.put("_bin", this.binaryHash);
+                    returnAsBinary = true;
+                }
+
+
+                if (headers.containsKey("_binaryStart")) {
+                    // Client is initiating handshake for binary protocol
+                    finalHeaders.put("_bin", this.binaryHash);
+                    finalHeaders.put("_binaryEncoding", this.binaryEncoding);
+                    returnAsBinary = true;
+                }
+
                 // Reflect call id
                 var callId = headers.get("_id");
                 if (callId != null) {
@@ -271,15 +356,38 @@ public class Processor {
                 }
 
                 Map<String, Object> messageBody;
-                try {
-                    messageBody = (Map<String, Object>) inputJsonJava.get(2);
-                } catch (ClassCastException e) {
-                    throw new JapiMessageBodyNotObject();
+                if (!inputIsMessagepack) {
+                    try {
+                        messageBody = (Map<String, Object>) inputJsonJava.get(2);
+                    } catch (ClassCastException e) {
+                        throw new JapiMessageBodyNotObject();
+                    }
+                } else {
+                    // Need to decode the data
+                    Map<Integer, Object> initialMessageBody;
+                    try {
+                        initialMessageBody = (Map<Integer, Object>) inputJsonJava.get(2);
+                    } catch (ClassCastException e) {
+                        throw new JapiMessageBodyNotObject();
+                    }
+
+                    try {
+                        messageBody = (Map<String, Object>) decode(initialMessageBody);
+                    } catch (Exception e) {
+                        throw new BinaryDecodeFailure(e);
+                    }
                 }
 
                 var output = _process(functionName, headers, messageBody);
 
-                return List.of("function.%s.output".formatted(functionName), finalHeaders, output);
+                Object finalOutput;
+                if (returnAsBinary) {
+                    finalOutput = encode(finalHeaders);
+                } else {
+                    finalOutput = output;
+                }
+
+                return List.of("function.%s.output".formatted(functionName), finalHeaders, finalOutput);
             } catch (Exception e) {
                 try {
                     this.onError.accept(e);
@@ -423,6 +531,13 @@ public class Processor {
             var messageType = "error._InvalidInput";
 
             return List.of(messageType, finalHeaders, Map.of());
+        } catch (InvalidBinaryEncoding | BinaryDecodeFailure e) {
+            var messageType = "error._InvalidBinary";
+
+            finalHeaders.put("_binaryEncoding", binaryEncoding);
+
+            return List.of(messageType, finalHeaders, Map.of());
+
         } catch (Exception e) {
             var messageType = "error._ApplicationFailure";
 
@@ -438,6 +553,26 @@ public class Processor {
     private Map<String, List<Map<String, String>>> invalidFields(Map<String, String> errors) {
         var jsonErrors = errors.entrySet().stream().map(e -> (Map<String, String>) new TreeMap<>(Map.of("field", e.getKey(), "reason", e.getValue()))).collect(Collectors.toList());
         return Map.of("cases", jsonErrors);
+    }
+
+    private Object decode(Object given) {
+        if (given instanceof Map<?,?> m) {
+            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncodingReversed.get(e.getKey()), e -> decode(e.getValue())));
+        } else if (given instanceof List<?> l) {
+            return l.stream().map(e -> decode(e));
+        } else {
+            return given;
+        }
+    }
+
+    private Object encode(Object given) {
+        if (given instanceof Map<?,?> m) {
+            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncoding.get(e.getKey()), e -> encode(e.getValue())));
+        } else if (given instanceof List<?> l) {
+            return l.stream().map(e -> encode(e));
+        } else {
+            return given;
+        }
     }
 
     private Map<String, Object> _process(String functionName, Map<String, Object> headers, Map<String, Object> input) {
@@ -683,6 +818,8 @@ public class Processor {
                 } else if (value instanceof List) {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE);
                 } else if (value instanceof Map<?, ?>) {
+                    // TODO: Allow single member maps to pass in enum value as member key and coerce here to string
+                    // which will allow for a more efficient binary encoding
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ENUM_TYPE);
                 } else {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);

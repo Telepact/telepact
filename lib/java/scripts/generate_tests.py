@@ -87,7 +87,7 @@ for case in cases:
         var expectedOutput = """
         {}
         """.trim();
-        var output = processor.process(input);
+        var output = processor.process(input.getBytes(StandardCharsets.UTF_8));
         var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
         var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>(){{}});
         assertEquals(expectedOutputJsonJava, outputJsonJava);
