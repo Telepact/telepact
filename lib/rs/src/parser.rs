@@ -438,7 +438,7 @@ fn parse_def(
 pub fn new_japi_description<R: Read>(
     japi_description_json: &mut R,
 ) -> Result<HashMap<String, Definition>, crate::JapiDescriptionParseError> {
-    let mut descriptions: HashMap<String, Definition> = HashMap::new();
+    let mut definitions: HashMap<String, Definition> = HashMap::new();
 
     let v: Value = from_reader(japi_description_json).map_err(|_| JapiDescriptionParseError {
         msg: "Invalid JSON".to_string(),
@@ -449,10 +449,10 @@ pub fn new_japi_description<R: Read>(
     })?;
 
     for (def_ref, _) in root {
-        if !descriptions.contains_key(def_ref) {
-            parse_def(root, &mut descriptions, def_ref)?;
+        if !definitions.contains_key(def_ref) {
+            parse_def(root, &mut definitions, def_ref)?;
         }
     }
 
-    return Ok(descriptions);
+    return Ok(definitions);
 }
