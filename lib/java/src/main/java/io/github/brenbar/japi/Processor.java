@@ -1,18 +1,11 @@
 package io.github.brenbar.japi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.msgpack.jackson.dataformat.MessagePackFactory;
-
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -32,12 +25,6 @@ public class Processor {
 
         public Error() {
             super();
-        }
-    }
-
-    private static class InvalidJson extends Error {
-        public InvalidJson(Throwable cause) {
-            super(cause);
         }
     }
 
@@ -184,8 +171,7 @@ public class Processor {
     private Serializer serializer;
     private Consumer<Throwable> onError;
 
-    private Map<String, Integer> binaryEncoding;
-    private Map<Integer, String> binaryEncodingReversed;
+    private BinaryEncoder binaryEncoder;
     private long binaryHash;
 
     public static class Options {
@@ -259,9 +245,9 @@ public class Processor {
                 }
             }
         }
-        var atomicInteger = new AtomicInteger(0);
-        this.binaryEncoding = allApiDescriptionKeys.stream().collect(Collectors.toMap(k -> k, k -> atomicInteger.getAndIncrement()));
-        this.binaryEncodingReversed = this.binaryEncoding.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+        var atomicLong = new AtomicLong(0);
+        var binaryEncoding = allApiDescriptionKeys.stream().collect(Collectors.toMap(k -> k, k -> atomicLong.getAndIncrement()));
+        this.binaryEncoder = new BinaryEncoder(binaryEncoding, binaryHash);
         var finalString = allApiDescriptionKeys.stream().collect(Collectors.joining("\n"));
         try {
             var hash = MessageDigest.getInstance("SHA-256").digest(finalString.getBytes(StandardCharsets.UTF_8));
@@ -277,21 +263,25 @@ public class Processor {
         boolean inputIsBinary = false;
         if (inputJapiMessagePayload[0] == '[') {
             try {
-                inputJapiMessage = serializer.deserializeFromJson(inputJapiMessagePayload);
+                inputJapiMessage = this.serializer.deserializeFromJson(inputJapiMessagePayload);
             } catch (Serializer.DeserializationError e) {
                 onError.accept(e);
-                return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
+                return this.serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
             }
         } else {
             try {
-                inputJapiMessage = serializer.deserializeFromBinary(inputJapiMessagePayload, this.binaryEncodingReversed, this.binaryHash);
+                var encodedInputJapiMessage = this.serializer.deserializeFromMsgPack(inputJapiMessagePayload);
+                if (encodedInputJapiMessage.size() < 3) {
+                    return this.serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of("reason", "JapiMessageArrayMustHaveThreeElements")));
+                }
+                inputJapiMessage = this.binaryEncoder.decode(encodedInputJapiMessage);
                 inputIsBinary = true;
-            } catch (Serializer.BinaryDecodingError e) {
-                onError.accept(e);
-                return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
+            } catch (BinaryEncoder.IncorrectBinaryHash e) {
+                this.onError.accept(e);
+                return this.serializer.serializeToJson(List.of("error._InvalidBinaryEncoding", Map.of(), Map.of()));
             } catch (Serializer.DeserializationError e) {
-                onError.accept(e);
-                return serializer.serializeToJson(List.of("error._BinaryDecodeFailure", Map.of(), Map.of()));
+                this.onError.accept(e);
+                return this.serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
             }
         }
 
@@ -303,9 +293,10 @@ public class Processor {
         }
 
         if (inputIsBinary || returnAsBinary) {
-            return serializer.serializeToBinary(outputJapiMessage, this.binaryEncoding);
+            var encodedOutputJapiMessage = this.binaryEncoder.encode(outputJapiMessage);
+            return this.serializer.serializeToMsgPack(encodedOutputJapiMessage);
         } else {
-            return serializer.serializeToJson(outputJapiMessage);
+            return this.serializer.serializeToJson(outputJapiMessage);
         }
     }
 
@@ -338,10 +329,10 @@ public class Processor {
                     throw new JapiMessageHeaderNotObject();
                 }
 
-                if (headers.containsKey("_binaryStart")) {
+                if (Objects.equals(headers.get("_binaryStart"), true)) {
                     // Client is initiating handshake for binary protocol
                     finalHeaders.put("_bin", this.binaryHash);
-                    finalHeaders.put("_binaryEncoding", this.binaryEncoding);
+                    finalHeaders.put("_binaryEncoding", this.binaryEncoder.encodeMap);
                 }
 
                 // Reflect call id
@@ -508,7 +499,7 @@ public class Processor {
         } catch (InvalidBinaryEncoding | BinaryDecodeFailure e) {
             var messageType = "error._InvalidBinary";
 
-            finalHeaders.put("_binaryEncoding", binaryEncoding);
+            finalHeaders.put("_binaryEncoding", this.binaryEncoder.encodeMap);
 
             return List.of(messageType, finalHeaders, Map.of());
 
@@ -531,7 +522,7 @@ public class Processor {
 
     private Object decode(Object given) {
         if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncodingReversed.get(e.getKey()), e -> decode(e.getValue())));
+            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncoder.decodeMap.get(e.getKey()), e -> decode(e.getValue())));
         } else if (given instanceof List<?> l) {
             return l.stream().map(e -> decode(e));
         } else {
@@ -541,7 +532,7 @@ public class Processor {
 
     private Object encode(Object given) {
         if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncoding.get(e.getKey()), e -> encode(e.getValue())));
+            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncoder.encodeMap.get(e.getKey()), e -> encode(e.getValue())));
         } else if (given instanceof List<?> l) {
             return l.stream().map(e -> encode(e));
         } else {
