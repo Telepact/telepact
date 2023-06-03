@@ -47,6 +47,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -93,8 +95,27 @@ for case in cases:
         var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>(){{}});
         assertEquals(expectedOutputJsonJava, outputJsonJava);
     }}
+    
+    @Test
+    public void testBinary_{}() throws IOException {{
+        var objectMapper = new ObjectMapper();
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
+        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
+        var input = """
+        {}
+        """.trim();
+        var expectedOutput = """
+        {}
+        """.trim();
+        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
+        var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
+        client.call("_ping", Map.of(), Map.of());
+        var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {{}});
+        var outputJava = client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2));
+        assertEquals(expectedOutputJsonJava.get(2), outputJava);
+    }}    
 
-    '''.format(case.name, case.input, case.output)
+    '''.format(case.name, case.input, case.output, case.name, case.input, case.output)
     )
 
 test_file.write('''

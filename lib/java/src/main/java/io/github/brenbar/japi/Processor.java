@@ -172,7 +172,6 @@ public class Processor {
     private Consumer<Throwable> onError;
 
     private BinaryEncoder binaryEncoder;
-    private long binaryHash;
 
     public static class Options {
         private Consumer<Throwable> onError = (e) -> {};
@@ -211,6 +210,17 @@ public class Processor {
             {
               "api": "object"
             }
+          ],
+          "struct._InvalidField": [
+            {
+              "field": "string",
+              "reason": "string"
+            }
+          ],
+          "error._InvalidInput": [
+            {
+              "cases": "array<struct._InvalidField>"
+            }
           ]
         }
         """);
@@ -243,19 +253,22 @@ public class Processor {
                 } else if (type instanceof Parser.Enum e) {
                     allApiDescriptionKeys.addAll(e.allowedValues());
                 }
+            } else if (entry.getValue() instanceof Parser.ErrorDefinition e) {
+                allApiDescriptionKeys.addAll(e.fields().keySet());
             }
         }
         var atomicLong = new AtomicLong(0);
         var binaryEncoding = allApiDescriptionKeys.stream().collect(Collectors.toMap(k -> k, k -> atomicLong.getAndIncrement()));
-        this.binaryEncoder = new BinaryEncoder(binaryEncoding, binaryHash);
         var finalString = allApiDescriptionKeys.stream().collect(Collectors.joining("\n"));
+        long binaryHash;
         try {
             var hash = MessageDigest.getInstance("SHA-256").digest(finalString.getBytes(StandardCharsets.UTF_8));
             var buffer = ByteBuffer.wrap(hash);
-            this.binaryHash = buffer.getLong();
+            binaryHash = buffer.getLong();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+        this.binaryEncoder = new BinaryEncoder(binaryEncoding, binaryHash);
     }
 
     public byte[] process(byte[] inputJapiMessagePayload) {
@@ -289,7 +302,7 @@ public class Processor {
         var headers = (Map<String, Object>) outputJapiMessage.get(1);
         var returnAsBinary = headers.containsKey("_bin");
         if (!returnAsBinary && inputIsBinary) {
-            headers.put("_bin", this.binaryHash);
+            headers.put("_bin", this.binaryEncoder.binaryHash);
         }
 
         if (inputIsBinary || returnAsBinary) {
@@ -331,7 +344,7 @@ public class Processor {
 
                 if (Objects.equals(headers.get("_binaryStart"), true)) {
                     // Client is initiating handshake for binary protocol
-                    finalHeaders.put("_bin", this.binaryHash);
+                    finalHeaders.put("_bin", this.binaryEncoder.binaryHash);
                     finalHeaders.put("_binaryEncoding", this.binaryEncoder.encodeMap);
                 }
 

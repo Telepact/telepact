@@ -14,45 +14,65 @@ public class BinaryEncoder {
 
     public BinaryEncoder(Map<String, Long> binaryEncoding, Object binaryHash) {
         this.encodeMap = binaryEncoding;
-        this.decodeMap = binaryEncoding.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+        this.decodeMap = binaryEncoding.entrySet().stream().collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
         this.binaryHash = binaryHash;
     }
 
     public List<Object> encode(List<Object> japiMessage) {
-        var encodedMessageType = encodeValue(japiMessage.get(0), encodeMap);
+        var encodedMessageType = get(encodeMap, japiMessage.get(0));
         var headers = japiMessage.get(1);
-        var encodedBody = encodeValue(japiMessage.get(2), encodeMap);
+        var encodedBody = encodeKeys(japiMessage.get(2));
         return List.of(encodedMessageType, headers, encodedBody);
     }
 
     public List<Object> decode(List<Object> japiMessage) throws IncorrectBinaryHash {
-        var decodedMessageType = decodeValue(japiMessage.get(0), decodeMap);
+        var encodedMessageType = japiMessage.get(0);
+        if (encodedMessageType instanceof Integer i) {
+            encodedMessageType = Long.valueOf(i);
+        }
+        var decodedMessageType = get(decodeMap, encodedMessageType);
         var headers = (Map<String, Object>) japiMessage.get(1);
         var givenHash = (Long) headers.get("_bin");
-        var decodedBody = decodeValue(japiMessage.get(2), decodeMap);
+        var decodedBody = decodeKeys(japiMessage.get(2));
         if (binaryHash != null && !Objects.equals(givenHash, binaryHash)) {
             throw new IncorrectBinaryHash();
         }
         return List.of(decodedMessageType, headers, decodedBody);
     }
 
-    private Object encodeValue(Object given, Map<String, Long> encodeMap) {
+    private Object encodeKeys(Object given) {
         if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> encodeMap.get(e.getKey()), e -> encodeValue(e.getValue(), encodeMap)));
+            return m.entrySet().stream().collect(Collectors.toMap(e -> get(encodeMap, e.getKey()), e -> encodeKeys(e.getValue())));
         } else if (given instanceof List<?> l) {
-            return l.stream().map(e -> encodeValue(e, encodeMap));
+            return l.stream().map(e -> encodeKeys(e)).toList();
         } else {
             return given;
         }
     }
 
-    private Object decodeValue(Object given, Map<Long, String> decodeMap) {
+    private Object decodeKeys(Object given) {
         if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> decodeMap.get(e.getKey()), e -> decodeValue(e.getValue(), decodeMap)));
+            return m.entrySet().stream().collect(Collectors.toMap(e -> {
+                var key = e.getKey();
+                // TODO: Update the msgpack library to not coerce these ints to strings
+                //       because now we have to coerce it back.
+                if (key instanceof String s) {
+                    key = Long.valueOf(s);
+                }
+                return get(decodeMap, key);
+            }, e -> decodeKeys(e.getValue())));
         } else if (given instanceof List<?> l) {
-            return l.stream().map(e -> decodeValue(e, decodeMap));
+            return l.stream().map(e -> decodeKeys(e)).toList();
         } else {
             return given;
         }
+    }
+
+    private Object get(Map<?,?> map, Object key) {
+        var value = map.get(key);
+        if (value == null) {
+            throw new RuntimeException("Missing encoding for " + String.valueOf(key));
+        }
+        return value;
     }
 }
