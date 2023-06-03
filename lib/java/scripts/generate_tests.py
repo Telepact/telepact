@@ -114,7 +114,7 @@ for case in cases:
         """.trim();
         var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
         var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
-        client.call("_ping", Map.of(), Map.of());
+        client.call("_ping", Map.of(), Map.of()); // warmup
         var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {{}});
         var e = assertThrows(Client.Error.class, () -> client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2)));
         assertEquals(expectedOutputJsonJava.get(0), e.type);
@@ -137,7 +137,7 @@ for case in cases:
         """.trim();
         var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
         var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
-        client.call("_ping", Map.of(), Map.of());
+        client.call("_ping", Map.of(), Map.of()); // warmup
         var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {{}});
         var outputJava = client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2));
         assertEquals(expectedOutputJsonJava.get(2), outputJava);
