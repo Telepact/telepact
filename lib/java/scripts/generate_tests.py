@@ -81,7 +81,7 @@ for case in cases:
     public void test_{}() throws IOException {{
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
-        var processor = new Processor(this::handle, json, (e) -> {{e.printStackTrace();}});
+        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
         var input = """
         {}
         """.trim();

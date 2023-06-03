@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
@@ -13,11 +11,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -185,21 +181,38 @@ public class Processor {
     private Handler internalHandler;
     private Map<String, Object> originalApiDescription;
     private Map<String, Parser.Definition> apiDescription;
+    private Serializer serializer;
     private Consumer<Throwable> onError;
 
     private Map<String, Integer> binaryEncoding;
     private Map<Integer, String> binaryEncodingReversed;
     private long binaryHash;
 
-    public Processor(Handler handler, String apiDescriptionJson) {
-        this(handler, apiDescriptionJson, (e) -> {});
+    public static class Options {
+        private Consumer<Throwable> onError = (e) -> {};
+        private Serializer serializer = new Serializer.Default();
+
+        public Options setOnError(Consumer<Throwable> onError) {
+            this.onError = onError;
+            return this;
+        }
+
+        public Options setSerializer(Serializer serializer) {
+            this.serializer = serializer;
+            return this;
+        }
     }
 
-    public Processor(Handler handler, String apiDescriptionJson, Consumer<Throwable> onError) {
+    public Processor(Handler handler, String apiDescriptionJson) {
+        this(handler, apiDescriptionJson, new Options());
+    }
+
+    public Processor(Handler handler, String apiDescriptionJson, Options options) {
         var description = Parser.newJapiDescription(apiDescriptionJson);
         // Also add the internal api spec
         this.apiDescription = description.parsed();
         this.originalApiDescription = description.original();
+        this.serializer = options.serializer;
 
         var internalDescription = Parser.newJapiDescription("""
         {
@@ -225,7 +238,7 @@ public class Processor {
             case "_api" -> Map.of("api", originalApiDescription);
             default -> throw new FunctionNotFound(functionName);
         };
-        this.onError = onError;
+        this.onError = options.onError;
 
         // Calculate binary hash
         var allApiDescriptionKeys = new TreeSet<String>();
@@ -259,70 +272,56 @@ public class Processor {
         }
     }
 
-    private void gatherAllApiDescriptionKeys(HashSet<String> allKeys, Map<String, Object> node) {
-        for (var entry : node.entrySet()) {
-            allKeys.add(entry.getKey());
-            if (entry.getValue() instanceof Map<?,?> m) {
-                gatherAllApiDescriptionKeys(allKeys, node);
-            }
-        }
-    }
-
-    public byte[] process(byte[] inputJson) {
-        var objectMapper = new ObjectMapper();
-        JsonNode inputJsonNode;
-        boolean isMessagePack = false;
-        try {
-            inputJsonNode = objectMapper.readTree(inputJson);
-        } catch (IOException e) {
-            // Try msgpack
-            var msgPackMapper = new ObjectMapper(new MessagePackFactory());
+    public byte[] process(byte[] inputJapiMessagePayload) {
+        List<Object> inputJapiMessage;
+        boolean inputIsBinary = false;
+        if (inputJapiMessagePayload[0] == '[') {
             try {
-                inputJsonNode = msgPackMapper.readTree(inputJson);
-                isMessagePack = true;
-            } catch (IOException ex) {
-                throw new InvalidJson(ex);
+                inputJapiMessage = serializer.deserializeFromJson(inputJapiMessagePayload);
+            } catch (Serializer.DeserializationError e) {
+                onError.accept(e);
+                return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
+            }
+        } else {
+            try {
+                inputJapiMessage = serializer.deserializeFromBinary(inputJapiMessagePayload, this.binaryEncodingReversed, this.binaryHash);
+                inputIsBinary = true;
+            } catch (Serializer.BinaryDecodingError e) {
+                onError.accept(e);
+                return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
+            } catch (Serializer.DeserializationError e) {
+                onError.accept(e);
+                return serializer.serializeToJson(List.of("error._BinaryDecodeFailure", Map.of(), Map.of()));
             }
         }
 
-        List<Object> inputJsonJava;
-        try {
-            inputJsonJava = objectMapper.convertValue(inputJsonNode, new TypeReference<List<Object>>() {});
-        } catch (IllegalArgumentException e) {
-            throw new JapiMessageNotArray();
+        var outputJapiMessage = process(inputJapiMessage);
+        var headers = (Map<String, Object>) outputJapiMessage.get(1);
+        var returnAsBinary = headers.containsKey("_bin");
+        if (!returnAsBinary && inputIsBinary) {
+            headers.put("_bin", this.binaryHash);
         }
 
-        var outputJsonJava = process(inputJsonJava, isMessagePack);
-
-        try {
-            return objectMapper.writeValueAsBytes(outputJsonJava);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (inputIsBinary || returnAsBinary) {
+            return serializer.serializeToBinary(outputJapiMessage, this.binaryEncoding);
+        } else {
+            return serializer.serializeToJson(outputJapiMessage);
         }
     }
 
-    public List<Object> process(List<Object> inputJsonJava, boolean inputIsMessagepack) {
+    private List<Object> process(List<Object> inputJapiMessage) {
         var finalHeaders = new HashMap<String, Object>();
         try {
             try {
-                if (inputJsonJava.size() < 3) {
+                if (inputJapiMessage.size() < 3) {
                     throw new JapiMessageArrayTooFewElements();
                 }
 
                 String messageType;
-                if (!inputIsMessagepack) {
-                    try {
-                        messageType = (String) inputJsonJava.get(0);
-                    } catch (ClassCastException e) {
-                        throw new JapiMessageTypeNotString();
-                    }
-                } else {
-                    try {
-                        var encodedMessageType = (Integer) inputJsonJava.get(0);
-                        messageType = binaryEncodingReversed.get(encodedMessageType);
-                    } catch (Exception e) {
-                        throw new BinaryDecodeFailure(e);
-                    }
+                try {
+                    messageType = (String) inputJapiMessage.get(0);
+                } catch (ClassCastException e) {
+                    throw new JapiMessageTypeNotString();
                 }
 
                 var regex = Pattern.compile("^function\\.([a-zA-Z_][a-zA-Z0-9_]*)(.input)?");
@@ -334,29 +333,15 @@ public class Processor {
 
                 Map<String, Object> headers;
                 try {
-                    headers = (Map<String, Object>) inputJsonJava.get(1);
+                    headers = (Map<String, Object>) inputJapiMessage.get(1);
                 } catch (ClassCastException e) {
                     throw new JapiMessageHeaderNotObject();
                 }
-
-                var returnAsBinary = false;
-
-                if (inputIsMessagepack) {
-                    var givenHash = (Long) headers.get("_bin");
-                    if (givenHash != binaryHash) {
-                        throw new InvalidBinaryEncoding();
-                    }
-
-                    finalHeaders.put("_bin", this.binaryHash);
-                    returnAsBinary = true;
-                }
-
 
                 if (headers.containsKey("_binaryStart")) {
                     // Client is initiating handshake for binary protocol
                     finalHeaders.put("_bin", this.binaryHash);
                     finalHeaders.put("_binaryEncoding", this.binaryEncoding);
-                    returnAsBinary = true;
                 }
 
                 // Reflect call id
@@ -366,43 +351,17 @@ public class Processor {
                 }
 
                 Map<String, Object> messageBody;
-                if (!inputIsMessagepack) {
-                    try {
-                        messageBody = (Map<String, Object>) inputJsonJava.get(2);
-                    } catch (ClassCastException e) {
-                        throw new JapiMessageBodyNotObject();
-                    }
-                } else {
-                    // Need to decode the data
-                    Map<Integer, Object> initialMessageBody;
-                    try {
-                        initialMessageBody = (Map<Integer, Object>) inputJsonJava.get(2);
-                    } catch (ClassCastException e) {
-                        throw new JapiMessageBodyNotObject();
-                    }
-
-                    try {
-                        messageBody = (Map<String, Object>) decode(initialMessageBody);
-                    } catch (Exception e) {
-                        throw new BinaryDecodeFailure(e);
-                    }
+                try {
+                    messageBody = (Map<String, Object>) inputJapiMessage.get(2);
+                } catch (ClassCastException e) {
+                    throw new JapiMessageBodyNotObject();
                 }
 
                 var output = _process(functionName, headers, messageBody);
 
                 var outputMessageType = "function.%s".formatted(functionName);
 
-                Object finalOutput;
-                Object finalOutputMessageType;
-                if (returnAsBinary) {
-                    finalOutput = encode(finalHeaders);
-                    finalOutputMessageType = binaryEncoding.get(outputMessageType);
-                } else {
-                    finalOutput = output;
-                    finalOutputMessageType = outputMessageType;
-                }
-
-                return List.of(finalOutputMessageType, finalHeaders, finalOutput);
+                return List.of(outputMessageType, finalHeaders, output);
             } catch (Exception e) {
                 try {
                     this.onError.accept(e);
