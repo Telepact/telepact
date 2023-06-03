@@ -22,10 +22,6 @@ public abstract class Client {
         }
     }
 
-    public interface Transport {
-        byte[] transport(byte[] japiMessagePayload);
-    }
-
     public interface Processor {
         List<Object> process(List<Object> japiMessage, Next next);
     }
@@ -34,16 +30,15 @@ public abstract class Client {
         List<Object> proceed(List<Object> japiMessage);
     }
 
-    private Transport transport;
     private Processor processor;
-    private Serializer serializer;
     private boolean useBinary;
     private AtomicReference<BinaryEncoder> binaryEncoderStore = new AtomicReference<>();
 
     public static class Options {
-        private Serializer serializer = new Serializer.Default();
-        private Processor processor = (m, n) -> n.proceed(m);
-        private boolean useBinary = false;
+        public Serializer serializer = new Serializer.Default();
+        public Processor processor = (m, n) -> n.proceed(m);
+        public boolean useBinary = false;
+        public long timeoutMs = 5000;
 
         public Options setSerializer(Serializer serializer) {
             this.serializer = serializer;
@@ -59,12 +54,15 @@ public abstract class Client {
             this.useBinary = useBinary;
             return this;
         }
+
+        public Options setTimeoutMs(long timeoutMs) {
+            this.timeoutMs = timeoutMs;
+            return this;
+        }
     }
 
-    public Client(Transport transport, Options options) {
-        this.transport = transport;
+    public Client(Options options) {
         this.processor = options.processor;
-        this.serializer = options.serializer;
         this.useBinary = options.useBinary;
     }
 
@@ -90,47 +88,39 @@ public abstract class Client {
     }
 
     private List<Object> proceed(List<Object> inputJapiMessage) {
-        var binaryEncoder = this.binaryEncoderStore.get();
-        if (this.useBinary && binaryEncoder == null) {
-            // Don't have schema yet. We'll have to send as JSON to start, and we'll ask the
-            // jAPI provider to supply the binary encoding.
-            var headers = (Map<String, Object>) inputJapiMessage.get(1);
-            headers.put("_binaryStart", true);
-        }
+        try {
+            var binaryEncoder = this.binaryEncoderStore.get();
+            if (this.useBinary && binaryEncoder == null) {
+                // Don't have schema yet. We'll have to send as JSON to start, and we'll ask the
+                // jAPI provider to supply the binary encoding.
+                var headers = (Map<String, Object>) inputJapiMessage.get(1);
+                headers.put("_binaryStart", true);
+            }
 
-        List<Object> outputJapiMessage;
-        if (binaryEncoder != null) {
-            var encodedInputJapiMessage = binaryEncoder.encode(inputJapiMessage);
-            var inputJapiMessagePayload = this.serializer.serializeToMsgPack(encodedInputJapiMessage);
-            var outputJapiMessagePayload = this.transport.transport(inputJapiMessagePayload);
-            try {
-                var encodedOutputJapiMessage = this.serializer.deserializeFromMsgPack(outputJapiMessagePayload);
+            List<Object> outputJapiMessage;
+            if (binaryEncoder != null) {
+                var encodedInputJapiMessage = binaryEncoder.encode(inputJapiMessage);
+                var encodedOutputJapiMessage = serializeAndTransport(encodedInputJapiMessage, true);
                 outputJapiMessage = binaryEncoder.decode(encodedOutputJapiMessage);
-            } catch (Exception e) {
-                throw new ClientProcessError(e);
+            } else {
+                outputJapiMessage = serializeAndTransport(inputJapiMessage, false);
             }
-        } else {
-            var inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
-            var outputJapiMessagePayload = this.transport.transport(inputJapiMessagePayload);
-            try {
-                outputJapiMessage = this.serializer.deserializeFromJson(outputJapiMessagePayload);
-            } catch (Serializer.DeserializationError e) {
-                throw new ClientProcessError(e);
+
+            // If we received a binary encoding from the jAPI provider, cache it
+            var headers = (Map<String, Object>) outputJapiMessage.get(1);
+            if (headers.containsKey("_binaryEncoding")) {
+                var binaryHash = (Object) headers.get("_bin");
+                var binaryEncoding = (Map<String, Long>) headers.get("_binaryEncoding");
+                var newBinarySchema = new BinaryEncoder(binaryEncoding, binaryHash);
+                this.binaryEncoderStore.set(newBinarySchema);
             }
-        }
 
-        // If we received a binary encoding from the jAPI provider, cache it
-        var headers = (Map<String, Object>) outputJapiMessage.get(1);
-        if (headers.containsKey("_binaryEncoding")) {
-            var binaryHash = (Object) headers.get("_bin");
-            var binaryEncoding = (Map<String, Long>) headers.get("_binaryEncoding");
-            var newBinarySchema = new BinaryEncoder(binaryEncoding, binaryHash);
-            this.binaryEncoderStore.set(newBinarySchema);
+            return outputJapiMessage;
+        } catch (Exception e) {
+            throw new ClientProcessError(e);
         }
-
-        return outputJapiMessage;
     }
 
-    public abstract List<Object> serializeAndTransport(List<Object> e);
+    protected abstract List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack);
 
 }
