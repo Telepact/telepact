@@ -221,7 +221,10 @@ public class Processor {
             {
               "cases": "array<struct._InvalidField>"
             }
-          ]
+          ],
+          "error._InvalidOutput": [
+            {}
+          ]          
         }
         """);
 

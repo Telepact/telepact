@@ -1,5 +1,6 @@
 package io.github.brenbar.japi;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,8 +42,28 @@ public class BinaryEncoder {
     }
 
     private Object encodeKeys(Object given) {
-        if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> get(encodeMap, e.getKey()), e -> encodeKeys(e.getValue())));
+        if (given == null) {
+            return given;
+        } else if (given instanceof Map<?,?> m) {
+            var newMap = new HashMap<>();
+            m.entrySet().stream().forEach(e -> {
+                // TODO: Update the msgpack library to not coerce these ints to strings
+                //       because now we have to coerce it back conditionally, since we
+                //       can't know for sure if somebody didn't just use a number string
+                //       in their generic object.
+                var key = e.getKey();
+                if (key instanceof String s) {
+                    try {
+                        key = Long.valueOf(s);
+                    } catch (Exception ignored) {}
+                }
+                if (encodeMap.containsKey(key)) {
+                    key = get(encodeMap, key);
+                }
+                var encodedValue = encodeKeys(e.getValue());
+                newMap.put(key, encodedValue);
+            });
+            return newMap;
         } else if (given instanceof List<?> l) {
             return l.stream().map(e -> encodeKeys(e)).toList();
         } else {
@@ -52,15 +73,25 @@ public class BinaryEncoder {
 
     private Object decodeKeys(Object given) {
         if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> {
-                var key = e.getKey();
+            var newMap = new HashMap<>();
+            m.entrySet().stream().forEach(e -> {
                 // TODO: Update the msgpack library to not coerce these ints to strings
-                //       because now we have to coerce it back.
+                //       because now we have to coerce it back conditionally, since we
+                //       can't know for sure if somebody didn't just use a number string
+                //       in their generic object.
+                var key = e.getKey();
                 if (key instanceof String s) {
-                    key = Long.valueOf(s);
+                    try {
+                        key = Long.valueOf(s);
+                    } catch (Exception ignored) {}
                 }
-                return get(decodeMap, key);
-            }, e -> decodeKeys(e.getValue())));
+                if (decodeMap.containsKey(key)) {
+                    key = get(decodeMap, key);
+                }
+                var encodedValue = decodeKeys(e.getValue());
+                newMap.put(key, encodedValue);
+            });
+            return newMap;
         } else if (given instanceof List<?> l) {
             return l.stream().map(e -> decodeKeys(e)).toList();
         } else {

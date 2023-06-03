@@ -53,6 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Tests {
 
@@ -96,6 +97,33 @@ for case in cases:
         assertEquals(expectedOutputJsonJava, outputJsonJava);
     }}
     
+    '''.format(case.name, case.input, case.output))
+
+    if case.output.startswith("[\"error."):
+        test_file.write('''
+    @Test
+    public void testBinary_{}() throws IOException {{
+        var objectMapper = new ObjectMapper();
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
+        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
+        var input = """
+        {}
+        """.trim();
+        var expectedOutput = """
+        {}
+        """.trim();
+        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
+        var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
+        client.call("_ping", Map.of(), Map.of());
+        var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {{}});
+        var e = assertThrows(Client.Error.class, () -> client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2)));
+        assertEquals(expectedOutputJsonJava.get(0), e.type);
+        assertEquals(expectedOutputJsonJava.get(2), e.body);
+    }}    
+    
+        '''.format(case.name, case.input, case.output))
+    else:
+        test_file.write('''
     @Test
     public void testBinary_{}() throws IOException {{
         var objectMapper = new ObjectMapper();
@@ -114,9 +142,8 @@ for case in cases:
         var outputJava = client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2));
         assertEquals(expectedOutputJsonJava.get(2), outputJava);
     }}    
-
-    '''.format(case.name, case.input, case.output, case.name, case.input, case.output)
-    )
+    
+        '''.format(case.name, case.input, case.output))
 
 test_file.write('''
 }

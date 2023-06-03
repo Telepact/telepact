@@ -3,6 +3,7 @@ package io.github.brenbar.japi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;

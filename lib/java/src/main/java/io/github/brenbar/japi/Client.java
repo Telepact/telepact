@@ -12,6 +12,7 @@ public abstract class Client {
         public final String type;
         public final Map<String, Object> body;
         public Error(String type, Map<String, Object> body) {
+            super(type + ": " + body);
             this.type = type;
             this.body = body;
         }
@@ -83,7 +84,7 @@ public abstract class Client {
         var output = (Map<String, Object>) outputJapiMessage.get(2);
 
         if (outputMessageType.startsWith("error.")) {
-            throw new Error(messageType, output);
+            throw new Error(outputMessageType, output);
         }
 
         return output;
