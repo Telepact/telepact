@@ -83,7 +83,7 @@ for case in cases:
     @Test
     public void test_{}() throws IOException {{
         var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
         var input = """
         {}
@@ -104,7 +104,7 @@ for case in cases:
     @Test
     public void testBinary_{}() throws IOException {{
         var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
         var input = """
         {}
@@ -127,7 +127,7 @@ for case in cases:
     @Test
     public void testBinary_{}() throws IOException {{
         var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "japi.json"));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
         var input = """
         {}

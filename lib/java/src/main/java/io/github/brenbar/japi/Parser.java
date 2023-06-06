@@ -299,7 +299,7 @@ public class Parser {
     }
 
     private static TypeDeclaration parseType(Map<String, List<Object>> descriptionRoot, Map<String, Definition> definitions, String typeDeclaration) {
-        var typeDefRegex = Pattern.compile("^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]+[a-zA-Z0-9_])*))(\\?)?$");
+        var typeDefRegex = Pattern.compile("^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$");
         var matcher = typeDefRegex.matcher(typeDeclaration);
         matcher.find();
 

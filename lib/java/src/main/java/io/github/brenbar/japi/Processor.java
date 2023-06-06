@@ -331,7 +331,7 @@ public class Processor {
                     throw new JapiMessageTypeNotString();
                 }
 
-                var regex = Pattern.compile("^function\\.([a-zA-Z_][a-zA-Z0-9_]*)(.input)?");
+                var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)(.input)?");
                 var matcher = regex.matcher(messageType);
                 if (!matcher.matches()) {
                     throw new JapiMessageTypeNotFunction();
