@@ -1,6 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
+    "additionalProperties": false,
     "patternProperties": {
         "^title\\.[a-zA-Z_]\\w*$": {
             "type": "array",
@@ -10,9 +11,17 @@
         },
         "^struct\\.[a-zA-Z_]\\w*": {
             "type": "array",
+            "defaultSnippets": [
+                {
+                    "label": "Struct template",
+                    "body": [{ "$1": "${2|boolean,integer,number,string,array,object|}" }]
+                }
+            ],            
             "prefixItems": [
                 {
                     "type": "object",
+                    "description": "Help",
+                    "additionalProperties": false,
                     "patternProperties": 
                     {
                         "^[a-zA-Z_]\\w*!?$": {
@@ -45,6 +54,7 @@
             "prefixItems": [
                 {
                     "type": "object",
+                    "additionalProperties": false,
                     "patternProperties": {
                         "^[a-zA-Z_]\\w*?$": {
                             "$ref": "#/$defs/typeDeclaration"
@@ -61,6 +71,7 @@
             "prefixItems": [
                 {
                     "type": "object",
+                    "additionalProperties": false,
                     "patternProperties": 
                     {
                         "^[a-zA-Z_]\\w*!?$": {
@@ -79,6 +90,7 @@
             "prefixItems": [
                 {
                     "type": "object",
+                    "additionalProperties": false,
                     "patternProperties": 
                     {
                         "^[a-zA-Z_]\\w*!?$": {
@@ -91,6 +103,7 @@
                 },
                 {
                     "type": "object",
+                    "additionalProperties": false,
                     "patternProperties": 
                     {
                         "^[a-zA-Z_]\\w*!?$": {
@@ -114,7 +127,13 @@
     "$defs": {
         "typeDeclaration": {
             "type": "string",
-            "regex": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$"
+            "regex": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$",
+            "defaultSnippets": [
+                {
+                    "label": "jAPI type",
+                    "body": "${1|boolean,integer,number,string,array<any>,object<any>|}"
+                }
+            ]
         },
         "docString": {
             "type": "string",

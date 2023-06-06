@@ -99,10 +99,7 @@
   ],
 
   "enum.EnumExample": [
-    [
-      "one", 
-      "two"
-    ],
+    ["one", "two"],
     "/// A basic enum example",
     "/// ",
     "/// All enums are strings."
@@ -122,11 +119,16 @@
     {
       "value!": "union.Value"
     },
-    [
-      "error.ErrorExample"
-    ],
+    ["error.ErrorExample"],
+    "/// ",
     "/// The primary function example.",
     "/// ",
     "/// The arguments is always a struct. The result is also always a struct."
+  ],
+
+  "struct.another": [
+    {
+      "another": "boolean"
+    }
   ]
 }
