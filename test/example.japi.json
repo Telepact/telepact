@@ -128,7 +128,7 @@
 
   "struct.another": [
     {
-      "another": "boolean"
+      "myNewField": "boolean"
     }
   ]
 }

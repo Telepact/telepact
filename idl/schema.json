@@ -1,145 +1,143 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "type": "object",
-    "additionalProperties": false,
-    "patternProperties": {
-        "^title\\.[a-zA-Z_]\\w*$": {
-            "type": "array",
-            "items": {
-                "$ref": "#/$defs/docString"
-            }
-        },
-        "^struct\\.[a-zA-Z_]\\w*": {
-            "type": "array",
-            "defaultSnippets": [
-                {
-                    "label": "Struct template",
-                    "body": [{ "$1": "${2|boolean,integer,number,string,array,object|}" }]
-                }
-            ],            
-            "prefixItems": [
-                {
-                    "type": "object",
-                    "description": "Help",
-                    "additionalProperties": false,
-                    "patternProperties": 
-                    {
-                        "^[a-zA-Z_]\\w*!?$": {
-                            "$ref": "#/$defs/typeDeclaration"
-                        }
-                    }
-                }
-            ],
-            "items": {
-                "$ref": "#/$defs/docString"
-            }
-        },
-        "enum\\.[a-zA-Z_]\\w*$": {
-            "type": "array",
-            "prefixItems": [
-                {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "regex": "^[a-zA-Z_]\\w*$"
-                    }
-                }
-            ],
-            "items": {
-                "$ref": "#/$defs/docString"
-            }
-        },
-        "union\\.[a-zA-Z_]\\w*$": {
-            "type": "array",
-            "prefixItems": [
-                {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "patternProperties": {
-                        "^[a-zA-Z_]\\w*?$": {
-                            "$ref": "#/$defs/typeDeclaration"
-                        }
-                    }
-                }
-            ],
-            "items": {
-                "$ref": "#/$defs/docString"
-            }
-        },
-        "^error\\.[a-zA-Z_]\\w*": {
-            "type": "array",
-            "prefixItems": [
-                {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "patternProperties": 
-                    {
-                        "^[a-zA-Z_]\\w*!?$": {
-                            "$ref": "#/$defs/typeDeclaration"
-                        }
-                    }
-                }
-            ],
-            "items": {
-                "$ref": "#/$defs/docString"
-            }
-        },
-        "^function\\.[a-zA-Z_]\\w*": {
-            "type": "array",
-            "description": "A FUNCTION",
-            "prefixItems": [
-                {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "patternProperties": 
-                    {
-                        "^[a-zA-Z_]\\w*!?$": {
-                            "$ref": "#/$defs/typeDeclaration"
-                        }
-                    }
-                },
-                {
-                    "const": "-->"
-                },
-                {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "patternProperties": 
-                    {
-                        "^[a-zA-Z_]\\w*!?$": {
-                            "$ref": "#/$defs/typeDeclaration"
-                        }
-                    }
-                },
-                {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "regex": "^error\\.[a-zA-Z_]\\w*"
-                    }
-                }                            
-            ],
-            "items": {
-                "$ref": "#/$defs/docString"
-            }
-        }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^title\\.[a-zA-Z_]\\w*$": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/docString"
+      }
     },
-    "$defs": {
-        "typeDeclaration": {
-            "type": "string",
-            "regex": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$",
-            "defaultSnippets": [
-                {
-                    "label": "jAPI type",
-                    "body": "${1|boolean,integer,number,string,array<any>,object<any>|}"
-                }
-            ]
-        },
-        "docString": {
-            "type": "string",
-            "regex": "^/// .*"
+    "^struct\\.[a-zA-Z_]\\w*": {
+      "type": "array",
+      "defaultSnippets": [
+        {
+          "label": "Struct template",
+          "body": [
+            {
+              "$1": "${2|boolean,integer,number,string,array<any>,object<any>|}"
+            }
+          ]
         }
-        
+      ],
+      "prefixItems": [
+        {
+          "type": "object",
+          "description": "Help",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
+          }
+        }
+      ],
+      "items": {
+        "$ref": "#/$defs/docString"
+      }
+    },
+    "enum\\.[a-zA-Z_]\\w*$": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "regex": "^[a-zA-Z_]\\w*$"
+          }
+        }
+      ],
+      "items": {
+        "$ref": "#/$defs/docString"
+      }
+    },
+    "union\\.[a-zA-Z_]\\w*$": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
+          }
+        }
+      ],
+      "items": {
+        "$ref": "#/$defs/docString"
+      }
+    },
+    "^error\\.[a-zA-Z_]\\w*": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
+          }
+        }
+      ],
+      "items": {
+        "$ref": "#/$defs/docString"
+      }
+    },
+    "^function\\.[a-zA-Z_]\\w*": {
+      "type": "array",
+      "description": "A FUNCTION",
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
+          }
+        },
+        {
+          "const": "-->"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "regex": "^error\\.[a-zA-Z_]\\w*"
+          }
+        }
+      ],
+      "items": {
+        "$ref": "#/$defs/docString"
+      }
     }
-
+  },
+  "$defs": {
+    "typeDeclaration": {
+      "type": "string",
+      "regex": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$",
+      "defaultSnippets": [
+        {
+          "label": "jAPI type",
+          "body": "${1|boolean,integer,number,string,array<any>,object<any>|}"
+        }
+      ]
+    },
+    "docString": {
+      "type": "string",
+      "regex": "^/// .*"
+    }
+  }
 }
