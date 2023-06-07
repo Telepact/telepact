@@ -1,10 +1,11 @@
 {
   "title.Example": [
-    "/// This is the example schema. It is focussed on outlining type edge cases for use in tests.",
-    "/// ",
-    "/// As a friendly reminder:",
-    "///   - ! means optional field",
-    "///   - ? means nullable type"
+    " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
+    "                                                                                           ",
+    " As a friendly reminder:                                                                   ",
+    " - ! means optional field                                                                  ",
+    " - ? means nullable type                                                                   ",
+    "                                                                                           "
   ],
   "union.Value": [
     {
@@ -78,7 +79,9 @@
       "objEnum": "object<enum.EnumExample>",
       "objNullEnum": "object<enum.EnumExample?>"
     },
-    "/// A union value demonstrating all common type permutations."
+    "                                                           ",
+    " A union value demonstrating all common type permutations. ",
+    "                                                           "
   ],
 
   "struct.StructExample": [
@@ -86,9 +89,11 @@
       "required": "boolean",
       "optional!": "boolean"
     },
-    "/// The main struct example.",
-    "/// ",
-    "/// The [required] field must be supplied. The optional field does not need to be supplied."
+    "                                                                                         ",
+    " The main struct example.                                                                ",
+    "                                                                                         ",
+    " The [required] field must be supplied. The optional field does not need to be supplied. ",
+    "                                                                                         "
   ],
 
   "union.UnionExample": [
@@ -100,15 +105,20 @@
 
   "enum.EnumExample": [
     ["one", "two"],
-    "/// A basic enum example",
-    "/// ",
-    "/// All enums are strings."
+    "                          ",
+    " A basic enum example.    ",
+    "                          ",
+    " All enums are strings.   ",
+    "                          "
   ],
 
   "error.ErrorExample": [
     {
       "exampleProperty": "string"
-    }
+    },
+    "                          ",
+    " An example custom error. ",
+    "                          "
   ],
 
   "function.test": [
@@ -120,15 +130,9 @@
       "value!": "union.Value"
     },
     ["error.ErrorExample"],
-    "/// ",
-    "/// The primary function example.",
-    "/// ",
-    "/// The arguments is always a struct. The result is also always a struct."
-  ],
-
-  "struct.another": [
-    {
-      "myNewField": "boolean"
-    }
+    "                                                                       ",
+    " The primary function example.                                         ",
+    " The arguments is always a struct. The result is also always a struct. ",
+    "                                                                       "
   ]
 }

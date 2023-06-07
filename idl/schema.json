@@ -2,25 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
+  "properties": {
+    "test": {
+      "type": "string",
+      "description": "The value."
+    }
+  },
   "patternProperties": {
     "^title\\.[a-zA-Z_]\\w*$": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/docString"
+        "type": "string"
       }
     },
     "^struct\\.[a-zA-Z_]\\w*": {
       "type": "array",
-      "defaultSnippets": [
-        {
-          "label": "Struct template",
-          "body": [
-            {
-              "$1": "${2|boolean,integer,number,string,array<any>,object<any>|}"
-            }
-          ]
-        }
-      ],
+      "description": "A struct with 0 or more fields.",
       "prefixItems": [
         {
           "type": "object",
@@ -34,29 +31,57 @@
         }
       ],
       "items": {
-        "$ref": "#/$defs/docString"
-      }
+        "type": "string"
+      },
+      "defaultSnippets": [
+        {
+          "label": "Struct template",
+          "body": [
+            {
+              "field1$0": "boolean",
+              "field2": "struct.Example1"
+            },
+            "                                                                           ",
+            " A struct template that exemplifies fields with standard and custom types. ",
+            "                                                                           "
+          ]
+        }
+      ]
     },
     "enum\\.[a-zA-Z_]\\w*$": {
       "type": "array",
+      "description": "A enum with 1 or more allowed values.",
       "prefixItems": [
         {
           "type": "array",
           "items": {
             "type": "string",
-            "regex": "^[a-zA-Z_]\\w*$"
+            "pattern": "^[a-zA-Z_]\\w*$"
           }
         }
       ],
       "items": {
-        "$ref": "#/$defs/docString"
-      }
+        "type": "string"
+      },
+      "defaultSnippets": [
+        {
+          "label": "enum template",
+          "body": [
+            ["value1$0", "value2"],
+            "                                                                          ",
+            " A union template that exemplifies fields with standard and custom types. ",
+            "                                                                          "
+          ]
+        }
+      ]
     },
     "union\\.[a-zA-Z_]\\w*$": {
       "type": "array",
+      "description": "A union with 1 or more fields.",
       "prefixItems": [
         {
           "type": "object",
+          "minProperties": 1,
           "additionalProperties": false,
           "patternProperties": {
             "^[a-zA-Z_]\\w*?$": {
@@ -66,8 +91,22 @@
         }
       ],
       "items": {
-        "$ref": "#/$defs/docString"
-      }
+        "type": "string"
+      },
+      "defaultSnippets": [
+        {
+          "label": "union template",
+          "body": [
+            {
+              "field1$0": "boolean",
+              "field2": "struct.Example1"
+            },
+            "                                                                          ",
+            " A union template that exemplifies fields with standard and custom types. ",
+            "                                                                          "
+          ]
+        }
+      ]
     },
     "^error\\.[a-zA-Z_]\\w*": {
       "type": "array",
@@ -83,12 +122,26 @@
         }
       ],
       "items": {
-        "$ref": "#/$defs/docString"
-      }
+        "type": "string"
+      },
+      "defaultSnippets": [
+        {
+          "label": "Error template",
+          "body": [
+            {
+              "field1$0": "boolean",
+              "field2": "struct.Example1"
+            },
+            "                                                                           ",
+            " An error template that exemplifies fields with standard and custom types. ",
+            "                                                                           "
+          ]
+        }
+      ]
     },
     "^function\\.[a-zA-Z_]\\w*": {
       "type": "array",
-      "description": "A FUNCTION",
+      "description": "A function with:\n(1) an input struct of 0 or more fields\n(2) an output struct of 0 or more fields\n(3) and an array of allowed custom errors",
       "prefixItems": [
         {
           "type": "object",
@@ -115,29 +168,51 @@
           "type": "array",
           "items": {
             "type": "string",
-            "regex": "^error\\.[a-zA-Z_]\\w*"
+            "pattern": "^error\\.[a-zA-Z_]\\w*"
           }
         }
       ],
       "items": {
-        "$ref": "#/$defs/docString"
-      }
+        "type": "string"
+      },
+      "defaultSnippets": [
+        {
+          "label": "Function template",
+          "body": [
+            {
+              "inputField1": "boolean",
+              "inputField2": "struct.Example1"
+            },
+            "-->",
+            {
+              "outputField1": "string",
+              "outputField2": "struct.Example2"
+            },
+            ["error.Example1", "error.Example2"],
+            "                                                                                 ",
+            " An function template that exemplifies:                                          ",
+            " - input and output fields with standard and custom types                        ",
+            " - a list of allowed custom errors to raise from jAPI                            ",
+            "                                                                                 ",
+            " Note: when the jAPI provider encounters a custom error not in the allowed list, ",
+            " it will be coerced to `error._ApplicationFailure`.                              ",
+            "                                                                                 "
+          ]
+        }
+      ]
     }
   },
   "$defs": {
     "typeDeclaration": {
       "type": "string",
-      "regex": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$",
+      "pattern": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$",
+      "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {
-          "label": "jAPI type",
-          "body": "${1|boolean,integer,number,string,array<any>,object<any>|}"
+          "label": "jAPI type declaration",
+          "body": "${1|boolean,integer,number,string,any,array<any>,object<any>,struct.Example,union.Example,enum.Example|}"
         }
       ]
-    },
-    "docString": {
-      "type": "string",
-      "regex": "^/// .*"
     }
   }
 }

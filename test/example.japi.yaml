@@ -1,0 +1,18 @@
+---
+function.yetAnother:
+  - inputField1: boolean
+    inputField2: struct.Example1
+  - -->
+  - outputField1: string
+    outputField2: struct.Example2
+  - - error.Example1
+    - error.Example2
+  - ///
+  - /// An example function that exemplifies
+  - /// - input fields and output fields with examples of standard and custom
+  - ///   types
+  - /// - a list of allowed custom errors to show to the consumer
+  - ///
+  - /// Note that when the jAPI provider encounters a custom error not in the
+  - /// allowed list, it will be coalesced to `error._ApplicationFailure`.
+  - ///

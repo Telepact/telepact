@@ -57,6 +57,10 @@ public class Parser {
             Map<String, FieldDeclaration> fields
     ) implements Definition {}
 
+    public record TitleDefinition(
+            String name
+    ) implements Definition {}
+
     private record FieldNameAndFieldDeclaration(
             String fieldName,
             FieldDeclaration fieldDeclaration
@@ -252,6 +256,9 @@ public class Parser {
 
                 yield new TypeDefinition(definitionName, type);
             }
+            case "title" -> {
+                yield new TitleDefinition(definitionName);
+            }
             default -> throw new JapiDescriptionParseError("Unrecognized japi keyword %s".formatted(keyword));
         };
 
@@ -259,7 +266,7 @@ public class Parser {
     }
 
     private static List<String> splitJapiDefinitionName(String name) {
-        var regex = Pattern.compile("^(struct|union|enum|error|function|event).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
+        var regex = Pattern.compile("^(struct|union|enum|error|function|event|title).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
         var matcher = regex.matcher(name);
         matcher.find();
         var keyword = matcher.group(1);
