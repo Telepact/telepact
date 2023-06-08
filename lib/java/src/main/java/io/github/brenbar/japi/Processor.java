@@ -518,7 +518,10 @@ public class Processor {
             finalHeaders.put("_binaryEncoding", this.binaryEncoder.encodeMap);
 
             return List.of(messageType, finalHeaders, Map.of());
+        } catch (FunctionNotFound e) {
+            var messageType = "error._UnknownFunction";
 
+            return List.of(messageType, finalHeaders, Map.of());
         } catch (Exception e) {
             var messageType = "error._ApplicationFailure";
 

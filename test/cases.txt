@@ -1329,3 +1329,7 @@
 "testCallId"
 
 ["function._ping",{"_id":"abcd"},{}]|["function._ping",{"_id":"abcd"},{}]
+
+"testUnknownFunction"
+
+["function.notFound",{},{}]|["error._UnknownFunction",{},{}]
