@@ -50,33 +50,6 @@
     },
     "enum\\.[a-zA-Z_]\\w*$": {
       "type": "array",
-      "description": "A enum with 1 or more allowed values.",
-      "prefixItems": [
-        {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-zA-Z_]\\w*$"
-          }
-        }
-      ],
-      "items": {
-        "type": "string"
-      },
-      "defaultSnippets": [
-        {
-          "label": "enum template",
-          "body": [
-            ["value1$0", "value2"],
-            "                                                                          ",
-            " A union template that exemplifies fields with standard and custom types. ",
-            "                                                                          "
-          ]
-        }
-      ]
-    },
-    "union\\.[a-zA-Z_]\\w*$": {
-      "type": "array",
       "description": "A union with 1 or more fields.",
       "prefixItems": [
         {
@@ -205,12 +178,12 @@
   "$defs": {
     "typeDeclaration": {
       "type": "string",
-      "pattern": "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$",
+      "pattern": "^((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(any)>))(\\?)?|(null))>))(\\?)?|(null))>))(\\?)?|(null))>))(\\?)?|(null))>))(\\?)?|(null))>))(\\?)?|(null)$",
       "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {
           "label": "jAPI type declaration",
-          "body": "${1|boolean,integer,number,string,any,array<any>,object<any>,struct.Example,union.Example,enum.Example|}"
+          "body": "${1|boolean,integer,number,string,any,array<any>,object<any>,struct.Example,enum.Example|}"
         }
       ]
     }

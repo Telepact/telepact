@@ -7,7 +7,7 @@
     " - ? means nullable type                                                                   ",
     "                                                                                           "
   ],
-  "union.Value": [
+  "enum.Value": [
     {
       "bool": "boolean",
       "nullBool": "boolean?",
@@ -37,19 +37,19 @@
       "objStr": "object<string>",
       "objNullStr": "object<string?>",
 
-      "arr": "array",
-      "nullArr": "array?",
-      "arrArr": "array<array>",
-      "arrNullArr": "array<array?>",
-      "objArr": "object<array>",
-      "objNullArr": "object<array?>",
+      "arr": "array<any>",
+      "nullArr": "array<any>?",
+      "arrArr": "array<array<any>>",
+      "arrNullArr": "array<array<any>?>",
+      "objArr": "object<array<any>>",
+      "objNullArr": "object<array<any>?>",
 
-      "obj": "object",
-      "nullObj": "object?",
-      "arrObj": "array<object>",
-      "arrNullObj": "array<object?>",
-      "objObj": "object<object>",
-      "objNullObj": "object<object?>",
+      "obj": "object<any>",
+      "nullObj": "object<any>?",
+      "arrObj": "array<object<any>>",
+      "arrNullObj": "array<object<any>?>",
+      "objObj": "object<object<any>>",
+      "objNullObj": "object<object<any>?>",
 
       "any": "any",
       "nullAny": "any?",
@@ -65,13 +65,6 @@
       "objStruct": "object<struct.StructExample>",
       "objNullStruct": "object<struct.StructExample?>",
 
-      "union": "union.UnionExample",
-      "nullUnion": "union.UnionExample?",
-      "arrUnion": "array<union.UnionExample>",
-      "arrNullUnion": "array<union.UnionExample?>",
-      "objUnion": "object<union.UnionExample>",
-      "objNullUnion": "object<union.UnionExample?>",
-
       "enum": "enum.EnumExample",
       "nullEnum": "enum.EnumExample?",
       "arrEnum": "array<enum.EnumExample>",
@@ -80,7 +73,7 @@
       "objNullEnum": "object<enum.EnumExample?>"
     },
     "                                                           ",
-    " A union value demonstrating all common type permutations. ",
+    " A enum value demonstrating all common type permutations. ",
     "                                                           "
   ],
 
@@ -96,20 +89,11 @@
     "                                                                                         "
   ],
 
-  "union.UnionExample": [
+  "enum.EnumExample": [
     {
       "first": "integer",
       "second": "string"
     }
-  ],
-
-  "enum.EnumExample": [
-    ["one", "two"],
-    "                          ",
-    " A basic enum example.    ",
-    "                          ",
-    " All enums are strings.   ",
-    "                          "
   ],
 
   "error.ErrorExample": [
@@ -123,11 +107,11 @@
 
   "function.test": [
     {
-      "value!": "union.Value"
+      "value!": "enum.Value"
     },
     "-->",
     {
-      "value!": "union.Value"
+      "value!": "enum.Value"
     },
     ["error.ErrorExample"],
     "                                                                       ",

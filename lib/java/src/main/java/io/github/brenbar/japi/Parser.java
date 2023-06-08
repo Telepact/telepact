@@ -12,19 +12,70 @@ import java.util.stream.Collectors;
 
 public class Parser {
 
-    public interface Type {}
+    public interface Type {
+        public String getName();
+    }
 
-    public static class JsonNull implements Type {}
-    public static class JsonBoolean implements Type {}
-    public static class JsonInteger implements Type {}
-    public static class JsonNumber implements Type {}
-    public static class JsonString implements Type {}
-    public record JsonArray(TypeDeclaration nestedType) implements Type {}
-    public record JsonObject(TypeDeclaration nestedType) implements Type {}
-    public record Struct(Map<String, FieldDeclaration> fields) implements Type {}
-    public record Union(Map<String, FieldDeclaration> cases) implements Type {}
-    public record Enum(List<String> allowedValues) implements Type {}
-    public static class JsonAny implements Type {}
+    public static class JsonNull implements Type {
+        @Override
+        public String getName() {
+            return "null";
+        }
+    }
+    public static class JsonBoolean implements Type {
+        @Override
+        public String getName() {
+            return "boolean";
+        }
+    }
+    public static class JsonInteger implements Type {
+        @Override
+        public String getName() {
+            return "integer";
+        }
+    }
+    public static class JsonNumber implements Type {
+        @Override
+        public String getName() {
+            return "number";
+        }
+    }
+    public static class JsonString implements Type {
+        @Override
+        public String getName() {
+            return "string";
+        }
+    }
+    public record JsonArray(TypeDeclaration nestedType) implements Type {
+        @Override
+        public String getName() {
+            return "array";
+        }
+    }
+    public record JsonObject(TypeDeclaration nestedType) implements Type {
+        @Override
+        public String getName() {
+            return "object";
+        }
+    }
+    public record Struct(String name, Map<String, FieldDeclaration> fields) implements Type {
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
+    public record Enum(String name, Map<String, FieldDeclaration> cases) implements Type {
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
+    public static class JsonAny implements Type {
+        @Override
+        public String getName() {
+            return "any";
+        }
+    }
 
 
     public record TypeDeclaration(
@@ -33,6 +84,7 @@ public class Parser {
     ) {}
 
     public interface Definition {
+        public String getName();
     }
 
     public record FieldDeclaration(
@@ -45,21 +97,41 @@ public class Parser {
             Map<String, FieldDeclaration> inputFields,
             Map<String, FieldDeclaration> outputFields,
             List<String> errors
-    ) implements Definition {}
+    ) implements Definition {
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
 
     public record TypeDefinition(
         String name,
         Type type
-    ) implements Definition {}
+    ) implements Definition {
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
 
     public record ErrorDefinition(
             String name,
             Map<String, FieldDeclaration> fields
-    ) implements Definition {}
+    ) implements Definition {
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
 
     public record TitleDefinition(
             String name
-    ) implements Definition {}
+    ) implements Definition {
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
 
     private record FieldNameAndFieldDeclaration(
             String fieldName,
@@ -163,7 +235,7 @@ public class Parser {
                     }
                 }
 
-                yield new FunctionDefinition(definitionName, inputFields, outputFields, errors);
+                yield new FunctionDefinition(defRefName, inputFields, outputFields, errors);
             }
             case "struct" -> {
                 if (definitionArray.size() < 1) {
@@ -186,9 +258,9 @@ public class Parser {
                     fields.put(result.fieldName, result.fieldDeclaration);
                 }
 
-                var type = new Struct(fields);
+                var type = new Struct(defRefName, fields);
 
-                yield new TypeDefinition(definitionName, type);
+                yield new TypeDefinition(defRefName, type);
             }
             case "error" -> {
                 if (definitionArray.size() < 1) {
@@ -211,11 +283,11 @@ public class Parser {
                     fields.put(result.fieldName, result.fieldDeclaration);
                 }
 
-                yield new ErrorDefinition(definitionName, fields);
+                yield new ErrorDefinition(defRefName, fields);
             }
-            case "union" -> {
+            case "enum" -> {
                 if (definitionArray.size() < 1) {
-                    throw new JapiDescriptionParseError("union definition must be an array of 0 or more string elements followed by 1 object element");
+                    throw new JapiDescriptionParseError("enum definition must be an array of 0 or more string elements followed by 1 object element");
                 }
 
                 var definition = definitionArray.get(0);
@@ -224,7 +296,7 @@ public class Parser {
                 try {
                     definitionsMap = (Map<String, Object>) definition;
                 } catch (ClassCastException e) {
-                    throw new JapiDescriptionParseError("union definition must be an array of 0 or more string elements followed by 1 object element");
+                    throw new JapiDescriptionParseError("enum definition must be an array of 0 or more string elements followed by 1 object element");
                 }
 
                 var fields = new HashMap<String, FieldDeclaration>();
@@ -235,29 +307,12 @@ public class Parser {
                     fields.put(result.fieldName, result.fieldDeclaration);
                 }
 
-                var type = new Union(fields);
+                var type = new Enum(defRefName, fields);
 
-                yield new TypeDefinition(definitionName, type);
-            }
-            case "enum" -> {
-                if (definitionArray.size() < 1) {
-                    throw new JapiDescriptionParseError("enum definition must be an array of 0 or more string elements followed by 1 array element");
-                }
-                var definition = definitionArray.get(0);
-
-                List<String> values;
-                try {
-                    values = (List<String>) definition;
-                } catch (ClassCastException e) {
-                    throw new JapiDescriptionParseError("enum definition must be an array of 0 or more string elements followed by 1 array element");
-                }
-
-                var type = new Enum(values);
-
-                yield new TypeDefinition(definitionName, type);
+                yield new TypeDefinition(defRefName, type);
             }
             case "title" -> {
-                yield new TitleDefinition(definitionName);
+                yield new TitleDefinition(defRefName);
             }
             default -> throw new JapiDescriptionParseError("Unrecognized japi keyword %s".formatted(keyword));
         };
@@ -306,7 +361,7 @@ public class Parser {
     }
 
     private static TypeDeclaration parseType(Map<String, List<Object>> descriptionRoot, Map<String, Definition> definitions, String typeDeclaration) {
-        var typeDefRegex = Pattern.compile("^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|union)\\.([a-zA-Z_]\\w*)))(\\?)?$");
+        var typeDefRegex = Pattern.compile("^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*)))(\\?)?$");
         var matcher = typeDefRegex.matcher(typeDeclaration);
         matcher.find();
 
@@ -326,6 +381,11 @@ public class Parser {
                 case "any" -> new JsonAny();
                 default -> throw new JapiDescriptionParseError("Unrecognized type: %s".formatted(name));
             };
+
+            if (type instanceof JsonNull) {
+                nullable = true;
+            }
+
             return new TypeDeclaration(type, nullable);
         } catch (Exception e) {
             if (e instanceof JapiDescriptionParseError e1) {
