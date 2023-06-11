@@ -64,6 +64,11 @@ public class Processor {
             super(cause);
         }
     }
+    private static class InvalidApplicationFailure extends Error {
+        public InvalidApplicationFailure(Throwable cause) {
+            super(cause);
+        }
+    }
     private static class DisallowedError extends Error {
         public DisallowedError(Throwable cause) {
             super(cause);
@@ -527,7 +532,7 @@ public class Processor {
             var messageBody = entry.getValue();
 
             return List.of(messageType, finalHeaders, messageBody);
-        } catch (InvalidOutput e) {
+        } catch (InvalidOutput | InvalidApplicationFailure e) {
             var messageType = "error._InvalidOutput";
 
             return List.of(messageType, finalHeaders, Map.of());
@@ -617,7 +622,12 @@ public class Processor {
         } catch (ApplicationFailure e) {
             if (allowedErrors.contains(e.messageType)) {
                 var def = (Parser.ErrorDefinition) this.apiDescription.get(e.messageType);
-                validateStruct("error", def.fields(), e.body);
+                try {
+                    validateStruct("error", def.fields(), e.body);
+                } catch (Exception e2) {
+                    throw new InvalidApplicationFailure(e2);
+                }
+
                 throw e;
             } else {
                 throw new DisallowedError(e);

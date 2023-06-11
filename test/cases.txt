@@ -1203,4 +1203,5 @@
 "testErrors"
 
 ["function.test",{"error.ErrorExample":{"property":"a"}},{}]|["error.ErrorExample",{},{"property":"a"}]
+["function.test",{"error.ErrorExample":{"wrong":"a"}},{}]|["error._InvalidOutput",{},{}]
 ["function.test",{"error.UnknownErrorExample":{"property":"a"}},{}]|["error._ApplicationFailure",{},{}]
