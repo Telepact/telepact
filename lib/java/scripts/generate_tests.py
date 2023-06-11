@@ -60,11 +60,19 @@ public class Tests {
     Map<String, Object> handle(String functionName, Map<String, Object> headers, Map<String, Object> body) {
         return switch (functionName) {
             case "test" -> {
+                var error = headers.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
                 if (headers.containsKey("output")) {
                     try {
                         var o = (Map<String, Object>) headers.get("output");
                         yield o;
                     } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else if (error.isPresent()) {
+                    try {
+                        var e = (Map<String, Object>) headers.get(error.get());
+                        throw new Processor.ApplicationFailure(error.get(), e);
+                    } catch (ClassCastException e) {
                         throw new RuntimeException(e);
                     }
                 } else {

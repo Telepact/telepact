@@ -15,6 +15,16 @@ public class Processor {
         Map<String, Object> handle(String functionName, Map<String, Object> headers, Map<String, Object> input);
     }
 
+    public static class ApplicationFailure extends RuntimeException {
+        public final String messageType;
+        public final Map<String, Object> body;
+
+        public ApplicationFailure(String messageType, Map<String, Object> body) {
+            this.messageType = messageType;
+            this.body = body;
+        }
+    }
+
     private static class Error extends RuntimeException {
         public Error(String message) {
             super(message);
@@ -54,6 +64,12 @@ public class Processor {
             super(cause);
         }
     }
+    private static class DisallowedError extends Error {
+        public DisallowedError(Throwable cause) {
+            super(cause);
+        }
+    }
+
     private static class FieldError extends InvalidInput {
     }
 
@@ -220,7 +236,10 @@ public class Processor {
           ],
           "error._InvalidOutput": [
             {}
-          ]          
+          ],
+          "error._ApplicationFailure": [
+            {}
+          ]
         }
         """);
 
@@ -526,6 +545,10 @@ public class Processor {
             var messageType = "error._UnknownFunction";
 
             return List.of(messageType, finalHeaders, Map.of());
+        } catch (ApplicationFailure e) {
+            var messageType = e.messageType;
+
+            return List.of(messageType, finalHeaders, e.body);
         } catch (Exception e) {
             var messageType = "error._ApplicationFailure";
 
@@ -573,9 +596,11 @@ public class Processor {
 
         Map<String, Parser.FieldDeclaration> inputDefinition;
         Map<String, Parser.FieldDeclaration> outputDefinition;
+        List<String> allowedErrors;
         if (functionDef instanceof Parser.FunctionDefinition f) {
             inputDefinition = f.inputFields();
             outputDefinition = f.outputFields();
+            allowedErrors = f.errors();
         } else {
             throw new FunctionNotFound(functionName);
         }
@@ -583,10 +608,20 @@ public class Processor {
         validateStruct("input", inputDefinition, input);
 
         Map<String, Object> output;
-        if (functionName.startsWith("_")) {
-            output = internalHandler.handle(functionName, headers, input);
-        } else {
-            output = handler.handle(functionName, headers, input);
+        try {
+            if (functionName.startsWith("_")) {
+                output = internalHandler.handle(functionName, headers, input);
+            } else {
+                output = handler.handle(functionName, headers, input);
+            }
+        } catch (ApplicationFailure e) {
+            if (allowedErrors.contains(e.messageType)) {
+                var def = (Parser.ErrorDefinition) this.apiDescription.get(e.messageType);
+                validateStruct("error", def.fields(), e.body);
+                throw e;
+            } else {
+                throw new DisallowedError(e);
+            }
         }
 
         try {

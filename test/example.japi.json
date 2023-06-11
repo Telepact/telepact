@@ -98,11 +98,20 @@
 
   "error.ErrorExample": [
     {
-      "exampleProperty": "string"
+      "property": "string"
     },
     "                          ",
     " An example custom error. ",
     "                          "
+  ],
+
+  "error.UnknownErrorExample": [
+    {
+      "property": "string"
+    },
+    "                                                                     ",
+    " An example custom error that will not be used by the test function. ",
+    "                                                                     "
   ],
 
   "function.test": [

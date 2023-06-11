@@ -1199,3 +1199,8 @@
 "testUnknownFunction"
 
 ["function.notFound",{},{}]|["error._UnknownFunction",{},{}]
+
+"testErrors"
+
+["function.test",{"error.ErrorExample":{"property":"a"}},{}]|["error.ErrorExample",{},{"property":"a"}]
+["function.test",{"error.UnknownErrorExample":{"property":"a"}},{}]|["error._ApplicationFailure",{},{}]
