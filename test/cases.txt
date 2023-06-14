@@ -1214,3 +1214,8 @@
 ["function.test",{"_selectFields":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{"required":false}}}]
 ["function.test",{"_selectFields":{"struct.StructExample":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{}}}]
 ["function.test",{"_selectFields":{"struct.StructExample":[]},"output":{"value":{"struct":{"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{}}}]
+
+["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"arrStruct":[{"required":false},{"optional":false,"required":false}]}}},{"value":{"arrStruct":[{"required":false},{"optional":false,"required":false}]}}]|["function.test",{},{"value":{"arrStruct":[{},{"optional":false}]}}]
+
+["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"objStruct":{"a":{"required":false},"b":{"optional":false,"required":false}}}}},{"value":{"objStruct":{"a":{"required":false},"b":{"optional":false,"required":false}}}}]|["function.test",{},{"value":{"objStruct":{"a":{},"b":{"optional":false}}}}]
+
