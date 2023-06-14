@@ -1205,3 +1205,12 @@
 ["function.test",{"error.ErrorExample":{"property":"a"}},{}]|["error.ErrorExample",{},{"property":"a"}]
 ["function.test",{"error.ErrorExample":{"wrong":"a"}},{}]|["error._InvalidOutput",{},{}]
 ["function.test",{"error.UnknownErrorExample":{"property":"a"}},{}]|["error._ApplicationFailure",{},{}]
+
+"testSelectFields"
+
+["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{"optional":false}}}]
+["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"struct":{"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{}}}]
+["function.test",{"_selectFields":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{"optional":false,"required":false}}}]
+["function.test",{"_selectFields":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{"required":false}}}]
+["function.test",{"_selectFields":{"struct.StructExample":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{}}}]
+["function.test",{"_selectFields":{"struct.StructExample":[]},"output":{"value":{"struct":{"required":false}}}},{"value":{"struct":{"optional":false,"required":false}}}]|["function.test",{},{"value":{"struct":{}}}]

@@ -375,24 +375,33 @@ public class Processor {
                     finalHeaders.put("_id", callId);
                 }
 
-                Map<String, Object> messageBody;
+                Map<String, Object> input;
                 try {
-                    messageBody = (Map<String, Object>) inputJapiMessage.get(2);
+                    input = (Map<String, Object>) inputJapiMessage.get(2);
                 } catch (ClassCastException e) {
                     throw new JapiMessageBodyNotObject();
                 }
 
-                var output = _process(functionName, headers, messageBody);
+                var functionDef = this.apiDescription.get(messageType);
 
-                // TODO select.fields
+                Map<String, Parser.FieldDeclaration> inputDefinition;
+                Map<String, Parser.FieldDeclaration> outputDefinition;
+                List<String> allowedErrors;
+                if (functionDef instanceof Parser.FunctionDefinition f) {
+                    inputDefinition = f.inputFields();
+                    outputDefinition = f.outputFields();
+                    allowedErrors = f.errors();
+                } else {
+                    throw new FunctionNotFound(functionName);
+                }
+
+                Map<String, List<String>> slicedTypes = null;
                 if (headers.containsKey("_selectFields")) {
-                    Map<String, List<String>> slicedTypes;
                     try {
-                        var ref = (Map<String, Object>) headers.get("_selectFields");
-                        for (Map.Entry<String, Object> entry : ref.entrySet()) {
-                            var typeName = entry.getKey();
+                        slicedTypes = (Map<String, List<String>>) headers.get("_selectFields");
+                        for (Map.Entry<String, List<String>> entry : slicedTypes.entrySet()) {
                             var fields = entry.getValue();
-                            for (var field : ((List<?>) fields)) {
+                            for (var field : fields) {
                                 // verify the cast works
                                 var stringField = (String) field;
                             }
@@ -400,12 +409,48 @@ public class Processor {
                     } catch (ClassCastException e) {
                         throw new InvalidSelectFieldsHeader();
                     }
-                    // TODO
+                }
+
+                validateStruct("input", inputDefinition, input);
+
+                Map<String, Object> output;
+                try {
+                    if (functionName.startsWith("_")) {
+                        output = internalHandler.handle(functionName, headers, input);
+                    } else {
+                        output = handler.handle(functionName, headers, input);
+                    }
+                } catch (ApplicationFailure e) {
+                    if (allowedErrors.contains(e.messageType)) {
+                        var def = (Parser.ErrorDefinition) this.apiDescription.get(e.messageType);
+                        try {
+                            validateStruct("error", def.fields(), e.body);
+                        } catch (Exception e2) {
+                            throw new InvalidApplicationFailure(e2);
+                        }
+
+                        throw e;
+                    } else {
+                        throw new DisallowedError(e);
+                    }
+                }
+
+                try {
+                    validateStruct("output", outputDefinition, output);
+                } catch (Exception e) {
+                    throw new InvalidOutput(e);
+                }
+
+                Map<String, Object> finalOutput;
+                if (slicedTypes != null) {
+                    finalOutput = (Map<String, Object>) sliceTypes(new Parser.Struct("output", outputDefinition), output, slicedTypes);
+                } else {
+                    finalOutput = output;
                 }
 
                 var outputMessageType = "function.%s".formatted(functionName);
 
-                return List.of(outputMessageType, finalHeaders, output);
+                return List.of(outputMessageType, finalHeaders, finalOutput);
             } catch (Exception e) {
                 try {
                     this.onError.accept(e);
@@ -571,27 +616,47 @@ public class Processor {
         return Map.of("cases", jsonErrors);
     }
 
-    private void sliceTypes(Parser.Type type, Object value, Map<String, List<String>> slicedTypes) {
-        // TODO
-    }
-
-    private Object decode(Object given) {
-        if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncoder.decodeMap.get(e.getKey()), e -> decode(e.getValue())));
-        } else if (given instanceof List<?> l) {
-            return l.stream().map(e -> decode(e));
+    // TODO: wire up
+    private Object sliceTypes(Parser.Type type, Object value, Map<String, List<String>> slicedTypes) {
+        if (type instanceof Parser.Struct s) {
+            var slicedFields = slicedTypes.get(s.name());
+            var valueAsMap = (Map<String, Object>) value;
+            var finalMap = new HashMap<>();
+            for (var entry : valueAsMap.entrySet()) {
+                if (slicedFields == null || slicedFields.contains(entry.getKey())) {
+                    var field = s.fields().get(entry.getKey());
+                    var slicedValue = sliceTypes(field.typeDeclaration().type(), entry.getValue(), slicedTypes);
+                    finalMap.put(entry.getKey(), slicedValue);
+                }
+            }
+            return finalMap;
+        } else if (type instanceof Parser.Enum e) {
+            var valueAsMap = (Map<String, Object>) value;
+            var finalMap = new HashMap<>();
+            for (var entry : valueAsMap.entrySet()) {
+                var field = e.cases().get(entry.getKey());
+                var slicedValue = sliceTypes(field.typeDeclaration().type(), entry.getValue(), slicedTypes);
+                finalMap.put(entry.getKey(), slicedValue);
+            }
+            return finalMap;
+        } else if (type instanceof Parser.JsonObject o) {
+            var valueAsMap = (Map<String, Object>) value;
+            var finalMap = new HashMap<>();
+            for (var entry : valueAsMap.entrySet()) {
+                var slicedValue = sliceTypes(o.nestedType().type(), entry.getValue(), slicedTypes);
+                finalMap.put(entry.getKey(), slicedValue);
+            }
+            return finalMap;
+        } else if (type instanceof Parser.JsonArray a) {
+            var valueAsList = (List<Object>) value;
+            var finalList = new ArrayList<>();
+            for (var entry : valueAsList) {
+                var slicedValue = sliceTypes(a.nestedType().type(), entry, slicedTypes);
+                finalList.add(slicedValue);
+            }
+            return finalList;
         } else {
-            return given;
-        }
-    }
-
-    private Object encode(Object given) {
-        if (given instanceof Map<?,?> m) {
-            return m.entrySet().stream().collect(Collectors.toMap(e -> this.binaryEncoder.encodeMap.get(e.getKey()), e -> encode(e.getValue())));
-        } else if (given instanceof List<?> l) {
-            return l.stream().map(e -> encode(e));
-        } else {
-            return given;
+            return value;
         }
     }
 
