@@ -210,13 +210,13 @@ public class Processor {
     }
 
     public Processor(Handler handler, String apiDescriptionJson, Options options) {
-        var description = Parser.newJapiDescription(apiDescriptionJson);
+        var description = Parser.newJapi(apiDescriptionJson);
         // Also add the internal api spec
         this.apiDescription = description.parsed();
         this.originalApiDescription = description.original();
         this.serializer = options.serializer;
 
-        var internalDescription = Parser.newJapiDescription("""
+        var internalDescription = Parser.newJapi("""
         {
           "function._ping": [
             {},
@@ -264,8 +264,8 @@ public class Processor {
         for (var entry : apiDescription.entrySet()) {
             allApiDescriptionKeys.add(entry.getKey());
             if (entry.getValue() instanceof Parser.FunctionDefinition f) {
-                allApiDescriptionKeys.addAll(f.inputFields().keySet());
-                allApiDescriptionKeys.addAll(f.outputFields().keySet());
+                allApiDescriptionKeys.addAll(f.inputStruct().fields().keySet());
+                allApiDescriptionKeys.addAll(f.outputStruct().fields().keySet());
                 allApiDescriptionKeys.addAll(f.errors());
             } else if (entry.getValue() instanceof Parser.TypeDefinition t) {
                 var type = t.type();
@@ -384,13 +384,9 @@ public class Processor {
 
                 var functionDef = this.apiDescription.get(messageType);
 
-                Map<String, Parser.FieldDeclaration> inputDefinition;
-                Map<String, Parser.FieldDeclaration> outputDefinition;
-                List<String> allowedErrors;
+                Parser.FunctionDefinition functionDefinition;
                 if (functionDef instanceof Parser.FunctionDefinition f) {
-                    inputDefinition = f.inputFields();
-                    outputDefinition = f.outputFields();
-                    allowedErrors = f.errors();
+                    functionDefinition = f;
                 } else {
                     throw new FunctionNotFound(functionName);
                 }
@@ -411,7 +407,7 @@ public class Processor {
                     }
                 }
 
-                validateStruct("input", inputDefinition, input);
+                validateStruct("input", functionDefinition.inputStruct().fields(), input);
 
                 Map<String, Object> output;
                 try {
@@ -421,7 +417,7 @@ public class Processor {
                         output = handler.handle(functionName, headers, input);
                     }
                 } catch (ApplicationFailure e) {
-                    if (allowedErrors.contains(e.messageType)) {
+                    if (functionDefinition.errors().contains(e.messageType)) {
                         var def = (Parser.ErrorDefinition) this.apiDescription.get(e.messageType);
                         try {
                             validateStruct("error", def.fields(), e.body);
@@ -436,14 +432,14 @@ public class Processor {
                 }
 
                 try {
-                    validateStruct("output", outputDefinition, output);
+                    validateStruct("output", functionDefinition.outputStruct().fields(), output);
                 } catch (Exception e) {
                     throw new InvalidOutput(e);
                 }
 
                 Map<String, Object> finalOutput;
                 if (slicedTypes != null) {
-                    finalOutput = (Map<String, Object>) sliceTypes(new Parser.Struct("output", outputDefinition), output, slicedTypes);
+                    finalOutput = (Map<String, Object>) sliceTypes(functionDefinition.outputStruct(), output, slicedTypes);
                 } else {
                     finalOutput = output;
                 }
@@ -658,54 +654,6 @@ public class Processor {
         } else {
             return value;
         }
-    }
-
-    private Map<String, Object> _process(String functionName, Map<String, Object> headers, Map<String, Object> input) {
-        var messageType = "function.%s".formatted(functionName);
-        var functionDef = this.apiDescription.get(messageType);
-
-        Map<String, Parser.FieldDeclaration> inputDefinition;
-        Map<String, Parser.FieldDeclaration> outputDefinition;
-        List<String> allowedErrors;
-        if (functionDef instanceof Parser.FunctionDefinition f) {
-            inputDefinition = f.inputFields();
-            outputDefinition = f.outputFields();
-            allowedErrors = f.errors();
-        } else {
-            throw new FunctionNotFound(functionName);
-        }
-
-        validateStruct("input", inputDefinition, input);
-
-        Map<String, Object> output;
-        try {
-            if (functionName.startsWith("_")) {
-                output = internalHandler.handle(functionName, headers, input);
-            } else {
-                output = handler.handle(functionName, headers, input);
-            }
-        } catch (ApplicationFailure e) {
-            if (allowedErrors.contains(e.messageType)) {
-                var def = (Parser.ErrorDefinition) this.apiDescription.get(e.messageType);
-                try {
-                    validateStruct("error", def.fields(), e.body);
-                } catch (Exception e2) {
-                    throw new InvalidApplicationFailure(e2);
-                }
-
-                throw e;
-            } else {
-                throw new DisallowedError(e);
-            }
-        }
-
-        try {
-            validateStruct("output", outputDefinition, output);
-        } catch (Exception e) {
-            throw new InvalidOutput(e);
-        }
-
-        return output;
     }
 
     private void validateStruct(
