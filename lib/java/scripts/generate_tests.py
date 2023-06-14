@@ -82,6 +82,36 @@ public class Tests {
             default -> throw new RuntimeException();
         };
     }
+    
+    private void test(String input, String expectedOutput) throws IOException {
+        var objectMapper = new ObjectMapper();
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
+        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> e.printStackTrace()));
+        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){});
+
+        // test json
+        {
+            var output = processor.process(input.getBytes(StandardCharsets.UTF_8));
+            var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>() {});
+            assertEquals(expectedOutputJsonJava, outputJsonJava);
+        }
+
+        // test binary
+        {
+            var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
+            client.call("_ping", Map.of(), Map.of()); // warmup
+            var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {});
+
+            if (expectedOutput.startsWith("[\\"error.")) {
+                var e = assertThrows(Client.Error.class, () -> client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2)));
+                assertEquals(expectedOutputJsonJava.get(0), e.type);
+                assertEquals(expectedOutputJsonJava.get(2), e.body);
+            } else {
+                var outputJava = client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2));
+                assertEquals(expectedOutputJsonJava.get(2), outputJava);
+            }
+        }
+    }
 
 ''')
 
@@ -90,68 +120,15 @@ for case in cases:
     test_file.write('''
     @Test
     public void test_{}() throws IOException {{
-        var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
         var input = """
         {}
         """.trim();
         var expectedOutput = """
         {}
         """.trim();
-        var output = processor.process(input.getBytes(StandardCharsets.UTF_8));
-        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
-        var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>(){{}});
-        assertEquals(expectedOutputJsonJava, outputJsonJava);
+        test(input, expectedOutput);
     }}
-    
     '''.format(case.name, case.input, case.output))
-
-    if case.output.startswith("[\"error."):
-        test_file.write('''
-    @Test
-    public void testBinary_{}() throws IOException {{
-        var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
-        var input = """
-        {}
-        """.trim();
-        var expectedOutput = """
-        {}
-        """.trim();
-        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
-        var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
-        client.call("_ping", Map.of(), Map.of()); // warmup
-        var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {{}});
-        var e = assertThrows(Client.Error.class, () -> client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2)));
-        assertEquals(expectedOutputJsonJava.get(0), e.type);
-        assertEquals(expectedOutputJsonJava.get(2), e.body);
-    }}    
-    
-        '''.format(case.name, case.input, case.output))
-    else:
-        test_file.write('''
-    @Test
-    public void testBinary_{}() throws IOException {{
-        var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> {{e.printStackTrace();}}));
-        var input = """
-        {}
-        """.trim();
-        var expectedOutput = """
-        {}
-        """.trim();
-        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){{}});
-        var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
-        client.call("_ping", Map.of(), Map.of()); // warmup
-        var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {{}});
-        var outputJava = client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2));
-        assertEquals(expectedOutputJsonJava.get(2), outputJava);
-    }}    
-    
-        '''.format(case.name, case.input, case.output))
 
 test_file.write('''
 }
