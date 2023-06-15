@@ -58,7 +58,15 @@ public class Processor {
             this.functionName = functionName;
         }
     }
-    private static class InvalidInput extends Error {}
+    private static class InvalidInput extends Error {
+        public InvalidInput() {
+            super();
+        }
+        public InvalidInput(Throwable cause) {
+            super(cause);
+        }
+
+    }
     private static class InvalidOutput extends Error {
         public InvalidOutput(Throwable cause) {
             super(cause);
@@ -76,6 +84,12 @@ public class Processor {
     }
 
     private static class FieldError extends InvalidInput {
+        public FieldError() {
+            super();
+        }
+        public FieldError(Throwable cause) {
+            super(cause);
+        }
     }
 
     private static class StructMissingFields extends FieldError {
@@ -120,6 +134,11 @@ public class Processor {
         public final String fieldName;
         public final InvalidFieldTypeError error;
         public InvalidFieldType(String fieldName, InvalidFieldTypeError error) {
+            this.fieldName = fieldName;
+            this.error = error;
+        }
+        public InvalidFieldType(String fieldName, InvalidFieldTypeError error, Throwable cause) {
+            super(cause);
             this.fieldName = fieldName;
             this.error = error;
         }
@@ -176,6 +195,12 @@ public class Processor {
         STRING_INVALID_FOR_ENUM_TYPE,
         ARRAY_INVALID_FOR_ENUM_TYPE,
         VALUE_INVALID_FOR_ENUM_TYPE,
+
+        BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE,
+        NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE,
+        STRING_INVALID_FOR_ENUM_STRUCT_TYPE,
+        ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE,
+        VALUE_INVALID_FOR_ENUM_STRUCT_TYPE,
 
         INVALID_ENUM_VALUE,
         INVALID_TYPE
@@ -564,6 +589,16 @@ public class Processor {
 
                 case VALUE_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumType"));
 
+                case BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForEnumStructType"));
+
+                case NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForEnumStructType"));
+
+                case STRING_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForEnumStructType"));
+
+                case ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForEnumStructType"));
+
+                case VALUE_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumStructType"));
+
                 case INVALID_ENUM_VALUE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "UnknownEnumValue"));
 
                 case INVALID_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "InvalidType"));
@@ -628,13 +663,14 @@ public class Processor {
             return finalMap;
         } else if (type instanceof Parser.Enum e) {
             var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var field = e.cases().get(entry.getKey());
-                var slicedValue = sliceTypes(field.typeDeclaration().type(), entry.getValue(), slicedTypes);
-                finalMap.put(entry.getKey(), slicedValue);
+            var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
+            var structReference = e.cases().get(enumEntry.getKey());
+            Map<String, Object> newStruct = new HashMap<>();
+            for (var structEntry : structReference.fields().entrySet()) {
+                var slicedValue = sliceTypes(structEntry.getValue().typeDeclaration().type(), enumEntry.getValue(), slicedTypes);
+                newStruct.put(structEntry.getKey(), slicedValue);
             }
-            return finalMap;
+            return Map.of(enumEntry.getKey(), newStruct);
         } else if (type instanceof Parser.JsonObject o) {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -663,10 +699,10 @@ public class Processor {
     ) {
         var missingFields = new ArrayList<String>();
         for (Map.Entry<String, Parser.FieldDeclaration> entry : referenceStruct.entrySet()) {
-            var name = entry.getKey();
+            var fieldName = entry.getKey();
             var fieldDeclaration = entry.getValue();
-            if (!actualStruct.containsKey(name) && !fieldDeclaration.optional()) {
-                missingFields.add(name);
+            if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional()) {
+                missingFields.add(fieldName);
             }
         }
 
@@ -687,35 +723,28 @@ public class Processor {
         }
 
         for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
-            var name = entry.getKey();
+            var fieldName = entry.getKey();
             var field = entry.getValue();
-            var referenceField = referenceStruct.get(name);
+            var referenceField = referenceStruct.get(fieldName);
             if (referenceField == null) {
-                throw new StructHasExtraFields(namespace, List.of(name));
+                throw new StructHasExtraFields(namespace, List.of(fieldName));
             }
-            validateType("%s.%s".formatted(namespace, name), referenceField.typeDeclaration(), field);
+            validateType("%s.%s".formatted(namespace, fieldName), referenceField.typeDeclaration(), field);
         }
     }
 
     private void validateEnum(
             String namespace,
-            Map<String, Parser.FieldDeclaration> reference,
+            Map<String, Parser.Struct> reference,
+            String enumCase,
             Map<String, Object> actual
     ) {
-        if (actual.size() != 1) {
-            throw new EnumDoesNotHaveOnlyOneField(namespace);
-        }
-
-        var entry = actual.entrySet().stream().findFirst().get();
-        var name = entry.getKey();
-        var fieldValue = entry.getValue();
-
-        var referenceField = reference.get(name);
+        var referenceField = reference.get(enumCase);
         if (referenceField == null) {
-            throw new UnknownEnumField(namespace, name);
+            throw new UnknownEnumField(namespace, enumCase);
         }
 
-        validateType("%s.%s".formatted(namespace, name), referenceField.typeDeclaration(), fieldValue);
+        validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(), actual);
     }
 
     private void validateType(String fieldName, Parser.TypeDeclaration typeDeclaration, Object value) {
@@ -849,8 +878,27 @@ public class Processor {
                 } else if (value instanceof List) {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE);
                 } else if (value instanceof Map<?, ?> m) {
-                    validateEnum(fieldName, u.cases(), (Map<String, Object>) m);
-                    return;
+                    if (m.size() != 1) {
+                        throw new EnumDoesNotHaveOnlyOneField(fieldName);
+                    }
+                    var entry = m.entrySet().stream().findFirst().get();
+                    var enumCase = (String) entry.getKey();
+                    var enumValue = entry.getValue();
+
+                    if (enumValue instanceof Boolean) {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE);
+                    } else if (enumValue instanceof Number) {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE);
+                    } else if (enumValue instanceof String) {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_STRUCT_TYPE);
+                    } else if (enumValue instanceof List) {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE);
+                    } else if (enumValue instanceof Map<?,?> m2) {
+                        validateEnum(fieldName, u.cases(), enumCase, (Map<String, Object>) m2);
+                        return;
+                    } else {
+                        throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE);
+                    }
                 } else {
                     throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);
                 }

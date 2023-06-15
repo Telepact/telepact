@@ -64,7 +64,7 @@ public class Parser {
             return name;
         }
     }
-    public record Enum(String name, Map<String, FieldDeclaration> cases) implements Type {
+    public record Enum(String name, Map<String, Struct> cases) implements Type {
         @Override
         public String getName() {
             return name;
@@ -183,36 +183,36 @@ public class Parser {
         var parsedDefinition = switch (keyword) {
             case "function" -> {
                 if (definitionArray.size() < 2) {
-                    throw new JapiParseError("Invalid function definition");
+                    throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
                 }
 
                 Map<String, Object> inputDefinitionAsJsonJava;
                 try {
                     inputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
                 } catch (ClassCastException e) {
-                    throw new JapiParseError("Invalid function definition");
+                    throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
                 }
                 var inputFields = new HashMap<String, FieldDeclaration>();
                 for (var entry : inputDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var result = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    inputFields.put(result.fieldName, result.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
+                    inputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
                 }
 
                 Map<String, Object> outputDefinitionAsJsonJava;
                 try {
                     outputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(1);
                 } catch (ClassCastException e) {
-                    throw new JapiParseError("Invalid function definition");
+                    throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
                 }
 
                 var outputFields = new HashMap<String, FieldDeclaration>();
                 for (var entry : outputDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var result = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    outputFields.put(result.fieldName, result.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
+                    outputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
                 }
 
                 List<String> errors = List.of();
@@ -222,12 +222,12 @@ public class Parser {
                     try {
                         errors = (List<String>) errorDefinition;
                     } catch (ClassCastException e) {
-                        throw new JapiParseError("Invalid function definition");
+                        throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
                     }
 
                     for (var errorDef : errors) {
                         if (!japiAsJsonJava.containsKey(errorDef)) {
-                            throw new JapiParseError("Unknown error reference: %s".formatted(errorDef));
+                            throw new JapiParseError("Unknown error reference for %s".formatted(errorDef));
                         }
                     }
                 }
@@ -239,22 +239,22 @@ public class Parser {
             }
             case "struct" -> {
                 if (definitionArray.size() < 1) {
-                    throw new JapiParseError("Invalid struct definition");
+                    throw new JapiParseError("Invalid struct definition for %s".formatted(definitionKey));
                 }
 
                 Map<String, Object> structDefinitionAsJsonJava;
                 try {
                     structDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
                 } catch (ClassCastException e) {
-                    throw new JapiParseError("Invalid struct definition");
+                    throw new JapiParseError("Invalid struct definition for %s".formatted(definitionKey));
                 }
 
                 var fields = new HashMap<String, FieldDeclaration>();
                 for (var entry : structDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var result = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    fields.put(result.fieldName, result.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
+                    fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
                 }
 
                 var type = new Struct(definitionKey, fields);
@@ -263,47 +263,60 @@ public class Parser {
             }
             case "error" -> {
                 if (definitionArray.size() < 1) {
-                    throw new JapiParseError("Invalid error definition");
+                    throw new JapiParseError("Invalid error definition for %s".formatted(definitionKey));
                 }
 
                 Map<String, Object> errorDefinitionAsJsonJava;
                 try {
                     errorDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
                 } catch (ClassCastException e) {
-                    throw new JapiParseError("Invalid error definition");
+                    throw new JapiParseError("Invalid error definition for %s".formatted(definitionKey));
                 }
 
                 var fields = new HashMap<String, FieldDeclaration>();
                 for (var entry : errorDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var result = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    fields.put(result.fieldName, result.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
+                    fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
                 }
 
                 yield new ErrorDefinition(definitionKey, fields);
             }
             case "enum" -> {
                 if (definitionArray.size() < 1) {
-                    throw new JapiParseError("Invalid enum definition");
+                    throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
                 }
 
                 Map<String, Object> enumDefinitionAsJsonJava;
                 try {
                     enumDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
                 } catch (ClassCastException e) {
-                    throw new JapiParseError("Invalid enum definition");
+                    throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
                 }
 
-                var fields = new HashMap<String, FieldDeclaration>();
+                var cases = new HashMap<String, Struct>();
                 for (var entry : enumDefinitionAsJsonJava.entrySet()) {
-                    var fieldDeclaration = entry.getKey();
-                    var typeDeclarationValue = entry.getValue();
-                    var result = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, true);
-                    fields.put(result.fieldName, result.fieldDeclaration);
+                    var enumCase = entry.getKey();
+                    Map<String, Object> caseStructDefinitionAsJava;
+                    try {
+                        caseStructDefinitionAsJava = (Map<String, Object>) entry.getValue();
+                    } catch (ClassCastException e) {
+                        throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
+                    }
+
+                    var fields = new HashMap<String, FieldDeclaration>();
+                    for (var caseStructEntry : caseStructDefinitionAsJava.entrySet()) {
+                        var caseStructFieldDeclaration = caseStructEntry.getKey();
+                        var caseStructTypeDeclarationValue = caseStructEntry.getValue();
+                        var caseStructParsedField = parseField(japiAsJsonJava, parsedDefinitions, caseStructFieldDeclaration, caseStructTypeDeclarationValue, false);
+                        fields.put(caseStructParsedField.fieldName, caseStructParsedField.fieldDeclaration);
+                    }
+                    var struct = new Struct("%s.%s".formatted(definitionKey, enumCase), fields);
+                    cases.put(enumCase, struct);
                 }
 
-                var type = new Enum(definitionKey, fields);
+                var type = new Enum(definitionKey, cases);
 
                 yield new TypeDefinition(definitionKey, type);
             }

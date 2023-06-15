@@ -72,9 +72,9 @@
       "objEnum!": "object<enum.EnumExample>",
       "objNullEnum!": "object<enum.EnumExample?>"
     },
-    "                                                          ",
-    " A enum value demonstrating all common type permutations. ",
-    "                                                          "
+    "                                                            ",
+    " A struct value demonstrating all common type permutations. ",
+    "                                                            "
   ],
 
   "struct.StructExample": [
@@ -91,8 +91,11 @@
 
   "enum.EnumExample": [
     {
-      "first": "integer",
-      "second": "string"
+      "one": {},
+      "two": {
+        "required": "boolean",
+        "optional!": "boolean"
+      }
     }
   ],
 
