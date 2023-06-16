@@ -1,13 +1,21 @@
 {
-  "title.Example": [
-    " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
-    "                                                                                           ",
-    " As a friendly reminder:                                                                   ",
-    " - ! means optional field                                                                  ",
-    " - ? means nullable type                                                                   ",
-    "                                                                                           "
+  "info.Example": [
+    [
+      " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
+      "                                                                                           ",
+      " As a reminder:                                                                   ",
+      " - ! means optional field                                                                  ",
+      " - ? means nullable type                                                                   ",
+      "                                                                                           "
+    ],
+    {}
   ],
   "struct.Value": [
+    [
+      "                                                            ",
+      " A struct value demonstrating all common type permutations. ",
+      "                                                            "
+    ],
     {
       "bool!": "boolean",
       "nullBool!": "boolean?",
@@ -71,25 +79,25 @@
       "arrNullEnum!": "array<enum.EnumExample?>",
       "objEnum!": "object<enum.EnumExample>",
       "objNullEnum!": "object<enum.EnumExample?>"
-    },
-    "                                                            ",
-    " A struct value demonstrating all common type permutations. ",
-    "                                                            "
+    }
   ],
 
   "struct.StructExample": [
+    [
+      "                                                                                         ",
+      " The main struct example.                                                                ",
+      "                                                                                         ",
+      " The [required] field must be supplied. The optional field does not need to be supplied. ",
+      "                                                                                         "
+    ],
     {
       "required": "boolean",
       "optional!": "boolean"
-    },
-    "                                                                                         ",
-    " The main struct example.                                                                ",
-    "                                                                                         ",
-    " The [required] field must be supplied. The optional field does not need to be supplied. ",
-    "                                                                                         "
+    }
   ],
 
   "enum.EnumExample": [
+    [],
     {
       "one": {},
       "two": {
@@ -100,35 +108,38 @@
   ],
 
   "error.ErrorExample": [
+    [
+      "                          ",
+      " An example custom error. ",
+      "                          "
+    ],
     {
       "property": "string"
-    },
-    "                          ",
-    " An example custom error. ",
-    "                          "
+    }
   ],
 
   "error.UnknownErrorExample": [
+    [
+      "                                                                     ",
+      " An example custom error that will not be used by the test function. ",
+      "                                                                     "
+    ],
     {
       "property": "string"
-    },
-    "                                                                     ",
-    " An example custom error that will not be used by the test function. ",
-    "                                                                     "
+    }
   ],
 
   "function.test": [
-    {
-      "value!": "struct.Value"
-    },
-    "-->",
-    {
-      "value!": "struct.Value"
-    },
-    ["error.ErrorExample"],
-    "                                                                       ",
-    " The primary function example.                                         ",
-    " The arguments is always a struct. The result is also always a struct. ",
-    "                                                                       "
+    [],
+    [
+      {
+        "value!": "struct.Value"
+      },
+      "-->",
+      {
+        "value!": "struct.Value"
+      },
+      ["error.ErrorExample"]
+    ]
   ]
 }

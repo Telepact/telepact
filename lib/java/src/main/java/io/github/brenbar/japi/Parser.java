@@ -169,8 +169,8 @@ public class Parser {
     }
 
     private static Definition parseDefinition(Map<String, List<Object>> japiAsJsonJava, Map<String, Definition> parsedDefinitions, String definitionKey) {
-        var definitionAsJsonJava = japiAsJsonJava.get(definitionKey);
-        if (definitionAsJsonJava == null) {
+        var definitionAsJsonJavaWithDoc = japiAsJsonJava.get(definitionKey);
+        if (definitionAsJsonJavaWithDoc == null) {
             throw new JapiParseError("Could not find definition for %s".formatted(definitionKey));
         }
 
@@ -178,16 +178,14 @@ public class Parser {
         var keyword = splitName.get(0);
         var definitionName = splitName.get(1);
 
-        var definitionArray = definitionAsJsonJava.stream().filter(l -> !(l instanceof String)).collect(Collectors.toList());
+        var definitionAsJsonJava = definitionAsJsonJavaWithDoc.get(1);
 
         var parsedDefinition = switch (keyword) {
             case "function" -> {
-                if (definitionArray.size() < 2) {
-                    throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
-                }
-
+                List<Object> definitionArray;
                 Map<String, Object> inputDefinitionAsJsonJava;
                 try {
+                    definitionArray = (List<Object>) definitionAsJsonJava;
                     inputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
                 } catch (ClassCastException e) {
                     throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
@@ -202,7 +200,7 @@ public class Parser {
 
                 Map<String, Object> outputDefinitionAsJsonJava;
                 try {
-                    outputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(1);
+                    outputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(2);
                 } catch (ClassCastException e) {
                     throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
                 }
@@ -216,8 +214,8 @@ public class Parser {
                 }
 
                 List<String> errors = List.of();
-                if (definitionArray.size() >= 3) {
-                    var errorDefinition = definitionArray.get(2);
+                if (definitionArray.size() == 4) {
+                    var errorDefinition = definitionArray.get(3);
 
                     try {
                         errors = (List<String>) errorDefinition;
@@ -238,13 +236,9 @@ public class Parser {
                 yield new FunctionDefinition(definitionKey, inputStruct, outputStruct, errors);
             }
             case "struct" -> {
-                if (definitionArray.size() < 1) {
-                    throw new JapiParseError("Invalid struct definition for %s".formatted(definitionKey));
-                }
-
                 Map<String, Object> structDefinitionAsJsonJava;
                 try {
-                    structDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
+                    structDefinitionAsJsonJava = (Map<String, Object>) definitionAsJsonJava;
                 } catch (ClassCastException e) {
                     throw new JapiParseError("Invalid struct definition for %s".formatted(definitionKey));
                 }
@@ -262,13 +256,9 @@ public class Parser {
                 yield new TypeDefinition(definitionKey, type);
             }
             case "error" -> {
-                if (definitionArray.size() < 1) {
-                    throw new JapiParseError("Invalid error definition for %s".formatted(definitionKey));
-                }
-
                 Map<String, Object> errorDefinitionAsJsonJava;
                 try {
-                    errorDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
+                    errorDefinitionAsJsonJava = (Map<String, Object>) definitionAsJsonJava;
                 } catch (ClassCastException e) {
                     throw new JapiParseError("Invalid error definition for %s".formatted(definitionKey));
                 }
@@ -284,13 +274,9 @@ public class Parser {
                 yield new ErrorDefinition(definitionKey, fields);
             }
             case "enum" -> {
-                if (definitionArray.size() < 1) {
-                    throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
-                }
-
                 Map<String, Object> enumDefinitionAsJsonJava;
                 try {
-                    enumDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
+                    enumDefinitionAsJsonJava = (Map<String, Object>) definitionAsJsonJava;
                 } catch (ClassCastException e) {
                     throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
                 }
@@ -320,7 +306,7 @@ public class Parser {
 
                 yield new TypeDefinition(definitionKey, type);
             }
-            case "title" -> {
+            case "info" -> {
                 yield new TitleDefinition(definitionKey);
             }
             default -> throw new JapiParseError("Unrecognized japi keyword %s".formatted(keyword));
@@ -330,7 +316,7 @@ public class Parser {
     }
 
     private static List<String> splitDefinitionKeywordAndName(String name) {
-        var regex = Pattern.compile("^(struct|union|enum|error|function|event|title).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
+        var regex = Pattern.compile("^(struct|union|enum|error|function|event|info).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
         var matcher = regex.matcher(name);
         matcher.find();
         var keyword = matcher.group(1);

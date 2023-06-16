@@ -244,30 +244,42 @@ public class Processor {
         var internalDescription = Parser.newJapi("""
         {
           "function._ping": [
-            {},
-            {}
+            [],
+            [
+              {},
+              "-->",
+              {}
+            ]
           ],
           "function._api": [
-            {},
-            {
-              "api": "object"
-            }
+            [],
+            [
+              {},
+              "-->",
+              {
+                "api": "object"
+              }
+            ]
           ],
           "struct._InvalidField": [
+            [],
             {
               "field": "string",
               "reason": "string"
             }
           ],
           "error._InvalidInput": [
+            [],
             {
               "cases": "array<struct._InvalidField>"
             }
           ],
           "error._InvalidOutput": [
+            [],
             {}
           ],
           "error._ApplicationFailure": [
+            [],
             {}
           ]
         }

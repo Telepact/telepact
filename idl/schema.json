@@ -9,16 +9,48 @@
     }
   },
   "patternProperties": {
-    "^title\\.[a-zA-Z_]\\w*$": {
+    "^info\\.[a-zA-Z_]\\w*$": {
       "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "prefixItems": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "object"
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "defaultSnippets": [
+        {
+          "label": "Info template",
+          "body": [
+            [
+              "                                                                           ",
+              " A template of an info entry with attached metadata.",
+              "                                                                           "
+            ],
+            {
+              "metadata1$0": "Some info",
+              "metadata2": "Some other info"
+            }
+          ]
+        }
+      ]
     },
     "^struct\\.[a-zA-Z_]\\w*": {
       "type": "array",
       "description": "A struct with 0 or more fields.",
       "prefixItems": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         {
           "type": "object",
           "additionalProperties": false,
@@ -29,20 +61,21 @@
           }
         }
       ],
-      "items": {
-        "type": "string"
-      },
+      "items": false,
+      "minItems": 2,
       "defaultSnippets": [
         {
           "label": "Struct template",
           "body": [
+            [
+              "                                                                           ",
+              " A struct template that exemplifies fields with standard and custom types. ",
+              "                                                                           "
+            ],
             {
               "field1$0": "boolean",
               "field2": "struct.Example1"
-            },
-            "                                                                           ",
-            " A struct template that exemplifies fields with standard and custom types. ",
-            "                                                                           "
+            }
           ]
         }
       ]
@@ -51,6 +84,12 @@
       "type": "array",
       "description": "A union with 1 or more fields.",
       "prefixItems": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         {
           "type": "object",
           "minProperties": 1,
@@ -68,20 +107,21 @@
           }
         }
       ],
-      "items": {
-        "type": "string"
-      },
+      "items": false,
+      "minItems": 2,
       "defaultSnippets": [
         {
           "label": "union template",
           "body": [
+            [
+              "                                                                          ",
+              " A union template that exemplifies fields with standard and custom types. ",
+              "                                                                          "
+            ],
             {
               "field1$0": "boolean",
               "field2": "struct.Example1"
-            },
-            "                                                                          ",
-            " A union template that exemplifies fields with standard and custom types. ",
-            "                                                                          "
+            }
           ]
         }
       ]
@@ -89,6 +129,12 @@
     "^error\\.[a-zA-Z_]\\w*": {
       "type": "array",
       "prefixItems": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         {
           "type": "object",
           "additionalProperties": false,
@@ -99,20 +145,21 @@
           }
         }
       ],
-      "items": {
-        "type": "string"
-      },
+      "items": false,
+      "minItems": 2,
       "defaultSnippets": [
         {
           "label": "Error template",
           "body": [
+            [
+              "                                                                           ",
+              " An error template that exemplifies fields with standard and custom types. ",
+              "                                                                           "
+            ],
             {
               "field1$0": "boolean",
               "field2": "struct.Example1"
-            },
-            "                                                                           ",
-            " An error template that exemplifies fields with standard and custom types. ",
-            "                                                                           "
+            }
           ]
         }
       ]
@@ -122,59 +169,75 @@
       "description": "A function with:\n(1) an input struct of 0 or more fields\n(2) an output struct of 0 or more fields\n(3) and an array of allowed custom errors",
       "prefixItems": [
         {
-          "type": "object",
-          "additionalProperties": false,
-          "patternProperties": {
-            "^[a-zA-Z_]\\w*!?$": {
-              "$ref": "#/$defs/typeDeclaration"
-            }
-          }
-        },
-        {
-          "const": "-->"
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "patternProperties": {
-            "^[a-zA-Z_]\\w*!?$": {
-              "$ref": "#/$defs/typeDeclaration"
-            }
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         },
         {
           "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^error\\.[a-zA-Z_]\\w*"
-          }
+          "prefixItems": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*!?$": {
+                  "$ref": "#/$defs/typeDeclaration"
+                }
+              }
+            },
+            {
+              "const": "-->"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*!?$": {
+                  "$ref": "#/$defs/typeDeclaration"
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^error\\.[a-zA-Z_]\\w*"
+              }
+            }
+          ],
+          "items": false,
+          "minItems": 3
         }
       ],
-      "items": {
-        "type": "string"
-      },
+      "items": false,
+      "minItems": 2,
       "defaultSnippets": [
         {
           "label": "Function template",
           "body": [
-            {
-              "inputField1": "boolean",
-              "inputField2": "struct.Example1"
-            },
-            "-->",
-            {
-              "outputField1": "string",
-              "outputField2": "struct.Example2"
-            },
-            ["error.Example1", "error.Example2"],
-            "                                                                                 ",
-            " An function template that exemplifies:                                          ",
-            " - input and output fields with standard and custom types                        ",
-            " - a list of allowed custom errors to raise from jAPI                            ",
-            "                                                                                 ",
-            " Note: when the jAPI provider encounters a custom error not in the allowed list, ",
-            " it will be coerced to `error._ApplicationFailure`.                              ",
-            "                                                                                 "
+            [
+              "                                                                                 ",
+              " An function template that exemplifies:                                          ",
+              " - input and output fields with standard and custom types                        ",
+              " - a list of allowed custom errors to raise from jAPI                            ",
+              "                                                                                 ",
+              " Note: when the jAPI provider encounters a custom error not in the allowed list, ",
+              " it will be coerced to `error._ApplicationFailure`.                              ",
+              "                                                                                 "
+            ],
+            [
+              {
+                "inputField1": "boolean",
+                "inputField2": "struct.Example1"
+              },
+              "-->",
+              {
+                "outputField1": "string",
+                "outputField2": "struct.Example2"
+              },
+              ["error.Example1", "error.Example2"]
+            ]
           ]
         }
       ]
