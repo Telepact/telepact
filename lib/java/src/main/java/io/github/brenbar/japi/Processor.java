@@ -515,106 +515,7 @@ public class Processor {
 
             return List.of(messageType, finalHeaders, messageBody);
         } catch (InvalidFieldType e) {
-            var entry = switch (e.error) {
-                case NULL_INVALID_FOR_NON_NULL_TYPE ->
-                        Map.entry("error._InvalidInput", invalidField(e.fieldName, "NullInvalidForNonNullType"));
-
-                case NUMBER_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForBooleanType"));
-
-                case STRING_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForBooleanType"));
-
-                case ARRAY_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForBooleanType"));
-
-                case OBJECT_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForBooleanType"));
-
-                case VALUE_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForBooleanType"));
-
-                case BOOLEAN_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForIntegerType"));
-
-                case NUMBER_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForIntegerType"));
-
-                case STRING_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForIntegerType"));
-
-                case ARRAY_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForIntegerType"));
-
-                case OBJECT_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForIntegerType"));
-
-                case VALUE_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForIntegerType"));
-
-                case BOOLEAN_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForNumberType"));
-
-                case STRING_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForNumberType"));
-
-                case ARRAY_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForNumberType"));
-
-                case OBJECT_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForNumberType"));
-
-                case VALUE_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForNumberType"));
-
-                case BOOLEAN_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForStringType"));
-
-                case NUMBER_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForStringType"));
-
-                case ARRAY_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForStringType"));
-
-                case OBJECT_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForStringType"));
-
-                case VALUE_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForStringType"));
-
-                case BOOLEAN_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForArrayType"));
-
-                case NUMBER_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForArrayType"));
-
-                case STRING_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForArrayType"));
-
-                case OBJECT_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForArrayType"));
-
-                case VALUE_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForArrayType"));
-
-                case BOOLEAN_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForObjectType"));
-
-                case NUMBER_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForObjectType"));
-
-                case STRING_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForObjectType"));
-
-                case ARRAY_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForObjectType"));
-
-                case VALUE_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForObjectType"));
-
-                case BOOLEAN_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForStructType"));
-
-                case NUMBER_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForStructType"));
-
-                case STRING_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForStructType"));
-
-                case ARRAY_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForStructType"));
-
-                case VALUE_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForStructType"));
-
-                case BOOLEAN_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForEnumType"));
-
-                case NUMBER_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForEnumType"));
-
-                case STRING_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForEnumType"));
-
-                case ARRAY_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForEnumType"));
-
-                case VALUE_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumType"));
-
-                case BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForEnumStructType"));
-
-                case NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForEnumStructType"));
-
-                case STRING_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForEnumStructType"));
-
-                case ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForEnumStructType"));
-
-                case VALUE_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumStructType"));
-
-                case INVALID_ENUM_VALUE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "UnknownEnumValue"));
-
-                case INVALID_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "InvalidType"));
-            };
+            var entry = invalidField(e);
 
             var messageType = entry.getKey();
             var messageBody = entry.getValue();
@@ -648,6 +549,110 @@ public class Processor {
             return List.of(messageType, finalHeaders, Map.of());
         }
 
+    }
+
+    private Map.Entry<String, Map<String, List<Map<String, String>>>> invalidField(InvalidFieldType e) {
+        var entry = switch (e.error) {
+            case NULL_INVALID_FOR_NON_NULL_TYPE ->
+                    Map.entry("error._InvalidInput", invalidField(e.fieldName, "NullInvalidForNonNullType"));
+
+            case NUMBER_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForBooleanType"));
+
+            case STRING_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForBooleanType"));
+
+            case ARRAY_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForBooleanType"));
+
+            case OBJECT_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForBooleanType"));
+
+            case VALUE_INVALID_FOR_BOOLEAN_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForBooleanType"));
+
+            case BOOLEAN_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForIntegerType"));
+
+            case NUMBER_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForIntegerType"));
+
+            case STRING_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForIntegerType"));
+
+            case ARRAY_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForIntegerType"));
+
+            case OBJECT_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForIntegerType"));
+
+            case VALUE_INVALID_FOR_INTEGER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForIntegerType"));
+
+            case BOOLEAN_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForNumberType"));
+
+            case STRING_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForNumberType"));
+
+            case ARRAY_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForNumberType"));
+
+            case OBJECT_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForNumberType"));
+
+            case VALUE_INVALID_FOR_NUMBER_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForNumberType"));
+
+            case BOOLEAN_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForStringType"));
+
+            case NUMBER_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForStringType"));
+
+            case ARRAY_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForStringType"));
+
+            case OBJECT_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForStringType"));
+
+            case VALUE_INVALID_FOR_STRING_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForStringType"));
+
+            case BOOLEAN_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForArrayType"));
+
+            case NUMBER_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForArrayType"));
+
+            case STRING_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForArrayType"));
+
+            case OBJECT_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ObjectInvalidForArrayType"));
+
+            case VALUE_INVALID_FOR_ARRAY_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForArrayType"));
+
+            case BOOLEAN_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForObjectType"));
+
+            case NUMBER_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForObjectType"));
+
+            case STRING_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForObjectType"));
+
+            case ARRAY_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForObjectType"));
+
+            case VALUE_INVALID_FOR_OBJECT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForObjectType"));
+
+            case BOOLEAN_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForStructType"));
+
+            case NUMBER_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForStructType"));
+
+            case STRING_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForStructType"));
+
+            case ARRAY_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForStructType"));
+
+            case VALUE_INVALID_FOR_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForStructType"));
+
+            case BOOLEAN_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForEnumType"));
+
+            case NUMBER_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForEnumType"));
+
+            case STRING_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForEnumType"));
+
+            case ARRAY_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForEnumType"));
+
+            case VALUE_INVALID_FOR_ENUM_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumType"));
+
+            case BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "BooleanInvalidForEnumStructType"));
+
+            case NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "NumberInvalidForEnumStructType"));
+
+            case STRING_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "StringInvalidForEnumStructType"));
+
+            case ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ArrayInvalidForEnumStructType"));
+
+            case VALUE_INVALID_FOR_ENUM_STRUCT_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "ValueInvalidForEnumStructType"));
+
+            case INVALID_ENUM_VALUE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "UnknownEnumValue"));
+
+            case INVALID_TYPE -> Map.entry("error._InvalidInput", invalidField(e.fieldName, "InvalidType"));
+        };
+        return entry;
     }
 
     private Map<String, List<Map<String, String>>> invalidField(String field, String reason) {
