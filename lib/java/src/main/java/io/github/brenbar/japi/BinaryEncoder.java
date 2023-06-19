@@ -6,16 +6,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class BinaryEncoder {
+class BinaryEncoder {
 
-    public static class IncorrectBinaryHash extends Exception {}
     public final Map<String, Long> encodeMap;
     public final Map<Long, String> decodeMap;
     public final Object binaryHash;
 
     public BinaryEncoder(Map<String, Long> binaryEncoding, Object binaryHash) {
         this.encodeMap = binaryEncoding;
-        this.decodeMap = binaryEncoding.entrySet().stream().collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
+        this.decodeMap = binaryEncoding.entrySet().stream()
+                .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
         this.binaryHash = binaryHash;
     }
 
@@ -26,7 +26,7 @@ public class BinaryEncoder {
         return List.of(encodedMessageType, headers, encodedBody);
     }
 
-    public List<Object> decode(List<Object> japiMessage) throws IncorrectBinaryHash {
+    public List<Object> decode(List<Object> japiMessage) throws IncorrectBinaryHashException {
         var encodedMessageType = japiMessage.get(0);
         if (encodedMessageType instanceof Integer i) {
             encodedMessageType = Long.valueOf(i);
@@ -36,7 +36,7 @@ public class BinaryEncoder {
         var givenHash = (Long) headers.get("_bin");
         var decodedBody = decodeKeys(japiMessage.get(2));
         if (binaryHash != null && !Objects.equals(givenHash, binaryHash)) {
-            throw new IncorrectBinaryHash();
+            throw new IncorrectBinaryHashException();
         }
         return List.of(decodedMessageType, headers, decodedBody);
     }
@@ -44,18 +44,19 @@ public class BinaryEncoder {
     private Object encodeKeys(Object given) {
         if (given == null) {
             return given;
-        } else if (given instanceof Map<?,?> m) {
+        } else if (given instanceof Map<?, ?> m) {
             var newMap = new HashMap<>();
             m.entrySet().stream().forEach(e -> {
                 // TODO: Update the msgpack library to not coerce these ints to strings
-                //       because now we have to coerce it back conditionally, since we
-                //       can't know for sure if somebody didn't just use a number string
-                //       in their generic object.
+                // because now we have to coerce it back conditionally, since we
+                // can't know for sure if somebody didn't just use a number string
+                // in their generic object.
                 var key = e.getKey();
                 if (key instanceof String s) {
                     try {
                         key = Long.valueOf(s);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 if (encodeMap.containsKey(key)) {
                     key = get(encodeMap, key);
@@ -72,18 +73,19 @@ public class BinaryEncoder {
     }
 
     private Object decodeKeys(Object given) {
-        if (given instanceof Map<?,?> m) {
+        if (given instanceof Map<?, ?> m) {
             var newMap = new HashMap<>();
             m.entrySet().stream().forEach(e -> {
                 // TODO: Update the msgpack library to not coerce these ints to strings
-                //       because now we have to coerce it back conditionally, since we
-                //       can't know for sure if somebody didn't just use a number string
-                //       in their generic object.
+                // because now we have to coerce it back conditionally, since we
+                // can't know for sure if somebody didn't just use a number string
+                // in their generic object.
                 var key = e.getKey();
                 if (key instanceof String s) {
                     try {
                         key = Long.valueOf(s);
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 if (decodeMap.containsKey(key)) {
                     key = get(decodeMap, key);
@@ -99,7 +101,7 @@ public class BinaryEncoder {
         }
     }
 
-    private Object get(Map<?,?> map, Object key) {
+    private Object get(Map<?, ?> map, Object key) {
         var value = map.get(key);
         if (value == null) {
             throw new RuntimeException("Missing encoding for " + String.valueOf(key));
