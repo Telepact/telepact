@@ -1,6 +1,7 @@
 package io.github.brenbar.japi.server;
 
 import io.github.brenbar.japi.BinaryEncoder;
+import io.github.brenbar.japi.DefaultSerializer;
 import io.github.brenbar.japi.Serializer;
 
 import java.util.*;
@@ -20,7 +21,7 @@ public class Processor {
     public static class Options {
         private Consumer<Throwable> onError = (e) -> {
         };
-        private Serializer serializer = new Serializer.Default();
+        private Serializer serializer = new DefaultSerializer();
 
         public Options setOnError(Consumer<Throwable> onError) {
             this.onError = onError;

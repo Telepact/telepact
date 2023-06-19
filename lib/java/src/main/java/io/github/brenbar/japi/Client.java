@@ -11,6 +11,7 @@ public abstract class Client {
     public static class Error extends RuntimeException {
         public final String type;
         public final Map<String, Object> body;
+
         public Error(String type, Map<String, Object> body) {
             super(type + ": " + body);
             this.type = type;
@@ -37,7 +38,7 @@ public abstract class Client {
     private AtomicReference<BinaryEncoder> binaryEncoderStore = new AtomicReference<>();
 
     public static class Options {
-        public Serializer serializer = new Serializer.Default();
+        public Serializer serializer = new DefaultSerializer();
         public Processor processor = (m, n) -> n.proceed(m);
         public boolean useBinary = false;
         public long timeoutMs = 5000;
@@ -71,8 +72,7 @@ public abstract class Client {
     public Map<String, Object> call(
             String functionName,
             Map<String, Object> headers,
-            Map<String, Object> input
-    ) {
+            Map<String, Object> input) {
         // Ensure our headers are editable.
         var mutableHeaders = new HashMap<>(headers);
         var messageType = "function.%s".formatted(functionName);
@@ -116,16 +116,17 @@ public abstract class Client {
                 var binaryHash = (Object) outputHeaders.get("_bin");
                 var initialBinaryEncoding = (Map<String, Object>) outputHeaders.get("_binaryEncoding");
                 // Ensure everything is a long
-                var binaryEncoding = initialBinaryEncoding.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> {
-                    var value = e.getValue();
-                    if (value instanceof Integer i) {
-                        return Long.valueOf(i);
-                    } else if (value instanceof Long l) {
-                        return l;
-                    } else {
-                        throw new RuntimeException("Unexpected type");
-                    }
-                }));
+                var binaryEncoding = initialBinaryEncoding.entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey(), e -> {
+                            var value = e.getValue();
+                            if (value instanceof Integer i) {
+                                return Long.valueOf(i);
+                            } else if (value instanceof Long l) {
+                                return l;
+                            } else {
+                                throw new RuntimeException("Unexpected type");
+                            }
+                        }));
                 var newBinaryEncoder = new BinaryEncoder(binaryEncoding, binaryHash);
                 this.binaryEncoderStore.set(newBinaryEncoder);
 

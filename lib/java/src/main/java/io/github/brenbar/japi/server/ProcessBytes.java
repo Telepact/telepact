@@ -1,6 +1,7 @@
 package io.github.brenbar.japi.server;
 
 import io.github.brenbar.japi.BinaryEncoder;
+import io.github.brenbar.japi.DeserializationError;
 import io.github.brenbar.japi.Serializer;
 
 import java.util.List;
@@ -17,7 +18,7 @@ class ProcessBytes {
         if (inputJapiMessagePayload[0] == '[') {
             try {
                 inputJapiMessage = serializer.deserializeFromJson(inputJapiMessagePayload);
-            } catch (Serializer.DeserializationError e) {
+            } catch (DeserializationError e) {
                 onError.accept(e);
                 return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
             }
@@ -33,7 +34,7 @@ class ProcessBytes {
             } catch (BinaryEncoder.IncorrectBinaryHash e) {
                 onError.accept(e);
                 return serializer.serializeToJson(List.of("error._InvalidBinaryEncoding", Map.of(), Map.of()));
-            } catch (Serializer.DeserializationError e) {
+            } catch (DeserializationError e) {
                 onError.accept(e);
                 return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
             }
