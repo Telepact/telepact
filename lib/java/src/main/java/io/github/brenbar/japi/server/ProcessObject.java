@@ -1,7 +1,6 @@
 package io.github.brenbar.japi.server;
 
 import io.github.brenbar.japi.BinaryEncoder;
-import io.github.brenbar.japi.Parser;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -10,7 +9,8 @@ import java.util.stream.Collectors;
 
 class ProcessObject {
 
-    static List<Object> process(List<Object> inputJapiMessage, Consumer<Throwable> onError, BinaryEncoder binaryEncoder, Map<String, Parser.Definition> apiDescription, Handler internalHandler, Handler handler) {
+    static List<Object> process(List<Object> inputJapiMessage, Consumer<Throwable> onError, BinaryEncoder binaryEncoder,
+            Map<String, Definition> apiDescription, Handler internalHandler, Handler handler) {
         var finalHeaders = new HashMap<String, Object>();
         try {
             try {
@@ -60,8 +60,8 @@ class ProcessObject {
 
                 var functionDef = apiDescription.get(messageType);
 
-                Parser.FunctionDefinition functionDefinition;
-                if (functionDef instanceof Parser.FunctionDefinition f) {
+                FunctionDefinition functionDefinition;
+                if (functionDef instanceof FunctionDefinition f) {
                     functionDefinition = f;
                 } else {
                     throw new Error.FunctionNotFound(functionName);
@@ -94,7 +94,7 @@ class ProcessObject {
                     }
                 } catch (Error.ApplicationFailure e) {
                     if (functionDefinition.errors().contains(e.messageType)) {
-                        var def = (Parser.ErrorDefinition) apiDescription.get(e.messageType);
+                        var def = (ErrorDefinition) apiDescription.get(e.messageType);
                         try {
                             ValidateStruct.validate("error", def.fields(), e.body);
                         } catch (Exception e2) {
@@ -115,7 +115,8 @@ class ProcessObject {
 
                 Map<String, Object> finalOutput;
                 if (slicedTypes != null) {
-                    finalOutput = (Map<String, Object>) SliceTypes.sliceTypes(functionDefinition.outputStruct(), output, slicedTypes);
+                    finalOutput = (Map<String, Object>) SliceTypes.sliceTypes(functionDefinition.outputStruct(), output,
+                            slicedTypes);
                 } else {
                     finalOutput = output;
                 }
@@ -126,26 +127,30 @@ class ProcessObject {
             } catch (Exception e) {
                 try {
                     onError.accept(e);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 throw e;
             }
         } catch (Error.StructHasExtraFields e) {
             var messageType = "error._InvalidInput";
-            var errors = e.extraFields.stream().collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "UnknownStructField"));
+            var errors = e.extraFields.stream()
+                    .collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "UnknownStructField"));
             var messageBody = CreateInvalidFields.createInvalidFields(errors);
 
             return List.of(messageType, finalHeaders, messageBody);
 
         } catch (Error.StructMissingFields e) {
             var messageType = "error._InvalidInput";
-            var errors = e.missingFields.stream().collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "RequiredStructFieldMissing"));
+            var errors = e.missingFields.stream().collect(
+                    Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "RequiredStructFieldMissing"));
             var messageBody = CreateInvalidFields.createInvalidFields(errors);
 
             return List.of(messageType, finalHeaders, messageBody);
 
         } catch (Error.UnknownEnumField e) {
             var messageType = "error._InvalidInput";
-            var messageBody = CreateInvalidFields.createInvalidField("%s.%s".formatted(e.namespace, e.field), "UnknownEnumField");
+            var messageBody = CreateInvalidFields.createInvalidField("%s.%s".formatted(e.namespace, e.field),
+                    "UnknownEnumField");
 
             return List.of(messageType, finalHeaders, messageBody);
         } catch (Error.EnumDoesNotHaveOnlyOneField e) {

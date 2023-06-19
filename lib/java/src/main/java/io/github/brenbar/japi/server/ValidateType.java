@@ -1,13 +1,11 @@
 package io.github.brenbar.japi.server;
 
-import io.github.brenbar.japi.Parser;
-
 import java.util.List;
 import java.util.Map;
 
 class ValidateType {
 
-    static void validateType(String fieldName, Parser.TypeDeclaration typeDeclaration, Object value) {
+    static void validateType(String fieldName, TypeDeclaration typeDeclaration, Object value) {
         if (value == null) {
             if (!typeDeclaration.nullable()) {
                 throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE);
@@ -16,7 +14,7 @@ class ValidateType {
             }
         } else {
             var expectedType = typeDeclaration.type();
-            if (expectedType instanceof Parser.JsonBoolean) {
+            if (expectedType instanceof JsonBoolean) {
                 if (value instanceof Boolean) {
                     return;
                 } else if (value instanceof Number) {
@@ -30,14 +28,15 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_BOOLEAN_TYPE);
                 }
-            } else if (expectedType instanceof Parser.JsonInteger) {
+            } else if (expectedType instanceof JsonInteger) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_INTEGER_TYPE);
                 } else if (value instanceof Number) {
                     if (value instanceof Long || value instanceof Integer) {
                         return;
                     } else {
-                        throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_INTEGER_TYPE);
+                        throw new Error.InvalidFieldType(fieldName,
+                                InvalidFieldTypeError.NUMBER_INVALID_FOR_INTEGER_TYPE);
                     }
                 } else if (value instanceof String) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_INTEGER_TYPE);
@@ -48,7 +47,7 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_INTEGER_TYPE);
                 }
-            } else if (expectedType instanceof Parser.JsonNumber) {
+            } else if (expectedType instanceof JsonNumber) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_NUMBER_TYPE);
                 } else if (value instanceof Number) {
@@ -62,7 +61,7 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE);
                 }
-            } else if (expectedType instanceof Parser.JsonString) {
+            } else if (expectedType instanceof JsonString) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRING_TYPE);
                 } else if (value instanceof Number) {
@@ -76,7 +75,7 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRING_TYPE);
                 }
-            } else if (expectedType instanceof Parser.JsonArray a) {
+            } else if (expectedType instanceof JsonArray a) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ARRAY_TYPE);
                 } else if (value instanceof Number) {
@@ -94,7 +93,7 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ARRAY_TYPE);
                 }
-            } else if (expectedType instanceof Parser.JsonObject o) {
+            } else if (expectedType instanceof JsonObject o) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_OBJECT_TYPE);
                 } else if (value instanceof Number) {
@@ -113,7 +112,7 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_OBJECT_TYPE);
                 }
-            } else if (expectedType instanceof Parser.Struct s) {
+            } else if (expectedType instanceof Struct s) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRUCT_TYPE);
                 } else if (value instanceof Number) {
@@ -128,7 +127,7 @@ class ValidateType {
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE);
                 }
-            } else if (expectedType instanceof Parser.Enum u) {
+            } else if (expectedType instanceof Enum u) {
                 if (value instanceof Boolean) {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_TYPE);
                 } else if (value instanceof Number) {
@@ -146,23 +145,28 @@ class ValidateType {
                     var enumValue = entry.getValue();
 
                     if (enumValue instanceof Boolean) {
-                        throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        throw new Error.InvalidFieldType(fieldName,
+                                InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE);
                     } else if (enumValue instanceof Number) {
-                        throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        throw new Error.InvalidFieldType(fieldName,
+                                InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE);
                     } else if (enumValue instanceof String) {
-                        throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        throw new Error.InvalidFieldType(fieldName,
+                                InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_STRUCT_TYPE);
                     } else if (enumValue instanceof List) {
-                        throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        throw new Error.InvalidFieldType(fieldName,
+                                InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE);
                     } else if (enumValue instanceof Map<?, ?> m2) {
                         ValidateEnum.validateEnum(fieldName, u.cases(), enumCase, (Map<String, Object>) m2);
                         return;
                     } else {
-                        throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        throw new Error.InvalidFieldType(fieldName,
+                                InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE);
                     }
                 } else {
                     throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);
                 }
-            } else if (expectedType instanceof Parser.JsonAny a) {
+            } else if (expectedType instanceof JsonAny a) {
                 // all values validate for any
             } else {
                 throw new Error.InvalidFieldType(fieldName, InvalidFieldTypeError.INVALID_TYPE);

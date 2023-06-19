@@ -1,7 +1,6 @@
 package io.github.brenbar.japi.server;
 
 import io.github.brenbar.japi.BinaryEncoder;
-import io.github.brenbar.japi.Parser;
 import io.github.brenbar.japi.Serializer;
 
 import java.util.List;
@@ -10,7 +9,9 @@ import java.util.function.Consumer;
 
 class ProcessBytes {
 
-    static byte[] process(byte[] inputJapiMessagePayload, Serializer serializer, Consumer<Throwable> onError, BinaryEncoder binaryEncoder, Map<String, Parser.Definition> apiDescription, Handler internalHandler, Handler handler) {
+    static byte[] process(byte[] inputJapiMessagePayload, Serializer serializer, Consumer<Throwable> onError,
+            BinaryEncoder binaryEncoder, Map<String, Definition> apiDescription, Handler internalHandler,
+            Handler handler) {
         List<Object> inputJapiMessage;
         boolean inputIsBinary = false;
         if (inputJapiMessagePayload[0] == '[') {
@@ -24,7 +25,8 @@ class ProcessBytes {
             try {
                 var encodedInputJapiMessage = serializer.deserializeFromMsgPack(inputJapiMessagePayload);
                 if (encodedInputJapiMessage.size() < 3) {
-                    return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of("reason", "JapiMessageArrayMustHaveThreeElements")));
+                    return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(),
+                            Map.of("reason", "JapiMessageArrayMustHaveThreeElements")));
                 }
                 inputJapiMessage = binaryEncoder.decode(encodedInputJapiMessage);
                 inputIsBinary = true;
@@ -37,7 +39,8 @@ class ProcessBytes {
             }
         }
 
-        var outputJapiMessage = ProcessObject.process(inputJapiMessage, onError, binaryEncoder, apiDescription, internalHandler, handler);
+        var outputJapiMessage = ProcessObject.process(inputJapiMessage, onError, binaryEncoder, apiDescription,
+                internalHandler, handler);
         var headers = (Map<String, Object>) outputJapiMessage.get(1);
         var returnAsBinary = headers.containsKey("_bin");
         if (!returnAsBinary && inputIsBinary) {
@@ -50,4 +53,5 @@ class ProcessBytes {
         } else {
             return serializer.serializeToJson(outputJapiMessage);
         }
-    }}
+    }
+}

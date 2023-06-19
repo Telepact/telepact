@@ -1,7 +1,6 @@
 package io.github.brenbar.japi.server;
 
 import io.github.brenbar.japi.BinaryEncoder;
-import io.github.brenbar.japi.Parser;
 import io.github.brenbar.japi.Serializer;
 
 import java.util.*;
@@ -12,14 +11,15 @@ public class Processor {
     private Handler handler;
     private Handler internalHandler;
     private Map<String, Object> originalApiDescription;
-    private Map<String, Parser.Definition> apiDescription;
+    private Map<String, Definition> apiDescription;
     private Serializer serializer;
     private Consumer<Throwable> onError;
 
     private BinaryEncoder binaryEncoder;
 
     public static class Options {
-        private Consumer<Throwable> onError = (e) -> {};
+        private Consumer<Throwable> onError = (e) -> {
+        };
         private Serializer serializer = new Serializer.Default();
 
         public Options setOnError(Consumer<Throwable> onError) {
@@ -56,6 +56,7 @@ public class Processor {
     }
 
     public byte[] process(byte[] inputJapiMessagePayload) {
-        return ProcessBytes.process(inputJapiMessagePayload, serializer, onError, binaryEncoder, apiDescription, internalHandler, handler);
+        return ProcessBytes.process(inputJapiMessagePayload, serializer, onError, binaryEncoder, apiDescription,
+                internalHandler, handler);
     }
 }

@@ -1,15 +1,13 @@
 package io.github.brenbar.japi.server;
 
-import io.github.brenbar.japi.Parser;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 class SliceTypes {
-    static Object sliceTypes(Parser.Type type, Object value, Map<String, List<String>> slicedTypes) {
-        if (type instanceof Parser.Struct s) {
+    static Object sliceTypes(Type type, Object value, Map<String, List<String>> slicedTypes) {
+        if (type instanceof Struct s) {
             var slicedFields = slicedTypes.get(s.name());
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -21,17 +19,18 @@ class SliceTypes {
                 }
             }
             return finalMap;
-        } else if (type instanceof Parser.Enum e) {
+        } else if (type instanceof Enum e) {
             var valueAsMap = (Map<String, Object>) value;
             var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
             var structReference = e.cases().get(enumEntry.getKey());
             Map<String, Object> newStruct = new HashMap<>();
             for (var structEntry : structReference.fields().entrySet()) {
-                var slicedValue = sliceTypes(structEntry.getValue().typeDeclaration().type(), enumEntry.getValue(), slicedTypes);
+                var slicedValue = sliceTypes(structEntry.getValue().typeDeclaration().type(), enumEntry.getValue(),
+                        slicedTypes);
                 newStruct.put(structEntry.getKey(), slicedValue);
             }
             return Map.of(enumEntry.getKey(), newStruct);
-        } else if (type instanceof Parser.JsonObject o) {
+        } else if (type instanceof JsonObject o) {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
@@ -39,7 +38,7 @@ class SliceTypes {
                 finalMap.put(entry.getKey(), slicedValue);
             }
             return finalMap;
-        } else if (type instanceof Parser.JsonArray a) {
+        } else if (type instanceof JsonArray a) {
             var valueAsList = (List<Object>) value;
             var finalList = new ArrayList<>();
             for (var entry : valueAsList) {

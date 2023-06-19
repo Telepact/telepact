@@ -1,7 +1,5 @@
 package io.github.brenbar.japi.server;
 
-import io.github.brenbar.japi.Parser;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +8,10 @@ class ValidateStruct {
 
     static void validate(
             String namespace,
-            Map<String, Parser.FieldDeclaration> referenceStruct,
-            Map<String, Object> actualStruct
-    ) {
+            Map<String, FieldDeclaration> referenceStruct,
+            Map<String, Object> actualStruct) {
         var missingFields = new ArrayList<String>();
-        for (Map.Entry<String, Parser.FieldDeclaration> entry : referenceStruct.entrySet()) {
+        for (Map.Entry<String, FieldDeclaration> entry : referenceStruct.entrySet()) {
             var fieldName = entry.getKey();
             var fieldDeclaration = entry.getValue();
             if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional()) {

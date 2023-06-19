@@ -1,41 +1,42 @@
 package io.github.brenbar.japi.server;
 
 import io.github.brenbar.japi.BinaryEncoder;
-import io.github.brenbar.japi.Parser;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 class BuildBinaryEncoder {
 
-    static BinaryEncoder build(Map<String, Parser.Definition> apiDescription) {
-        var allApiDescriptionKeys = new TreeSet<String>();
-        for (var entry : apiDescription.entrySet()) {
-            allApiDescriptionKeys.add(entry.getKey());
-            if (entry.getValue() instanceof Parser.FunctionDefinition f) {
-                allApiDescriptionKeys.addAll(f.inputStruct().fields().keySet());
-                allApiDescriptionKeys.addAll(f.outputStruct().fields().keySet());
-                allApiDescriptionKeys.addAll(f.errors());
-            } else if (entry.getValue() instanceof Parser.TypeDefinition t) {
+    static BinaryEncoder build(Map<String, Definition> definitions) {
+        var allKeys = new TreeSet<String>();
+        for (var entry : definitions.entrySet()) {
+            allKeys.add(entry.getKey());
+            if (entry.getValue() instanceof FunctionDefinition f) {
+                allKeys.addAll(f.inputStruct().fields().keySet());
+                allKeys.addAll(f.outputStruct().fields().keySet());
+                allKeys.addAll(f.errors());
+            } else if (entry.getValue() instanceof TypeDefinition t) {
                 var type = t.type();
-                if (type instanceof Parser.Struct o) {
-                    allApiDescriptionKeys.addAll(o.fields().keySet());
-                } else if (type instanceof Parser.Enum u) {
-                    allApiDescriptionKeys.addAll(u.cases().keySet());
+                if (type instanceof Struct o) {
+                    allKeys.addAll(o.fields().keySet());
+                } else if (type instanceof Enum u) {
+                    allKeys.addAll(u.cases().keySet());
                 }
-            } else if (entry.getValue() instanceof Parser.ErrorDefinition e) {
-                allApiDescriptionKeys.addAll(e.fields().keySet());
+            } else if (entry.getValue() instanceof ErrorDefinition e) {
+                allKeys.addAll(e.fields().keySet());
             }
         }
-        var atomicLong = new AtomicLong(0);
-        var binaryEncoding = allApiDescriptionKeys.stream().collect(Collectors.toMap(k -> k, k -> atomicLong.getAndIncrement()));
-        var finalString = allApiDescriptionKeys.stream().collect(Collectors.joining("\n"));
+        var i = (long) 0;
+        var binaryEncoding = new HashMap<String, Long>();
+        for (var key : allKeys) {
+            binaryEncoding.put(key, i++);
+        }
+        var finalString = String.join("\n", allKeys);
         long binaryHash;
         try {
             var hash = MessageDigest.getInstance("SHA-256").digest(finalString.getBytes(StandardCharsets.UTF_8));

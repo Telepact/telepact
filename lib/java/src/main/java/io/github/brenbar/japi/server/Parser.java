@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.japi.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,147 +12,14 @@ import java.util.stream.Collectors;
 
 public class Parser {
 
-    public interface Type {
-        public String getName();
-    }
-
-    public static class JsonNull implements Type {
-        @Override
-        public String getName() {
-            return "null";
-        }
-    }
-    public static class JsonBoolean implements Type {
-        @Override
-        public String getName() {
-            return "boolean";
-        }
-    }
-    public static class JsonInteger implements Type {
-        @Override
-        public String getName() {
-            return "integer";
-        }
-    }
-    public static class JsonNumber implements Type {
-        @Override
-        public String getName() {
-            return "number";
-        }
-    }
-    public static class JsonString implements Type {
-        @Override
-        public String getName() {
-            return "string";
-        }
-    }
-    public record JsonArray(TypeDeclaration nestedType) implements Type {
-        @Override
-        public String getName() {
-            return "array";
-        }
-    }
-    public record JsonObject(TypeDeclaration nestedType) implements Type {
-        @Override
-        public String getName() {
-            return "object";
-        }
-    }
-    public record Struct(String name, Map<String, FieldDeclaration> fields) implements Type {
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-    public record Enum(String name, Map<String, Struct> cases) implements Type {
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-    public static class JsonAny implements Type {
-        @Override
-        public String getName() {
-            return "any";
-        }
-    }
-
-
-    public record TypeDeclaration(
-        Type type,
-        boolean nullable
-    ) {}
-
-    public interface Definition {
-        public String getName();
-    }
-
-    public record FieldDeclaration(
-        TypeDeclaration typeDeclaration,
-        boolean optional
-    ) {}
-
-    public record FunctionDefinition(
-            String name,
-            Struct inputStruct,
-            Struct outputStruct,
-            List<String> errors
-    ) implements Definition {
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-
-    public record TypeDefinition(
-        String name,
-        Type type
-    ) implements Definition {
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-
-    public record ErrorDefinition(
-            String name,
-            Map<String, FieldDeclaration> fields
-    ) implements Definition {
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-
-    public record TitleDefinition(
-            String name
-    ) implements Definition {
-        @Override
-        public String getName() {
-            return name;
-        }
-    }
-
-    private record FieldNameAndFieldDeclaration(
-            String fieldName,
-            FieldDeclaration fieldDeclaration
-    ) {}
-
-    public static class JapiParseError extends RuntimeException {
-        public JapiParseError(String message) {
-            super(message);
-        }
-    }
-
-    public record Japi(Map<String, Object> original, Map<String, Definition> parsed) {}
-
     public static Japi newJapi(String japiAsJson) {
         var parsedDefinitions = new HashMap<String, Definition>();
 
         var objectMapper = new ObjectMapper();
         Map<String, List<Object>> japiAsJsonJava;
         try {
-            japiAsJsonJava = objectMapper.readValue(japiAsJson, new TypeReference<>(){});
+            japiAsJsonJava = objectMapper.readValue(japiAsJson, new TypeReference<>() {
+            });
 
             for (var entry : japiAsJsonJava.entrySet()) {
                 var definitionKey = entry.getKey();
@@ -168,7 +35,8 @@ public class Parser {
         return new Japi((Map<String, Object>) (Object) japiAsJsonJava, parsedDefinitions);
     }
 
-    private static Definition parseDefinition(Map<String, List<Object>> japiAsJsonJava, Map<String, Definition> parsedDefinitions, String definitionKey) {
+    private static Definition parseDefinition(Map<String, List<Object>> japiAsJsonJava,
+            Map<String, Definition> parsedDefinitions, String definitionKey) {
         var definitionAsJsonJavaWithDoc = japiAsJsonJava.get(definitionKey);
         if (definitionAsJsonJavaWithDoc == null) {
             throw new JapiParseError("Could not find definition for %s".formatted(definitionKey));
@@ -194,8 +62,9 @@ public class Parser {
                 for (var entry : inputDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    inputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+                            typeDeclarationValue, false);
+                    inputFields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
                 }
 
                 Map<String, Object> outputDefinitionAsJsonJava;
@@ -209,8 +78,9 @@ public class Parser {
                 for (var entry : outputDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    outputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+                            typeDeclarationValue, false);
+                    outputFields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
                 }
 
                 List<String> errors = List.of();
@@ -247,8 +117,9 @@ public class Parser {
                 for (var entry : structDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+                            typeDeclarationValue, false);
+                    fields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
                 }
 
                 var type = new Struct(definitionKey, fields);
@@ -267,8 +138,9 @@ public class Parser {
                 for (var entry : errorDefinitionAsJsonJava.entrySet()) {
                     var fieldDeclaration = entry.getKey();
                     var typeDeclarationValue = entry.getValue();
-                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration, typeDeclarationValue, false);
-                    fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+                    var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+                            typeDeclarationValue, false);
+                    fields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
                 }
 
                 yield new ErrorDefinition(definitionKey, fields);
@@ -295,8 +167,9 @@ public class Parser {
                     for (var caseStructEntry : caseStructDefinitionAsJava.entrySet()) {
                         var caseStructFieldDeclaration = caseStructEntry.getKey();
                         var caseStructTypeDeclarationValue = caseStructEntry.getValue();
-                        var caseStructParsedField = parseField(japiAsJsonJava, parsedDefinitions, caseStructFieldDeclaration, caseStructTypeDeclarationValue, false);
-                        fields.put(caseStructParsedField.fieldName, caseStructParsedField.fieldDeclaration);
+                        var caseStructParsedField = parseField(japiAsJsonJava, parsedDefinitions,
+                                caseStructFieldDeclaration, caseStructTypeDeclarationValue, false);
+                        fields.put(caseStructParsedField.fieldName(), caseStructParsedField.fieldDeclaration());
                     }
                     var struct = new Struct("%s.%s".formatted(definitionKey, enumCase), fields);
                     cases.put(enumCase, struct);
@@ -329,8 +202,7 @@ public class Parser {
             Map<String, Definition> parsedDefinitions,
             String fieldDeclaration,
             Object typeDeclarationValue,
-            boolean isForUnion
-    ) {
+            boolean isForUnion) {
         var regex = Pattern.compile("^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$");
         var matcher = regex.matcher(fieldDeclaration);
         matcher.find();
@@ -355,8 +227,10 @@ public class Parser {
         return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
     }
 
-    private static TypeDeclaration parseType(Map<String, List<Object>> japiAsJsonJava, Map<String, Definition> parsedDefinitions, String typeDeclaration) {
-        var regex = Pattern.compile("^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*)))(\\?)?$");
+    private static TypeDeclaration parseType(Map<String, List<Object>> japiAsJsonJava,
+            Map<String, Definition> parsedDefinitions, String typeDeclaration) {
+        var regex = Pattern.compile(
+                "^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*)))(\\?)?$");
         var matcher = regex.matcher(typeDeclaration);
         matcher.find();
 
@@ -425,10 +299,10 @@ public class Parser {
                 throw new RuntimeException("Ignore: will try another type");
             }
 
-            var definition = parsedDefinitions.computeIfAbsent(name, (k) ->
-                    parseDefinition(japiAsJsonJava, parsedDefinitions, typeDeclaration));
+            var definition = parsedDefinitions.computeIfAbsent(name,
+                    (k) -> parseDefinition(japiAsJsonJava, parsedDefinitions, typeDeclaration));
             if (definition instanceof TypeDefinition t) {
-                return new TypeDeclaration(t.type, nullable);
+                return new TypeDeclaration(t.type(), nullable);
             } else if (definition instanceof FunctionDefinition f) {
                 throw new JapiParseError("Cannot reference a function in type declarations");
             } else if (definition instanceof ErrorDefinition e) {
