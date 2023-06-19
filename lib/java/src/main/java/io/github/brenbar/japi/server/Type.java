@@ -1,6 +1,6 @@
 package io.github.brenbar.japi.server;
 
-public interface Type {
+interface Type {
 
     public String getName();
 

@@ -2,7 +2,7 @@ package io.github.brenbar.japi.server;
 
 import java.util.List;
 
-public record FunctionDefinition(
+record FunctionDefinition(
         String name,
         Struct inputStruct,
         Struct outputStruct,

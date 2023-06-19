@@ -1,6 +1,6 @@
 package io.github.brenbar.japi.server;
 
-public record TypeDefinition(
+record TypeDefinition(
         String name,
         Type type) implements Definition {
     @Override
