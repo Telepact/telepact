@@ -35,12 +35,12 @@ public class Processor {
     }
 
     public Processor(Handler handler, String apiDescriptionJson, Options options) {
-        var description = Parser.newJapi(apiDescriptionJson);
+        var description = InternalParse.newJapi(apiDescriptionJson);
         this.apiDescription = description.parsed();
         this.originalApiDescription = description.original();
         this.serializer = options.serializer;
 
-        var internalDescription = Parser.newJapi(InternalJapi.JSON);
+        var internalDescription = InternalParse.newJapi(InternalJapi.JSON);
 
         this.apiDescription.putAll(internalDescription.parsed());
         this.originalApiDescription.putAll(internalDescription.original());
@@ -49,11 +49,11 @@ public class Processor {
         this.internalHandler = InternalJapi.build(this.originalApiDescription);
         this.onError = options.onError;
 
-        this.binaryEncoder = BuildBinaryEncoder.build(apiDescription);
+        this.binaryEncoder = InternalBinaryEncoderBuilder.build(apiDescription);
     }
 
     public byte[] process(byte[] inputJapiMessagePayload) {
-        return ProcessBytes.process(inputJapiMessagePayload, serializer, onError, binaryEncoder, apiDescription,
+        return InternalProcess.process(inputJapiMessagePayload, serializer, onError, binaryEncoder, apiDescription,
                 internalHandler, handler);
     }
 }

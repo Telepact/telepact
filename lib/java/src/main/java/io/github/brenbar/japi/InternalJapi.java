@@ -52,7 +52,7 @@ class InternalJapi {
     return (functionName, headers, input) -> switch (functionName) {
       case "_ping" -> Map.of();
       case "_api" -> Map.of("api", originalApiDescription);
-      default -> throw new Error.FunctionNotFound(functionName);
+      default -> throw new FunctionNotFound(functionName);
     };
   }
 }

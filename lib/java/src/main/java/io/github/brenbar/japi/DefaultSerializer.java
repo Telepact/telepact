@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DefaultSerializer implements Serializer {
+class DefaultSerializer implements Serializer {
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory());

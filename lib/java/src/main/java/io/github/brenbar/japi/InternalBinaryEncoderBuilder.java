@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-class BuildBinaryEncoder {
+class InternalBinaryEncoderBuilder {
 
     static BinaryEncoder build(Map<String, Definition> definitions) {
         var allKeys = new TreeSet<String>();
