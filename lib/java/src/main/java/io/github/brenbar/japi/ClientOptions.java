@@ -4,6 +4,7 @@ public class ClientOptions {
     public Serializer serializer = new DefaultSerializer();
     public ClientProcessor processor = (m, n) -> n.proceed(m);
     public boolean useBinary = false;
+    public boolean forceSendJson = true;
     public long timeoutMs = 5000;
 
     public ClientOptions setSerializer(Serializer serializer) {
@@ -18,6 +19,11 @@ public class ClientOptions {
 
     public ClientOptions setUseBinary(boolean useBinary) {
         this.useBinary = useBinary;
+        return this;
+    }
+
+    public ClientOptions setForceSendJson(boolean sendBinary) {
+        this.forceSendJson = sendBinary;
         return this;
     }
 

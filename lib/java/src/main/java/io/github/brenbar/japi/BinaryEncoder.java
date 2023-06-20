@@ -3,20 +3,19 @@ package io.github.brenbar.japi;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 class BinaryEncoder {
 
     public final Map<String, Long> encodeMap;
     public final Map<Long, String> decodeMap;
-    public final Object binaryHash;
+    public final Long binaryChecksum;
 
-    public BinaryEncoder(Map<String, Long> binaryEncoding, Object binaryHash) {
+    public BinaryEncoder(Map<String, Long> binaryEncoding, Long binaryHash) {
         this.encodeMap = binaryEncoding;
         this.decodeMap = binaryEncoding.entrySet().stream()
                 .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
-        this.binaryHash = binaryHash;
+        this.binaryChecksum = binaryHash;
     }
 
     public List<Object> encode(List<Object> japiMessage) {
@@ -33,9 +32,9 @@ class BinaryEncoder {
         }
         var decodedMessageType = get(decodeMap, encodedMessageType);
         var headers = (Map<String, Object>) japiMessage.get(1);
-        var givenHash = (Long) headers.get("_bin");
+        var givenChecksums = (List<Long>) headers.get("_bin");
         var decodedBody = decodeKeys(japiMessage.get(2));
-        if (binaryHash != null && !Objects.equals(givenHash, binaryHash)) {
+        if (binaryChecksum != null && !givenChecksums.contains(binaryChecksum)) {
             throw new IncorrectBinaryHashException();
         }
         return List.of(decodedMessageType, headers, decodedBody);

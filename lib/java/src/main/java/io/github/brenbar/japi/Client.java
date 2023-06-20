@@ -1,20 +1,25 @@
 package io.github.brenbar.japi;
 
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
 public abstract class Client {
 
     private ClientProcessor processor;
     private boolean useBinary;
-    private AtomicReference<BinaryEncoder> binaryEncoderStore = new AtomicReference<>();
+    private boolean forceSendJson;
+    private Deque<BinaryEncoder> binaryEncoderStore = new ConcurrentLinkedDeque<>();
 
     public Client(ClientOptions options) {
         this.processor = options.processor;
         this.useBinary = options.useBinary;
+        this.forceSendJson = options.forceSendJson;
     }
 
     public Map<String, Object> call(
@@ -41,50 +46,74 @@ public abstract class Client {
     private List<Object> proceed(List<Object> inputJapiMessage) {
         try {
             var headers = (Map<String, Object>) inputJapiMessage.get(1);
-            var binaryEncoder = this.binaryEncoderStore.get();
-            if (this.useBinary && binaryEncoder == null) {
-                // Don't have schema yet. We'll have to send as JSON to start, and we'll ask the
-                // jAPI provider to supply the binary encoding.
-                headers.put("_binaryStart", true);
+
+            if (this.useBinary) {
+                List<Object> binaryChecksums = new ArrayList<>();
+                for (var binaryEncoding : binaryEncoderStore) {
+                    binaryChecksums.add(binaryEncoding);
+                }
+                headers.put("_bin", binaryChecksums);
             }
 
-            List<Object> outputJapiMessage;
-            if (binaryEncoder != null) {
-                headers.put("_bin", binaryEncoder.binaryHash);
-                var encodedInputJapiMessage = binaryEncoder.encode(inputJapiMessage);
-                var encodedOutputJapiMessage = serializeAndTransport(encodedInputJapiMessage, true);
-                outputJapiMessage = binaryEncoder.decode(encodedOutputJapiMessage);
+            var binaryEncoder = this.binaryEncoderStore.size() == 0 ? null : this.binaryEncoderStore.getFirst();
+            List<Object> finalInputJapiMessage;
+            boolean sendAsMsgPack = false;
+            if (this.forceSendJson || !this.useBinary || binaryEncoder == null) {
+                finalInputJapiMessage = inputJapiMessage;
             } else {
-                outputJapiMessage = serializeAndTransport(inputJapiMessage, false);
+                finalInputJapiMessage = binaryEncoder.encode(inputJapiMessage);
+                sendAsMsgPack = true;
             }
 
-            // If we received a binary encoding from the jAPI provider, cache it
+            var outputJapiMessage = serializeAndTransport(finalInputJapiMessage, sendAsMsgPack);
             var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
-            if (outputHeaders.containsKey("_binaryEncoding")) {
-                var binaryHash = (Object) outputHeaders.get("_bin");
-                var initialBinaryEncoding = (Map<String, Object>) outputHeaders.get("_binaryEncoding");
-                // Ensure everything is a long
-                var binaryEncoding = initialBinaryEncoding.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(), e -> {
-                            var value = e.getValue();
-                            if (value instanceof Integer i) {
-                                return Long.valueOf(i);
-                            } else if (value instanceof Long l) {
-                                return l;
-                            } else {
-                                throw new RuntimeException("Unexpected type");
-                            }
-                        }));
-                var newBinaryEncoder = new BinaryEncoder(binaryEncoding, binaryHash);
-                this.binaryEncoderStore.set(newBinaryEncoder);
 
-                return newBinaryEncoder.decode(outputJapiMessage);
+            // If the response is in binary, decode it
+            if (outputHeaders.containsKey("_bin")) {
+                var binaryChecksum = (List<Long>) outputHeaders.get("_bin");
+
+                if (outputHeaders.containsKey("_binaryEncoding")) {
+                    var initialBinaryEncoding = (Map<String, Object>) outputHeaders.get("_binaryEncoding");
+                    // Ensure everything is a long
+                    var binaryEncoding = initialBinaryEncoding.entrySet().stream()
+                            .collect(Collectors.toMap(e -> e.getKey(), e -> {
+                                var value = e.getValue();
+                                if (value instanceof Integer i) {
+                                    return Long.valueOf(i);
+                                } else if (value instanceof Long l) {
+                                    return l;
+                                } else {
+                                    throw new RuntimeException("Unexpected type");
+                                }
+                            }));
+                    var newBinaryEncoder = new BinaryEncoder(binaryEncoding, binaryChecksum.get(0));
+                    this.binaryEncoderStore.add(newBinaryEncoder);
+
+                    // We need to maintain 2 binary encodings in case a server is undergoing an API
+                    // change during a new jAPI deployment
+                    if (this.binaryEncoderStore.size() >= 3) {
+                        this.binaryEncoderStore.removeLast();
+                    }
+                }
+
+                var outputBinaryEncoder = findBinaryEncoder(binaryChecksum.get(0));
+
+                return outputBinaryEncoder.decode(outputJapiMessage);
             }
 
             return outputJapiMessage;
         } catch (Exception e) {
             throw new ClientProcessError(e);
         }
+    }
+
+    private BinaryEncoder findBinaryEncoder(Long checksum) {
+        for (var binaryEncoder : this.binaryEncoderStore) {
+            if (binaryEncoder.binaryChecksum == checksum) {
+                return binaryEncoder;
+            }
+        }
+        throw new ClientProcessError(new Exception("No matching encoding found, cannot decode binary"));
     }
 
     protected abstract List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack);
