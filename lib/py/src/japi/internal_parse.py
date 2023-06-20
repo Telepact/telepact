@@ -4,6 +4,8 @@ from typing import List, Dict, Union
 import re
 from typing import List, Dict, Any, Union
 
+from internal_types import Definition, Enum, ErrorDefinition, FunctionDefinition, Japi, Struct, TitleDefinition, TypeDefinition
+
 
 class TypeDeclaration:
     def __init__(self, type_obj: Any, nullable: bool):
@@ -213,7 +215,7 @@ def parse_definition(
         raise JapiParseError(f"Unrecognized japi keyword {keyword}")
 
 
-def parseField(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict[str, Any], field_declaration: str, type_declaration_value: Any, is_for_union: bool) -> FieldNameAndFieldDeclaration:
+def parse_field(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict[str, Any], field_declaration: str, type_declaration_value: Any, is_for_union: bool) -> FieldNameAndFieldDeclaration:
     regex = re.compile(r"^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$")
     matcher = regex.match(field_declaration)
 
@@ -232,13 +234,13 @@ def parseField(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict
     except TypeError:
         raise JapiParseError("Type declarations should be strings")
 
-    type_declaration = parseType(
+    type_declaration = parse_type(
         japi_as_json_java, parsed_definitions, type_declaration_string)
 
     return FieldNameAndFieldDeclaration(field_name, FieldDeclaration(type_declaration, optional))
 
 
-def parseType(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict[str, Any], type_declaration: str) -> TypeDeclaration:
+def parse_type(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict[str, Any], type_declaration: str) -> TypeDeclaration:
     regex = re.compile(
         r"^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\.([a-zA-Z_]\w*)))(\?)?$")
     matcher = regex.match(type_declaration)
@@ -287,7 +289,7 @@ def parseType(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict[
         nested_name = matcher.group(6)
         nested_type = None
         if nested_name:
-            nested_type = parseType(
+            nested_type = parse_type(
                 japi_as_json_java, parsed_definitions, nested_name)
         else:
             nested_type = TypeDeclaration(JsonAny(), False)
@@ -311,7 +313,7 @@ def parseType(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict[
         if name is None:
             raise RuntimeError("Ignore: will try another type")
 
-        definition = parsed_definitions.setdefault(name, parseDefinition(
+        definition = parsed_definitions.setdefault(name, parse_definition(
             japi_as_json_java, parsed_definitions, type_declaration))
         if isinstance(definition, TypeDefinition):
             return TypeDeclaration(definition.type, nullable)

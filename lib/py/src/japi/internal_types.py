@@ -6,6 +6,18 @@ class Type:
         raise NotImplementedError
 
 
+class TypeDeclaration:
+    def __init__(self, type: Type, nullable: bool) -> None:
+        self.type = type
+        self.nullable = nullable
+
+
+class FieldDeclaration:
+    def __init__(self, type_declaration: TypeDeclaration, optional: bool) -> None:
+        self.type_declaration = type_declaration
+        self.optional = optional
+
+
 class Definition:
     def get_name(self) -> str:
         raise NotImplementedError
@@ -101,12 +113,6 @@ class FunctionDefinition(Definition):
         return self.name
 
 
-class FieldDeclaration:
-    def __init__(self, type_declaration: TypeDeclaration, optional: bool) -> None:
-        self.type_declaration = type_declaration
-        self.optional = optional
-
-
 class FieldNameAndFieldDeclaration:
     def __init__(self, field_name: str, field_declaration: FieldDeclaration) -> None:
         self.field_name = field_name
@@ -128,12 +134,6 @@ class TypeDefinition(Definition):
 
     def get_name(self) -> str:
         return self.name
-
-
-class TypeDeclaration:
-    def __init__(self, type: Type, nullable: bool) -> None:
-        self.type = type
-        self.nullable = nullable
 
 
 class JapiMessageArrayTooFewElements(RuntimeError):
@@ -230,13 +230,6 @@ class UnknownEnumField(FieldError):
         self.field = field
 
 
-class InvalidFieldType(FieldError):
-    def __init__(self, field_name: str, error: InvalidFieldTypeError, cause: Optional[Exception] = None) -> None:
-        super().__init__(cause)
-        self.field_name = field_name
-        self.error = error
-
-
 class IncorrectBinaryHashException(Exception):
     pass
 
@@ -301,3 +294,10 @@ class InvalidFieldTypeError(Enum):
 
     INVALID_ENUM_VALUE = 48
     INVALID_TYPE = 49
+
+
+class InvalidFieldType(FieldError):
+    def __init__(self, field_name: str, error: InvalidFieldTypeError, cause: Optional[Exception] = None) -> None:
+        super().__init__(cause)
+        self.field_name = field_name
+        self.error = error

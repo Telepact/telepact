@@ -1,6 +1,8 @@
 from typing import List, Dict, Union, Any
 from functools import reduce
 
+from internal_types import IncorrectBinaryHashException
+
 
 class BinaryEncoder:
     def __init__(self, binary_encoding: Dict[str, int], binary_hash: Any) -> None:
