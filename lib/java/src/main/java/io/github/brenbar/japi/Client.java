@@ -8,63 +8,11 @@ import java.util.stream.Collectors;
 
 public abstract class Client {
 
-    public static class Error extends RuntimeException {
-        public final String type;
-        public final Map<String, Object> body;
-
-        public Error(String type, Map<String, Object> body) {
-            super(type + ": " + body);
-            this.type = type;
-            this.body = body;
-        }
-    }
-
-    public static class ClientProcessError extends RuntimeException {
-        public ClientProcessError(Throwable cause) {
-            super(cause);
-        }
-    }
-
-    public interface Processor {
-        List<Object> process(List<Object> japiMessage, Next next);
-    }
-
-    public interface Next {
-        List<Object> proceed(List<Object> japiMessage);
-    }
-
-    private Processor processor;
+    private ClientProcessor processor;
     private boolean useBinary;
     private AtomicReference<BinaryEncoder> binaryEncoderStore = new AtomicReference<>();
 
-    public static class Options {
-        public Serializer serializer = new DefaultSerializer();
-        public Processor processor = (m, n) -> n.proceed(m);
-        public boolean useBinary = false;
-        public long timeoutMs = 5000;
-
-        public Options setSerializer(Serializer serializer) {
-            this.serializer = serializer;
-            return this;
-        }
-
-        public Options setProcessor(Processor processor) {
-            this.processor = processor;
-            return this;
-        }
-
-        public Options setUseBinary(boolean useBinary) {
-            this.useBinary = useBinary;
-            return this;
-        }
-
-        public Options setTimeoutMs(long timeoutMs) {
-            this.timeoutMs = timeoutMs;
-            return this;
-        }
-    }
-
-    public Client(Options options) {
+    public Client(ClientOptions options) {
         this.processor = options.processor;
         this.useBinary = options.useBinary;
     }
@@ -84,7 +32,7 @@ public abstract class Client {
         var output = (Map<String, Object>) outputJapiMessage.get(2);
 
         if (outputMessageType.startsWith("error.")) {
-            throw new Error(outputMessageType, output);
+            throw new ClientError(outputMessageType, output);
         }
 
         return output;

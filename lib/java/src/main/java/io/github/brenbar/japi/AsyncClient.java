@@ -30,17 +30,18 @@ public class AsyncClient extends Client {
     private Long timeoutMs;
 
     public AsyncClient(AsyncTransport asyncTransport) {
-        this(asyncTransport, new Options());
+        this(asyncTransport, new ClientOptions());
     }
 
-    public AsyncClient(AsyncTransport asyncTransport, Options options) {
+    public AsyncClient(AsyncTransport asyncTransport, ClientOptions options) {
         super(options);
         this.asyncTransport = asyncTransport;
         this.serializer = options.serializer;
         this.timeoutMs = options.timeoutMs;
     }
 
-    private static Map<Object, CompletableFuture<List<Object>>> waitingRequests = Collections.synchronizedMap(new Cache<Object, CompletableFuture<List<Object>>>(256));
+    private static Map<Object, CompletableFuture<List<Object>>> waitingRequests = Collections
+            .synchronizedMap(new Cache<Object, CompletableFuture<List<Object>>>(256));
 
     @Override
     protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack) {

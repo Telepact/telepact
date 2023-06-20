@@ -1,8 +1,6 @@
 package io.github.brenbar.japi;
 
-import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -17,10 +15,10 @@ public class SyncClient extends Client {
     private Long timeoutMs;
 
     public SyncClient(SyncTransport syncTransport) {
-        this(syncTransport, new Options());
+        this(syncTransport, new ClientOptions());
     }
 
-    public SyncClient(SyncTransport syncTransport, Options options) {
+    public SyncClient(SyncTransport syncTransport, ClientOptions options) {
         super(options);
         this.syncTransport = syncTransport;
         this.serializer = options.serializer;
@@ -37,7 +35,8 @@ public class SyncClient extends Client {
                 inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
             }
 
-            var outputJapiMessagePayload = syncTransport.send(inputJapiMessagePayload).get(timeoutMs, TimeUnit.MILLISECONDS);
+            var outputJapiMessagePayload = syncTransport.send(inputJapiMessagePayload).get(timeoutMs,
+                    TimeUnit.MILLISECONDS);
 
             List<Object> outputJapiMessage;
             if (outputJapiMessagePayload[0] == '[') {
