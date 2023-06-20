@@ -142,7 +142,7 @@ class InternalProcess {
                     } else {
                         output = handler.handle(functionName, headers, input);
                     }
-                } catch (ApplicationFailure e) {
+                } catch (ApplicationError e) {
                     if (functionDefinition.errors().contains(e.messageType)) {
                         var def = (ErrorDefinition) apiDescription.get(e.messageType);
                         try {
@@ -233,7 +233,7 @@ class InternalProcess {
             var messageType = "error._UnknownFunction";
 
             return List.of(messageType, finalHeaders, Map.of());
-        } catch (ApplicationFailure e) {
+        } catch (ApplicationError e) {
             var messageType = e.messageType;
 
             return List.of(messageType, finalHeaders, e.body);
