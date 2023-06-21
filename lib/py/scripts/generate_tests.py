@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 cases_filepath = "../../test/cases.txt"
-test_filepath = "tests/test_cases.java"
+test_filepath = "tests/test_cases.py"
 
 cases_file = open(cases_filepath, "r")
 test_file = open(test_filepath, "w")
@@ -40,14 +40,21 @@ for l in cases_file:
 
 test_file.write('''
 import json
+import pytest
+import asyncio
 from typing import Any, Dict, List, Optional
 from functools import partial
-from java_processor import Processor, SyncClient
+from lib.py.src.japi.application_error import ApplicationError
+from lib.py.src.japi.client_error import ClientError
+from lib.py.src.japi.client_options import ClientOptions
+from lib.py.src.japi.sync_client import SyncClient
+from lib.py.src.japi.processor import Options, Processor
 
 
 def handle(function_name: str, headers: Dict[str, Any], body: Dict[str, Any]) -> Dict[str, Any]:
     if function_name == "test":
-        error = next((k for k in headers.keys() if k.startswith("error.")), None)
+        error = next((k for k in headers.keys()
+                     if k.startswith("error.")), None)
         if "output" in headers:
             try:
                 return headers["output"]
@@ -57,12 +64,12 @@ def handle(function_name: str, headers: Dict[str, Any], body: Dict[str, Any]) ->
             try:
                 error_obj = headers.get(error)
                 if not isinstance(error_obj, dict):
-                    raise ClassCastException
-                raise Processor.ApplicationFailure(error, error_obj)
-            except ClassCastException as e:
+                    raise TypeError()
+                raise ApplicationError(error, error_obj)
+            except TypeError as e:
                 raise RuntimeError(e)
         else:
-            return {}
+            return {{}}
     else:
         raise RuntimeError()
 
@@ -70,7 +77,8 @@ def handle(function_name: str, headers: Dict[str, Any], body: Dict[str, Any]) ->
 def assert_output(input_str: str, expected_output_str: str) -> None:
     with open("../../test/example.japi.json") as file:
         json_content = file.read()
-    processor = Processor(partial(handle), json_content, Processor.Options().set_on_error(lambda e: print(e)))
+    processor = Processor(partial(handle), json_content,
+                          Options().set_on_error(lambda e: print(e)))
 
     expected_output_json = json.loads(expected_output_str)
 
@@ -80,17 +88,19 @@ def assert_output(input_str: str, expected_output_str: str) -> None:
     assert expected_output_json == output_json
 
     # Test binary
-    client = SyncClient(lambda m: asyncio.get_event_loop().run_until_complete(processor.process(m)), Client.Options().set_use_binary(True))
-    client.call("_ping", {}, {})  # Warmup
+    client = SyncClient(lambda m: asyncio.get_event_loop().run_until_complete(
+        processor.process(m)), ClientOptions().set_use_binary(True))
+    client.call("_ping", {{}}, {{}})  # Warmup
     input_json = json.loads(input_str)
 
     if expected_output_str.startswith("[\\"error."):
-        with pytest.raises(Client.Error) as error:
+        with pytest.raises(ClientError) as error:
             client.call(input_json[0][9:], input_json[1], input_json[2])
         assert expected_output_json[0] == error.type
         assert expected_output_json[2] == error.body
     else:
-        output_java = client.call(input_json[0][9:], input_json[1], input_json[2])
+        output_java = client.call(
+            input_json[0][9:], input_json[1], input_json[2])
         assert expected_output_json[2] == output_java
 
 ''')
@@ -98,9 +108,9 @@ def assert_output(input_str: str, expected_output_str: str) -> None:
 for case in cases:
     print(case)
     test_file.write('''
-    def test_{}():
-        input = '{}'
-        expected_output = '{}'
-        assert_output(input, expected_output);
-    }}
+def test_{}():
+    input = '{}'
+    expected_output = '{}'
+    assert_output(input, expected_output)
+
     '''.format(case.name, case.input, case.output))
