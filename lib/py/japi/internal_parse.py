@@ -4,68 +4,8 @@ from typing import List, Dict, Union
 import re
 from typing import List, Dict, Any, Union
 
-from japi.internal_types import Definition, Enum, ErrorDefinition, FunctionDefinition, Japi, Struct, TitleDefinition, TypeDefinition
-
-
-class TypeDeclaration:
-    def __init__(self, type_obj: Any, nullable: bool):
-        self.type = type_obj
-        self.nullable = nullable
-
-
-class JsonNull:
-    pass
-
-
-class JsonBoolean:
-    pass
-
-
-class JsonInteger:
-    pass
-
-
-class JsonNumber:
-    pass
-
-
-class JsonString:
-    pass
-
-
-class JsonAny:
-    pass
-
-
-class JsonArray:
-    def __init__(self, nested_type: TypeDeclaration):
-        self.nested_type = nested_type
-
-
-class JsonObject:
-    def __init__(self, nested_type: TypeDeclaration):
-        self.nested_type = nested_type
-
-
-class JapiParseError(Exception):
-    pass
-
-
-class FieldDeclaration:
-    def __init__(self, type_declaration, optional):
-        self.type_declaration = type_declaration
-        self.optional = optional
-
-
-class FieldNameAndFieldDeclaration:
-    def __init__(self, field_name, field_declaration):
-        self.field_name = field_name
-        self.field_declaration = field_declaration
-
-
-class JapiParseError(Exception):
-    pass
-
+from japi.internal_types import Definition, Enum, ErrorDefinition, FieldDeclaration, FieldNameAndFieldDeclaration, FunctionDefinition, Japi, JsonAny, JsonArray, JsonBoolean, JsonInteger, JsonNull, JsonNumber, JsonObject, JsonString, Struct, TitleDefinition, TypeDeclaration, TypeDefinition
+from japi.processor import JapiParseError
 
 def new_japi(japi_as_json: str) -> Japi:
     parsed_definitions: Dict[str, Definition] = {}
@@ -157,7 +97,7 @@ def parse_definition(
         for field_declaration, type_declaration_value in struct_definition_as_json_java.items():
             parsed_field = parse_field(
                 japi_as_json_java, parsed_definitions, field_declaration, type_declaration_value, False)
-            fields[parsed_field.field_name()] = parsed_field.field_declaration()
+            fields[parsed_field.field_name] = parsed_field.field_declaration
 
         type_ = Struct(definition_key, fields)
 
@@ -174,7 +114,7 @@ def parse_definition(
         for field_declaration, type_declaration_value in error_definition_as_json_java.items():
             parsed_field = parse_field(
                 japi_as_json_java, parsed_definitions, field_declaration, type_declaration_value, False)
-            fields[parsed_field.field_name()] = parsed_field.field_declaration()
+            fields[parsed_field.field_name] = parsed_field.field_declaration()
 
         return ErrorDefinition(definition_key, fields)
 
@@ -199,7 +139,7 @@ def parse_definition(
                 case_struct_parsed_field = parse_field(
                     japi_as_json_java, parsed_definitions, case_struct_field_declaration, case_struct_type_declaration_value, False)
                 fields[case_struct_parsed_field.field_name(
-                )] = case_struct_parsed_field.field_declaration()
+                )] = case_struct_parsed_field.field_declaration
 
             struct = Struct(f"{definition_key}.{enum_case}", fields)
             cases[enum_case] = struct
@@ -314,7 +254,7 @@ def parse_type(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict
             raise RuntimeError("Ignore: will try another type")
 
         definition = parsed_definitions.setdefault(name, parse_definition(
-            japi_as_json_java, parsed_definitions, type_declaration))
+            japi_as_json_java, parsed_definitions, name))
         if isinstance(definition, TypeDefinition):
             return TypeDeclaration(definition.type, nullable)
         elif isinstance(definition, FunctionDefinition):
@@ -325,7 +265,7 @@ def parse_type(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict
                 "Cannot reference an error in type declarations")
     except JapiParseError as e1:
         raise e1
-    except Exception:
-        pass
+    except Exception as e1:
+        raise JapiParseError("Invalid type declaration: %s" % type_declaration, e1)
 
-    raise JapiParseError("Invalid type declaration: %s" % type_declaration)
+    

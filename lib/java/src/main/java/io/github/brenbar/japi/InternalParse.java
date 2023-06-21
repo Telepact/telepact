@@ -292,7 +292,7 @@ class InternalParse {
             }
 
             var definition = parsedDefinitions.computeIfAbsent(name,
-                    (k) -> parseDefinition(japiAsJsonJava, parsedDefinitions, typeDeclaration));
+                    (k) -> parseDefinition(japiAsJsonJava, parsedDefinitions, name));
             if (definition instanceof TypeDefinition t) {
                 return new TypeDeclaration(t.type(), nullable);
             } else if (definition instanceof FunctionDefinition f) {
@@ -304,8 +304,8 @@ class InternalParse {
             if (e instanceof JapiParseError e1) {
                 throw e1;
             }
+            throw new JapiParseError("Invalid type declaration: %s".formatted(typeDeclaration), e);
         }
 
-        throw new JapiParseError("Invalid type declaration: %s".formatted(typeDeclaration));
     }
 }
