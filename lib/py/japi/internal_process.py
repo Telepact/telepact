@@ -134,22 +134,22 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
                         string_field: str = field
 
             validate_struct(
-                "input", function_definition.input_struct().fields(), input_data)
+                "input", function_definition.input_struct.fields, input_data)
 
             if function_name.startswith("_"):
-                output_data = internal_handler.handle(
+                output_data = internal_handler(
                     function_name, headers, input_data)
             else:
-                output_data = handler.handle(
+                output_data = handler(
                     function_name, headers, input_data)
 
             if isinstance(output_data, ApplicationError):
-                if output_data.message_type in function_definition.errors():
+                if output_data.message_type in function_definition.errors:
                     def_ = api_description.get(output_data.message_type)
                     if isinstance(def_, ErrorDefinition):
                         try:
                             validate_struct(
-                                "error", def_.fields(), output_data.body)
+                                "error", def_.fields, output_data.body)
                         except Exception as e2:
                             raise InvalidApplicationFailure(e2)
 
@@ -158,12 +158,12 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
                         raise DisallowedError(output_data)
 
             validate_struct(
-                "output", function_definition.output_struct().fields(), output_data)
+                "output", function_definition.output_struct.fields, output_data)
 
             final_output: Dict[str, Any]
             if sliced_types is not None:
                 final_output = slice_types(
-                    function_definition.output_struct(), output_data, sliced_types)
+                    function_definition.output_struct, output_data, sliced_types)
             else:
                 final_output = output_data
 

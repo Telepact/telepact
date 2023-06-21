@@ -6,21 +6,20 @@ from japi.client_error import ClientError
 from japi.client_process_error import ClientProcessError
 
 from japi.client_processor import ClientProcessor
-from japi.client_options import ClientOptions
 
 
 class Client:
-    def __init__(self, options: ClientOptions) -> None:
-        self.processor: ClientProcessor = options.processor
-        self.use_binary: bool = options.use_binary
-        self.force_send_json: bool = options.force_send_json
+    def __init__(self, processor: ClientProcessor = lambda m, n: n(m), use_binary: bool = False, force_send_json: bool = True) -> None:
+        self.processor: ClientProcessor = processor
+        self.use_binary: bool = use_binary
+        self.force_send_json: bool = force_send_json
         self.binary_encoder_store: deque[BinaryEncoder] = deque()
 
     def call(self, function_name: str, headers: Dict[str, Any], input_data: Dict[str, Any]) -> Dict[str, Any]:
         mutable_headers = headers.copy()
         message_type = f"function.{function_name}"
         input_japi_message = [message_type, mutable_headers, input_data]
-        output_japi_message = self.processor.process(
+        output_japi_message = self.processor(
             input_japi_message, self.proceed)
 
         output_message_type = output_japi_message[0]
@@ -78,7 +77,7 @@ class Client:
 
             return output_japi_message
         except Exception as e:
-            raise ClientProcessError(e)
+            raise ClientProcessError() from e
 
     def find_binary_encoder(self, checksum: int) -> BinaryEncoder:
         for binary_encoder in self.binary_encoder_store:

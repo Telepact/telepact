@@ -41,14 +41,15 @@ for l in cases_file:
 test_file.write('''
 import json
 import pytest
-import asyncio
+import concurrent.futures
+import traceback
+import sys
 from typing import Any, Dict, List, Optional
 from functools import partial
-from lib.py.src.japi.application_error import ApplicationError
-from lib.py.src.japi.client_error import ClientError
-from lib.py.src.japi.client_options import ClientOptions
-from lib.py.src.japi.sync_client import SyncClient
-from lib.py.src.japi.processor import Options, Processor
+from japi.application_error import ApplicationError
+from japi.client_error import ClientError
+from japi.sync_client import SyncClient
+from japi.processor import Processor
 
 
 def handle(function_name: str, headers: Dict[str, Any], body: Dict[str, Any]) -> Dict[str, Any]:
@@ -74,11 +75,17 @@ def handle(function_name: str, headers: Dict[str, Any], body: Dict[str, Any]) ->
         raise RuntimeError()
 
 
+def print_error(e: Exception) -> None:
+    print(e)
+    traceback.print_exc(file=sys.stdout)
+    return None        
+
+
 def assert_output(input_str: str, expected_output_str: str) -> None:
     with open("../../test/example.japi.json") as file:
         json_content = file.read()
     processor = Processor(partial(handle), json_content,
-                          Options().set_on_error(lambda e: print(e)))
+                          on_error=lambda e: print_error(e))
 
     expected_output_json = json.loads(expected_output_str)
 
@@ -87,10 +94,13 @@ def assert_output(input_str: str, expected_output_str: str) -> None:
     output_json = json.loads(output)
     assert expected_output_json == output_json
 
+    def test_server_processor(message: str):
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            return executor.submit(lambda: processor.process(message))
+
     # Test binary
-    client = SyncClient(lambda m: asyncio.get_event_loop().run_until_complete(
-        processor.process(m)), ClientOptions().set_use_binary(True))
-    client.call("_ping", {{}}, {{}})  # Warmup
+    client = SyncClient(lambda m: test_server_processor(m), use_binary=True)
+    client.call("_ping", {}, {})  # Warmup
     input_json = json.loads(input_str)
 
     if expected_output_str.startswith("[\\"error."):

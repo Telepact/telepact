@@ -2,20 +2,18 @@ from typing import List, Dict, Any, Callable, Union
 import concurrent.futures
 
 from japi.client_process_error import ClientProcessError
-from japi.client_options import ClientOptions
 from japi.client import Client
+from japi.default_serializer import DefaultSerializer
+from japi.serializer import Serializer
 
 
 class SyncClient(Client):
-    class SyncTransport:
-        def send(self, japi_message_payload: bytes) -> concurrent.futures.Future[bytes]:
-            pass
 
-    def __init__(self, sync_transport: SyncTransport, options: ClientOptions = ClientOptions()):
-        super().__init__(options)
+    def __init__(self, sync_transport: Callable[[bytes], concurrent.futures.Future[bytes]], timeout_ms: int = 5000, serializer: Serializer = DefaultSerializer(), use_binary: bool = False, force_send_json: bool = True):
+        super().__init__(use_binary=use_binary, force_send_json=force_send_json)
         self.sync_transport = sync_transport
-        self.serializer = options.serializer
-        self.timeout_ms = options.timeout_ms
+        self.serializer = serializer
+        self.timeout_ms = timeout_ms
 
     def serialize_and_transport(
         self, input_japi_message: List[Any], use_msg_pack: bool
@@ -30,7 +28,7 @@ class SyncClient(Client):
                     input_japi_message
                 )
 
-            output_japi_message_payload = self.sync_transport.send(
+            output_japi_message_payload = self.sync_transport(
                 input_japi_message_payload
             ).result(self.timeout_ms / 1000)
 
