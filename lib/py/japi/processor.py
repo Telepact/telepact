@@ -22,12 +22,11 @@ class Options:
 
 
 class Processor:
-    def __init__(self, handler: Handler, api_description_json: str, options: Optional[Options] = None) -> None:
-        options = options or Options()
+    def __init__(self, handler: Handler, api_description_json: str, serializer: Serializer = DefaultSerializer(), on_error: Callable[[Exception], None] = lambda e: None) -> None:
         description = internal_parse.new_japi(api_description_json)
         self.api_description = description.parsed
         self.original_api_description = description.original
-        self.serializer = options.serializer
+        self.serializer = serializer
 
         internal_description = internal_parse.new_japi(internal_japi.JSON)
 
@@ -37,7 +36,7 @@ class Processor:
         self.handler = handler
         self.internal_handler = internal_japi.build(
             self.original_api_description)
-        self.on_error = options.on_error
+        self.on_error = on_error
 
         self.binary_encoder = internal_binary_encoder_builder.build(
             self.api_description)

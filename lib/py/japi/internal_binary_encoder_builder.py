@@ -10,17 +10,17 @@ def build(definitions: Dict[str, Union[FunctionDefinition, TypeDefinition, Error
     for key, definition in definitions.items():
         all_keys.add(key)
         if isinstance(definition, FunctionDefinition):
-            all_keys.update(definition.inputStruct().fields().keys())
-            all_keys.update(definition.outputStruct().fields().keys())
-            all_keys.update(definition.errors())
+            all_keys.update(definition.input_struct.fields.keys())
+            all_keys.update(definition.output_struct.fields.keys())
+            all_keys.update(definition.errors)
         elif isinstance(definition, TypeDefinition):
-            type = definition.type()
+            type = definition.type
             if isinstance(type, Struct):
-                all_keys.update(type.fields().keys())
+                all_keys.update(type.fields.keys())
             elif isinstance(type, Enum):
-                all_keys.update(type.cases().keys())
+                all_keys.update(type.cases.keys())
         elif isinstance(definition, ErrorDefinition):
-            all_keys.update(definition.fields().keys())
+            all_keys.update(definition.fields.keys())
 
     i = 0
     binary_encoding = {}
