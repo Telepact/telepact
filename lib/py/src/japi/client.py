@@ -1,15 +1,23 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Union, Any
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
+from binary_encoder import BinaryEncoder
+from client_error import ClientError
+from client_process_error import ClientProcessError
+
+from client_processor import ClientProcessor
+from client_options import ClientOptions
 
 
 class Client:
-    def __init__(self, options: "ClientOptions") -> None:
-        self.processor: "ClientProcessor" = options.processor
+    def __init__(self, options: ClientOptions) -> None:
+        self.processor: ClientProcessor = options.processor
         self.use_binary: bool = options.use_binary
-        self.binary_encoder_store: AtomicReference["BinaryEncoder"] = AtomicReference(
-        )
+        self.force_send_json: bool = options.force_send_json
+        self.binary_encoder_store: deque[BinaryEncoder] = deque()
 
     def call(self, function_name: str, headers: Dict[str, Any], input_data: Dict[str, Any]) -> Dict[str, Any]:
-        mutable_headers = HashMap(headers)
+        mutable_headers = headers.copy()
         message_type = f"function.{function_name}"
         input_japi_message = [message_type, mutable_headers, input_data]
         output_japi_message = self.processor.process(
@@ -27,65 +35,58 @@ class Client:
     def proceed(self, input_japi_message: List[Any]) -> List[Any]:
         try:
             headers = input_japi_message[1]
-            binary_encoder = self.binary_encoder_store.get()
-            if self.use_binary and binary_encoder is None:
-                headers["_binaryStart"] = True
 
-            output_japi_message = []
-            if binary_encoder is not None:
-                headers["_bin"] = binary_encoder.binary_hash
-                encoded_input_japi_message = binary_encoder.encode(
-                    input_japi_message)
-                encoded_output_japi_message = self.serialize_and_transport(
-                    encoded_input_japi_message, True)
-                output_japi_message = binary_encoder.decode(
-                    encoded_output_japi_message)
+            if self.use_binary:
+                binary_checksums = [
+                    binary_encoding.checksum for binary_encoding in self.binary_encoder_store]
+                headers["_bin"] = binary_checksums
+
+            binary_encoder = self.binary_encoder_store[0] if self.binary_encoder_store else None
+            final_input_japi_message: List[Any]
+            send_as_msg_pack = False
+            if self.force_send_json or not self.use_binary or binary_encoder is None:
+                final_input_japi_message = input_japi_message
             else:
-                output_japi_message = self.serialize_and_transport(
-                    input_japi_message, False)
+                final_input_japi_message = binary_encoder.encode(
+                    input_japi_message)
+                send_as_msg_pack = True
 
+            output_japi_message = self.serialize_and_transport(
+                final_input_japi_message, send_as_msg_pack)
             output_headers = output_japi_message[1]
-            if "_binaryEncoding" in output_headers:
-                binary_hash = output_headers["_bin"]
-                initial_binary_encoding = output_headers["_binaryEncoding"]
-                binary_encoding = {
-                    key: int(value) if isinstance(value, int) else value for key, value in initial_binary_encoding.items()
-                }
-                new_binary_encoder = BinaryEncoder(
-                    binary_encoding, binary_hash)
-                self.binary_encoder_store.set(new_binary_encoder)
-                return new_binary_encoder.decode(output_japi_message)
+
+            if "_bin" in output_headers:
+                binary_checksum = output_headers["_bin"]
+
+                if "_binaryEncoding" in output_headers:
+                    initial_binary_encoding = output_headers["_binaryEncoding"]
+                    binary_encoding = {
+                        key: int(value) if isinstance(value, int) else value
+                        for key, value in initial_binary_encoding.items()
+                    }
+                    new_binary_encoder = BinaryEncoder(
+                        binary_encoding, binary_checksum[0])
+                    self.binary_encoder_store.append(new_binary_encoder)
+
+                    if len(self.binary_encoder_store) >= 3:
+                        self.binary_encoder_store.pop()
+
+                output_binary_encoder = self.find_binary_encoder(
+                    binary_checksum[0])
+
+                return output_binary_encoder.decode(output_japi_message)
 
             return output_japi_message
         except Exception as e:
             raise ClientProcessError(e)
 
+    def find_binary_encoder(self, checksum: int) -> BinaryEncoder:
+        for binary_encoder in self.binary_encoder_store:
+            if binary_encoder.checksum == checksum:
+                return binary_encoder
+        raise ClientProcessError(
+            Exception("No matching encoding found, cannot decode binary"))
+
     def serialize_and_transport(self, input_japi_message: List[Any], use_msg_pack: bool) -> List[Any]:
-        # Implement this method in the derived class
-        pass
-
-
-class ClientOptions:
-    def __init__(self, processor: "ClientProcessor", use_binary: bool) -> None:
-        self.processor: "ClientProcessor" = processor
-        self.use_binary: bool = use_binary
-
-
-class ClientProcessor:
-    def process(self, input_japi_message: List[Any], proceed: "Callable[[List[Any]], List[Any]]") -> List[Any]:
-        # Implement this method in the derived class
-        pass
-
-
-class BinaryEncoder:
-    def __init__(self, binary_encoding: Dict[str, int], binary_hash: Any) -> None:
-        self.binary_encoding: Dict[str, int] = binary_encoding
-        self.binary_hash: Any = binary_hash
-
-    def encode(self, input_data: Any) -> Any:
-        # Implement the encoding logic
-        pass
-
-    def decode(self, encoded_data: Any) -> Any:
-        # Implement the decoding logic
-        pass
+        raise NotImplementedError(
+            "Method serialize_and_transport must be implemented in a subclass.")

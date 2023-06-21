@@ -35,7 +35,7 @@ public class SyncClient extends Client {
                 inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
             }
 
-            var outputJapiMessagePayload = syncTransport.send(inputJapiMessagePayload).get(timeoutMs,
+            var outputJapiMessagePayload = syncTransport.send(inputJapiMessagePayload).get(this.timeoutMs,
                     TimeUnit.MILLISECONDS);
 
             List<Object> outputJapiMessage;

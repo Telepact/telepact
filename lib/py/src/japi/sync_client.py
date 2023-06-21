@@ -1,11 +1,15 @@
 from typing import List, Dict, Any, Callable, Union
 import concurrent.futures
 
+from client_process_error import ClientProcessError
+from client_options import ClientOptions
+from client import Client
+
 
 class SyncClient(Client):
     class SyncTransport:
         def send(self, japi_message_payload: bytes) -> concurrent.futures.Future[bytes]:
-            ...
+            pass
 
     def __init__(self, sync_transport: SyncTransport, options: ClientOptions = ClientOptions()):
         super().__init__(options)
@@ -28,7 +32,7 @@ class SyncClient(Client):
 
             output_japi_message_payload = self.sync_transport.send(
                 input_japi_message_payload
-            ).result(timeout_ms / 1000)
+            ).result(self.timeout_ms / 1000)
 
             output_japi_message: List[Any]
             if output_japi_message_payload[0] == ord('['):
