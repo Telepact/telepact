@@ -4,9 +4,9 @@ import base64
 import random
 import asyncio
 
-from client import Client
-from client_process_error import ClientProcessError
-from client_options import ClientOptions
+from japi.client import Client
+from japi.client_process_error import ClientProcessError
+from japi.client_options import ClientOptions
 
 
 class AsyncClient(Client):

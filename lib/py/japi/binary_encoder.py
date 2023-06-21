@@ -1,6 +1,6 @@
 from typing import List, Dict, Union
 
-from internal_types import IncorrectBinaryHashException
+from japi.internal_types import IncorrectBinaryHashException
 
 
 class BinaryEncoder:

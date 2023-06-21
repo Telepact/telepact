@@ -1,10 +1,10 @@
 from typing import Any, Callable, Dict, List, Optional
 from dataclasses import dataclass
-from lib.py.src.japi import internal_binary_encoder_builder, internal_japi, internal_parse, internal_process
-from lib.py.src.japi.default_serializer import DefaultSerializer
-from lib.py.src.japi.handler import Handler
+from japi import internal_binary_encoder_builder, internal_japi, internal_parse, internal_process
+from japi.default_serializer import DefaultSerializer
+from japi.handler import Handler
 
-from lib.py.src.japi.serializer import Serializer
+from japi.serializer import Serializer
 
 
 class JapiParseError(RuntimeError):

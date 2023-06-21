@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from typing import Dict, List, Tuple
 
-from internal_types import *
+from japi.internal_types import *
 
 from typing import Dict, Any
 import re
@@ -22,11 +22,11 @@ from typing import List, Callable, Dict, Any
 
 from typing import Any, List, Dict, Callable, Tuple, Union
 # Assuming BinaryEncoder is imported from another module
-from binary_encoder import BinaryEncoder
-from handler import Handler
-from serializer import Serializer
-from deserialization_error import DeserializationError
-from application_error import ApplicationError
+from japi.binary_encoder import BinaryEncoder
+from japi.handler import Handler
+from japi.serializer import Serializer
+from japi.deserialization_error import DeserializationError
+from japi.application_error import ApplicationError
 
 
 def process(input_japi_message_payload: bytes,

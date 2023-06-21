@@ -1,4 +1,4 @@
-from internal_types import FunctionNotFound
+from japi.internal_types import FunctionNotFound
 
 from typing import Dict, Any, List
 

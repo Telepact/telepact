@@ -1,12 +1,12 @@
 from typing import List, Dict, Union, Any
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
-from binary_encoder import BinaryEncoder
-from client_error import ClientError
-from client_process_error import ClientProcessError
+from japi.binary_encoder import BinaryEncoder
+from japi.client_error import ClientError
+from japi.client_process_error import ClientProcessError
 
-from client_processor import ClientProcessor
-from client_options import ClientOptions
+from japi.client_processor import ClientProcessor
+from japi.client_options import ClientOptions
 
 
 class Client:

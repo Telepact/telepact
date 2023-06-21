@@ -1,7 +1,7 @@
 from typing import List
 from typing_extensions import Protocol
 
-from lib.py.src.japi.client_next_process import ClientNextProcess
+from japi.client_next_process import ClientNextProcess
 
 
 class ClientProcessor(Protocol):

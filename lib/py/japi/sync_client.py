@@ -1,9 +1,9 @@
 from typing import List, Dict, Any, Callable, Union
 import concurrent.futures
 
-from client_process_error import ClientProcessError
-from client_options import ClientOptions
-from client import Client
+from japi.client_process_error import ClientProcessError
+from japi.client_options import ClientOptions
+from japi.client import Client
 
 
 class SyncClient(Client):

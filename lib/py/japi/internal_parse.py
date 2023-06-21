@@ -4,7 +4,7 @@ from typing import List, Dict, Union
 import re
 from typing import List, Dict, Any, Union
 
-from internal_types import Definition, Enum, ErrorDefinition, FunctionDefinition, Japi, Struct, TitleDefinition, TypeDefinition
+from japi.internal_types import Definition, Enum, ErrorDefinition, FunctionDefinition, Japi, Struct, TitleDefinition, TypeDefinition
 
 
 class TypeDeclaration:

@@ -1,7 +1,7 @@
 import json
-from serializer import Serializer
-from serialization_error import SerializationError
-from deserialization_error import DeserializationError
+from japi.serializer import Serializer
+from japi.serialization_error import SerializationError
+from japi.deserialization_error import DeserializationError
 import msgpack
 
 from typing import List

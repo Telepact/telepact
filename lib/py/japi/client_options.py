@@ -1,4 +1,4 @@
-from default_serializer import DefaultSerializer
+from japi.default_serializer import DefaultSerializer
 
 
 class ClientOptions:

@@ -1,31 +1,8 @@
 import hashlib
 from typing import Dict, Union
+from japi.binary_encoder import BinaryEncoder
 
-
-class BinaryEncoder:
-    def __init__(self, encode_map: Dict[str, int], binary_hash: int):
-        self.encode_map = encode_map
-        self.binary_hash = binary_hash
-
-
-class FunctionDefinition:
-    pass
-
-
-class TypeDefinition:
-    pass
-
-
-class Struct:
-    pass
-
-
-class Enum:
-    pass
-
-
-class ErrorDefinition:
-    pass
+from japi.internal_types import Enum, ErrorDefinition, FunctionDefinition, Struct, TypeDefinition
 
 
 def build(definitions: Dict[str, Union[FunctionDefinition, TypeDefinition, ErrorDefinition]]) -> BinaryEncoder:
