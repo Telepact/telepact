@@ -47,7 +47,7 @@ class InternalProcess {
         var headers = (Map<String, Object>) outputJapiMessage.get(1);
         var returnAsBinary = headers.containsKey("_bin");
         if (!returnAsBinary && inputIsBinary) {
-            headers.put("_bin", binaryEncoder.binaryChecksum);
+            headers.put("_bin", binaryEncoder.checksum);
         }
 
         if (inputIsBinary || returnAsBinary) {
@@ -97,12 +97,12 @@ class InternalProcess {
                         throw new JapiParseError("Japi message");
                     }
 
-                    if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.binaryChecksum)) {
+                    if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
                         // Client is initiating handshake for binary protocol
                         finalHeaders.put("_binaryEncoding", binaryEncoder.encodeMap);
                     }
 
-                    finalHeaders.put("_bin", List.of(binaryEncoder.binaryChecksum));
+                    finalHeaders.put("_bin", List.of(binaryEncoder.checksum));
                 }
 
                 // Reflect call id

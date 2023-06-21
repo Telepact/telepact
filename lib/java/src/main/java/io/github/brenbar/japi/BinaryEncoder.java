@@ -9,13 +9,13 @@ class BinaryEncoder {
 
     public final Map<String, Long> encodeMap;
     public final Map<Long, String> decodeMap;
-    public final Long binaryChecksum;
+    public final Long checksum;
 
     public BinaryEncoder(Map<String, Long> binaryEncoding, Long binaryHash) {
         this.encodeMap = binaryEncoding;
         this.decodeMap = binaryEncoding.entrySet().stream()
                 .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
-        this.binaryChecksum = binaryHash;
+        this.checksum = binaryHash;
     }
 
     public List<Object> encode(List<Object> japiMessage) {
@@ -34,7 +34,7 @@ class BinaryEncoder {
         var headers = (Map<String, Object>) japiMessage.get(1);
         var givenChecksums = (List<Long>) headers.get("_bin");
         var decodedBody = decodeKeys(japiMessage.get(2));
-        if (binaryChecksum != null && !givenChecksums.contains(binaryChecksum)) {
+        if (this.checksum != null && !givenChecksums.contains(this.checksum)) {
             throw new IncorrectBinaryHashException();
         }
         return List.of(decodedMessageType, headers, decodedBody);

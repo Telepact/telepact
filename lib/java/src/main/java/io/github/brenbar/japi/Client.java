@@ -50,7 +50,7 @@ public abstract class Client {
             if (this.useBinary) {
                 List<Object> binaryChecksums = new ArrayList<>();
                 for (var binaryEncoding : binaryEncoderStore) {
-                    binaryChecksums.add(binaryEncoding);
+                    binaryChecksums.add(binaryEncoding.checksum);
                 }
                 headers.put("_bin", binaryChecksums);
             }
@@ -109,7 +109,7 @@ public abstract class Client {
 
     private BinaryEncoder findBinaryEncoder(Long checksum) {
         for (var binaryEncoder : this.binaryEncoderStore) {
-            if (binaryEncoder.binaryChecksum == checksum) {
+            if (Objects.equals(binaryEncoder.checksum, checksum)) {
                 return binaryEncoder;
             }
         }
