@@ -299,6 +299,8 @@ class InternalParse {
                 throw new JapiParseError("Cannot reference a function in type declarations");
             } else if (definition instanceof ErrorDefinition e) {
                 throw new JapiParseError("Cannot reference an error in type declarations");
+            } else {
+                throw new JapiParseError("Unknown definition: %s".formatted(typeDeclaration));
             }
         } catch (Exception e) {
             if (e instanceof JapiParseError e1) {
