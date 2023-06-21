@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -219,7 +218,7 @@ class InternalProcess {
 
             return List.of(messageType, finalHeaders, messageBody);
         } catch (InvalidFieldType e) {
-            var entry = createInvalidField(e);
+            var entry = createInvalidFieldFull(e);
 
             var messageType = entry.getKey();
             var messageBody = entry.getValue();
@@ -476,7 +475,7 @@ class InternalProcess {
         validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(), actual);
     }
 
-    static Map.Entry<String, Map<String, List<Map<String, String>>>> createInvalidField(InvalidFieldType e) {
+    static Map.Entry<String, Map<String, List<Map<String, String>>>> createInvalidFieldFull(InvalidFieldType e) {
         var entry = switch (e.error) {
             case NULL_INVALID_FOR_NON_NULL_TYPE ->
                 Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NullInvalidForNonNullType"));

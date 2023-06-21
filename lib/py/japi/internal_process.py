@@ -209,7 +209,7 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
         return [message_type, final_headers, message_body]
 
     except InvalidFieldType as e:
-        entry = create_invalid_field(e)
+        entry = create_invalid_field_full(e)
 
         message_type = entry[0]
         message_body = entry[1]
@@ -252,7 +252,7 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
 def validate_struct(namespace: str, reference_struct: Dict[str, FieldDeclaration], actual_struct: Dict[str, Any]) -> None:
     missing_fields = []
     for field_name, field_declaration in reference_struct.items():
-        if field_name not in actual_struct and not field_declaration.optional():
+        if field_name not in actual_struct and not field_declaration.optional:
             missing_fields.append(field_name)
 
     if missing_fields:
@@ -271,7 +271,7 @@ def validate_struct(namespace: str, reference_struct: Dict[str, FieldDeclaration
         if reference_field is None:
             raise StructHasExtraFields(namespace, [field_name])
         validate_type(f"{namespace}.{field_name}",
-                      reference_field.type_declaration(), field)
+                      reference_field.type_declaration, field)
 
 
 def validate_type(field_name: str, type_declaration: TypeDeclaration, value: Any) -> None:
@@ -422,7 +422,7 @@ def validate_type(field_name: str, type_declaration: TypeDeclaration, value: Any
                 raise InvalidFieldType(
                     field_name, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE)
             elif isinstance(value, Dict):
-                validate_struct(field_name, expected_type.fields(), value)
+                validate_struct(field_name, expected_type.fields, value)
                 return
             else:
                 raise InvalidFieldType(
@@ -488,19 +488,13 @@ def validate_enum(namespace: str, reference: Dict[str, Dict[str, Any]], enum_cas
                     reference_field["fields"], actual)
 
 
-def validate_struct(namespace: str, reference_fields: Dict[str, Any], actual: Dict[str, Any]) -> None:
-    # Implement the logic for validating the struct fields here
-    # ...
-    pass
-
-
 class UnknownEnumField(Exception):
     def __init__(self, message: str) -> None:
         super().__init__(message)
 
 
-def create_invalid_field(e: InvalidFieldType) -> Tuple[str, Dict[str, List[Dict[str, str]]]]:
-    entry = {
+def create_invalid_field_full(e: InvalidFieldType) -> Tuple[str, Dict[str, List[Dict[str, str]]]]:
+    entries = {
         InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE: (
             "error._invalid_input",
             create_invalid_field(
@@ -728,7 +722,7 @@ def create_invalid_field(e: InvalidFieldType) -> Tuple[str, Dict[str, List[Dict[
             create_invalid_field(e.field_name, "invalid_type")
         ),
     }
-    return entry
+    return entries.get(e.error)
 
 
 def create_invalid_field(field: str, reason: str) -> Dict[str, List[Dict[str, str]]]:
