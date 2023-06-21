@@ -7,14 +7,6 @@ from japi.handler import Handler
 from japi.serializer import Serializer
 
 
-class JapiParseError(RuntimeError):
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
-
-    def __init__(self, cause: Exception) -> None:
-        super().__init__(cause)
-
-
 @dataclass
 class Options:
     on_error: Callable[[Exception], None] = lambda e: None
@@ -33,14 +25,14 @@ class Processor:
     def __init__(self, handler: Handler, api_description_json: str, options: Optional[Options] = None) -> None:
         options = options or Options()
         description = internal_parse.new_japi(api_description_json)
-        self.api_description = description.parsed()
-        self.original_api_description = description.original()
+        self.api_description = description.parsed
+        self.original_api_description = description.original
         self.serializer = options.serializer
 
         internal_description = internal_parse.new_japi(internal_japi.JSON)
 
-        self.api_description.update(internal_description.parsed())
-        self.original_api_description.update(internal_description.original())
+        self.api_description.update(internal_description.parsed)
+        self.original_api_description.update(internal_description.original)
 
         self.handler = handler
         self.internal_handler = internal_japi.build(

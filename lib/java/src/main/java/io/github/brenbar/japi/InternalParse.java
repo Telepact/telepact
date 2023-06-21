@@ -285,29 +285,21 @@ class InternalParse {
             }
         }
 
-        try {
-            var name = matcher.group(7);
-            if (name == null) {
-                throw new RuntimeException("Ignore: will try another type");
-            }
-
-            var definition = parsedDefinitions.computeIfAbsent(name,
-                    (k) -> parseDefinition(japiAsJsonJava, parsedDefinitions, name));
-            if (definition instanceof TypeDefinition t) {
-                return new TypeDeclaration(t.type(), nullable);
-            } else if (definition instanceof FunctionDefinition f) {
-                throw new JapiParseError("Cannot reference a function in type declarations");
-            } else if (definition instanceof ErrorDefinition e) {
-                throw new JapiParseError("Cannot reference an error in type declarations");
-            } else {
-                throw new JapiParseError("Unknown definition: %s".formatted(typeDeclaration));
-            }
-        } catch (Exception e) {
-            if (e instanceof JapiParseError e1) {
-                throw e1;
-            }
-            throw new JapiParseError("Invalid type declaration: %s".formatted(typeDeclaration), e);
+        var name = matcher.group(7);
+        if (name == null) {
+            throw new JapiParseError("Invalid definition: %s".formatted(typeDeclaration));
         }
 
+        var definition = parsedDefinitions.computeIfAbsent(name,
+                (k) -> parseDefinition(japiAsJsonJava, parsedDefinitions, name));
+        if (definition instanceof TypeDefinition t) {
+            return new TypeDeclaration(t.type(), nullable);
+        } else if (definition instanceof FunctionDefinition f) {
+            throw new JapiParseError("Cannot reference a function in type declarations");
+        } else if (definition instanceof ErrorDefinition e) {
+            throw new JapiParseError("Cannot reference an error in type declarations");
+        } else {
+            throw new JapiParseError("Unknown definition: %s".formatted(typeDeclaration));
+        }
     }
 }

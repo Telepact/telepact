@@ -5,7 +5,8 @@ import re
 from typing import List, Dict, Any, Union
 
 from japi.internal_types import Definition, Enum, ErrorDefinition, FieldDeclaration, FieldNameAndFieldDeclaration, FunctionDefinition, Japi, JsonAny, JsonArray, JsonBoolean, JsonInteger, JsonNull, JsonNumber, JsonObject, JsonString, Struct, TitleDefinition, TypeDeclaration, TypeDefinition
-from japi.processor import JapiParseError
+from japi.japi_parse_error import JapiParseError
+
 
 def new_japi(japi_as_json: str) -> Japi:
     parsed_definitions: Dict[str, Definition] = {}
@@ -50,8 +51,7 @@ def parse_definition(
         for field_declaration, type_declaration_value in input_definition_as_json_java.items():
             parsed_field = parse_field(
                 japi_as_json_java, parsed_definitions, field_declaration, type_declaration_value, False)
-            input_fields[parsed_field.field_name(
-            )] = parsed_field.field_declaration()
+            input_fields[parsed_field.field_name] = parsed_field.field_declaration
 
         try:
             output_definition_as_json_java = definition_array[2]
@@ -63,8 +63,7 @@ def parse_definition(
         for field_declaration, type_declaration_value in output_definition_as_json_java.items():
             parsed_field = parse_field(
                 japi_as_json_java, parsed_definitions, field_declaration, type_declaration_value, False)
-            output_fields[parsed_field.field_name(
-            )] = parsed_field.field_declaration()
+            output_fields[parsed_field.field_name] = parsed_field.field_declaration
 
         errors: List[str] = []
         if len(definition_array) == 4:
@@ -114,7 +113,7 @@ def parse_definition(
         for field_declaration, type_declaration_value in error_definition_as_json_java.items():
             parsed_field = parse_field(
                 japi_as_json_java, parsed_definitions, field_declaration, type_declaration_value, False)
-            fields[parsed_field.field_name] = parsed_field.field_declaration()
+            fields[parsed_field.field_name] = parsed_field.field_declaration
 
         return ErrorDefinition(definition_key, fields)
 
@@ -138,8 +137,7 @@ def parse_definition(
             for case_struct_field_declaration, case_struct_type_declaration_value in case_struct_definition_as_java.items():
                 case_struct_parsed_field = parse_field(
                     japi_as_json_java, parsed_definitions, case_struct_field_declaration, case_struct_type_declaration_value, False)
-                fields[case_struct_parsed_field.field_name(
-                )] = case_struct_parsed_field.field_declaration
+                fields[case_struct_parsed_field.field_name] = case_struct_parsed_field.field_declaration
 
             struct = Struct(f"{definition_key}.{enum_case}", fields)
             cases[enum_case] = struct
@@ -248,26 +246,19 @@ def parse_type(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict
     except Exception:
         pass
 
-    try:
-        name = matcher.group(7)
-        if name is None:
-            raise RuntimeError("Ignore: will try another type")
+    name = matcher.group(7)
+    if name is None:
+        raise RuntimeError("Ignore: will try another type")
 
-        definition = parsed_definitions.setdefault(name, parse_definition(
-            japi_as_json_java, parsed_definitions, name))
-        if isinstance(definition, TypeDefinition):
-            return TypeDeclaration(definition.type, nullable)
-        elif isinstance(definition, FunctionDefinition):
-            raise JapiParseError(
-                "Cannot reference a function in type declarations")
-        elif isinstance(definition, ErrorDefinition):
-            raise JapiParseError(
-                "Cannot reference an error in type declarations")
-        else:
-            raise JapiParseError("Unknown definition: %s" % type_declaration)
-    except JapiParseError as e1:
-        raise e1
-    except Exception as e1:
-        raise JapiParseError("Invalid type declaration: %s" % type_declaration, e1)
-
-    
+    definition = parsed_definitions.setdefault(name, parse_definition(
+        japi_as_json_java, parsed_definitions, name))
+    if isinstance(definition, TypeDefinition):
+        return TypeDeclaration(definition.type, nullable)
+    elif isinstance(definition, FunctionDefinition):
+        raise JapiParseError(
+            "Cannot reference a function in type declarations")
+    elif isinstance(definition, ErrorDefinition):
+        raise JapiParseError(
+            "Cannot reference an error in type declarations")
+    else:
+        raise JapiParseError("Unknown definition: %s" % type_declaration)
