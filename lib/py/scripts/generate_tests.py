@@ -70,7 +70,7 @@ def handle(function_name: str, headers: Dict[str, Any], body: Dict[str, Any]) ->
             except TypeError as e:
                 raise RuntimeError(e)
         else:
-            return {{}}
+            return {}
     else:
         raise RuntimeError()
 
