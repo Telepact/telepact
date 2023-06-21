@@ -263,6 +263,8 @@ def parse_type(japi_as_json_java: Dict[str, List[Any]], parsed_definitions: Dict
         elif isinstance(definition, ErrorDefinition):
             raise JapiParseError(
                 "Cannot reference an error in type declarations")
+        else:
+            raise JapiParseError("Unknown definition: %s" % type_declaration)
     except JapiParseError as e1:
         raise e1
     except Exception as e1:
