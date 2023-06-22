@@ -1,9 +1,26 @@
 package io.github.brenbar.japi;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class Processor {
+
+    static class ServerContext {
+        public final String functionName;
+        public final Map<String, Object> properties = new HashMap<String, Object>();
+
+        public ServerContext(String functionName) {
+            this.functionName = functionName;
+        }
+    }
+
+    interface PreProcess extends BiConsumer<ServerContext, Map<String, Object>> {
+    }
+
+    interface Handler extends BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> {
+    }
 
     private Handler handler;
     private Handler internalHandler;

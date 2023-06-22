@@ -5,15 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import io.github.brenbar.japi.Processor.ServerContext;
+
 class InternalProcess {
 
     static byte[] process(byte[] inputJapiMessagePayload, Serializer serializer, Consumer<Throwable> onError,
-            BinaryEncoder binaryEncoder, Map<String, Definition> apiDescription, Handler internalHandler,
-            Handler handler) {
+            BinaryEncoder binaryEncoder, Map<String, Definition> apiDescription,
+            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> internalHandler,
+            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> handler,
+            BiConsumer<ServerContext, Map<String, Object>> preProcess) {
         List<Object> inputJapiMessage;
         boolean inputIsBinary = false;
         if (inputJapiMessagePayload[0] == '[') {
@@ -42,7 +48,7 @@ class InternalProcess {
         }
 
         var outputJapiMessage = processObject(inputJapiMessage, onError, binaryEncoder, apiDescription,
-                internalHandler, handler);
+                internalHandler, handler, preProcess);
         var headers = (Map<String, Object>) outputJapiMessage.get(1);
         var returnAsBinary = headers.containsKey("_bin");
         if (!returnAsBinary && inputIsBinary) {
@@ -59,7 +65,10 @@ class InternalProcess {
 
     private static List<Object> processObject(List<Object> inputJapiMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
-            Map<String, Definition> apiDescription, Handler internalHandler, Handler handler) {
+            Map<String, Definition> apiDescription,
+            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> internalHandler,
+            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> handler,
+            BiConsumer<ServerContext, Map<String, Object>> preProcess) {
         var finalHeaders = new HashMap<String, Object>();
         try {
             try {
@@ -144,12 +153,16 @@ class InternalProcess {
 
                 validateStruct("input", functionDefinition.inputStruct().fields(), input);
 
+                var context = new ServerContext(functionName);
+
+                preProcess.accept(context, headers);
+
                 Map<String, Object> output;
                 try {
                     if (functionName.startsWith("_")) {
-                        output = internalHandler.handle(functionName, headers, input);
+                        output = internalHandler.apply(context, input);
                     } else {
-                        output = handler.handle(functionName, headers, input);
+                        output = handler.apply(context, input);
                     }
                 } catch (ApplicationError e) {
                     if (functionDefinition.errors().contains(e.messageType)) {

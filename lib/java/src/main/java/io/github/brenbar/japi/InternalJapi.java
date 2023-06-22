@@ -48,11 +48,11 @@ class InternalJapi {
       }
       """;
 
-  static Handler build(Map<String, Object> originalApiDescription) {
-    return (functionName, headers, input) -> switch (functionName) {
+  static io.github.brenbar.japi.Processor.Handler build(Map<String, Object> originalApiDescription) {
+    return (context, input) -> switch (context.functionName) {
       case "_ping" -> Map.of();
       case "_api" -> Map.of("api", originalApiDescription);
-      default -> throw new FunctionNotFound(functionName);
+      default -> throw new FunctionNotFound(context.functionName);
     };
   }
 }

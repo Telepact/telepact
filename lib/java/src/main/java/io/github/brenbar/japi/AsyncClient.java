@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class AsyncClient extends Client {
 
@@ -21,23 +22,15 @@ public class AsyncClient extends Client {
         }
     }
 
-    public interface AsyncTransport {
-        void send(byte[] japiMessagePayload);
-    }
-
-    private AsyncTransport asyncTransport;
+    private Consumer<byte[]> asyncTransport;
     private Serializer serializer;
     private Long timeoutMs;
 
-    public AsyncClient(AsyncTransport asyncTransport) {
-        this(asyncTransport, new ClientOptions());
-    }
-
-    public AsyncClient(AsyncTransport asyncTransport, ClientOptions options) {
-        super(options);
+    public AsyncClient(Consumer<byte[]> asyncTransport) {
+        super();
         this.asyncTransport = asyncTransport;
-        this.serializer = options.serializer;
-        this.timeoutMs = options.timeoutMs;
+        this.serializer = new DefaultSerializer();
+        this.timeoutMs = 5000L;
     }
 
     private static Map<Object, CompletableFuture<List<Object>>> waitingRequests = Collections
@@ -50,7 +43,7 @@ public class AsyncClient extends Client {
 
             var headers = (Map<String, Object>) inputJapiMessage.get(1);
             headers.put("_id", id);
-            headers.put("_timeoutMs", timeoutMs);
+            headers.put("_tMs", timeoutMs);
 
             var future = new CompletableFuture<List<Object>>();
 
@@ -63,7 +56,7 @@ public class AsyncClient extends Client {
                 inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
             }
 
-            asyncTransport.send(inputJapiMessagePayload);
+            asyncTransport.accept(inputJapiMessagePayload);
 
             return future.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {

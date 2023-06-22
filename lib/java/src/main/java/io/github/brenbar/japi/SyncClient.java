@@ -3,31 +3,37 @@ package io.github.brenbar.japi;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class SyncClient extends Client {
 
-    public interface SyncTransport {
-        Future<byte[]> send(byte[] japiMessagePayload);
-    }
-
-    private SyncTransport syncTransport;
+    private Function<byte[], Future<byte[]>> syncTransport;
     private Serializer serializer;
     private Long timeoutMs;
 
-    public SyncClient(SyncTransport syncTransport) {
-        this(syncTransport, new ClientOptions());
+    public SyncClient(Function<byte[], Future<byte[]>> syncTransport) {
+        super();
+        this.syncTransport = syncTransport;
+        this.serializer = new DefaultSerializer();
+        this.timeoutMs = 5000L;
     }
 
-    public SyncClient(SyncTransport syncTransport, ClientOptions options) {
-        super(options);
-        this.syncTransport = syncTransport;
-        this.serializer = options.serializer;
-        this.timeoutMs = options.timeoutMs;
+    public SyncClient setSerializer(Serializer serializer) {
+        this.serializer = serializer;
+        return this;
+    }
+
+    public SyncClient setTimeoutMs(Long timeoutMs) {
+        this.timeoutMs = timeoutMs;
+        return this;
     }
 
     @Override
     protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack) {
         try {
+            var headers = (Map<String, Object>) inputJapiMessage.get(1);
+            headers.put("_tim", timeoutMs);
+
             byte[] inputJapiMessagePayload;
             if (useMsgPack) {
                 inputJapiMessagePayload = this.serializer.serializeToMsgPack(inputJapiMessage);
@@ -35,7 +41,7 @@ public class SyncClient extends Client {
                 inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
             }
 
-            var outputJapiMessagePayload = syncTransport.send(inputJapiMessagePayload).get(this.timeoutMs,
+            var outputJapiMessagePayload = syncTransport.apply(inputJapiMessagePayload).get(this.timeoutMs,
                     TimeUnit.MILLISECONDS);
 
             List<Object> outputJapiMessage;
