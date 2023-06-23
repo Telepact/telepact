@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -130,7 +129,20 @@ class InternalProcess {
                     if (functionDefinition.errors().contains(e.messageType)) {
                         var def = (ErrorDefinition) apiDescription.get(e.messageType);
                         try {
-                            validateStruct("error", def.fields(), e.body);
+                            var errorValidationFailures = validateStruct("error", def.fields(), e.body);
+                            if (!errorValidationFailures.isEmpty()) {
+                                var validationFailureCases = new ArrayList<Map<String, String>>();
+                                for (var validationFailure : errorValidationFailures) {
+                                    var validationFailureCase = Map.of(
+                                            "field", validationFailure.path,
+                                            "reason", validationFailure.reason);
+                                    validationFailureCases.add(validationFailureCase);
+                                }
+                                // TODO: Show the output validation cases. Obscurity is not security here.
+                                // throw new JApiError("error._InvalidOutput", Map.of("cases",
+                                // validationFailureCases));
+                                throw new JApiError("error._InvalidOutput", Map.of());
+                            }
                         } catch (Exception e2) {
                             throw new InvalidApplicationFailure(e2);
                         }
@@ -145,7 +157,7 @@ class InternalProcess {
                         output);
                 if (!outputValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
-                    for (var validationFailure : inputValidationFailures) {
+                    for (var validationFailure : outputValidationFailures) {
                         var validationFailureCase = Map.of(
                                 "field", validationFailure.path,
                                 "reason", validationFailure.reason);
@@ -266,10 +278,13 @@ class InternalProcess {
             var fieldName = entry.getKey();
             var field = entry.getValue();
             var referenceField = referenceStruct.get(fieldName);
-            var validationFailure = new ValidationFailure("%s.%s".formatted(namespace, fieldName),
-                    InvalidFieldTypeError.EXTRA_STRUCT_FIELD_NOT_ALLOWED);
-            validationFailures
-                    .add(validationFailure);
+            if (referenceField == null) {
+                var validationFailure = new ValidationFailure("%s.%s".formatted(namespace, fieldName),
+                        InvalidFieldTypeError.EXTRA_STRUCT_FIELD_NOT_ALLOWED);
+                validationFailures
+                        .add(validationFailure);
+                continue;
+            }
             var nestedValidationFailures = validateType("%s.%s".formatted(namespace, fieldName),
                     referenceField.typeDeclaration(), field);
             validationFailures.addAll(nestedValidationFailures);
@@ -458,7 +473,8 @@ class InternalProcess {
                 } else if (value instanceof Map<?, ?> m) {
                     if (m.size() != 1) {
                         return Collections.singletonList(
-                                new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE));
+                                new ValidationFailure(fieldName,
+                                        InvalidFieldTypeError.MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
                     }
                     var entry = m.entrySet().stream().findFirst().get();
                     var enumCase = (String) entry.getKey();
@@ -504,8 +520,9 @@ class InternalProcess {
 
         var referenceField = reference.get(enumCase);
         if (referenceField == null) {
-            var validationFailure = new ValidationFailure(namespace, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);
-            validationFailures.add(validationFailure);
+            return Collections
+                    .singletonList(new ValidationFailure("%s.%s".formatted(namespace, enumCase),
+                            InvalidFieldTypeError.UNKNOWN_ENUM_VALUE));
         }
 
         var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(),

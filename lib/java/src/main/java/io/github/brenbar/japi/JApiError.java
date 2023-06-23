@@ -7,6 +7,7 @@ public class JApiError extends RuntimeException {
     public final Map<String, Object> details;
 
     public JApiError(String target, Map<String, Object> details) {
+        super("%s: %s".formatted(target, details));
         this.target = target;
         this.details = details;
     }
