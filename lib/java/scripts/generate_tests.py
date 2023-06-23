@@ -57,8 +57,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Tests {
 
-    Map<String, Object> handle(String functionName, Map<String, Object> headers, Map<String, Object> body) {
-        return switch (functionName) {
+    Map<String, Object> handle(Context context, Map<String, Object> body) {
+        var headers = context.properties;
+        return switch (context.functionName) {
             case "test" -> {
                 var error = headers.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
                 if (headers.containsKey("output")) {
@@ -71,7 +72,7 @@ public class Tests {
                 } else if (error.isPresent()) {
                     try {
                         var e = (Map<String, Object>) headers.get(error.get());
-                        throw new Processor.ApplicationFailure(error.get(), e);
+                        throw new ApplicationError(error.get(), e);
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
                     }
@@ -86,28 +87,43 @@ public class Tests {
     private void test(String input, String expectedOutput) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(this::handle, json, new Processor.Options().setOnError((e) -> e.printStackTrace()));
-        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>(){});
+        var processor = new Processor(this::handle, json).setOnError((e) -> e.printStackTrace())
+                .setExtractContextProperties((h) -> h);
+        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
+        });
 
         // test json
         {
             var output = processor.process(input.getBytes(StandardCharsets.UTF_8));
-            var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>() {});
+            var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>() {
+            });
             assertEquals(expectedOutputJsonJava, outputJsonJava);
         }
 
         // test binary
         {
-            var client = new SyncClient((m) -> CompletableFuture.completedFuture(processor.process(m)), new Client.Options().setUseBinary(true));
-            client.call("_ping", Map.of(), Map.of()); // warmup
-            var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {});
+            var client = new SyncClient(
+                    (m) -> {
+                        System.out.println(new String(m));
+                        var result = processor.process(m);
+                        System.out.println(new String(result));
+                        return CompletableFuture.completedFuture(result);
+                    }).setForceSendJson(false).setUseBinary(true);
+            client.call(new Request("_ping", Map.of())); // warmup
+            var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {
+            });
 
-            if (expectedOutput.startsWith("[\\"error.")) {
-                var e = assertThrows(Client.Error.class, () -> client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2)));
+            if (expectedOutput.startsWith("[\"error.")) {
+                var e = assertThrows(ClientError.class,
+                        () -> client.call(new Request(((String) inputJava.get(0)).substring(9),
+                                (Map<String, Object>) inputJava.get(2)).addHeaders(
+                                        (Map<String, Object>) inputJava.get(1))));
                 assertEquals(expectedOutputJsonJava.get(0), e.type);
                 assertEquals(expectedOutputJsonJava.get(2), e.body);
             } else {
-                var outputJava = client.call(((String) inputJava.get(0)).substring(9), (Map<String, Object>) inputJava.get(1), (Map<String, Object>) inputJava.get(2));
+                var outputJava = client.call(new Request(((String) inputJava.get(0)).substring(9),
+                        (Map<String, Object>) inputJava.get(2)).addHeaders(
+                                (Map<String, Object>) inputJava.get(1)));
                 assertEquals(expectedOutputJsonJava.get(2), outputJava);
             }
         }

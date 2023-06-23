@@ -5,6 +5,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import io.github.brenbar.japi.Client.Middleware;
+import io.github.brenbar.japi.Client.ModifyHeaders;
+
 public class SyncClient {
 
     private Client client;
@@ -26,6 +29,26 @@ public class SyncClient {
 
     public SyncClient setTimeoutMs(Long timeoutMs) {
         this.timeoutMs = timeoutMs;
+        return this;
+    }
+
+    public SyncClient setModifyHeaders(ModifyHeaders modifyHeaders) {
+        client.modifyHeaders = modifyHeaders;
+        return this;
+    }
+
+    public SyncClient setMiddleware(Middleware middleware) {
+        client.middleware = middleware;
+        return this;
+    }
+
+    public SyncClient setUseBinary(boolean useBinary) {
+        client.useBinary = useBinary;
+        return this;
+    }
+
+    public SyncClient setForceSendJson(boolean forceSendJson) {
+        client.forceSendJson = forceSendJson;
         return this;
     }
 

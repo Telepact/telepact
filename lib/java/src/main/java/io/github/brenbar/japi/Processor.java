@@ -11,7 +11,7 @@ public class Processor {
     interface Handler extends BiFunction<Context, Map<String, Object>, Map<String, Object>> {
     }
 
-    interface ModifyHeaders extends Function<Map<String, Object>, Map<String, Object>> {
+    interface ExtractContextProperties extends Function<Map<String, Object>, Map<String, Object>> {
     }
 
     interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
@@ -20,6 +20,7 @@ public class Processor {
     private Handler handler;
     private Handler internalHandler;
     private Middleware middleware;
+    private ExtractContextProperties extractContextProperties;
     private Map<String, Object> originalApiDescription;
     private Map<String, Definition> apiDescription;
     private Serializer serializer;
@@ -43,6 +44,7 @@ public class Processor {
         this.onError = (e) -> {
         };
         this.middleware = (i, n) -> n.apply(i);
+        this.extractContextProperties = (h) -> new HashMap<>();
 
         this.binaryEncoder = InternalBinaryEncoderBuilder.build(apiDescription);
     }
@@ -54,6 +56,11 @@ public class Processor {
 
     public Processor setSerializer(Serializer serializer) {
         this.serializer = serializer;
+        return this;
+    }
+
+    public Processor setExtractContextProperties(ExtractContextProperties extractContextProperties) {
+        this.extractContextProperties = extractContextProperties;
         return this;
     }
 
@@ -109,6 +116,6 @@ public class Processor {
 
     private List<Object> processObject(List<Object> jApiMessage) {
         return InternalProcess.processObject(jApiMessage, this.onError, this.binaryEncoder, this.apiDescription,
-                this.internalHandler, this.handler);
+                this.internalHandler, this.handler, this.extractContextProperties);
     }
 }

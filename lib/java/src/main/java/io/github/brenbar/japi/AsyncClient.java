@@ -6,6 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import io.github.brenbar.japi.Client.Middleware;
+import io.github.brenbar.japi.Client.ModifyHeaders;
+
 public class AsyncClient {
 
     private static class Cache<K, V> extends LinkedHashMap<K, V> {
@@ -32,6 +35,36 @@ public class AsyncClient {
         this.asyncTransport = asyncTransport;
         this.serializer = new DefaultSerializer();
         this.timeoutMs = 5000L;
+    }
+
+    public AsyncClient setSerializer(Serializer serializer) {
+        this.serializer = serializer;
+        return this;
+    }
+
+    public AsyncClient setTimeoutMs(Long timeoutMs) {
+        this.timeoutMs = timeoutMs;
+        return this;
+    }
+
+    public AsyncClient setModifyHeaders(ModifyHeaders modifyHeaders) {
+        client.modifyHeaders = modifyHeaders;
+        return this;
+    }
+
+    public AsyncClient setMiddleware(Middleware middleware) {
+        client.middleware = middleware;
+        return this;
+    }
+
+    public AsyncClient setUseBinary(boolean useBinary) {
+        client.useBinary = useBinary;
+        return this;
+    }
+
+    public AsyncClient setForceSendJson(boolean forceSendJson) {
+        client.forceSendJson = forceSendJson;
+        return this;
     }
 
     public Map<String, Object> call(

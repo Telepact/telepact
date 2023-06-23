@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,8 @@ class InternalProcess {
             BinaryEncoder binaryEncoder,
             Map<String, Definition> apiDescription,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> internalHandler,
-            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler) {
+            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
+            Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
         var finalHeaders = new HashMap<String, Object>();
         try {
             try {
@@ -102,6 +104,8 @@ class InternalProcess {
                 validateStruct("input", functionDefinition.inputStruct().fields(), input);
 
                 var context = new Context(functionName);
+                var contextPropertiesFromHeaders = extractContextProperties.apply(headers);
+                context.properties.putAll(contextPropertiesFromHeaders);
 
                 Map<String, Object> output;
                 try {
