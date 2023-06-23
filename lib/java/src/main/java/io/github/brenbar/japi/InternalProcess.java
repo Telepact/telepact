@@ -644,4 +644,32 @@ class InternalProcess {
             return value;
         }
     }
+
+    static boolean inputIsBinary(byte[] inputJapiMessagePayload) {
+        return inputJapiMessagePayload[0] != '[';
+    }
+
+    static List<Object> deserialize(byte[] inputJapiMessagePayload, Serializer serializer,
+            BinaryEncoder binaryEncoder) {
+        if (!inputIsBinary(inputJapiMessagePayload)) {
+            try {
+                return serializer.deserializeFromJson(inputJapiMessagePayload);
+            } catch (DeserializationError e) {
+                throw new JApiError("error._ParseFailure", Map.of());
+            }
+        } else {
+            try {
+                var encodedInputJapiMessage = serializer.deserializeFromMsgPack(inputJapiMessagePayload);
+                if (encodedInputJapiMessage.size() < 3) {
+                    throw new JApiError("error._ParseFailure",
+                            Map.of("reason", "JapiMessageArrayMustHaveThreeElements"));
+                }
+                return binaryEncoder.decode(encodedInputJapiMessage);
+            } catch (BinaryChecksumMismatchException e) {
+                throw new JApiError("error._InvalidBinaryEncoding", Map.of());
+            } catch (DeserializationError e) {
+                throw new JApiError("error._ParseFailure", Map.of(), e);
+            }
+        }
+    }
 }

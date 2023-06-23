@@ -69,48 +69,33 @@ public class Processor {
     }
 
     private byte[] deserializeAndProcess(byte[] inputJapiMessagePayload) {
-        List<Object> inputJapiMessage;
-        boolean inputIsBinary = false;
-        if (inputJapiMessagePayload[0] == '[') {
-            try {
-                inputJapiMessage = this.serializer.deserializeFromJson(inputJapiMessagePayload);
-            } catch (DeserializationError e) {
-                // TODO: Need to swallow onError failures
-                this.onError.accept(e);
-                return this.serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
-            }
-        } else {
-            try {
-                var encodedInputJapiMessage = this.serializer.deserializeFromMsgPack(inputJapiMessagePayload);
-                if (encodedInputJapiMessage.size() < 3) {
-                    return this.serializer.serializeToJson(List.of("error._ParseFailure", Map.of(),
-                            Map.of("reason", "JapiMessageArrayMustHaveThreeElements")));
-                }
-                inputJapiMessage = binaryEncoder.decode(encodedInputJapiMessage);
-                inputIsBinary = true;
-            } catch (IncorrectBinaryHashException e) {
-                // TODO: Need to swallow onError failures
-                this.onError.accept(e);
-                return this.serializer.serializeToJson(List.of("error._InvalidBinaryEncoding", Map.of(), Map.of()));
-            } catch (DeserializationError e) {
-                // TODO: Need to swallow onError failures
-                this.onError.accept(e);
-                return this.serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
-            }
-        }
+        try {
+            List<Object> inputJapiMessage = InternalProcess.deserialize(inputJapiMessagePayload, this.serializer,
+                    this.binaryEncoder);
 
-        var outputJapiMessage = this.middleware.apply(inputJapiMessage, this::processObject);
-        var headers = (Map<String, Object>) outputJapiMessage.get(1);
-        var returnAsBinary = headers.containsKey("_bin");
-        if (!returnAsBinary && inputIsBinary) {
-            headers.put("_bin", this.binaryEncoder.checksum);
-        }
+            boolean inputIsBinary = InternalProcess.inputIsBinary(inputJapiMessagePayload);
 
-        if (inputIsBinary || returnAsBinary) {
-            var encodedOutputJapiMessage = this.binaryEncoder.encode(outputJapiMessage);
-            return this.serializer.serializeToMsgPack(encodedOutputJapiMessage);
-        } else {
-            return this.serializer.serializeToJson(outputJapiMessage);
+            var outputJapiMessage = this.middleware.apply(inputJapiMessage, this::processObject);
+            var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
+
+            // TODO: Is this logic necessary?
+            var returnAsBinary = outputHeaders.containsKey("_bin");
+            if (!returnAsBinary && inputIsBinary) {
+                outputHeaders.put("_bin", this.binaryEncoder.checksum);
+            }
+
+            if (inputIsBinary || returnAsBinary) {
+                var encodedOutputJapiMessage = this.binaryEncoder.encode(outputJapiMessage);
+                return this.serializer.serializeToMsgPack(encodedOutputJapiMessage);
+            } else {
+                return this.serializer.serializeToJson(outputJapiMessage);
+            }
+        } catch (JApiError e) {
+            this.onError.accept(e);
+            return this.serializer.serializeToJson(List.of(e.target, Map.of(), e.details));
+        } catch (Exception e) {
+            this.onError.accept(e);
+            return this.serializer.serializeToJson(List.of("error._ProcessFailure", Map.of(), Map.of()));
         }
     }
 

@@ -272,7 +272,15 @@ class InvalidFieldType extends FieldError {
     }
 }
 
-class IncorrectBinaryHashException extends Exception {
+class JapiMessageParseError extends RuntimeException {
+    public String target;
+
+    public JapiMessageParseError(String target) {
+        this.target = target;
+    }
+}
+
+class BinaryChecksumMismatchException extends Exception {
 }
 
 enum InvalidFieldTypeError {

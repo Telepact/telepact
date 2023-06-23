@@ -25,7 +25,7 @@ class BinaryEncoder {
         return List.of(encodedMessageType, headers, encodedBody);
     }
 
-    public List<Object> decode(List<Object> japiMessage) throws IncorrectBinaryHashException {
+    public List<Object> decode(List<Object> japiMessage) throws BinaryChecksumMismatchException {
         var encodedMessageType = japiMessage.get(0);
         if (encodedMessageType instanceof Integer i) {
             encodedMessageType = Long.valueOf(i);
@@ -35,7 +35,7 @@ class BinaryEncoder {
         var givenChecksums = (List<Long>) headers.get("_bin");
         var decodedBody = decodeKeys(japiMessage.get(2));
         if (this.checksum != null && !givenChecksums.contains(this.checksum)) {
-            throw new IncorrectBinaryHashException();
+            throw new BinaryChecksumMismatchException();
         }
         return List.of(decodedMessageType, headers, decodedBody);
     }

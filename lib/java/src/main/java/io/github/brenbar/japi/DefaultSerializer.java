@@ -37,7 +37,7 @@ class DefaultSerializer implements Serializer {
             return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
         } catch (IOException e) {
-            throw new DeserializationError(e);
+            throw new DeserializationError("error._ParseFailure", e);
         }
     }
 
@@ -47,7 +47,7 @@ class DefaultSerializer implements Serializer {
             return binaryMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
         } catch (IOException e) {
-            throw new DeserializationError(e);
+            throw new DeserializationError("error._ParseFailure", e);
         }
     }
 
