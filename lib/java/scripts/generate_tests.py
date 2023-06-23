@@ -113,7 +113,7 @@ public class Tests {
             var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {
             });
 
-            if (expectedOutput.startsWith("[\"error.")) {
+            if (expectedOutput.startsWith("[\\"error.")) {
                 var e = assertThrows(ClientError.class,
                         () -> client.call(new Request(((String) inputJava.get(0)).substring(9),
                                 (Map<String, Object>) inputJava.get(2)).addHeaders(

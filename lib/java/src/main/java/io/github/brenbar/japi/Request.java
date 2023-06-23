@@ -24,12 +24,12 @@ public class Request {
     }
 
     public Request addHeader(String name, Object value) {
-        headers.put(name, value);
+        this.headers.put(name, value);
         return this;
     }
 
     public Request addHeaders(Map<String, Object> headers) {
-        headers.putAll(headers);
+        this.headers.putAll(headers);
         return this;
     }
 
