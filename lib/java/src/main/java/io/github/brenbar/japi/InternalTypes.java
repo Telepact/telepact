@@ -258,14 +258,14 @@ class UnknownEnumField extends FieldError {
 
 class InvalidFieldType extends FieldError {
     public final String fieldName;
-    public final InvalidFieldTypeError error;
+    public final String error;
 
-    public InvalidFieldType(String fieldName, InvalidFieldTypeError error) {
+    public InvalidFieldType(String fieldName, String error) {
         this.fieldName = fieldName;
         this.error = error;
     }
 
-    public InvalidFieldType(String fieldName, InvalidFieldTypeError error, Throwable cause) {
+    public InvalidFieldType(String fieldName, String error, Throwable cause) {
         super(cause);
         this.fieldName = fieldName;
         this.error = error;
@@ -283,64 +283,77 @@ class JapiMessageParseError extends RuntimeException {
 class BinaryChecksumMismatchException extends Exception {
 }
 
-enum InvalidFieldTypeError {
-    NULL_INVALID_FOR_NON_NULL_TYPE,
+class InvalidFieldTypeError {
+    public static final String NULL_INVALID_FOR_NON_NULL_TYPE = "NullInvalidForNonNullType";
 
-    NUMBER_INVALID_FOR_BOOLEAN_TYPE,
-    STRING_INVALID_FOR_BOOLEAN_TYPE,
-    ARRAY_INVALID_FOR_BOOLEAN_TYPE,
-    OBJECT_INVALID_FOR_BOOLEAN_TYPE,
-    VALUE_INVALID_FOR_BOOLEAN_TYPE,
+    public static final String NUMBER_INVALID_FOR_BOOLEAN_TYPE = "NumberInvalidForBooleanType";
+    public static final String STRING_INVALID_FOR_BOOLEAN_TYPE = "StringInvalidForBooleanType";
+    public static final String ARRAY_INVALID_FOR_BOOLEAN_TYPE = "StringInvalidForBooleanType";
+    public static final String OBJECT_INVALID_FOR_BOOLEAN_TYPE = "StringInvalidForBooleanType";
+    public static final String VALUE_INVALID_FOR_BOOLEAN_TYPE = "StringInvalidForBooleanType";
 
-    BOOLEAN_INVALID_FOR_INTEGER_TYPE,
-    NUMBER_INVALID_FOR_INTEGER_TYPE,
-    STRING_INVALID_FOR_INTEGER_TYPE,
-    ARRAY_INVALID_FOR_INTEGER_TYPE,
-    OBJECT_INVALID_FOR_INTEGER_TYPE,
-    VALUE_INVALID_FOR_INTEGER_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_INTEGER_TYPE = "StringInvalidForIntegerType";
+    public static final String NUMBER_INVALID_FOR_INTEGER_TYPE = "StringInvalidForIntegerType";
+    public static final String STRING_INVALID_FOR_INTEGER_TYPE = "StringInvalidForIntegerType";
+    public static final String ARRAY_INVALID_FOR_INTEGER_TYPE = "StringInvalidForIntegerType";
+    public static final String OBJECT_INVALID_FOR_INTEGER_TYPE = "StringInvalidForIntegerType";
+    public static final String VALUE_INVALID_FOR_INTEGER_TYPE = "StringInvalidForIntegerType";
 
-    BOOLEAN_INVALID_FOR_NUMBER_TYPE,
-    STRING_INVALID_FOR_NUMBER_TYPE,
-    ARRAY_INVALID_FOR_NUMBER_TYPE,
-    OBJECT_INVALID_FOR_NUMBER_TYPE,
-    VALUE_INVALID_FOR_NUMBER_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_NUMBER_TYPE = "StringInvalidForNumberType";
+    public static final String STRING_INVALID_FOR_NUMBER_TYPE = "StringInvalidForNumberType";
+    public static final String ARRAY_INVALID_FOR_NUMBER_TYPE = "StringInvalidForNumberType";
+    public static final String OBJECT_INVALID_FOR_NUMBER_TYPE = "StringInvalidForNumberType";
+    public static final String VALUE_INVALID_FOR_NUMBER_TYPE = "StringInvalidForNumberType";
 
-    BOOLEAN_INVALID_FOR_STRING_TYPE,
-    NUMBER_INVALID_FOR_STRING_TYPE,
-    ARRAY_INVALID_FOR_STRING_TYPE,
-    OBJECT_INVALID_FOR_STRING_TYPE,
-    VALUE_INVALID_FOR_STRING_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_STRING_TYPE = "StringInvalidForStringType";
+    public static final String NUMBER_INVALID_FOR_STRING_TYPE = "StringInvalidForStringType";
+    public static final String ARRAY_INVALID_FOR_STRING_TYPE = "StringInvalidForStringType";
+    public static final String OBJECT_INVALID_FOR_STRING_TYPE = "StringInvalidForStringType";
+    public static final String VALUE_INVALID_FOR_STRING_TYPE = "StringInvalidForStringType";
 
-    BOOLEAN_INVALID_FOR_ARRAY_TYPE,
-    NUMBER_INVALID_FOR_ARRAY_TYPE,
-    STRING_INVALID_FOR_ARRAY_TYPE,
-    OBJECT_INVALID_FOR_ARRAY_TYPE,
-    VALUE_INVALID_FOR_ARRAY_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_ARRAY_TYPE = "StringInvalidForArrayType";
+    public static final String NUMBER_INVALID_FOR_ARRAY_TYPE = "StringInvalidForArrayType";
+    public static final String STRING_INVALID_FOR_ARRAY_TYPE = "StringInvalidForArrayType";
+    public static final String OBJECT_INVALID_FOR_ARRAY_TYPE = "StringInvalidForArrayType";
+    public static final String VALUE_INVALID_FOR_ARRAY_TYPE = "StringInvalidForArrayType";
 
-    BOOLEAN_INVALID_FOR_OBJECT_TYPE,
-    NUMBER_INVALID_FOR_OBJECT_TYPE,
-    STRING_INVALID_FOR_OBJECT_TYPE,
-    ARRAY_INVALID_FOR_OBJECT_TYPE,
-    VALUE_INVALID_FOR_OBJECT_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_OBJECT_TYPE = "StringInvalidForObjectType";
+    public static final String NUMBER_INVALID_FOR_OBJECT_TYPE = "StringInvalidForObjectType";
+    public static final String STRING_INVALID_FOR_OBJECT_TYPE = "StringInvalidForObjectType";
+    public static final String ARRAY_INVALID_FOR_OBJECT_TYPE = "StringInvalidForObjectType";
+    public static final String VALUE_INVALID_FOR_OBJECT_TYPE = "StringInvalidForObjectType";
 
-    BOOLEAN_INVALID_FOR_STRUCT_TYPE,
-    NUMBER_INVALID_FOR_STRUCT_TYPE,
-    STRING_INVALID_FOR_STRUCT_TYPE,
-    ARRAY_INVALID_FOR_STRUCT_TYPE,
-    VALUE_INVALID_FOR_STRUCT_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_STRUCT_TYPE = "StringInvalidForStructType";
+    public static final String NUMBER_INVALID_FOR_STRUCT_TYPE = "StringInvalidForStructType";
+    public static final String STRING_INVALID_FOR_STRUCT_TYPE = "StringInvalidForStructType";
+    public static final String ARRAY_INVALID_FOR_STRUCT_TYPE = "StringInvalidForStructType";
+    public static final String VALUE_INVALID_FOR_STRUCT_TYPE = "StringInvalidForStructType";
 
-    BOOLEAN_INVALID_FOR_ENUM_TYPE,
-    NUMBER_INVALID_FOR_ENUM_TYPE,
-    STRING_INVALID_FOR_ENUM_TYPE,
-    ARRAY_INVALID_FOR_ENUM_TYPE,
-    VALUE_INVALID_FOR_ENUM_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_ENUM_TYPE = "StringInvalidForEnumType";
+    public static final String NUMBER_INVALID_FOR_ENUM_TYPE = "StringInvalidForEnumType";
+    public static final String STRING_INVALID_FOR_ENUM_TYPE = "StringInvalidForEnumType";
+    public static final String ARRAY_INVALID_FOR_ENUM_TYPE = "StringInvalidForEnumType";
+    public static final String VALUE_INVALID_FOR_ENUM_TYPE = "StringInvalidForEnumType";
 
-    BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE,
-    NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE,
-    STRING_INVALID_FOR_ENUM_STRUCT_TYPE,
-    ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE,
-    VALUE_INVALID_FOR_ENUM_STRUCT_TYPE,
+    public static final String BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE = "StringInvalidForEnumStructType";
+    public static final String NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE = "StringInvalidForEnumStructType";
+    public static final String STRING_INVALID_FOR_ENUM_STRUCT_TYPE = "StringInvalidForEnumStructType";
+    public static final String ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE = "StringInvalidForEnumStructType";
+    public static final String VALUE_INVALID_FOR_ENUM_STRUCT_TYPE = "StringInvalidForEnumStructType";
 
-    INVALID_ENUM_VALUE,
-    INVALID_TYPE
+    public static final String INVALID_ENUM_VALUE = "UnknownEnumValue";
+    public static final String INVALID_TYPE = "InvalidType";
+
+    public static final String REQUIRED_STRUCT_FIELD_MISSING = "MissingRequiredStructField";
+    public static final String EXTRA_STRUCT_FIELD_NOT_ALLOWED = "IllegalExtraStructField";
+}
+
+class ValidationFailure {
+    public final String path;
+    public final String reason;
+
+    public ValidationFailure(String path, String reason) {
+        this.path = path;
+        this.reason = reason;
+    }
 }

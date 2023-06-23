@@ -1,9 +1,11 @@
 package io.github.brenbar.japi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -101,7 +103,17 @@ class InternalProcess {
                     }
                 }
 
-                validateStruct("input", functionDefinition.inputStruct().fields(), input);
+                var inputValidationFailures = validateStruct("input", functionDefinition.inputStruct().fields(), input);
+                if (!inputValidationFailures.isEmpty()) {
+                    var validationFailureCases = new ArrayList<Map<String, String>>();
+                    for (var validationFailure : inputValidationFailures) {
+                        var validationFailureCase = Map.of(
+                                "field", validationFailure.path,
+                                "reason", validationFailure.reason);
+                        validationFailureCases.add(validationFailureCase);
+                    }
+                    throw new JApiError("error._InvalidInput", Map.of("cases", validationFailureCases));
+                }
 
                 var context = new Context(functionName);
                 var contextPropertiesFromHeaders = extractContextProperties.apply(headers);
@@ -129,10 +141,20 @@ class InternalProcess {
                     }
                 }
 
-                try {
-                    validateStruct("output", functionDefinition.outputStruct().fields(), output);
-                } catch (Exception e) {
-                    throw new InvalidOutput(e);
+                var outputValidationFailures = validateStruct("output", functionDefinition.outputStruct().fields(),
+                        output);
+                if (!outputValidationFailures.isEmpty()) {
+                    var validationFailureCases = new ArrayList<Map<String, String>>();
+                    for (var validationFailure : inputValidationFailures) {
+                        var validationFailureCase = Map.of(
+                                "field", validationFailure.path,
+                                "reason", validationFailure.reason);
+                        validationFailureCases.add(validationFailureCase);
+                    }
+                    // TODO: Show the output validation cases. Obscurity is not security here.
+                    // throw new JApiError("error._InvalidOutput", Map.of("cases",
+                    // validationFailureCases));
+                    throw new JApiError("error._InvalidOutput", Map.of());
                 }
 
                 Map<String, Object> finalOutput;
@@ -153,6 +175,8 @@ class InternalProcess {
                 }
                 throw e;
             }
+        } catch (JApiError e) {
+            throw e;
         } catch (StructHasExtraFields e) {
             var messageType = "error._InvalidInput";
             var errors = e.extraFields.stream()
@@ -216,10 +240,12 @@ class InternalProcess {
         }
     }
 
-    private static void validateStruct(
+    private static List<ValidationFailure> validateStruct(
             String namespace,
             Map<String, FieldDeclaration> referenceStruct,
             Map<String, Object> actualStruct) {
+        var validationFailures = new ArrayList<ValidationFailure>();
+
         var missingFields = new ArrayList<String>();
         for (Map.Entry<String, FieldDeclaration> entry : referenceStruct.entrySet()) {
             var fieldName = entry.getKey();
@@ -229,364 +255,268 @@ class InternalProcess {
             }
         }
 
-        if (!missingFields.isEmpty()) {
-            throw new StructMissingFields(namespace, missingFields);
-        }
-
-        var extraFields = new ArrayList<String>();
-        for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
-            var name = entry.getKey();
-            if (!referenceStruct.containsKey(name)) {
-                extraFields.add(name);
-            }
-        }
-
-        if (!extraFields.isEmpty()) {
-            throw new StructHasExtraFields(namespace, extraFields);
+        for (var missingField : missingFields) {
+            var validationFailure = new ValidationFailure("%s.%s".formatted(namespace, missingField),
+                    InvalidFieldTypeError.REQUIRED_STRUCT_FIELD_MISSING);
+            validationFailures
+                    .add(validationFailure);
         }
 
         for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
             var fieldName = entry.getKey();
             var field = entry.getValue();
             var referenceField = referenceStruct.get(fieldName);
-            if (referenceField == null) {
-                throw new StructHasExtraFields(namespace, List.of(fieldName));
-            }
-            validateType("%s.%s".formatted(namespace, fieldName), referenceField.typeDeclaration(), field);
+            var validationFailure = new ValidationFailure("%s.%s".formatted(namespace, fieldName),
+                    InvalidFieldTypeError.EXTRA_STRUCT_FIELD_NOT_ALLOWED);
+            validationFailures
+                    .add(validationFailure);
+            var nestedValidationFailures = validateType("%s.%s".formatted(namespace, fieldName),
+                    referenceField.typeDeclaration(), field);
+            validationFailures.addAll(nestedValidationFailures);
         }
+
+        return validationFailures;
     }
 
-    private static void validateType(String fieldName, TypeDeclaration typeDeclaration, Object value) {
+    private static List<ValidationFailure> validateType(String fieldName, TypeDeclaration typeDeclaration,
+            Object value) {
         if (value == null) {
             if (!typeDeclaration.nullable()) {
-                throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE);
+                return Collections.singletonList(new ValidationFailure(fieldName,
+                        InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE));
             } else {
-                return;
+                return Collections.emptyList();
             }
         } else {
             var expectedType = typeDeclaration.type();
             if (expectedType instanceof JsonBoolean) {
                 if (value instanceof Boolean) {
-                    return;
+                    return Collections.emptyList();
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_BOOLEAN_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_BOOLEAN_TYPE));
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_BOOLEAN_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_BOOLEAN_TYPE));
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_BOOLEAN_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_BOOLEAN_TYPE));
                 } else if (value instanceof Map) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_BOOLEAN_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_BOOLEAN_TYPE));
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_BOOLEAN_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_BOOLEAN_TYPE));
                 }
             } else if (expectedType instanceof JsonInteger) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_INTEGER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_INTEGER_TYPE));
                 } else if (value instanceof Number) {
                     if (value instanceof Long || value instanceof Integer) {
-                        return;
+                        return Collections.emptyList();
                     } else {
-                        throw new InvalidFieldType(fieldName,
-                                InvalidFieldTypeError.NUMBER_INVALID_FOR_INTEGER_TYPE);
+                        return Collections.singletonList(new ValidationFailure(fieldName,
+                                InvalidFieldTypeError.NUMBER_INVALID_FOR_INTEGER_TYPE));
                     }
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_INTEGER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_INTEGER_TYPE));
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_INTEGER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_INTEGER_TYPE));
                 } else if (value instanceof Map) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_INTEGER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_INTEGER_TYPE));
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_INTEGER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_INTEGER_TYPE));
                 }
             } else if (expectedType instanceof JsonNumber) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_NUMBER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_NUMBER_TYPE));
                 } else if (value instanceof Number) {
-                    return;
+                    return Collections.emptyList();
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_NUMBER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_NUMBER_TYPE));
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_NUMBER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_NUMBER_TYPE));
                 } else if (value instanceof Map) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE));
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE));
                 }
             } else if (expectedType instanceof JsonString) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRING_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRING_TYPE));
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRING_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRING_TYPE));
                 } else if (value instanceof String) {
-                    return;
+                    return Collections.emptyList();
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRING_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRING_TYPE));
                 } else if (value instanceof Map) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_STRING_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_STRING_TYPE));
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRING_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRING_TYPE));
                 }
             } else if (expectedType instanceof JsonArray a) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ARRAY_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ARRAY_TYPE));
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ARRAY_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ARRAY_TYPE));
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ARRAY_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ARRAY_TYPE));
                 } else if (value instanceof List l) {
+                    var validationFailures = new ArrayList<ValidationFailure>();
                     for (var i = 0; i < l.size(); i += 1) {
                         var element = l.get(i);
-                        validateType("%s[%s]".formatted(fieldName, i), a.nestedType(), element);
+                        var nestedValidationFailures = validateType("%s[%s]".formatted(fieldName, i), a.nestedType(),
+                                element);
+                        validationFailures.addAll(nestedValidationFailures);
                     }
-                    return;
+                    return validationFailures;
                 } else if (value instanceof Map) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ARRAY_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ARRAY_TYPE));
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ARRAY_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ARRAY_TYPE));
                 }
             } else if (expectedType instanceof JsonObject o) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_OBJECT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_OBJECT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_OBJECT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_OBJECT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
+                    var validationFailures = new ArrayList<ValidationFailure>();
                     for (Map.Entry<?, ?> entry : m.entrySet()) {
                         var k = (String) entry.getKey();
                         var v = entry.getValue();
-                        validateType("%s{%s}".formatted(fieldName, k), o.nestedType(), v);
+                        var nestedValidationFailures = validateType("%s{%s}".formatted(fieldName, k), o.nestedType(),
+                                v);
+                        validationFailures.addAll(nestedValidationFailures);
                     }
-                    return;
+                    return validationFailures;
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_OBJECT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_OBJECT_TYPE));
                 }
             } else if (expectedType instanceof Struct s) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRUCT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRUCT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_STRUCT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
-                    validateStruct(fieldName, s.fields(), (Map<String, Object>) m);
-                    return;
+                    return validateStruct(fieldName, s.fields(), (Map<String, Object>) m);
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE));
                 }
             } else if (expectedType instanceof Enum u) {
                 if (value instanceof Boolean) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof Number) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof String) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof List) {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
                     if (m.size() != 1) {
-                        throw new EnumDoesNotHaveOnlyOneField(fieldName);
+                        return Collections.singletonList(
+                                new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE));
                     }
                     var entry = m.entrySet().stream().findFirst().get();
                     var enumCase = (String) entry.getKey();
                     var enumValue = entry.getValue();
 
                     if (enumValue instanceof Boolean) {
-                        throw new InvalidFieldType(fieldName,
-                                InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        return Collections.singletonList(new ValidationFailure(fieldName,
+                                InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof Number) {
-                        throw new InvalidFieldType(fieldName,
-                                InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        return Collections.singletonList(new ValidationFailure(fieldName,
+                                InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof String) {
-                        throw new InvalidFieldType(fieldName,
-                                InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        return Collections.singletonList(new ValidationFailure(fieldName,
+                                InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof List) {
-                        throw new InvalidFieldType(fieldName,
-                                InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        return Collections.singletonList(new ValidationFailure(fieldName,
+                                InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof Map<?, ?> m2) {
-                        validateEnum(fieldName, u.cases(), enumCase, (Map<String, Object>) m2);
-                        return;
+                        return validateEnum(fieldName, u.cases(), enumCase, (Map<String, Object>) m2);
                     } else {
-                        throw new InvalidFieldType(fieldName,
-                                InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE);
+                        return Collections.singletonList(new ValidationFailure(fieldName,
+                                InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
                     }
                 } else {
-                    throw new InvalidFieldType(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE));
                 }
             } else if (expectedType instanceof JsonAny a) {
                 // all values validate for any
+                return Collections.emptyList();
             } else {
-                throw new InvalidFieldType(fieldName, InvalidFieldTypeError.INVALID_TYPE);
+                return Collections.singletonList(new ValidationFailure(fieldName, InvalidFieldTypeError.INVALID_TYPE));
             }
         }
     }
 
-    private static void validateEnum(
+    private static List<ValidationFailure> validateEnum(
             String namespace,
             Map<String, Struct> reference,
             String enumCase,
             Map<String, Object> actual) {
+        var validationFailures = new ArrayList<ValidationFailure>();
+
         var referenceField = reference.get(enumCase);
         if (referenceField == null) {
-            throw new UnknownEnumField(namespace, enumCase);
+            var validationFailure = new ValidationFailure(namespace, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE);
+            validationFailures.add(validationFailure);
         }
 
-        validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(), actual);
+        var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(),
+                actual);
+        validationFailures.addAll(nestedValidationFailures);
+
+        return validationFailures;
     }
 
     static Map.Entry<String, Map<String, List<Map<String, String>>>> createInvalidFieldFull(InvalidFieldType e) {
-        var entry = switch (e.error) {
-            case NULL_INVALID_FOR_NON_NULL_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NullInvalidForNonNullType"));
-
-            case NUMBER_INVALID_FOR_BOOLEAN_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForBooleanType"));
-
-            case STRING_INVALID_FOR_BOOLEAN_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForBooleanType"));
-
-            case ARRAY_INVALID_FOR_BOOLEAN_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForBooleanType"));
-
-            case OBJECT_INVALID_FOR_BOOLEAN_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ObjectInvalidForBooleanType"));
-
-            case VALUE_INVALID_FOR_BOOLEAN_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForBooleanType"));
-
-            case BOOLEAN_INVALID_FOR_INTEGER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForIntegerType"));
-
-            case NUMBER_INVALID_FOR_INTEGER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForIntegerType"));
-
-            case STRING_INVALID_FOR_INTEGER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForIntegerType"));
-
-            case ARRAY_INVALID_FOR_INTEGER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForIntegerType"));
-
-            case OBJECT_INVALID_FOR_INTEGER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ObjectInvalidForIntegerType"));
-
-            case VALUE_INVALID_FOR_INTEGER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForIntegerType"));
-
-            case BOOLEAN_INVALID_FOR_NUMBER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForNumberType"));
-
-            case STRING_INVALID_FOR_NUMBER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForNumberType"));
-
-            case ARRAY_INVALID_FOR_NUMBER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForNumberType"));
-
-            case OBJECT_INVALID_FOR_NUMBER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ObjectInvalidForNumberType"));
-
-            case VALUE_INVALID_FOR_NUMBER_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForNumberType"));
-
-            case BOOLEAN_INVALID_FOR_STRING_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForStringType"));
-
-            case NUMBER_INVALID_FOR_STRING_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForStringType"));
-
-            case ARRAY_INVALID_FOR_STRING_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForStringType"));
-
-            case OBJECT_INVALID_FOR_STRING_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ObjectInvalidForStringType"));
-
-            case VALUE_INVALID_FOR_STRING_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForStringType"));
-
-            case BOOLEAN_INVALID_FOR_ARRAY_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForArrayType"));
-
-            case NUMBER_INVALID_FOR_ARRAY_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForArrayType"));
-
-            case STRING_INVALID_FOR_ARRAY_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForArrayType"));
-
-            case OBJECT_INVALID_FOR_ARRAY_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ObjectInvalidForArrayType"));
-
-            case VALUE_INVALID_FOR_ARRAY_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForArrayType"));
-
-            case BOOLEAN_INVALID_FOR_OBJECT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForObjectType"));
-
-            case NUMBER_INVALID_FOR_OBJECT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForObjectType"));
-
-            case STRING_INVALID_FOR_OBJECT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForObjectType"));
-
-            case ARRAY_INVALID_FOR_OBJECT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForObjectType"));
-
-            case VALUE_INVALID_FOR_OBJECT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForObjectType"));
-
-            case BOOLEAN_INVALID_FOR_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForStructType"));
-
-            case NUMBER_INVALID_FOR_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForStructType"));
-
-            case STRING_INVALID_FOR_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForStructType"));
-
-            case ARRAY_INVALID_FOR_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForStructType"));
-
-            case VALUE_INVALID_FOR_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForStructType"));
-
-            case BOOLEAN_INVALID_FOR_ENUM_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForEnumType"));
-
-            case NUMBER_INVALID_FOR_ENUM_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForEnumType"));
-
-            case STRING_INVALID_FOR_ENUM_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForEnumType"));
-
-            case ARRAY_INVALID_FOR_ENUM_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForEnumType"));
-
-            case VALUE_INVALID_FOR_ENUM_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForEnumType"));
-
-            case BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "BooleanInvalidForEnumStructType"));
-
-            case NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "NumberInvalidForEnumStructType"));
-
-            case STRING_INVALID_FOR_ENUM_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "StringInvalidForEnumStructType"));
-
-            case ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ArrayInvalidForEnumStructType"));
-
-            case VALUE_INVALID_FOR_ENUM_STRUCT_TYPE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "ValueInvalidForEnumStructType"));
-
-            case INVALID_ENUM_VALUE ->
-                Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "UnknownEnumValue"));
-
-            case INVALID_TYPE -> Map.entry("error._InvalidInput", createInvalidField(e.fieldName, "InvalidType"));
-        };
-        return entry;
+        return Map.entry("error._InvalidInput", createInvalidField(e.fieldName, e.error.toString()));
     }
 
     static Map<String, List<Map<String, String>>> createInvalidField(String field, String reason) {
