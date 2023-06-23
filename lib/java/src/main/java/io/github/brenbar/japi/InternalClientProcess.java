@@ -1,7 +1,7 @@
 package io.github.brenbar.japi;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -9,21 +9,52 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.github.brenbar.japi.Client.PreProcess;
-
 public class InternalClientProcess {
 
     static Map<String, Object> call(
-            JApiFunction jApiFunction,
-            BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> preProcess) {
-        // Ensure our headers are editable.
-        var mutableHeaders = new HashMap<>(headers);
-        var messageType = "function.%s".formatted(functionName);
-        var inputJapiMessage = List.of(messageType, mutableHeaders, input);
-        var outputJapiMessage = preProcess.apply(inputJapiMessage, proceed);
+            Request request,
+            BiFunction<List<Object>, Boolean, List<Object>> serializeAndTransport,
+            Function<Map<String, Object>, Map<String, Object>> modifyHeaders,
+            BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> middleware,
+            Deque<BinaryEncoder> recentBinaryEncoders,
+            boolean useBinaryDefault,
+            boolean forceSendJsonDefault) {
+
+        var headers = modifyHeaders.apply(request.headers);
+
+        if (!request.selectedStructFields.isEmpty()) {
+            headers.put("_selectFields", request.selectedStructFields);
+        }
+
+        boolean finalUseBinary;
+        if (request.useBinary.isPresent()) {
+            finalUseBinary = request.useBinary.get();
+        } else {
+            finalUseBinary = useBinaryDefault;
+        }
+
+        boolean finalForceSendJson;
+        if (request.forceSendJson.isPresent()) {
+            finalForceSendJson = request.forceSendJson.get();
+        } else {
+            finalForceSendJson = forceSendJsonDefault;
+        }
+
+        if (finalUseBinary) {
+            List<Object> binaryChecksums = new ArrayList<>();
+            for (var binaryEncoding : recentBinaryEncoders) {
+                binaryChecksums.add(binaryEncoding.checksum);
+            }
+            headers.put("_bin", binaryChecksums);
+        }
+
+        var messageType = "function.%s".formatted(request.functionName);
+        var inputJapiMessage = List.of(messageType, headers, request.functionInput);
+
+        var outputJapiMessage = encodeSerializeAndTransport(inputJapiMessage, serializeAndTransport, middleware,
+                recentBinaryEncoders, finalUseBinary, finalForceSendJson);
 
         var outputMessageType = (String) outputJapiMessage.get(0);
-        var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
         var output = (Map<String, Object>) outputJapiMessage.get(2);
 
         if (outputMessageType.startsWith("error.")) {
@@ -33,29 +64,25 @@ public class InternalClientProcess {
         return output;
     }
 
-    private static List<Object> proceed(List<Object> inputJapiMessage) {
+    private static List<Object> encodeSerializeAndTransport(List<Object> inputJapiMessage,
+            BiFunction<List<Object>, Boolean, List<Object>> serializeAndTransport,
+            BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> middleware,
+            Deque<BinaryEncoder> recentBinaryEncoders,
+            boolean useBinary,
+            boolean forceSendJson) {
         try {
-            var headers = (Map<String, Object>) inputJapiMessage.get(1);
+            var binaryEncoder = recentBinaryEncoders.size() == 0 ? null : recentBinaryEncoders.getFirst();
 
-            if (this.useBinary) {
-                List<Object> binaryChecksums = new ArrayList<>();
-                for (var binaryEncoding : binaryEncoderStore) {
-                    binaryChecksums.add(binaryEncoding.checksum);
-                }
-                headers.put("_bin", binaryChecksums);
-            }
-
-            var binaryEncoder = this.binaryEncoderStore.size() == 0 ? null : this.binaryEncoderStore.getFirst();
-            List<Object> finalInputJapiMessage;
             boolean sendAsMsgPack = false;
-            if (this.forceSendJson || !this.useBinary || binaryEncoder == null) {
+            List<Object> finalInputJapiMessage;
+            if (forceSendJson || !useBinary || binaryEncoder == null) {
                 finalInputJapiMessage = inputJapiMessage;
             } else {
                 finalInputJapiMessage = binaryEncoder.encode(inputJapiMessage);
                 sendAsMsgPack = true;
             }
 
-            var outputJapiMessage = serializeAndTransport(finalInputJapiMessage, sendAsMsgPack);
+            var outputJapiMessage = serializeAndTransport.apply(finalInputJapiMessage, sendAsMsgPack);
             var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
 
             // If the response is in binary, decode it
@@ -77,16 +104,16 @@ public class InternalClientProcess {
                                 }
                             }));
                     var newBinaryEncoder = new BinaryEncoder(binaryEncoding, binaryChecksum.get(0));
-                    this.binaryEncoderStore.add(newBinaryEncoder);
+                    recentBinaryEncoders.add(newBinaryEncoder);
 
                     // We need to maintain 2 binary encodings in case a server is undergoing an API
                     // change during a new jAPI deployment
-                    if (this.binaryEncoderStore.size() >= 3) {
-                        this.binaryEncoderStore.removeLast();
+                    if (recentBinaryEncoders.size() >= 3) {
+                        recentBinaryEncoders.removeLast();
                     }
                 }
 
-                var outputBinaryEncoder = findBinaryEncoder(binaryChecksum.get(0));
+                var outputBinaryEncoder = findBinaryEncoder(recentBinaryEncoders, binaryChecksum.get(0));
 
                 return outputBinaryEncoder.decode(outputJapiMessage);
             }
@@ -97,12 +124,33 @@ public class InternalClientProcess {
         }
     }
 
-    private static BinaryEncoder findBinaryEncoder(Long checksum) {
-        for (var binaryEncoder : this.binaryEncoderStore) {
+    private static BinaryEncoder findBinaryEncoder(Deque<BinaryEncoder> binaryEncoderStore, Long checksum) {
+        for (var binaryEncoder : binaryEncoderStore) {
             if (Objects.equals(binaryEncoder.checksum, checksum)) {
                 return binaryEncoder;
             }
         }
-        throw new ClientProcessError(new Exception("No matching encoding found, cannot decode binary"));
+        throw new ClientProcessError(
+                new Exception("No matching encoding found for checksum %d, cannot decode binary".formatted(checksum)));
+    }
+
+    static byte[] serialize(List<Object> jApiMessage, Serializer serializer, boolean sendAsMsgPack) {
+        if (sendAsMsgPack) {
+            return serializer.serializeToMsgPack(jApiMessage);
+        } else {
+            return serializer.serializeToJson(jApiMessage);
+        }
+    }
+
+    static List<Object> deserialize(byte[] jApiMessageBytes, Serializer serializer) {
+        try {
+            if (jApiMessageBytes[0] == '[') {
+                return serializer.deserializeFromJson(jApiMessageBytes);
+            } else {
+                return serializer.deserializeFromMsgPack(jApiMessageBytes);
+            }
+        } catch (DeserializationError e) {
+            throw new ClientProcessError(e);
+        }
     }
 }

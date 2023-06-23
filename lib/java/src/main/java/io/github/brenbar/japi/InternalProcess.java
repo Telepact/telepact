@@ -5,70 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import io.github.brenbar.japi.Processor.ServerContext;
-
 class InternalProcess {
 
-    static byte[] process(byte[] inputJapiMessagePayload, Serializer serializer, Consumer<Throwable> onError,
-            BinaryEncoder binaryEncoder, Map<String, Definition> apiDescription,
-            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> internalHandler,
-            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> handler,
-            BiConsumer<ServerContext, Map<String, Object>> preProcess) {
-        List<Object> inputJapiMessage;
-        boolean inputIsBinary = false;
-        if (inputJapiMessagePayload[0] == '[') {
-            try {
-                inputJapiMessage = serializer.deserializeFromJson(inputJapiMessagePayload);
-            } catch (DeserializationError e) {
-                onError.accept(e);
-                return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
-            }
-        } else {
-            try {
-                var encodedInputJapiMessage = serializer.deserializeFromMsgPack(inputJapiMessagePayload);
-                if (encodedInputJapiMessage.size() < 3) {
-                    return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(),
-                            Map.of("reason", "JapiMessageArrayMustHaveThreeElements")));
-                }
-                inputJapiMessage = binaryEncoder.decode(encodedInputJapiMessage);
-                inputIsBinary = true;
-            } catch (IncorrectBinaryHashException e) {
-                onError.accept(e);
-                return serializer.serializeToJson(List.of("error._InvalidBinaryEncoding", Map.of(), Map.of()));
-            } catch (DeserializationError e) {
-                onError.accept(e);
-                return serializer.serializeToJson(List.of("error._ParseFailure", Map.of(), Map.of()));
-            }
-        }
-
-        var outputJapiMessage = processObject(inputJapiMessage, onError, binaryEncoder, apiDescription,
-                internalHandler, handler, preProcess);
-        var headers = (Map<String, Object>) outputJapiMessage.get(1);
-        var returnAsBinary = headers.containsKey("_bin");
-        if (!returnAsBinary && inputIsBinary) {
-            headers.put("_bin", binaryEncoder.checksum);
-        }
-
-        if (inputIsBinary || returnAsBinary) {
-            var encodedOutputJapiMessage = binaryEncoder.encode(outputJapiMessage);
-            return serializer.serializeToMsgPack(encodedOutputJapiMessage);
-        } else {
-            return serializer.serializeToJson(outputJapiMessage);
-        }
-    }
-
-    private static List<Object> processObject(List<Object> inputJapiMessage, Consumer<Throwable> onError,
+    static List<Object> processObject(List<Object> inputJapiMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
             Map<String, Definition> apiDescription,
-            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> internalHandler,
-            BiFunction<ServerContext, Map<String, Object>, Map<String, Object>> handler,
-            BiConsumer<ServerContext, Map<String, Object>> preProcess) {
+            BiFunction<Context, Map<String, Object>, Map<String, Object>> internalHandler,
+            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler) {
         var finalHeaders = new HashMap<String, Object>();
         try {
             try {
@@ -153,9 +101,7 @@ class InternalProcess {
 
                 validateStruct("input", functionDefinition.inputStruct().fields(), input);
 
-                var context = new ServerContext(functionName);
-
-                preProcess.accept(context, headers);
+                var context = new Context(functionName);
 
                 Map<String, Object> output;
                 try {

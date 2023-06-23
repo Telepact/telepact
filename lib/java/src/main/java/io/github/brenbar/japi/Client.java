@@ -1,38 +1,45 @@
 package io.github.brenbar.japi;
 
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-public abstract class Client {
+class Client {
 
-    private Client.PreProcess preProcess;
+    interface SerializeAndTransport extends BiFunction<List<Object>, Boolean, List<Object>> {
+    }
+
+    interface ModifyHeaders extends Function<Map<String, Object>, Map<String, Object>> {
+    }
+
+    interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
+    }
+
+    private SerializeAndTransport serializeAndTransport;
+    private ModifyHeaders modifyHeaders;
+    private Middleware middleware;
+    private Deque<BinaryEncoder> recentBinaryEncoders = new ConcurrentLinkedDeque<>();
     private boolean useBinary;
     private boolean forceSendJson;
-    private Deque<BinaryEncoder> binaryEncoderStore = new ConcurrentLinkedDeque<>();
 
-    interface Process extends Function<List<Object>, List<Object>> {
-    }
-
-    interface PreProcess extends Function<JApiFunction, JApiFunction> {
-    }
-
-    public Client() {
-        this.preProcess = (f) -> f;
+    public Client(SerializeAndTransport serializeAndTransport) {
+        this.serializeAndTransport = serializeAndTransport;
+        this.modifyHeaders = (h) -> h;
+        this.middleware = (m, n) -> n.apply(m);
         this.useBinary = false;
         this.forceSendJson = true;
     }
 
-    public Client setPreProcess(Client.PreProcess preProcess) {
-        this.preProcess = preProcess;
+    public Client setModifyHeaders(ModifyHeaders modifyHeaders) {
+        this.modifyHeaders = modifyHeaders;
+        return this;
+    }
+
+    public Client setMiddleware(Middleware middleware) {
+        this.middleware = middleware;
         return this;
     }
 
@@ -47,10 +54,10 @@ public abstract class Client {
     }
 
     public Map<String, Object> call(
-            JApiFunction jApiFunction) {
-        return InternalClientProcess.call(jApiFunction, this.preProcess);
+            Request jApiFunction) {
+        return InternalClientProcess.call(jApiFunction, this.serializeAndTransport, this.modifyHeaders, this.middleware,
+                this.recentBinaryEncoders, this.useBinary,
+                this.forceSendJson);
     }
-
-    protected abstract List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack);
 
 }

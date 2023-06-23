@@ -5,14 +5,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class SyncClient extends Client {
+public class SyncClient {
 
+    private Client client;
     private Function<byte[], Future<byte[]>> syncTransport;
     private Serializer serializer;
     private Long timeoutMs;
 
     public SyncClient(Function<byte[], Future<byte[]>> syncTransport) {
-        super();
+        this.client = new Client(this::serializeAndTransport);
         this.syncTransport = syncTransport;
         this.serializer = new DefaultSerializer();
         this.timeoutMs = 5000L;
@@ -28,29 +29,23 @@ public class SyncClient extends Client {
         return this;
     }
 
-    @Override
-    protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack) {
+    public Map<String, Object> call(
+            Request jApiFunction) {
+        return client.call(jApiFunction);
+    }
+
+    protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean sendAsMsgPack) {
         try {
             var headers = (Map<String, Object>) inputJapiMessage.get(1);
             headers.put("_tim", timeoutMs);
 
-            byte[] inputJapiMessagePayload;
-            if (useMsgPack) {
-                inputJapiMessagePayload = this.serializer.serializeToMsgPack(inputJapiMessage);
-            } else {
-                inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
-            }
+            byte[] inputJapiMessagePayload = InternalClientProcess.serialize(inputJapiMessage, serializer,
+                    sendAsMsgPack);
 
             var outputJapiMessagePayload = syncTransport.apply(inputJapiMessagePayload).get(this.timeoutMs,
                     TimeUnit.MILLISECONDS);
 
-            List<Object> outputJapiMessage;
-            if (outputJapiMessagePayload[0] == '[') {
-                outputJapiMessage = serializer.deserializeFromJson(outputJapiMessagePayload);
-            } else {
-                outputJapiMessage = serializer.deserializeFromMsgPack(outputJapiMessagePayload);
-            }
-
+            List<Object> outputJapiMessage = InternalClientProcess.deserialize(outputJapiMessagePayload, serializer);
             return outputJapiMessage;
         } catch (Exception e) {
             throw new ClientProcessError(e);

@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class AsyncClient extends Client {
+public class AsyncClient {
 
     private static class Cache<K, V> extends LinkedHashMap<K, V> {
 
@@ -22,39 +22,40 @@ public class AsyncClient extends Client {
         }
     }
 
+    private Client client;
     private Consumer<byte[]> asyncTransport;
     private Serializer serializer;
     private Long timeoutMs;
 
     public AsyncClient(Consumer<byte[]> asyncTransport) {
-        super();
+        this.client = new Client(this::serializeAndTransport);
         this.asyncTransport = asyncTransport;
         this.serializer = new DefaultSerializer();
         this.timeoutMs = 5000L;
     }
 
+    public Map<String, Object> call(
+            Request jApiFunction) {
+        return client.call(jApiFunction);
+    }
+
     private static Map<Object, CompletableFuture<List<Object>>> waitingRequests = Collections
             .synchronizedMap(new Cache<Object, CompletableFuture<List<Object>>>(256));
 
-    @Override
-    protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean useMsgPack) {
+    protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean sendAsMsgPack) {
         try {
             var id = generate32BitId();
 
             var headers = (Map<String, Object>) inputJapiMessage.get(1);
             headers.put("_id", id);
-            headers.put("_tMs", timeoutMs);
+            headers.put("_tim", timeoutMs);
 
             var future = new CompletableFuture<List<Object>>();
 
             waitingRequests.put(id, future);
 
-            byte[] inputJapiMessagePayload;
-            if (useMsgPack) {
-                inputJapiMessagePayload = this.serializer.serializeToMsgPack(inputJapiMessage);
-            } else {
-                inputJapiMessagePayload = this.serializer.serializeToJson(inputJapiMessage);
-            }
+            byte[] inputJapiMessagePayload = InternalClientProcess.serialize(inputJapiMessage, serializer,
+                    sendAsMsgPack);
 
             asyncTransport.accept(inputJapiMessagePayload);
 
@@ -66,12 +67,7 @@ public class AsyncClient extends Client {
 
     public void receiveOutputJapiMessage(byte[] outputJapiMessagePayload) {
         try {
-            List<Object> outputJapiMessage;
-            if (outputJapiMessagePayload[0] == '[') {
-                outputJapiMessage = serializer.deserializeFromJson(outputJapiMessagePayload);
-            } else {
-                outputJapiMessage = serializer.deserializeFromMsgPack(outputJapiMessagePayload);
-            }
+            List<Object> outputJapiMessage = InternalClientProcess.deserialize(outputJapiMessagePayload, serializer);
 
             var headers = (Map<String, Object>) outputJapiMessage.get(1);
             var id = headers.get("_id");
