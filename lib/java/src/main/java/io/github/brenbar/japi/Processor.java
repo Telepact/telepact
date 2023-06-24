@@ -78,11 +78,7 @@ public class Processor {
             var outputJapiMessage = this.middleware.apply(inputJapiMessage, this::processObject);
             var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
 
-            // TODO: Is this logic necessary?
             var returnAsBinary = outputHeaders.containsKey("_bin");
-            if (!returnAsBinary && inputIsBinary) {
-                outputHeaders.put("_bin", this.binaryEncoder.checksum);
-            }
 
             if (inputIsBinary || returnAsBinary) {
                 var encodedOutputJapiMessage = this.binaryEncoder.encode(outputJapiMessage);
