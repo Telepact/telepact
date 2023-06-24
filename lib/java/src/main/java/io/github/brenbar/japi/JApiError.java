@@ -4,17 +4,17 @@ import java.util.Map;
 
 public class JApiError extends RuntimeException {
     public final String target;
-    public final Map<String, Object> details;
+    public final Map<String, Object> body;
 
     public JApiError(String target, Map<String, Object> details) {
         super("%s: %s".formatted(target, details));
         this.target = target;
-        this.details = details;
+        this.body = details;
     }
 
     public JApiError(String target, Map<String, Object> details, Throwable cause) {
-        super(cause);
+        super("%s: %s".formatted(target, details), cause);
         this.target = target;
-        this.details = details;
+        this.body = details;
     }
 }

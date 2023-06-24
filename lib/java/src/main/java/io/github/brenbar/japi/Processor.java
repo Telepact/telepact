@@ -92,7 +92,7 @@ public class Processor {
             }
         } catch (JApiError e) {
             this.onError.accept(e);
-            return this.serializer.serializeToJson(List.of(e.target, Map.of(), e.details));
+            return this.serializer.serializeToJson(List.of(e.target, Map.of(), e.body));
         } catch (Exception e) {
             this.onError.accept(e);
             return this.serializer.serializeToJson(List.of("error._ProcessFailure", Map.of(), Map.of()));

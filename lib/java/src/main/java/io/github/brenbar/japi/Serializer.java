@@ -8,7 +8,7 @@ public interface Serializer {
 
     byte[] serializeToMsgPack(List<Object> japiMessage);
 
-    List<Object> deserializeFromJson(byte[] bytes) throws DeserializationError;
+    List<Object> deserializeFromJson(byte[] bytes) throws DeserializationException;
 
-    List<Object> deserializeFromMsgPack(byte[] bytes) throws DeserializationError;
+    List<Object> deserializeFromMsgPack(byte[] bytes) throws DeserializationException;
 }

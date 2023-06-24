@@ -151,16 +151,7 @@ class JapiMessageTypeNotFunction extends RuntimeException {
 class JapiMessageHeaderNotObject extends RuntimeException {
 }
 
-class InvalidBinaryEncoding extends RuntimeException {
-}
-
 class InvalidSelectFieldsHeader extends RuntimeException {
-}
-
-class BinaryDecodeFailure extends RuntimeException {
-    public BinaryDecodeFailure(Throwable cause) {
-        super(cause);
-    }
 }
 
 class JapiMessageBodyNotObject extends RuntimeException {
@@ -175,23 +166,6 @@ class FunctionNotFound extends RuntimeException {
     }
 }
 
-class InvalidInput extends RuntimeException {
-    public InvalidInput() {
-        super();
-    }
-
-    public InvalidInput(Throwable cause) {
-        super(cause);
-    }
-
-}
-
-class InvalidOutput extends RuntimeException {
-    public InvalidOutput(Throwable cause) {
-        super(cause);
-    }
-}
-
 class InvalidApplicationFailure extends RuntimeException {
     public InvalidApplicationFailure(Throwable cause) {
         super(cause);
@@ -202,85 +176,6 @@ class DisallowedError extends RuntimeException {
     public DisallowedError(Throwable cause) {
         super(cause);
     }
-}
-
-class FieldError extends InvalidInput {
-    public FieldError() {
-        super();
-    }
-
-    public FieldError(Throwable cause) {
-        super(cause);
-    }
-}
-
-class StructMissingFields extends FieldError {
-    public final String namespace;
-    public final List<String> missingFields;
-
-    public StructMissingFields(String namespace, List<String> missingFields) {
-        super();
-        this.namespace = namespace;
-        this.missingFields = missingFields;
-    }
-}
-
-class StructHasExtraFields extends FieldError {
-    public final String namespace;
-    public final List<String> extraFields;
-
-    public StructHasExtraFields(String namespace, List<String> extraFields) {
-        super();
-        this.namespace = namespace;
-        this.extraFields = extraFields;
-    }
-}
-
-class EnumDoesNotHaveOnlyOneField extends FieldError {
-    public final String namespace;
-
-    public EnumDoesNotHaveOnlyOneField(String namespace) {
-        super();
-        this.namespace = namespace;
-    }
-}
-
-class UnknownEnumField extends FieldError {
-    public final String namespace;
-    public final String field;
-
-    public UnknownEnumField(String namespace, String field) {
-        super();
-        this.namespace = namespace;
-        this.field = field;
-    }
-}
-
-class InvalidFieldType extends FieldError {
-    public final String fieldName;
-    public final String error;
-
-    public InvalidFieldType(String fieldName, String error) {
-        this.fieldName = fieldName;
-        this.error = error;
-    }
-
-    public InvalidFieldType(String fieldName, String error, Throwable cause) {
-        super(cause);
-        this.fieldName = fieldName;
-        this.error = error;
-    }
-}
-
-class JapiMessageParseError extends RuntimeException {
-    public String target;
-
-    public JapiMessageParseError(String target) {
-        this.target = target;
-    }
-}
-
-class BinaryChecksumMismatchException extends Exception {
 }
 
 class InvalidFieldTypeError {

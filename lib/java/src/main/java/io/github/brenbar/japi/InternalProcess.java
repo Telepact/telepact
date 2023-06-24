@@ -24,20 +24,20 @@ class InternalProcess {
         try {
             try {
                 if (inputJapiMessage.size() < 3) {
-                    throw new JapiMessageArrayTooFewElements();
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustHaveThreeElements"));
                 }
 
                 String messageType;
                 try {
                     messageType = (String) inputJapiMessage.get(0);
                 } catch (ClassCastException e) {
-                    throw new JapiMessageTypeNotString();
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageTypeMustBeStringType"));
                 }
 
                 var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)(.input)?");
                 var matcher = regex.matcher(messageType);
                 if (!matcher.matches()) {
-                    throw new JapiMessageTypeNotFunction();
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageTypeStringMustBeFunction"));
                 }
                 var functionName = matcher.group(1);
 
@@ -45,7 +45,7 @@ class InternalProcess {
                 try {
                     headers = (Map<String, Object>) inputJapiMessage.get(1);
                 } catch (ClassCastException e) {
-                    throw new JapiMessageHeaderNotObject();
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageHeaderMustBeObject"));
                 }
 
                 if (headers.containsKey("_bin")) {
@@ -53,7 +53,7 @@ class InternalProcess {
                     try {
                         binaryChecksums = (List<Object>) headers.get("_bin");
                     } catch (Exception e) {
-                        throw new JapiParseError("Japi message");
+                        throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryHeaderMustBeArray"));
                     }
 
                     if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
@@ -74,7 +74,7 @@ class InternalProcess {
                 try {
                     input = (Map<String, Object>) inputJapiMessage.get(2);
                 } catch (ClassCastException e) {
-                    throw new JapiMessageBodyNotObject();
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageBodyMustBeObject"));
                 }
 
                 var functionDef = apiDescription.get(messageType);
@@ -83,7 +83,7 @@ class InternalProcess {
                 if (functionDef instanceof FunctionDefinition f) {
                     functionDefinition = f;
                 } else {
-                    throw new FunctionNotFound(functionName);
+                    throw new JApiError("error._UnknownFunction", Map.of());
                 }
 
                 Map<String, List<String>> slicedTypes = null;
@@ -98,7 +98,8 @@ class InternalProcess {
                             }
                         }
                     } catch (ClassCastException e) {
-                        throw new InvalidSelectFieldsHeader();
+                        throw new JApiError("error._ParseFailure",
+                                Map.of("reason", "SelectStructFieldsHeaderMustBeObjectOfArraysOfStrings"));
                     }
                 }
 
@@ -125,26 +126,22 @@ class InternalProcess {
                     } else {
                         output = handler.apply(context, input);
                     }
-                } catch (ApplicationError e) {
-                    if (functionDefinition.errors().contains(e.messageType)) {
-                        var def = (ErrorDefinition) apiDescription.get(e.messageType);
-                        try {
-                            var errorValidationFailures = validateStruct("error", def.fields(), e.body);
-                            if (!errorValidationFailures.isEmpty()) {
-                                var validationFailureCases = new ArrayList<Map<String, String>>();
-                                for (var validationFailure : errorValidationFailures) {
-                                    var validationFailureCase = Map.of(
-                                            "field", validationFailure.path,
-                                            "reason", validationFailure.reason);
-                                    validationFailureCases.add(validationFailureCase);
-                                }
-                                // TODO: Show the output validation cases. Obscurity is not security here.
-                                // throw new JApiError("error._InvalidOutput", Map.of("cases",
-                                // validationFailureCases));
-                                throw new JApiError("error._InvalidOutput", Map.of());
+                } catch (JApiError e) {
+                    if (functionDefinition.errors().contains(e.target)) {
+                        var def = (ErrorDefinition) apiDescription.get(e.target);
+                        var errorValidationFailures = validateStruct("error", def.fields(), e.body);
+                        if (!errorValidationFailures.isEmpty()) {
+                            var validationFailureCases = new ArrayList<Map<String, String>>();
+                            for (var validationFailure : errorValidationFailures) {
+                                var validationFailureCase = Map.of(
+                                        "field", validationFailure.path,
+                                        "reason", validationFailure.reason);
+                                validationFailureCases.add(validationFailureCase);
                             }
-                        } catch (Exception e2) {
-                            throw new InvalidApplicationFailure(e2);
+                            // TODO: Show the output validation cases. Obscurity is not security here.
+                            // throw new JApiError("error._InvalidOutput", Map.of("cases",
+                            // validationFailureCases));
+                            throw new JApiError("error._InvalidOutput", Map.of());
                         }
 
                         throw e;
@@ -189,62 +186,6 @@ class InternalProcess {
             }
         } catch (JApiError e) {
             throw e;
-        } catch (StructHasExtraFields e) {
-            var messageType = "error._InvalidInput";
-            var errors = e.extraFields.stream()
-                    .collect(Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "UnknownStructField"));
-            var messageBody = createInvalidFields(errors);
-
-            return List.of(messageType, finalHeaders, messageBody);
-
-        } catch (StructMissingFields e) {
-            var messageType = "error._InvalidInput";
-            var errors = e.missingFields.stream().collect(
-                    Collectors.toMap(f -> "%s.%s".formatted(e.namespace, f), f -> "RequiredStructFieldMissing"));
-            var messageBody = createInvalidFields(errors);
-
-            return List.of(messageType, finalHeaders, messageBody);
-
-        } catch (UnknownEnumField e) {
-            var messageType = "error._InvalidInput";
-            var messageBody = createInvalidField("%s.%s".formatted(e.namespace, e.field),
-                    "UnknownEnumField");
-
-            return List.of(messageType, finalHeaders, messageBody);
-        } catch (EnumDoesNotHaveOnlyOneField e) {
-            var messageType = "error._InvalidInput";
-            var messageBody = createInvalidField(e.namespace, "EnumDoesNotHaveExactlyOneField");
-
-            return List.of(messageType, finalHeaders, messageBody);
-        } catch (InvalidFieldType e) {
-            var entry = createInvalidFieldFull(e);
-
-            var messageType = entry.getKey();
-            var messageBody = entry.getValue();
-
-            return List.of(messageType, finalHeaders, messageBody);
-        } catch (InvalidOutput | InvalidApplicationFailure e) {
-            var messageType = "error._InvalidOutput";
-
-            return List.of(messageType, finalHeaders, Map.of());
-        } catch (InvalidInput e) {
-            var messageType = "error._InvalidInput";
-
-            return List.of(messageType, finalHeaders, Map.of());
-        } catch (InvalidBinaryEncoding | BinaryDecodeFailure e) {
-            var messageType = "error._InvalidBinary";
-
-            finalHeaders.put("_binaryEncoding", binaryEncoder.encodeMap);
-
-            return List.of(messageType, finalHeaders, Map.of());
-        } catch (FunctionNotFound e) {
-            var messageType = "error._UnknownFunction";
-
-            return List.of(messageType, finalHeaders, Map.of());
-        } catch (ApplicationError e) {
-            var messageType = e.messageType;
-
-            return List.of(messageType, finalHeaders, e.body);
         } catch (Exception e) {
             var messageType = "error._ApplicationFailure";
 
@@ -532,21 +473,6 @@ class InternalProcess {
         return validationFailures;
     }
 
-    static Map.Entry<String, Map<String, List<Map<String, String>>>> createInvalidFieldFull(InvalidFieldType e) {
-        return Map.entry("error._InvalidInput", createInvalidField(e.fieldName, e.error.toString()));
-    }
-
-    static Map<String, List<Map<String, String>>> createInvalidField(String field, String reason) {
-        return createInvalidFields(Map.of(field, reason));
-    }
-
-    static Map<String, List<Map<String, String>>> createInvalidFields(Map<String, String> errors) {
-        var jsonErrors = errors.entrySet().stream()
-                .map(e -> (Map<String, String>) new TreeMap<>(Map.of("field", e.getKey(), "reason", e.getValue())))
-                .collect(Collectors.toList());
-        return Map.of("cases", jsonErrors);
-    }
-
     static Object sliceTypes(Type type, Object value, Map<String, List<String>> slicedTypes) {
         if (type instanceof Struct s) {
             var slicedFields = slicedTypes.get(s.name());
@@ -601,7 +527,7 @@ class InternalProcess {
         if (!inputIsBinary(inputJapiMessagePayload)) {
             try {
                 return serializer.deserializeFromJson(inputJapiMessagePayload);
-            } catch (DeserializationError e) {
+            } catch (DeserializationException e) {
                 throw new JApiError("error._ParseFailure", Map.of());
             }
         } else {
@@ -614,7 +540,7 @@ class InternalProcess {
                 return binaryEncoder.decode(encodedInputJapiMessage);
             } catch (BinaryChecksumMismatchException e) {
                 throw new JApiError("error._InvalidBinaryEncoding", Map.of());
-            } catch (DeserializationError e) {
+            } catch (DeserializationException e) {
                 throw new JApiError("error._ParseFailure", Map.of(), e);
             }
         }

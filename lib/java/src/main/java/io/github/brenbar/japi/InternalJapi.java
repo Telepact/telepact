@@ -52,7 +52,7 @@ class InternalJapi {
     return (context, input) -> switch (context.functionName) {
       case "_ping" -> Map.of();
       case "_api" -> Map.of("api", originalApiDescription);
-      default -> throw new FunctionNotFound(context.functionName);
+      default -> throw new RuntimeException("Internal method not implemented");
     };
   }
 }

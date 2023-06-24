@@ -72,7 +72,7 @@ public class Tests {
                 } else if (error.isPresent()) {
                     try {
                         var e = (Map<String, Object>) headers.get(error.get());
-                        throw new ApplicationError(error.get(), e);
+                        throw new JApiError(error.get(), e);
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
                     }

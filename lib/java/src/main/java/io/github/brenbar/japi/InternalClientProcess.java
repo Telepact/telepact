@@ -149,7 +149,7 @@ public class InternalClientProcess {
             } else {
                 return serializer.deserializeFromMsgPack(jApiMessageBytes);
             }
-        } catch (DeserializationError e) {
+        } catch (DeserializationException e) {
             throw new ClientProcessError(e);
         }
     }
