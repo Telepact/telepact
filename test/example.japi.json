@@ -3,7 +3,7 @@
     [
       " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
       "                                                                                           ",
-      " As a reminder:                                                                   ",
+      " As a reminder:                                                                            ",
       " - ! means optional field                                                                  ",
       " - ? means nullable type                                                                   ",
       "                                                                                           "

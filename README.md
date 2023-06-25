@@ -13,9 +13,9 @@ HTTP client example (with `cURL`):
 ```bash
 $ export URL=http://example.com/api/v1
 $ curl -X '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
-["function.add.output", {}, {"result": 3}]
+["function.add", {}, {"result": 3}]
 $ curl -X '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]' $URL
-["function.sub.output", {}, {"result": -1}]
+["function.sub", {}, {"result": -1}]
 ```
 
 Websocket client example (with `python`):
@@ -33,9 +33,9 @@ print('{}'.format((ws.recv())))
 
 ```
 $ python japi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
-["function.add.output", {}, {"result": 3}]
+["function.add", {}, {"result": 3}]
 $ python japi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
-["function.add.output", {}, {"result": -1}]
+["function.add", {}, {"result": -1}]
 ```
 
 # Motivation
