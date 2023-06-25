@@ -107,6 +107,26 @@ Again, all of these features are opt-in client-side, provided to the consumer
 through server-side jAPI libraries, which makes these features automatic without
 any effort by the server-side implementation.
 
+## More FAQ
+
+### Why force servers to perform output validation? Wouldn't it be better to give clients malformed data so that they are at least empowered to adapt?
+
+jAPI automatically performs validation of function outputs (as well as errors)
+against the API description, and there is no setting for servers to turn off
+this behavior.
+
+This design decision is intentional. It helps maintain the high standard of type
+safety in the jAPI ecosystem by preventing API providers from indulging in the
+plausible deniability of claiming malformed data is just an inconvenience and
+are instead forced to deal with a hard failure through bug reports. Hard
+failures also help draw attention to type safety deficits early in the
+development phase.
+
+Clients who are uniquely vulnerable to hard server failures and who find it
+advantageous to receive the malformed data anyway and adapt on-the-fly are able
+to turn off this output validation by submitting their requests with the
+`{"_unsafe":true}` header.
+
 # Navigation
 
 - [Specification](SPECIFICATION.md)

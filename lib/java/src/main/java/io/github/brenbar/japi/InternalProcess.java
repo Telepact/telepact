@@ -127,7 +127,7 @@ class InternalProcess {
                 } catch (JApiError e) {
                     if (functionDefinition.errors().contains(e.target)) {
                         var def = (ErrorDefinition) apiDescription.get(e.target);
-                        var errorValidationFailures = validateStruct("error", def.fields(), e.body);
+                        var errorValidationFailures = validateStruct(e.target, def.fields(), e.body);
                         if (!errorValidationFailures.isEmpty()) {
                             var validationFailureCases = new ArrayList<Map<String, String>>();
                             for (var validationFailure : errorValidationFailures) {
