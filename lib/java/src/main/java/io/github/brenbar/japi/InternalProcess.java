@@ -516,13 +516,13 @@ class InternalProcess {
         }
     }
 
-    static boolean inputIsBinary(byte[] inputJapiMessagePayload) {
-        return inputJapiMessagePayload[0] != '[';
+    static boolean inputIsJson(byte[] inputJapiMessagePayload) {
+        return inputJapiMessagePayload[0] == '[';
     }
 
     static List<Object> deserialize(byte[] inputJapiMessagePayload, Serializer serializer,
             BinaryEncoder binaryEncoder) {
-        if (!inputIsBinary(inputJapiMessagePayload)) {
+        if (inputIsJson(inputJapiMessagePayload)) {
             try {
                 return serializer.deserializeFromJson(inputJapiMessagePayload);
             } catch (DeserializationException e) {
@@ -537,7 +537,7 @@ class InternalProcess {
                 }
                 return binaryEncoder.decode(encodedInputJapiMessage);
             } catch (BinaryChecksumMismatchException e) {
-                throw new JApiError("error._InvalidBinaryEncoding", Map.of());
+                throw new JApiError("error._BinaryDecodeFailure", Map.of());
             } catch (DeserializationException e) {
                 throw new JApiError("error._ParseFailure", Map.of(), e);
             }

@@ -73,13 +73,12 @@ public class Processor {
             List<Object> inputJapiMessage = InternalProcess.deserialize(inputJapiMessagePayload, this.serializer,
                     this.binaryEncoder);
 
-            boolean inputIsBinary = InternalProcess.inputIsBinary(inputJapiMessagePayload);
-
             var outputJapiMessage = this.middleware.apply(inputJapiMessage, this::processObject);
             var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
 
             var returnAsBinary = outputHeaders.containsKey("_bin");
 
+            boolean inputIsBinary = !InternalProcess.inputIsJson(inputJapiMessagePayload);
             if (inputIsBinary || returnAsBinary) {
                 var encodedOutputJapiMessage = this.binaryEncoder.encode(outputJapiMessage);
                 return this.serializer.serializeToMsgPack(encodedOutputJapiMessage);
