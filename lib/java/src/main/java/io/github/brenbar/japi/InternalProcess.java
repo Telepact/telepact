@@ -101,7 +101,8 @@ class InternalProcess {
                     }
                 }
 
-                var inputValidationFailures = validateStruct("input", functionDefinition.inputStruct().fields(), input);
+                var inputValidationFailures = validateStruct(functionDefinition.name(),
+                        functionDefinition.inputStruct().fields(), input);
                 if (!inputValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
                     for (var validationFailure : inputValidationFailures) {
@@ -148,7 +149,8 @@ class InternalProcess {
                     }
                 }
 
-                var outputValidationFailures = validateStruct("output", functionDefinition.outputStruct().fields(),
+                var outputValidationFailures = validateStruct(functionDefinition.name(),
+                        functionDefinition.outputStruct().fields(),
                         output);
                 if (!outputValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
