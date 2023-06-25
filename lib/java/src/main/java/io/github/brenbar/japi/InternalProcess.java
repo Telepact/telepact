@@ -137,10 +137,7 @@ class InternalProcess {
                                         "reason", validationFailure.reason);
                                 validationFailureCases.add(validationFailureCase);
                             }
-                            // TODO: Show the output validation cases. Obscurity is not security here.
-                            // throw new JApiError("error._InvalidOutput", Map.of("cases",
-                            // validationFailureCases));
-                            throw new JApiError("error._InvalidOutput", Map.of());
+                            throw new JApiError("error._InvalidOutput", Map.of("cases", validationFailureCases));
                         }
 
                         throw e;
@@ -160,10 +157,7 @@ class InternalProcess {
                                 "reason", validationFailure.reason);
                         validationFailureCases.add(validationFailureCase);
                     }
-                    // TODO: Show the output validation cases. Obscurity is not security here.
-                    // throw new JApiError("error._InvalidOutput", Map.of("cases",
-                    // validationFailureCases));
-                    throw new JApiError("error._InvalidOutput", Map.of());
+                    throw new JApiError("error._InvalidOutput", Map.of("cases", validationFailureCases));
                 }
 
                 Map<String, Object> finalOutput;
