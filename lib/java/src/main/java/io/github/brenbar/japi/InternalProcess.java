@@ -106,7 +106,7 @@ class InternalProcess {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
                     for (var validationFailure : inputValidationFailures) {
                         var validationFailureCase = Map.of(
-                                "field", validationFailure.path,
+                                "path", validationFailure.path,
                                 "reason", validationFailure.reason);
                         validationFailureCases.add(validationFailureCase);
                     }
@@ -132,7 +132,7 @@ class InternalProcess {
                             var validationFailureCases = new ArrayList<Map<String, String>>();
                             for (var validationFailure : errorValidationFailures) {
                                 var validationFailureCase = Map.of(
-                                        "field", validationFailure.path,
+                                        "path", validationFailure.path,
                                         "reason", validationFailure.reason);
                                 validationFailureCases.add(validationFailureCase);
                             }
@@ -154,7 +154,7 @@ class InternalProcess {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
                     for (var validationFailure : outputValidationFailures) {
                         var validationFailureCase = Map.of(
-                                "field", validationFailure.path,
+                                "path", validationFailure.path,
                                 "reason", validationFailure.reason);
                         validationFailureCases.add(validationFailureCase);
                     }
