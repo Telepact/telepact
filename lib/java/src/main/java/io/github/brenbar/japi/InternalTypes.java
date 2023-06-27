@@ -102,11 +102,11 @@ class Struct implements Type {
 class Enum implements Type {
 
     public final String name;
-    public final Map<String, Struct> cases;
+    public final Map<String, Struct> values;
 
     public Enum(String name, Map<String, Struct> cases) {
         this.name = name;
-        this.cases = cases;
+        this.values = cases;
     }
 
     @Override

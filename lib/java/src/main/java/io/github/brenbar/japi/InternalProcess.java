@@ -454,7 +454,7 @@ class InternalProcess {
                         return Collections.singletonList(new ValidationFailure(fieldName,
                                 ValidationErrors.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof Map<?, ?> m2) {
-                        return validateEnum(fieldName, u.cases, enumCase, (Map<String, Object>) m2);
+                        return validateEnum(fieldName, u.values, enumCase, (Map<String, Object>) m2);
                     } else {
                         return Collections.singletonList(new ValidationFailure(fieldName,
                                 ValidationErrors.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
@@ -489,7 +489,7 @@ class InternalProcess {
         } else if (type instanceof Enum e) {
             var valueAsMap = (Map<String, Object>) value;
             var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-            var structReference = e.cases.get(enumEntry.getKey());
+            var structReference = e.values.get(enumEntry.getKey());
             Map<String, Object> newStruct = new HashMap<>();
             for (var structEntry : structReference.fields.entrySet()) {
                 var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration.type,

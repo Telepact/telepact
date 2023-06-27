@@ -137,29 +137,29 @@ class InternalParse {
             throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
         }
 
-        var cases = new HashMap<String, Struct>();
+        var values = new HashMap<String, Struct>();
         for (var entry : enumDefinitionAsParsedJson.entrySet()) {
             var enumCase = entry.getKey();
-            Map<String, Object> caseStructDefinitionAsParsedJson;
+            Map<String, Object> enumStructDefinitionAsParsedJson;
             try {
-                caseStructDefinitionAsParsedJson = (Map<String, Object>) entry.getValue();
+                enumStructDefinitionAsParsedJson = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
                 throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
             }
 
             var fields = new HashMap<String, FieldDeclaration>();
-            for (var caseStructEntry : caseStructDefinitionAsParsedJson.entrySet()) {
-                var caseStructFieldDeclaration = caseStructEntry.getKey();
-                var caseStructTypeDeclarationValue = caseStructEntry.getValue();
-                var caseStructParsedField = parseField(jApiAsParsedJson, parsedDefinitions,
-                        caseStructFieldDeclaration, caseStructTypeDeclarationValue, false);
-                fields.put(caseStructParsedField.fieldName, caseStructParsedField.fieldDeclaration);
+            for (var enumStructEntry : enumStructDefinitionAsParsedJson.entrySet()) {
+                var enumStructFieldDeclaration = enumStructEntry.getKey();
+                var enumStructTypeDeclarationValue = enumStructEntry.getValue();
+                var enumStructParsedField = parseField(jApiAsParsedJson, parsedDefinitions,
+                        enumStructFieldDeclaration, enumStructTypeDeclarationValue, false);
+                fields.put(enumStructParsedField.fieldName, enumStructParsedField.fieldDeclaration);
             }
             var struct = new Struct("%s.%s".formatted(definitionKey, enumCase), fields);
-            cases.put(enumCase, struct);
+            values.put(enumCase, struct);
         }
 
-        var type = new Enum(definitionKey, cases);
+        var type = new Enum(definitionKey, values);
 
         return new TypeDefinition(definitionKey, type);
     }

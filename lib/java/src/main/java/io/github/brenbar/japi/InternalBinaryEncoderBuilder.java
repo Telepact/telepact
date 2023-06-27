@@ -23,7 +23,7 @@ class InternalBinaryEncoderBuilder {
                 if (type instanceof Struct o) {
                     allKeys.addAll(o.fields.keySet());
                 } else if (type instanceof Enum u) {
-                    allKeys.addAll(u.cases.keySet());
+                    allKeys.addAll(u.values.keySet());
                 }
             } else if (entry.getValue() instanceof ErrorDefinition e) {
                 allKeys.addAll(e.fields.keySet());
