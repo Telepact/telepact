@@ -128,7 +128,7 @@ class InternalProcess {
                         output = handler.apply(context, input);
                     }
                 } catch (JApiError e) {
-                    if (functionDefinition.errors.contains(e.target)) {
+                    if (functionDefinition.allowedErrors.contains(e.target)) {
                         var def = (ErrorDefinition) jApi.get(e.target);
                         var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
                         if (!errorValidationFailures.isEmpty()) {
@@ -206,7 +206,7 @@ class InternalProcess {
 
         for (var missingField : missingFields) {
             var validationFailure = new ValidationFailure("%s.%s".formatted(path, missingField),
-                    InvalidFieldTypeError.REQUIRED_STRUCT_FIELD_MISSING);
+                    ValidationErrors.REQUIRED_STRUCT_FIELD_MISSING);
             validationFailures
                     .add(validationFailure);
         }
@@ -217,7 +217,7 @@ class InternalProcess {
             var referenceField = referenceStruct.get(fieldName);
             if (referenceField == null) {
                 var validationFailure = new ValidationFailure("%s.%s".formatted(path, fieldName),
-                        InvalidFieldTypeError.EXTRA_STRUCT_FIELD_NOT_ALLOWED);
+                        ValidationErrors.EXTRA_STRUCT_FIELD_NOT_ALLOWED);
                 validationFailures
                         .add(validationFailure);
                 continue;
@@ -241,7 +241,7 @@ class InternalProcess {
         if (referenceField == null) {
             return Collections
                     .singletonList(new ValidationFailure("%s.%s".formatted(namespace, enumCase),
-                            InvalidFieldTypeError.UNKNOWN_ENUM_VALUE));
+                            ValidationErrors.UNKNOWN_ENUM_VALUE));
         }
 
         var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields,
@@ -256,7 +256,7 @@ class InternalProcess {
         if (value == null) {
             if (!typeDeclaration.nullable) {
                 return Collections.singletonList(new ValidationFailure(fieldName,
-                        InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE));
+                        ValidationErrors.NULL_INVALID_FOR_NON_NULL_TYPE));
             } else {
                 return Collections.emptyList();
             }
@@ -267,92 +267,92 @@ class InternalProcess {
                     return Collections.emptyList();
                 } else if (value instanceof Number) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_BOOLEAN_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_INVALID_FOR_BOOLEAN_TYPE));
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_BOOLEAN_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_BOOLEAN_TYPE));
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_BOOLEAN_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_BOOLEAN_TYPE));
                 } else if (value instanceof Map) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_BOOLEAN_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.OBJECT_INVALID_FOR_BOOLEAN_TYPE));
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_BOOLEAN_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_BOOLEAN_TYPE));
                 }
             } else if (expectedType instanceof JsonInteger) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_INTEGER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_INTEGER_TYPE));
                 } else if (value instanceof Number) {
                     if (value instanceof Long || value instanceof Integer) {
                         return Collections.emptyList();
                     } else {
                         return Collections.singletonList(new ValidationFailure(fieldName,
-                                InvalidFieldTypeError.NUMBER_INVALID_FOR_INTEGER_TYPE));
+                                ValidationErrors.NUMBER_INVALID_FOR_INTEGER_TYPE));
                     }
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_INTEGER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_INTEGER_TYPE));
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_INTEGER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_INTEGER_TYPE));
                 } else if (value instanceof Map) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_INTEGER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.OBJECT_INVALID_FOR_INTEGER_TYPE));
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_INTEGER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_INTEGER_TYPE));
                 }
             } else if (expectedType instanceof JsonNumber) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_NUMBER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_NUMBER_TYPE));
                 } else if (value instanceof Number) {
                     return Collections.emptyList();
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_NUMBER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_NUMBER_TYPE));
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_NUMBER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_NUMBER_TYPE));
                 } else if (value instanceof Map) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.OBJECT_INVALID_FOR_NUMBER_TYPE));
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_NUMBER_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.OBJECT_INVALID_FOR_NUMBER_TYPE));
                 }
             } else if (expectedType instanceof JsonString) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRING_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_STRING_TYPE));
                 } else if (value instanceof Number) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRING_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_INVALID_FOR_STRING_TYPE));
                 } else if (value instanceof String) {
                     return Collections.emptyList();
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRING_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_STRING_TYPE));
                 } else if (value instanceof Map) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_STRING_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.OBJECT_INVALID_FOR_STRING_TYPE));
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRING_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_STRING_TYPE));
                 }
             } else if (expectedType instanceof JsonArray a) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ARRAY_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_ARRAY_TYPE));
                 } else if (value instanceof Number) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ARRAY_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_INVALID_FOR_ARRAY_TYPE));
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ARRAY_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_ARRAY_TYPE));
                 } else if (value instanceof List l) {
                     var validationFailures = new ArrayList<ValidationFailure>();
                     for (var i = 0; i < l.size(); i += 1) {
@@ -364,24 +364,24 @@ class InternalProcess {
                     return validationFailures;
                 } else if (value instanceof Map) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.OBJECT_INVALID_FOR_ARRAY_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.OBJECT_INVALID_FOR_ARRAY_TYPE));
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ARRAY_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_ARRAY_TYPE));
                 }
             } else if (expectedType instanceof JsonObject o) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_OBJECT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof Number) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_OBJECT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_OBJECT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_OBJECT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_OBJECT_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
                     var validationFailures = new ArrayList<ValidationFailure>();
                     for (Map.Entry<?, ?> entry : m.entrySet()) {
@@ -394,45 +394,45 @@ class InternalProcess {
                     return validationFailures;
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_OBJECT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_OBJECT_TYPE));
                 }
             } else if (expectedType instanceof Struct s) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_STRUCT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof Number) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_STRUCT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_STRUCT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
                     return validateStruct(fieldName, s.fields, (Map<String, Object>) m);
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_STRUCT_TYPE));
                 }
             } else if (expectedType instanceof Enum u) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof Number) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof String) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.STRING_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof List) {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.ARRAY_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
                     if (m.size() != 1) {
                         return Collections.singletonList(
                                 new ValidationFailure(fieldName,
-                                        InvalidFieldTypeError.MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
+                                        ValidationErrors.MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
                     }
                     var entry = m.entrySet().stream().findFirst().get();
                     var enumCase = (String) entry.getKey();
@@ -440,31 +440,31 @@ class InternalProcess {
 
                     if (enumValue instanceof Boolean) {
                         return Collections.singletonList(new ValidationFailure(fieldName,
-                                InvalidFieldTypeError.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
+                                ValidationErrors.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof Number) {
                         return Collections.singletonList(new ValidationFailure(fieldName,
-                                InvalidFieldTypeError.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE));
+                                ValidationErrors.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof String) {
                         return Collections.singletonList(new ValidationFailure(fieldName,
-                                InvalidFieldTypeError.STRING_INVALID_FOR_ENUM_STRUCT_TYPE));
+                                ValidationErrors.STRING_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof List) {
                         return Collections.singletonList(new ValidationFailure(fieldName,
-                                InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
+                                ValidationErrors.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof Map<?, ?> m2) {
                         return validateEnum(fieldName, u.cases, enumCase, (Map<String, Object>) m2);
                     } else {
                         return Collections.singletonList(new ValidationFailure(fieldName,
-                                InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
+                                ValidationErrors.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
                     }
                 } else {
                     return Collections.singletonList(
-                            new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE));
+                            new ValidationFailure(fieldName, ValidationErrors.VALUE_INVALID_FOR_ENUM_TYPE));
                 }
             } else if (expectedType instanceof JsonAny a) {
                 // all values are valid for any
                 return Collections.emptyList();
             } else {
-                return Collections.singletonList(new ValidationFailure(fieldName, InvalidFieldTypeError.INVALID_TYPE));
+                return Collections.singletonList(new ValidationFailure(fieldName, ValidationErrors.INVALID_TYPE));
             }
         }
     }

@@ -138,7 +138,7 @@ class FunctionDefinition implements Definition {
     public final String name;
     public final Struct inputStruct;
     public final Struct outputStruct;
-    public final List<String> errors;
+    public final List<String> allowedErrors;
 
     public FunctionDefinition(
             String name,
@@ -148,7 +148,7 @@ class FunctionDefinition implements Definition {
         this.name = name;
         this.inputStruct = inputStruct;
         this.outputStruct = outputStruct;
-        this.errors = errors;
+        this.allowedErrors = errors;
     }
 
     @Override
@@ -228,49 +228,13 @@ class TypeDeclaration {
     }
 }
 
-class JapiMessageArrayTooFewElements extends RuntimeException {
-}
-
-class JapiMessageTypeNotString extends RuntimeException {
-}
-
-class JapiMessageNotArray extends RuntimeException {
-}
-
-class JapiMessageTypeNotFunction extends RuntimeException {
-}
-
-class JapiMessageHeaderNotObject extends RuntimeException {
-}
-
-class InvalidSelectFieldsHeader extends RuntimeException {
-}
-
-class JapiMessageBodyNotObject extends RuntimeException {
-}
-
-class FunctionNotFound extends RuntimeException {
-    public final String functionName;
-
-    public FunctionNotFound(String functionName) {
-        super("Function not found: %s".formatted(functionName));
-        this.functionName = functionName;
-    }
-}
-
-class InvalidApplicationFailure extends RuntimeException {
-    public InvalidApplicationFailure(Throwable cause) {
-        super(cause);
-    }
-}
-
 class DisallowedError extends RuntimeException {
     public DisallowedError(Throwable cause) {
         super(cause);
     }
 }
 
-class InvalidFieldTypeError {
+class ValidationErrors {
     public static final String NULL_INVALID_FOR_NON_NULL_TYPE = "NullInvalidForNonNullType";
 
     public static final String NUMBER_INVALID_FOR_BOOLEAN_TYPE = "NumberInvalidForBooleanType";
