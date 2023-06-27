@@ -58,20 +58,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class Tests {
 
     Map<String, Object> handle(Context context, Map<String, Object> body) {
-        var headers = context.properties;
         return switch (context.functionName) {
             case "test" -> {
-                var error = headers.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
-                if (headers.containsKey("output")) {
+                var error = context.properties.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
+                if (context.properties.containsKey("output")) {
                     try {
-                        var o = (Map<String, Object>) headers.get("output");
+                        var o = (Map<String, Object>) context.properties.get("output");
                         yield o;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 } else if (error.isPresent()) {
                     try {
-                        var e = (Map<String, Object>) headers.get(error.get());
+                        var e = (Map<String, Object>) context.properties.get(error.get());
                         throw new JApiError(error.get(), e);
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
@@ -109,19 +108,19 @@ public class Tests {
                         System.out.println(new String(result));
                         return CompletableFuture.completedFuture(result);
                     }).setForceSendJson(false).setUseBinary(true);
-            client.call(new Request("_ping", Map.of())); // warmup
+            client.submit(new Request("_ping", Map.of())); // warmup
             var inputAsParsedJson = objectMapper.readValue(input, new TypeReference<List<Object>>() {
             });
 
             if (expectedOutput.startsWith("[\\"error.")) {
                 var e = assertThrows(JApiError.class,
-                        () -> client.call(new Request(((String) inputAsParsedJson.get(0)).substring(9),
+                        () -> client.submit(new Request(((String) inputAsParsedJson.get(0)).substring(9),
                                 (Map<String, Object>) inputAsParsedJson.get(2)).addHeaders(
                                         (Map<String, Object>) inputAsParsedJson.get(1))));
                 assertEquals(expectedOutputAsParsedJson.get(0), e.target);
                 assertEquals(expectedOutputAsParsedJson.get(2), e.body);
             } else {
-                var outputAsParsedJson = client.call(new Request(((String) inputAsParsedJson.get(0)).substring(9),
+                var outputAsParsedJson = client.submit(new Request(((String) inputAsParsedJson.get(0)).substring(9),
                         (Map<String, Object>) inputAsParsedJson.get(2)).addHeaders(
                                 (Map<String, Object>) inputAsParsedJson.get(1)));
                 assertEquals(expectedOutputAsParsedJson.get(2), outputAsParsedJson);
