@@ -12,70 +12,72 @@ import java.util.regex.Pattern;
 
 class InternalProcess {
 
-    static List<Object> processObject(List<Object> inputJapiMessage, Consumer<Throwable> onError,
+    static List<Object> processObject(List<Object> inputJApiMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
-            Map<String, Definition> apiDescription,
+            Map<String, Definition> jApiDescription,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> internalHandler,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
             Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
-        var finalHeaders = new HashMap<String, Object>();
+
+        var outputHeaders = new HashMap<String, Object>();
         try {
             try {
-                if (inputJapiMessage.size() < 3) {
+                if (inputJApiMessage.size() < 3) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustHaveThreeElements"));
                 }
 
-                String messageType;
+                String inputTarget;
                 try {
-                    messageType = (String) inputJapiMessage.get(0);
+                    inputTarget = (String) inputJApiMessage.get(0);
                 } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageTypeMustBeStringType"));
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "TargetMustBeStringType"));
                 }
 
-                var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)(.input)?");
-                var matcher = regex.matcher(messageType);
+                var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)");
+                var matcher = regex.matcher(inputTarget);
                 if (!matcher.matches()) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageTypeStringMustBeFunction"));
+                    throw new JApiError("error._ParseFailure",
+                            Map.of("reason", "TargetStringMustBeFunction"));
                 }
                 var functionName = matcher.group(1);
 
-                Map<String, Object> headers;
+                Map<String, Object> inputHeaders;
                 try {
-                    headers = (Map<String, Object>) inputJapiMessage.get(1);
+                    inputHeaders = (Map<String, Object>) inputJApiMessage.get(1);
                 } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageHeaderMustBeObject"));
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "HeadersMustBeObject"));
                 }
 
-                if (headers.containsKey("_bin")) {
+                if (inputHeaders.containsKey("_bin")) {
                     List<Object> binaryChecksums;
                     try {
-                        binaryChecksums = (List<Object>) headers.get("_bin");
+                        binaryChecksums = (List<Object>) inputHeaders.get("_bin");
                     } catch (Exception e) {
                         throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryHeaderMustBeArray"));
                     }
 
                     if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
                         // Client is initiating handshake for binary protocol
-                        finalHeaders.put("_binaryEncoding", binaryEncoder.encodeMap);
+                        outputHeaders.put("_binaryEncoding", binaryEncoder.encodeMap);
                     }
 
-                    finalHeaders.put("_bin", List.of(binaryEncoder.checksum));
+                    outputHeaders.put("_bin", List.of(binaryEncoder.checksum));
                 }
 
                 // Reflect call id
-                var callId = headers.get("_id");
+                var callId = inputHeaders.get("_id");
                 if (callId != null) {
-                    finalHeaders.put("_id", callId);
+                    outputHeaders.put("_id", callId);
                 }
 
                 Map<String, Object> input;
                 try {
-                    input = (Map<String, Object>) inputJapiMessage.get(2);
+                    input = (Map<String, Object>) inputJApiMessage.get(2);
                 } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageBodyMustBeObject"));
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "BodyMustBeObject"));
                 }
 
-                var functionDef = apiDescription.get(messageType);
+                var functionDef = jApiDescription.get(inputTarget);
 
                 FunctionDefinition functionDefinition;
                 if (functionDef instanceof FunctionDefinition f) {
@@ -85,9 +87,9 @@ class InternalProcess {
                 }
 
                 Map<String, List<String>> slicedTypes = null;
-                if (headers.containsKey("_selectFields")) {
+                if (inputHeaders.containsKey("_selectFields")) {
                     try {
-                        slicedTypes = (Map<String, List<String>>) headers.get("_selectFields");
+                        slicedTypes = (Map<String, List<String>>) inputHeaders.get("_selectFields");
                         for (Map.Entry<String, List<String>> entry : slicedTypes.entrySet()) {
                             var fields = entry.getValue();
                             for (var field : fields) {
@@ -115,7 +117,7 @@ class InternalProcess {
                 }
 
                 var context = new Context(functionName);
-                var contextPropertiesFromHeaders = extractContextProperties.apply(headers);
+                var contextPropertiesFromHeaders = extractContextProperties.apply(inputHeaders);
                 context.properties.putAll(contextPropertiesFromHeaders);
 
                 Map<String, Object> output;
@@ -127,7 +129,7 @@ class InternalProcess {
                     }
                 } catch (JApiError e) {
                     if (functionDefinition.errors().contains(e.target)) {
-                        var def = (ErrorDefinition) apiDescription.get(e.target);
+                        var def = (ErrorDefinition) jApiDescription.get(e.target);
                         var errorValidationFailures = validateStruct(e.target, def.fields(), e.body);
                         if (!errorValidationFailures.isEmpty()) {
                             var validationFailureCases = new ArrayList<Map<String, String>>();
@@ -168,9 +170,9 @@ class InternalProcess {
                     finalOutput = output;
                 }
 
-                var outputMessageType = "function.%s".formatted(functionName);
+                var outputTarget = "function.%s".formatted(functionName);
 
-                return List.of(outputMessageType, finalHeaders, finalOutput);
+                return List.of(outputTarget, outputHeaders, finalOutput);
             } catch (Exception e) {
                 try {
                     onError.accept(e);
@@ -181,9 +183,9 @@ class InternalProcess {
         } catch (JApiError e) {
             throw e;
         } catch (Exception e) {
-            var messageType = "error._ApplicationFailure";
+            var outputTarget = "error._ApplicationFailure";
 
-            return List.of(messageType, finalHeaders, Map.of());
+            return List.of(outputTarget, outputHeaders, Map.of());
         }
     }
 

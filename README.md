@@ -127,6 +127,31 @@ advantageous to receive the malformed data anyway and adapt on-the-fly are able
 to turn off this output validation by submitting their requests with the
 `{"_unsafe":true}` header.
 
+## Glossary
+
+- **Body** - A structured JSON object containing the primary data payload of the
+  jAPI Message.
+
+- **Client** - An entity consuming a jAPI.
+
+- **Input** - The body of a `function.*`-targeted jAPI Message sent from the
+  Client.
+
+- **Headers** - An unstructured JSON object consisting of metadata about a jAPI
+  Message.
+
+- **Message** - The JSON payload sent over the IPC boundary, comprised of a
+  single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
+
+- **Output** - The body of a `function.*`-targeted jAPI Message sent from the
+  Server.
+
+- **Server** - An entity providing an implementation of a jAPI and adhering to
+  the jAPI specification.
+
+- **Target** - A reference to a top-level definition in the jAPI description of
+  the jAPI server.
+
 # Navigation
 
 - [Specification](SPECIFICATION.md)
