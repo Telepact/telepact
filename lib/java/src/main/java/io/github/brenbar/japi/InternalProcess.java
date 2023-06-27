@@ -521,7 +521,7 @@ class InternalProcess {
         if (inputIsJson(inputJapiMessagePayload)) {
             try {
                 return serializer.deserializeFromJson(inputJapiMessagePayload);
-            } catch (DeserializationException e) {
+            } catch (DeserializationError e) {
                 throw new JApiError("error._ParseFailure", Map.of());
             }
         } else {
@@ -534,7 +534,7 @@ class InternalProcess {
                 return binaryEncoder.decode(encodedInputJapiMessage);
             } catch (BinaryChecksumMismatchException e) {
                 throw new JApiError("error._BinaryDecodeFailure", Map.of());
-            } catch (DeserializationException e) {
+            } catch (DeserializationError e) {
                 throw new JApiError("error._ParseFailure", Map.of(), e);
             }
         }
