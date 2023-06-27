@@ -10,14 +10,15 @@ import java.util.Random;
 
 public class InternalMockProcess {
 
-    static Map<String, Object> handle(Context context, Map<String, Object> input, Map<String, Definition> jApi) {
+    static Map<String, Object> handle(Context context, Map<String, Object> input, Map<String, Definition> jApi,
+            Random random) {
         var definition = jApi.get("function.%s".formatted(context.functionName));
 
         // TODO:
         // - stubs and verifications
 
         if (definition instanceof FunctionDefinition f) {
-            return constructRandomStruct(f.outputStruct.fields, new Random());
+            return constructRandomStruct(f.outputStruct.fields, random);
         } else {
             throw new JApiError("error._UnknownFunction", Map.of());
         }
