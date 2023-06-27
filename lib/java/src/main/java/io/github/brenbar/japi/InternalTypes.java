@@ -104,9 +104,9 @@ class Enum implements Type {
     public final String name;
     public final Map<String, Struct> values;
 
-    public Enum(String name, Map<String, Struct> cases) {
+    public Enum(String name, Map<String, Struct> values) {
         this.name = name;
-        this.values = cases;
+        this.values = values;
     }
 
     @Override
