@@ -29,14 +29,14 @@ public class Processor {
 
     public Processor(String jApiAsJson, Handler handler) {
         var jApiTuple = InternalParse.newJApi(jApiAsJson);
-        this.jApi = jApiTuple.parsed();
-        this.originalJApiAsParsedJson = jApiTuple.original();
+        this.jApi = jApiTuple.parsed;
+        this.originalJApiAsParsedJson = jApiTuple.original;
         this.serializer = new DefaultSerializer();
 
         var internalJApiTuple = InternalParse.newJApi(InternalJApi.JSON);
 
-        this.jApi.putAll(internalJApiTuple.parsed());
-        this.originalJApiAsParsedJson.putAll(internalJApiTuple.original());
+        this.jApi.putAll(internalJApiTuple.parsed);
+        this.originalJApiAsParsedJson.putAll(internalJApiTuple.original);
 
         this.handler = handler;
         this.internalHandler = InternalJApi.build(this.originalJApiAsParsedJson);

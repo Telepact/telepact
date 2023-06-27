@@ -83,7 +83,7 @@ class InternalParse {
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
-            inputFields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
+            inputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
         Map<String, Object> outputDefinitionAsParsedJson;
@@ -99,7 +99,7 @@ class InternalParse {
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
-            outputFields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
+            outputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
         List<String> errors = List.of();
@@ -153,7 +153,7 @@ class InternalParse {
                 var caseStructTypeDeclarationValue = caseStructEntry.getValue();
                 var caseStructParsedField = parseField(jApiAsParsedJson, parsedDefinitions,
                         caseStructFieldDeclaration, caseStructTypeDeclarationValue, false);
-                fields.put(caseStructParsedField.fieldName(), caseStructParsedField.fieldDeclaration());
+                fields.put(caseStructParsedField.fieldName, caseStructParsedField.fieldDeclaration);
             }
             var struct = new Struct("%s.%s".formatted(definitionKey, enumCase), fields);
             cases.put(enumCase, struct);
@@ -182,7 +182,7 @@ class InternalParse {
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
-            fields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
+            fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
         var type = new Struct(definitionKey, fields);
@@ -238,7 +238,7 @@ class InternalParse {
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
-            fields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
+            fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
         return new ErrorDefinition(definitionKey, fields);
@@ -318,7 +318,7 @@ class InternalParse {
         var definition = parsedDefinitions.computeIfAbsent(name,
                 (k) -> parseDefinition(jApiAsParsedJson, parsedDefinitions, name));
         if (definition instanceof TypeDefinition t) {
-            return new TypeDeclaration(t.type(), nullable);
+            return new TypeDeclaration(t.type, nullable);
         } else if (definition instanceof FunctionDefinition f) {
             throw new JapiParseError("Cannot reference a function in type declarations");
         } else if (definition instanceof ErrorDefinition e) {

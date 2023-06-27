@@ -15,18 +15,18 @@ class InternalBinaryEncoderBuilder {
         for (var entry : definitions.entrySet()) {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof FunctionDefinition f) {
-                allKeys.addAll(f.inputStruct().fields().keySet());
-                allKeys.addAll(f.outputStruct().fields().keySet());
-                allKeys.addAll(f.errors());
+                allKeys.addAll(f.inputStruct.fields.keySet());
+                allKeys.addAll(f.outputStruct.fields.keySet());
+                allKeys.addAll(f.errors);
             } else if (entry.getValue() instanceof TypeDefinition t) {
-                var type = t.type();
+                var type = t.type;
                 if (type instanceof Struct o) {
-                    allKeys.addAll(o.fields().keySet());
+                    allKeys.addAll(o.fields.keySet());
                 } else if (type instanceof Enum u) {
-                    allKeys.addAll(u.cases().keySet());
+                    allKeys.addAll(u.cases.keySet());
                 }
             } else if (entry.getValue() instanceof ErrorDefinition e) {
-                allKeys.addAll(e.fields().keySet());
+                allKeys.addAll(e.fields.keySet());
             }
         }
         var i = (long) 0;

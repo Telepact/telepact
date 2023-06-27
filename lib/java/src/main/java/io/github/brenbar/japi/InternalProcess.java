@@ -103,8 +103,8 @@ class InternalProcess {
                     }
                 }
 
-                var inputValidationFailures = validateStruct(functionDefinition.name(),
-                        functionDefinition.inputStruct().fields(), input);
+                var inputValidationFailures = validateStruct(functionDefinition.name,
+                        functionDefinition.inputStruct.fields, input);
                 if (!inputValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
                     for (var validationFailure : inputValidationFailures) {
@@ -128,9 +128,9 @@ class InternalProcess {
                         output = handler.apply(context, input);
                     }
                 } catch (JApiError e) {
-                    if (functionDefinition.errors().contains(e.target)) {
+                    if (functionDefinition.errors.contains(e.target)) {
                         var def = (ErrorDefinition) jApi.get(e.target);
-                        var errorValidationFailures = validateStruct(e.target, def.fields(), e.body);
+                        var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
                         if (!errorValidationFailures.isEmpty()) {
                             var validationFailureCases = new ArrayList<Map<String, String>>();
                             for (var validationFailure : errorValidationFailures) {
@@ -148,8 +148,8 @@ class InternalProcess {
                     }
                 }
 
-                var outputValidationFailures = validateStruct(functionDefinition.name(),
-                        functionDefinition.outputStruct().fields(),
+                var outputValidationFailures = validateStruct(functionDefinition.name,
+                        functionDefinition.outputStruct.fields,
                         output);
                 if (!outputValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
@@ -164,7 +164,7 @@ class InternalProcess {
 
                 Map<String, Object> finalOutput;
                 if (selectStructFieldsHeader != null) {
-                    finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct(), output,
+                    finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct, output,
                             selectStructFieldsHeader);
                 } else {
                     finalOutput = output;
@@ -199,7 +199,7 @@ class InternalProcess {
         for (Map.Entry<String, FieldDeclaration> entry : referenceStruct.entrySet()) {
             var fieldName = entry.getKey();
             var fieldDeclaration = entry.getValue();
-            if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional()) {
+            if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional) {
                 missingFields.add(fieldName);
             }
         }
@@ -223,7 +223,7 @@ class InternalProcess {
                 continue;
             }
             var nestedValidationFailures = validateType("%s.%s".formatted(path, fieldName),
-                    referenceField.typeDeclaration(), field);
+                    referenceField.typeDeclaration, field);
             validationFailures.addAll(nestedValidationFailures);
         }
 
@@ -244,7 +244,7 @@ class InternalProcess {
                             InvalidFieldTypeError.UNKNOWN_ENUM_VALUE));
         }
 
-        var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(),
+        var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields,
                 actual);
         validationFailures.addAll(nestedValidationFailures);
 
@@ -254,14 +254,14 @@ class InternalProcess {
     private static List<ValidationFailure> validateType(String fieldName, TypeDeclaration typeDeclaration,
             Object value) {
         if (value == null) {
-            if (!typeDeclaration.nullable()) {
+            if (!typeDeclaration.nullable) {
                 return Collections.singletonList(new ValidationFailure(fieldName,
                         InvalidFieldTypeError.NULL_INVALID_FOR_NON_NULL_TYPE));
             } else {
                 return Collections.emptyList();
             }
         } else {
-            var expectedType = typeDeclaration.type();
+            var expectedType = typeDeclaration.type;
             if (expectedType instanceof JsonBoolean) {
                 if (value instanceof Boolean) {
                     return Collections.emptyList();
@@ -357,7 +357,7 @@ class InternalProcess {
                     var validationFailures = new ArrayList<ValidationFailure>();
                     for (var i = 0; i < l.size(); i += 1) {
                         var element = l.get(i);
-                        var nestedValidationFailures = validateType("%s[%s]".formatted(fieldName, i), a.nestedType(),
+                        var nestedValidationFailures = validateType("%s[%s]".formatted(fieldName, i), a.nestedType,
                                 element);
                         validationFailures.addAll(nestedValidationFailures);
                     }
@@ -410,7 +410,7 @@ class InternalProcess {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, InvalidFieldTypeError.ARRAY_INVALID_FOR_STRUCT_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
-                    return validateStruct(fieldName, s.fields(), (Map<String, Object>) m);
+                    return validateStruct(fieldName, s.fields, (Map<String, Object>) m);
                 } else {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_STRUCT_TYPE));
@@ -451,7 +451,7 @@ class InternalProcess {
                         return Collections.singletonList(new ValidationFailure(fieldName,
                                 InvalidFieldTypeError.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
                     } else if (enumValue instanceof Map<?, ?> m2) {
-                        return validateEnum(fieldName, u.cases(), enumCase, (Map<String, Object>) m2);
+                        return validateEnum(fieldName, u.cases, enumCase, (Map<String, Object>) m2);
                     } else {
                         return Collections.singletonList(new ValidationFailure(fieldName,
                                 InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
@@ -471,13 +471,13 @@ class InternalProcess {
 
     static Object selectStructFields(Type type, Object value, Map<String, List<String>> selectedStructFields) {
         if (type instanceof Struct s) {
-            var selectedFields = selectedStructFields.get(s.name());
+            var selectedFields = selectedStructFields.get(s.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
                 if (selectedFields == null || selectedFields.contains(entry.getKey())) {
-                    var field = s.fields().get(entry.getKey());
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration().type(), entry.getValue(),
+                    var field = s.fields.get(entry.getKey());
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
@@ -486,10 +486,10 @@ class InternalProcess {
         } else if (type instanceof Enum e) {
             var valueAsMap = (Map<String, Object>) value;
             var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-            var structReference = e.cases().get(enumEntry.getKey());
+            var structReference = e.cases.get(enumEntry.getKey());
             Map<String, Object> newStruct = new HashMap<>();
-            for (var structEntry : structReference.fields().entrySet()) {
-                var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration().type(),
+            for (var structEntry : structReference.fields.entrySet()) {
+                var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration.type,
                         enumEntry.getValue(),
                         selectedStructFields);
                 newStruct.put(structEntry.getKey(), valueWithSelectedFields);
@@ -499,7 +499,7 @@ class InternalProcess {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(o.nestedType().type(), entry.getValue(),
+                var valueWithSelectedFields = selectStructFields(o.nestedType().type, entry.getValue(),
                         selectedStructFields);
                 finalMap.put(entry.getKey(), valueWithSelectedFields);
             }
@@ -508,7 +508,7 @@ class InternalProcess {
             var valueAsList = (List<Object>) value;
             var finalList = new ArrayList<>();
             for (var entry : valueAsList) {
-                var valueWithSelectedFields = selectStructFields(a.nestedType().type(), entry, selectedStructFields);
+                var valueWithSelectedFields = selectStructFields(a.nestedType.type, entry, selectedStructFields);
                 finalList.add(valueWithSelectedFields);
             }
             return finalList;

@@ -11,7 +11,14 @@ interface Definition {
     public String getName();
 }
 
-record JApi(Map<String, Object> original, Map<String, Definition> parsed) {
+class JApi {
+    public final Map<String, Object> original;
+    public final Map<String, Definition> parsed;
+
+    public JApi(Map<String, Object> original, Map<String, Definition> parsed) {
+        this.original = original;
+        this.parsed = parsed;
+    }
 }
 
 class JsonAny implements Type {
@@ -21,7 +28,13 @@ class JsonAny implements Type {
     }
 }
 
-record JsonArray(TypeDeclaration nestedType) implements Type {
+class JsonArray implements Type {
+    public final TypeDeclaration nestedType;
+
+    public JsonArray(TypeDeclaration nestedType) {
+        this.nestedType = nestedType;
+    }
+
     @Override
     public String getName() {
         return "array";
@@ -70,70 +83,149 @@ class JsonString implements Type {
     }
 }
 
-record Struct(String name, Map<String, FieldDeclaration> fields) implements Type {
+class Struct implements Type {
+
+    public final String name;
+    public final Map<String, FieldDeclaration> fields;
+
+    public Struct(String name, Map<String, FieldDeclaration> fields) {
+        this.name = name;
+        this.fields = fields;
+    }
+
     @Override
     public String getName() {
         return name;
     }
 }
 
-record Enum(String name, Map<String, Struct> cases) implements Type {
+class Enum implements Type {
+
+    public final String name;
+    public final Map<String, Struct> cases;
+
+    public Enum(String name, Map<String, Struct> cases) {
+        this.name = name;
+        this.cases = cases;
+    }
+
     @Override
     public String getName() {
         return name;
     }
 }
 
-record ErrorDefinition(
-        String name,
-        Map<String, FieldDeclaration> fields) implements Definition {
+class ErrorDefinition implements Definition {
+
+    public final String name;
+    public final Map<String, FieldDeclaration> fields;
+
+    public ErrorDefinition(
+            String name,
+            Map<String, FieldDeclaration> fields) {
+        this.name = name;
+        this.fields = fields;
+    }
+
     @Override
     public String getName() {
         return name;
     }
 }
 
-record FunctionDefinition(
-        String name,
-        Struct inputStruct,
-        Struct outputStruct,
-        List<String> errors) implements Definition {
+class FunctionDefinition implements Definition {
+
+    public final String name;
+    public final Struct inputStruct;
+    public final Struct outputStruct;
+    public final List<String> errors;
+
+    public FunctionDefinition(
+            String name,
+            Struct inputStruct,
+            Struct outputStruct,
+            List<String> errors) {
+        this.name = name;
+        this.inputStruct = inputStruct;
+        this.outputStruct = outputStruct;
+        this.errors = errors;
+    }
+
     @Override
     public String getName() {
         return name;
     }
 }
 
-record FieldDeclaration(
-        TypeDeclaration typeDeclaration,
-        boolean optional) {
+class FieldDeclaration {
+
+    public final TypeDeclaration typeDeclaration;
+    public final boolean optional;
+
+    public FieldDeclaration(
+            TypeDeclaration typeDeclaration,
+            boolean optional) {
+        this.typeDeclaration = typeDeclaration;
+        this.optional = optional;
+    }
 }
 
-record FieldNameAndFieldDeclaration(
-        String fieldName,
-        FieldDeclaration fieldDeclaration) {
+class FieldNameAndFieldDeclaration {
+
+    public final String fieldName;
+    public final FieldDeclaration fieldDeclaration;
+
+    public FieldNameAndFieldDeclaration(
+            String fieldName,
+            FieldDeclaration fieldDeclaration) {
+        this.fieldName = fieldName;
+        this.fieldDeclaration = fieldDeclaration;
+    }
 }
 
-record TitleDefinition(
-        String name) implements Definition {
+class TitleDefinition implements Definition {
+
+    public final String name;
+
+    public TitleDefinition(
+            String name) {
+        this.name = name;
+    }
+
     @Override
     public String getName() {
         return name;
     }
 }
 
-record TypeDefinition(
-        String name,
-        Type type) implements Definition {
+class TypeDefinition implements Definition {
+
+    public final String name;
+    public final Type type;
+
+    public TypeDefinition(
+            String name,
+            Type type) {
+        this.name = name;
+        this.type = type;
+    }
+
     @Override
     public String getName() {
         return name;
     }
 }
 
-record TypeDeclaration(
-        Type type,
-        boolean nullable) {
+class TypeDeclaration {
+    public final Type type;
+    public final boolean nullable;
+
+    public TypeDeclaration(
+            Type type,
+            boolean nullable) {
+        this.type = type;
+        this.nullable = nullable;
+    }
 }
 
 class JapiMessageArrayTooFewElements extends RuntimeException {
