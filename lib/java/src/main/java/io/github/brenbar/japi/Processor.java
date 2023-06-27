@@ -16,15 +16,14 @@ public class Processor {
     interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
     }
 
-    private Handler handler;
-    private Middleware middleware;
-    private ExtractContextProperties extractContextProperties;
-    private Map<String, Object> originalJApiAsParsedJson;
-    private Map<String, Definition> jApi;
-    private Serializer serializer;
-    private Consumer<Throwable> onError;
-
-    private BinaryEncoder binaryEncoder;
+    Handler handler;
+    Middleware middleware;
+    ExtractContextProperties extractContextProperties;
+    Map<String, Object> originalJApiAsParsedJson;
+    Map<String, Definition> jApi;
+    Serializer serializer;
+    Consumer<Throwable> onError;
+    BinaryEncoder binaryEncoder;
 
     public Processor(String jApiAsJson, Handler handler) {
         var jApiTuple = InternalParse.newJApi(jApiAsJson);

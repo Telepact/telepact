@@ -392,7 +392,7 @@ class InternalProcess {
                     for (Map.Entry<?, ?> entry : m.entrySet()) {
                         var k = (String) entry.getKey();
                         var v = entry.getValue();
-                        var nestedValidationFailures = validateType("%s{%s}".formatted(fieldName, k), o.nestedType(),
+                        var nestedValidationFailures = validateType("%s{%s}".formatted(fieldName, k), o.nestedType,
                                 v);
                         validationFailures.addAll(nestedValidationFailures);
                     }
@@ -504,7 +504,7 @@ class InternalProcess {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(o.nestedType().type, entry.getValue(),
+                var valueWithSelectedFields = selectStructFields(o.nestedType.type, entry.getValue(),
                         selectedStructFields);
                 finalMap.put(entry.getKey(), valueWithSelectedFields);
             }

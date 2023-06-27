@@ -69,7 +69,14 @@ class JsonNumber implements Type {
     }
 }
 
-record JsonObject(TypeDeclaration nestedType) implements Type {
+class JsonObject implements Type {
+
+    public final TypeDeclaration nestedType;
+
+    public JsonObject(TypeDeclaration nestedType) {
+        this.nestedType = nestedType;
+    }
+
     @Override
     public String getName() {
         return "object";
