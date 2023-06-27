@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -120,6 +121,8 @@ class InternalProcess {
                 var contextPropertiesFromHeaders = extractContextProperties.apply(inputHeaders);
                 context.properties.putAll(contextPropertiesFromHeaders);
 
+                var unsafeOutputEnabled = Objects.equals(true, inputHeaders.get("_unsafe"));
+
                 Map<String, Object> output;
                 try {
                     if (functionName.startsWith("_")) {
@@ -131,7 +134,7 @@ class InternalProcess {
                     if (functionDefinition.allowedErrors.contains(e.target)) {
                         var def = (ErrorDefinition) jApi.get(e.target);
                         var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
-                        if (!errorValidationFailures.isEmpty()) {
+                        if (!errorValidationFailures.isEmpty() && !unsafeOutputEnabled) {
                             var validationFailureCases = new ArrayList<Map<String, String>>();
                             for (var validationFailure : errorValidationFailures) {
                                 var validationFailureCase = Map.of(
@@ -151,7 +154,7 @@ class InternalProcess {
                 var outputValidationFailures = validateStruct(functionDefinition.name,
                         functionDefinition.outputStruct.fields,
                         output);
-                if (!outputValidationFailures.isEmpty()) {
+                if (!outputValidationFailures.isEmpty() && !unsafeOutputEnabled) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
                     for (var validationFailure : outputValidationFailures) {
                         var validationFailureCase = Map.of(
