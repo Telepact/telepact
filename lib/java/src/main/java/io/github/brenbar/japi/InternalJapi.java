@@ -47,12 +47,4 @@ class InternalJApi {
         ]
       }
       """;
-
-  static io.github.brenbar.japi.Processor.Handler build(Map<String, Object> originalJApiDescription) {
-    return (context, input) -> switch (context.functionName) {
-      case "_ping" -> Map.of();
-      case "_api" -> Map.of("api", originalJApiDescription);
-      default -> throw new RuntimeException("Internal method not implemented");
-    };
-  }
 }

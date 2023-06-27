@@ -17,7 +17,6 @@ public class Processor {
     }
 
     private Handler handler;
-    private Handler internalHandler;
     private Middleware middleware;
     private ExtractContextProperties extractContextProperties;
     private Map<String, Object> originalJApiAsParsedJson;
@@ -39,7 +38,6 @@ public class Processor {
         this.originalJApiAsParsedJson.putAll(internalJApiTuple.original);
 
         this.handler = handler;
-        this.internalHandler = InternalJApi.build(this.originalJApiAsParsedJson);
         this.onError = (e) -> {
         };
         this.middleware = (i, n) -> n.apply(i);
@@ -95,6 +93,6 @@ public class Processor {
 
     private List<Object> processObject(List<Object> inputMessage) {
         return InternalProcess.processObject(inputMessage, this.onError, this.binaryEncoder, this.jApi,
-                this.internalHandler, this.handler, this.extractContextProperties);
+                this.originalJApiAsParsedJson, this.handler, this.extractContextProperties);
     }
 }

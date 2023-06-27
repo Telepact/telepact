@@ -16,7 +16,7 @@ class InternalProcess {
     static List<Object> processObject(List<Object> inputMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
             Map<String, Definition> jApi,
-            BiFunction<Context, Map<String, Object>, Map<String, Object>> internalHandler,
+            Map<String, Object> originalJApiAsParsedJson,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
             Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
 
@@ -125,8 +125,10 @@ class InternalProcess {
 
                 Map<String, Object> output;
                 try {
-                    if (functionName.startsWith("_")) {
-                        output = internalHandler.apply(context, input);
+                    if (functionName.equals("_ping")) {
+                        output = Map.of();
+                    } else if (functionName.equals("_jApi")) {
+                        output = Map.of("jApi", originalJApiAsParsedJson);
                     } else {
                         output = handler.apply(context, input);
                     }
