@@ -29,18 +29,18 @@ public class Processor {
     private BinaryEncoder binaryEncoder;
 
     public Processor(Handler handler, String apiDescriptionJson) {
-        var description = InternalParse.newJapi(apiDescriptionJson);
+        var description = InternalParse.newJApi(apiDescriptionJson);
         this.apiDescription = description.parsed();
         this.originalApiDescription = description.original();
         this.serializer = new DefaultSerializer();
 
-        var internalDescription = InternalParse.newJapi(InternalJapi.JSON);
+        var internalDescription = InternalParse.newJApi(InternalJApi.JSON);
 
         this.apiDescription.putAll(internalDescription.parsed());
         this.originalApiDescription.putAll(internalDescription.original());
 
         this.handler = handler;
-        this.internalHandler = InternalJapi.build(this.originalApiDescription);
+        this.internalHandler = InternalJApi.build(this.originalApiDescription);
         this.onError = (e) -> {
         };
         this.middleware = (i, n) -> n.apply(i);

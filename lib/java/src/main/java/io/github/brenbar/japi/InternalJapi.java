@@ -2,7 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.Map;
 
-class InternalJapi {
+class InternalJApi {
 
   static final String JSON = """
       {

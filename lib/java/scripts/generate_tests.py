@@ -83,21 +83,21 @@ public class Tests {
             default -> throw new RuntimeException();
         };
     }
-    
+
     private void test(String input, String expectedOutput) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var processor = new Processor(this::handle, json).setOnError((e) -> e.printStackTrace())
                 .setExtractContextProperties((h) -> h);
-        var expectedOutputJsonJava = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
+        var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
         });
 
         // test json
         {
             var output = processor.process(input.getBytes(StandardCharsets.UTF_8));
-            var outputJsonJava = objectMapper.readValue(output, new TypeReference<List<Object>>() {
+            var outputAsParsedJson = objectMapper.readValue(output, new TypeReference<List<Object>>() {
             });
-            assertEquals(expectedOutputJsonJava, outputJsonJava);
+            assertEquals(expectedOutputAsParsedJson, outputAsParsedJson);
         }
 
         // test binary
@@ -110,21 +110,21 @@ public class Tests {
                         return CompletableFuture.completedFuture(result);
                     }).setForceSendJson(false).setUseBinary(true);
             client.call(new Request("_ping", Map.of())); // warmup
-            var inputJava = objectMapper.readValue(input, new TypeReference<List<Object>>() {
+            var inputAsParsedJson = objectMapper.readValue(input, new TypeReference<List<Object>>() {
             });
 
             if (expectedOutput.startsWith("[\\"error.")) {
                 var e = assertThrows(JApiError.class,
-                        () -> client.call(new Request(((String) inputJava.get(0)).substring(9),
-                                (Map<String, Object>) inputJava.get(2)).addHeaders(
-                                        (Map<String, Object>) inputJava.get(1))));
-                assertEquals(expectedOutputJsonJava.get(0), e.target);
-                assertEquals(expectedOutputJsonJava.get(2), e.body);
+                        () -> client.call(new Request(((String) inputAsParsedJson.get(0)).substring(9),
+                                (Map<String, Object>) inputAsParsedJson.get(2)).addHeaders(
+                                        (Map<String, Object>) inputAsParsedJson.get(1))));
+                assertEquals(expectedOutputAsParsedJson.get(0), e.target);
+                assertEquals(expectedOutputAsParsedJson.get(2), e.body);
             } else {
-                var outputJava = client.call(new Request(((String) inputJava.get(0)).substring(9),
-                        (Map<String, Object>) inputJava.get(2)).addHeaders(
-                                (Map<String, Object>) inputJava.get(1)));
-                assertEquals(expectedOutputJsonJava.get(2), outputJava);
+                var outputAsParsedJson = client.call(new Request(((String) inputAsParsedJson.get(0)).substring(9),
+                        (Map<String, Object>) inputAsParsedJson.get(2)).addHeaders(
+                                (Map<String, Object>) inputAsParsedJson.get(1)));
+                assertEquals(expectedOutputAsParsedJson.get(2), outputAsParsedJson);
             }
         }
     }

@@ -11,19 +11,19 @@ import java.util.regex.Pattern;
 
 class InternalParse {
 
-    static Japi newJapi(String japiAsJson) {
+    static JApi newJApi(String jApiAsJson) {
         var parsedDefinitions = new HashMap<String, Definition>();
 
         var objectMapper = new ObjectMapper();
-        Map<String, List<Object>> japiAsJsonJava;
+        Map<String, List<Object>> japiAsParsedJson;
         try {
-            japiAsJsonJava = objectMapper.readValue(japiAsJson, new TypeReference<>() {
+            japiAsParsedJson = objectMapper.readValue(jApiAsJson, new TypeReference<>() {
             });
 
-            for (var entry : japiAsJsonJava.entrySet()) {
+            for (var entry : japiAsParsedJson.entrySet()) {
                 var definitionKey = entry.getKey();
                 if (!parsedDefinitions.containsKey(definitionKey)) {
-                    var definition = parseDefinition(japiAsJsonJava, parsedDefinitions, definitionKey);
+                    var definition = parseDefinition(japiAsParsedJson, parsedDefinitions, definitionKey);
                     parsedDefinitions.put(definitionKey, definition);
                 }
             }
@@ -31,13 +31,13 @@ class InternalParse {
             throw new JapiParseError("Document root must be an object");
         }
 
-        return new Japi((Map<String, Object>) (Object) japiAsJsonJava, parsedDefinitions);
+        return new JApi((Map<String, Object>) (Object) japiAsParsedJson, parsedDefinitions);
     }
 
-    private static Definition parseDefinition(Map<String, List<Object>> japiAsJsonJava,
+    private static Definition parseDefinition(Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions, String definitionKey) {
-        var definitionAsJsonJavaWithDoc = japiAsJsonJava.get(definitionKey);
-        if (definitionAsJsonJavaWithDoc == null) {
+        var definitionWithDocAsParsedJson = jApiAsParsedJson.get(definitionKey);
+        if (definitionWithDocAsParsedJson == null) {
             throw new JapiParseError("Could not find definition for %s".formatted(definitionKey));
         }
 
@@ -46,16 +46,17 @@ class InternalParse {
         matcher.find();
         var keyword = matcher.group(1);
 
-        var definitionAsJsonJava = definitionAsJsonJavaWithDoc.get(1);
+        var definitionAsParsedJson = definitionWithDocAsParsedJson.get(1);
 
         var parsedDefinition = switch (keyword) {
             case "function" ->
-                parseFunctionDefinition(definitionKey, japiAsJsonJava, parsedDefinitions, definitionAsJsonJava);
+                parseFunctionDefinition(definitionKey, jApiAsParsedJson, parsedDefinitions, definitionAsParsedJson);
             case "struct" ->
-                parseStructDefinition(definitionKey, japiAsJsonJava, parsedDefinitions, definitionAsJsonJava);
+                parseStructDefinition(definitionKey, jApiAsParsedJson, parsedDefinitions, definitionAsParsedJson);
             case "error" ->
-                parseErrorDefinition(definitionKey, japiAsJsonJava, parsedDefinitions, definitionAsJsonJava);
-            case "enum" -> parseEnumDefinition(definitionKey, japiAsJsonJava, parsedDefinitions, definitionAsJsonJava);
+                parseErrorDefinition(definitionKey, jApiAsParsedJson, parsedDefinitions, definitionAsParsedJson);
+            case "enum" ->
+                parseEnumDefinition(definitionKey, jApiAsParsedJson, parsedDefinitions, definitionAsParsedJson);
             case "info" -> new TitleDefinition(definitionKey);
             default -> throw new JapiParseError("Unrecognized japi keyword %s".formatted(keyword));
         };
@@ -65,38 +66,38 @@ class InternalParse {
 
     private static FunctionDefinition parseFunctionDefinition(
             String definitionKey,
-            Map<String, List<Object>> japiAsJsonJava,
+            Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions,
-            Object definitionAsJsonJava) {
+            Object definitionAsParsedJson) {
         List<Object> definitionArray;
-        Map<String, Object> inputDefinitionAsJsonJava;
+        Map<String, Object> inputDefinitionAsParsedJson;
         try {
-            definitionArray = (List<Object>) definitionAsJsonJava;
-            inputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(0);
+            definitionArray = (List<Object>) definitionAsParsedJson;
+            inputDefinitionAsParsedJson = (Map<String, Object>) definitionArray.get(0);
         } catch (ClassCastException e) {
             throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
         }
         var inputFields = new HashMap<String, FieldDeclaration>();
-        for (var entry : inputDefinitionAsJsonJava.entrySet()) {
+        for (var entry : inputDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
-            var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+            var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
             inputFields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
         }
 
-        Map<String, Object> outputDefinitionAsJsonJava;
+        Map<String, Object> outputDefinitionAsParsedJson;
         try {
-            outputDefinitionAsJsonJava = (Map<String, Object>) definitionArray.get(2);
+            outputDefinitionAsParsedJson = (Map<String, Object>) definitionArray.get(2);
         } catch (ClassCastException e) {
             throw new JapiParseError("Invalid function definition for %s".formatted(definitionKey));
         }
 
         var outputFields = new HashMap<String, FieldDeclaration>();
-        for (var entry : outputDefinitionAsJsonJava.entrySet()) {
+        for (var entry : outputDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
-            var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+            var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
             outputFields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
         }
@@ -112,7 +113,7 @@ class InternalParse {
             }
 
             for (var errorDef : errors) {
-                if (!japiAsJsonJava.containsKey(errorDef)) {
+                if (!jApiAsParsedJson.containsKey(errorDef)) {
                     throw new JapiParseError("Unknown error reference for %s".formatted(errorDef));
                 }
             }
@@ -126,31 +127,31 @@ class InternalParse {
 
     private static TypeDefinition parseEnumDefinition(
             String definitionKey,
-            Map<String, List<Object>> japiAsJsonJava,
+            Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions,
-            Object definitionAsJsonJava) {
-        Map<String, Object> enumDefinitionAsJsonJava;
+            Object definitionAsParsedJson) {
+        Map<String, Object> enumDefinitionAsParsedJson;
         try {
-            enumDefinitionAsJsonJava = (Map<String, Object>) definitionAsJsonJava;
+            enumDefinitionAsParsedJson = (Map<String, Object>) definitionAsParsedJson;
         } catch (ClassCastException e) {
             throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
         }
 
         var cases = new HashMap<String, Struct>();
-        for (var entry : enumDefinitionAsJsonJava.entrySet()) {
+        for (var entry : enumDefinitionAsParsedJson.entrySet()) {
             var enumCase = entry.getKey();
-            Map<String, Object> caseStructDefinitionAsJava;
+            Map<String, Object> caseStructDefinitionAsParsedJson;
             try {
-                caseStructDefinitionAsJava = (Map<String, Object>) entry.getValue();
+                caseStructDefinitionAsParsedJson = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
                 throw new JapiParseError("Invalid enum definition for %s".formatted(definitionKey));
             }
 
             var fields = new HashMap<String, FieldDeclaration>();
-            for (var caseStructEntry : caseStructDefinitionAsJava.entrySet()) {
+            for (var caseStructEntry : caseStructDefinitionAsParsedJson.entrySet()) {
                 var caseStructFieldDeclaration = caseStructEntry.getKey();
                 var caseStructTypeDeclarationValue = caseStructEntry.getValue();
-                var caseStructParsedField = parseField(japiAsJsonJava, parsedDefinitions,
+                var caseStructParsedField = parseField(jApiAsParsedJson, parsedDefinitions,
                         caseStructFieldDeclaration, caseStructTypeDeclarationValue, false);
                 fields.put(caseStructParsedField.fieldName(), caseStructParsedField.fieldDeclaration());
             }
@@ -165,21 +166,21 @@ class InternalParse {
 
     private static TypeDefinition parseStructDefinition(
             String definitionKey,
-            Map<String, List<Object>> japiAsJsonJava,
+            Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions,
-            Object definitionAsJsonJava) {
-        Map<String, Object> structDefinitionAsJsonJava;
+            Object definitionAsParsedJson) {
+        Map<String, Object> structDefinitionAsParsedJson;
         try {
-            structDefinitionAsJsonJava = (Map<String, Object>) definitionAsJsonJava;
+            structDefinitionAsParsedJson = (Map<String, Object>) definitionAsParsedJson;
         } catch (ClassCastException e) {
             throw new JapiParseError("Invalid struct definition for %s".formatted(definitionKey));
         }
 
         var fields = new HashMap<String, FieldDeclaration>();
-        for (var entry : structDefinitionAsJsonJava.entrySet()) {
+        for (var entry : structDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
-            var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+            var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
             fields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
         }
@@ -190,7 +191,7 @@ class InternalParse {
     }
 
     private static FieldNameAndFieldDeclaration parseField(
-            Map<String, List<Object>> japiAsJsonJava,
+            Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions,
             String fieldDeclaration,
             Object typeDeclarationValue,
@@ -214,28 +215,28 @@ class InternalParse {
             throw new JapiParseError("Type declarations should be strings");
         }
 
-        var typeDeclaration = parseType(japiAsJsonJava, parsedDefinitions, typeDeclarationString);
+        var typeDeclaration = parseType(jApiAsParsedJson, parsedDefinitions, typeDeclarationString);
 
         return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
     }
 
     private static ErrorDefinition parseErrorDefinition(
             String definitionKey,
-            Map<String, List<Object>> japiAsJsonJava,
+            Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions,
-            Object definitionAsJsonJava) {
-        Map<String, Object> errorDefinitionAsJsonJava;
+            Object definitionAsParsedJson) {
+        Map<String, Object> errorDefinitionAsParsedJson;
         try {
-            errorDefinitionAsJsonJava = (Map<String, Object>) definitionAsJsonJava;
+            errorDefinitionAsParsedJson = (Map<String, Object>) definitionAsParsedJson;
         } catch (ClassCastException e) {
             throw new JapiParseError("Invalid error definition for %s".formatted(definitionKey));
         }
 
         var fields = new HashMap<String, FieldDeclaration>();
-        for (var entry : errorDefinitionAsJsonJava.entrySet()) {
+        for (var entry : errorDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
-            var parsedField = parseField(japiAsJsonJava, parsedDefinitions, fieldDeclaration,
+            var parsedField = parseField(jApiAsParsedJson, parsedDefinitions, fieldDeclaration,
                     typeDeclarationValue, false);
             fields.put(parsedField.fieldName(), parsedField.fieldDeclaration());
         }
@@ -243,7 +244,7 @@ class InternalParse {
         return new ErrorDefinition(definitionKey, fields);
     }
 
-    private static TypeDeclaration parseType(Map<String, List<Object>> japiAsJsonJava,
+    private static TypeDeclaration parseType(Map<String, List<Object>> jApiAsParsedJson,
             Map<String, Definition> parsedDefinitions, String typeDeclaration) {
         var regex = Pattern.compile(
                 "^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*)))(\\?)?$");
@@ -291,7 +292,7 @@ class InternalParse {
 
             TypeDeclaration nestedType;
             if (nestedName != null) {
-                nestedType = parseType(japiAsJsonJava, parsedDefinitions, nestedName);
+                nestedType = parseType(jApiAsParsedJson, parsedDefinitions, nestedName);
             } else {
                 nestedType = new TypeDeclaration(new JsonAny(), false);
             }
@@ -315,7 +316,7 @@ class InternalParse {
         }
 
         var definition = parsedDefinitions.computeIfAbsent(name,
-                (k) -> parseDefinition(japiAsJsonJava, parsedDefinitions, name));
+                (k) -> parseDefinition(jApiAsParsedJson, parsedDefinitions, name));
         if (definition instanceof TypeDefinition t) {
             return new TypeDeclaration(t.type(), nullable);
         } else if (definition instanceof FunctionDefinition f) {

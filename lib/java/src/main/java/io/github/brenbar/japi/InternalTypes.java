@@ -11,7 +11,7 @@ interface Definition {
     public String getName();
 }
 
-record Japi(Map<String, Object> original, Map<String, Definition> parsed) {
+record JApi(Map<String, Object> original, Map<String, Definition> parsed) {
 }
 
 class JsonAny implements Type {
