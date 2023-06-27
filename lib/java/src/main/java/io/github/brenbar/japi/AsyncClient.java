@@ -67,19 +67,19 @@ public class AsyncClient {
         return this;
     }
 
-    public Map<String, Object> call(
-            Request jApiFunction) {
-        return client.call(jApiFunction);
+    public Map<String, Object> submit(
+            Request request) {
+        return client.submit(request);
     }
 
     private static Map<Object, CompletableFuture<List<Object>>> waitingRequests = Collections
             .synchronizedMap(new Cache<Object, CompletableFuture<List<Object>>>(256));
 
-    protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean sendAsMsgPack) {
+    protected List<Object> serializeAndTransport(List<Object> inputMessage, boolean sendAsMsgPack) {
         try {
             var id = generate32BitId();
 
-            var headers = (Map<String, Object>) inputJapiMessage.get(1);
+            var headers = (Map<String, Object>) inputMessage.get(1);
             headers.put("_id", id);
             headers.put("_tim", timeoutMs);
 
@@ -87,10 +87,10 @@ public class AsyncClient {
 
             waitingRequests.put(id, future);
 
-            byte[] inputJapiMessagePayload = InternalClientProcess.serialize(inputJapiMessage, serializer,
+            byte[] inputMessageBytes = InternalClientProcess.serialize(inputMessage, serializer,
                     sendAsMsgPack);
 
-            asyncTransport.accept(inputJapiMessagePayload);
+            asyncTransport.accept(inputMessageBytes);
 
             return future.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
@@ -98,14 +98,14 @@ public class AsyncClient {
         }
     }
 
-    public void receiveOutputJapiMessage(byte[] outputJapiMessagePayload) {
+    public void receiveOutputMessage(byte[] outputMessageBytes) {
         try {
-            List<Object> outputJapiMessage = InternalClientProcess.deserialize(outputJapiMessagePayload, serializer);
+            List<Object> outputMessage = InternalClientProcess.deserialize(outputMessageBytes, serializer);
 
-            var headers = (Map<String, Object>) outputJapiMessage.get(1);
+            var headers = (Map<String, Object>) outputMessage.get(1);
             var id = headers.get("_id");
 
-            waitingRequests.remove(id).complete(outputJapiMessage);
+            waitingRequests.remove(id).complete(outputMessage);
         } catch (Exception e) {
             throw new ClientProcessError(e);
         }

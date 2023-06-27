@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class InternalClientProcess {
 
-    static Map<String, Object> call(
+    static Map<String, Object> submit(
             Request request,
             BiFunction<List<Object>, Boolean, List<Object>> serializeAndTransport,
             Function<Map<String, Object>, Map<String, Object>> modifyHeaders,

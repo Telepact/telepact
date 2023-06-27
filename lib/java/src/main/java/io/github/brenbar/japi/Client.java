@@ -53,9 +53,9 @@ class Client {
         return this;
     }
 
-    public Map<String, Object> call(
-            Request jApiFunction) {
-        return InternalClientProcess.call(jApiFunction, this.serializeAndTransport, this.modifyHeaders, this.middleware,
+    public Map<String, Object> submit(
+            Request request) {
+        return InternalClientProcess.submit(request, this.serializeAndTransport, this.modifyHeaders, this.middleware,
                 this.recentBinaryEncoders, this.useBinary,
                 this.forceSendJson);
     }

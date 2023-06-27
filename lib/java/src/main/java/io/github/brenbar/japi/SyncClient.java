@@ -52,24 +52,24 @@ public class SyncClient {
         return this;
     }
 
-    public Map<String, Object> call(
-            Request jApiFunction) {
-        return client.call(jApiFunction);
+    public Map<String, Object> submit(
+            Request request) {
+        return client.submit(request);
     }
 
-    protected List<Object> serializeAndTransport(List<Object> inputJapiMessage, boolean sendAsMsgPack) {
+    protected List<Object> serializeAndTransport(List<Object> inputMessage, boolean sendAsMsgPack) {
         try {
-            var headers = (Map<String, Object>) inputJapiMessage.get(1);
+            var headers = (Map<String, Object>) inputMessage.get(1);
             headers.put("_tim", timeoutMs);
 
-            byte[] inputJapiMessagePayload = InternalClientProcess.serialize(inputJapiMessage, serializer,
+            byte[] inputMessageBytes = InternalClientProcess.serialize(inputMessage, serializer,
                     sendAsMsgPack);
 
-            var outputJapiMessagePayload = syncTransport.apply(inputJapiMessagePayload).get(this.timeoutMs,
+            var outputMessageBytes = syncTransport.apply(inputMessageBytes).get(this.timeoutMs,
                     TimeUnit.MILLISECONDS);
 
-            List<Object> outputJapiMessage = InternalClientProcess.deserialize(outputJapiMessagePayload, serializer);
-            return outputJapiMessage;
+            List<Object> outputMessage = InternalClientProcess.deserialize(outputMessageBytes, serializer);
+            return outputMessage;
         } catch (Exception e) {
             throw new ClientProcessError(e);
         }
