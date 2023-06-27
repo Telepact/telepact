@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 
 class InternalProcess {
 
-    static List<Object> processObject(List<Object> inputJApiMessage, Consumer<Throwable> onError,
+    static List<Object> processObject(List<Object> inputMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
-            Map<String, Definition> jApiDescription,
+            Map<String, Definition> jApi,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> internalHandler,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
             Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
@@ -22,13 +22,13 @@ class InternalProcess {
         var outputHeaders = new HashMap<String, Object>();
         try {
             try {
-                if (inputJApiMessage.size() < 3) {
+                if (inputMessage.size() < 3) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustHaveThreeElements"));
                 }
 
                 String inputTarget;
                 try {
-                    inputTarget = (String) inputJApiMessage.get(0);
+                    inputTarget = (String) inputMessage.get(0);
                 } catch (ClassCastException e) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "TargetMustBeStringType"));
                 }
@@ -43,7 +43,7 @@ class InternalProcess {
 
                 Map<String, Object> inputHeaders;
                 try {
-                    inputHeaders = (Map<String, Object>) inputJApiMessage.get(1);
+                    inputHeaders = (Map<String, Object>) inputMessage.get(1);
                 } catch (ClassCastException e) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "HeadersMustBeObject"));
                 }
@@ -72,12 +72,12 @@ class InternalProcess {
 
                 Map<String, Object> input;
                 try {
-                    input = (Map<String, Object>) inputJApiMessage.get(2);
+                    input = (Map<String, Object>) inputMessage.get(2);
                 } catch (ClassCastException e) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "BodyMustBeObject"));
                 }
 
-                var functionDef = jApiDescription.get(inputTarget);
+                var functionDef = jApi.get(inputTarget);
 
                 FunctionDefinition functionDefinition;
                 if (functionDef instanceof FunctionDefinition f) {
@@ -86,11 +86,11 @@ class InternalProcess {
                     throw new JApiError("error._UnknownFunction", Map.of());
                 }
 
-                Map<String, List<String>> slicedTypes = null;
+                Map<String, List<String>> selectStructFieldsHeader = null;
                 if (inputHeaders.containsKey("_selectFields")) {
                     try {
-                        slicedTypes = (Map<String, List<String>>) inputHeaders.get("_selectFields");
-                        for (Map.Entry<String, List<String>> entry : slicedTypes.entrySet()) {
+                        selectStructFieldsHeader = (Map<String, List<String>>) inputHeaders.get("_selectFields");
+                        for (Map.Entry<String, List<String>> entry : selectStructFieldsHeader.entrySet()) {
                             var fields = entry.getValue();
                             for (var field : fields) {
                                 // verify the cast works
@@ -129,7 +129,7 @@ class InternalProcess {
                     }
                 } catch (JApiError e) {
                     if (functionDefinition.errors().contains(e.target)) {
-                        var def = (ErrorDefinition) jApiDescription.get(e.target);
+                        var def = (ErrorDefinition) jApi.get(e.target);
                         var errorValidationFailures = validateStruct(e.target, def.fields(), e.body);
                         if (!errorValidationFailures.isEmpty()) {
                             var validationFailureCases = new ArrayList<Map<String, String>>();
@@ -163,9 +163,9 @@ class InternalProcess {
                 }
 
                 Map<String, Object> finalOutput;
-                if (slicedTypes != null) {
-                    finalOutput = (Map<String, Object>) sliceTypes(functionDefinition.outputStruct(), output,
-                            slicedTypes);
+                if (selectStructFieldsHeader != null) {
+                    finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct(), output,
+                            selectStructFieldsHeader);
                 } else {
                     finalOutput = output;
                 }
@@ -190,7 +190,7 @@ class InternalProcess {
     }
 
     private static List<ValidationFailure> validateStruct(
-            String namespace,
+            String path,
             Map<String, FieldDeclaration> referenceStruct,
             Map<String, Object> actualStruct) {
         var validationFailures = new ArrayList<ValidationFailure>();
@@ -205,7 +205,7 @@ class InternalProcess {
         }
 
         for (var missingField : missingFields) {
-            var validationFailure = new ValidationFailure("%s.%s".formatted(namespace, missingField),
+            var validationFailure = new ValidationFailure("%s.%s".formatted(path, missingField),
                     InvalidFieldTypeError.REQUIRED_STRUCT_FIELD_MISSING);
             validationFailures
                     .add(validationFailure);
@@ -216,16 +216,37 @@ class InternalProcess {
             var field = entry.getValue();
             var referenceField = referenceStruct.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new ValidationFailure("%s.%s".formatted(namespace, fieldName),
+                var validationFailure = new ValidationFailure("%s.%s".formatted(path, fieldName),
                         InvalidFieldTypeError.EXTRA_STRUCT_FIELD_NOT_ALLOWED);
                 validationFailures
                         .add(validationFailure);
                 continue;
             }
-            var nestedValidationFailures = validateType("%s.%s".formatted(namespace, fieldName),
+            var nestedValidationFailures = validateType("%s.%s".formatted(path, fieldName),
                     referenceField.typeDeclaration(), field);
             validationFailures.addAll(nestedValidationFailures);
         }
+
+        return validationFailures;
+    }
+
+    private static List<ValidationFailure> validateEnum(
+            String namespace,
+            Map<String, Struct> reference,
+            String enumCase,
+            Map<String, Object> actual) {
+        var validationFailures = new ArrayList<ValidationFailure>();
+
+        var referenceField = reference.get(enumCase);
+        if (referenceField == null) {
+            return Collections
+                    .singletonList(new ValidationFailure("%s.%s".formatted(namespace, enumCase),
+                            InvalidFieldTypeError.UNKNOWN_ENUM_VALUE));
+        }
+
+        var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(),
+                actual);
+        validationFailures.addAll(nestedValidationFailures);
 
         return validationFailures;
     }
@@ -440,7 +461,7 @@ class InternalProcess {
                             new ValidationFailure(fieldName, InvalidFieldTypeError.VALUE_INVALID_FOR_ENUM_TYPE));
                 }
             } else if (expectedType instanceof JsonAny a) {
-                // all values validate for any
+                // all values are valid for any
                 return Collections.emptyList();
             } else {
                 return Collections.singletonList(new ValidationFailure(fieldName, InvalidFieldTypeError.INVALID_TYPE));
@@ -448,37 +469,17 @@ class InternalProcess {
         }
     }
 
-    private static List<ValidationFailure> validateEnum(
-            String namespace,
-            Map<String, Struct> reference,
-            String enumCase,
-            Map<String, Object> actual) {
-        var validationFailures = new ArrayList<ValidationFailure>();
-
-        var referenceField = reference.get(enumCase);
-        if (referenceField == null) {
-            return Collections
-                    .singletonList(new ValidationFailure("%s.%s".formatted(namespace, enumCase),
-                            InvalidFieldTypeError.UNKNOWN_ENUM_VALUE));
-        }
-
-        var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields(),
-                actual);
-        validationFailures.addAll(nestedValidationFailures);
-
-        return validationFailures;
-    }
-
-    static Object sliceTypes(Type type, Object value, Map<String, List<String>> slicedTypes) {
+    static Object selectStructFields(Type type, Object value, Map<String, List<String>> selectedStructFields) {
         if (type instanceof Struct s) {
-            var slicedFields = slicedTypes.get(s.name());
+            var selectedFields = selectedStructFields.get(s.name());
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
-                if (slicedFields == null || slicedFields.contains(entry.getKey())) {
+                if (selectedFields == null || selectedFields.contains(entry.getKey())) {
                     var field = s.fields().get(entry.getKey());
-                    var slicedValue = sliceTypes(field.typeDeclaration().type(), entry.getValue(), slicedTypes);
-                    finalMap.put(entry.getKey(), slicedValue);
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration().type(), entry.getValue(),
+                            selectedStructFields);
+                    finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
             return finalMap;
@@ -488,25 +489,27 @@ class InternalProcess {
             var structReference = e.cases().get(enumEntry.getKey());
             Map<String, Object> newStruct = new HashMap<>();
             for (var structEntry : structReference.fields().entrySet()) {
-                var slicedValue = sliceTypes(structEntry.getValue().typeDeclaration().type(), enumEntry.getValue(),
-                        slicedTypes);
-                newStruct.put(structEntry.getKey(), slicedValue);
+                var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration().type(),
+                        enumEntry.getValue(),
+                        selectedStructFields);
+                newStruct.put(structEntry.getKey(), valueWithSelectedFields);
             }
             return Map.of(enumEntry.getKey(), newStruct);
         } else if (type instanceof JsonObject o) {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
-                var slicedValue = sliceTypes(o.nestedType().type(), entry.getValue(), slicedTypes);
-                finalMap.put(entry.getKey(), slicedValue);
+                var valueWithSelectedFields = selectStructFields(o.nestedType().type(), entry.getValue(),
+                        selectedStructFields);
+                finalMap.put(entry.getKey(), valueWithSelectedFields);
             }
             return finalMap;
         } else if (type instanceof JsonArray a) {
             var valueAsList = (List<Object>) value;
             var finalList = new ArrayList<>();
             for (var entry : valueAsList) {
-                var slicedValue = sliceTypes(a.nestedType().type(), entry, slicedTypes);
-                finalList.add(slicedValue);
+                var valueWithSelectedFields = selectStructFields(a.nestedType().type(), entry, selectedStructFields);
+                finalList.add(valueWithSelectedFields);
             }
             return finalList;
         } else {
@@ -514,21 +517,21 @@ class InternalProcess {
         }
     }
 
-    static boolean inputIsJson(byte[] inputJapiMessagePayload) {
-        return inputJapiMessagePayload[0] == '[';
+    static boolean inputIsJson(byte[] inputJapiMessageBytes) {
+        return inputJapiMessageBytes[0] == '[';
     }
 
-    static List<Object> deserialize(byte[] inputJapiMessagePayload, Serializer serializer,
+    static List<Object> deserialize(byte[] inputJapiMessageBytes, Serializer serializer,
             BinaryEncoder binaryEncoder) {
-        if (inputIsJson(inputJapiMessagePayload)) {
+        if (inputIsJson(inputJapiMessageBytes)) {
             try {
-                return serializer.deserializeFromJson(inputJapiMessagePayload);
+                return serializer.deserializeFromJson(inputJapiMessageBytes);
             } catch (DeserializationError e) {
                 throw new JApiError("error._ParseFailure", Map.of());
             }
         } else {
             try {
-                var encodedInputJapiMessage = serializer.deserializeFromMsgPack(inputJapiMessagePayload);
+                var encodedInputJapiMessage = serializer.deserializeFromMsgPack(inputJapiMessageBytes);
                 if (encodedInputJapiMessage.size() < 3) {
                     throw new JApiError("error._ParseFailure",
                             Map.of("reason", "JapiMessageArrayMustHaveThreeElements"));
