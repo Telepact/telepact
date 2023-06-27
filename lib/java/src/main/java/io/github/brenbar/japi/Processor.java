@@ -27,7 +27,7 @@ public class Processor {
 
     private BinaryEncoder binaryEncoder;
 
-    public Processor(Handler handler, String jApiAsJson) {
+    public Processor(String jApiAsJson, Handler handler) {
         var jApiTuple = InternalParse.newJApi(jApiAsJson);
         this.jApi = jApiTuple.parsed();
         this.originalJApiAsParsedJson = jApiTuple.original();

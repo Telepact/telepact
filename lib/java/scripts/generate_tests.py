@@ -86,7 +86,7 @@ public class Tests {
     private void test(String input, String expectedOutput) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(this::handle, json).setOnError((e) -> e.printStackTrace())
+        var processor = new Processor(json, this::handle).setOnError((e) -> e.printStackTrace())
                 .setExtractContextProperties((h) -> h);
         var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
         });
