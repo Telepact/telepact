@@ -4,7 +4,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -17,11 +16,6 @@ class Client {
     }
 
     interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
-    }
-
-    enum Mode {
-        SYNC,
-        ASYNC,
     }
 
     private SerializeAndTransport serializeAndTransport;

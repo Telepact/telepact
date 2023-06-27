@@ -114,11 +114,11 @@ public class Tests {
             });
 
             if (expectedOutput.startsWith("[\\"error.")) {
-                var e = assertThrows(ClientError.class,
+                var e = assertThrows(JApiError.class,
                         () -> client.call(new Request(((String) inputJava.get(0)).substring(9),
                                 (Map<String, Object>) inputJava.get(2)).addHeaders(
                                         (Map<String, Object>) inputJava.get(1))));
-                assertEquals(expectedOutputJsonJava.get(0), e.type);
+                assertEquals(expectedOutputJsonJava.get(0), e.target);
                 assertEquals(expectedOutputJsonJava.get(2), e.body);
             } else {
                 var outputJava = client.call(new Request(((String) inputJava.get(0)).substring(9),

@@ -58,7 +58,7 @@ public class InternalClientProcess {
         var output = (Map<String, Object>) outputJapiMessage.get(2);
 
         if (outputMessageType.startsWith("error.")) {
-            throw new ClientError(outputMessageType, output);
+            throw new JApiError(outputMessageType, output);
         }
 
         return output;
