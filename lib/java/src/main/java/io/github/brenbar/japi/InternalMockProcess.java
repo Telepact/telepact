@@ -19,7 +19,7 @@ public class InternalMockProcess {
         if (definition instanceof FunctionDefinition f) {
             return constructRandomStruct(f.outputStruct.fields, new Random());
         } else {
-            throw new JApiError("error._FunctionNotFound", Map.of());
+            throw new JApiError("error._UnknownFunction", Map.of());
         }
     }
 
