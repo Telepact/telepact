@@ -27,17 +27,17 @@ public class AsyncClient {
 
     private Client client;
     private Consumer<byte[]> asyncTransport;
-    private Serializer serializer;
+    private SerializationStrategy serializer;
     private Long timeoutMs;
 
     public AsyncClient(Consumer<byte[]> asyncTransport) {
         this.client = new Client(this::serializeAndTransport);
         this.asyncTransport = asyncTransport;
-        this.serializer = new DefaultSerializer();
+        this.serializer = new DefaultSerializationStrategy();
         this.timeoutMs = 5000L;
     }
 
-    public AsyncClient setSerializer(Serializer serializer) {
+    public AsyncClient setSerializer(SerializationStrategy serializer) {
         this.serializer = serializer;
         return this;
     }
@@ -58,12 +58,12 @@ public class AsyncClient {
     }
 
     public AsyncClient setUseBinary(boolean useBinary) {
-        client.useBinary = useBinary;
+        client.useBinaryDefault = useBinary;
         return this;
     }
 
     public AsyncClient setForceSendJson(boolean forceSendJson) {
-        client.forceSendJson = forceSendJson;
+        client.forceSendJsonDefault = forceSendJson;
         return this;
     }
 

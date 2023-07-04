@@ -5,6 +5,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -13,12 +15,13 @@ public class InternalClientProcess {
 
     static Map<String, Object> submit(
             Request request,
-            BiFunction<List<Object>, Boolean, List<Object>> serializeAndTransport,
+            BiFunction<List<Object>, Boolean, Future<List<Object>>> serializeAndTransport,
             Function<Map<String, Object>, Map<String, Object>> modifyHeaders,
             BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> middleware,
             Deque<BinaryEncoder> recentBinaryEncoders,
             boolean useBinaryDefault,
-            boolean forceSendJsonDefault) {
+            boolean forceSendJsonDefault,
+            long timeoutMsDefault) {
 
         var headers = modifyHeaders.apply(request.headers);
 
@@ -40,6 +43,13 @@ public class InternalClientProcess {
             finalForceSendJson = forceSendJsonDefault;
         }
 
+        long finalTimeoutMs;
+        if (request.timeoutMs.isPresent()) {
+            finalTimeoutMs = request.timeoutMs.get();
+        } else {
+            finalTimeoutMs = timeoutMsDefault;
+        }
+
         if (finalUseBinary) {
             List<Object> binaryChecksums = new ArrayList<>();
             for (var binaryEncoding : recentBinaryEncoders) {
@@ -52,7 +62,7 @@ public class InternalClientProcess {
         var inputJapiMessage = List.of(messageType, headers, request.functionInput);
 
         var outputJapiMessage = encodeSerializeAndTransport(inputJapiMessage, serializeAndTransport, middleware,
-                recentBinaryEncoders, finalUseBinary, finalForceSendJson);
+                recentBinaryEncoders, finalUseBinary, finalForceSendJson, timeoutMsDefault);
 
         var outputMessageType = (String) outputJapiMessage.get(0);
         var output = (Map<String, Object>) outputJapiMessage.get(2);
@@ -65,11 +75,12 @@ public class InternalClientProcess {
     }
 
     private static List<Object> encodeSerializeAndTransport(List<Object> inputJapiMessage,
-            BiFunction<List<Object>, Boolean, List<Object>> serializeAndTransport,
+            BiFunction<List<Object>, Boolean, Future<List<Object>>> serializeAndTransport,
             BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> middleware,
             Deque<BinaryEncoder> recentBinaryEncoders,
             boolean useBinary,
-            boolean forceSendJson) {
+            boolean forceSendJson,
+            long timeoutMs) {
         try {
             var binaryEncoder = recentBinaryEncoders.size() == 0 ? null : recentBinaryEncoders.getFirst();
 
@@ -82,7 +93,12 @@ public class InternalClientProcess {
                 sendAsMsgPack = true;
             }
 
-            var outputJapiMessage = serializeAndTransport.apply(finalInputJapiMessage, sendAsMsgPack);
+            var headers = (Map<String, Object>) inputJapiMessage.get(1);
+            headers.put("_tim", timeoutMs);
+
+            var outputJapiMessage = serializeAndTransport.apply(finalInputJapiMessage, sendAsMsgPack)
+                    .get(timeoutMs, TimeUnit.MILLISECONDS);
+
             var outputHeaders = (Map<String, Object>) outputJapiMessage.get(1);
 
             // If the response is in binary, decode it
@@ -134,20 +150,20 @@ public class InternalClientProcess {
                 new Exception("No matching encoding found for checksum %d, cannot decode binary".formatted(checksum)));
     }
 
-    static byte[] serialize(List<Object> jApiMessage, Serializer serializer, boolean sendAsMsgPack) {
+    static byte[] serialize(List<Object> jApiMessage, SerializationStrategy serializer, boolean sendAsMsgPack) {
         if (sendAsMsgPack) {
-            return serializer.serializeToMsgPack(jApiMessage);
+            return serializer.toMsgPack(jApiMessage);
         } else {
-            return serializer.serializeToJson(jApiMessage);
+            return serializer.toJson(jApiMessage);
         }
     }
 
-    static List<Object> deserialize(byte[] jApiMessageBytes, Serializer serializer) {
+    static List<Object> deserialize(byte[] jApiMessageBytes, SerializationStrategy serializer) {
         try {
             if (jApiMessageBytes[0] == '[') {
-                return serializer.deserializeFromJson(jApiMessageBytes);
+                return serializer.fromJson(jApiMessageBytes);
             } else {
-                return serializer.deserializeFromMsgPack(jApiMessageBytes);
+                return serializer.fromMsgPack(jApiMessageBytes);
             }
         } catch (DeserializationError e) {
             throw new ClientProcessError(e);

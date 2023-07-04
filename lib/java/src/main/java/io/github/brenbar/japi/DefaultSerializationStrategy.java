@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-class DefaultSerializer implements Serializer {
+class DefaultSerializationStrategy implements SerializationStrategy {
 
     private ObjectMapper jsonMapper = new ObjectMapper();
     private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory());
 
     @Override
-    public byte[] serializeToJson(List<Object> japiMessage) {
+    public byte[] toJson(List<Object> japiMessage) {
         try {
             return jsonMapper.writeValueAsBytes(japiMessage);
         } catch (JsonProcessingException e) {
@@ -23,7 +23,7 @@ class DefaultSerializer implements Serializer {
         }
     }
 
-    public byte[] serializeToMsgPack(List<Object> japiMessage) {
+    public byte[] toMsgPack(List<Object> japiMessage) {
         try {
             return binaryMapper.writeValueAsBytes(japiMessage);
         } catch (JsonProcessingException e) {
@@ -32,7 +32,7 @@ class DefaultSerializer implements Serializer {
     }
 
     @Override
-    public List<Object> deserializeFromJson(byte[] bytes) throws DeserializationError {
+    public List<Object> fromJson(byte[] bytes) throws DeserializationError {
         try {
             return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
@@ -42,7 +42,7 @@ class DefaultSerializer implements Serializer {
     }
 
     @Override
-    public List<Object> deserializeFromMsgPack(byte[] bytes) throws DeserializationError {
+    public List<Object> fromMsgPack(byte[] bytes) throws DeserializationError {
         try {
             return binaryMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });

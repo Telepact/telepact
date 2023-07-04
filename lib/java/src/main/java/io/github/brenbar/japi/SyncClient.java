@@ -12,17 +12,17 @@ public class SyncClient {
 
     private Client client;
     private Function<byte[], Future<byte[]>> syncTransport;
-    private Serializer serializer;
+    private SerializationStrategy serializer;
     private Long timeoutMs;
 
     public SyncClient(Function<byte[], Future<byte[]>> syncTransport) {
         this.client = new Client(this::serializeAndTransport);
         this.syncTransport = syncTransport;
-        this.serializer = new DefaultSerializer();
+        this.serializer = new DefaultSerializationStrategy();
         this.timeoutMs = 5000L;
     }
 
-    public SyncClient setSerializer(Serializer serializer) {
+    public SyncClient setSerializer(SerializationStrategy serializer) {
         this.serializer = serializer;
         return this;
     }
@@ -43,12 +43,12 @@ public class SyncClient {
     }
 
     public SyncClient setUseBinary(boolean useBinary) {
-        client.useBinary = useBinary;
+        client.useBinaryDefault = useBinary;
         return this;
     }
 
     public SyncClient setForceSendJson(boolean forceSendJson) {
-        client.forceSendJson = forceSendJson;
+        client.forceSendJsonDefault = forceSendJson;
         return this;
     }
 

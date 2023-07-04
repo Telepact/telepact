@@ -21,7 +21,7 @@ public class Processor {
     ExtractContextProperties extractContextProperties;
     Map<String, Object> originalJApiAsParsedJson;
     Map<String, Definition> jApi;
-    Serializer serializer;
+    SerializationStrategy serializer;
     Consumer<Throwable> onError;
     BinaryEncoder binaryEncoder;
 
@@ -29,7 +29,7 @@ public class Processor {
         var jApiTuple = InternalParse.newJApi(jApiAsJson);
         this.jApi = jApiTuple.parsed;
         this.originalJApiAsParsedJson = jApiTuple.original;
-        this.serializer = new DefaultSerializer();
+        this.serializer = new DefaultSerializationStrategy();
 
         var internalJApiTuple = InternalParse.newJApi(InternalJApi.JSON);
 
@@ -50,7 +50,7 @@ public class Processor {
         return this;
     }
 
-    public Processor setSerializer(Serializer serializer) {
+    public Processor setSerializer(SerializationStrategy serializer) {
         this.serializer = serializer;
         return this;
     }
@@ -77,16 +77,16 @@ public class Processor {
             boolean inputIsBinary = !InternalProcess.inputIsJson(inputMessageBytes);
             if (inputIsBinary || returnAsBinary) {
                 var encodedOutputMessage = this.binaryEncoder.encode(outputMessage);
-                return this.serializer.serializeToMsgPack(encodedOutputMessage);
+                return this.serializer.toMsgPack(encodedOutputMessage);
             } else {
-                return this.serializer.serializeToJson(outputMessage);
+                return this.serializer.toJson(outputMessage);
             }
         } catch (JApiError e) {
             this.onError.accept(e);
-            return this.serializer.serializeToJson(List.of(e.target, Map.of(), e.body));
+            return this.serializer.toJson(List.of(e.target, Map.of(), e.body));
         } catch (Exception e) {
             this.onError.accept(e);
-            return this.serializer.serializeToJson(List.of("error._ProcessFailure", Map.of(), Map.of()));
+            return this.serializer.toJson(List.of("error._ProcessFailure", Map.of(), Map.of()));
         }
     }
 

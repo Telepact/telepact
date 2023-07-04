@@ -59,10 +59,15 @@ class InternalProcess {
 
                     if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
                         // Client is initiating handshake for binary protocol
-                        outputHeaders.put("_binaryEncoding", binaryEncoder.encodeMap);
+                        outputHeaders.put("_includeBinaryEncoding", true);
                     }
 
-                    outputHeaders.put("_bin", List.of(binaryEncoder.checksum));
+                    outputHeaders.put("_serializeAsBinary", true);
+                }
+
+                var clientKnownBinaryChecksums = inputHeaders.get("_clientKnownBinaryChecksums");
+                if (clientKnownBinaryChecksums != null) {
+                    outputHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
                 }
 
                 // Reflect call id
@@ -526,24 +531,24 @@ class InternalProcess {
         return inputJapiMessageBytes[0] == '[';
     }
 
-    static List<Object> deserialize(byte[] inputJapiMessageBytes, Serializer serializer,
+    static List<Object> deserialize(byte[] inputJapiMessageBytes, SerializationStrategy serializer,
             BinaryEncoder binaryEncoder) {
         if (inputIsJson(inputJapiMessageBytes)) {
             try {
-                return serializer.deserializeFromJson(inputJapiMessageBytes);
+                return serializer.fromJson(inputJapiMessageBytes);
             } catch (DeserializationError e) {
                 throw new JApiError("error._ParseFailure", Map.of());
             }
         } else {
             try {
-                var encodedInputJapiMessage = serializer.deserializeFromMsgPack(inputJapiMessageBytes);
+                var encodedInputJapiMessage = serializer.fromMsgPack(inputJapiMessageBytes);
                 if (encodedInputJapiMessage.size() < 3) {
                     throw new JApiError("error._ParseFailure",
                             Map.of("reason", "JapiMessageArrayMustHaveThreeElements"));
                 }
                 return binaryEncoder.decode(encodedInputJapiMessage);
-            } catch (BinaryChecksumMismatchException e) {
-                throw new JApiError("error._BinaryDecodeFailure", Map.of());
+                // } catch (BinaryChecksumMismatchException e) {
+                // throw new JApiError("error._BinaryDecodeFailure", Map.of());
             } catch (DeserializationError e) {
                 throw new JApiError("error._ParseFailure", Map.of(), e);
             }

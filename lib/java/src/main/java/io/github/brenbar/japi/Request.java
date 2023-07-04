@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Request {
+public class Request implements Message {
     public final String functionName;
     public final Map<String, Object> headers = new HashMap<>();
     public final Map<String, List<String>> selectedStructFields = new HashMap<>();
     public final Map<String, Object> functionInput;
     public Optional<Boolean> useBinary = Optional.empty();
     public Optional<Boolean> forceSendJson = Optional.empty();
+    public Optional<Long> timeoutMs = Optional.empty();
 
     public Request(String functionName, Map<String, Object> functionInput) {
         this.functionName = functionName;
@@ -41,5 +42,25 @@ public class Request {
     public Request setForceSendJson(boolean forceSendJson) {
         this.forceSendJson = Optional.of(forceSendJson);
         return this;
+    }
+
+    public Request setTimeoutMs(long timeoutMs) {
+        this.timeoutMs = Optional.of(timeoutMs);
+        return this;
+    }
+
+    @Override
+    public String getTarget() {
+        return functionName;
+    }
+
+    @Override
+    public Map<String, Object> getHeaders() {
+        return headers;
+    }
+
+    @Override
+    public Map<String, Object> getBody() {
+        return functionInput;
     }
 }
