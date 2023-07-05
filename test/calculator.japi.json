@@ -1,0 +1,108 @@
+{
+  "enum.Value": [
+    [
+      "                                                                           ",
+      " A value for computation that can take either a constant or variable form. ",
+      "                                                                           "
+    ],
+    {
+      "constant": {
+        "value": "number"
+      },
+      "variable": {
+        "value": "string"
+      }
+    }
+  ],
+  "enum.Operation": [
+    [
+      "                                 ",
+      " A basic mathematical operation. ",
+      "                                 "
+    ],
+    {
+      "add": {},
+      "sub": {},
+      "mul": {},
+      "div": {}
+    }
+  ],
+  "struct.Variable": [
+    [
+      "                                                                               ",
+      " A mathematical variable represented by a `name` that holds a certain `value`. ",
+      "                                                                               "
+    ],
+    {
+      "name": "string",
+      "value": "number"
+    }
+  ],
+  "function.saveVariable": [
+    [
+      "                                                    ",
+      " Save a variable with the given `name` and `value`. ",
+      "                                                    "
+    ],
+    [
+      {
+        "name": "string",
+        "value": "number"
+      },
+      "-->",
+      {},
+      []
+    ]
+  ],
+  "function.compute": [
+    [
+      "                                                       ",
+      " Compute the `result` of the given `x` and `y` values. ",
+      "                                                       "
+    ],
+    [
+      {
+        "x": "enum.Value",
+        "y": "enum.Value"
+      },
+      "-->",
+      {
+        "result": "number"
+      },
+      ["error.CannotDivideByZero"]
+    ]
+  ],
+  "function.exportVariables": [
+    [
+      "                      ",
+      " A function template. ",
+      "                      "
+    ],
+    [
+      {},
+      "-->",
+      {
+        "variables": "array<struct.Variable>"
+      },
+      []
+    ]
+  ],
+  "error.CannotDivideByZero": [
+    [
+      "                                                                        ",
+      " Indicates a computation was attempted that supplied zero as a divisor. ",
+      "                                                                        "
+    ],
+    {}
+  ],
+  "error.UnknownVariable": [
+    [
+      "                                                                             ",
+      " Indicates a variable access by `name` was attempted but the name was unknown. ",
+      "                                                                             "
+    ],
+    {
+      "name": "string"
+    }
+  ]
+}
