@@ -14,9 +14,12 @@ class InternalSerialize {
         var headers = (Map<String, Object>) message.get(1);
 
         var clientKnownChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
+
         if (clientKnownChecksums == null || !clientKnownChecksums.contains(binaryEncoder.checksum)) {
             headers.put("_binaryEncoding", binaryEncoder.encodeMap);
         }
+
+        headers.put("_bin", List.of(binaryEncoder.checksum));
 
         return binaryEncoder.encode(message);
     }
