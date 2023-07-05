@@ -2,6 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 interface Type {
     public String getName();
@@ -316,5 +317,30 @@ class ValidationFailure {
     public ValidationFailure(String path, String reason) {
         this.path = path;
         this.reason = reason;
+    }
+}
+
+class Mock {
+    final String whenFunctionName;
+    final Map<String, Object> whenFunctionInput;
+    final boolean exactMatchInput;
+    final Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput;
+
+    public Mock(String whenFunctionName, Map<String, Object> whenFunctionInput, boolean exactMatchInput,
+            Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput) {
+        this.whenFunctionName = whenFunctionName;
+        this.whenFunctionInput = whenFunctionInput;
+        this.exactMatchInput = exactMatchInput;
+        this.thenAnswerOutput = thenAnswerOutput;
+    }
+}
+
+class Invocation {
+    final String functionName;
+    final Map<String, Object> functionInput;
+
+    public Invocation(String functionName, Map<String, Object> functionInput) {
+        this.functionName = functionName;
+        this.functionInput = functionInput;
     }
 }

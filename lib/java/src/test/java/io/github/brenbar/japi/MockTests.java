@@ -35,9 +35,46 @@ public class MockTests {
         var result = client.submit(new Request("compute",
                 Map.ofEntries(
                         Map.entry("x", Map.of("variable", Map.of("value", "a"))),
-                        Map.entry("y", Map.of("constant", Map.of("value", 2))))));
+                        Map.entry("y", Map.of("constant", Map.of("value", 2))),
+                        Map.entry("op", Map.of("add", Map.of())))));
 
         // This is the value per the given random seed
         assertEquals(0.730967787376657, result.get("result"));
+    }
+
+    @Test
+    public void testMocking() throws IOException {
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
+        var mock = new MockProcessor(json);
+        mock.processor.setOnError((e) -> {
+            e.printStackTrace();
+        });
+        mock.resetRandomSeed(0L);
+        var client = new Client((m, s) -> {
+            return CompletableFuture.supplyAsync(() -> {
+                try {
+                    return s.deserialize(mock.process(s.serialize(m)));
+                } catch (DeserializationError e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
+
+        mock.mockExact("compute", Map.ofEntries(
+                Map.entry("x", Map.of("variable", Map.of("value", "a"))),
+                Map.entry("y", Map.of("constant", Map.of("value", 2))),
+                Map.entry("op", Map.of("add", Map.of()))), (i) -> Map.of("result", 5));
+
+        client.submit(new Request("saveVariable", Map.of("name", "a", "value", 2)));
+
+        var result = client.submit(new Request("compute",
+                Map.ofEntries(
+                        Map.entry("x", Map.of("variable", Map.of("value", "a"))),
+                        Map.entry("y", Map.of("constant", Map.of("value", 2))),
+                        Map.entry("op", Map.of("add", Map.of())))));
+
+        assertEquals(5, result.get("result"));
+
+        mock.verifyExact("saveVariable", Map.of("name", "a", "value", 2));
     }
 }

@@ -5,23 +5,66 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 class InternalMockProcess {
 
     static Map<String, Object> handle(Context context, Map<String, Object> input, Map<String, Definition> jApi,
-            Random random) {
-        var definition = jApi.get("function.%s".formatted(context.functionName));
+            Random random, List<Mock> mocks, List<Invocation> invocations) {
 
-        // TODO:
-        // - stubs and verifications
+        invocations.add(new Invocation(context.functionName, input));
+
+        for (var mock : mocks) {
+            if (Objects.equals(mock.whenFunctionName, context.functionName)) {
+                if (Objects.equals(mock.whenFunctionInput, input)) {
+                    return mock.thenAnswerOutput.apply(input);
+                } else if (mock.exactMatchInput) {
+                    continue;
+                } else if (isSubMap(input, mock.whenFunctionInput)) {
+                    return mock.thenAnswerOutput.apply(input);
+                }
+            }
+        }
+
+        var definition = jApi.get("function.%s".formatted(context.functionName));
 
         if (definition instanceof FunctionDefinition f) {
             return constructRandomStruct(f.outputStruct.fields, random);
         } else {
             throw new JApiError("error._UnknownFunction", Map.of());
         }
+    }
+
+    static boolean isSubMap(Map<String, Object> reference, Map<String, Object> toCheck) {
+        for (var toCheckEntry : toCheck.entrySet()) {
+            var toCheckKey = toCheckEntry.getKey();
+            var toCheckEntryValue = toCheckEntry.getValue();
+            var referenceEntryValue = reference.get(toCheckKey);
+            var entryIsEqual = isSubMapEntryEqual(referenceEntryValue, toCheckEntryValue);
+            if (!entryIsEqual) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isSubMapEntryEqual(Object reference, Object toCheck) {
+        if (reference instanceof Map m1 && toCheck instanceof Map m2) {
+            return isSubMap(m1, m2);
+        } else if (reference instanceof List referenceList && toCheck instanceof List toCheckList) {
+            for (int i = 0; i < referenceList.size(); i += 1) {
+                var referenceElement = referenceList.get(i);
+                var toCheckElement = toCheckList.get(i);
+                var isEqual = isSubMapEntryEqual(referenceElement, toCheckElement);
+                if (!isEqual) {
+                    return false;
+                }
+            }
+        }
+        return Objects.equals(reference, toCheck);
     }
 
     private static Map<String, Object> constructRandomStruct(

@@ -63,7 +63,8 @@
     [
       {
         "x": "enum.Value",
-        "y": "enum.Value"
+        "y": "enum.Value",
+        "op": "enum.Operation"
       },
       "-->",
       {
