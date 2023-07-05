@@ -4,7 +4,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class ClientBinaryEncodingStrategy implements BinaryEncodingStrategy {
+class ClientBinaryEncodingStrategy implements BinaryEncodingStrategy {
 
     private Deque<BinaryEncoder> recentBinaryEncoders = new ConcurrentLinkedDeque<>();
 

@@ -12,6 +12,12 @@ interface Definition {
     public String getName();
 }
 
+interface BinaryEncodingStrategy {
+    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
+
+    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
+}
+
 class JApi {
     public final Map<String, Object> original;
     public final Map<String, Definition> parsed;
