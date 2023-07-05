@@ -37,7 +37,7 @@ class DefaultSerializationStrategy implements SerializationStrategy {
             return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
         } catch (IOException e) {
-            throw new DeserializationError("error._ParseFailure", e);
+            throw new DeserializationError(e);
         }
     }
 
@@ -47,7 +47,7 @@ class DefaultSerializationStrategy implements SerializationStrategy {
             return binaryMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
         } catch (IOException e) {
-            throw new DeserializationError("error._ParseFailure", e);
+            throw new DeserializationError(e);
         }
     }
 

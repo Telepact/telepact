@@ -21,15 +21,15 @@ public class Processor {
     ExtractContextProperties extractContextProperties;
     Map<String, Object> originalJApiAsParsedJson;
     Map<String, Definition> jApi;
-    SerializationStrategy serializer;
+    SerializationStrategy serializationStrategyx;
     Consumer<Throwable> onError;
     BinaryEncoder binaryEncoder;
+    Serializer serializer;
 
     public Processor(String jApiAsJson, Handler handler) {
         var jApiTuple = InternalParse.newJApi(jApiAsJson);
         this.jApi = jApiTuple.parsed;
         this.originalJApiAsParsedJson = jApiTuple.original;
-        this.serializer = new DefaultSerializationStrategy();
 
         var internalJApiTuple = InternalParse.newJApi(InternalJApi.JSON);
 
@@ -43,6 +43,9 @@ public class Processor {
         this.extractContextProperties = (h) -> new HashMap<>();
 
         this.binaryEncoder = InternalBinaryEncoderBuilder.build(jApi);
+
+        this.serializer = new Serializer(new DefaultSerializationStrategy(),
+                new ServerBinaryEncodingStrategy(binaryEncoder));
     }
 
     public Processor setOnError(Consumer<Throwable> onError) {
@@ -50,8 +53,8 @@ public class Processor {
         return this;
     }
 
-    public Processor setSerializer(SerializationStrategy serializer) {
-        this.serializer = serializer;
+    public Processor setSerializationStrategy(SerializationStrategy strategy) {
+        this.serializer.serializationStrategy = strategy;
         return this;
     }
 
@@ -66,27 +69,27 @@ public class Processor {
 
     private byte[] deserializeAndProcess(byte[] inputMessageBytes) {
         try {
-            List<Object> inputMessage = InternalProcess.deserialize(inputMessageBytes, this.serializer,
-                    this.binaryEncoder);
+            List<Object> inputMessage;
+            try {
+                inputMessage = serializer.deserialize(inputMessageBytes);
+            } catch (DeserializationError e) {
+                var cause = e.getCause();
+                if (cause instanceof BinaryEncoderUnavailableError e2) {
+                    throw new JApiError("error._BinaryDecodeFailure", Map.of());
+                } else {
+                    throw new JApiError("error._ParseFailure", Map.of());
+                }
+            }
 
             var outputMessage = this.middleware.apply(inputMessage, this::processObject);
-            var outputHeaders = (Map<String, Object>) outputMessage.get(1);
 
-            var returnAsBinary = outputHeaders.containsKey("_bin");
-
-            boolean inputIsBinary = !InternalProcess.inputIsJson(inputMessageBytes);
-            if (inputIsBinary || returnAsBinary) {
-                var encodedOutputMessage = this.binaryEncoder.encode(outputMessage);
-                return this.serializer.toMsgPack(encodedOutputMessage);
-            } else {
-                return this.serializer.toJson(outputMessage);
-            }
+            return this.serializer.serialize(outputMessage);
         } catch (JApiError e) {
             this.onError.accept(e);
-            return this.serializer.toJson(List.of(e.target, Map.of(), e.body));
+            return this.serializer.serialize(List.of(e.target, Map.of(), e.body));
         } catch (Exception e) {
             this.onError.accept(e);
-            return this.serializer.toJson(List.of("error._ProcessFailure", Map.of(), Map.of()));
+            return this.serializer.serialize(List.of("error._ProcessFailure", Map.of(), Map.of()));
         }
     }
 

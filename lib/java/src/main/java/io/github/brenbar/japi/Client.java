@@ -1,44 +1,35 @@
 package io.github.brenbar.japi;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-class Client {
-
-    interface SerializeAndTransport extends BiFunction<List<Object>, Boolean, Future<List<Object>>> {
-    }
-
-    interface ModifyHeaders extends Function<Map<String, Object>, Map<String, Object>> {
-    }
+public class Client {
 
     interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
     }
 
-    private SerializeAndTransport serializeAndTransport;
-    ModifyHeaders modifyHeaders;
-    Middleware middleware;
-    private Deque<BinaryEncoder> recentBinaryEncoders = new ConcurrentLinkedDeque<>();
+    interface Adapter extends BiFunction<List<Object>, Serializer, Future<List<Object>>> {
+    }
+
+    private Adapter adapter;
+    private Serializer serializer;
+    private Middleware middleware;
     boolean useBinaryDefault;
     boolean forceSendJsonDefault;
     long timeoutMsDefault;
 
-    public Client(SerializeAndTransport serializeAndTransport) {
-        this.serializeAndTransport = serializeAndTransport;
-        this.modifyHeaders = (h) -> h;
+    public Client(Adapter adapter) {
+        this.adapter = adapter;
+
         this.middleware = (m, n) -> n.apply(m);
         this.useBinaryDefault = false;
         this.forceSendJsonDefault = true;
-        this.timeoutMsDefault = timeoutMsDefault;
-    }
+        this.timeoutMsDefault = 5000;
 
-    public Client setModifyHeaders(ModifyHeaders modifyHeaders) {
-        this.modifyHeaders = modifyHeaders;
-        return this;
+        this.serializer = new Serializer(new DefaultSerializationStrategy(), new ClientBinaryEncodingStrategy());
     }
 
     public Client setMiddleware(Middleware middleware) {
@@ -61,11 +52,32 @@ class Client {
         return this;
     }
 
+    public Client setSerializationStrategy(SerializationStrategy serializationStrategy) {
+        this.serializer.serializationStrategy = serializationStrategy;
+        return this;
+    }
+
     public Map<String, Object> submit(
             Request request) {
-        return InternalClientProcess.submit(request, this.serializeAndTransport, this.modifyHeaders, this.middleware,
-                this.recentBinaryEncoders, this.useBinaryDefault,
-                this.forceSendJsonDefault, this.timeoutMsDefault);
+
+        var requestMessage = InternalClientProcess.constructRequestMessage(request, useBinaryDefault,
+                forceSendJsonDefault, timeoutMsDefault);
+
+        var outputJapiMessage = this.middleware.apply(requestMessage, this::processMessage);
+
+        var outputMessageType = (String) outputJapiMessage.get(0);
+        var output = (Map<String, Object>) outputJapiMessage.get(2);
+
+        if (outputMessageType.startsWith("error.")) {
+            throw new JApiError(outputMessageType, output);
+        }
+
+        return output;
+    }
+
+    public List<Object> processMessage(List<Object> message) {
+        return InternalClientProcess.processRequestObject(message, this.adapter, this.serializer,
+                this.timeoutMsDefault);
     }
 
 }

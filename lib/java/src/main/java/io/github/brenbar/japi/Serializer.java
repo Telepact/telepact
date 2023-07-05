@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Serializer {
 
-    private SerializationStrategy serializationStrategy;
+    SerializationStrategy serializationStrategy;
     private BinaryEncodingStrategy binaryEncoderStrategy;
 
     public Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncoderStrategy) {

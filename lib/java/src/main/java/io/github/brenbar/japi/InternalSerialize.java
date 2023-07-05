@@ -6,15 +6,39 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
-public class ClientBinaryEncoderStrategy implements BinaryEncodingStrategy {
+class InternalSerialize {
 
-    private Deque<BinaryEncoder> recentBinaryEncoders = new ConcurrentLinkedDeque<>();
+    static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoder binaryEncoder) {
+        var headers = (Map<String, Object>) message.get(1);
 
-    @Override
-    public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
+        var clientKnownChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
+        if (clientKnownChecksums == null || !clientKnownChecksums.contains(binaryEncoder.checksum)) {
+            headers.put("_binaryEncoding", binaryEncoder.encodeMap);
+        }
+
+        return binaryEncoder.encode(message);
+    }
+
+    static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoder binaryEncoder)
+            throws BinaryEncoderUnavailableError {
+        var headers = (Map<String, Object>) message.get(1);
+
+        var binaryChecksums = (List<Long>) headers.get("_bin");
+        headers.put("_clientKnownBinaryChecksums", binaryChecksums);
+
+        var binaryChecksum = binaryChecksums.get(0);
+
+        if (!Objects.equals(binaryChecksum, binaryEncoder.checksum)) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        return binaryEncoder.decode(message);
+    }
+
+    static List<Object> clientBinaryEncode(List<Object> message, Deque<BinaryEncoder> recentBinaryEncoders)
+            throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(1);
 
         var checksums = recentBinaryEncoders.stream().map(be -> be.checksum).toList();
@@ -30,8 +54,8 @@ public class ClientBinaryEncoderStrategy implements BinaryEncodingStrategy {
         return binaryEncoder.encode(message);
     }
 
-    @Override
-    public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
+    static List<Object> clientBinaryDecode(List<Object> message, Deque<BinaryEncoder> recentBinaryEncoders)
+            throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(1);
 
         var binaryChecksums = (List<Long>) headers.get("_bin");

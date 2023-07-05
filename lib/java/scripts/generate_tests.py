@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import io.github.brenbar.japi.Client.Adapter;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -101,13 +103,20 @@ public class Tests {
 
         // test binary
         {
-            var client = new SyncClient(
-                    (m) -> {
-                        System.out.println(new String(m));
-                        var result = processor.process(m);
-                        System.out.println(new String(result));
-                        return CompletableFuture.completedFuture(result);
-                    }).setForceSendJson(false).setUseBinary(true);
+            Adapter adapter = (m, s) -> {
+                return CompletableFuture.supplyAsync(() -> {
+                    var inputBytes = s.serialize(m);
+                    var outputBytes = processor.process(inputBytes);
+                    List<Object> output;
+                    try {
+                        output = s.deserialize(outputBytes);
+                    } catch (DeserializationError e1) {
+                        throw new RuntimeException(e1);
+                    }
+                    return output;
+                });
+            };
+            var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true);
             client.submit(new Request("_ping", Map.of())); // warmup
             var inputAsParsedJson = objectMapper.readValue(input, new TypeReference<List<Object>>() {
             });
