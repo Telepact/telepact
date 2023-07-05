@@ -16,7 +16,7 @@ public class MockTests {
     public void testGeneratedValues() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
         var processor = new MockProcessor(json);
-        processor.processor.setOnError((e) -> {
+        processor.processor.setOnError((Throwable e) -> {
             e.printStackTrace();
         });
         processor.resetRandomSeed(0L);
@@ -46,7 +46,7 @@ public class MockTests {
     public void testMocking() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
         var mock = new MockProcessor(json);
-        mock.processor.setOnError((e) -> {
+        mock.processor.setOnError((Throwable e) -> {
             e.printStackTrace();
         });
         mock.resetRandomSeed(0L);
@@ -63,7 +63,7 @@ public class MockTests {
         mock.mockExact("compute", Map.ofEntries(
                 Map.entry("x", Map.of("variable", Map.of("value", "a"))),
                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
-                Map.entry("op", Map.of("add", Map.of()))), (i) -> Map.of("result", 5));
+                Map.entry("op", Map.of("add", Map.of()))), (Map<String, Object> i) -> Map.of("result", 5));
 
         client.submit(new Request("saveVariable", Map.of("name", "a", "value", 2)));
 
@@ -75,6 +75,7 @@ public class MockTests {
 
         assertEquals(5, result.get("result"));
 
-        mock.verifyExact("saveVariable", Map.of("name", "b", "value", 2));
+        mock.verifyPartial("saveVariable", Map.of("value", 2));
+        mock.verifyExact("saveVariable", Map.of("name", "a", "value", 2));
     }
 }
