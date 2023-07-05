@@ -5,7 +5,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
-public class InternalClientProcess {
+class InternalClientProcess {
 
     static List<Object> constructRequestMessage(Request request, boolean useBinaryDefault, boolean forceSendJsonDefault,
             long timeoutMsDefault) {

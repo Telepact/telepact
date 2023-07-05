@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class InternalMockProcess {
+class InternalMockProcess {
 
     static Map<String, Object> handle(Context context, Map<String, Object> input, Map<String, Definition> jApi,
             Random random) {
