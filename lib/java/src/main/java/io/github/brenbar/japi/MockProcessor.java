@@ -52,7 +52,22 @@ public class MockProcessor {
                 }
             }
         }
-        throw new AssertionError("No matching invocations.");
+        var errorString = new StringBuilder("""
+                No matching invocations.
+                Wanted partial match:
+                %s(%s)
+                Available:
+                """.formatted(functionName, partialMatchFunctionInput));
+        var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
+                .toList();
+        if (functionInvocations.isEmpty()) {
+            errorString.append("<none>");
+        } else {
+            for (var invocation : functionInvocations) {
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+            }
+        }
+        throw new AssertionError(errorString);
     }
 
     public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput) {
@@ -63,6 +78,21 @@ public class MockProcessor {
                 }
             }
         }
-        throw new AssertionError("No matching invocations.");
+        var errorString = new StringBuilder("""
+                No matching invocations.
+                Wanted exact match:
+                %s(%s)
+                Available:
+                """.formatted(functionName, exactMatchFunctionInput));
+        var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
+                .toList();
+        if (functionInvocations.isEmpty()) {
+            errorString.append("<none>");
+        } else {
+            for (var invocation : functionInvocations) {
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+            }
+        }
+        throw new AssertionError(errorString);
     }
 }

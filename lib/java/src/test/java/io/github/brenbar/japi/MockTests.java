@@ -75,6 +75,6 @@ public class MockTests {
 
         assertEquals(5, result.get("result"));
 
-        mock.verifyExact("saveVariable", Map.of("name", "a", "value", 2));
+        mock.verifyExact("saveVariable", Map.of("name", "b", "value", 2));
     }
 }
