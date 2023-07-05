@@ -86,10 +86,10 @@ public class Processor {
             return this.serializer.serialize(outputMessage);
         } catch (JApiError e) {
             this.onError.accept(e);
-            return this.serializer.serialize(List.of(e.target, Map.of(), e.body));
+            return this.serializer.serialize(List.of(e.target, new HashMap<>(), e.body));
         } catch (Exception e) {
             this.onError.accept(e);
-            return this.serializer.serialize(List.of("error._ProcessFailure", Map.of(), Map.of()));
+            return this.serializer.serialize(List.of("error._ProcessFailure", new HashMap<>(), Map.of()));
         }
     }
 

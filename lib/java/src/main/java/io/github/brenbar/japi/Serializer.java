@@ -16,7 +16,7 @@ public class Serializer {
 
     public byte[] serialize(List<Object> message) {
         var headers = (Map<String, Object>) message.get(1);
-        var serializeAsBinary = Objects.equals(true, headers.get("_serializeAsBinary"));
+        var serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
         var forceSendJson = Objects.equals(true, headers.remove("_serializeAsJson"));
         if (serializeAsBinary && !forceSendJson) {
             try {
