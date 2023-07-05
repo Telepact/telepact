@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Request implements Message {
+public class Request {
     public final String functionName;
     public final Map<String, Object> headers = new HashMap<>();
     public final Map<String, List<String>> selectedStructFields = new HashMap<>();
@@ -47,20 +47,5 @@ public class Request implements Message {
     public Request setTimeoutMs(long timeoutMs) {
         this.timeoutMs = Optional.of(timeoutMs);
         return this;
-    }
-
-    @Override
-    public String getTarget() {
-        return functionName;
-    }
-
-    @Override
-    public Map<String, Object> getHeaders() {
-        return headers;
-    }
-
-    @Override
-    public Map<String, Object> getBody() {
-        return functionInput;
     }
 }
