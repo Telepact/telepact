@@ -42,7 +42,7 @@ public class Processor {
         this.middleware = (i, n) -> n.apply(i);
         this.extractContextProperties = (h) -> new HashMap<>();
 
-        this.binaryEncoder = InternalBinaryEncoderBuilder.build(jApi);
+        this.binaryEncoder = InternalBinaryEncode.build(jApi);
 
         this.serializer = new Serializer(new DefaultSerializationStrategy(),
                 new ServerBinaryEncodingStrategy(binaryEncoder));
