@@ -314,6 +314,8 @@ class ValidationErrors {
 
     public static final String MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE = "EnumDoesNotHaveExactlyOneField";
     public static final String UNKNOWN_ENUM_VALUE = "UnknownEnumField";
+
+    public static final String NUMBER_OUT_OF_RANGE = "NumberOutOfRange";
 }
 
 class ValidationFailure {

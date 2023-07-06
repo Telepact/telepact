@@ -1,5 +1,7 @@
 package io.github.brenbar.japi;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -295,6 +297,9 @@ class InternalProcess {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_INTEGER_TYPE));
+                } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_OUT_OF_RANGE));
                 } else if (value instanceof Number) {
                     if (value instanceof Long || value instanceof Integer) {
                         return Collections.emptyList();
@@ -319,6 +324,9 @@ class InternalProcess {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, ValidationErrors.BOOLEAN_INVALID_FOR_NUMBER_TYPE));
+                } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
+                    return Collections.singletonList(
+                            new ValidationFailure(fieldName, ValidationErrors.NUMBER_OUT_OF_RANGE));
                 } else if (value instanceof Number) {
                     return Collections.emptyList();
                 } else if (value instanceof String) {
