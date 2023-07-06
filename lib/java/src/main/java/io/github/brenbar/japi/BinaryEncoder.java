@@ -47,17 +47,7 @@ class BinaryEncoder {
         } else if (given instanceof Map<?, ?> m) {
             var newMap = new HashMap<>();
             m.entrySet().stream().forEach(e -> {
-                // TODO: Update the msgpack library to not coerce these ints to strings
-                // because now we have to coerce it back conditionally, since we
-                // can't know for sure if somebody didn't just use a number string
-                // in their generic object.
                 var key = e.getKey();
-                if (key instanceof String s) {
-                    try {
-                        key = Long.valueOf(s);
-                    } catch (Exception ignored) {
-                    }
-                }
                 if (encodeMap.containsKey(key)) {
                     key = get(encodeMap, key);
                 }
@@ -76,17 +66,7 @@ class BinaryEncoder {
         if (given instanceof Map<?, ?> m) {
             var newMap = new HashMap<>();
             m.entrySet().stream().forEach(e -> {
-                // TODO: Update the msgpack library to not coerce these ints to strings
-                // because now we have to coerce it back conditionally, since we
-                // can't know for sure if somebody didn't just use a number string
-                // in their generic object.
                 var key = e.getKey();
-                if (key instanceof String s) {
-                    try {
-                        key = Long.valueOf(s);
-                    } catch (Exception ignored) {
-                    }
-                }
                 if (decodeMap.containsKey(key)) {
                     key = get(decodeMap, key);
                 }
