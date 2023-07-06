@@ -350,3 +350,7 @@ class Invocation {
         this.functionInput = functionInput;
     }
 }
+
+class NumberOutOfRangeError extends Exception {
+
+}

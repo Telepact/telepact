@@ -75,9 +75,11 @@ public class Processor {
             } catch (DeserializationError e) {
                 var cause = e.getCause();
                 if (cause instanceof BinaryEncoderUnavailableError e2) {
-                    throw new JApiError("error._BinaryDecodeFailure", Map.of());
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryDecodeFailure"), e2);
+                } else if (cause instanceof NumberOutOfRangeError e3) {
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "NumberOutOfRange"), e3);
                 } else {
-                    throw new JApiError("error._ParseFailure", Map.of());
+                    throw new JApiError("error._ParseFailure", Map.of(), e);
                 }
             }
 

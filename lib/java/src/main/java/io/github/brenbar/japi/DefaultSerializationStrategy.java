@@ -10,15 +10,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 class DefaultSerializationStrategy implements SerializationStrategy {
 
-    private ObjectMapper jsonMapper = new ObjectMapper();
-    // .enable(DeserializationFeature.USE_LONG_FOR_INTS);
+    private ObjectMapper jsonMapper = new ObjectMapper()
+            .enable(DeserializationFeature.USE_LONG_FOR_INTS);
     private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory())
-            // .enable(DeserializationFeature.USE_LONG_FOR_INTS)
+            .enable(DeserializationFeature.USE_LONG_FOR_INTS)
             .registerModule(new SimpleModule()
                     .addDeserializer(Object.class,
                             (JsonDeserializer<Object>) new MessagePackUntypedObjectDeserializer())
@@ -46,6 +47,12 @@ class DefaultSerializationStrategy implements SerializationStrategy {
         try {
             return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
+        } catch (JsonMappingException e) {
+            if (e.getMessage().contains("out of range")) {
+                throw new DeserializationError(new NumberOutOfRangeError());
+            } else {
+                throw new DeserializationError(e);
+            }
         } catch (IOException e) {
             throw new DeserializationError(e);
         }

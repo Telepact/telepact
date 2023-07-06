@@ -51,6 +51,7 @@ import java.util.concurrent.CompletableFuture;
 
 import io.github.brenbar.japi.Client.Adapter;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -86,7 +87,8 @@ public class Tests {
     }
 
     private void test(String input, String expectedOutput) throws IOException {
-        var objectMapper = new ObjectMapper();
+        var objectMapper = new ObjectMapper()
+                .enable(DeserializationFeature.USE_LONG_FOR_INTS);                
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var processor = new Processor(json, this::handle).setOnError((e) -> e.printStackTrace())
                 .setExtractContextProperties((h) -> h);
