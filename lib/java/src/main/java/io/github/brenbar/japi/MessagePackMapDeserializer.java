@@ -24,8 +24,8 @@ class MessagePackMapDeserializer extends MapDeserializer {
         @Override
         public Object deserializeKey(String s, DeserializationContext deserializationContext) throws IOException {
             JsonParser parser = deserializationContext.getParser();
-            if (parser instanceof MessagePackParser) {
-                if (((MessagePackParser) parser).isCurrentFieldId()) {
+            if (parser instanceof MessagePackParser p) {
+                if (p.isCurrentFieldId()) {
                     return Long.valueOf(s);
                 }
             }

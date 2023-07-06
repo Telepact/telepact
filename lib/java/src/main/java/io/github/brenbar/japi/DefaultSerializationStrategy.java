@@ -15,10 +15,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 class DefaultSerializationStrategy implements SerializationStrategy {
 
-    private ObjectMapper jsonMapper = new ObjectMapper()
-            .enable(DeserializationFeature.USE_LONG_FOR_INTS);
+    private ObjectMapper jsonMapper = new ObjectMapper();
+    // .enable(DeserializationFeature.USE_LONG_FOR_INTS);
     private ObjectMapper binaryMapper = new ObjectMapper(new MessagePackFactory())
-            .enable(DeserializationFeature.USE_LONG_FOR_INTS)
+            // .enable(DeserializationFeature.USE_LONG_FOR_INTS)
             .registerModule(new SimpleModule()
                     .addDeserializer(Object.class,
                             (JsonDeserializer<Object>) new MessagePackUntypedObjectDeserializer())
