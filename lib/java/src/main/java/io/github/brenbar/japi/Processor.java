@@ -77,7 +77,8 @@ public class Processor {
                 if (cause instanceof BinaryEncoderUnavailableError e2) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryDecodeFailure"), e2);
                 } else {
-                    throw new JApiError("error._ParseFailure", Map.of(), e);
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"),
+                            e);
                 }
             }
 

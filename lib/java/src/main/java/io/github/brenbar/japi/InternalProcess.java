@@ -26,14 +26,14 @@ class InternalProcess {
         try {
             try {
                 if (inputMessage.size() < 3) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustHaveThreeElements"));
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"));
                 }
 
                 String inputTarget;
                 try {
                     inputTarget = (String) inputMessage.get(0);
                 } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "TargetMustBeStringType"));
+                    throw new JApiError("error._ParseFailure", Map.of("reason", "TargetMustBeString"));
                 }
 
                 var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)");

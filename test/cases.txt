@@ -1235,3 +1235,27 @@
 
 ["function.test",{"_unsafe":true,"output":{"value":{"bool":0}}},{}]|["function.test",{},{"value":{"bool":0}}]
 ["function.test",{"_unsafe":true,"error.ErrorExample":{"wrong":"a"}},{}]|["error.ErrorExample",{},{"wrong":"a"}]
+
+"testParseFailure"
+
+false|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
+0|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
+""|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
+{}|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
+[{},{}]|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
+["function._ping",{}]|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
+
+[false,{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
+[0,{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
+[[],{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
+[{},{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
+
+["function._ping",false,{}]|["error._ParseFailure",{},{"reason":"HeadersMustBeObject"}]|skipBinary
+["function._ping",0,{}]|["error._ParseFailure",{},{"reason":"HeadersMustBeObject"}]|skipBinary
+["function._ping","",{}]|["error._ParseFailure",{},{"reason":"HeadersMustBeObject"}]|skipBinary
+["function._ping",[],{}]|["error._ParseFailure",{},{"reason":"HeadersMustBeObject"}]|skipBinary
+
+["function._ping",{},false]|["error._ParseFailure",{},{"reason":"BodyMustBeObject"}]|skipBinary
+["function._ping",{},0]|["error._ParseFailure",{},{"reason":"BodyMustBeObject"}]|skipBinary
+["function._ping",{},""]|["error._ParseFailure",{},{"reason":"BodyMustBeObject"}]|skipBinary
+["function._ping",{},[]]|["error._ParseFailure",{},{"reason":"BodyMustBeObject"}]|skipBinary
