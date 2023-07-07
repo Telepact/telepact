@@ -1210,7 +1210,7 @@
 
 "testUnknownFunction"
 
-["function.notFound",{},{}]|["error._UnknownFunction",{},{}]
+["function.notFound",{},{}]|["error._UnknownFunction",{},{}]|skipBinary
 
 "testErrors"
 
@@ -1247,6 +1247,7 @@ false|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}
 
 [false,{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
 [0,{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
+["",{},{}]|["error._ParseFailure",{},{"reason":"TargetStringMustBeFunction"}]|skipBinary
 [[],{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
 [{},{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
 
