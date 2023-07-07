@@ -124,8 +124,8 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
                 raise FunctionNotFound(function_name)
 
             sliced_types: Dict[str, List[str]] = None
-            if "_selectFields" in headers:
-                sliced_types = headers.get("_selectFields")
+            if "_sel" in headers:
+                sliced_types = headers.get("_sel")
                 if not isinstance(sliced_types, dict):
                     raise InvalidSelectFieldsHeader()
                 for fields in sliced_types.values():

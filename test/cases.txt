@@ -1221,39 +1221,39 @@
 
 "testSelectFields"
 
-["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["function.test",{},{"value":{"struct":{"optional":false}}}]
-["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"struct":{"required":false}}}},{}]|["function.test",{},{"value":{"struct":{}}}]
-["function.test",{"_selectFields":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["function.test",{},{"value":{"struct":{"optional":false,"required":false}}}]
-["function.test",{"_selectFields":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"required":false}}}},{}]|["function.test",{},{"value":{"struct":{"required":false}}}]
-["function.test",{"_selectFields":{"struct.StructExample":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["function.test",{},{"value":{"struct":{}}}]
-["function.test",{"_selectFields":{"struct.StructExample":[]},"output":{"value":{"struct":{"required":false}}}},{}]|["function.test",{},{"value":{"struct":{}}}]
+["function.test",{"_sel":{"struct.StructExample":["optional"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["function.test",{},{"value":{"struct":{"optional":false}}}]
+["function.test",{"_sel":{"struct.StructExample":["optional"]},"output":{"value":{"struct":{"required":false}}}},{}]|["function.test",{},{"value":{"struct":{}}}]
+["function.test",{"_sel":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["function.test",{},{"value":{"struct":{"optional":false,"required":false}}}]
+["function.test",{"_sel":{"struct.StructExample":["optional","required"]},"output":{"value":{"struct":{"required":false}}}},{}]|["function.test",{},{"value":{"struct":{"required":false}}}]
+["function.test",{"_sel":{"struct.StructExample":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["function.test",{},{"value":{"struct":{}}}]
+["function.test",{"_sel":{"struct.StructExample":[]},"output":{"value":{"struct":{"required":false}}}},{}]|["function.test",{},{"value":{"struct":{}}}]
 
-["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"arrStruct":[{"required":false},{"optional":false,"required":false}]}}},{}]|["function.test",{},{"value":{"arrStruct":[{},{"optional":false}]}}]
+["function.test",{"_sel":{"struct.StructExample":["optional"]},"output":{"value":{"arrStruct":[{"required":false},{"optional":false,"required":false}]}}},{}]|["function.test",{},{"value":{"arrStruct":[{},{"optional":false}]}}]
 
-["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"objStruct":{"a":{"required":false},"b":{"optional":false,"required":false}}}}},{}]|["function.test",{},{"value":{"objStruct":{"a":{},"b":{"optional":false}}}}]
+["function.test",{"_sel":{"struct.StructExample":["optional"]},"output":{"value":{"objStruct":{"a":{"required":false},"b":{"optional":false,"required":false}}}}},{}]|["function.test",{},{"value":{"objStruct":{"a":{},"b":{"optional":false}}}}]
 
-["function.test",{"_selectFields":false,"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}","reason":"SelectHeaderMustBeObject"}]}]
-["function.test",{"_selectFields":0,"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}","reason":"SelectHeaderMustBeObject"}]}]
-["function.test",{"_selectFields":"","output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}","reason":"SelectHeaderMustBeObject"}]}]
-["function.test",{"_selectFields":[],"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}","reason":"SelectHeaderMustBeObject"}]}]
+["function.test",{"_sel":false,"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}","reason":"SelectHeaderMustBeObject"}]}]
+["function.test",{"_sel":0,"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}","reason":"SelectHeaderMustBeObject"}]}]
+["function.test",{"_sel":"","output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}","reason":"SelectHeaderMustBeObject"}]}]
+["function.test",{"_sel":[],"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}","reason":"SelectHeaderMustBeObject"}]}]
 
-["function.test",{"_selectFields":{"":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{}","reason":"SelectHeaderKeyMustBeStructReference"}]}]
-["function.test",{"_selectFields":{"notStruct":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{notStruct}","reason":"SelectHeaderKeyMustBeStructReference"}]}]
+["function.test",{"_sel":{"":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{}","reason":"SelectHeaderKeyMustBeStructReference"}]}]
+["function.test",{"_sel":{"notStruct":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{notStruct}","reason":"SelectHeaderKeyMustBeStructReference"}]}]
 
-["function.test",{"_selectFields":{"struct.Unknown":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.Unknown}","reason":"UnknownStruct"}]}]
+["function.test",{"_sel":{"struct.Unknown":[]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.Unknown}","reason":"UnknownStruct"}]}]
 
-["function.test",{"_selectFields":{"struct.StructExample":false},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":0},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":""},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":{}},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
+["function.test",{"_sel":{"struct.StructExample":false},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
+["function.test",{"_sel":{"struct.StructExample":0},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
+["function.test",{"_sel":{"struct.StructExample":""},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
+["function.test",{"_sel":{"struct.StructExample":{}},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}","reason":"SelectHeaderFieldsMustBeArray"}]}]
 
-["function.test",{"_selectFields":{"struct.StructExample":[false]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":[0]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":[[]]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":[{}]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
+["function.test",{"_sel":{"struct.StructExample":[false]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
+["function.test",{"_sel":{"struct.StructExample":[0]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
+["function.test",{"_sel":{"struct.StructExample":[[]]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
+["function.test",{"_sel":{"struct.StructExample":[{}]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}[0]","reason":"SelectHeaderFieldMustBeString"}]}]
 
-["function.test",{"_selectFields":{"struct.StructExample":["unknownField"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}[0]","reason":"UnknownStructField"}]}]
-["function.test",{"_selectFields":{"struct.StructExample":[""]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_selectFields}{struct.StructExample}[0]","reason":"UnknownStructField"}]}]
+["function.test",{"_sel":{"struct.StructExample":["unknownField"]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}[0]","reason":"UnknownStructField"}]}]
+["function.test",{"_sel":{"struct.StructExample":[""]},"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._InvalidRequestHeaders",{},{"cases":[{"path":"headers{_sel}{struct.StructExample}[0]","reason":"UnknownStructField"}]}]
 
 
 "testUnsafe"

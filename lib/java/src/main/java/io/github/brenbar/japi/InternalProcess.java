@@ -167,9 +167,9 @@ class InternalProcess {
                 }
 
                 Map<String, Object> finalOutput;
-                if (inputHeaders.containsKey("_selectFields")) {
+                if (inputHeaders.containsKey("_sel")) {
                     Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) inputHeaders
-                            .get("_selectFields");
+                            .get("_sel");
                     finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct, output,
                             selectStructFieldsHeader);
                 } else {
@@ -215,26 +215,26 @@ class InternalProcess {
             }
         }
 
-        if (headers.containsKey("_selectFields")) {
+        if (headers.containsKey("_sel")) {
             Map<String, Object> selectStructFieldsHeader = new HashMap<>();
             try {
                 selectStructFieldsHeader = (Map<String, Object>) headers
-                        .get("_selectFields");
+                        .get("_sel");
 
             } catch (ClassCastException e) {
-                validationFailures.add(new ValidationFailure("headers{_selectFields}",
+                validationFailures.add(new ValidationFailure("headers{_sel}",
                         "SelectHeaderMustBeObject"));
             }
             for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
                 var structName = entry.getKey();
                 if (!structName.startsWith("struct.")) {
-                    validationFailures.add(new ValidationFailure("headers{_selectFields}{%s}".formatted(structName),
+                    validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "SelectHeaderKeyMustBeStructReference"));
                     continue;
                 }
                 var structReference = jApi.get(structName);
                 if (structReference == null) {
-                    validationFailures.add(new ValidationFailure("headers{_selectFields}{%s}".formatted(structName),
+                    validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "UnknownStruct"));
                     continue;
                 }
@@ -243,7 +243,7 @@ class InternalProcess {
                 try {
                     fields = (List<Object>) entry.getValue();
                 } catch (ClassCastException e) {
-                    validationFailures.add(new ValidationFailure("headers{_selectFields}{%s}".formatted(structName),
+                    validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "SelectHeaderFieldsMustBeArray"));
                 }
 
@@ -254,7 +254,7 @@ class InternalProcess {
                         stringField = (String) field;
                     } catch (ClassCastException e) {
                         validationFailures.add(new ValidationFailure(
-                                "headers{_selectFields}{%s}[%d]".formatted(structName, i),
+                                "headers{_sel}{%s}[%d]".formatted(structName, i),
                                 "SelectHeaderFieldMustBeString"));
                         continue;
                     }
@@ -262,7 +262,7 @@ class InternalProcess {
                         if (d.type instanceof Struct s) {
                             if (!s.fields.containsKey(stringField)) {
                                 validationFailures.add(new ValidationFailure(
-                                        "headers{_selectFields}{%s}[%d]".formatted(structName, i),
+                                        "headers{_sel}{%s}[%d]".formatted(structName, i),
                                         "UnknownStructField"));
                             }
                         }

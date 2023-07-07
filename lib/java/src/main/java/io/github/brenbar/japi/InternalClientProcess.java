@@ -33,7 +33,7 @@ class InternalClientProcess {
         var headers = request.headers;
 
         if (!request.selectedStructFields.isEmpty()) {
-            headers.put("_selectFields", request.selectedStructFields);
+            headers.put("_sel", request.selectedStructFields);
         }
 
         if (finalForceSendJson) {
