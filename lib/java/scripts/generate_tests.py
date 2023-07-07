@@ -45,8 +45,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static io.github.brenbar.japi.TestUtility.test;
-
 public class GeneratedTests {
 
 ''')
@@ -62,9 +60,26 @@ for case in cases:
         var expectedOutput = """
         {}
         """.trim();
-        test(input, expectedOutput, {});
+        TestUtility.test(input, expectedOutput);
     }}
-    '''.format(case.name, case.input, case.output, 'true' if case.skip_binary else 'false'))
+    '''.format(case.name, case.input, case.output))
+
+    if case.skip_binary:
+        continue
+
+    test_file.write('''
+    @Test
+    public void testBinary_{}() throws IOException {{
+        var input = """
+        {}
+        """.trim();
+        var expectedOutput = """
+        {}
+        """.trim();
+        TestUtility.testBinary(input, expectedOutput);
+    }}
+    '''.format(case.name, case.input, case.output))    
+
 
 test_file.write('''
 }

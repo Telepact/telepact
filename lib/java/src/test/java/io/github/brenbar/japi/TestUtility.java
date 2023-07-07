@@ -44,7 +44,7 @@ public class TestUtility {
         };
     }
 
-    public static void test(String input, String expectedOutput, boolean skipBinary) throws IOException {
+    public static void test(String input, String expectedOutput) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace())
@@ -62,10 +62,15 @@ public class TestUtility {
             });
             assertEquals(expectedOutputAsParsedJson, outputAsParsedJson);
         }
+    }
 
-        if (skipBinary) {
-            return;
-        }
+    public static void testBinary(String input, String expectedOutput) throws IOException {
+        var objectMapper = new ObjectMapper();
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
+        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace())
+                .setExtractContextProperties((h) -> h);
+        var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
+        });
 
         // test binary
         {
