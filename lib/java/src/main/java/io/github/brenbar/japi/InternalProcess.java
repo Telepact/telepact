@@ -55,8 +55,17 @@ class InternalProcess {
                     List<Object> binaryChecksums;
                     try {
                         binaryChecksums = (List<Object>) inputHeaders.get("_bin");
-                    } catch (Exception e) {
-                        throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryHeaderMustBeArray"));
+                        for (var binaryChecksum : binaryChecksums) {
+                            try {
+                                var integerElement = (Integer) binaryChecksum;
+                            } catch (ClassCastException e) {
+                                var longElement = (Long) binaryChecksum;
+                            }
+                        }
+                    } catch (ClassCastException e) {
+                        throw new JApiError("error._ParseFailure",
+                                Map.of("reason", "BinaryHeaderMustBeArrayOfIntegers"));
+
                     }
 
                     if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
