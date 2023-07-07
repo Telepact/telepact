@@ -1232,6 +1232,11 @@
 
 ["function.test",{"_selectFields":{"struct.StructExample":["optional"]},"output":{"value":{"objStruct":{"a":{"required":false},"b":{"optional":false,"required":false}}}}},{}]|["function.test",{},{"value":{"objStruct":{"a":{},"b":{"optional":false}}}}]
 
+["function.test",{"_selectFields":false,"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._ParseFailure",{},{"reason":"SelectHeaderMustBeObjectOfArraysOfStrings"}]
+["function.test",{"_selectFields":0,"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._ParseFailure",{},{"reason":"SelectHeaderMustBeObjectOfArraysOfStrings"}]
+["function.test",{"_selectFields":"","output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._ParseFailure",{},{"reason":"SelectHeaderMustBeObjectOfArraysOfStrings"}]
+["function.test",{"_selectFields":[],"output":{"value":{"struct":{"optional":false,"required":false}}}},{}]|["error._ParseFailure",{},{"reason":"SelectHeaderMustBeObjectOfArraysOfStrings"}]
+
 "testUnsafe"
 
 ["function.test",{"_unsafe":true,"output":{"value":{"bool":0}}},{}]|["function.test",{},{"value":{"bool":0}}]

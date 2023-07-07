@@ -116,7 +116,7 @@ class InternalProcess {
                         }
                     } catch (ClassCastException e) {
                         throw new JApiError("error._ParseFailure",
-                                Map.of("reason", "SelectStructFieldsHeaderMustBeObjectOfArraysOfStrings"));
+                                Map.of("reason", "SelectHeaderMustBeObjectOfArraysOfStrings"));
                     }
                 }
 
