@@ -51,22 +51,22 @@ class InternalProcess {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "HeadersMustBeObject"));
                 }
 
-                if (inputHeaders.containsKey("_bin")) {
-                    List<Object> binaryChecksums;
-                    try {
-                        binaryChecksums = (List<Object>) inputHeaders.get("_bin");
-                        for (var binaryChecksum : binaryChecksums) {
-                            try {
-                                var integerElement = (Integer) binaryChecksum;
-                            } catch (ClassCastException e) {
-                                var longElement = (Long) binaryChecksum;
-                            }
-                        }
-                    } catch (ClassCastException e) {
-                        throw new JApiError("error._ParseFailure",
-                                Map.of("reason", "BinaryHeaderMustBeArrayOfIntegers"));
+                var headerValidationFailures = validateHeaders(inputHeaders, jApi);
 
+                if (!headerValidationFailures.isEmpty()) {
+                    var validationFailureCases = new ArrayList<Map<String, String>>();
+
+                    for (var validationFailure : headerValidationFailures) {
+                        var validationFailureCase = Map.of(
+                                "path", validationFailure.path,
+                                "reason", validationFailure.reason);
+                        validationFailureCases.add(validationFailureCase);
                     }
+                    throw new JApiError("error._InvalidRequestHeaders", Map.of("cases", validationFailureCases));
+                }
+
+                if (inputHeaders.containsKey("_bin")) {
+                    List<Object> binaryChecksums = (List<Object>) inputHeaders.get("_bin");
 
                     if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
                         // Client is initiating handshake for binary protocol
@@ -101,23 +101,6 @@ class InternalProcess {
                     functionDefinition = f;
                 } else {
                     throw new JApiError("error._UnknownFunction", Map.of());
-                }
-
-                Map<String, List<String>> selectStructFieldsHeader = null;
-                if (inputHeaders.containsKey("_selectFields")) {
-                    try {
-                        selectStructFieldsHeader = (Map<String, List<String>>) inputHeaders.get("_selectFields");
-                        for (Map.Entry<String, List<String>> entry : selectStructFieldsHeader.entrySet()) {
-                            var fields = entry.getValue();
-                            for (var field : fields) {
-                                // verify the cast works
-                                var stringField = (String) field;
-                            }
-                        }
-                    } catch (ClassCastException e) {
-                        throw new JApiError("error._ParseFailure",
-                                Map.of("reason", "SelectHeaderMustBeObjectOfArraysOfStrings"));
-                    }
                 }
 
                 var inputValidationFailures = validateStruct(functionDefinition.name,
@@ -184,7 +167,9 @@ class InternalProcess {
                 }
 
                 Map<String, Object> finalOutput;
-                if (selectStructFieldsHeader != null) {
+                if (inputHeaders.containsKey("_selectFields")) {
+                    Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) inputHeaders
+                            .get("_selectFields");
                     finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct, output,
                             selectStructFieldsHeader);
                 } else {
@@ -208,6 +193,86 @@ class InternalProcess {
 
             return List.of(outputTarget, outputHeaders, Map.of());
         }
+    }
+
+    private static List<ValidationFailure> validateHeaders(
+            Map<String, Object> headers, Map<String, Definition> jApi) {
+        var validationFailures = new ArrayList<ValidationFailure>();
+
+        if (headers.containsKey("_bin")) {
+            List<Object> binaryChecksums;
+            try {
+                binaryChecksums = (List<Object>) headers.get("_bin");
+                for (var binaryChecksum : binaryChecksums) {
+                    try {
+                        var integerElement = (Integer) binaryChecksum;
+                    } catch (ClassCastException e) {
+                        var longElement = (Long) binaryChecksum;
+                    }
+                }
+            } catch (ClassCastException e) {
+                validationFailures.add(new ValidationFailure("_bin", "BinaryHeaderMustBeArrayOfIntegers"));
+            }
+        }
+
+        if (headers.containsKey("_selectFields")) {
+            Map<String, Object> selectStructFieldsHeader = new HashMap<>();
+            try {
+                selectStructFieldsHeader = (Map<String, Object>) headers
+                        .get("_selectFields");
+
+            } catch (ClassCastException e) {
+                validationFailures.add(new ValidationFailure("_selectFields",
+                        "SelectHeaderMustBeObject"));
+            }
+            for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
+                var structName = entry.getKey();
+                if (!structName.startsWith("struct.")) {
+                    validationFailures.add(new ValidationFailure("_selectFields{%s}".formatted(structName),
+                            "SelectHeaderKeyMustBeStructReference"));
+                    continue;
+                }
+                var structReference = jApi.get(structName);
+                if (structReference == null) {
+                    validationFailures.add(new ValidationFailure("_selectFields{%s}".formatted(structName),
+                            "UnknownStruct"));
+                    continue;
+                }
+
+                List<Object> fields = new ArrayList<>();
+                try {
+                    fields = (List<Object>) entry.getValue();
+                } catch (ClassCastException e) {
+                    validationFailures.add(new ValidationFailure("_selectFields{%s}".formatted(structName),
+                            "SelectHeaderFieldsMustBeArray"));
+                }
+
+                for (int i = 0; i < fields.size(); i += 1) {
+                    var field = fields.get(i);
+                    String stringField;
+                    try {
+                        stringField = (String) field;
+                    } catch (ClassCastException e) {
+                        validationFailures.add(new ValidationFailure(
+                                "_selectFields{%s}[%d]".formatted(structName, i),
+                                "SelectHeaderFieldMustBeString"));
+                        continue;
+                    }
+                    if (structReference instanceof TypeDefinition d) {
+                        if (d.type instanceof Struct s) {
+                            if (!s.fields.containsKey(stringField)) {
+                                validationFailures.add(new ValidationFailure(
+                                        "_selectFields{%s}[%d]".formatted(structName, i),
+                                        "UnknownStructField"));
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return validationFailures;
     }
 
     private static List<ValidationFailure> validateStruct(
