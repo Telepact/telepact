@@ -1,7 +1,7 @@
 from dataclasses import dataclass;
 
 cases_filepath = "../../test/cases.txt"
-test_filepath = "src/test/java/io/github/brenbar/japi/Tests.java"
+test_filepath = "src/test/java/io/github/brenbar/japi/GeneratedTests.java"
 
 cases_file = open(cases_filepath, "r")
 test_file = open(test_filepath, "w")
@@ -47,7 +47,7 @@ import java.io.*;
 
 import static io.github.brenbar.japi.TestUtility.test;
 
-public class Tests {
+public class GeneratedTests {
 
 ''')
 
