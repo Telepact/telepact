@@ -95,8 +95,11 @@ public class Tests {
 
         // test json
         {
-            var output = processor.process(input.getBytes(StandardCharsets.UTF_8));
-            var outputAsParsedJson = objectMapper.readValue(output, new TypeReference<List<Object>>() {
+            var inputBytes = input.getBytes(StandardCharsets.UTF_8);
+            System.out.println("--> %s".formatted(new String(inputBytes)));
+            var outputBytes = processor.process(inputBytes);
+            System.out.println("<-- %s".formatted(new String(outputBytes)));
+            var outputAsParsedJson = objectMapper.readValue(outputBytes, new TypeReference<List<Object>>() {
             });
             assertEquals(expectedOutputAsParsedJson, outputAsParsedJson);
         }
@@ -106,7 +109,9 @@ public class Tests {
             Adapter adapter = (m, s) -> {
                 return CompletableFuture.supplyAsync(() -> {
                     var inputBytes = s.serialize(m);
+                    System.out.println("--> %s".formatted(new String(inputBytes)));
                     var outputBytes = processor.process(inputBytes);
+                    System.out.println("<-- %s".formatted(new String(outputBytes)));
                     List<Object> output;
                     try {
                         output = s.deserialize(outputBytes);
