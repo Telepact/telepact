@@ -113,7 +113,7 @@ class InternalProcess {
                                 "reason", validationFailure.reason);
                         validationFailureCases.add(validationFailureCase);
                     }
-                    throw new JApiError("error._InvalidInput", Map.of("cases", validationFailureCases));
+                    throw new JApiError("error._InvalidRequestBody", Map.of("cases", validationFailureCases));
                 }
 
                 var context = new Context(functionName);
@@ -143,7 +143,7 @@ class InternalProcess {
                                         "reason", validationFailure.reason);
                                 validationFailureCases.add(validationFailureCase);
                             }
-                            throw new JApiError("error._InvalidOutput", Map.of("cases", validationFailureCases));
+                            throw new JApiError("error._InvalidResponseBody", Map.of("cases", validationFailureCases));
                         }
 
                         throw e;
@@ -163,7 +163,7 @@ class InternalProcess {
                                 "reason", validationFailure.reason);
                         validationFailureCases.add(validationFailureCase);
                     }
-                    throw new JApiError("error._InvalidOutput", Map.of("cases", validationFailureCases));
+                    throw new JApiError("error._InvalidResponseBody", Map.of("cases", validationFailureCases));
                 }
 
                 Map<String, Object> finalOutput;

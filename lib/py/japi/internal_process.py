@@ -179,7 +179,7 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
             raise e
 
     except StructHasExtraFields as e:
-        message_type = "error._InvalidInput"
+        message_type = "error._InvalidRequestBody"
         errors = {
             f"{e.namespace}.{field}": "UnknownStructField" for field in e.extra_fields}
         message_body = create_invalid_fields(errors)
@@ -187,7 +187,7 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
         return [message_type, final_headers, message_body]
 
     except StructMissingFields as e:
-        message_type = "error._InvalidInput"
+        message_type = "error._InvalidRequestBody"
         errors = {
             f"{e.namespace}.{field}": "RequiredStructFieldMissing" for field in e.missing_fields}
         message_body = create_invalid_fields(errors)
@@ -195,14 +195,14 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
         return [message_type, final_headers, message_body]
 
     except UnknownEnumField as e:
-        message_type = "error._InvalidInput"
+        message_type = "error._InvalidRequestBody"
         message_body = create_invalid_field(
             f"{e.namespace}.{e.field}", "UnknownEnumField")
 
         return [message_type, final_headers, message_body]
 
     except EnumDoesNotHaveOnlyOneField as e:
-        message_type = "error._InvalidInput"
+        message_type = "error._InvalidRequestBody"
         message_body = create_invalid_field(
             e.namespace, "EnumDoesNotHaveExactlyOneField")
 
@@ -217,12 +217,12 @@ def process_object(input_japi_message: List[Any], on_error: Callable[[Exception]
         return [message_type, final_headers, message_body]
 
     except (InvalidOutput, InvalidApplicationFailure):
-        message_type = "error._InvalidOutput"
+        message_type = "error._InvalidResponseBody"
 
         return [message_type, final_headers, {}]
 
     except InvalidInput:
-        message_type = "error._InvalidInput"
+        message_type = "error._InvalidRequestBody"
 
         return [message_type, final_headers, {}]
 

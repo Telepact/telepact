@@ -30,13 +30,13 @@ JSON = '''
       "reason": "string"
     }
   ],
-  "error._InvalidInput": [
+  "error._InvalidRequestBody": [
     [],
     {
       "cases": "array<struct._InvalidField>"
     }
   ],
-  "error._InvalidOutput": [
+  "error._InvalidResponseBody": [
     [],
     {}
   ],

@@ -142,196 +142,196 @@ impl JapiProcessor {
                 let (msg_type, body) = match e {
                     ProcessError::InvalidInput(e2) => match e2 {
                         FieldError::NullInvalidForNonNullType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NullInvalidForNonNullType".to_string()),
                         ),
                         FieldError::IntegerInvalidForBooleanType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(
                                 &field,
                                 &"IntegerInvalidForBooleanType".to_string(),
                             ),
                         ),
                         FieldError::NumberInvalidForBooleanType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForBooleanType".to_string()),
                         ),
                         FieldError::StringInvalidForBooleanType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForBooleanType".to_string()),
                         ),
                         FieldError::ArrayInvalidForBooleanType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForBooleanType".to_string()),
                         ),
                         FieldError::ObjectInvalidForBooleanType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ObjectInvalidForBooleanType".to_string()),
                         ),
                         FieldError::BooleanInvalidForIntegerType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(
                                 &field,
                                 &"BooleanInvalidForIntegerType".to_string(),
                             ),
                         ),
                         FieldError::NumberInvalidForIntegerType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForIntegerType".to_string()),
                         ),
                         FieldError::StringInvalidForIntegerType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForIntegerType".to_string()),
                         ),
                         FieldError::ArrayInvalidForIntegerType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForIntegerType".to_string()),
                         ),
                         FieldError::ObjectInvalidForIntegerType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ObjectInvalidForIntegerType".to_string()),
                         ),
                         FieldError::BooleanInvalidForNumberType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForNumberType".to_string()),
                         ),
                         FieldError::StringInvalidForNumberType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForNumberType".to_string()),
                         ),
                         FieldError::ArrayInvalidForNumberType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForNumberType".to_string()),
                         ),
                         FieldError::ObjectInvalidForNumberType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ObjectInvalidForNumberType".to_string()),
                         ),
 
                         FieldError::BooleanInvalidForStringType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForStringType".to_string()),
                         ),
                         FieldError::IntegerInvalidForStringType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForStringType".to_string()),
                         ),
                         FieldError::NumberInvalidForStringType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForStringType".to_string()),
                         ),
                         FieldError::ArrayInvalidForStringType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForStringType".to_string()),
                         ),
                         FieldError::ObjectInvalidForStringType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ObjectInvalidForStringType".to_string()),
                         ),
 
                         FieldError::BooleanInvalidForArrayType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForArrayType".to_string()),
                         ),
                         FieldError::IntegerInvalidForArrayType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForArrayType".to_string()),
                         ),
                         FieldError::NumberInvalidForArrayType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForArrayType".to_string()),
                         ),
                         FieldError::StringInvalidForArrayType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForArrayType".to_string()),
                         ),
                         FieldError::ObjectInvalidForArrayType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ObjectInvalidForArrayType".to_string()),
                         ),
 
                         FieldError::BooleanInvalidForObjectType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForObjectType".to_string()),
                         ),
                         FieldError::IntegerInvalidForObjectType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForObjectType".to_string()),
                         ),
                         FieldError::NumberInvalidForObjectType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForObjectType".to_string()),
                         ),
                         FieldError::StringInvalidForObjectType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForObjectType".to_string()),
                         ),
                         FieldError::ArrayInvalidForObjectType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForObjectType".to_string()),
                         ),
                         FieldError::BooleanInvalidForStructType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForStructType".to_string()),
                         ),
                         FieldError::IntegerInvalidForStructType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForStructType".to_string()),
                         ),
                         FieldError::NumberInvalidForStructType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForStructType".to_string()),
                         ),
                         FieldError::StringInvalidForStructType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForStructType".to_string()),
                         ),
                         FieldError::ArrayInvalidForStructType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForStructType".to_string()),
                         ),
                         FieldError::BooleanInvalidForUnionType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForUnionType".to_string()),
                         ),
                         FieldError::IntegerInvalidForUnionType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForUnionType".to_string()),
                         ),
                         FieldError::NumberInvalidForUnionType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForUnionType".to_string()),
                         ),
                         FieldError::StringInvalidForUnionType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"StringInvalidForUnionType".to_string()),
                         ),
                         FieldError::ArrayInvalidForUnionType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForUnionType".to_string()),
                         ),
                         FieldError::BooleanInvalidForEnumType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"BooleanInvalidForEnumType".to_string()),
                         ),
                         FieldError::IntegerInvalidForEnumType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForEnumType".to_string()),
                         ),
                         FieldError::NumberInvalidForEnumType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"NumberInvalidForEnumType".to_string()),
                         ),
                         FieldError::ArrayInvalidForEnumType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ArrayInvalidForEnumType".to_string()),
                         ),
                         FieldError::ObjectInvalidForEnumType(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"ObjectInvalidForEnumType".to_string()),
                         ),
                         FieldError::InvalidEnumValue(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(&field, &"UnknownEnumValue".to_string()),
                         ),
                         FieldError::StructMissingFields(namespace, fields) => {
@@ -345,7 +345,7 @@ impl JapiProcessor {
                                 })
                                 .collect();
                             (
-                                Value::String(format!("error._InvalidInput")),
+                                Value::String(format!("error._InvalidRequestBody")),
                                 self._invalid_fields(errors),
                             )
                         }
@@ -360,19 +360,19 @@ impl JapiProcessor {
                                 })
                                 .collect();
                             (
-                                Value::String(format!("error._InvalidInput")),
+                                Value::String(format!("error._InvalidRequestBody")),
                                 self._invalid_fields(errors),
                             )
                         }
                         FieldError::UnionDoesNotHaveOnlyOneField(field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(
                                 &field,
                                 &"UnionDoesNotHaveExactlyOneField".to_string(),
                             ),
                         ),
                         FieldError::UnknownUnionField(namespace, field) => (
-                            Value::String(format!("error._InvalidInput")),
+                            Value::String(format!("error._InvalidRequestBody")),
                             self._invalid_field(
                                 &format!("{}.{}", namespace, field),
                                 &"UnknownUnionField".to_string(),
@@ -384,7 +384,7 @@ impl JapiProcessor {
                         ),
                     },
                     ProcessError::InvalidOutput(_) => (
-                        Value::String(format!("error._InvalidOutput")),
+                        Value::String(format!("error._InvalidResponseBody")),
                         Value::Object(Map::new()),
                     ),
                     _ => (
