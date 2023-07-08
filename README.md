@@ -119,18 +119,18 @@ any configuration by the server.
 ### Why have both optional and nullable fields?
 
 jAPI allows API designers to mark a field as optional (the field might be
-omitted) as well as mark a fields type as nullable (the field might appear with
+omitted) as well as mark the field type as nullable (the field might appear with
 a null value).
 
 These design options are both present to maximize the design expressiveness of
-the API. jAPI takes the stance that there is a semantic difference between
-"null" and "undefined," the distinction being notably exemplified in languages
-like TypeScript. While "null" is a value that can be passed around like a string
-or number, "undefined" can not be passed around but is rather an incidental
-property of the shape of the data itself. This is especially useful in update
-APIs where you want to "erase" just one field of a model, where "null" can be
-used to indicate the erasure of data, and "optionality" can be used to omit all
-fields except the one field you want to erase.
+the API. jAPI leverages optionality to accomplish the expressiveness of
+`undefined` in languages like TypeScript. While `null` is a value that can be
+passed around like a string or number, `undefined` or optionality can not be
+passed around but is rather an incidental property of the shape of the data
+itself. This is especially useful in update APIs where you want to erase just
+one field of a model, where null can be used to indicate the erasure of data,
+and optionality can be used to omit all fields except the one field you want to
+erase.
 
 ### Why are enums in jAPI not like traditional enums seen in C or Java?
 
