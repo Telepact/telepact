@@ -41,12 +41,23 @@ class InternalJApi {
             "reason": "string"
           }
         ],
+        "error._InvalidRequestTarget": [
+          [
+            "                                                                         ",
+            " Indicates a failure to pass validation due an invalid Request Target as ",
+            " as explained by a `reason`.                                             ",
+            "                                                                         "
+          ],
+          {
+            "reason": "string"
+          }
+        ],
         "error._InvalidRequestBody": [
           [
-            "                                                                                            ",
-            " Indicates a failure to pass server-side validation due to invalid data in the Request Body ",
-            " as explained by a list of `cases`.                                                         ",
-            "                                                                                            "
+            "                                                                                ",
+            " Indicates a failure to pass validation due to invalid data in the Request Body ",
+            " as explained by a list of `cases`.                                             ",
+            "                                                                                "
           ],
           {
             "cases": "array<struct._ValidationFailure>"
@@ -54,10 +65,10 @@ class InternalJApi {
         ],
         "error._InvalidRequestHeaders": [
           [
-            "                                                                                               ",
-            " Indicates a failure to pass server-side validation due to invalid data in the Request Headers ",
-            " as explained by a list of `cases`.                                                            ",
-            "                                                                                               "
+            "                                                                                   ",
+            " Indicates a failure to pass validation due to invalid data in the Request Headers ",
+            " as explained by a list of `cases`.                                                ",
+            "                                                                                   "
           ],
           {
             "cases": "array<struct._ValidationFailure>"
@@ -66,7 +77,7 @@ class InternalJApi {
         "error._InvalidResponseBody": [
           [
             "                                                                                             ",
-            " Indicates a failure to pass server-side validation due to invalid data in the Response Body ",
+            " Indicates a failure to pass validation due to invalid data in the Response Body ",
             " as explained by a list of `cases`.                                                          ",
             "                                                                                             "
           ],
@@ -76,9 +87,9 @@ class InternalJApi {
         ],
         "error._ParseFailure": [
           [
-            "                                                                ",
-            " Indicates a failure for a Request to be parsed due a `reason`. ",
-            "                                                                "
+            "                                                                                  ",
+            " Indicates a failure for a Request to be parsed as a jAPI message due a `reason`. ",
+            "                                                                                  "
           ],
           {
             "reason": "string"

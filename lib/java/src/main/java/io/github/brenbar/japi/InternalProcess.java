@@ -36,6 +36,7 @@ class InternalProcess {
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
             Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
 
+        boolean unsafeOutputEnabled = false;
         var outputHeaders = new HashMap<String, Object>();
         try {
             try {
@@ -47,13 +48,13 @@ class InternalProcess {
                 try {
                     inputTarget = (String) inputMessage.get(0);
                 } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "TargetMustBeString"));
+                    throw new JApiError("error._InvalidRequestTarget", Map.of("reason", "TargetMustBeString"));
                 }
 
                 var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)");
                 var matcher = regex.matcher(inputTarget);
                 if (!matcher.matches()) {
-                    throw new JApiError("error._ParseFailure",
+                    throw new JApiError("error._InvalidRequestTarget",
                             Map.of("reason", "TargetStringMustBeFunction"));
                 }
                 var functionName = matcher.group(1);
@@ -114,7 +115,7 @@ class InternalProcess {
                 if (functionDef instanceof FunctionDefinition f) {
                     functionDefinition = f;
                 } else {
-                    throw new JApiError("error._UnknownFunction", Map.of());
+                    throw new JApiError("error._InvalidRequestTarget", Map.of("reason", "UnknownFunction"));
                 }
 
                 var inputValidationFailures = validateStruct(functionDefinition.name,
@@ -134,7 +135,7 @@ class InternalProcess {
                 var contextPropertiesFromHeaders = extractContextProperties.apply(inputHeaders);
                 context.properties.putAll(contextPropertiesFromHeaders);
 
-                var unsafeOutputEnabled = Objects.equals(true, inputHeaders.get("_unsafe"));
+                unsafeOutputEnabled = Objects.equals(true, inputHeaders.get("_unsafe"));
 
                 Map<String, Object> output;
                 try {
@@ -147,19 +148,6 @@ class InternalProcess {
                     }
                 } catch (JApiError e) {
                     if (functionDefinition.allowedErrors.contains(e.target)) {
-                        var def = (ErrorDefinition) jApi.get(e.target);
-                        var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
-                        if (!errorValidationFailures.isEmpty() && !unsafeOutputEnabled) {
-                            var validationFailureCases = new ArrayList<Map<String, String>>();
-                            for (var validationFailure : errorValidationFailures) {
-                                var validationFailureCase = Map.of(
-                                        "path", validationFailure.path,
-                                        "reason", validationFailure.reason);
-                                validationFailureCases.add(validationFailureCase);
-                            }
-                            throw new JApiError("error._InvalidResponseBody", Map.of("cases", validationFailureCases));
-                        }
-
                         throw e;
                     } else {
                         throw new DisallowedError(e);
@@ -201,6 +189,19 @@ class InternalProcess {
                 throw e;
             }
         } catch (JApiError e) {
+            var def = (ErrorDefinition) jApi.get(e.target);
+            var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
+            if (!errorValidationFailures.isEmpty() && !unsafeOutputEnabled) {
+                var validationFailureCases = new ArrayList<Map<String, String>>();
+                for (var validationFailure : errorValidationFailures) {
+                    var validationFailureCase = Map.of(
+                            "path", validationFailure.path,
+                            "reason", validationFailure.reason);
+                    validationFailureCases.add(validationFailureCase);
+                }
+                throw new JApiError("error._InvalidResponseBody", Map.of("cases", validationFailureCases));
+            }
+
             throw e;
         } catch (Exception e) {
             var outputTarget = "error._ApplicationFailure";

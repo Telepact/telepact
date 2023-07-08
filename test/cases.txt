@@ -1211,7 +1211,13 @@
 
 "testUnknownFunction"
 
-["function.notFound",{},{}]|["error._UnknownFunction",{},{}]|skipBinary
+["function.notFound",{},{}]|["error._InvalidRequestTarget",{},{"reason":"UnknownFunction"}]|skipBinary
+
+[false,{},{}]|["error._InvalidRequestTarget",{},{"reason":"TargetMustBeString"}]|skipBinary
+[0,{},{}]|["error._InvalidRequestTarget",{},{"reason":"TargetMustBeString"}]|skipBinary
+["",{},{}]|["error._InvalidRequestTarget",{},{"reason":"TargetStringMustBeFunction"}]|skipBinary
+[[],{},{}]|["error._InvalidRequestTarget",{},{"reason":"TargetMustBeString"}]|skipBinary
+[{},{},{}]|["error._InvalidRequestTarget",{},{"reason":"TargetMustBeString"}]|skipBinary
 
 "testErrors"
 
@@ -1269,12 +1275,6 @@ false|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}
 {}|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
 [{},{}]|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
 ["function._ping",{}]|["error._ParseFailure",{},{"reason":"MessageMustBeArrayWithThreeElements"}]|skipBinary
-
-[false,{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
-[0,{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
-["",{},{}]|["error._ParseFailure",{},{"reason":"TargetStringMustBeFunction"}]|skipBinary
-[[],{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
-[{},{},{}]|["error._ParseFailure",{},{"reason":"TargetMustBeString"}]|skipBinary
 
 ["function._ping",false,{}]|["error._ParseFailure",{},{"reason":"HeadersMustBeObject"}]|skipBinary
 ["function._ping",0,{}]|["error._ParseFailure",{},{"reason":"HeadersMustBeObject"}]|skipBinary

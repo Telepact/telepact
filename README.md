@@ -46,7 +46,7 @@ $ python japi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x":
 | API design cleanly separated from transport                | ❌      | ✅   | ✅      | ✅   |
 | Maximally expressive API design options                    | ✅      | ❌   | ❌      | ✅   |
 | Low development burden for servers                         | ✅      | ✅   | ❌      | ✅   |
-| No required libraries for clients                          | ✅      | ❌   | ✅      | ✅   |
+| No required libraries for clients                          | ✅      | ❌   | ❌      | ✅   |
 | Type-safe generated code                                   | 🤔      | ✅   | ✅      | ✅   |
 | Developer-friendly data serialization protocol with JSON   | ✅      | ❌   | ✅      | ✅   |
 | Compact and efficient data serialization protocol          | ❌      | ✅   | ❌      | ✅   |
@@ -73,23 +73,24 @@ boundaries derived from a wholistic IDL that does not leak transport details.
 However, gRPC lacks overall accessibility due to reliance on libraries in a
 finite number of programming languages and expectation to generate code. And
 there are some API design limitations with gRPC, such as prohibitive rules with
-lists (i.e. repeated values) as well as a weak error model at the protocol layer
-which has limited patching at the library level across the gRPC ecosystem.
+lists (i.e. repeated values), a lack of distinction between null and undefined,
+and a weak error model at the protocol layer which has prompted patching at the
+library level with limited coverage across the gRPC ecosystem.
 
 ## Why not GraphQL?
 
-GraphQL is a highly accessible API technology that features a unique query
-language to dynamically build data payloads as needed from a pre-crafted set of
-server-side functions. However, GraphQL tends to create its pristine client
-development experience at the expense of server-side development, as an
-understanding of the query model is required to properly design the functions
-that plug into that query engine. And in some cases, lifting complex data joins
-out of a database and into server memory may be prohibitively slow for some
-large data sets. It does features a rich data model, but it lacks support for
-common programming idioms, such as variable maps. While binary serialization is
-technically possible through manual configuration, it is largely not observed in
-practice due to the accessibility tax it would incur on both servers and
-clients.
+GraphQL is a unique API technology that features a custom query language to
+dynamically build data payloads from a pre-crafted set of server-side functions.
+While consumption of the "graph" is extremely expressive for clients,
+construction of the graph's backing functions places a modest burden on
+server-side development to properly and efficiently integrate the query engine
+with the backing database. GraphQL also has limited accessibility as clients
+largely rely on GraphQL libraries to construct the query strings so as to
+minimize parse error risk. GraphQL does feature a rich data model, but it lacks
+support for common programming idioms, such as variable maps. While binary
+serialization is technically possible through manual configuration, it is
+largely not observed in practice due to the accessibility tax it would incur on
+both servers and clients.
 
 ## Why jAPI?
 
@@ -104,11 +105,10 @@ programming data types. And then from that baseline, jAPI critically allows
 clients to upgrade their experience as deemed appropriate by the client,
 optionally using:
 
-- jAPI client libraries that help facilitate crafting of JSON payloads
+- jAPI client libraries that help facilitate crafting of jAPI messages
 - Generated code for further increased type safety
 - A built-in binary serialization protocol for optimized efficiency
-- A built-in mechanism to omit fields from responses for further optimized
-  efficiency
+- A built-in mechanism to omit fields from responses for optimized efficiency
 
 These client features are built-in via the jAPI library used by the server, such
 that all of these features are available to the client automatically, without
@@ -168,8 +168,8 @@ to turn off this output validation by submitting their requests with the
 
 - **Client** - An entity consuming a jAPI.
 
-- **Input** - The body of a `function.*`-targeted jAPI Message sent from the
-  Client.
+- **Input** - The colloquial name for the body of a `function.*`-targeted jAPI
+  Message sent from the Client.
 
 - **Headers** - An unstructured JSON object consisting of metadata about a jAPI
   Message.
@@ -177,8 +177,8 @@ to turn off this output validation by submitting their requests with the
 - **Message** - The JSON payload sent over the IPC boundary, comprised of a
   single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
 
-- **Output** - The body of a `function.*`-targeted jAPI Message sent from the
-  Server.
+- **Output** - The colloquial name for the body of a `function.*`-targeted jAPI
+  Message sent from the Server.
 
 - **Server** - An entity providing an implementation of a jAPI and adhering to
   the jAPI specification.
