@@ -30,7 +30,7 @@ public class MockProcessor {
     }
 
     private Map<String, Object> handle(Context context, Map<String, Object> input) {
-        return InternalMockProcess.handle(context, input, this.processor.jApi, this.random, this.mocks,
+        return InternalMockProcess.handle(context, input, this.processor.jApiSchema, this.random, this.mocks,
                 this.invocations);
     }
 

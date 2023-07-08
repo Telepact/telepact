@@ -19,21 +19,13 @@ public class Processor {
     Handler handler;
     Middleware middleware;
     ExtractContextProperties extractContextProperties;
-    Map<String, Object> originalJApiAsParsedJson;
-    Map<String, Definition> jApi;
+    JApiSchema jApiSchema;
     Consumer<Throwable> onError;
     BinaryEncoder binaryEncoder;
     Serializer serializer;
 
     public Processor(String jApiAsJson, Handler handler) {
-        var jApiTuple = InternalParse.newJApi(jApiAsJson);
-        this.jApi = jApiTuple.parsed;
-        this.originalJApiAsParsedJson = jApiTuple.original;
-
-        var internalJApiTuple = InternalParse.newJApi(InternalJApi.JSON);
-
-        this.jApi.putAll(internalJApiTuple.parsed);
-        this.originalJApiAsParsedJson.putAll(internalJApiTuple.original);
+        this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiAsJson);
 
         this.handler = handler;
         this.onError = (e) -> {
@@ -41,7 +33,7 @@ public class Processor {
         this.middleware = (i, n) -> n.apply(i);
         this.extractContextProperties = (h) -> new HashMap<>();
 
-        this.binaryEncoder = InternalBinaryEncode.constructBinaryEncoder(jApi);
+        this.binaryEncoder = InternalBinaryEncode.constructBinaryEncoder(this.jApiSchema);
 
         this.serializer = new Serializer(new DefaultSerializationStrategy(),
                 new ServerBinaryEncodingStrategy(binaryEncoder));
@@ -83,7 +75,7 @@ public class Processor {
     }
 
     private List<Object> processObject(List<Object> inputMessage) {
-        return InternalProcess.processObject(inputMessage, this.onError, this.binaryEncoder, this.jApi,
-                this.originalJApiAsParsedJson, this.handler, this.extractContextProperties);
+        return InternalProcess.processObject(inputMessage, this.onError, this.binaryEncoder,
+                this.jApiSchema, this.handler, this.extractContextProperties);
     }
 }

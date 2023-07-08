@@ -19,11 +19,11 @@ interface BinaryEncodingStrategy {
     List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
 }
 
-class JApi {
+class JApiSchema {
     public final Map<String, Object> original;
     public final Map<String, Definition> parsed;
 
-    public JApi(Map<String, Object> original, Map<String, Definition> parsed) {
+    public JApiSchema(Map<String, Object> original, Map<String, Definition> parsed) {
         this.original = original;
         this.parsed = parsed;
     }

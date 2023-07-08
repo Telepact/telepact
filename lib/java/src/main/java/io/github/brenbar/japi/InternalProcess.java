@@ -31,8 +31,7 @@ class InternalProcess {
 
     static List<Object> processObject(List<Object> inputMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
-            Map<String, Definition> jApi,
-            Map<String, Object> originalJApiAsParsedJson,
+            JApiSchema jApiSchema,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
             Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
 
@@ -66,7 +65,7 @@ class InternalProcess {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "HeadersMustBeObject"));
                 }
 
-                var headerValidationFailures = validateHeaders(inputHeaders, jApi);
+                var headerValidationFailures = validateHeaders(inputHeaders, jApiSchema);
 
                 if (!headerValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
@@ -109,7 +108,7 @@ class InternalProcess {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "BodyMustBeObject"));
                 }
 
-                var functionDef = jApi.get(inputTarget);
+                var functionDef = jApiSchema.parsed.get(inputTarget);
 
                 FunctionDefinition functionDefinition;
                 if (functionDef instanceof FunctionDefinition f) {
@@ -142,7 +141,7 @@ class InternalProcess {
                     if (functionName.equals("_ping")) {
                         output = Map.of();
                     } else if (functionName.equals("_jApi")) {
-                        output = Map.of("jApi", originalJApiAsParsedJson);
+                        output = Map.of("jApi", jApiSchema.original);
                     } else {
                         output = handler.apply(context, input);
                     }
@@ -189,7 +188,7 @@ class InternalProcess {
                 throw e;
             }
         } catch (JApiError e) {
-            var def = (ErrorDefinition) jApi.get(e.target);
+            var def = (ErrorDefinition) jApiSchema.parsed.get(e.target);
             var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
             if (!errorValidationFailures.isEmpty() && !unsafeOutputEnabled) {
                 var validationFailureCases = new ArrayList<Map<String, String>>();
@@ -211,7 +210,7 @@ class InternalProcess {
     }
 
     private static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, Map<String, Definition> jApi) {
+            Map<String, Object> headers, JApiSchema jApiSchema) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
@@ -247,7 +246,7 @@ class InternalProcess {
                             "SelectHeaderKeyMustBeStructReference"));
                     continue;
                 }
-                var structReference = jApi.get(structName);
+                var structReference = jApiSchema.parsed.get(structName);
                 if (structReference == null) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "UnknownStruct"));

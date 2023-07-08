@@ -132,6 +132,23 @@ one field of a model, where null can be used to indicate the erasure of data,
 and optionality can be used to omit all fields except the one field you want to
 erase.
 
+### Why do functions in jAPI not support positional arguments?
+
+jAPI functions are automatically associated with an input struct and an output
+struct that API designers can use to colloquially define arguments and return
+values, respectively. The colloquial arguments being supplied via the input
+struct will be inherently unordered due to the nature of JSON objects, and there
+is no way to approximate traditional positional arguments at the root of the
+Request Message Body.
+
+This design decision is intentional. Positional arguments are a significant risk
+that provoke backwards incompatible changes through seemingly innocent API
+changes, such as changing the order of arguments or appending new arguments.
+This problem is especially pronounced in generated code for many programming
+languages. By making the design entry point a struct, API designers are
+predisposed for backwards-compatible changes like appending optional struct
+fields.
+
 ### Why are enums in jAPI not like traditional enums seen in C or Java?
 
 jAPI enums take the form of the tagged unions paradigm as featured in modern
@@ -140,14 +157,14 @@ similar to the traditional enum, except that a struct is automatically attached
 to each enum value.
 
 This design maximizes backwards compatible change points in the API design, as
-adding a field to a struct is a legal backwards compatible change. The
-traditional enum can be approximated by simply leaving all structs blank.
+adding an optional field to a struct is a legal backwards compatible change. The
+traditional enum can be approximated by simply leaving all enum structs blank.
 
-### Why force servers to perform output validation? Wouldn't it be better to give clients malformed data so that they are at least empowered to adapt?
+### Why force servers to perform output validation?
 
 jAPI automatically performs validation of function outputs (as well as errors)
-against the API description, and there is no setting for servers to turn off
-this behavior.
+against the jAPI schema, and there is no setting for servers to turn off this
+behavior.
 
 This design decision is intentional. It helps maintain the high standard of type
 safety in the jAPI ecosystem by preventing API providers from indulging in the

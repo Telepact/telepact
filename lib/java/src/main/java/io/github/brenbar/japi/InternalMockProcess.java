@@ -12,7 +12,7 @@ import java.util.Random;
 
 class InternalMockProcess {
 
-    static Map<String, Object> handle(Context context, Map<String, Object> input, Map<String, Definition> jApi,
+    static Map<String, Object> handle(Context context, Map<String, Object> input, JApiSchema jaApiSchema,
             Random random, List<Mock> mocks, List<Invocation> invocations) {
 
         invocations.add(new Invocation(context.functionName, input));
@@ -29,7 +29,7 @@ class InternalMockProcess {
             }
         }
 
-        var definition = jApi.get("function.%s".formatted(context.functionName));
+        var definition = jaApiSchema.parsed.get("function.%s".formatted(context.functionName));
 
         if (definition instanceof FunctionDefinition f) {
             return constructRandomStruct(f.outputStruct.fields, random);

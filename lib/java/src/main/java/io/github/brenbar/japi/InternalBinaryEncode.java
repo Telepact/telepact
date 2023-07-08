@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 
 class InternalBinaryEncode {
 
-    static BinaryEncoder constructBinaryEncoder(Map<String, Definition> definitions) {
+    static BinaryEncoder constructBinaryEncoder(JApiSchema jApiSchema) {
         var allKeys = new TreeSet<String>();
-        for (var entry : definitions.entrySet()) {
+        for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof FunctionDefinition f) {
                 allKeys.addAll(f.inputStruct.fields.keySet());

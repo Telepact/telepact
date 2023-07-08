@@ -11,7 +11,17 @@ import java.util.regex.Pattern;
 
 class InternalParse {
 
-    static JApi newJApi(String jApiAsJson) {
+    static JApiSchema newJApiSchemaWithInternalSchema(String jApiAsJson) {
+        var schema = newJApiSchema(jApiAsJson);
+        var internalSchema = newJApiSchema(InternalJApi.JSON);
+
+        schema.original.putAll(internalSchema.original);
+        schema.parsed.putAll(internalSchema.parsed);
+
+        return schema;
+    }
+
+    private static JApiSchema newJApiSchema(String jApiAsJson) {
         var parsedDefinitions = new HashMap<String, Definition>();
 
         var objectMapper = new ObjectMapper();
@@ -31,7 +41,7 @@ class InternalParse {
             throw new JapiParseError("Document root must be an object");
         }
 
-        return new JApi((Map<String, Object>) (Object) japiAsParsedJson, parsedDefinitions);
+        return new JApiSchema((Map<String, Object>) (Object) japiAsParsedJson, parsedDefinitions);
     }
 
     private static Definition parseDefinition(Map<String, List<Object>> jApiAsParsedJson,
