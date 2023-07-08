@@ -116,6 +116,33 @@ any configuration by the server.
 
 ## More FAQ
 
+### Why have both optional and nullable fields?
+
+jAPI allows API designers to mark a field as optional (the field might be
+omitted) as well as mark a fields type as nullable (the field might appear with
+a null value).
+
+These design options are both present to maximize the design expressiveness of
+the API. jAPI takes the stance that there is a semantic difference between
+"null" and "undefined," the distinction being notably exemplified in languages
+like TypeScript. While "null" is a value that can be passed around like a string
+or number, "undefined" can not be passed around but is rather an incidental
+property of the shape of the data itself. This is especially useful in update
+APIs where you want to "erase" just one field of a model, where "null" can be
+used to indicate the erasure of data, and "optionality" can be used to omit all
+fields except the one field you want to erase.
+
+### Why are enums in jAPI not like traditional enums seen in C or Java?
+
+jAPI enums take the form of the tagged unions paradigm as featured in modern
+programming languages like rust. In the particular case of jAPI, it is very
+similar to the traditional enum, except that a struct is automatically attached
+to each enum value.
+
+This design maximizes backwards compatible change points in the API design, as
+adding a field to a struct is a legal backwards compatible change. The
+traditional enum can be approximated by simply leaving all structs blank.
+
 ### Why force servers to perform output validation? Wouldn't it be better to give clients malformed data so that they are at least empowered to adapt?
 
 jAPI automatically performs validation of function outputs (as well as errors)
@@ -159,9 +186,9 @@ to turn off this output validation by submitting their requests with the
 - **Target** - A reference to a top-level definition in the jAPI description of
   the jAPI server.
 
-- **jAPI** - The JSON document describing the API. This document is written in
-  the JSON language following a particular JSON schema, but conventionally, this
-  document would be written using an IDL.
+- **jAPI Schema** - The JSON document describing the API. This document is
+  written in the JSON language following a particular JSON schema, but
+  conventionally, this document would be written using an IDL.
 
 # Navigation
 
