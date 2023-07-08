@@ -40,72 +40,79 @@ $ python japi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x":
 
 # Motivation
 
-| Capability                                                   | RESTful | gRPC | jAPI |
-| ------------------------------------------------------------ | ------- | ---- | ---- |
-| Serve API with a transport other than HTTP                   | ❌      | ❌   | ✅   |
-| Define API decoupled from transport concepts                 | ❌      | ✅   | ✅   |
-| Consume API without any required libraries                   | ✅      | ❌   | ✅   |
-| Consume API with type-safe generated code                    | 🤔      | ✅   | ✅   |
-| Serve API with type-safe generated code                      | 🤔      | ✅   | ✅   |
-| Use JSON as a developer-friendly data serialization protocol | ✅      | ❌   | ✅   |
-| Use compact and efficient data serialization protocols       | 🤔      | ✅   | ✅   |
-| Return variable payloads according to consumer needs         | 🤔      | ❌   | ✅   |
-
-🤔 = Possible, but not consistently observed in practice
+| Capability                                                 | RESTful | gRPC | GraphQL | jAPI |
+| ---------------------------------------------------------- | ------- | ---- | ------- | ---- |
+| Transport agnosticism (can use something other than HTTP)  | ❌      | ❌   | ✅      | ✅   |
+| API design cleanly separated from transport                | ❌      | ✅   | ✅      | ✅   |
+| Maximally expressive API design options                    | ✅      | ❌   | ❌      | ✅   |
+| Low development burden for servers                         | ✅      | ✅   | ❌      | ✅   |
+| No required libraries for clients                          | ✅      | ❌   | ✅      | ✅   |
+| Type-safe generated code                                   | 🤔      | ✅   | ✅      | ✅   |
+| Developer-friendly data serialization protocol with JSON   | ✅      | ❌   | ✅      | ✅   |
+| Compact and efficient data serialization protocol          | ❌      | ✅   | ❌      | ✅   |
+| Built-in client-driven selection of serialization protocol | ❌      | ❌   | ❌      | ✅   |
+| Built-in client-driven dynamic response shaping            | ❌      | ❌   | ✅      | ✅   |
 
 ## Why not RESTful APIs?
 
-RESTful APIs are inherently HTTP APIs and cannot be used with any other
-networking transport (e.g. sockets, messaging). And unfortunately, HTTP concepts
-unnecessarily become intertwined with the API itself, which often leads to
-design inefficiencies where API design is stalled to answer HTTP-specific
-questions, such as determining the right url structure, the right query
-parameters, the right HTTP method, the right HTTP status code, and many others.
+RESTful APIs are familiar to many developers and are highly accessible due to
+reliance on ubiquitous tooling like HTTP and JSON. However, RESTful APIs by
+definition rely on HTTP and cannot be used across other IPC boundaries, limiting
+their use. RESTful APIs also tend to leak transport details into the API
+definition itself, which often leads to design inefficiencies where API design
+is stalled to answer HTTP-specific questions, such as determining the right url
+structure, query parameters, HTTP method, HTTP status code, etc. Type-safe code
+generation for RESTful APIs is in development with OAS and is generally
+available with limitations.
 
 ## Why not gRPC?
 
-gRPC APIs are also inherently tied to the HTTP transport, and similarly to
-RESTful APIs, cannot be used with other networking transports. Although in
-contrast to RESTful APIs, gRPC does properly decouple HTTP concepts from its API
-definitions, simplifying the API design story. gRPC also uses a more efficient
-serialization protocol than the typical RESTful API, but this protocol is used
-exclusively and is largely inaccessible to API consumers. So in practice,
-consumers must fully adopt gRPC tooling client-side, which places an integration
-burden on consumers who are not familiar with gRPC. Consumers will be required
-to use a supported language of gRPC, and will likely need to build up tooling to
-generate their own client code if their API provider doesn't offer a readily
-accessible client library.
+gRPC APIs are highly efficient and leverages critical improvements offered by
+the HTTP/2 specification. They are also type-safe through generated code
+boundaries derived from a wholistic IDL that does not leak transport details.
+However, gRPC lacks overall accessibility due to reliance on libraries in a
+finite number of programming languages and expectation to generate code. And
+there are some API design limitations with gRPC, such as prohibitive rules with
+lists (i.e. repeated values) as well as a weak error model at the protocol layer
+which has limited patching at the library level across the gRPC ecosystem.
+
+## Why not GraphQL?
+
+GraphQL is a highly accessible API technology that features a unique query
+language to dynamically build data payloads as needed from a pre-crafted set of
+server-side functions. However, GraphQL tends to create its pristine client
+development experience at the expense of server-side development, as an
+understanding of the query model is required to properly design the functions
+that plug into that query engine. And in some cases, lifting complex data joins
+out of a database and into server memory may be prohibitively slow for some
+large data sets. It does features a rich data model, but it lacks support for
+common programming idioms, such as variable maps. While binary serialization is
+technically possible through manual configuration, it is largely not observed in
+practice due to the accessibility tax it would incur on both servers and
+clients.
 
 ## Why jAPI?
 
-### jAPI is portable
-
-You can offer your API anywhere a JSON payload can be supplied. That could be an
-HTTP URL, a websocket, a topic for a message broker like Kafka, the browser
-event loop, or even simple inter-process communication interfaces like UNIX
-named pipes.
-
-### jAPI is flexible
-
-Server-side jAPI tooling allows you to offer a range of consumer experiences,
-from simple to advanced, all computed at runtime without any server-side
-configuration. At its simplest variation, consumers are not required to use any
-jAPI libraries; they can simply use the native JSON and networking capabilities
-of their preferred programming language and/or industry standard library and
-craft JSON payloads according to your API specification.
-
-But from there, consumers can also opt-in to several features including:
+jAPI takes all of the strengths of REST, gRPC, and GraphQL and combines them
+into a simple but careful design. It is built, first and foremost, on JSON with
+transport agnosticism to maximize accessibility to clients that want to
+integrate using only the native JSON and networking capabilities of their
+preferred programming language and/or industry standard library. It achieves
+type safety through built-in server-side validation against a server-defined API
+schema, complete with typing options that allow for modeling all common
+programming data types. And then from that baseline, jAPI critically allows
+clients to upgrade their experience as deemed appropriate by the client,
+optionally using:
 
 - jAPI client libraries that help facilitate crafting of JSON payloads
-- Type safety with client-side generated code
-- Swapping out of JSON for an efficient binary protocol to improve API speed
-- "Slicing" data returned from an API, where the consumer indicates data fields
-  that should be omitted by the API provider so as to further optimize speed
-  through reduced serialization.
+- Generated code for further increased type safety
+- A built-in binary serialization protocol for optimized efficiency
+- A built-in mechanism to omit fields from responses for further optimized
+  efficiency
 
-Again, all of these features are opt-in client-side, provided to the consumer
-through server-side jAPI libraries, which makes these features automatic without
-any effort by the server-side implementation.
+These client features are built-in via the jAPI library used by the server, such
+that all of these features are available to the client automatically, without
+any configuration by the server.
 
 ## More FAQ
 
