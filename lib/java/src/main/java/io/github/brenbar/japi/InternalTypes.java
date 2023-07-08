@@ -3,6 +3,7 @@ package io.github.brenbar.japi;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 interface Type {
     public String getName();
@@ -355,4 +356,18 @@ class Invocation {
 
 class NumberOutOfRangeError extends Exception {
 
+}
+
+class BinaryEncoder {
+
+    public final Map<String, Long> encodeMap;
+    public final Map<Long, String> decodeMap;
+    public final Long checksum;
+
+    public BinaryEncoder(Map<String, Long> binaryEncoding, Long binaryHash) {
+        this.encodeMap = binaryEncoding;
+        this.decodeMap = binaryEncoding.entrySet().stream()
+                .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
+        this.checksum = binaryHash;
+    }
 }

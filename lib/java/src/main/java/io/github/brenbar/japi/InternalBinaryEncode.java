@@ -63,7 +63,7 @@ class InternalBinaryEncode {
 
         headers.put("_bin", List.of(binaryEncoder.checksum));
 
-        return binaryEncoder.encode(message);
+        return encode(message, binaryEncoder);
     }
 
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoder binaryEncoder)
@@ -79,7 +79,7 @@ class InternalBinaryEncode {
             throw new BinaryEncoderUnavailableError();
         }
 
-        return binaryEncoder.decode(message);
+        return decode(message, binaryEncoder);
     }
 
     static List<Object> clientBinaryEncode(List<Object> message, Deque<BinaryEncoder> recentBinaryEncoders)
@@ -96,7 +96,7 @@ class InternalBinaryEncode {
             throw new BinaryEncoderUnavailableError();
         }
 
-        return binaryEncoder.encode(message);
+        return encode(message, binaryEncoder);
     }
 
     static List<Object> clientBinaryDecode(List<Object> message, Deque<BinaryEncoder> recentBinaryEncoders)
@@ -136,7 +136,7 @@ class InternalBinaryEncode {
             throw new BinaryEncoderUnavailableError();
         }
 
-        return binaryEncoder.get().decode(message);
+        return decode(message, binaryEncoder.get());
     }
 
     private static Optional<BinaryEncoder> findBinaryEncoder(Deque<BinaryEncoder> binaryEncoderStore, Long checksum) {
@@ -146,5 +146,75 @@ class InternalBinaryEncode {
             }
         }
         return Optional.empty();
+    }
+
+    private static List<Object> encode(List<Object> japiMessage, BinaryEncoder binaryEncoder) {
+        var encodedMessageType = get(binaryEncoder.encodeMap, japiMessage.get(0));
+        var headers = (Map<String, Object>) japiMessage.get(1);
+        var encodedBody = encodeKeys(japiMessage.get(2), binaryEncoder);
+        return List.of(encodedMessageType, headers, encodedBody);
+    }
+
+    static List<Object> decode(List<Object> japiMessage, BinaryEncoder binaryEncoder) {
+        var encodedMessageType = japiMessage.get(0);
+        if (encodedMessageType instanceof Integer i) {
+            encodedMessageType = Long.valueOf(i);
+        }
+        var decodedMessageType = get(binaryEncoder.decodeMap, encodedMessageType);
+        var headers = (Map<String, Object>) japiMessage.get(1);
+        var givenChecksums = (List<Long>) headers.get("_bin");
+        var decodedBody = decodeKeys(japiMessage.get(2), binaryEncoder);
+        // if (this.checksum != null && !givenChecksums.contains(this.checksum)) {
+        // throw new BinaryChecksumMismatchException();
+        // }
+        return List.of(decodedMessageType, headers, decodedBody);
+    }
+
+    private static Object encodeKeys(Object given, BinaryEncoder binaryEncoder) {
+        if (given == null) {
+            return given;
+        } else if (given instanceof Map<?, ?> m) {
+            var newMap = new HashMap<>();
+            m.entrySet().stream().forEach(e -> {
+                var key = e.getKey();
+                if (binaryEncoder.encodeMap.containsKey(key)) {
+                    key = get(binaryEncoder.encodeMap, key);
+                }
+                var encodedValue = encodeKeys(e.getValue(), binaryEncoder);
+                newMap.put(key, encodedValue);
+            });
+            return newMap;
+        } else if (given instanceof List<?> l) {
+            return l.stream().map(e -> encodeKeys(e, binaryEncoder)).toList();
+        } else {
+            return given;
+        }
+    }
+
+    private static Object decodeKeys(Object given, BinaryEncoder binaryEncoder) {
+        if (given instanceof Map<?, ?> m) {
+            var newMap = new HashMap<>();
+            m.entrySet().stream().forEach(e -> {
+                var key = e.getKey();
+                if (binaryEncoder.decodeMap.containsKey(key)) {
+                    key = get(binaryEncoder.decodeMap, key);
+                }
+                var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
+                newMap.put(key, encodedValue);
+            });
+            return newMap;
+        } else if (given instanceof List<?> l) {
+            return l.stream().map(e -> decodeKeys(e, binaryEncoder)).toList();
+        } else {
+            return given;
+        }
+    }
+
+    private static Object get(Map<?, ?> map, Object key) {
+        var value = map.get(key);
+        if (value == null) {
+            throw new RuntimeException("Missing encoding for " + String.valueOf(key));
+        }
+        return value;
     }
 }

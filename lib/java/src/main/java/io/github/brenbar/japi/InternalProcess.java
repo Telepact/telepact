@@ -628,7 +628,7 @@ class InternalProcess {
                     throw new JApiError("error._ParseFailure",
                             Map.of("reason", "JapiMessageArrayMustHaveThreeElements"));
                 }
-                return binaryEncoder.decode(encodedInputJapiMessage);
+                return InternalBinaryEncode.decode(encodedInputJapiMessage, binaryEncoder);
                 // } catch (BinaryChecksumMismatchException e) {
                 // throw new JApiError("error._BinaryDecodeFailure", Map.of());
             } catch (DeserializationError e) {
