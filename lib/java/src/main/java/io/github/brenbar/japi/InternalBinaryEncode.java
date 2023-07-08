@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 class InternalBinaryEncode {
 
-    static BinaryEncoder build(Map<String, Definition> definitions) {
+    static BinaryEncoder constructBinaryEncoder(Map<String, Definition> definitions) {
         var allKeys = new TreeSet<String>();
         for (var entry : definitions.entrySet()) {
             allKeys.add(entry.getKey());
