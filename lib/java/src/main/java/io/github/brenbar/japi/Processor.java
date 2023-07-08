@@ -21,7 +21,6 @@ public class Processor {
     ExtractContextProperties extractContextProperties;
     Map<String, Object> originalJApiAsParsedJson;
     Map<String, Definition> jApi;
-    SerializationStrategy serializationStrategyx;
     Consumer<Throwable> onError;
     BinaryEncoder binaryEncoder;
     Serializer serializer;
@@ -69,18 +68,7 @@ public class Processor {
 
     private byte[] deserializeAndProcess(byte[] inputMessageBytes) {
         try {
-            List<Object> inputMessage;
-            try {
-                inputMessage = serializer.deserialize(inputMessageBytes);
-            } catch (DeserializationError e) {
-                var cause = e.getCause();
-                if (cause instanceof BinaryEncoderUnavailableError e2) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryDecodeFailure"), e2);
-                } else {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"),
-                            e);
-                }
-            }
+            var inputMessage = InternalProcess.reconstructRequestMessage(inputMessageBytes, this.serializer);
 
             var outputMessage = this.middleware.apply(inputMessage, this::processObject);
 

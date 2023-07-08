@@ -15,6 +15,20 @@ import java.util.regex.Pattern;
 
 class InternalProcess {
 
+    static List<Object> reconstructRequestMessage(byte[] requestMessageBytes, Serializer serializer) {
+        try {
+            return serializer.deserialize(requestMessageBytes);
+        } catch (DeserializationError e) {
+            var cause = e.getCause();
+            if (cause instanceof BinaryEncoderUnavailableError e2) {
+                throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryDecodeFailure"), e2);
+            } else {
+                throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"),
+                        e);
+            }
+        }
+    }
+
     static List<Object> processObject(List<Object> inputMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
             Map<String, Definition> jApi,
