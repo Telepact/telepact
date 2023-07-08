@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 cases_filepath = "../../test/cases.txt"
-test_filepath = "tests/test_cases.py"
+test_filepath = "tests/generated_tests.py"
 
 cases_file = open(cases_filepath, "r")
 test_file = open(test_filepath, "w")

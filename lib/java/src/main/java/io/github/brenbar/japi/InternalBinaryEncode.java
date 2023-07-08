@@ -58,7 +58,7 @@ class InternalBinaryEncode {
         var clientKnownChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
 
         if (clientKnownChecksums == null || !clientKnownChecksums.contains(binaryEncoder.checksum)) {
-            headers.put("_binaryEncoding", binaryEncoder.encodeMap);
+            headers.put("_enc", binaryEncoder.encodeMap);
         }
 
         headers.put("_bin", List.of(binaryEncoder.checksum));
@@ -107,8 +107,8 @@ class InternalBinaryEncode {
         var binaryChecksum = binaryChecksums.get(0);
 
         // If there is a binary encoding included on this message, cache it
-        if (headers.containsKey("_binaryEncoding")) {
-            var initialBinaryEncoding = (Map<String, Object>) headers.get("_binaryEncoding");
+        if (headers.containsKey("_enc")) {
+            var initialBinaryEncoding = (Map<String, Object>) headers.get("_enc");
             // Ensure everything is a long
             var binaryEncoding = initialBinaryEncoding.entrySet().stream()
                     .collect(Collectors.toMap(e -> e.getKey(), e -> {
