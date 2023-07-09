@@ -38,16 +38,15 @@
       "value": "number"
     }
   ],
-  "function.saveVariable": [
+  "function.saveVariables": [
     [
-      "                                                    ",
-      " Save a variable with the given `name` and `value`. ",
-      "                                                    "
+      "                                                                            ",
+      " Save a set of variables as a dynamic map of variable names to their value. ",
+      "                                                                            "
     ],
     [
       {
-        "name": "string",
-        "value": "number"
+        "variables": "object<number>"
       },
       "-->",
       {},
@@ -75,12 +74,14 @@
   ],
   "function.exportVariables": [
     [
-      "                      ",
-      " A function template. ",
-      "                      "
+      "                                                        ",
+      " Export all saved variables, up to an optional `limit`. ",
+      "                                                        "
     ],
     [
-      {},
+      {
+        "limit!": "integer"
+      },
       "-->",
       {
         "variables": "array<struct.Variable>"

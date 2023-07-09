@@ -15,12 +15,13 @@ public class JApiError extends RuntimeException {
     public final Map<String, Object> body;
 
     public JApiError(String target, Map<String, Object> body) {
+        super("%s: %s".formatted(target, body));
         this.target = target;
         this.body = body;
     }
 
     public JApiError(String target, Map<String, Object> body, Throwable cause) {
-        super(cause);
+        super("%s: %s".formatted(target, body), cause);
         this.target = target;
         this.body = body;
     }

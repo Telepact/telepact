@@ -30,7 +30,7 @@ public class MockTests {
             });
         });
 
-        client.submit(new Request("saveVariable", Map.of("name", "a", "value", 10)));
+        client.submit(new Request("saveVariables", Map.of("variables", Map.of("a", 10))));
 
         var result = client.submit(new Request("compute",
                 Map.ofEntries(
@@ -65,7 +65,7 @@ public class MockTests {
                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
                 Map.entry("op", Map.of("add", Map.of()))), (Map<String, Object> i) -> Map.of("result", 5));
 
-        client.submit(new Request("saveVariable", Map.of("name", "a", "value", 2)));
+        client.submit(new Request("saveVariables", Map.of("variables", Map.of("a", 10))));
 
         var result = client.submit(new Request("compute",
                 Map.ofEntries(
@@ -75,7 +75,7 @@ public class MockTests {
 
         assertEquals(5, result.get("result"));
 
-        mock.verifyPartial("saveVariable", Map.of("value", 2));
-        mock.verifyExact("saveVariable", Map.of("name", "a", "value", 2));
+        mock.verifyPartial("saveVariables", Map.of("variables", Map.of("a", 10)));
+        mock.verifyExact("saveVariables", Map.of("variables", Map.of("a", 10)));
     }
 }
