@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-class InternalBinaryEncode {
+class InternalSerializer {
 
     static BinaryEncoder constructBinaryEncoder(JApiSchema jApiSchema) {
         var allKeys = new TreeSet<String>();
@@ -50,6 +50,38 @@ class InternalBinaryEncode {
             throw new RuntimeException(e);
         }
         return new BinaryEncoder(binaryEncoding, binaryHash);
+    }
+
+    static byte[] serialize(List<Object> message, BinaryEncodingStrategy binaryEncodingStrategy,
+            SerializationStrategy serializationStrategy) {
+        var headers = (Map<String, Object>) message.get(1);
+        var serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
+        var forceSendJson = Objects.equals(true, headers.remove("_serializeAsJson"));
+        if (serializeAsBinary && !forceSendJson) {
+            try {
+                var encodedMessage = binaryEncodingStrategy.encode(message);
+                return serializationStrategy.toMsgPack(encodedMessage);
+            } catch (BinaryEncoderUnavailableError e) {
+                // We can still submit as json
+                return serializationStrategy.toJson(message);
+            }
+        } else {
+            return serializationStrategy.toJson(message);
+        }
+    }
+
+    static List<Object> deserialize(byte[] messageBytes, SerializationStrategy serializationStrategy,
+            BinaryEncodingStrategy binaryEncodingStrategy) {
+        if (messageBytes[0] == '[') {
+            return serializationStrategy.fromJson(messageBytes);
+        } else {
+            var encodedMessage = serializationStrategy.fromMsgPack(messageBytes);
+            try {
+                return binaryEncodingStrategy.decode(encodedMessage);
+            } catch (BinaryEncoderUnavailableError e) {
+                throw new DeserializationError(e);
+            }
+        }
     }
 
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoder binaryEncoder) {

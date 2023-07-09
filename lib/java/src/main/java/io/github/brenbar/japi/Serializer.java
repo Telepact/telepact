@@ -1,8 +1,6 @@
 package io.github.brenbar.japi;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * The serializer used to serialize and deserialize jAPI Messages.
@@ -10,11 +8,11 @@ import java.util.Objects;
 public class Serializer {
 
     SerializationStrategy serializationStrategy;
-    private BinaryEncodingStrategy binaryEncoderStrategy;
+    private BinaryEncodingStrategy binaryEncodingStrategy;
 
-    Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncoderStrategy) {
+    Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncodingStrategy) {
         this.serializationStrategy = serializationStrategy;
-        this.binaryEncoderStrategy = binaryEncoderStrategy;
+        this.binaryEncodingStrategy = binaryEncodingStrategy;
     }
 
     /**
@@ -24,20 +22,7 @@ public class Serializer {
      * @return
      */
     public byte[] serialize(List<Object> message) {
-        var headers = (Map<String, Object>) message.get(1);
-        var serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
-        var forceSendJson = Objects.equals(true, headers.remove("_serializeAsJson"));
-        if (serializeAsBinary && !forceSendJson) {
-            try {
-                var encodedMessage = binaryEncoderStrategy.encode(message);
-                return serializationStrategy.toMsgPack(encodedMessage);
-            } catch (BinaryEncoderUnavailableError e) {
-                // We can still submit as json
-                return serializationStrategy.toJson(message);
-            }
-        } else {
-            return serializationStrategy.toJson(message);
-        }
+        return InternalSerializer.serialize(message, this.binaryEncodingStrategy, this.serializationStrategy);
     }
 
     /**
@@ -47,15 +32,6 @@ public class Serializer {
      * @return
      */
     public List<Object> deserialize(byte[] messageBytes) {
-        if (messageBytes[0] == '[') {
-            return serializationStrategy.fromJson(messageBytes);
-        } else {
-            var encodedMessage = serializationStrategy.fromMsgPack(messageBytes);
-            try {
-                return binaryEncoderStrategy.decode(encodedMessage);
-            } catch (BinaryEncoderUnavailableError e) {
-                throw new DeserializationError(e);
-            }
-        }
+        return InternalSerializer.deserialize(messageBytes, this.serializationStrategy, this.binaryEncodingStrategy);
     }
 }

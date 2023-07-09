@@ -63,7 +63,7 @@ public class Server {
         };
         this.middleware = (m, n) -> n.apply(m);
 
-        this.binaryEncoder = InternalBinaryEncode.constructBinaryEncoder(this.jApiSchema);
+        this.binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
 
         this.serializer = new Serializer(new InternalDefaultSerializationStrategy(),
                 new InternalServerBinaryEncodingStrategy(binaryEncoder));

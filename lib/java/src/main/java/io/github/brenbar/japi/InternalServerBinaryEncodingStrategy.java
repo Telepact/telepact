@@ -12,12 +12,12 @@ class InternalServerBinaryEncodingStrategy implements BinaryEncodingStrategy {
 
     @Override
     public List<Object> encode(List<Object> message) {
-        return InternalBinaryEncode.serverBinaryEncode(message, binaryEncoder);
+        return InternalSerializer.serverBinaryEncode(message, binaryEncoder);
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return InternalBinaryEncode.serverBinaryDecode(message, binaryEncoder);
+        return InternalSerializer.serverBinaryDecode(message, binaryEncoder);
     }
 
 }
