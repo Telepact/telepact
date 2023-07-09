@@ -1,2 +1,0 @@
-class ClientProcessError(RuntimeError):
-    pass
