@@ -15,7 +15,7 @@ public class MockTests {
     @Test
     public void testGeneratedValues() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
-        var processor = new MockProcessor(json);
+        var processor = new MockServer(json);
         processor.processor.setOnError((Throwable e) -> {
             e.printStackTrace();
         });
@@ -45,7 +45,7 @@ public class MockTests {
     @Test
     public void testMocking() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
-        var mock = new MockProcessor(json);
+        var mock = new MockServer(json);
         mock.processor.setOnError((Throwable e) -> {
             e.printStackTrace();
         });
@@ -75,7 +75,16 @@ public class MockTests {
 
         assertEquals(5, result.get("result"));
 
-        mock.verifyPartial("saveVariables", Map.of("variables", Map.of("a", 10)));
+        client.submit(new Request("exportVariables", Map.of()));
+        client.submit(new Request("exportVariables", Map.of()));
+        client.submit(new Request("exportVariables", Map.of()));
+
         mock.verifyExact("saveVariables", Map.of("variables", Map.of("a", 10)));
+
+        mock.verifyPartial("compute", Map.of("x", Map.of("variable", Map.of("value", "a"))));
+
+        mock.verifyPartial("exportVariables", Map.of(), new MockServer.ExactNumberOfTimes(3));
+
+        mock.verifyNoMoreInteractions();
     }
 }

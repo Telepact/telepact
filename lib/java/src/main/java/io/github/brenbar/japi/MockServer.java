@@ -13,7 +13,7 @@ import java.util.function.Function;
  * Clients can use this class as an alternative transport in their adapters to
  * interact with a functional jAPI with common mocking strategies.
  */
-public class MockProcessor {
+public class MockServer {
 
     public final Server processor;
     private final Random random;
@@ -21,12 +21,28 @@ public class MockProcessor {
     private final List<Mock> mocks = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
 
-    public MockProcessor(String jApi) {
+    interface VerificationTimes {
+
+    }
+
+    public static class UnlimitedNumberOfTimes implements VerificationTimes {
+
+    }
+
+    public static class ExactNumberOfTimes implements VerificationTimes {
+        public final int times;
+
+        public ExactNumberOfTimes(int times) {
+            this.times = times;
+        }
+    }
+
+    public MockServer(String jApi) {
         this.processor = new Server(jApi, this::handle);
         this.random = new Random();
     }
 
-    public MockProcessor resetRandomSeed(Long seed) {
+    public MockServer resetRandomSeed(Long seed) {
         this.random.setSeed(seed);
         return this;
     }
@@ -51,13 +67,36 @@ public class MockProcessor {
     }
 
     public void verifyPartial(String functionName, Map<String, Object> partialMatchFunctionInput) {
+        verifyPartial(functionName, partialMatchFunctionInput, new UnlimitedNumberOfTimes());
+    }
+
+    public void verifyPartial(String functionName, Map<String, Object> partialMatchFunctionInput,
+            VerificationTimes verificationTimes) {
+        var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
                 if (InternalMockProcess.isSubMap(invocation.functionInput, partialMatchFunctionInput)) {
-                    return;
+                    invocation.verified = true;
+                    matchesFound += 1;
                 }
             }
         }
+
+        if (verificationTimes instanceof ExactNumberOfTimes e) {
+            if (e.times != matchesFound) {
+                var errorString = new StringBuilder("""
+                        Wanted exactly %d partial matches, but found %d.
+                        Query:
+                        %s(%s)
+                        """.formatted(e.times, matchesFound, functionName, partialMatchFunctionInput));
+                throw new AssertionError(errorString);
+            }
+        }
+
+        if (matchesFound > 0) {
+            return;
+        }
+
         var errorString = new StringBuilder("""
                 No matching invocations.
                 Wanted partial match:
@@ -77,13 +116,36 @@ public class MockProcessor {
     }
 
     public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput) {
+        verifyExact(functionName, exactMatchFunctionInput, new UnlimitedNumberOfTimes());
+    }
+
+    public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput,
+            VerificationTimes verificationTimes) {
+        var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
                 if (Objects.equals(invocation.functionInput, exactMatchFunctionInput)) {
-                    return;
+                    invocation.verified = true;
+                    matchesFound += 1;
                 }
             }
         }
+
+        if (verificationTimes instanceof ExactNumberOfTimes e) {
+            if (e.times != matchesFound) {
+                var errorString = new StringBuilder("""
+                        Wanted exactly %d exact matches, but found %d.
+                        Query:
+                        %s(%s)
+                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionInput));
+                throw new AssertionError(errorString);
+            }
+        }
+
+        if (matchesFound > 0) {
+            return;
+        }
+
         var errorString = new StringBuilder("""
                 No matching invocations.
                 Wanted exact match:
@@ -100,5 +162,24 @@ public class MockProcessor {
             }
         }
         throw new AssertionError(errorString);
+    }
+
+    public void verifyNoMoreInteractions() {
+        var invocationsNotVerified = this.invocations.stream().filter(i -> !i.verified).toList();
+
+        if (invocationsNotVerified.size() > 0) {
+            var errorString = new StringBuilder("""
+                    Expected no more interactions, but more were found.
+                    Available:
+                    """);
+            for (var invocation : invocationsNotVerified) {
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+            }
+            throw new AssertionError(errorString);
+        }
+    }
+
+    public void clearInvocations() {
+        this.invocations.clear();
     }
 }

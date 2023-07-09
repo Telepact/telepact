@@ -347,6 +347,7 @@ class Mock {
 class Invocation {
     final String functionName;
     final Map<String, Object> functionInput;
+    boolean verified = false;
 
     public Invocation(String functionName, Map<String, Object> functionInput) {
         this.functionName = functionName;
