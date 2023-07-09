@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-class DefaultSerializationStrategy implements SerializationStrategy {
+class InternalDefaultSerializationStrategy implements SerializationStrategy {
 
     static class MessagePackMapDeserializer extends MapDeserializer {
 
@@ -98,7 +98,7 @@ class DefaultSerializationStrategy implements SerializationStrategy {
     }
 
     @Override
-    public List<Object> fromJson(byte[] bytes) throws DeserializationError {
+    public List<Object> fromJson(byte[] bytes) {
         try {
             return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
@@ -114,7 +114,7 @@ class DefaultSerializationStrategy implements SerializationStrategy {
     }
 
     @Override
-    public List<Object> fromMsgPack(byte[] bytes) throws DeserializationError {
+    public List<Object> fromMsgPack(byte[] bytes) {
         try {
             return binaryMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });

@@ -44,66 +44,63 @@ public class TestUtility {
         };
     }
 
-    public static void test(String input, String expectedOutput) throws IOException {
+    public static void test(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
-        var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
-        });
+        var processor = new Server(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
+        var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
+                new TypeReference<List<Object>>() {
+                });
 
         // test json
         {
-            var inputBytes = input.getBytes(StandardCharsets.UTF_8);
-            System.out.println("--> %s".formatted(new String(inputBytes)));
-            var outputBytes = processor.process(inputBytes);
-            System.out.println("<-- %s".formatted(new String(outputBytes)));
-            var outputAsParsedJson = objectMapper.readValue(outputBytes, new TypeReference<List<Object>>() {
+            var requestBytes = requestJson.getBytes(StandardCharsets.UTF_8);
+            System.out.println("--> %s".formatted(new String(requestBytes)));
+            var responseBytes = processor.process(requestBytes);
+            System.out.println("<-- %s".formatted(new String(responseBytes)));
+            var responseAsParsedJson = objectMapper.readValue(responseBytes, new TypeReference<List<Object>>() {
             });
-            assertEquals(expectedOutputAsParsedJson, outputAsParsedJson);
+            assertEquals(expectedResponseAsParsedJson, responseAsParsedJson);
         }
     }
 
-    public static void testBinary(String input, String expectedOutput) throws IOException {
+    public static void testBinary(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
-        var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
-        });
+        var processor = new Server(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
+        var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
+                new TypeReference<List<Object>>() {
+                });
 
         // test binary
         {
             Adapter adapter = (m, s) -> {
                 return CompletableFuture.supplyAsync(() -> {
-                    var inputBytes = s.serialize(m);
-                    System.out.println("--> %s".formatted(new String(inputBytes)));
-                    var outputBytes = processor.process(inputBytes);
-                    System.out.println("<-- %s".formatted(new String(outputBytes)));
-                    List<Object> output;
-                    try {
-                        output = s.deserialize(outputBytes);
-                    } catch (DeserializationError e1) {
-                        throw new RuntimeException(e1);
-                    }
-                    return output;
+                    var requestBytes = s.serialize(m);
+                    System.out.println("--> %s".formatted(new String(requestBytes)));
+                    var responseBytes = processor.process(requestBytes);
+                    System.out.println("<-- %s".formatted(new String(responseBytes)));
+                    List<Object> response = s.deserialize(responseBytes);
+                    return response;
                 });
             };
             var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true);
             client.submit(new Request("_ping", Map.of())); // warmup
-            var inputAsParsedJson = objectMapper.readValue(input, new TypeReference<List<Object>>() {
+            var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
-            if (expectedOutput.startsWith("[\"error.")) {
+            if (expectedResponseJson.startsWith("[\"error.")) {
                 var e = assertThrows(JApiError.class,
-                        () -> client.submit(new Request(((String) inputAsParsedJson.get(0)).substring(9),
-                                (Map<String, Object>) inputAsParsedJson.get(2)).addHeaders(
-                                        (Map<String, Object>) inputAsParsedJson.get(1))));
-                assertEquals(expectedOutputAsParsedJson.get(0), e.target);
-                assertEquals(expectedOutputAsParsedJson.get(2), e.body);
+                        () -> client.submit(new Request(((String) requestAsParsedJson.get(0)).substring(9),
+                                (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
+                                        (Map<String, Object>) requestAsParsedJson.get(1))));
+                assertEquals(expectedResponseAsParsedJson.get(0), e.target);
+                assertEquals(expectedResponseAsParsedJson.get(2), e.body);
             } else {
-                var outputAsParsedJson = client.submit(new Request(((String) inputAsParsedJson.get(0)).substring(9),
-                        (Map<String, Object>) inputAsParsedJson.get(2)).addHeaders(
-                                (Map<String, Object>) inputAsParsedJson.get(1)));
-                assertEquals(expectedOutputAsParsedJson.get(2), outputAsParsedJson);
+                var outputAsParsedJson = client.submit(new Request(((String) requestAsParsedJson.get(0)).substring(9),
+                        (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
+                                (Map<String, Object>) requestAsParsedJson.get(1)));
+                assertEquals(expectedResponseAsParsedJson.get(2), outputAsParsedJson);
             }
         }
     }

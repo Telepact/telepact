@@ -1,6 +1,9 @@
 package io.github.brenbar.japi;
 
-public class DeserializationError extends Exception {
+/**
+ * Indicates deserialization of a jAPI message was unsuccessful.
+ */
+public class DeserializationError extends RuntimeException {
 
     public DeserializationError(Throwable cause) {
         super(cause);

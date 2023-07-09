@@ -7,16 +7,22 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.function.Function;
 
+/**
+ * A Mock instance of a jAPI server.
+ * 
+ * Clients can use this class as an alternative transport in their adapters to
+ * interact with a functional jAPI with common mocking strategies.
+ */
 public class MockProcessor {
 
-    public final Processor processor;
+    public final Server processor;
     private final Random random;
 
     private final List<Mock> mocks = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
 
     public MockProcessor(String jApi) {
-        this.processor = new Processor(jApi, this::handle);
+        this.processor = new Server(jApi, this::handle);
         this.random = new Random();
     }
 

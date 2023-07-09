@@ -178,6 +178,33 @@ advantageous to receive the malformed data anyway and adapt on-the-fly are able
 to turn off this output validation by submitting their requests with the
 `{"_unsafe":true}` header.
 
+### If all I want is compact binary serialization, why not just use gRPC?
+
+jAPI and gRPC both have compact binary serialization for drastically improved
+efficiency over conventional serialization such as JSON. However, jAPI brings a
+critical new innovation to the space of RPC and binary serialization in that it
+_does not leak the ABI into the API_.
+
+ABI, or Application _Binary_ Interface, is the actual interface between RPC
+clients and servers using such compact serialization protocols. The data passing
+through this interface is unreadable due to conventional json keys being encoded
+as numbers. Because an encoding is in play, clients and servers need to agree on
+what numbers represent which fields all throughout the API. gRPC and other
+conventional RPC frameworks accomplish this by having the clients and servers
+both base their field ids on the same information at code generation time by
+leaking these ABI field ids into the API schema itself. Unfortunately, this adds
+an unusual cognitive burden for developers designing such APIs, because they now
+need to guard against interface drift between the API and the ABI, typically by
+complying with a set of policies concerning how those field ids are defined and
+how they can change.
+
+jAPI breaks free from the conventional practice of defining and maintaining
+field ids, and instead accomplishes client and server agreement over field ids
+through a client-server handshake at runtime. In consequence, jAPI boasts a far
+simpler developer experience during the API design phase as well as the unique
+privilege of allowing clients to leverage binary serialization without generated
+code.
+
 ## Glossary
 
 - **Body** - A structured JSON object containing the primary data payload of the

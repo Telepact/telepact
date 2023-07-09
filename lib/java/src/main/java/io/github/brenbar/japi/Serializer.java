@@ -4,16 +4,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * The serializer used to serialize and deserialize jAPI Messages.
+ */
 public class Serializer {
 
     SerializationStrategy serializationStrategy;
     private BinaryEncodingStrategy binaryEncoderStrategy;
 
-    public Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncoderStrategy) {
+    Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncoderStrategy) {
         this.serializationStrategy = serializationStrategy;
         this.binaryEncoderStrategy = binaryEncoderStrategy;
     }
 
+    /**
+     * Serialize the given jAPI message.
+     * 
+     * @param message
+     * @return
+     */
     public byte[] serialize(List<Object> message) {
         var headers = (Map<String, Object>) message.get(1);
         var serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
@@ -31,11 +40,17 @@ public class Serializer {
         }
     }
 
-    public List<Object> deserialize(byte[] message) throws DeserializationError {
-        if (message[0] == '[') {
-            return serializationStrategy.fromJson(message);
+    /**
+     * Deserialize the given jAPI message bytes.
+     * 
+     * @param messageBytes
+     * @return
+     */
+    public List<Object> deserialize(byte[] messageBytes) {
+        if (messageBytes[0] == '[') {
+            return serializationStrategy.fromJson(messageBytes);
         } else {
-            var encodedMessage = serializationStrategy.fromMsgPack(message);
+            var encodedMessage = serializationStrategy.fromMsgPack(messageBytes);
             try {
                 return binaryEncoderStrategy.decode(encodedMessage);
             } catch (BinaryEncoderUnavailableError e) {
