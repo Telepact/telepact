@@ -21,13 +21,7 @@ public class MockTests {
         });
         processor.resetRandomSeed(0L);
         var client = new Client((m, s) -> {
-            return CompletableFuture.supplyAsync(() -> {
-                try {
-                    return s.deserialize(processor.process(s.serialize(m)));
-                } catch (DeserializationError e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            return CompletableFuture.supplyAsync(() -> s.deserialize(processor.process(s.serialize(m))));
         });
 
         client.submit(new Request("saveVariables", Map.of("variables", Map.of("a", 10))));
@@ -51,13 +45,7 @@ public class MockTests {
         });
         mock.resetRandomSeed(0L);
         var client = new Client((m, s) -> {
-            return CompletableFuture.supplyAsync(() -> {
-                try {
-                    return s.deserialize(mock.process(s.serialize(m)));
-                } catch (DeserializationError e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            return CompletableFuture.supplyAsync(() -> s.deserialize(mock.process(s.serialize(m))));
         });
 
         mock.mockExact("compute", Map.ofEntries(

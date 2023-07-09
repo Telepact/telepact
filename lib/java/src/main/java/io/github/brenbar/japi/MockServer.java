@@ -78,7 +78,7 @@ public class MockServer {
     }
 
     private Map<String, Object> handle(Context context, Map<String, Object> input) {
-        return InternalMockProcess.handle(context, input, this.processor.jApiSchema, this.random, this.mocks,
+        return InternalMockServer.handle(context, input, this.processor.jApiSchema, this.random, this.mocks,
                 this.invocations);
     }
 
@@ -129,47 +129,7 @@ public class MockServer {
      */
     public void verifyPartial(String functionName, Map<String, Object> partialMatchInput,
             VerificationTimes verificationTimes) {
-        var matchesFound = 0;
-        for (var invocation : invocations) {
-            if (Objects.equals(invocation.functionName, functionName)) {
-                if (InternalMockProcess.isSubMap(invocation.functionInput, partialMatchInput)) {
-                    invocation.verified = true;
-                    matchesFound += 1;
-                }
-            }
-        }
-
-        if (verificationTimes instanceof ExactNumberOfTimes e) {
-            if (e.times != matchesFound) {
-                var errorString = new StringBuilder("""
-                        Wanted exactly %d partial matches, but found %d.
-                        Query:
-                        %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, partialMatchInput));
-                throw new AssertionError(errorString);
-            }
-        }
-
-        if (matchesFound > 0) {
-            return;
-        }
-
-        var errorString = new StringBuilder("""
-                No matching invocations.
-                Wanted partial match:
-                %s(%s)
-                Available:
-                """.formatted(functionName, partialMatchInput));
-        var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
-                .toList();
-        if (functionInvocations.isEmpty()) {
-            errorString.append("<none>");
-        } else {
-            for (var invocation : functionInvocations) {
-                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
-            }
-        }
-        throw new AssertionError(errorString);
+        InternalMockServer.verifyPartial(functionName, partialMatchInput, verificationTimes, this.invocations);
     }
 
     /**
@@ -193,47 +153,7 @@ public class MockServer {
      */
     public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput,
             VerificationTimes verificationTimes) {
-        var matchesFound = 0;
-        for (var invocation : invocations) {
-            if (Objects.equals(invocation.functionName, functionName)) {
-                if (Objects.equals(invocation.functionInput, exactMatchFunctionInput)) {
-                    invocation.verified = true;
-                    matchesFound += 1;
-                }
-            }
-        }
-
-        if (verificationTimes instanceof ExactNumberOfTimes e) {
-            if (e.times != matchesFound) {
-                var errorString = new StringBuilder("""
-                        Wanted exactly %d exact matches, but found %d.
-                        Query:
-                        %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionInput));
-                throw new AssertionError(errorString);
-            }
-        }
-
-        if (matchesFound > 0) {
-            return;
-        }
-
-        var errorString = new StringBuilder("""
-                No matching invocations.
-                Wanted exact match:
-                %s(%s)
-                Available:
-                """.formatted(functionName, exactMatchFunctionInput));
-        var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
-                .toList();
-        if (functionInvocations.isEmpty()) {
-            errorString.append("<none>");
-        } else {
-            for (var invocation : functionInvocations) {
-                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
-            }
-        }
-        throw new AssertionError(errorString);
+        InternalMockServer.verifyExact(functionName, exactMatchFunctionInput, verificationTimes, this.invocations);
     }
 
     /**
@@ -243,18 +163,7 @@ public class MockServer {
      * up to this point have already been verified.)
      */
     public void verifyNoMoreInteractions() {
-        var invocationsNotVerified = this.invocations.stream().filter(i -> !i.verified).toList();
-
-        if (invocationsNotVerified.size() > 0) {
-            var errorString = new StringBuilder("""
-                    Expected no more interactions, but more were found.
-                    Available:
-                    """);
-            for (var invocation : invocationsNotVerified) {
-                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
-            }
-            throw new AssertionError(errorString);
-        }
+        InternalMockServer.verifyNoMoreInteractions(this.invocations);
     }
 
     /**

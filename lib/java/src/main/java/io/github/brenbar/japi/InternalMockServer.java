@@ -10,7 +10,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-class InternalMockProcess {
+import io.github.brenbar.japi.MockServer.ExactNumberOfTimes;
+import io.github.brenbar.japi.MockServer.VerificationTimes;
+
+class InternalMockServer {
 
     static Map<String, Object> handle(Context context, Map<String, Object> input, JApiSchema jaApiSchema,
             Random random, List<Mock> mocks, List<Invocation> invocations) {
@@ -125,5 +128,110 @@ class InternalMockProcess {
         }
 
         return null;
+    }
+
+    static void verifyPartial(String functionName, Map<String, Object> partialMatchInput,
+            VerificationTimes verificationTimes, List<Invocation> invocations) {
+        var matchesFound = 0;
+        for (var invocation : invocations) {
+            if (Objects.equals(invocation.functionName, functionName)) {
+                if (InternalMockServer.isSubMap(invocation.functionInput, partialMatchInput)) {
+                    invocation.verified = true;
+                    matchesFound += 1;
+                }
+            }
+        }
+
+        if (verificationTimes instanceof ExactNumberOfTimes e) {
+            if (e.times != matchesFound) {
+                var errorString = new StringBuilder("""
+                        Wanted exactly %d partial matches, but found %d.
+                        Query:
+                        %s(%s)
+                        """.formatted(e.times, matchesFound, functionName, partialMatchInput));
+                throw new AssertionError(errorString);
+            }
+        }
+
+        if (matchesFound > 0) {
+            return;
+        }
+
+        var errorString = new StringBuilder("""
+                No matching invocations.
+                Wanted partial match:
+                %s(%s)
+                Available:
+                """.formatted(functionName, partialMatchInput));
+        var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
+                .toList();
+        if (functionInvocations.isEmpty()) {
+            errorString.append("<none>");
+        } else {
+            for (var invocation : functionInvocations) {
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+            }
+        }
+        throw new AssertionError(errorString);
+    }
+
+    static void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput,
+            VerificationTimes verificationTimes, List<Invocation> invocations) {
+        var matchesFound = 0;
+        for (var invocation : invocations) {
+            if (Objects.equals(invocation.functionName, functionName)) {
+                if (Objects.equals(invocation.functionInput, exactMatchFunctionInput)) {
+                    invocation.verified = true;
+                    matchesFound += 1;
+                }
+            }
+        }
+
+        if (verificationTimes instanceof ExactNumberOfTimes e) {
+            if (e.times != matchesFound) {
+                var errorString = new StringBuilder("""
+                        Wanted exactly %d exact matches, but found %d.
+                        Query:
+                        %s(%s)
+                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionInput));
+                throw new AssertionError(errorString);
+            }
+        }
+
+        if (matchesFound > 0) {
+            return;
+        }
+
+        var errorString = new StringBuilder("""
+                No matching invocations.
+                Wanted exact match:
+                %s(%s)
+                Available:
+                """.formatted(functionName, exactMatchFunctionInput));
+        var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
+                .toList();
+        if (functionInvocations.isEmpty()) {
+            errorString.append("<none>");
+        } else {
+            for (var invocation : functionInvocations) {
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+            }
+        }
+        throw new AssertionError(errorString);
+    }
+
+    static void verifyNoMoreInteractions(List<Invocation> invocations) {
+        var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
+
+        if (invocationsNotVerified.size() > 0) {
+            var errorString = new StringBuilder("""
+                    Expected no more interactions, but more were found.
+                    Available:
+                    """);
+            for (var invocation : invocationsNotVerified) {
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+            }
+            throw new AssertionError(errorString);
+        }
     }
 }
