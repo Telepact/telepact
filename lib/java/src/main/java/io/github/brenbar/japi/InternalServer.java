@@ -22,6 +22,10 @@ class InternalServer {
                 throw new InternalJApiError("error._ParseFailure", new HashMap<>(),
                         Map.of("reason", "BinaryDecodeFailure"),
                         e2);
+            } else if (cause instanceof BinaryEncoderMissingEncoding e2) {
+                throw new InternalJApiError("error._ParseFailure", new HashMap<>(),
+                        Map.of("reason", "BinaryDecodeFailure"),
+                        e2);
             } else {
                 throw new InternalJApiError("error._ParseFailure", new HashMap<>(),
                         Map.of("reason", "MessageMustBeArrayWithThreeElements"),
