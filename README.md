@@ -204,7 +204,7 @@ to turn off this output validation by submitting their requests with the
   the jAPI server.
 
 - **jAPI Schema** - The JSON document describing the API. This document is
-  written in the JSON language following a particular JSON schema, but
+  written in the JSON language following a jAPI-flavored JSON schema, but
   conventionally, this document would be written using an IDL.
 
 # Navigation
