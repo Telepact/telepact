@@ -21,17 +21,17 @@ public class TestUtility {
     private static Map<String, Object> handle(Context context, Map<String, Object> body) {
         return switch (context.functionName) {
             case "test" -> {
-                var error = context.properties.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
-                if (context.properties.containsKey("output")) {
+                var error = context.requestHeaders.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
+                if (context.requestHeaders.containsKey("output")) {
                     try {
-                        var o = (Map<String, Object>) context.properties.get("output");
+                        var o = (Map<String, Object>) context.requestHeaders.get("output");
                         yield o;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 } else if (error.isPresent()) {
                     try {
-                        var e = (Map<String, Object>) context.properties.get(error.get());
+                        var e = (Map<String, Object>) context.requestHeaders.get(error.get());
                         throw new JApiError(error.get(), e);
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
@@ -47,8 +47,7 @@ public class TestUtility {
     public static void test(String input, String expectedOutput) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace())
-                .setExtractContextProperties((h) -> h);
+        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
         var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
         });
 
@@ -67,8 +66,7 @@ public class TestUtility {
     public static void testBinary(String input, String expectedOutput) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace())
-                .setExtractContextProperties((h) -> h);
+        var processor = new Processor(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
         var expectedOutputAsParsedJson = objectMapper.readValue(expectedOutput, new TypeReference<List<Object>>() {
         });
 

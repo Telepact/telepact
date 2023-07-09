@@ -34,8 +34,7 @@ class InternalProcess {
     static List<Object> processObject(List<Object> requestMessage,
             BinaryEncoder binaryEncoder,
             JApiSchema jApiSchema,
-            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
-            Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
+            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler) {
 
         boolean unsafeResponseEnabled = false;
         var responseHeaders = new HashMap<String, Object>();
@@ -125,9 +124,7 @@ class InternalProcess {
                         Map.of("cases", validationFailureCases));
             }
 
-            var context = new Context(functionName);
-            var contextPropertiesFromHeaders = extractContextProperties.apply(requestHeaders);
-            context.properties.putAll(contextPropertiesFromHeaders);
+            var context = new Context(functionName, requestHeaders);
 
             unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 

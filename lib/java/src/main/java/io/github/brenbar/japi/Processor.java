@@ -10,28 +10,23 @@ public class Processor {
     interface Handler extends BiFunction<Context, Map<String, Object>, Map<String, Object>> {
     }
 
-    interface ExtractContextProperties extends Function<Map<String, Object>, Map<String, Object>> {
-    }
-
     interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
     }
 
     Handler handler;
     Middleware middleware;
-    ExtractContextProperties extractContextProperties;
     JApiSchema jApiSchema;
     Consumer<Throwable> onError;
     BinaryEncoder binaryEncoder;
     Serializer serializer;
 
-    public Processor(String jApiAsJson, Handler handler) {
-        this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiAsJson);
+    public Processor(String jApiSchemaAsJson, Handler handler) {
+        this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson);
 
         this.handler = handler;
         this.onError = (e) -> {
         };
         this.middleware = (i, n) -> n.apply(i);
-        this.extractContextProperties = (h) -> new HashMap<>();
 
         this.binaryEncoder = InternalBinaryEncode.constructBinaryEncoder(this.jApiSchema);
 
@@ -46,11 +41,6 @@ public class Processor {
 
     public Processor setSerializationStrategy(SerializationStrategy strategy) {
         this.serializer.serializationStrategy = strategy;
-        return this;
-    }
-
-    public Processor setExtractContextProperties(ExtractContextProperties extractContextProperties) {
-        this.extractContextProperties = extractContextProperties;
         return this;
     }
 
@@ -82,6 +72,6 @@ public class Processor {
 
     private List<Object> processObject(List<Object> requestMessage) {
         return InternalProcess.processObject(requestMessage, this.binaryEncoder,
-                this.jApiSchema, this.handler, this.extractContextProperties);
+                this.jApiSchema, this.handler);
     }
 }
