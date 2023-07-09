@@ -29,43 +29,43 @@ class InternalProcess {
         }
     }
 
-    static List<Object> processObject(List<Object> inputMessage, Consumer<Throwable> onError,
+    static List<Object> processObject(List<Object> requestMessage, Consumer<Throwable> onError,
             BinaryEncoder binaryEncoder,
             JApiSchema jApiSchema,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
             Function<Map<String, Object>, Map<String, Object>> extractContextProperties) {
 
-        boolean unsafeOutputEnabled = false;
-        var outputHeaders = new HashMap<String, Object>();
+        boolean unsafeResponseEnabled = false;
+        var responseHeaders = new HashMap<String, Object>();
         try {
             try {
-                if (inputMessage.size() < 3) {
+                if (requestMessage.size() < 3) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"));
                 }
 
-                String inputTarget;
+                String requestTarget;
                 try {
-                    inputTarget = (String) inputMessage.get(0);
+                    requestTarget = (String) requestMessage.get(0);
                 } catch (ClassCastException e) {
                     throw new JApiError("error._InvalidRequestTarget", Map.of("reason", "TargetMustBeString"));
                 }
 
                 var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)");
-                var matcher = regex.matcher(inputTarget);
+                var matcher = regex.matcher(requestTarget);
                 if (!matcher.matches()) {
                     throw new JApiError("error._InvalidRequestTarget",
                             Map.of("reason", "TargetStringMustBeFunction"));
                 }
                 var functionName = matcher.group(1);
 
-                Map<String, Object> inputHeaders;
+                Map<String, Object> requestHeaders;
                 try {
-                    inputHeaders = (Map<String, Object>) inputMessage.get(1);
+                    requestHeaders = (Map<String, Object>) requestMessage.get(1);
                 } catch (ClassCastException e) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "HeadersMustBeObject"));
                 }
 
-                var headerValidationFailures = validateHeaders(inputHeaders, jApiSchema);
+                var headerValidationFailures = validateHeaders(requestHeaders, jApiSchema);
 
                 if (!headerValidationFailures.isEmpty()) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
@@ -79,36 +79,36 @@ class InternalProcess {
                     throw new JApiError("error._InvalidRequestHeaders", Map.of("cases", validationFailureCases));
                 }
 
-                if (inputHeaders.containsKey("_bin")) {
-                    List<Object> binaryChecksums = (List<Object>) inputHeaders.get("_bin");
+                if (requestHeaders.containsKey("_bin")) {
+                    List<Object> binaryChecksums = (List<Object>) requestHeaders.get("_bin");
 
                     if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
                         // Client is initiating handshake for binary protocol
-                        outputHeaders.put("_includeBinaryEncoding", true);
+                        responseHeaders.put("_includeBinaryEncoding", true);
                     }
 
-                    outputHeaders.put("_serializeAsBinary", true);
+                    responseHeaders.put("_serializeAsBinary", true);
                 }
 
-                var clientKnownBinaryChecksums = inputHeaders.get("_clientKnownBinaryChecksums");
+                var clientKnownBinaryChecksums = requestHeaders.get("_clientKnownBinaryChecksums");
                 if (clientKnownBinaryChecksums != null) {
-                    outputHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+                    responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
                 }
 
                 // Reflect call id
-                var callId = inputHeaders.get("_id");
+                var callId = requestHeaders.get("_id");
                 if (callId != null) {
-                    outputHeaders.put("_id", callId);
+                    responseHeaders.put("_id", callId);
                 }
 
                 Map<String, Object> input;
                 try {
-                    input = (Map<String, Object>) inputMessage.get(2);
+                    input = (Map<String, Object>) requestMessage.get(2);
                 } catch (ClassCastException e) {
                     throw new JApiError("error._ParseFailure", Map.of("reason", "BodyMustBeObject"));
                 }
 
-                var functionDef = jApiSchema.parsed.get(inputTarget);
+                var functionDef = jApiSchema.parsed.get(requestTarget);
 
                 FunctionDefinition functionDefinition;
                 if (functionDef instanceof FunctionDefinition f) {
@@ -131,10 +131,10 @@ class InternalProcess {
                 }
 
                 var context = new Context(functionName);
-                var contextPropertiesFromHeaders = extractContextProperties.apply(inputHeaders);
+                var contextPropertiesFromHeaders = extractContextProperties.apply(requestHeaders);
                 context.properties.putAll(contextPropertiesFromHeaders);
 
-                unsafeOutputEnabled = Objects.equals(true, inputHeaders.get("_unsafe"));
+                unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
                 Map<String, Object> output;
                 try {
@@ -156,7 +156,7 @@ class InternalProcess {
                 var outputValidationFailures = validateStruct(functionDefinition.name,
                         functionDefinition.outputStruct.fields,
                         output);
-                if (!outputValidationFailures.isEmpty() && !unsafeOutputEnabled) {
+                if (!outputValidationFailures.isEmpty() && !unsafeResponseEnabled) {
                     var validationFailureCases = new ArrayList<Map<String, String>>();
                     for (var validationFailure : outputValidationFailures) {
                         var validationFailureCase = Map.of(
@@ -168,8 +168,8 @@ class InternalProcess {
                 }
 
                 Map<String, Object> finalOutput;
-                if (inputHeaders.containsKey("_sel")) {
-                    Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) inputHeaders
+                if (requestHeaders.containsKey("_sel")) {
+                    Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                             .get("_sel");
                     finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct, output,
                             selectStructFieldsHeader);
@@ -179,7 +179,7 @@ class InternalProcess {
 
                 var outputTarget = "function.%s".formatted(functionName);
 
-                return List.of(outputTarget, outputHeaders, finalOutput);
+                return List.of(outputTarget, responseHeaders, finalOutput);
             } catch (Exception e) {
                 try {
                     onError.accept(e);
@@ -190,7 +190,7 @@ class InternalProcess {
         } catch (JApiError e) {
             var def = (ErrorDefinition) jApiSchema.parsed.get(e.target);
             var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
-            if (!errorValidationFailures.isEmpty() && !unsafeOutputEnabled) {
+            if (!errorValidationFailures.isEmpty() && !unsafeResponseEnabled) {
                 var validationFailureCases = new ArrayList<Map<String, String>>();
                 for (var validationFailure : errorValidationFailures) {
                     var validationFailureCase = Map.of(
@@ -205,7 +205,7 @@ class InternalProcess {
         } catch (Exception e) {
             var outputTarget = "error._ApplicationFailure";
 
-            return List.of(outputTarget, outputHeaders, Map.of());
+            return List.of(outputTarget, responseHeaders, Map.of());
         }
     }
 

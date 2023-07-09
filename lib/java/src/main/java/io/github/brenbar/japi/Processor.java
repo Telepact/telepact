@@ -54,17 +54,17 @@ public class Processor {
         return this;
     }
 
-    public byte[] process(byte[] inputMessageBytes) {
-        return deserializeAndProcess(inputMessageBytes);
+    public byte[] process(byte[] requestMessageBytes) {
+        return deserializeAndProcess(requestMessageBytes);
     }
 
-    private byte[] deserializeAndProcess(byte[] inputMessageBytes) {
+    private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
-            var inputMessage = InternalProcess.reconstructRequestMessage(inputMessageBytes, this.serializer);
+            var requestMessage = InternalProcess.reconstructRequestMessage(requestMessageBytes, this.serializer);
 
-            var outputMessage = this.middleware.apply(inputMessage, this::processObject);
+            var responseMessage = this.middleware.apply(requestMessage, this::processObject);
 
-            return this.serializer.serialize(outputMessage);
+            return this.serializer.serialize(responseMessage);
         } catch (JApiError e) {
             this.onError.accept(e);
             return this.serializer.serialize(List.of(e.target, new HashMap<>(), e.body));
@@ -74,8 +74,8 @@ public class Processor {
         }
     }
 
-    private List<Object> processObject(List<Object> inputMessage) {
-        return InternalProcess.processObject(inputMessage, this.onError, this.binaryEncoder,
+    private List<Object> processObject(List<Object> requestMessage) {
+        return InternalProcess.processObject(requestMessage, this.onError, this.binaryEncoder,
                 this.jApiSchema, this.handler, this.extractContextProperties);
     }
 }
