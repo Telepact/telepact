@@ -46,7 +46,6 @@ public class Server {
     Handler handler;
     Middleware middleware;
     Consumer<Throwable> onError;
-    BinaryEncoder binaryEncoder;
     Serializer serializer;
 
     /**
@@ -61,9 +60,11 @@ public class Server {
         this.onError = (e) -> {
         };
         this.middleware = (m, n) -> n.apply(m);
-        this.binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
-        this.serializer = new Serializer(new InternalDefaultSerializationStrategy(),
-                new InternalServerBinaryEncodingStrategy(this.binaryEncoder));
+
+        var binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
+        var serializationStrategy = new InternalDefaultSerializationStrategy();
+        var binaryEncodingStrategy = new InternalServerBinaryEncodingStrategy(binaryEncoder);
+        this.serializer = new Serializer(serializationStrategy, binaryEncodingStrategy);
     }
 
     /**
@@ -122,7 +123,6 @@ public class Server {
     }
 
     private List<Object> processObject(List<Object> requestMessage) {
-        return InternalServer.processObject(requestMessage, this.binaryEncoder,
-                this.jApiSchema, this.handler);
+        return InternalServer.processObject(requestMessage, this.jApiSchema, this.handler);
     }
 }

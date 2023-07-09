@@ -35,7 +35,6 @@ class InternalServer {
     }
 
     static List<Object> processObject(List<Object> requestMessage,
-            BinaryEncoder binaryEncoder,
             JApiSchema jApiSchema,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler) {
 
