@@ -21,14 +21,23 @@ public class MockServer {
     private final List<Mock> mocks = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
 
-    interface VerificationTimes {
+    /**
+     * Applies a criteria to the number of times a verification should be matched.
+     */
+    public interface VerificationTimes {
 
     }
 
+    /**
+     * Allows any number of matches for a verification query.
+     */
     public static class UnlimitedNumberOfTimes implements VerificationTimes {
 
     }
 
+    /**
+     * Allows only the given number of matches for a verification query.
+     */
     public static class ExactNumberOfTimes implements VerificationTimes {
         public final int times;
 
@@ -37,16 +46,33 @@ public class MockServer {
         }
     }
 
-    public MockServer(String jApi) {
-        this.processor = new Server(jApi, this::handle);
+    /**
+     * Create a mock server with the given jAPI Schema.
+     * 
+     * @param jApiSchemaAsJson
+     */
+    public MockServer(String jApiSchemaAsJson) {
+        this.processor = new Server(jApiSchemaAsJson, this::handle);
         this.random = new Random();
     }
 
+    /**
+     * Set an alternative RNG seed to be used for stub data generation.
+     * 
+     * @param seed
+     * @return
+     */
     public MockServer resetRandomSeed(Long seed) {
         this.random.setSeed(seed);
         return this;
     }
 
+    /**
+     * Process a given jAPI Request Message into a jAPI Response Message.
+     * 
+     * @param requestMessageBytes
+     * @return
+     */
     public byte[] process(byte[] message) {
         return this.processor.process(message);
     }
@@ -56,26 +82,57 @@ public class MockServer {
                 this.invocations);
     }
 
-    public void mockPartial(String whenFunctionName, Map<String, Object> whenPartialMatchFunctionInput,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerFunctionOutput) {
-        mocks.add(0, new Mock(whenFunctionName, whenPartialMatchFunctionInput, false, thenAnswerFunctionOutput));
-    }
-
-    public void mockExact(String whenFunctionName, Map<String, Object> whenExactMatchFunctionInput,
+    /**
+     * Create a mock condition when the given function name matches and the given
+     * input partially matches.
+     * 
+     * @param whenFunctionName
+     * @param whenPartialMatchInput
+     * @param thenAnswerOutput
+     */
+    public void mockPartial(String whenFunctionName, Map<String, Object> whenPartialMatchInput,
             Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput) {
-        mocks.add(0, new Mock(whenFunctionName, whenExactMatchFunctionInput, true, thenAnswerOutput));
+        mocks.add(0, new Mock(whenFunctionName, whenPartialMatchInput, false, thenAnswerOutput));
     }
 
-    public void verifyPartial(String functionName, Map<String, Object> partialMatchFunctionInput) {
-        verifyPartial(functionName, partialMatchFunctionInput, new UnlimitedNumberOfTimes());
+    /**
+     * Create a mock condition when the given function name matches and the given
+     * input exactly matches.
+     * 
+     * @param whenFunctionName
+     * @param whenExactMatchInput
+     * @param thenAnswerOutput
+     */
+    public void mockExact(String whenFunctionName, Map<String, Object> whenExactMatchInput,
+            Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput) {
+        mocks.add(0, new Mock(whenFunctionName, whenExactMatchInput, true, thenAnswerOutput));
     }
 
-    public void verifyPartial(String functionName, Map<String, Object> partialMatchFunctionInput,
+    /**
+     * Verify an interaction occurred that both matches the given function name and
+     * partially matches the given input.
+     * 
+     * @param functionName
+     * @param partialMatchInput
+     */
+    public void verifyPartial(String functionName, Map<String, Object> partialMatchInput) {
+        verifyPartial(functionName, partialMatchInput, new UnlimitedNumberOfTimes());
+    }
+
+    /**
+     * Verify an interaction occurred the given number of times that both matches
+     * the given function name and partially matches the given input.
+     * 
+     * @param functionName
+     * @param partialMatchInput
+     * @param verificationTimes
+     */
+    public void verifyPartial(String functionName, Map<String, Object> partialMatchInput,
             VerificationTimes verificationTimes) {
         var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
-                if (InternalMockProcess.isSubMap(invocation.functionInput, partialMatchFunctionInput)) {
+                if (InternalMockProcess.isSubMap(invocation.functionInput, partialMatchInput)) {
                     invocation.verified = true;
                     matchesFound += 1;
                 }
@@ -88,7 +145,7 @@ public class MockServer {
                         Wanted exactly %d partial matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, partialMatchFunctionInput));
+                        """.formatted(e.times, matchesFound, functionName, partialMatchInput));
                 throw new AssertionError(errorString);
             }
         }
@@ -102,7 +159,7 @@ public class MockServer {
                 Wanted partial match:
                 %s(%s)
                 Available:
-                """.formatted(functionName, partialMatchFunctionInput));
+                """.formatted(functionName, partialMatchInput));
         var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
                 .toList();
         if (functionInvocations.isEmpty()) {
@@ -115,10 +172,25 @@ public class MockServer {
         throw new AssertionError(errorString);
     }
 
-    public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput) {
-        verifyExact(functionName, exactMatchFunctionInput, new UnlimitedNumberOfTimes());
+    /**
+     * Verify an interaction occurred that both matches the given function name and
+     * exactly matches the given input.
+     * 
+     * @param functionName
+     * @param exactMatchInput
+     */
+    public void verifyExact(String functionName, Map<String, Object> exactMatchInput) {
+        verifyExact(functionName, exactMatchInput, new UnlimitedNumberOfTimes());
     }
 
+    /**
+     * Verify an interaction occurred the given number of times that both matches
+     * the given function name and exactly matches the given input.
+     * 
+     * @param functionName
+     * @param exactMatchFunctionInput
+     * @param verificationTimes
+     */
     public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput,
             VerificationTimes verificationTimes) {
         var matchesFound = 0;
@@ -164,6 +236,12 @@ public class MockServer {
         throw new AssertionError(errorString);
     }
 
+    /**
+     * Verify no more interactions occurred with this mock.
+     * 
+     * (This function implies that no interactions occurred or that all interactions
+     * up to this point have already been verified.)
+     */
     public void verifyNoMoreInteractions() {
         var invocationsNotVerified = this.invocations.stream().filter(i -> !i.verified).toList();
 
@@ -179,7 +257,17 @@ public class MockServer {
         }
     }
 
+    /**
+     * Clear all interaction data.
+     */
     public void clearInvocations() {
         this.invocations.clear();
+    }
+
+    /**
+     * Clear all mock conditions.
+     */
+    public void clearMocks() {
+        this.mocks.clear();
     }
 }
