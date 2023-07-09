@@ -60,22 +60,28 @@ public class Processor {
 
     private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
-            var requestMessage = InternalProcess.reconstructRequestMessage(requestMessageBytes, this.serializer);
+            try {
+                var requestMessage = InternalProcess.reconstructRequestMessage(requestMessageBytes, this.serializer);
 
-            var responseMessage = this.middleware.apply(requestMessage, this::processObject);
+                var responseMessage = this.middleware.apply(requestMessage, this::processObject);
 
-            return this.serializer.serialize(responseMessage);
-        } catch (JApiError e) {
-            this.onError.accept(e);
-            return this.serializer.serialize(List.of(e.target, new HashMap<>(), e.body));
+                return this.serializer.serialize(responseMessage);
+            } catch (Exception e) {
+                try {
+                    this.onError.accept(e);
+                } catch (Exception ignored) {
+                }
+                throw e;
+            }
+        } catch (InternalJApiError e) {
+            return this.serializer.serialize(List.of(e.target, e.headers, e.body));
         } catch (Exception e) {
-            this.onError.accept(e);
-            return this.serializer.serialize(List.of("error._ProcessFailure", new HashMap<>(), Map.of()));
+            return this.serializer.serialize(List.of("error._JApiFailure", new HashMap<>(), Map.of()));
         }
     }
 
     private List<Object> processObject(List<Object> requestMessage) {
-        return InternalProcess.processObject(requestMessage, this.onError, this.binaryEncoder,
+        return InternalProcess.processObject(requestMessage, this.binaryEncoder,
                 this.jApiSchema, this.handler, this.extractContextProperties);
     }
 }

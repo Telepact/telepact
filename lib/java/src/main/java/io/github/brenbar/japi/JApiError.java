@@ -3,18 +3,18 @@ package io.github.brenbar.japi;
 import java.util.Map;
 
 public class JApiError extends RuntimeException {
+
     public final String target;
     public final Map<String, Object> body;
 
-    public JApiError(String target, Map<String, Object> details) {
-        super("%s: %s".formatted(target, details));
+    public JApiError(String target, Map<String, Object> body) {
         this.target = target;
-        this.body = details;
+        this.body = body;
     }
 
-    public JApiError(String target, Map<String, Object> details, Throwable cause) {
-        super("%s: %s".formatted(target, details), cause);
+    public JApiError(String target, Map<String, Object> body, Throwable cause) {
+        super(cause);
         this.target = target;
-        this.body = details;
+        this.body = body;
     }
 }

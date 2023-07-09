@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -21,15 +20,18 @@ class InternalProcess {
         } catch (DeserializationError e) {
             var cause = e.getCause();
             if (cause instanceof BinaryEncoderUnavailableError e2) {
-                throw new JApiError("error._ParseFailure", Map.of("reason", "BinaryDecodeFailure"), e2);
+                throw new InternalJApiError("error._ParseFailure", new HashMap<>(),
+                        Map.of("reason", "BinaryDecodeFailure"),
+                        e2);
             } else {
-                throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"),
+                throw new InternalJApiError("error._ParseFailure", new HashMap<>(),
+                        Map.of("reason", "MessageMustBeArrayWithThreeElements"),
                         e);
             }
         }
     }
 
-    static List<Object> processObject(List<Object> requestMessage, Consumer<Throwable> onError,
+    static List<Object> processObject(List<Object> requestMessage,
             BinaryEncoder binaryEncoder,
             JApiSchema jApiSchema,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
@@ -38,175 +40,176 @@ class InternalProcess {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = new HashMap<String, Object>();
         try {
-            try {
-                if (requestMessage.size() < 3) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "MessageMustBeArrayWithThreeElements"));
-                }
-
-                String requestTarget;
-                try {
-                    requestTarget = (String) requestMessage.get(0);
-                } catch (ClassCastException e) {
-                    throw new JApiError("error._InvalidRequestTarget", Map.of("reason", "TargetMustBeString"));
-                }
-
-                var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)");
-                var matcher = regex.matcher(requestTarget);
-                if (!matcher.matches()) {
-                    throw new JApiError("error._InvalidRequestTarget",
-                            Map.of("reason", "TargetStringMustBeFunction"));
-                }
-                var functionName = matcher.group(1);
-
-                Map<String, Object> requestHeaders;
-                try {
-                    requestHeaders = (Map<String, Object>) requestMessage.get(1);
-                } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "HeadersMustBeObject"));
-                }
-
-                var headerValidationFailures = validateHeaders(requestHeaders, jApiSchema);
-
-                if (!headerValidationFailures.isEmpty()) {
-                    var validationFailureCases = new ArrayList<Map<String, String>>();
-
-                    for (var validationFailure : headerValidationFailures) {
-                        var validationFailureCase = Map.of(
-                                "path", validationFailure.path,
-                                "reason", validationFailure.reason);
-                        validationFailureCases.add(validationFailureCase);
-                    }
-                    throw new JApiError("error._InvalidRequestHeaders", Map.of("cases", validationFailureCases));
-                }
-
-                if (requestHeaders.containsKey("_bin")) {
-                    List<Object> binaryChecksums = (List<Object>) requestHeaders.get("_bin");
-
-                    if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
-                        // Client is initiating handshake for binary protocol
-                        responseHeaders.put("_includeBinaryEncoding", true);
-                    }
-
-                    responseHeaders.put("_serializeAsBinary", true);
-                }
-
-                var clientKnownBinaryChecksums = requestHeaders.get("_clientKnownBinaryChecksums");
-                if (clientKnownBinaryChecksums != null) {
-                    responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
-                }
-
-                // Reflect call id
-                var callId = requestHeaders.get("_id");
-                if (callId != null) {
-                    responseHeaders.put("_id", callId);
-                }
-
-                Map<String, Object> input;
-                try {
-                    input = (Map<String, Object>) requestMessage.get(2);
-                } catch (ClassCastException e) {
-                    throw new JApiError("error._ParseFailure", Map.of("reason", "BodyMustBeObject"));
-                }
-
-                var functionDef = jApiSchema.parsed.get(requestTarget);
-
-                FunctionDefinition functionDefinition;
-                if (functionDef instanceof FunctionDefinition f) {
-                    functionDefinition = f;
-                } else {
-                    throw new JApiError("error._InvalidRequestTarget", Map.of("reason", "UnknownFunction"));
-                }
-
-                var inputValidationFailures = validateStruct(functionDefinition.name,
-                        functionDefinition.inputStruct.fields, input);
-                if (!inputValidationFailures.isEmpty()) {
-                    var validationFailureCases = new ArrayList<Map<String, String>>();
-                    for (var validationFailure : inputValidationFailures) {
-                        var validationFailureCase = Map.of(
-                                "path", validationFailure.path,
-                                "reason", validationFailure.reason);
-                        validationFailureCases.add(validationFailureCase);
-                    }
-                    throw new JApiError("error._InvalidRequestBody", Map.of("cases", validationFailureCases));
-                }
-
-                var context = new Context(functionName);
-                var contextPropertiesFromHeaders = extractContextProperties.apply(requestHeaders);
-                context.properties.putAll(contextPropertiesFromHeaders);
-
-                unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
-
-                Map<String, Object> output;
-                try {
-                    if (functionName.equals("_ping")) {
-                        output = Map.of();
-                    } else if (functionName.equals("_jApi")) {
-                        output = Map.of("jApi", jApiSchema.original);
-                    } else {
-                        output = handler.apply(context, input);
-                    }
-                } catch (JApiError e) {
-                    if (functionDefinition.allowedErrors.contains(e.target)) {
-                        throw e;
-                    } else {
-                        throw new DisallowedError(e);
-                    }
-                }
-
-                var outputValidationFailures = validateStruct(functionDefinition.name,
-                        functionDefinition.outputStruct.fields,
-                        output);
-                if (!outputValidationFailures.isEmpty() && !unsafeResponseEnabled) {
-                    var validationFailureCases = new ArrayList<Map<String, String>>();
-                    for (var validationFailure : outputValidationFailures) {
-                        var validationFailureCase = Map.of(
-                                "path", validationFailure.path,
-                                "reason", validationFailure.reason);
-                        validationFailureCases.add(validationFailureCase);
-                    }
-                    throw new JApiError("error._InvalidResponseBody", Map.of("cases", validationFailureCases));
-                }
-
-                Map<String, Object> finalOutput;
-                if (requestHeaders.containsKey("_sel")) {
-                    Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
-                            .get("_sel");
-                    finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct, output,
-                            selectStructFieldsHeader);
-                } else {
-                    finalOutput = output;
-                }
-
-                var outputTarget = "function.%s".formatted(functionName);
-
-                return List.of(outputTarget, responseHeaders, finalOutput);
-            } catch (Exception e) {
-                try {
-                    onError.accept(e);
-                } catch (Exception ignored) {
-                }
-                throw e;
+            if (requestMessage.size() < 3) {
+                throw new InternalJApiError("error._ParseFailure",
+                        responseHeaders,
+                        Map.of("reason", "MessageMustBeArrayWithThreeElements"));
             }
-        } catch (JApiError e) {
-            var def = (ErrorDefinition) jApiSchema.parsed.get(e.target);
-            var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
-            if (!errorValidationFailures.isEmpty() && !unsafeResponseEnabled) {
+
+            String requestTarget;
+            try {
+                requestTarget = (String) requestMessage.get(0);
+            } catch (ClassCastException e) {
+                throw new InternalJApiError("error._InvalidRequestTarget", responseHeaders,
+                        Map.of("reason", "TargetMustBeString"));
+            }
+
+            Map<String, Object> requestHeaders;
+            try {
+                requestHeaders = (Map<String, Object>) requestMessage.get(1);
+            } catch (ClassCastException e) {
+                throw new InternalJApiError("error._ParseFailure", responseHeaders,
+                        Map.of("reason", "HeadersMustBeObject"));
+            }
+
+            // Reflect call id
+            var callId = requestHeaders.get("_id");
+            if (callId != null) {
+                responseHeaders.put("_id", callId);
+            }
+
+            Map<String, Object> input;
+            try {
+                input = (Map<String, Object>) requestMessage.get(2);
+            } catch (ClassCastException e) {
+                throw new InternalJApiError("error._ParseFailure", responseHeaders,
+                        Map.of("reason", "BodyMustBeObject"));
+            }
+
+            var regex = Pattern.compile("^function\\.([a-zA-Z_]\\w*)");
+            var matcher = regex.matcher(requestTarget);
+            if (!matcher.matches()) {
+                throw new InternalJApiError("error._InvalidRequestTarget",
+                        responseHeaders,
+                        Map.of("reason", "TargetStringMustBeFunction"));
+            }
+            var functionName = matcher.group(1);
+
+            var headerValidationFailures = validateHeaders(requestHeaders, jApiSchema);
+
+            if (!headerValidationFailures.isEmpty()) {
+                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
+                throw new InternalJApiError("error._InvalidRequestHeaders",
+                        responseHeaders,
+                        Map.of("cases", validationFailureCases));
+            }
+
+            if (requestHeaders.containsKey("_bin")) {
+                List<Object> binaryChecksums = (List<Object>) requestHeaders.get("_bin");
+
+                if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
+                    // Client is initiating handshake for binary protocol
+                    responseHeaders.put("_includeBinaryEncoding", true);
+                }
+
+                responseHeaders.put("_serializeAsBinary", true);
+            }
+
+            var clientKnownBinaryChecksums = requestHeaders.get("_clientKnownBinaryChecksums");
+            if (clientKnownBinaryChecksums != null) {
+                responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+            }
+
+            var functionDef = jApiSchema.parsed.get(requestTarget);
+
+            FunctionDefinition functionDefinition;
+            if (functionDef instanceof FunctionDefinition f) {
+                functionDefinition = f;
+            } else {
+                throw new InternalJApiError("error._InvalidRequestTarget", responseHeaders,
+                        Map.of("reason", "UnknownFunction"));
+            }
+
+            var inputValidationFailures = validateStruct(functionDefinition.name,
+                    functionDefinition.inputStruct.fields, input);
+            if (!inputValidationFailures.isEmpty()) {
+                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(inputValidationFailures);
+                throw new InternalJApiError("error._InvalidRequestBody", responseHeaders,
+                        Map.of("cases", validationFailureCases));
+            }
+
+            var context = new Context(functionName);
+            var contextPropertiesFromHeaders = extractContextProperties.apply(requestHeaders);
+            context.properties.putAll(contextPropertiesFromHeaders);
+
+            unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
+
+            Map<String, Object> output;
+            try {
+                if (functionName.equals("_ping")) {
+                    output = Map.of();
+                } else if (functionName.equals("_jApi")) {
+                    output = Map.of("jApi", jApiSchema.original);
+                } else {
+                    output = handler.apply(context, input);
+                }
+            } catch (JApiError e) {
+                if (functionDefinition.allowedErrors.contains(e.target)) {
+                    var def = (ErrorDefinition) jApiSchema.parsed.get(e.target);
+                    var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
+                    if (!errorValidationFailures.isEmpty() && !unsafeResponseEnabled) {
+                        var validationFailureCases = mapValidationFailuresToInvalidFieldCases(
+                                errorValidationFailures);
+                        throw new InternalJApiError("error._InvalidResponseBody", responseHeaders,
+                                Map.of("cases", validationFailureCases));
+                    }
+
+                    throw new InternalJApiError(e.target, responseHeaders, e.body, e.getCause());
+                } else {
+                    throw new InternalJApiError("error._ApplicationFailure", responseHeaders,
+                            Map.of());
+                }
+            }
+
+            var outputValidationFailures = validateStruct(functionDefinition.name,
+                    functionDefinition.outputStruct.fields,
+                    output);
+            if (!outputValidationFailures.isEmpty() && !unsafeResponseEnabled) {
                 var validationFailureCases = new ArrayList<Map<String, String>>();
-                for (var validationFailure : errorValidationFailures) {
+                for (var validationFailure : outputValidationFailures) {
                     var validationFailureCase = Map.of(
                             "path", validationFailure.path,
                             "reason", validationFailure.reason);
                     validationFailureCases.add(validationFailureCase);
                 }
-                throw new JApiError("error._InvalidResponseBody", Map.of("cases", validationFailureCases));
+                throw new InternalJApiError("error._InvalidResponseBody", responseHeaders,
+                        Map.of("cases", validationFailureCases));
+            }
+
+            Map<String, Object> finalOutput;
+            if (requestHeaders.containsKey("_sel")) {
+                Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
+                        .get("_sel");
+                finalOutput = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct, output,
+                        selectStructFieldsHeader);
+            } else {
+                finalOutput = output;
+            }
+
+            var outputTarget = "function.%s".formatted(functionName);
+
+            return List.of(outputTarget, responseHeaders, finalOutput);
+        } catch (InternalJApiError e) {
+            var def = (ErrorDefinition) jApiSchema.parsed.get(e.target);
+            var errorValidationFailures = validateStruct(e.target, def.fields, e.body);
+            if (!errorValidationFailures.isEmpty() && !unsafeResponseEnabled) {
+                throw new RuntimeException("jAPI failed it's own validation", e);
             }
 
             throw e;
-        } catch (Exception e) {
-            var outputTarget = "error._ApplicationFailure";
-
-            return List.of(outputTarget, responseHeaders, Map.of());
         }
+    }
+
+    private static List<Map<String, String>> mapValidationFailuresToInvalidFieldCases(
+            List<ValidationFailure> inputValidationFailures) {
+        var validationFailureCases = new ArrayList<Map<String, String>>();
+        for (var validationFailure : inputValidationFailures) {
+            var validationFailureCase = Map.of(
+                    "path", validationFailure.path,
+                    "reason", validationFailure.reason);
+            validationFailureCases.add(validationFailureCase);
+        }
+        return validationFailureCases;
     }
 
     private static List<ValidationFailure> validateHeaders(
@@ -620,34 +623,6 @@ class InternalProcess {
             return finalList;
         } else {
             return value;
-        }
-    }
-
-    static boolean inputIsJson(byte[] inputJapiMessageBytes) {
-        return inputJapiMessageBytes[0] == '[';
-    }
-
-    static List<Object> deserialize(byte[] inputJapiMessageBytes, SerializationStrategy serializer,
-            BinaryEncoder binaryEncoder) {
-        if (inputIsJson(inputJapiMessageBytes)) {
-            try {
-                return serializer.fromJson(inputJapiMessageBytes);
-            } catch (DeserializationError e) {
-                throw new JApiError("error._ParseFailure", Map.of());
-            }
-        } else {
-            try {
-                var encodedInputJapiMessage = serializer.fromMsgPack(inputJapiMessageBytes);
-                if (encodedInputJapiMessage.size() < 3) {
-                    throw new JApiError("error._ParseFailure",
-                            Map.of("reason", "JapiMessageArrayMustHaveThreeElements"));
-                }
-                return InternalBinaryEncode.decode(encodedInputJapiMessage, binaryEncoder);
-                // } catch (BinaryChecksumMismatchException e) {
-                // throw new JApiError("error._BinaryDecodeFailure", Map.of());
-            } catch (DeserializationError e) {
-                throw new JApiError("error._ParseFailure", Map.of(), e);
-            }
         }
     }
 }
