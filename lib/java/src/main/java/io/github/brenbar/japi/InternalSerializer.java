@@ -162,7 +162,7 @@ class InternalSerializer {
             }
         }
 
-        var binaryEncoder = findBinaryEncoder(recentBinaryEncoders, binaryChecksum);
+        var binaryEncoder = findBinaryEncoder(binaryChecksum, recentBinaryEncoders);
         if (!binaryEncoder.isPresent()) {
             throw new BinaryEncoderUnavailableError();
         }
@@ -170,7 +170,7 @@ class InternalSerializer {
         return decode(message, binaryEncoder.get());
     }
 
-    private static Optional<BinaryEncoder> findBinaryEncoder(Deque<BinaryEncoder> binaryEncoderStore, Long checksum) {
+    private static Optional<BinaryEncoder> findBinaryEncoder(Long checksum, Deque<BinaryEncoder> binaryEncoderStore) {
         for (var binaryEncoder : binaryEncoderStore) {
             if (Objects.equals(binaryEncoder.checksum, checksum)) {
                 return Optional.of(binaryEncoder);
@@ -179,22 +179,23 @@ class InternalSerializer {
         return Optional.empty();
     }
 
-    private static List<Object> encode(List<Object> japiMessage, BinaryEncoder binaryEncoder) {
-        var encodedMessageType = get(binaryEncoder.encodeMap, japiMessage.get(0));
-        var headers = (Map<String, Object>) japiMessage.get(1);
-        var encodedBody = encodeKeys(japiMessage.get(2), binaryEncoder);
+    private static List<Object> encode(List<Object> jApiMessage, BinaryEncoder binaryEncoder) {
+        var decodedMessageType = jApiMessage.get(0);
+        var encodedMessageType = get(decodedMessageType, binaryEncoder.encodeMap);
+        var headers = (Map<String, Object>) jApiMessage.get(1);
+        var encodedBody = encodeKeys(jApiMessage.get(2), binaryEncoder);
         return List.of(encodedMessageType, headers, encodedBody);
     }
 
-    static List<Object> decode(List<Object> japiMessage, BinaryEncoder binaryEncoder) {
-        var encodedMessageType = japiMessage.get(0);
+    static List<Object> decode(List<Object> jApiMessage, BinaryEncoder binaryEncoder) {
+        var encodedMessageType = jApiMessage.get(0);
         if (encodedMessageType instanceof Integer i) {
             encodedMessageType = Long.valueOf(i);
         }
-        var decodedMessageType = get(binaryEncoder.decodeMap, encodedMessageType);
-        var headers = (Map<String, Object>) japiMessage.get(1);
+        var decodedMessageType = get(encodedMessageType, binaryEncoder.decodeMap);
+        var headers = (Map<String, Object>) jApiMessage.get(1);
         var givenChecksums = (List<Long>) headers.get("_bin");
-        var decodedBody = decodeKeys(japiMessage.get(2), binaryEncoder);
+        var decodedBody = decodeKeys(jApiMessage.get(2), binaryEncoder);
         // if (this.checksum != null && !givenChecksums.contains(this.checksum)) {
         // throw new BinaryChecksumMismatchException();
         // }
@@ -209,7 +210,7 @@ class InternalSerializer {
             m.entrySet().stream().forEach(e -> {
                 var key = e.getKey();
                 if (binaryEncoder.encodeMap.containsKey(key)) {
-                    key = get(binaryEncoder.encodeMap, key);
+                    key = get(key, binaryEncoder.encodeMap);
                 }
                 var encodedValue = encodeKeys(e.getValue(), binaryEncoder);
                 newMap.put(key, encodedValue);
@@ -228,7 +229,7 @@ class InternalSerializer {
             m.entrySet().stream().forEach(e -> {
                 var key = e.getKey();
                 if (binaryEncoder.decodeMap.containsKey(key)) {
-                    key = get(binaryEncoder.decodeMap, key);
+                    key = get(key, binaryEncoder.decodeMap);
                 }
                 var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
                 newMap.put(key, encodedValue);
@@ -241,10 +242,10 @@ class InternalSerializer {
         }
     }
 
-    private static Object get(Map<?, ?> map, Object key) {
+    private static Object get(Object key, Map<?, ?> map) {
         var value = map.get(key);
         if (value == null) {
-            throw new RuntimeException("Missing encoding for " + String.valueOf(key));
+            throw new BinaryEncoderMissingEncoding(key);
         }
         return value;
     }

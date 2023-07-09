@@ -42,9 +42,9 @@ public class Server {
     interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
     }
 
+    JApiSchema jApiSchema;
     Handler handler;
     Middleware middleware;
-    JApiSchema jApiSchema;
     Consumer<Throwable> onError;
     BinaryEncoder binaryEncoder;
     Serializer serializer;
@@ -57,16 +57,13 @@ public class Server {
      */
     public Server(String jApiSchemaAsJson, Handler handler) {
         this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson);
-
         this.handler = handler;
         this.onError = (e) -> {
         };
         this.middleware = (m, n) -> n.apply(m);
-
         this.binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
-
         this.serializer = new Serializer(new InternalDefaultSerializationStrategy(),
-                new InternalServerBinaryEncodingStrategy(binaryEncoder));
+                new InternalServerBinaryEncodingStrategy(this.binaryEncoder));
     }
 
     /**
