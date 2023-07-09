@@ -95,12 +95,6 @@ class InternalServer {
             if (requestHeaders.containsKey("_bin")) {
                 List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
 
-                if (clientKnownBinaryChecksums.isEmpty()
-                        || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
-                    // Client is initiating handshake for binary protocol
-                    responseHeaders.put("_includeBinaryEncoding", true);
-                }
-
                 responseHeaders.put("_serializeAsBinary", true);
                 responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
             }
