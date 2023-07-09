@@ -5,20 +5,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-interface Type {
-    public String getName();
-}
-
-interface Definition {
-    public String getName();
-}
-
-interface BinaryEncodingStrategy {
-    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
-
-    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
-}
-
 class JApiSchema {
     public final Map<String, Object> original;
     public final Map<String, Definition> parsed;
@@ -29,23 +15,131 @@ class JApiSchema {
     }
 }
 
-class JsonAny implements Type {
+interface Definition {
+    public String getName();
+}
+
+class TitleDefinition implements Definition {
+
+    public final String name;
+
+    public TitleDefinition(
+            String name) {
+        this.name = name;
+    }
+
     @Override
     public String getName() {
-        return "any";
+        return name;
     }
 }
 
-class JsonArray implements Type {
-    public final TypeDeclaration nestedType;
+class FunctionDefinition implements Definition {
 
-    public JsonArray(TypeDeclaration nestedType) {
-        this.nestedType = nestedType;
+    public final String name;
+    public final Struct inputStruct;
+    public final Struct outputStruct;
+    public final List<String> allowedErrors;
+
+    public FunctionDefinition(
+            String name,
+            Struct inputStruct,
+            Struct outputStruct,
+            List<String> errors) {
+        this.name = name;
+        this.inputStruct = inputStruct;
+        this.outputStruct = outputStruct;
+        this.allowedErrors = errors;
     }
 
     @Override
     public String getName() {
-        return "array";
+        return name;
+    }
+}
+
+class TypeDefinition implements Definition {
+
+    public final String name;
+    public final Type type;
+
+    public TypeDefinition(
+            String name,
+            Type type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}
+
+class ErrorDefinition implements Definition {
+
+    public final String name;
+    public final Map<String, FieldDeclaration> fields;
+
+    public ErrorDefinition(
+            String name,
+            Map<String, FieldDeclaration> fields) {
+        this.name = name;
+        this.fields = fields;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}
+
+class FieldNameAndFieldDeclaration {
+
+    public final String fieldName;
+    public final FieldDeclaration fieldDeclaration;
+
+    public FieldNameAndFieldDeclaration(
+            String fieldName,
+            FieldDeclaration fieldDeclaration) {
+        this.fieldName = fieldName;
+        this.fieldDeclaration = fieldDeclaration;
+    }
+}
+
+class FieldDeclaration {
+
+    public final TypeDeclaration typeDeclaration;
+    public final boolean optional;
+
+    public FieldDeclaration(
+            TypeDeclaration typeDeclaration,
+            boolean optional) {
+        this.typeDeclaration = typeDeclaration;
+        this.optional = optional;
+    }
+}
+
+class TypeDeclaration {
+    public final Type type;
+    public final boolean nullable;
+
+    public TypeDeclaration(
+            Type type,
+            boolean nullable) {
+        this.type = type;
+        this.nullable = nullable;
+    }
+}
+
+interface Type {
+    public String getName();
+}
+
+class JsonNull implements Type {
+    @Override
+    public String getName() {
+        return "null";
     }
 }
 
@@ -63,17 +157,30 @@ class JsonInteger implements Type {
     }
 }
 
-class JsonNull implements Type {
-    @Override
-    public String getName() {
-        return "null";
-    }
-}
-
 class JsonNumber implements Type {
     @Override
     public String getName() {
         return "number";
+    }
+}
+
+class JsonString implements Type {
+    @Override
+    public String getName() {
+        return "string";
+    }
+}
+
+class JsonArray implements Type {
+    public final TypeDeclaration nestedType;
+
+    public JsonArray(TypeDeclaration nestedType) {
+        this.nestedType = nestedType;
+    }
+
+    @Override
+    public String getName() {
+        return "array";
     }
 }
 
@@ -91,10 +198,10 @@ class JsonObject implements Type {
     }
 }
 
-class JsonString implements Type {
+class JsonAny implements Type {
     @Override
     public String getName() {
-        return "string";
+        return "any";
     }
 }
 
@@ -130,126 +237,37 @@ class Enum implements Type {
     }
 }
 
-class ErrorDefinition implements Definition {
+class BinaryEncoder {
 
-    public final String name;
-    public final Map<String, FieldDeclaration> fields;
+    public final Map<String, Long> encodeMap;
+    public final Map<Long, String> decodeMap;
+    public final Long checksum;
 
-    public ErrorDefinition(
-            String name,
-            Map<String, FieldDeclaration> fields) {
-        this.name = name;
-        this.fields = fields;
-    }
-
-    @Override
-    public String getName() {
-        return name;
+    public BinaryEncoder(Map<String, Long> binaryEncoding, Long binaryHash) {
+        this.encodeMap = binaryEncoding;
+        this.decodeMap = binaryEncoding.entrySet().stream()
+                .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
+        this.checksum = binaryHash;
     }
 }
 
-class FunctionDefinition implements Definition {
+interface BinaryEncodingStrategy {
+    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
 
-    public final String name;
-    public final Struct inputStruct;
-    public final Struct outputStruct;
-    public final List<String> allowedErrors;
+    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
+}
 
-    public FunctionDefinition(
-            String name,
-            Struct inputStruct,
-            Struct outputStruct,
-            List<String> errors) {
-        this.name = name;
-        this.inputStruct = inputStruct;
-        this.outputStruct = outputStruct;
-        this.allowedErrors = errors;
-    }
+class ValidationFailure {
+    public final String path;
+    public final String reason;
 
-    @Override
-    public String getName() {
-        return name;
+    public ValidationFailure(String path, String reason) {
+        this.path = path;
+        this.reason = reason;
     }
 }
 
-class FieldDeclaration {
-
-    public final TypeDeclaration typeDeclaration;
-    public final boolean optional;
-
-    public FieldDeclaration(
-            TypeDeclaration typeDeclaration,
-            boolean optional) {
-        this.typeDeclaration = typeDeclaration;
-        this.optional = optional;
-    }
-}
-
-class FieldNameAndFieldDeclaration {
-
-    public final String fieldName;
-    public final FieldDeclaration fieldDeclaration;
-
-    public FieldNameAndFieldDeclaration(
-            String fieldName,
-            FieldDeclaration fieldDeclaration) {
-        this.fieldName = fieldName;
-        this.fieldDeclaration = fieldDeclaration;
-    }
-}
-
-class TitleDefinition implements Definition {
-
-    public final String name;
-
-    public TitleDefinition(
-            String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-}
-
-class TypeDefinition implements Definition {
-
-    public final String name;
-    public final Type type;
-
-    public TypeDefinition(
-            String name,
-            Type type) {
-        this.name = name;
-        this.type = type;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-}
-
-class TypeDeclaration {
-    public final Type type;
-    public final boolean nullable;
-
-    public TypeDeclaration(
-            Type type,
-            boolean nullable) {
-        this.type = type;
-        this.nullable = nullable;
-    }
-}
-
-class DisallowedError extends RuntimeException {
-    public DisallowedError(Throwable cause) {
-        super(cause);
-    }
-}
-
-class ValidationErrors {
+class ValidationErrorReasons {
     public static final String NULL_INVALID_FOR_NON_NULL_TYPE = "NullInvalidForNonNullType";
 
     public static final String NUMBER_INVALID_FOR_BOOLEAN_TYPE = "NumberInvalidForBooleanType";
@@ -319,16 +337,6 @@ class ValidationErrors {
     public static final String NUMBER_OUT_OF_RANGE = "NumberOutOfRange";
 }
 
-class ValidationFailure {
-    public final String path;
-    public final String reason;
-
-    public ValidationFailure(String path, String reason) {
-        this.path = path;
-        this.reason = reason;
-    }
-}
-
 class Mock {
     final String whenFunctionName;
     final Map<String, Object> whenFunctionInput;
@@ -352,43 +360,5 @@ class Invocation {
     public Invocation(String functionName, Map<String, Object> functionInput) {
         this.functionName = functionName;
         this.functionInput = functionInput;
-    }
-}
-
-class NumberOutOfRangeError extends Exception {
-
-}
-
-class BinaryEncoder {
-
-    public final Map<String, Long> encodeMap;
-    public final Map<Long, String> decodeMap;
-    public final Long checksum;
-
-    public BinaryEncoder(Map<String, Long> binaryEncoding, Long binaryHash) {
-        this.encodeMap = binaryEncoding;
-        this.decodeMap = binaryEncoding.entrySet().stream()
-                .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
-        this.checksum = binaryHash;
-    }
-}
-
-class InternalJApiError extends RuntimeException {
-    public final String target;
-    public final Map<String, Object> headers;
-    public final Map<String, Object> body;
-
-    InternalJApiError(String target, Map<String, Object> headers, Map<String, Object> details) {
-        super("%s: %s".formatted(target, details));
-        this.target = target;
-        this.headers = headers;
-        this.body = details;
-    }
-
-    InternalJApiError(String target, Map<String, Object> headers, Map<String, Object> details, Throwable cause) {
-        super("%s: %s".formatted(target, details), cause);
-        this.target = target;
-        this.headers = headers;
-        this.body = details;
     }
 }
