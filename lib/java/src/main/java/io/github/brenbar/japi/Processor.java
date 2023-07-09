@@ -36,7 +36,7 @@ public class Processor {
         this.binaryEncoder = InternalBinaryEncode.constructBinaryEncoder(this.jApiSchema);
 
         this.serializer = new Serializer(new DefaultSerializationStrategy(),
-                new ServerBinaryEncodingStrategy(binaryEncoder));
+                new InternalServerBinaryEncodingStrategy(binaryEncoder));
     }
 
     public Processor setOnError(Consumer<Throwable> onError) {

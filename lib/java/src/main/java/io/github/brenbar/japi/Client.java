@@ -29,7 +29,8 @@ public class Client {
         this.forceSendJsonDefault = true;
         this.timeoutMsDefault = 5000;
 
-        this.serializer = new Serializer(new DefaultSerializationStrategy(), new ClientBinaryEncodingStrategy());
+        this.serializer = new Serializer(new DefaultSerializationStrategy(),
+                new InternalClientBinaryEncodingStrategy());
     }
 
     public Client setMiddleware(Middleware middleware) {

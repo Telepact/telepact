@@ -2,11 +2,11 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-class ServerBinaryEncodingStrategy implements BinaryEncodingStrategy {
+class InternalServerBinaryEncodingStrategy implements BinaryEncodingStrategy {
 
     private BinaryEncoder binaryEncoder;
 
-    public ServerBinaryEncodingStrategy(BinaryEncoder binaryEncoder) {
+    public InternalServerBinaryEncodingStrategy(BinaryEncoder binaryEncoder) {
         this.binaryEncoder = binaryEncoder;
     }
 

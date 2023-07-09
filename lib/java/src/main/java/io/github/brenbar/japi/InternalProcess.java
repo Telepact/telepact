@@ -95,18 +95,15 @@ class InternalProcess {
             }
 
             if (requestHeaders.containsKey("_bin")) {
-                List<Object> binaryChecksums = (List<Object>) requestHeaders.get("_bin");
+                List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
 
-                if (binaryChecksums.isEmpty() || !binaryChecksums.contains(binaryEncoder.checksum)) {
+                if (clientKnownBinaryChecksums.isEmpty()
+                        || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
                     // Client is initiating handshake for binary protocol
                     responseHeaders.put("_includeBinaryEncoding", true);
                 }
 
                 responseHeaders.put("_serializeAsBinary", true);
-            }
-
-            var clientKnownBinaryChecksums = requestHeaders.get("_clientKnownBinaryChecksums");
-            if (clientKnownBinaryChecksums != null) {
                 responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
             }
 

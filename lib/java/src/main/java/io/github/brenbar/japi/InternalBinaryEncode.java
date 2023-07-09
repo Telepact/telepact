@@ -55,9 +55,9 @@ class InternalBinaryEncode {
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoder binaryEncoder) {
         var headers = (Map<String, Object>) message.get(1);
 
-        var clientKnownChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
+        var clientKnownBinaryChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
 
-        if (clientKnownChecksums == null || !clientKnownChecksums.contains(binaryEncoder.checksum)) {
+        if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
             headers.put("_enc", binaryEncoder.encodeMap);
         }
 
@@ -70,12 +70,11 @@ class InternalBinaryEncode {
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(1);
 
-        var binaryChecksums = (List<Long>) headers.get("_bin");
-        headers.put("_clientKnownBinaryChecksums", binaryChecksums);
+        var clientKnownBinaryChecksums = (List<Long>) headers.get("_bin");
 
-        var binaryChecksum = binaryChecksums.get(0);
+        var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
-        if (!Objects.equals(binaryChecksum, binaryEncoder.checksum)) {
+        if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
             throw new BinaryEncoderUnavailableError();
         }
 
