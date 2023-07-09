@@ -1,6 +1,7 @@
 package io.github.brenbar.japi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -67,9 +68,60 @@ public class MockTests {
         client.submit(new Request("exportVariables", Map.of()));
         client.submit(new Request("exportVariables", Map.of()));
 
+        var e1 = assertThrows(
+                AssertionError.class,
+                () -> mock.verifyExact("saveVariables", Map.of("variables", Map.of("b", 10))));
+        assertEquals("""
+                No matching invocations.
+                Wanted exact match:
+                saveVariables({variables={b=10}})
+                Available:
+                saveVariables({variables={a=10}})
+                """, e1.getMessage());
+        var e2 = assertThrows(
+                AssertionError.class,
+                () -> mock.verifyExact("saveVariables", Map.of("variables", Map.of("a", 0))));
+        assertEquals("""
+                No matching invocations.
+                Wanted exact match:
+                saveVariables({variables={a=0}})
+                Available:
+                saveVariables({variables={a=10}})
+                """, e2.getMessage());
+
         mock.verifyExact("saveVariables", Map.of("variables", Map.of("a", 10)));
 
+        var e3 = assertThrows(
+                AssertionError.class,
+                () -> mock.verifyPartial("compute", Map.of("x", Map.of("variable", Map.of("value", "b")))));
+        assertEquals("""
+                No matching invocations.
+                Wanted partial match:
+                compute({x={variable={value=b}}})
+                Available:
+                compute({x={variable={value=a}}, y={constant={value=2}}, op={add={}}})
+                """, e3.getMessage());
+        var e4 = assertThrows(
+                AssertionError.class,
+                () -> mock.verifyPartial("compute", Map.of("x", Map.of("variable", Map.of("val", "a")))));
+        assertEquals("""
+                No matching invocations.
+                Wanted partial match:
+                compute({x={variable={val=a}}})
+                Available:
+                compute({x={variable={value=a}}, y={constant={value=2}}, op={add={}}})
+                """, e4.getMessage());
+
         mock.verifyPartial("compute", Map.of("x", Map.of("variable", Map.of("value", "a"))));
+
+        var e5 = assertThrows(
+                AssertionError.class,
+                () -> mock.verifyPartial("exportVariables", Map.of(), new MockServer.ExactNumberOfTimes(2)));
+        assertEquals("""
+                Wanted exactly 2 partial matches, but found 3.
+                Query:
+                exportVariables({})
+                """, e5.getMessage());
 
         mock.verifyPartial("exportVariables", Map.of(), new MockServer.ExactNumberOfTimes(3));
 
