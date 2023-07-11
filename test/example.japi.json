@@ -107,29 +107,7 @@
     }
   ],
 
-  "error.ErrorExample": [
-    [
-      "                          ",
-      " An example custom error. ",
-      "                          "
-    ],
-    {
-      "property": "string"
-    }
-  ],
-
-  "error.UnknownErrorExample": [
-    [
-      "                                                                     ",
-      " An example custom error that will not be used by the test function. ",
-      "                                                                     "
-    ],
-    {
-      "property": "string"
-    }
-  ],
-
-  "function.test": [
+  "fn.test": [
     [],
     [
       {
@@ -137,9 +115,15 @@
       },
       "-->",
       {
-        "value!": "struct.Value"
-      },
-      ["error.ErrorExample"]
+        "ok": {
+          "value!": "struct.Value"
+        },
+        "err": {
+          "example": {
+            "property": "string"
+          }
+        }
+      }
     ]
   ]
 }

@@ -38,7 +38,7 @@
       "value": "number"
     }
   ],
-  "function.saveVariables": [
+  "fn.saveVariables": [
     [
       "                                                                            ",
       " Save a set of variables as a dynamic map of variable names to their value. ",
@@ -49,11 +49,13 @@
         "variables": "object<number>"
       },
       "-->",
-      {},
-      []
+      {
+        "ok": {},
+        "err": {}
+      }
     ]
   ],
-  "function.compute": [
+  "fn.compute": [
     [
       "                                                       ",
       " Compute the `result` of the given `x` and `y` values. ",
@@ -67,12 +69,16 @@
       },
       "-->",
       {
-        "result": "number"
-      },
-      ["error.CannotDivideByZero"]
+        "ok": {
+          "result": "number"
+        },
+        "err": {
+          "cannotDivideByZero": {}
+        }
+      }
     ]
   ],
-  "function.exportVariables": [
+  "fn.exportVariables": [
     [
       "                                                        ",
       " Export all saved variables, up to an optional `limit`. ",
@@ -84,27 +90,10 @@
       },
       "-->",
       {
-        "variables": "array<struct.Variable>"
-      },
-      []
+        "ok": {
+          "variables": "array<struct.Variable>"
+        }
+      }
     ]
-  ],
-  "error.CannotDivideByZero": [
-    [
-      "                                                                        ",
-      " Indicates a computation was attempted that supplied zero as a divisor. ",
-      "                                                                        "
-    ],
-    {}
-  ],
-  "error.UnknownVariable": [
-    [
-      "                                                                             ",
-      " Indicates a variable access by `name` was attempted but the name was unknown. ",
-      "                                                                             "
-    ],
-    {
-      "name": "string"
-    }
   ]
 }

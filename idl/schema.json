@@ -166,7 +166,7 @@
         }
       ]
     },
-    "^function\\.[a-zA-Z_]\\w*": {
+    "^fn\\.[a-zA-Z_]\\w*": {
       "type": "array",
       "description": "A function with:\n(1) an input struct of 0 or more fields\n(2) an output struct of 0 or more fields\n(3) and an array of allowed custom errors",
       "prefixItems": [
@@ -193,18 +193,33 @@
             },
             {
               "type": "object",
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z_]\\w*!?$": {
-                  "$ref": "#/$defs/typeDeclaration"
+              "required": ["ok"],
+              "properties": {
+                "ok": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z_]\\w*!?$": {
+                      "$ref": "#/$defs/typeDeclaration"
+                    }
+                  }
+                },
+                "err": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z_]\\w*?$": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "patternProperties": {
+                        "^[a-zA-Z_]\\w*!?$": {
+                          "$ref": "#/$defs/typeDeclaration"
+                        }
+                      }
+                    }
+                  }
                 }
-              }
-            },
-            {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^error\\.[a-zA-Z_]\\w*"
               }
             }
           ],
