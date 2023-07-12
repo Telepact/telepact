@@ -39,17 +39,17 @@ class FunctionDefinition implements Definition {
     public final String name;
     public final Struct inputStruct;
     public final Struct outputStruct;
-    public final List<String> allowedErrors;
+    public final Enum errorEnum;
 
     public FunctionDefinition(
             String name,
             Struct inputStruct,
             Struct outputStruct,
-            List<String> errors) {
+            Enum errorEnum) {
         this.name = name;
         this.inputStruct = inputStruct;
         this.outputStruct = outputStruct;
-        this.allowedErrors = errors;
+        this.errorEnum = errorEnum;
     }
 
     @Override
