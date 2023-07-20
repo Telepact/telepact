@@ -5,103 +5,82 @@ class InternalJApi {
   static final String JSON = """
       {
         "function._ping": [
+          {},
+          "->",
+          {
+            "ok": {},
+            "err": {
+              "_unknown": {}
+            }
+          },
           [
             "                  ",
             " Ping the server. ",
             "                  "
-          ],
-          [
-            {},
-            "-->",
-            {}
           ]
         ],
         "function._schema": [
+          {},
+          "->",
+          {
+            "ok": {
+              "schema": "object<any>"
+            },
+            "err": {
+              "_unknown": {}
+            }
+          },
           [
             "                                       ",
             " Get the jAPI `schema` of this server. ",
             "                                       "
-          ],
-          [
-            {},
-            "-->",
-            {
-              "schema": "object<any>"
-            }
           ]
         ],
         "struct._ValidationFailure": [
+          {
+            "path": "string",
+            "reason": "string"
+          },
           [
             "                                                                   ",
             " A validation failure located at a `path` explained by a `reason`. ",
             "                                                                   "
-          ],
-          {
-            "path": "string",
-            "reason": "string"
-          }
+          ]
         ],
-        "error._InvalidRequestTarget": [
-          [
-            "                                                                         ",
-            " Indicates a failure to pass validation due an invalid Request Target as ",
-            " as explained by a `reason`.                                             ",
-            "                                                                         "
-          ],
+        "mixin._Validation": [
+          {},
+          "->",
           {
-            "reason": "string"
-          }
-        ],
-        "error._InvalidRequestBody": [
+            "ok": {},
+            "err": {
+              "_InvalidRequestTarget": {
+                "reason": "string"
+              },
+              "_InvalidRequestHeaders": {
+                "cases": "array<struct._ValidationFailure>"
+              },
+              "_InvalidRequestBody": {
+                "cases": "array<struct._ValidationFailure>"
+              },
+              "_InvalidResponseBody": {
+                "cases": "array<struct._ValidationFailure>"
+              },
+              "_ParseFailure": {
+                "reason": "string"
+              },
+            }
+          },
           [
-            "                                                                                ",
-            " Indicates a failure to pass validation due to invalid data in the Request Body ",
-            " as explained by a list of `cases`.                                             ",
-            "                                                                                "
-          ],
-          {
-            "cases": "array<struct._ValidationFailure>"
-          }
-        ],
-        "error._InvalidRequestHeaders": [
-          [
-            "                                                                                   ",
-            " Indicates a failure to pass validation due to invalid data in the Request Headers ",
-            " as explained by a list of `cases`.                                                ",
-            "                                                                                   "
-          ],
-          {
-            "cases": "array<struct._ValidationFailure>"
-          }
-        ],
-        "error._InvalidResponseBody": [
-          [
-            "                                                                                             ",
-            " Indicates a failure to pass validation due to invalid data in the Response Body ",
-            " as explained by a list of `cases`.                                                          ",
-            "                                                                                             "
-          ],
-          {
-            "cases": "array<struct._ValidationFailure>"
-          }
-        ],
-        "error._ParseFailure": [
-          [
-            "                                                                                  ",
-            " Indicates a failure for a Request to be parsed as a jAPI message due a `reason`. ",
-            "                                                                                  "
-          ],
-          {
-            "reason": "string"
-          }
-        ],
-        "error._ApplicationFailure": [
-          [
-            "                                                        ",
-            " Indicates a failure in the application implementation. ",
-            "                                                        "
-          ],
-          {}
+            "                                                                                                     ",
+            " All functions may return a validation error:                                                        ",
+            " - `_InvalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
+            " - `_InvalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
+            " - `_InvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
+            " - `_InvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
+            "     outlined by a list of `cases.                                                                   ",
+            " - `_ParseFailure`: The Request could not be parsed as a jAPI Message.                               ",
+            "                                                                                                     "
+          ]
         ]
       }
       """;

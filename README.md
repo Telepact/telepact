@@ -191,7 +191,7 @@ through this interface is unreadable due to conventional json keys being encoded
 as numbers. Because an encoding is in play, clients and servers need to agree on
 what numbers represent which fields all throughout the API. gRPC and other
 conventional RPC frameworks accomplish this by having the clients and servers
-both base their field ids on the same information at code generation time by
+both base their field ids on the same information during code generation by
 leaking these ABI field ids into the API schema itself. Unfortunately, this adds
 an unusual cognitive burden for developers designing such APIs, because they now
 need to guard against interface drift between the API and the ABI, typically by
@@ -204,6 +204,30 @@ through a client-server handshake at runtime. In consequence, jAPI boasts a far
 simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
+
+### Why require API drafters to include `{"err":{"_unknown":{}}}` in every function?
+
+jAPI functions are required to specify the full result enum, which must also
+include a valid error enum. In jAPI, redundancy is conventionally solved with
+mixins, but the jAPI specifically forgoes mixins in favor of an explicit
+`_unknown` error enum value duplicated across all functions.
+
+This design decision accomplishes a few things:
+
+- It increases recognizability of the result struct by ensuring both the `ok`
+  and `err` enum values are present (as opposed to omitting and assuming empty
+  `{}`).
+- It helps clarify that the `ok` field points to a struct while the `err` field
+  points to an enum.
+- It maintains the design continuity of enums, where an enum must have at least
+  1 value (whereas assuming empty `{}` would be a violation of that pattern)
+- It provides an error enum pattern that can be easily copied for an API design
+  who needs to add more errors.
+
+jAPI is designed to maximize design accessibility through copy-and-paste, and
+the modest verbosity tax of a required `_unknown` error duplicated across all
+functions achieves this goal by ensuring that each function can serve as a
+complete design reference for a jAPI function.
 
 ## Glossary
 

@@ -13,17 +13,18 @@
       "type": "array",
       "prefixItems": [
         {
+          "type": "object"
+        },
+        {
           "type": "array",
           "items": {
             "type": "string"
           }
-        },
-        {
-          "type": "object"
         }
       ],
       "items": false,
-      "minItems": 2,
+      "minItems": 1,
+      "maxItems": 2,
       "defaultSnippets": [
         {
           "label": "Info template",
@@ -46,12 +47,6 @@
       "description": "A struct with 0 or more fields.",
       "prefixItems": [
         {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        {
           "type": "object",
           "additionalProperties": false,
           "patternProperties": {
@@ -59,10 +54,17 @@
               "$ref": "#/$defs/typeDeclaration"
             }
           }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       ],
       "items": false,
-      "minItems": 2,
+      "minItems": 1,
+      "maxItems": 2,
       "defaultSnippets": [
         {
           "label": "Struct template",
@@ -85,12 +87,6 @@
       "description": "An enum with 1 or more fields.",
       "prefixItems": [
         {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        {
           "type": "object",
           "minProperties": 1,
           "additionalProperties": false,
@@ -105,10 +101,22 @@
               }
             }
           }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       ],
-      "items": false,
-      "minItems": 2,
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "minItems": 1,
+      "maxItems": 2,
       "defaultSnippets": [
         {
           "label": "enum template",
@@ -171,15 +179,22 @@
       "description": "A function with:\n(1) an input struct of 0 or more fields\n(2) an output struct of 0 or more fields\n(3) and an array of allowed custom errors",
       "prefixItems": [
         {
-          "type": "array",
-          "items": {
-            "type": "string"
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
           }
         },
         {
-          "type": "array",
-          "prefixItems": [
-            {
+          "const": "->"
+        },
+        {
+          "type": "object",
+          "required": ["ok", "err"],
+          "properties": {
+            "ok": {
               "type": "object",
               "additionalProperties": false,
               "patternProperties": {
@@ -188,14 +203,17 @@
                 }
               }
             },
-            {
-              "const": "-->"
-            },
-            {
+            "err": {
               "type": "object",
-              "required": ["ok"],
+              "additionalProperties": false,
+              "required": ["_unknown"],
               "properties": {
-                "ok": {
+                "_unknown": {
+                  "const": {}
+                }
+              },
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*?$": {
                   "type": "object",
                   "additionalProperties": false,
                   "patternProperties": {
@@ -203,32 +221,21 @@
                       "$ref": "#/$defs/typeDeclaration"
                     }
                   }
-                },
-                "err": {
-                  "type": "object",
-                  "minProperties": 1,
-                  "additionalProperties": false,
-                  "patternProperties": {
-                    "^[a-zA-Z_]\\w*?$": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "patternProperties": {
-                        "^[a-zA-Z_]\\w*!?$": {
-                          "$ref": "#/$defs/typeDeclaration"
-                        }
-                      }
-                    }
-                  }
                 }
               }
             }
-          ],
-          "items": false,
-          "minItems": 3
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       ],
       "items": false,
-      "minItems": 2,
+      "minItems": 3,
+      "maxItems": 4,
       "defaultSnippets": [
         {
           "label": "Function template",

@@ -23,7 +23,10 @@ class InternalSerializer {
             if (entry.getValue() instanceof FunctionDefinition f) {
                 allKeys.addAll(f.inputStruct.fields.keySet());
                 allKeys.addAll(f.outputStruct.fields.keySet());
-                allKeys.addAll(f.allowedErrors);
+                for (var errorEnumEntry : f.errorEnum.values.entrySet()) {
+                    allKeys.add(errorEnumEntry.getKey());
+                    allKeys.addAll(errorEnumEntry.getValue().fields.keySet());
+                }
             } else if (entry.getValue() instanceof TypeDefinition t) {
                 var type = t.type;
                 if (type instanceof Struct o) {
