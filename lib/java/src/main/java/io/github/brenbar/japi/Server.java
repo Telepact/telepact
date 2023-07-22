@@ -39,7 +39,7 @@ public class Server {
      * };
      * </pre>
      */
-    interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
+    interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
     }
 
     JApiSchema jApiSchema;
@@ -103,11 +103,13 @@ public class Server {
     private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
             try {
-                var requestMessage = InternalServer.reconstructRequestMessage(requestMessageBytes, this.serializer);
+                var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
+                        this.jApiSchema);
 
-                var responseMessage = this.middleware.apply(requestMessage, this::processObject);
+                var responseMessage = this.middleware.apply(requestMessage, this::processMessage);
 
-                return this.serializer.serialize(responseMessage);
+                return this.serializer
+                        .serialize(List.of(responseMessage.target, responseMessage.headers, responseMessage.body));
             } catch (Exception e) {
                 try {
                     this.onError.accept(e);
@@ -122,7 +124,7 @@ public class Server {
         }
     }
 
-    private List<Object> processObject(List<Object> requestMessage) {
-        return InternalServer.processObject(requestMessage, this.jApiSchema, this.handler);
+    private Message processMessage(Message requestMessage) {
+        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler);
     }
 }

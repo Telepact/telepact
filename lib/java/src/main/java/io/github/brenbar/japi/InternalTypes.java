@@ -38,8 +38,8 @@ class FunctionDefinition implements Definition {
 
     public final String name;
     public final Struct inputStruct;
-    public final Struct outputStruct;
-    public final Enum errorEnum;
+    public final TypeDeclaration outputStruct;
+    public final TypeDeclaration errorEnum;
 
     public FunctionDefinition(
             String name,
@@ -48,8 +48,8 @@ class FunctionDefinition implements Definition {
             Enum errorEnum) {
         this.name = name;
         this.inputStruct = inputStruct;
-        this.outputStruct = outputStruct;
-        this.errorEnum = errorEnum;
+        this.outputStruct = new TypeDeclaration(outputStruct, false);
+        this.errorEnum = new TypeDeclaration(errorEnum, false);
     }
 
     @Override
@@ -257,6 +257,18 @@ interface BinaryEncodingStrategy {
     List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
 }
 
+class Message {
+    public final String target;
+    public final Map<String, Object> headers;
+    public final Map<String, Object> body;
+
+    public Message(String target, Map<String, Object> headers, Map<String, Object> body) {
+        this.target = target;
+        this.headers = headers;
+        this.body = body;
+    }
+}
+
 class ValidationFailure {
     public final String path;
     public final String reason;
@@ -335,6 +347,9 @@ class ValidationErrorReasons {
     public static final String UNKNOWN_ENUM_VALUE = "UnknownEnumField";
 
     public static final String NUMBER_OUT_OF_RANGE = "NumberOutOfRange";
+
+    public static final String RESULT_ENUM_DOES_NOT_HAVE_EXACTLY_ONE_FIELD = "ResultEnumDoesNotHaveExactlyOneField";
+    public static final String UNKNOWN_RESULT_ENUM_VALUE = "UnknownResultEnumField";
 }
 
 class Mock {
