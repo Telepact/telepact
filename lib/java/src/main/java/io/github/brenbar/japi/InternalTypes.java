@@ -38,18 +38,15 @@ class FunctionDefinition implements Definition {
 
     public final String name;
     public final Struct inputStruct;
-    public final TypeDeclaration outputStruct;
-    public final TypeDeclaration errorEnum;
+    public final Enum resultEnum;
 
     public FunctionDefinition(
             String name,
             Struct inputStruct,
-            Struct outputStruct,
-            Enum errorEnum) {
+            Enum resultEnum) {
         this.name = name;
         this.inputStruct = inputStruct;
-        this.outputStruct = new TypeDeclaration(outputStruct, false);
-        this.errorEnum = new TypeDeclaration(errorEnum, false);
+        this.resultEnum = resultEnum;
     }
 
     @Override
@@ -224,9 +221,9 @@ class Struct implements Type {
 class Enum implements Type {
 
     public final String name;
-    public final Map<String, Struct> values;
+    public final Map<String, Object> values;
 
-    public Enum(String name, Map<String, Struct> values) {
+    public Enum(String name, Map<String, Object> values) {
         this.name = name;
         this.values = values;
     }

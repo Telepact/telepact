@@ -229,6 +229,42 @@ the modest verbosity tax of a required `_unknown` error duplicated across all
 functions achieves this goal by ensuring that each function can serve as a
 complete design reference for a jAPI function.
 
+### Is adding a new enum value a backwards compatible change?
+
+Many API technologies will classify adding a new enum value to an existing enum
+as a backwards incompatible change. This is due to the potential risk of a
+client driving critical code paths off an enum value, and the emergence of a new
+enum value begets undefined behavior in that critical path, which invites bugs.
+And some technologies may suffer build-time failures due to the fact that many
+API technologies integrate directly with programming languages through generated
+code incorporating native enums, and many of these languages will simply not
+compile when a new enum value appears in the context of a `switch` or `match`
+statement until that new value has a handling procedure implemented.
+
+jAPI takes the stance that adding a new enum value to an existing enum _is_ a
+backwards compatible change, on the basis of the following:
+
+- Enums are powerful typing constructs that replace otherwise type unsafe
+  patterns, and classifying evolution of an enum as backwards incompatible
+  discourages use, violating jAPI's core principles of encouraging the strongest
+  of type patterns.
+- jAPI does not run the risk of build-time failures with enums since jAPI enums
+  are represented as special objects rather than native enums.
+- Clients are capable of implementing error-prone code regardless of how a
+  server evolves it's API, and jAPI cannot uphold its core principle of enabling
+  API evolution if it holds servers accountable for client-side design failures.
+  Clients can neglect proper handling of null, derive internal non-public
+  implementation details by parsing strings, or base critical computation on an
+  assumption that a boolean is always true. And a server would be able to break
+  such clients by suddenly returning null, changing the string to a different
+  pattern, or returning false, but this breakage would not be due to "backwards
+  incompatible" changes. The client made invalid assumptions, which may further
+  yet be a consequence of choosing a riskier type unsafe technology stack that
+  failed to highlight such invalid assumptions. And in the same way that a
+  client should not make assumptions about patterns in strings or neglect `else`
+  cases on its critical paths, a client should not make assumptions about
+  patterns in enums or neglect enum default branch logic.
+
 ## Glossary
 
 - **Body** - A structured JSON object containing the primary data payload of the

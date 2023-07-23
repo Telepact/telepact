@@ -185,7 +185,7 @@ class InternalServer {
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResult = (Map<String, Object>) selectStructFields(functionDefinition.outputStruct.type, result,
+            finalResult = (Map<String, Object>) selectStructFields(functionDefinition.resultEnum, result,
                     selectStructFieldsHeader);
         } else {
             finalResult = result;
@@ -290,24 +290,7 @@ class InternalServer {
             String path,
             FunctionDefinition functionDefinition,
             Map<String, Object> actualResult) {
-        if (actualResult.size() != 1) {
-            return Collections.singletonList(
-                    new ValidationFailure(path, ValidationErrorReasons.RESULT_ENUM_DOES_NOT_HAVE_EXACTLY_ONE_FIELD));
-        }
-
-        var entry = actualResult.entrySet().stream().findFirst().get();
-        var enumCase = (String) entry.getKey();
-        var enumValue = entry.getValue();
-
-        if ("ok".equals(enumCase)) {
-            return validateType("%s.ok".formatted(path), functionDefinition.outputStruct, enumValue);
-        } else if ("err".equals(enumCase)) {
-            return validateType("%s.err".formatted(path), functionDefinition.errorEnum, enumValue);
-        } else {
-            return Collections
-                    .singletonList(new ValidationFailure("%s.".formatted(path),
-                            ValidationErrorReasons.UNKNOWN_RESULT_ENUM_VALUE));
-        }
+        return validateEnum(path, functionDefinition.resultEnum.values, actualResult);
     }
 
     private static List<ValidationFailure> validateStruct(
@@ -352,8 +335,42 @@ class InternalServer {
     }
 
     private static List<ValidationFailure> validateEnum(
+            String fieldName,
+            Map<String, Object> referenceValues,
+            Map<?, ?> actual) {
+        if (actual.size() != 1) {
+            return Collections.singletonList(
+                    new ValidationFailure(fieldName,
+                            ValidationErrorReasons.MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
+        }
+        var entry = actual.entrySet().stream().findFirst().get();
+        var enumValue = (String) entry.getKey();
+        var enumData = entry.getValue();
+
+        if (enumData instanceof Boolean) {
+            return Collections.singletonList(new ValidationFailure(fieldName,
+                    ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
+        } else if (enumData instanceof Number) {
+            return Collections.singletonList(new ValidationFailure(fieldName,
+                    ValidationErrorReasons.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE));
+        } else if (enumData instanceof String) {
+            return Collections.singletonList(new ValidationFailure(fieldName,
+                    ValidationErrorReasons.STRING_INVALID_FOR_ENUM_STRUCT_TYPE));
+        } else if (enumData instanceof List) {
+            return Collections.singletonList(new ValidationFailure(fieldName,
+                    ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
+        } else if (enumData instanceof Map<?, ?> m2) {
+            return validateEnumData("%s.%s".formatted(fieldName, enumValue), referenceValues, enumValue,
+                    (Map<String, Object>) m2);
+        } else {
+            return Collections.singletonList(new ValidationFailure(fieldName,
+                    ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
+        }
+    }
+
+    private static List<ValidationFailure> validateEnumData(
             String namespace,
-            Map<String, Struct> reference,
+            Map<String, Object> reference,
             String enumCase,
             Map<String, Object> actual) {
         var validationFailures = new ArrayList<ValidationFailure>();
@@ -363,13 +380,18 @@ class InternalServer {
             return Collections
                     .singletonList(new ValidationFailure("%s.%s".formatted(namespace, enumCase),
                             ValidationErrorReasons.UNKNOWN_ENUM_VALUE));
+        } else if (referenceField instanceof Struct s) {
+
+            var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), s.fields,
+                    actual);
+            validationFailures.addAll(nestedValidationFailures);
+
+            return validationFailures;
+        } else if (referenceField instanceof Map<?, ?> m) {
+            return validateEnum(namespace, (Map<String, Object>) m, actual);
+        } else {
+            throw new JApiProcessError("Unexpected enum reference type");
         }
-
-        var nestedValidationFailures = validateStruct("%s.%s".formatted(namespace, enumCase), referenceField.fields,
-                actual);
-        validationFailures.addAll(nestedValidationFailures);
-
-        return validationFailures;
     }
 
     private static List<ValidationFailure> validateType(String fieldName, TypeDeclaration typeDeclaration,
@@ -542,7 +564,7 @@ class InternalServer {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, ValidationErrorReasons.VALUE_INVALID_FOR_STRUCT_TYPE));
                 }
-            } else if (expectedType instanceof Enum u) {
+            } else if (expectedType instanceof Enum e) {
                 if (value instanceof Boolean) {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_TYPE));
@@ -556,33 +578,7 @@ class InternalServer {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_TYPE));
                 } else if (value instanceof Map<?, ?> m) {
-                    if (m.size() != 1) {
-                        return Collections.singletonList(
-                                new ValidationFailure(fieldName,
-                                        ValidationErrorReasons.MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
-                    }
-                    var entry = m.entrySet().stream().findFirst().get();
-                    var enumCase = (String) entry.getKey();
-                    var enumValue = entry.getValue();
-
-                    if (enumValue instanceof Boolean) {
-                        return Collections.singletonList(new ValidationFailure(fieldName,
-                                ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
-                    } else if (enumValue instanceof Number) {
-                        return Collections.singletonList(new ValidationFailure(fieldName,
-                                ValidationErrorReasons.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE));
-                    } else if (enumValue instanceof String) {
-                        return Collections.singletonList(new ValidationFailure(fieldName,
-                                ValidationErrorReasons.STRING_INVALID_FOR_ENUM_STRUCT_TYPE));
-                    } else if (enumValue instanceof List) {
-                        return Collections.singletonList(new ValidationFailure(fieldName,
-                                ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
-                    } else if (enumValue instanceof Map<?, ?> m2) {
-                        return validateEnum(fieldName, u.values, enumCase, (Map<String, Object>) m2);
-                    } else {
-                        return Collections.singletonList(new ValidationFailure(fieldName,
-                                ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
-                    }
+                    return validateEnum(fieldName, e.values, m);
                 } else {
                     return Collections.singletonList(
                             new ValidationFailure(fieldName, ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_TYPE));
@@ -611,17 +607,7 @@ class InternalServer {
             }
             return finalMap;
         } else if (type instanceof Enum e) {
-            var valueAsMap = (Map<String, Object>) value;
-            var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-            var structReference = e.values.get(enumEntry.getKey());
-            Map<String, Object> newStruct = new HashMap<>();
-            for (var structEntry : structReference.fields.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration.type,
-                        enumEntry.getValue(),
-                        selectedStructFields);
-                newStruct.put(structEntry.getKey(), valueWithSelectedFields);
-            }
-            return Map.of(enumEntry.getKey(), newStruct);
+            return selectStructFieldsForEnum(e.values, value, selectedStructFields);
         } else if (type instanceof JsonObject o) {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -641,6 +627,32 @@ class InternalServer {
             return finalList;
         } else {
             return value;
+        }
+    }
+
+    static Object selectStructFieldsForEnum(Map<String, Object> enumReference, Object value,
+            Map<String, List<String>> selectedStructFields) {
+        var valueAsMap = (Map<String, Object>) value;
+        var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
+        var enumEntryReference = enumReference.get(enumEntry.getKey());
+        var enumValue = enumEntry.getKey();
+        var enumData = enumEntry.getValue();
+
+        if (enumEntryReference instanceof Struct s) {
+            var structReference = s;
+            Map<String, Object> newStruct = new HashMap<>();
+            for (var structEntry : structReference.fields.entrySet()) {
+                var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration.type,
+                        enumEntry.getValue(),
+                        selectedStructFields);
+                newStruct.put(structEntry.getKey(), valueWithSelectedFields);
+            }
+            return Map.of(enumEntry.getKey(), newStruct);
+        } else if (enumEntryReference instanceof Map<?, ?> m) {
+            var subSelect = selectStructFieldsForEnum((Map<String, Object>) m, enumData, selectedStructFields);
+            return Map.of(enumValue, subSelect);
+        } else {
+            throw new JApiProcessError("Unexpected enum reference type");
         }
     }
 }

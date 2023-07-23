@@ -152,11 +152,13 @@ class InternalParse {
 
         var inputStruct = new Struct("%s".formatted(definitionKey), inputFields);
         var outputStruct = new Struct("%s.ok".formatted(definitionKey), outputFields);
-        var errorEnum = new Enum("%s.err".formatted(definitionKey), errorValues);
+
+        var resultEnumValues = Map.of("ok", outputStruct, "err", errorValues);
+        var resultEnum = new Enum(definitionKey, resultEnumValues);
 
         // TODO: Ensure that `_unknown` is defined.
 
-        return new FunctionDefinition(definitionKey, inputStruct, outputStruct, errorEnum);
+        return new FunctionDefinition(definitionKey, inputStruct, resultEnum);
     }
 
     private static TypeDefinition parseStructDefinition(
@@ -197,7 +199,7 @@ class InternalParse {
             throw new JApiSchemaParseError("Invalid enum definition for %s".formatted(definitionKey));
         }
 
-        var values = new HashMap<String, Struct>();
+        var values = new HashMap<String, Object>();
         for (var entry : enumDefinitionAsParsedJson.entrySet()) {
             var enumCase = entry.getKey();
             Map<String, Object> enumStructDefinitionAsParsedJson;

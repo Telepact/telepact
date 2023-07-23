@@ -92,13 +92,93 @@
           "additionalProperties": false,
           "patternProperties": {
             "^[a-zA-Z_]\\w*?$": {
-              "type": "object",
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z_]\\w*!?$": {
-                  "$ref": "#/$defs/typeDeclaration"
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z_]\\w*!?$": {
+                      "$ref": "#/$defs/typeDeclaration"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": false,
+                  "patternProperties": {
+                    "^[a-zA-Z_]\\w*?$": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "patternProperties": {
+                            "^[a-zA-Z_]\\w*!?$": {
+                              "$ref": "#/$defs/typeDeclaration"
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "minProperties": 1,
+                          "additionalProperties": false,
+                          "patternProperties": {
+                            "^[a-zA-Z_]\\w*?$": {
+                              "oneOf": [
+                                {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "patternProperties": {
+                                    "^[a-zA-Z_]\\w*!?$": {
+                                      "$ref": "#/$defs/typeDeclaration"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "object",
+                                  "minProperties": 1,
+                                  "additionalProperties": false,
+                                  "patternProperties": {
+                                    "^[a-zA-Z_]\\w*?$": {
+                                      "oneOf": [
+                                        {
+                                          "type": "object",
+                                          "additionalProperties": false,
+                                          "patternProperties": {
+                                            "^[a-zA-Z_]\\w*!?$": {
+                                              "$ref": "#/$defs/typeDeclaration"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "object",
+                                          "minProperties": 1,
+                                          "additionalProperties": false,
+                                          "patternProperties": {
+                                            "^[a-zA-Z_]\\w*?$": {
+                                              "type": "object",
+                                              "additionalProperties": false,
+                                              "patternProperties": {
+                                                "^[a-zA-Z_]\\w*!?$": {
+                                                  "$ref": "#/$defs/typeDeclaration"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
                 }
-              }
+              ]
             }
           }
         },
@@ -131,44 +211,6 @@
                 "field1": "boolean"
               },
               "value2": {}
-            }
-          ]
-        }
-      ]
-    },
-    "^error\\.[a-zA-Z_]\\w*": {
-      "type": "array",
-      "prefixItems": [
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "patternProperties": {
-            "^[a-zA-Z_]\\w*!?$": {
-              "$ref": "#/$defs/typeDeclaration"
-            }
-          }
-        }
-      ],
-      "items": false,
-      "minItems": 2,
-      "defaultSnippets": [
-        {
-          "label": "Error template",
-          "body": [
-            [
-              "                    ",
-              " An error template. ",
-              "                    "
-            ],
-            {
-              "field1$0": "boolean",
-              "field2": "struct.Example1"
             }
           ]
         }
