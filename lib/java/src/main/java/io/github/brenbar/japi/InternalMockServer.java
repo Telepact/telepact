@@ -32,10 +32,10 @@ class InternalMockServer {
             }
         }
 
-        var definition = jaApiSchema.parsed.get("function.%s".formatted(context.functionName));
+        var definition = jaApiSchema.parsed.get("fn.%s".formatted(context.functionName));
 
         if (definition instanceof FunctionDefinition f) {
-            return constructRandomStruct(f.outputStruct.fields, random);
+            return constructRandomEnum(f.resultEnum.values, random);
         } else {
             throw new JApiError("error._UnknownFunction", Map.of());
         }
@@ -73,8 +73,11 @@ class InternalMockServer {
     private static Map<String, Object> constructRandomStruct(
             Map<String, FieldDeclaration> referenceStruct, Random random) {
 
+        var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
+        Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+
         var obj = new HashMap<String, Object>();
-        for (var field : referenceStruct.entrySet()) {
+        for (var field : sortedReferenceStruct) {
             var fieldDeclaration = field.getValue();
             if (fieldDeclaration.optional && random.nextBoolean()) {
                 continue;
@@ -117,17 +120,32 @@ class InternalMockServer {
         } else if (typeDeclaration.type instanceof Struct s) {
             return constructRandomStruct(s.fields, random);
         } else if (typeDeclaration.type instanceof Enum e) {
-            var enumValues = new ArrayList<>(e.values.entrySet());
-            Collections.sort(enumValues, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
-
-            var randomIndex = random.nextInt(enumValues.size());
-            var enumValue = enumValues.get(randomIndex);
-            var s = enumValue.getValue();
-
-            return constructRandomStruct(s.fields, random);
+            return constructRandomEnum(e.values, random);
         }
 
         return null;
+    }
+
+    private static Map<String, Object> constructRandomEnum(Map<String, Object> enumValuesReference, Random random) {
+        var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
+        Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+
+        var randomIndex = random.nextInt(sortedEnumValuesReference.size());
+        var enumEntry = sortedEnumValuesReference.get(randomIndex);
+
+        var enumValue = enumEntry.getKey();
+        var enumData = enumEntry.getValue();
+
+        if (enumData instanceof Map<?, ?> m) {
+            return Map.of(enumValue, constructRandomEnum((Map<String, Object>) m, random));
+        } else {
+            var structReference = new HashMap<String, FieldDeclaration>();
+            for (var entry : enumValuesReference.entrySet()) {
+                structReference.put(entry.getKey(), (FieldDeclaration) entry.getValue());
+            }
+            return Map.of(enumValue,
+                    constructRandomStruct(structReference, random));
+        }
     }
 
     static void verifyPartial(String functionName, Map<String, Object> partialMatchInput,

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -22,17 +23,13 @@ class InternalSerializer {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof FunctionDefinition f) {
                 allKeys.addAll(f.inputStruct.fields.keySet());
-                allKeys.addAll(f.outputStruct.fields.keySet());
-                for (var errorEnumEntry : f.errorEnum.values.entrySet()) {
-                    allKeys.add(errorEnumEntry.getKey());
-                    allKeys.addAll(errorEnumEntry.getValue().fields.keySet());
-                }
+                addAllEnumValues(allKeys, f.resultEnum.values);
             } else if (entry.getValue() instanceof TypeDefinition t) {
                 var type = t.type;
                 if (type instanceof Struct o) {
                     allKeys.addAll(o.fields.keySet());
-                } else if (type instanceof Enum u) {
-                    allKeys.addAll(u.values.keySet());
+                } else if (type instanceof Enum e) {
+                    addAllEnumValues(allKeys, e.values);
                 }
             } else if (entry.getValue() instanceof ErrorDefinition e) {
                 allKeys.addAll(e.fields.keySet());
@@ -171,6 +168,17 @@ class InternalSerializer {
         }
 
         return decode(message, binaryEncoder.get());
+    }
+
+    private static void addAllEnumValues(Set<String> allKeys, Map<String, Object> enumValues) {
+        for (var entry : enumValues.entrySet()) {
+            var enumValue = entry.getKey();
+            var enumData = entry.getValue();
+            allKeys.add(enumValue);
+            if (enumData instanceof Map<?, ?> m) {
+                addAllEnumValues(allKeys, (Map<String, Object>) enumData);
+            }
+        }
     }
 
     private static Optional<BinaryEncoder> findBinaryEncoder(Long checksum, Deque<BinaryEncoder> binaryEncoderStore) {
