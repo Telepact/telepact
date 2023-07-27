@@ -76,9 +76,9 @@ class InternalParse {
                             okStruct.fields.put(newKey, mixinOkStructEntry.getValue());
                         }
 
-                        var mixinErrEnum = (Map<String, Map<String, FieldDeclaration>>) definition.resultEnum.values
+                        var mixinErrEnum = (Map<String, Struct>) definition.resultEnum.values
                                 .get("err");
-                        var errEnum = (Map<String, Map<String, FieldDeclaration>>) f.resultEnum.values.get("err");
+                        var errEnum = (Map<String, Struct>) f.resultEnum.values.get("err");
                         for (var mixinErrStructEntry : mixinErrEnum.entrySet()) {
                             var newEnumValue = mixinErrStructEntry.getKey();
                             if (errEnum.containsKey(newEnumValue)) {
@@ -185,7 +185,7 @@ class InternalParse {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
         }
 
-        var errorValues = new HashMap<String, Map<String, FieldDeclaration>>();
+        var errorValues = new HashMap<String, Struct>();
         for (var entry : errorEnumAsParsedJson.entrySet()) {
             var enumCase = entry.getKey();
             Map<String, Object> enumStructDefinitionAsParsedJson;
@@ -204,7 +204,8 @@ class InternalParse {
                         parsedDefinitions);
                 fields.put(enumStructParsedField.fieldName, enumStructParsedField.fieldDeclaration);
             }
-            errorValues.put(enumCase, fields);
+            var errorValueStruct = new Struct("%s.%s".formatted(definitionKey, enumCase), fields);
+            errorValues.put(enumCase, errorValueStruct);
         }
 
         var inputStruct = new Struct("%s".formatted(definitionKey), inputFields);

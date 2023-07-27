@@ -46,7 +46,7 @@ class InternalClient {
             headers.put("_serializeAsBinary", true);
         }
 
-        var messageType = "function.%s".formatted(request.functionName);
+        var messageType = request.functionName;
         return List.of(messageType, headers, request.functionInput);
     }
 

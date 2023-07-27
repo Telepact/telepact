@@ -382,7 +382,7 @@ class InternalServer {
                             ValidationErrorReasons.UNKNOWN_ENUM_VALUE));
         } else if (referenceField instanceof Struct s) {
 
-            var nestedValidationFailures = validateStruct("%s.%s".formatted(path, enumCase), s.fields,
+            var nestedValidationFailures = validateStruct(path, s.fields,
                     actual);
             validationFailures.addAll(nestedValidationFailures);
 

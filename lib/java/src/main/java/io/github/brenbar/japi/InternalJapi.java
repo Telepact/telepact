@@ -83,7 +83,7 @@ class InternalJApi {
                 "cases": "array<struct._ValidationFailure>"
               },
               "_parseFailure": {
-                "reason": "string"
+                "reasons": "array<string>"
               }
             }
           },
