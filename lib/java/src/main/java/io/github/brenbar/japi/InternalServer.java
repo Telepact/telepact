@@ -174,7 +174,7 @@ class InternalServer {
             Map<String, Object> newErrorResult = Map.of("err",
                     Map.of("_invalidResponseBody", Map.of("cases", validationFailureCases)));
             var newErrorResultValidationFailures = validateResultEnum(functionDefinition.name, functionDefinition,
-                    result);
+                    newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
             }
