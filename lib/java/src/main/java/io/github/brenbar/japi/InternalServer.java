@@ -599,8 +599,9 @@ class InternalServer {
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
-                if (selectedFields == null || selectedFields.contains(entry.getKey())) {
-                    var field = s.fields.get(entry.getKey());
+                var fieldName = entry.getKey();
+                if (selectedFields == null || selectedFields.contains(fieldName)) {
+                    var field = s.fields.get(fieldName);
                     var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
@@ -635,20 +636,13 @@ class InternalServer {
             Map<String, List<String>> selectedStructFields) {
         var valueAsMap = (Map<String, Object>) value;
         var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-        var enumEntryReference = enumReference.get(enumEntry.getKey());
         var enumValue = enumEntry.getKey();
         var enumData = enumEntry.getValue();
 
-        if (enumEntryReference instanceof Struct s) {
-            var structReference = s;
-            Map<String, Object> newStruct = new HashMap<>();
-            for (var structEntry : structReference.fields.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(structEntry.getValue().typeDeclaration.type,
-                        enumEntry.getValue(),
-                        selectedStructFields);
-                newStruct.put(structEntry.getKey(), valueWithSelectedFields);
-            }
-            return Map.of(enumEntry.getKey(), newStruct);
+        var enumEntryReference = enumReference.get(enumValue);
+        if (enumEntryReference instanceof Struct structReference) {
+            var structWithSelectedFields = selectStructFields(structReference, enumData, selectedStructFields);
+            return Map.of(enumEntry.getKey(), structWithSelectedFields);
         } else if (enumEntryReference instanceof Map<?, ?> m) {
             var subSelect = selectStructFieldsForEnum((Map<String, Object>) m, enumData, selectedStructFields);
             return Map.of(enumValue, subSelect);
