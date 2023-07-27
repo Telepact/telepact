@@ -19,6 +19,56 @@ class InternalParse {
         schema.original.putAll(internalSchema.original);
         schema.parsed.putAll(internalSchema.parsed);
 
+        var mixins = new ArrayList<FunctionDefinition>();
+        for (var def : schema.parsed.entrySet()) {
+            if (def.getValue() instanceof FunctionDefinition f && def.getKey().startsWith("mixin.")) {
+                mixins.add(f);
+            }
+        }
+
+        // Apply mixin to all functions
+        for (var mixinDefinition : mixins) {
+
+            for (var parsedDefinition : schema.parsed.entrySet()) {
+                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
+                    for (var mixinArgumentField : mixinDefinition.inputStruct.fields.entrySet()) {
+                        var newKey = mixinArgumentField.getKey();
+                        if (f.inputStruct.fields.containsKey(newKey)) {
+                            throw new JApiSchemaParseError(
+                                    "Mixin argument field already in use: %s".formatted(newKey));
+                        }
+                        f.inputStruct.fields.put(newKey, mixinArgumentField.getValue());
+                    }
+
+                    var mixinOkStruct = (Struct) mixinDefinition.resultEnum.values.get("ok");
+                    var okStruct = (Struct) f.resultEnum.values.get("ok");
+                    for (var mixinOkStructEntry : mixinOkStruct.fields.entrySet()) {
+                        var newKey = mixinOkStructEntry.getKey();
+                        if (okStruct.fields.containsKey(newKey)) {
+                            throw new JApiSchemaParseError(
+                                    "Mixin ok struct field already in use: %s".formatted(newKey));
+                        }
+
+                        okStruct.fields.put(newKey, mixinOkStructEntry.getValue());
+                    }
+
+                    var mixinErrEnum = (Map<String, Struct>) mixinDefinition.resultEnum.values
+                            .get("err");
+                    var errEnum = (Map<String, Struct>) f.resultEnum.values.get("err");
+                    for (var mixinErrStructEntry : mixinErrEnum.entrySet()) {
+                        var newEnumValue = mixinErrStructEntry.getKey();
+                        if (errEnum.containsKey(newEnumValue)) {
+                            throw new JApiSchemaParseError(
+                                    "Mixin err enum value (%s) already in use for (%s)".formatted(newEnumValue,
+                                            f.name));
+                        }
+
+                        errEnum.put(newEnumValue, mixinErrStructEntry.getValue());
+                    }
+                }
+            }
+        }
+
         return schema;
     }
 
@@ -31,65 +81,11 @@ class InternalParse {
             japiSchemaAsParsedJson = objectMapper.readValue(jApiSchemaAsJson, new TypeReference<>() {
             });
 
-            var mixins = new ArrayList<Map.Entry<String, List<Object>>>();
-
             for (var entry : japiSchemaAsParsedJson.entrySet()) {
                 var definitionKey = entry.getKey();
-
-                if (definitionKey.startsWith("mixin.")) {
-                    // Apply mixins last
-                    mixins.add(entry);
-                }
-
                 if (!parsedDefinitions.containsKey(definitionKey)) {
                     var definition = parseDefinition(definitionKey, japiSchemaAsParsedJson, parsedDefinitions);
                     parsedDefinitions.put(definitionKey, definition);
-                }
-            }
-
-            for (var mixin : mixins) {
-                var definitionKey = mixin.getKey();
-                var definition = (FunctionDefinition) parseDefinition(definitionKey, japiSchemaAsParsedJson,
-                        parsedDefinitions);
-
-                // Apply mixin to all functions
-                for (var parsedDefinition : parsedDefinitions.entrySet()) {
-                    if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
-                        for (var mixinArgumentField : definition.inputStruct.fields.entrySet()) {
-                            var newKey = mixinArgumentField.getKey();
-                            if (f.inputStruct.fields.containsKey(newKey)) {
-                                throw new JApiSchemaParseError(
-                                        "Mixin argument field already in use: %s".formatted(newKey));
-                            }
-                            f.inputStruct.fields.put(newKey, mixinArgumentField.getValue());
-                        }
-
-                        var mixinOkStruct = (Struct) definition.resultEnum.values.get("ok");
-                        var okStruct = (Struct) f.resultEnum.values.get("ok");
-                        for (var mixinOkStructEntry : mixinOkStruct.fields.entrySet()) {
-                            var newKey = mixinOkStructEntry.getKey();
-                            if (okStruct.fields.containsKey(newKey)) {
-                                throw new JApiSchemaParseError(
-                                        "Mixin ok struct field already in use: %s".formatted(newKey));
-                            }
-
-                            okStruct.fields.put(newKey, mixinOkStructEntry.getValue());
-                        }
-
-                        var mixinErrEnum = (Map<String, Struct>) definition.resultEnum.values
-                                .get("err");
-                        var errEnum = (Map<String, Struct>) f.resultEnum.values.get("err");
-                        for (var mixinErrStructEntry : mixinErrEnum.entrySet()) {
-                            var newEnumValue = mixinErrStructEntry.getKey();
-                            if (errEnum.containsKey(newEnumValue)) {
-                                throw new JApiSchemaParseError(
-                                        "Mixin err enum value (%s) already in use for (%s)".formatted(newEnumValue,
-                                                f.name));
-                            }
-
-                            errEnum.put(newEnumValue, mixinErrStructEntry.getValue());
-                        }
-                    }
                 }
             }
         } catch (IOException e) {
