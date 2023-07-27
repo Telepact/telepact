@@ -84,7 +84,8 @@ public class TestUtility {
                     return response;
                 });
             };
-            var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true);
+            var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true)
+                    .setTimeoutMsDefault(60000);
             client.submit(new Request("_ping", Map.of())); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });

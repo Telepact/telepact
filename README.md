@@ -221,8 +221,8 @@ This design decision accomplishes a few things:
   points to an enum.
 - It maintains the design continuity of enums, where an enum must have at least
   1 value (whereas assuming empty `{}` would be a violation of that pattern)
-- It provides an error enum pattern that can be easily copied for an API design
-  who needs to add more errors.
+- It provides an error enum pattern that can be easily copied for cases that do
+  require additional errors.
 
 jAPI is designed to maximize design accessibility through copy-and-paste, and
 the modest verbosity tax of a required `_unknown` error duplicated across all

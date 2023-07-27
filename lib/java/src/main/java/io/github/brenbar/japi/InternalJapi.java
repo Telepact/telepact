@@ -4,7 +4,7 @@ class InternalJApi {
 
   static final String JSON = """
       {
-        "function._ping": [
+        "fn._ping": [
           {},
           "->",
           {
@@ -19,7 +19,7 @@ class InternalJApi {
             "                  "
           ]
         ],
-        "function._schema": [
+        "fn._schema": [
           {},
           "->",
           {
@@ -34,6 +34,23 @@ class InternalJApi {
             "                                       ",
             " Get the jAPI `schema` of this server. ",
             "                                       "
+          ]
+        ],
+        "fn._unknown": [
+          {},
+          "->",
+          {
+            "ok": {
+              "schema": "object<any>"
+            },
+            "err": {
+              "_unknown": {}
+            }
+          },
+          [
+            "                                                                ",
+            " A placeholder function when the requested function is unknown. ",
+            "                                                                "
           ]
         ],
         "struct._ValidationFailure": [
@@ -53,32 +70,32 @@ class InternalJApi {
           {
             "ok": {},
             "err": {
-              "_InvalidRequestTarget": {
+              "_invalidRequestTarget": {
                 "reason": "string"
               },
-              "_InvalidRequestHeaders": {
+              "_invalidRequestHeaders": {
                 "cases": "array<struct._ValidationFailure>"
               },
-              "_InvalidRequestBody": {
+              "_invalidRequestBody": {
                 "cases": "array<struct._ValidationFailure>"
               },
-              "_InvalidResponseBody": {
+              "_invalidResponseBody": {
                 "cases": "array<struct._ValidationFailure>"
               },
-              "_ParseFailure": {
+              "_parseFailure": {
                 "reason": "string"
-              },
+              }
             }
           },
           [
             "                                                                                                     ",
             " All functions may return a validation error:                                                        ",
-            " - `_InvalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
-            " - `_InvalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
-            " - `_InvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
-            " - `_InvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
+            " - `_invalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
+            " - `_invalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
+            " - `_invalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
+            " - `_invalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
             "     outlined by a list of `cases.                                                                   ",
-            " - `_ParseFailure`: The Request could not be parsed as a jAPI Message.                               ",
+            " - `_parseFailure`: The Request could not be parsed as a jAPI Message.                               ",
             "                                                                                                     "
           ]
         ]
