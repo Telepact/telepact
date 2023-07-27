@@ -20,12 +20,12 @@ public class TestUtility {
 
     private static Map<String, Object> handle(Context context, Map<String, Object> body) {
         return switch (context.functionName) {
-            case "test" -> {
+            case "fn.test" -> {
                 var error = context.requestHeaders.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
                 if (context.requestHeaders.containsKey("output")) {
                     try {
                         var o = (Map<String, Object>) context.requestHeaders.get("output");
-                        yield o;
+                        yield Map.of("ok", o);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
