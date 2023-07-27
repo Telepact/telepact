@@ -48,14 +48,15 @@ class InternalServer {
 
                 var regex = Pattern.compile("^fn\\.([a-zA-Z_]\\w*)");
                 var matcher = regex.matcher(givenTarget);
-                if (!matcher.matches()) {
-                    parseFailures.add("TargetStringMustBeFunction");
-                } else {
-                    var functionDef = jApiSchema.parsed.get(requestTarget);
-                    if (!(functionDef instanceof FunctionDefinition f)) {
+                if (matcher.matches()) {
+                    var functionDef = jApiSchema.parsed.get(givenTarget);
+                    if (functionDef instanceof FunctionDefinition f) {
+                        requestTarget = givenTarget;
+                    } else {
                         parseFailures.add("UnknownFunction");
                     }
-                    requestTarget = givenTarget;
+                } else {
+                    parseFailures.add("TargetStringMustBeFunction");
                 }
 
             } catch (ClassCastException e) {

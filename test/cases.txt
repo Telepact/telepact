@@ -133,8 +133,8 @@
 
 ["fn.test",{},{"value":{"int":false}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"int":0.1}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"NumberInvalidForIntegerType"}]}}}]
-["fn.test",{},{"value":{"int":9223372036854775808}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"NumberOutOfRange"}]}}}]skipBinary
-["fn.test",{},{"value":{"int":-9223372036854775809}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{},{"value":{"int":9223372036854775808}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"NumberOutOfRange"}]}}}]|skipBinary
+["fn.test",{},{"value":{"int":-9223372036854775809}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{},{"value":{"int":""}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"int":[]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"int":{}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.int","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -142,7 +142,7 @@
 ["fn.test",{"output":{"value":{"int":false}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"int":0.1}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"NumberInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"int":9223372036854775808}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"NumberOutOfRange"}]}}}]
-["fn.test",{"output":{"value":{"int":-9223372036854775809}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{"output":{"value":{"int":-9223372036854775809}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{"output":{"value":{"int":""}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"int":[]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"int":{}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.int","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -158,8 +158,8 @@
 
 ["fn.test",{},{"value":{"nullInt":false}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"nullInt":0.1}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"NumberInvalidForIntegerType"}]}}}]
-["fn.test",{},{"value":{"nullInt":9223372036854775808}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"NumberOutOfRange"}]}}}]skipBinary
-["fn.test",{},{"value":{"nullInt":-9223372036854775809}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{},{"value":{"nullInt":9223372036854775808}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"NumberOutOfRange"}]}}}]|skipBinary
+["fn.test",{},{"value":{"nullInt":-9223372036854775809}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{},{"value":{"nullInt":""}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"nullInt":[]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"nullInt":{}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullInt","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -167,7 +167,7 @@
 ["fn.test",{"output":{"value":{"nullInt":false}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"nullInt":0.1}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"NumberInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"nullInt":9223372036854775808}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"NumberOutOfRange"}]}}}]
-["fn.test",{"output":{"value":{"nullInt":-9223372036854775809}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{"output":{"value":{"nullInt":-9223372036854775809}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{"output":{"value":{"nullInt":""}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"nullInt":[]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"nullInt":{}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullInt","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -186,8 +186,8 @@
 
 ["fn.test",{},{"value":{"arrInt":[0,false]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"arrInt":[0,0.1]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"NumberInvalidForIntegerType"}]}}}]
-["fn.test",{},{"value":{"arrInt":[0,9223372036854775808]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]skipBinary
-["fn.test",{},{"value":{"arrInt":[0,-9223372036854775809]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{},{"value":{"arrInt":[0,9223372036854775808]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]|skipBinary
+["fn.test",{},{"value":{"arrInt":[0,-9223372036854775809]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{},{"value":{"arrInt":[0,""]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"arrInt":[0,[]]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"arrInt":[0,{}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrInt[1]","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -195,7 +195,7 @@
 ["fn.test",{"output":{"value":{"arrInt":[0,false]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrInt":[0,0.1]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"NumberInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrInt":[0,9223372036854775808]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]
-["fn.test",{"output":{"value":{"arrInt":[0,-9223372036854775809]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{"output":{"value":{"arrInt":[0,-9223372036854775809]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{"output":{"value":{"arrInt":[0,""]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrInt":[0,[]]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrInt":[0,{}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrInt[1]","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -213,8 +213,8 @@
 
 ["fn.test",{},{"value":{"arrNullInt":[0,false]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"arrNullInt":[0,0.1]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"NumberInvalidForIntegerType"}]}}}]
-["fn.test",{},{"value":{"arrNullInt":[0,9223372036854775808]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]skipBinary
-["fn.test",{},{"value":{"arrNullInt":[0,-9223372036854775809]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{},{"value":{"arrNullInt":[0,9223372036854775808]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]|skipBinary
+["fn.test",{},{"value":{"arrNullInt":[0,-9223372036854775809]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{},{"value":{"arrNullInt":[0,""]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"arrNullInt":[0,[]]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"arrNullInt":[0,{}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullInt[1]","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -222,7 +222,7 @@
 ["fn.test",{"output":{"value":{"arrNullInt":[0,false]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrNullInt":[0,0.1]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"NumberInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrNullInt":[0,9223372036854775808]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]
-["fn.test",{"output":{"value":{"arrNullInt":[0,-9223372036854775809]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{"output":{"value":{"arrNullInt":[0,-9223372036854775809]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{"output":{"value":{"arrNullInt":[0,""]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrNullInt":[0,[]]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"arrNullInt":[0,{}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullInt[1]","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -241,8 +241,8 @@
 
 ["fn.test",{},{"value":{"objInt":{"a":0,"b":false}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"objInt":{"a":0,"b":0.1}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"NumberInvalidForIntegerType"}]}}}]
-["fn.test",{},{"value":{"objInt":{"a":0,"b":9223372036854775808}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]skipBinary
-["fn.test",{},{"value":{"objInt":{"a":0,"b":-9223372036854775809}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{},{"value":{"objInt":{"a":0,"b":9223372036854775808}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]|skipBinary
+["fn.test",{},{"value":{"objInt":{"a":0,"b":-9223372036854775809}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{},{"value":{"objInt":{"a":0,"b":""}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"objInt":{"a":0,"b":[]}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"objInt":{"a":0,"b":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objInt{b}","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -250,7 +250,7 @@
 ["fn.test",{"output":{"value":{"objInt":{"a":0,"b":false}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objInt":{"a":0,"b":0.1}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"NumberInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objInt":{"a":0,"b":9223372036854775808}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]
-["fn.test",{"output":{"value":{"objInt":{"a":0,"b":-9223372036854775809}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{"output":{"value":{"objInt":{"a":0,"b":-9223372036854775809}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{"output":{"value":{"objInt":{"a":0,"b":""}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objInt":{"a":0,"b":[]}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objInt":{"a":0,"b":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objInt{b}","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -268,8 +268,8 @@
 
 ["fn.test",{},{"value":{"objNullInt":{"a":0,"b":false}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"objNullInt":{"a":0,"b":0.1}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"NumberInvalidForIntegerType"}]}}}]
-["fn.test",{},{"value":{"objNullInt":{"a":0,"b":9223372036854775808}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]skipBinary
-["fn.test",{},{"value":{"objNullInt":{"a":0,"b":-9223372036854775809}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{},{"value":{"objNullInt":{"a":0,"b":9223372036854775808}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]|skipBinary
+["fn.test",{},{"value":{"objNullInt":{"a":0,"b":-9223372036854775809}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{},{"value":{"objNullInt":{"a":0,"b":""}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"objNullInt":{"a":0,"b":[]}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{},{"value":{"objNullInt":{"a":0,"b":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullInt{b}","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -277,7 +277,7 @@
 ["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":false}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"BooleanInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":0.1}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"NumberInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":9223372036854775808}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]
-["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":-9223372036854775809}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]skipBinary
+["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":-9223372036854775809}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"NumberOutOfRange"}]}}}]|skipBinary
 ["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":""}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"StringInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":[]}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"ArrayInvalidForIntegerType"}]}}}]
 ["fn.test",{"output":{"value":{"objNullInt":{"a":0,"b":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullInt{b}","reason":"ObjectInvalidForIntegerType"}]}}}]
@@ -1211,13 +1211,13 @@
 
 "testUnknownFunction"
 
-["fn.notFound",{},{}]|["fn._unknown",{},{"err":{"_invalidRequestTarget":{"reason":"UnknownFunction}}}]skipBinary
+["fn.notFound",{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["UnknownFunction"]}}}]|skipBinary
 
-[false,{},{}]|["fn.test",{},{"err":{"_invalidRequestTarget":{"reason":"TargetMustBeString"}}}]skipBinary
-[0,{},{}]|["fn.test",{},{"err":{"_invalidRequestTarget":{"reason":"TargetMustBeString"}}}]skipBinary
-["",{},{}]|["fn.test",{},{"err":{"_invalidRequestTarget":{"reason":"TargetStringMustBeFunction"}}}]skipBinary
-[[],{},{}]|["fn.test",{},{"err":{"_invalidRequestTarget":{"reason":"TargetMustBeString"}}}]skipBinary
-[{},{},{}]|["fn.test",{},{"err":{"_invalidRequestTarget":{"reason":"TargetMustBeString"}}}]skipBinary
+[false,{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["TargetMustBeString"]}}}]|skipBinary
+[0,{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["TargetMustBeString"]}}}]|skipBinary
+["",{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["TargetStringMustBeFunction"]}}}]|skipBinary
+[[],{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["TargetMustBeString"]}}}]|skipBinary
+[{},{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["TargetMustBeString"]}}}]|skipBinary
 
 "testErrors"
 
@@ -1269,32 +1269,32 @@
 
 "testParseFailure"
 
-false|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]skipBinary
-0|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]skipBinary
-""|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]skipBinary
-{}|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]skipBinary
-[{},{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]skipBinary
-["fn._ping",{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]skipBinary
+false|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
+0|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
+""|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
+{}|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
+[{},{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
+["fn._ping",{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
 
-["fn._ping",false,{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]skipBinary
-["fn._ping",0,{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]skipBinary
-["fn._ping","",{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]skipBinary
-["fn._ping",[],{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]skipBinary
+["fn._ping",false,{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
+["fn._ping",0,{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
+["fn._ping","",{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
+["fn._ping",[],{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
 
-["fn._ping",{},false]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]skipBinary
-["fn._ping",{},0]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]skipBinary
-["fn._ping",{},""]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]skipBinary
-["fn._ping",{},[]]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]skipBinary
+["fn._ping",{},false]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
+["fn._ping",{},0]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
+["fn._ping",{},""]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
+["fn._ping",{},[]]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
 
 "testBinaryHeader"
 
-["fn._ping",{"_bin":false},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":0},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":""},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":{}},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
+["fn._ping",{"_bin":false},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":0},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":""},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":{}},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
 
-["fn._ping",{"_bin":[false]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":[0.1]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":[""]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":[[]]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
-["fn._ping",{"_bin":[{}]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]skipBinary
+["fn._ping",{"_bin":[false]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[0.1]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[""]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[[]]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[{}]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
