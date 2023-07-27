@@ -1269,32 +1269,32 @@
 
 "testParseFailure"
 
-false|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
-0|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
-""|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
-{}|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
-[{},{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
-["fn._ping",{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"MessageMustBeArrayWithThreeElements"}}}]|skipBinary
+false|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}}]|skipBinary
+0|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}}]|skipBinary
+""|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}}]|skipBinary
+{}|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}}]|skipBinary
+[{},{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}}]|skipBinary
+["fn._ping",{}]|["fn._unknown",{},{"err":{"_parseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}}]|skipBinary
 
-["fn._ping",false,{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
-["fn._ping",0,{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
-["fn._ping","",{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
-["fn._ping",[],{}]|["fn.test",{},{"err":{"_parseFailure":{"reason":"HeadersMustBeObject"}}}]|skipBinary
+["fn._ping",false,{}]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["HeadersMustBeObject"]}}}]|skipBinary
+["fn._ping",0,{}]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["HeadersMustBeObject"]}}}]|skipBinary
+["fn._ping","",{}]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["HeadersMustBeObject"]}}}]|skipBinary
+["fn._ping",[],{}]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["HeadersMustBeObject"]}}}]|skipBinary
 
-["fn._ping",{},false]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
-["fn._ping",{},0]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
-["fn._ping",{},""]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
-["fn._ping",{},[]]|["fn.test",{},{"err":{"_parseFailure":{"reason":"BodyMustBeObject"}}}]|skipBinary
+["fn._ping",{},false]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["BodyMustBeObject"]}}}]|skipBinary
+["fn._ping",{},0]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["BodyMustBeObject"]}}}]|skipBinary
+["fn._ping",{},""]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["BodyMustBeObject"]}}}]|skipBinary
+["fn._ping",{},[]]|["fn._ping",{},{"err":{"_parseFailure":{"reasons":["BodyMustBeObject"]}}}]|skipBinary
 
 "testBinaryHeader"
 
-["fn._ping",{"_bin":false},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":0},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":""},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":{}},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":false},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":0},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":""},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":{}},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
 
-["fn._ping",{"_bin":[false]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":[0.1]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":[""]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":[[]]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
-["fn._ping",{"_bin":[{}]},{}]|["fn.test",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[false]},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[0.1]},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[""]},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[[]]},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
+["fn._ping",{"_bin":[{}]},{}]|["fn._ping",{},{"err":{"_invalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}}]|skipBinary
