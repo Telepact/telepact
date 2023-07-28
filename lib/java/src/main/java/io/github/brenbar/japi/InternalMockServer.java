@@ -15,19 +15,19 @@ import io.github.brenbar.japi.MockServer.VerificationTimes;
 
 class InternalMockServer {
 
-    static Map<String, Object> handle(Context context, Map<String, Object> input, JApiSchema jaApiSchema,
+    static Map<String, Object> handle(Context context, Map<String, Object> argument, JApiSchema jaApiSchema,
             Random random, List<Mock> mocks, List<Invocation> invocations) {
 
-        invocations.add(new Invocation(context.functionName, input));
+        invocations.add(new Invocation(context.functionName, argument));
 
         for (var mock : mocks) {
             if (Objects.equals(mock.whenFunctionName, context.functionName)) {
-                if (Objects.equals(mock.whenFunctionInput, input)) {
-                    return mock.thenAnswerOutput.apply(input);
-                } else if (mock.exactMatchInput) {
+                if (Objects.equals(mock.whenFunctionArgument, argument)) {
+                    return mock.thenAnswerResult.apply(argument);
+                } else if (mock.exactMatchArgument) {
                     continue;
-                } else if (isSubMap(input, mock.whenFunctionInput)) {
-                    return mock.thenAnswerOutput.apply(input);
+                } else if (isSubMap(argument, mock.whenFunctionArgument)) {
+                    return mock.thenAnswerResult.apply(argument);
                 }
             }
         }
@@ -148,12 +148,12 @@ class InternalMockServer {
         }
     }
 
-    static void verifyPartial(String functionName, Map<String, Object> partialMatchInput,
+    static void verifyPartial(String functionName, Map<String, Object> partialMatchArgument,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
-                if (InternalMockServer.isSubMap(invocation.functionInput, partialMatchInput)) {
+                if (InternalMockServer.isSubMap(invocation.functionArgument, partialMatchArgument)) {
                     invocation.verified = true;
                     matchesFound += 1;
                 }
@@ -166,7 +166,7 @@ class InternalMockServer {
                         Wanted exactly %d partial matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, partialMatchInput));
+                        """.formatted(e.times, matchesFound, functionName, partialMatchArgument));
                 throw new AssertionError(errorString);
             }
         }
@@ -180,25 +180,25 @@ class InternalMockServer {
                 Wanted partial match:
                 %s(%s)
                 Available:
-                """.formatted(functionName, partialMatchInput));
+                """.formatted(functionName, partialMatchArgument));
         var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
                 .toList();
         if (functionInvocations.isEmpty()) {
             errorString.append("<none>");
         } else {
             for (var invocation : functionInvocations) {
-                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
         }
         throw new AssertionError(errorString);
     }
 
-    static void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput,
+    static void verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
-                if (Objects.equals(invocation.functionInput, exactMatchFunctionInput)) {
+                if (Objects.equals(invocation.functionArgument, exactMatchFunctionArgument)) {
                     invocation.verified = true;
                     matchesFound += 1;
                 }
@@ -211,7 +211,7 @@ class InternalMockServer {
                         Wanted exactly %d exact matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionInput));
+                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionArgument));
                 throw new AssertionError(errorString);
             }
         }
@@ -225,14 +225,14 @@ class InternalMockServer {
                 Wanted exact match:
                 %s(%s)
                 Available:
-                """.formatted(functionName, exactMatchFunctionInput));
+                """.formatted(functionName, exactMatchFunctionArgument));
         var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
                 .toList();
         if (functionInvocations.isEmpty()) {
             errorString.append("<none>");
         } else {
             for (var invocation : functionInvocations) {
-                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
         }
         throw new AssertionError(errorString);
@@ -247,7 +247,7 @@ class InternalMockServer {
                     Available:
                     """);
             for (var invocation : invocationsNotVerified) {
-                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionInput));
+                errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
             throw new AssertionError(errorString);
         }

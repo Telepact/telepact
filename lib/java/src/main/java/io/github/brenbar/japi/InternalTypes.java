@@ -37,15 +37,15 @@ class TitleDefinition implements Definition {
 class FunctionDefinition implements Definition {
 
     public final String name;
-    public final Struct inputStruct;
+    public final Struct argumentStruct;
     public final Enum resultEnum;
 
     public FunctionDefinition(
             String name,
-            Struct inputStruct,
+            Struct argumentStruct,
             Enum resultEnum) {
         this.name = name;
-        this.inputStruct = inputStruct;
+        this.argumentStruct = argumentStruct;
         this.resultEnum = resultEnum;
     }
 
@@ -351,26 +351,26 @@ class ValidationErrorReasons {
 
 class Mock {
     final String whenFunctionName;
-    final Map<String, Object> whenFunctionInput;
-    final boolean exactMatchInput;
-    final Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput;
+    final Map<String, Object> whenFunctionArgument;
+    final boolean exactMatchArgument;
+    final Function<Map<String, Object>, Map<String, Object>> thenAnswerResult;
 
-    public Mock(String whenFunctionName, Map<String, Object> whenFunctionInput, boolean exactMatchInput,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput) {
+    public Mock(String whenFunctionName, Map<String, Object> whenFunctionArgument, boolean exactMatchArgument,
+            Function<Map<String, Object>, Map<String, Object>> thenAnswerResult) {
         this.whenFunctionName = whenFunctionName;
-        this.whenFunctionInput = whenFunctionInput;
-        this.exactMatchInput = exactMatchInput;
-        this.thenAnswerOutput = thenAnswerOutput;
+        this.whenFunctionArgument = whenFunctionArgument;
+        this.exactMatchArgument = exactMatchArgument;
+        this.thenAnswerResult = thenAnswerResult;
     }
 }
 
 class Invocation {
     final String functionName;
-    final Map<String, Object> functionInput;
+    final Map<String, Object> functionArgument;
     boolean verified = false;
 
-    public Invocation(String functionName, Map<String, Object> functionInput) {
+    public Invocation(String functionName, Map<String, Object> functionArgument) {
         this.functionName = functionName;
-        this.functionInput = functionInput;
+        this.functionArgument = functionArgument;
     }
 }

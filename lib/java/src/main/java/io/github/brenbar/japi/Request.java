@@ -12,7 +12,7 @@ public class Request {
     public final String functionName;
     public final Map<String, Object> headers = new HashMap<>();
     public final Map<String, List<String>> selectedStructFields = new HashMap<>();
-    public final Map<String, Object> functionInput;
+    public final Map<String, Object> functionArgument;
     public Optional<Boolean> useBinary = Optional.empty();
     public Optional<Boolean> forceSendJson = Optional.empty();
     public Optional<Long> timeoutMs = Optional.empty();
@@ -21,11 +21,11 @@ public class Request {
      * Construct the Request.
      * 
      * @param functionName
-     * @param functionInput
+     * @param functionArgument
      */
-    public Request(String functionName, Map<String, Object> functionInput) {
+    public Request(String functionName, Map<String, Object> functionArgument) {
         this.functionName = functionName;
-        this.functionInput = functionInput;
+        this.functionArgument = functionArgument;
     }
 
     /**

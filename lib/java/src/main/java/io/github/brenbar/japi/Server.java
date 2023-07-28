@@ -11,13 +11,13 @@ import java.util.function.Function;
 public class Server {
 
     /**
-     * A Handler that defines how a jAPI Output is defined from the given
-     * server context and jAPI Input.
+     * A Handler that defines how a jAPI Result is defined from the given
+     * server context and jAPI Argument.
      * 
      * Example:
      * 
      * <pre>
-     * var handler = (context, input) -> {
+     * var handler = (context, argument) -> {
      *     // TODO: Return a map compliant with your jAPI schema.
      *     return Map.of();
      * };

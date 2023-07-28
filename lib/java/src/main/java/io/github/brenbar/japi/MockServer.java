@@ -77,83 +77,83 @@ public class MockServer {
         return this.processor.process(message);
     }
 
-    private Map<String, Object> handle(Context context, Map<String, Object> input) {
-        return InternalMockServer.handle(context, input, this.processor.jApiSchema, this.random, this.mocks,
+    private Map<String, Object> handle(Context context, Map<String, Object> argument) {
+        return InternalMockServer.handle(context, argument, this.processor.jApiSchema, this.random, this.mocks,
                 this.invocations);
     }
 
     /**
      * Create a mock condition when the given function name matches and the given
-     * input partially matches.
+     * argument partially matches.
      * 
      * @param whenFunctionName
-     * @param whenPartialMatchInput
-     * @param thenAnswerOutput
+     * @param whenPartialMatchArgument
+     * @param thenAnswerResult
      */
-    public void mockPartial(String whenFunctionName, Map<String, Object> whenPartialMatchInput,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput) {
-        mocks.add(0, new Mock(whenFunctionName, whenPartialMatchInput, false, thenAnswerOutput));
+    public void mockPartial(String whenFunctionName, Map<String, Object> whenPartialMatchArgument,
+            Function<Map<String, Object>, Map<String, Object>> thenAnswerResult) {
+        mocks.add(0, new Mock(whenFunctionName, whenPartialMatchArgument, false, thenAnswerResult));
     }
 
     /**
      * Create a mock condition when the given function name matches and the given
-     * input exactly matches.
+     * argument exactly matches.
      * 
      * @param whenFunctionName
-     * @param whenExactMatchInput
-     * @param thenAnswerOutput
+     * @param whenExactMatchArgument
+     * @param thenAnswerResult
      */
-    public void mockExact(String whenFunctionName, Map<String, Object> whenExactMatchInput,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerOutput) {
-        mocks.add(0, new Mock(whenFunctionName, whenExactMatchInput, true, thenAnswerOutput));
+    public void mockExact(String whenFunctionName, Map<String, Object> whenExactMatchArgument,
+            Function<Map<String, Object>, Map<String, Object>> thenAnswerResult) {
+        mocks.add(0, new Mock(whenFunctionName, whenExactMatchArgument, true, thenAnswerResult));
     }
 
     /**
      * Verify an interaction occurred that both matches the given function name and
-     * partially matches the given input.
+     * partially matches the given argument.
      * 
      * @param functionName
-     * @param partialMatchInput
+     * @param partialMatchArgument
      */
-    public void verifyPartial(String functionName, Map<String, Object> partialMatchInput) {
-        verifyPartial(functionName, partialMatchInput, new UnlimitedNumberOfTimes());
+    public void verifyPartial(String functionName, Map<String, Object> partialMatchArgument) {
+        verifyPartial(functionName, partialMatchArgument, new UnlimitedNumberOfTimes());
     }
 
     /**
      * Verify an interaction occurred the given number of times that both matches
-     * the given function name and partially matches the given input.
+     * the given function name and partially matches the given argument.
      * 
      * @param functionName
-     * @param partialMatchInput
+     * @param partialMatchArgument
      * @param verificationTimes
      */
-    public void verifyPartial(String functionName, Map<String, Object> partialMatchInput,
+    public void verifyPartial(String functionName, Map<String, Object> partialMatchArgument,
             VerificationTimes verificationTimes) {
-        InternalMockServer.verifyPartial(functionName, partialMatchInput, verificationTimes, this.invocations);
+        InternalMockServer.verifyPartial(functionName, partialMatchArgument, verificationTimes, this.invocations);
     }
 
     /**
      * Verify an interaction occurred that both matches the given function name and
-     * exactly matches the given input.
+     * exactly matches the given argument.
      * 
      * @param functionName
-     * @param exactMatchInput
+     * @param exactMatchArgument
      */
-    public void verifyExact(String functionName, Map<String, Object> exactMatchInput) {
-        verifyExact(functionName, exactMatchInput, new UnlimitedNumberOfTimes());
+    public void verifyExact(String functionName, Map<String, Object> exactMatchArgument) {
+        verifyExact(functionName, exactMatchArgument, new UnlimitedNumberOfTimes());
     }
 
     /**
      * Verify an interaction occurred the given number of times that both matches
-     * the given function name and exactly matches the given input.
+     * the given function name and exactly matches the given argument.
      * 
      * @param functionName
-     * @param exactMatchFunctionInput
+     * @param exactMatchFunctionArgument
      * @param verificationTimes
      */
-    public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionInput,
+    public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
             VerificationTimes verificationTimes) {
-        InternalMockServer.verifyExact(functionName, exactMatchFunctionInput, verificationTimes, this.invocations);
+        InternalMockServer.verifyExact(functionName, exactMatchFunctionArgument, verificationTimes, this.invocations);
     }
 
     /**

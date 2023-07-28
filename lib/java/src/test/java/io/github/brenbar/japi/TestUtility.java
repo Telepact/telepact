@@ -97,10 +97,10 @@ public class TestUtility {
                 assertEquals(expectedResponseAsParsedJson.get(0), e.target);
                 assertEquals(expectedResponseAsParsedJson.get(2), e.body);
             } else {
-                var outputAsParsedJson = client.submit(new Request(((String) requestAsParsedJson.get(0)),
+                var resultAsParsedJson = client.submit(new Request(((String) requestAsParsedJson.get(0)),
                         (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
                                 (Map<String, Object>) requestAsParsedJson.get(1)));
-                assertEquals(expectedResponseAsParsedJson.get(2), outputAsParsedJson);
+                assertEquals(expectedResponseAsParsedJson.get(2), resultAsParsedJson);
             }
         }
     }

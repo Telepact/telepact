@@ -22,7 +22,7 @@ class InternalSerializer {
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof FunctionDefinition f) {
-                allKeys.addAll(f.inputStruct.fields.keySet());
+                allKeys.addAll(f.argumentStruct.fields.keySet());
                 addAllEnumValues(allKeys, f.resultEnum.values);
             } else if (entry.getValue() instanceof TypeDefinition t) {
                 var type = t.type;

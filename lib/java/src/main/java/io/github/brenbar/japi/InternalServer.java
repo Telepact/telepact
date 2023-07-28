@@ -140,10 +140,10 @@ class InternalServer {
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
-        var inputValidationFailures = validateStruct(functionDefinition.name,
-                functionDefinition.inputStruct.fields, requestBody);
-        if (!inputValidationFailures.isEmpty()) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(inputValidationFailures);
+        var argumentValidationFailures = validateStruct(functionDefinition.name,
+                functionDefinition.argumentStruct.fields, requestBody);
+        if (!argumentValidationFailures.isEmpty()) {
+            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
             Map<String, Object> newErrorResult = Map.of("err",
                     Map.of("_invalidRequestBody", Map.of("cases", validationFailureCases)));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
@@ -196,9 +196,9 @@ class InternalServer {
     }
 
     private static List<Map<String, String>> mapValidationFailuresToInvalidFieldCases(
-            List<ValidationFailure> inputValidationFailures) {
+            List<ValidationFailure> argumentValidationFailures) {
         var validationFailureCases = new ArrayList<Map<String, String>>();
-        for (var validationFailure : inputValidationFailures) {
+        for (var validationFailure : argumentValidationFailures) {
             var validationFailureCase = Map.of(
                     "path", validationFailure.path,
                     "reason", validationFailure.reason);

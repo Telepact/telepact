@@ -31,13 +31,13 @@ class InternalParse {
 
             for (var parsedDefinition : schema.parsed.entrySet()) {
                 if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
-                    for (var mixinArgumentField : mixinDefinition.inputStruct.fields.entrySet()) {
+                    for (var mixinArgumentField : mixinDefinition.argumentStruct.fields.entrySet()) {
                         var newKey = mixinArgumentField.getKey();
-                        if (f.inputStruct.fields.containsKey(newKey)) {
+                        if (f.argumentStruct.fields.containsKey(newKey)) {
                             throw new JApiSchemaParseError(
                                     "Mixin argument field already in use: %s".formatted(newKey));
                         }
-                        f.inputStruct.fields.put(newKey, mixinArgumentField.getValue());
+                        f.argumentStruct.fields.put(newKey, mixinArgumentField.getValue());
                     }
 
                     var mixinOkStruct = (Struct) mixinDefinition.resultEnum.values.get("ok");
@@ -134,19 +134,19 @@ class InternalParse {
             String definitionKey,
             Map<String, List<Object>> jApiSchemaAsParsedJson,
             Map<String, Definition> parsedDefinitions) {
-        Map<String, Object> inputDefinitionAsParsedJson;
+        Map<String, Object> argumentDefinitionAsParsedJson;
         try {
-            inputDefinitionAsParsedJson = (Map<String, Object>) definitionArray.get(0);
+            argumentDefinitionAsParsedJson = (Map<String, Object>) definitionArray.get(0);
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
         }
-        var inputFields = new HashMap<String, FieldDeclaration>();
-        for (var entry : inputDefinitionAsParsedJson.entrySet()) {
+        var argumentFields = new HashMap<String, FieldDeclaration>();
+        for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
                     typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
-            inputFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+            argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
         Map<String, Object> resultDefinitionAsParsedJson;
@@ -204,15 +204,15 @@ class InternalParse {
             errorValues.put(enumCase, errorValueStruct);
         }
 
-        var inputStruct = new Struct("%s".formatted(definitionKey), inputFields);
-        var outputStruct = new Struct("%s.ok".formatted(definitionKey), okStructFields);
+        var argumentStruct = new Struct("%s".formatted(definitionKey), argumentFields);
+        var okStruct = new Struct("%s.ok".formatted(definitionKey), okStructFields);
 
-        var resultEnumValues = Map.of("ok", outputStruct, "err", errorValues);
+        var resultEnumValues = Map.of("ok", okStruct, "err", errorValues);
         var resultEnum = new Enum(definitionKey, resultEnumValues);
 
         // TODO: Ensure that `_unknown` is defined.
 
-        return new FunctionDefinition(definitionKey, inputStruct, resultEnum);
+        return new FunctionDefinition(definitionKey, argumentStruct, resultEnum);
     }
 
     private static TypeDefinition parseStructDefinition(
@@ -387,7 +387,7 @@ class InternalParse {
         if (definition instanceof TypeDefinition t) {
             return new TypeDeclaration(t.type, nullable);
         } else if (definition instanceof FunctionDefinition f) {
-            return new TypeDeclaration(f.inputStruct, nullable);
+            return new TypeDeclaration(f.argumentStruct, nullable);
         } else if (definition instanceof ErrorDefinition e) {
             throw new JApiSchemaParseError("Cannot reference an error in type declarations");
         } else {

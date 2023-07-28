@@ -1,4 +1,4 @@
-from dataclasses import dataclass;
+from dataclasses import dataclass
 
 cases_filepath = "../../test/cases.txt"
 test_filepath = "src/test/java/io/github/brenbar/japi/GeneratedTests.java"
@@ -6,12 +6,14 @@ test_filepath = "src/test/java/io/github/brenbar/japi/GeneratedTests.java"
 cases_file = open(cases_filepath, "r")
 test_file = open(test_filepath, "w")
 
+
 @dataclass
 class Case:
     name: str
-    input: str
-    output: str
+    argument: str
+    result: str
     skip_binary: bool
+
 
 cases = []
 
@@ -28,11 +30,12 @@ for l in cases_file:
         counter = 1
     elif line.__contains__('|'):
         lines = line.split('|')
-        input = lines[0]
-        output = lines[1]
+        argument = lines[0]
+        result = lines[1]
         skip_binary = lines[2] == 'skipBinary' if lines[2:] else False
 
-        case = Case('{}_{}'.format(current_test_name, counter), input, output, skip_binary)
+        case = Case('{}_{}'.format(current_test_name, counter),
+                    argument, result, skip_binary)
 
         cases.append(case)
 
@@ -54,15 +57,15 @@ for case in cases:
     test_file.write('''
     @Test
     public void test_{}() throws IOException {{
-        var input = """
+        var argument = """
         {}
         """.trim();
-        var expectedOutput = """
+        var expectedResult = """
         {}
         """.trim();
-        TestUtility.test(input, expectedOutput);
+        TestUtility.test(argument, expectedResult);
     }}
-    '''.format(case.name, case.input, case.output))
+    '''.format(case.name, case.argument, case.result))
 
     if case.skip_binary:
         continue
@@ -70,15 +73,15 @@ for case in cases:
     test_file.write('''
     @Test
     public void testBinary_{}() throws IOException {{
-        var input = """
+        var argument = """
         {}
         """.trim();
-        var expectedOutput = """
+        var expectedResult = """
         {}
         """.trim();
-        TestUtility.testBinary(input, expectedOutput);
+        TestUtility.testBinary(argument, expectedResult);
     }}
-    '''.format(case.name, case.input, case.output))    
+    '''.format(case.name, case.argument, case.result))
 
 
 test_file.write('''

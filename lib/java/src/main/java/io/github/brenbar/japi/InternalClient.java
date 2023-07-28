@@ -47,7 +47,7 @@ class InternalClient {
         }
 
         var messageType = request.functionName;
-        return List.of(messageType, headers, request.functionInput);
+        return List.of(messageType, headers, request.functionArgument);
     }
 
     static List<Object> processRequestObject(List<Object> inputJapiMessage,

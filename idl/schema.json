@@ -218,7 +218,7 @@
     },
     "^fn\\.[a-zA-Z_]\\w*": {
       "type": "array",
-      "description": "A function with:\n(1) an input struct of 0 or more fields\n(2) an output struct of 0 or more fields\n(3) and an array of allowed custom errors",
+      "description": "A function that accepts an argument argument and returns a result enum that is either an ok struct or an error enum.",
       "prefixItems": [
         {
           "type": "object",
@@ -283,8 +283,8 @@
           "label": "Function template",
           "body": [
             {
-              "inputField1": "boolean",
-              "inputField2": "struct.Example1"
+              "argumentField1": "boolean",
+              "argumentField2": "struct.Example1"
             },
             "->",
             {

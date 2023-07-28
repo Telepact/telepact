@@ -134,12 +134,12 @@ erase.
 
 ### Why do functions in jAPI not support positional arguments?
 
-jAPI functions are automatically associated with an input struct and an output
-struct that API designers can use to colloquially define arguments and return
-values, respectively. The colloquial arguments being supplied via the input
-struct will be inherently unordered due to the nature of JSON objects, and there
-is no way to approximate traditional positional arguments at the root of the
-Request Message Body.
+jAPI functions are automatically associated with an argument struct and an
+result struct that API designers can use to colloquially define arguments and
+return values, respectively. The colloquial arguments being supplied via the
+argument struct will be inherently unordered due to the nature of JSON objects,
+and there is no way to approximate traditional positional arguments at the root
+of the Request Message Body.
 
 This design decision is intentional. Positional arguments are a significant risk
 that provoke backwards incompatible changes through seemingly innocent API
@@ -160,9 +160,9 @@ This design maximizes backwards compatible change points in the API design, as
 adding an optional field to a struct is a legal backwards compatible change. The
 traditional enum can be approximated by simply leaving all enum structs blank.
 
-### Why force servers to perform output validation?
+### Why force servers to perform result validation?
 
-jAPI automatically performs validation of function outputs (as well as errors)
+jAPI automatically performs validation of function results (as well as errors)
 against the jAPI schema, and there is no setting for servers to turn off this
 behavior.
 
@@ -175,7 +175,7 @@ development phase.
 
 Clients who are uniquely vulnerable to hard server failures and who find it
 advantageous to receive the malformed data anyway and adapt on-the-fly are able
-to turn off this output validation by submitting their requests with the
+to turn off this result validation by submitting their requests with the
 `{"_unsafe":true}` header.
 
 ### If all I want is compact binary serialization, why not just use gRPC?
@@ -272,8 +272,8 @@ backwards compatible change, on the basis of the following:
 
 - **Client** - An entity consuming a jAPI.
 
-- **Input** - The colloquial name for the body of a `function.*`-targeted jAPI
-  Message sent from the Client.
+- **Argument** - The colloquial name for the body of a `function.*`-targeted
+  jAPI Message sent from the Client.
 
 - **Headers** - An unstructured JSON object consisting of metadata about a jAPI
   Message.
@@ -281,7 +281,7 @@ backwards compatible change, on the basis of the following:
 - **Message** - The JSON payload sent over the IPC boundary, comprised of a
   single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
 
-- **Output** - The colloquial name for the body of a `function.*`-targeted jAPI
+- **Result** - The colloquial name for the body of a `function.*`-targeted jAPI
   Message sent from the Server.
 
 - **Server** - An entity providing an implementation of a jAPI and adhering to
