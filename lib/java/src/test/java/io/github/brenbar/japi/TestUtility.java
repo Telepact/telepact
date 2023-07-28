@@ -22,9 +22,9 @@ public class TestUtility {
         return switch (context.functionName) {
             case "fn.test" -> {
                 var error = context.requestHeaders.keySet().stream().filter(k -> k.startsWith("error.")).findFirst();
-                if (context.requestHeaders.containsKey("output")) {
+                if (context.requestHeaders.containsKey("ok")) {
                     try {
-                        var o = (Map<String, Object>) context.requestHeaders.get("output");
+                        var o = (Map<String, Object>) context.requestHeaders.get("ok");
                         yield Map.of("ok", o);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
