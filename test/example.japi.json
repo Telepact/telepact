@@ -73,7 +73,14 @@
       "arrEnum!": "array<enum.EnumExample>",
       "arrNullEnum!": "array<enum.EnumExample?>",
       "objEnum!": "object<enum.EnumExample>",
-      "objNullEnum!": "object<enum.EnumExample?>"
+      "objNullEnum!": "object<enum.EnumExample?>",
+
+      "fn!": "fn.example",
+      "nullFn!": "fn.example?",
+      "arrFn!": "array<fn.example>",
+      "arrNullFn!": "array<fn.example?>",
+      "objFn!": "object<fn.example>",
+      "objNullFn!": "object<fn.example?>"
     },
     [
       "                                                            ",
@@ -104,6 +111,25 @@
         "optional!": "boolean"
       }
     }
+  ],
+
+  "fn.example": [
+    {
+      "required": "boolean",
+      "optional!": "boolean"
+    },
+    "->",
+    {
+      "ok": {},
+      "err": {
+        "_unknown": {}
+      }
+    },
+    [
+      "                      ",
+      " A function template. ",
+      "                      "
+    ]
   ],
 
   "fn.test": [

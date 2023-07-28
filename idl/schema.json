@@ -282,22 +282,27 @@
         {
           "label": "Function template",
           "body": [
+            {
+              "inputField1": "boolean",
+              "inputField2": "struct.Example1"
+            },
+            "->",
+            {
+              "ok": {
+                "outputField1": "string",
+                "outputField2": "struct.Example2"
+              },
+              "err": {
+                "_unknown": {},
+                "custom": {
+                  "errorField1": "integer"
+                }
+              }
+            },
             [
               "                      ",
               " A function template. ",
               "                      "
-            ],
-            [
-              {
-                "inputField1": "boolean",
-                "inputField2": "struct.Example1"
-              },
-              "-->",
-              {
-                "outputField1": "string",
-                "outputField2": "struct.Example2"
-              },
-              ["error.Example1", "error.Example2"]
             ]
           ]
         }
@@ -307,7 +312,7 @@
   "$defs": {
     "typeDeclaration": {
       "type": "string",
-      "pattern": "^((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|((array|object)<(any)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
+      "pattern": "^((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(any)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
       "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {

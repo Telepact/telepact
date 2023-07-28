@@ -314,7 +314,7 @@ class InternalParse {
     private static TypeDeclaration parseType(String typeDeclaration, Map<String, List<Object>> jApiSchemaAsParsedJson,
             Map<String, Definition> parsedDefinitions) {
         var regex = Pattern.compile(
-                "^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*)))(\\?)?$");
+                "^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn)\\.([a-zA-Z_]\\w*)))(\\?)?$");
         var matcher = regex.matcher(typeDeclaration);
         matcher.find();
 
@@ -387,7 +387,7 @@ class InternalParse {
         if (definition instanceof TypeDefinition t) {
             return new TypeDeclaration(t.type, nullable);
         } else if (definition instanceof FunctionDefinition f) {
-            throw new JApiSchemaParseError("Cannot reference a function in type declarations");
+            return new TypeDeclaration(f.inputStruct, nullable);
         } else if (definition instanceof ErrorDefinition e) {
             throw new JApiSchemaParseError("Cannot reference an error in type declarations");
         } else {
