@@ -50,10 +50,10 @@ class InternalClient {
         return List.of(messageType, headers, request.functionArgument);
     }
 
-    static List<Object> processRequestObject(List<Object> inputJapiMessage,
+    static List<Object> processRequestObject(List<Object> request,
             BiFunction<List<Object>, Serializer, Future<List<Object>>> adapter, Serializer serializer, long timeoutMs) {
         try {
-            return adapter.apply(inputJapiMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
+            return adapter.apply(request, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             throw new ClientProcessError(e);
         }

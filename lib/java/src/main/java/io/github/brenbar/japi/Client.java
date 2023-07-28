@@ -138,16 +138,16 @@ public class Client {
         var requestMessage = InternalClient.constructRequestMessage(request, useBinaryDefault,
                 forceSendJsonDefault, timeoutMsDefault);
 
-        var outputJapiMessage = this.middleware.apply(requestMessage, this::processMessage);
+        var response = this.middleware.apply(requestMessage, this::processMessage);
 
-        var outputMessageType = (String) outputJapiMessage.get(0);
-        var output = (Map<String, Object>) outputJapiMessage.get(2);
+        var responseMessageType = (String) response.get(0);
+        var result = (Map<String, Object>) response.get(2);
 
-        if (outputMessageType.startsWith("error.")) {
-            throw new JApiError(outputMessageType, output);
+        if (responseMessageType.startsWith("error.")) {
+            throw new JApiError(responseMessageType, result);
         }
 
-        return output;
+        return result;
     }
 
     private List<Object> processMessage(List<Object> message) {

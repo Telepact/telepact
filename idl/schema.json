@@ -289,13 +289,13 @@
             "->",
             {
               "ok": {
-                "outputField1": "string",
-                "outputField2": "struct.Example2"
+                "field1": "string",
+                "field2": "struct.Example2"
               },
               "err": {
                 "_unknown": {},
                 "custom": {
-                  "errorField1": "integer"
+                  "field1": "integer"
                 }
               }
             },
