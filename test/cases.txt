@@ -1221,9 +1221,9 @@
 
 "testErrors"
 
-["fn.test",{"error.ErrorExample":{"property":"a"}},{}]|["fn.test",{},{"err":{"ErrorExample":{"property":"a"}}}]
-["fn.test",{"error.ErrorExample":{"wrong":"a"}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"error.ErrorExample.property","reason":"RequiredStructFieldMissing"},{"path":"error.ErrorExample.wrong","reason":"UnknownStructField"}]}}}]
-["fn.test",{"error.UnknownErrorExample":{"property":"a"}},{}]|["fn.test",{},{"err":{"_ApplicationFailure":{}}}]
+["fn.test",{"err":{"example":{"property":"a"}}},{}]|["fn.test",{},{"err":{"example":{"property":"a"}}}]
+["fn.test",{"err":{"example":{"wrong":"a"}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.err.example.property","reason":"RequiredStructFieldMissing"},{"path":"fn.test.err.example.wrong","reason":"UnknownStructField"}]}}}]
+["fn.test",{"err":{"unknownExample":{"property":"a"}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.err.unknownExample","reason":"UnknownEnumField"}]}}}]
 
 "testSelectFields"
 
@@ -1265,7 +1265,7 @@
 "testUnsafe"
 
 ["fn.test",{"_unsafe":true,"ok":{"value":{"bool":0}}},{}]|["fn.test",{},{"ok":{"value":{"bool":0}}}]
-["fn.test",{"_unsafe":true,"error.ErrorExample":{"wrong":"a"}},{}]|["fn.test",{},{"err":{"ErrorExample":{"wrong":"a"}}}]
+["fn.test",{"_unsafe":true,"err":{"example":{"wrong":"a"}}},{}]|["fn.test",{},{"err":{"example":{"wrong":"a"}}}]
 
 "testParseFailure"
 
