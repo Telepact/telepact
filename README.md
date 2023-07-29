@@ -209,7 +209,7 @@ code.
 
 jAPI functions are required to specify the full result enum, which must also
 include a valid error enum. In jAPI, redundancy is conventionally solved with
-mixins, but the jAPI specifically forgoes mixins in favor of an explicit
+traits, but the jAPI specifically forgoes traits in favor of an explicit
 `_unknown` error enum value duplicated across all functions.
 
 This design decision accomplishes a few things:

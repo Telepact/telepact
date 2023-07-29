@@ -10,43 +10,120 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-import io.github.brenbar.japi.MockServer.ExactNumberOfTimes;
-import io.github.brenbar.japi.MockServer.VerificationTimes;
+import io.github.brenbar.japi.MockVerification.AtLeastNumberOfTimes;
+import io.github.brenbar.japi.MockVerification.AtMostNumberOfTimes;
+import io.github.brenbar.japi.MockVerification.ExactNumberOfTimes;
+import io.github.brenbar.japi.MockVerification.VerificationTimes;
 
 class InternalMockServer {
 
-    static Map<String, Object> handle(Context context, Map<String, Object> argument, JApiSchema jaApiSchema,
-            Random random, List<Mock> mocks, List<Invocation> invocations) {
+    static Map<String, Object> handle(Context context, Map<String, Object> argument) {
 
-        invocations.add(new Invocation(context.functionName, argument));
+        var stubs = (List<MockStub>) context.requestHeaders.get("_mockStubs");
+        var invocations = (List<Invocation>) context.requestHeaders.get("_mockInvocations");
+        var random = (Random) context.requestHeaders.get("_mockRandom");
+        var jApiSchema = (JApiSchema) context.requestHeaders.get("_mockJApiSchema");
 
-        for (var mock : mocks) {
-            if (Objects.equals(mock.whenFunctionName, context.functionName)) {
-                if (Objects.equals(mock.whenFunctionArgument, argument)) {
-                    return mock.thenAnswerResult.apply(argument);
-                } else if (mock.exactMatchArgument) {
-                    continue;
-                } else if (isSubMap(argument, mock.whenFunctionArgument)) {
-                    return mock.thenAnswerResult.apply(argument);
+        switch (context.functionName) {
+            case "fn._createStub" -> {
+                var whenFunctionName = (String) argument.get("whenFunctionName");
+                var whenArgument = (Map<String, Object>) argument.get("whenArgument");
+                var thenResult = (Map<String, Object>) argument
+                        .get("thenResult");
+                var allowArgumentPartialMatch = (Boolean) argument.get("allowArgumentPartialMatch");
+                var randomFillMissingResultFields = (Boolean) argument.get("randomFillMissingResultFields");
+
+                var stub = new MockStub(whenFunctionName, whenArgument, thenResult);
+                if (allowArgumentPartialMatch) {
+                    stub.setAllowArgumentPartialMatch(allowArgumentPartialMatch);
+                }
+                if (randomFillMissingResultFields) {
+                    stub.setGenerateMissingResultFields(randomFillMissingResultFields);
+                }
+
+                stubs.add(stub);
+                return Map.of();
+            }
+            case "fn._verify" -> {
+                var verifyFunctionName = (String) argument.get("verifyFunctionName");
+                var verifyArgument = (Map<String, Object>) argument.get("verifyArgument");
+                var verifyTimes = (Map<String, Object>) argument.get("verifyTimes");
+                var allowArgumentPartialMatch = (Boolean) argument.get("allowArgumentPartialMatch");
+
+                var verificationTimes = parseFromPseudoJson(verifyTimes);
+
+                if (allowArgumentPartialMatch) {
+                    return verifyPartial(verifyFunctionName, verifyArgument, verificationTimes, invocations);
+                } else {
+                    return verifyExact(verifyFunctionName, verifyArgument, verificationTimes, invocations);
+                }
+            }
+            case "fn._verifyNoMoreInteractions" -> {
+                return verifyNoMoreInteractions(invocations);
+            }
+            case "fn._clearInvocations" -> {
+                invocations.clear();
+                return Map.of("ok", Map.of());
+            }
+            case "fn._clearStubs" -> {
+                stubs.clear();
+                return Map.of("ok", Map.of());
+            }
+            default -> {
+                invocations.add(new Invocation(context.functionName, argument));
+
+                for (var stub : stubs) {
+                    if (Objects.equals(stub.whenFunctionName, context.functionName)) {
+                        if (stub.allowArgumentPartialMatch) {
+                            if (isSubMap(stub.whenArgument, argument)) {
+                                return stub.thenResult;
+                            }
+                        } else {
+                            if (Objects.equals(stub.whenArgument, argument)) {
+                                return stub.thenResult;
+                            }
+                        }
+                    }
+                }
+
+                var definition = jApiSchema.parsed.get("fn.%s".formatted(context.functionName));
+
+                if (definition instanceof FunctionDefinition f) {
+                    return constructRandomEnum(f.resultEnum.values, random);
+                } else {
+                    throw new JApiError("error._UnknownFunction", Map.of());
                 }
             }
         }
-
-        var definition = jaApiSchema.parsed.get("fn.%s".formatted(context.functionName));
-
-        if (definition instanceof FunctionDefinition f) {
-            return constructRandomEnum(f.resultEnum.values, random);
-        } else {
-            throw new JApiError("error._UnknownFunction", Map.of());
-        }
     }
 
-    static boolean isSubMap(Map<String, Object> reference, Map<String, Object> toCheck) {
-        for (var toCheckEntry : toCheck.entrySet()) {
-            var toCheckKey = toCheckEntry.getKey();
-            var toCheckEntryValue = toCheckEntry.getValue();
-            var referenceEntryValue = reference.get(toCheckKey);
-            var entryIsEqual = isSubMapEntryEqual(referenceEntryValue, toCheckEntryValue);
+    static VerificationTimes parseFromPseudoJson(Map<String, Object> verifyTimes) {
+        var verifyTimesEntry = verifyTimes.entrySet().stream().findAny().get();
+        var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
+        return switch (verifyTimesEntry.getKey()) {
+            case "unlimited" -> new MockVerification.UnlimitedNumberOfTimes();
+            case "exact" -> {
+                var times = (Integer) verifyTimesStruct.get("times");
+                yield new MockVerification.ExactNumberOfTimes(times);
+            }
+            case "atMost" -> {
+                var times = (Integer) verifyTimesStruct.get("times");
+                yield new MockVerification.AtMostNumberOfTimes(times);
+            }
+            case "atLeast" -> {
+                var times = (Integer) verifyTimesStruct.get("times");
+                yield new MockVerification.AtLeastNumberOfTimes(times);
+            }
+            default -> throw new JApiProcessError("Unknown verification times");
+        };
+    }
+
+    static boolean isSubMap(Map<String, Object> reference, Map<String, Object> actual) {
+        for (var actualEntry : actual.entrySet()) {
+            var actualKey = actualEntry.getKey();
+            var actualValue = actualEntry.getValue();
+            var referenceEntryValue = reference.get(actualKey);
+            var entryIsEqual = isSubMapEntryEqual(referenceEntryValue, actualValue);
             if (!entryIsEqual) {
                 return false;
             }
@@ -54,20 +131,20 @@ class InternalMockServer {
         return true;
     }
 
-    private static boolean isSubMapEntryEqual(Object reference, Object toCheck) {
-        if (reference instanceof Map m1 && toCheck instanceof Map m2) {
+    private static boolean isSubMapEntryEqual(Object reference, Object actual) {
+        if (reference instanceof Map m1 && actual instanceof Map m2) {
             return isSubMap(m1, m2);
-        } else if (reference instanceof List referenceList && toCheck instanceof List toCheckList) {
+        } else if (reference instanceof List referenceList && actual instanceof List actualList) {
             for (int i = 0; i < referenceList.size(); i += 1) {
                 var referenceElement = referenceList.get(i);
-                var toCheckElement = toCheckList.get(i);
-                var isEqual = isSubMapEntryEqual(referenceElement, toCheckElement);
+                var actualElement = actualList.get(i);
+                var isEqual = isSubMapEntryEqual(referenceElement, actualElement);
                 if (!isEqual) {
                     return false;
                 }
             }
         }
-        return Objects.equals(reference, toCheck);
+        return Objects.equals(reference, actual);
     }
 
     private static Map<String, Object> constructRandomStruct(
@@ -148,7 +225,7 @@ class InternalMockServer {
         }
     }
 
-    static void verifyPartial(String functionName, Map<String, Object> partialMatchArgument,
+    static Map<String, Object> verifyPartial(String functionName, Map<String, Object> partialMatchArgument,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
         for (var invocation : invocations) {
@@ -167,12 +244,12 @@ class InternalMockServer {
                         Query:
                         %s(%s)
                         """.formatted(e.times, matchesFound, functionName, partialMatchArgument));
-                throw new AssertionError(errorString);
+                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
             }
         }
 
         if (matchesFound > 0) {
-            return;
+            return Map.of("ok", Map.of());
         }
 
         var errorString = new StringBuilder("""
@@ -190,10 +267,10 @@ class InternalMockServer {
                 errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
         }
-        throw new AssertionError(errorString);
+        return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
     }
 
-    static void verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
+    static Map<String, Object> verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
         for (var invocation : invocations) {
@@ -206,18 +283,36 @@ class InternalMockServer {
         }
 
         if (verificationTimes instanceof ExactNumberOfTimes e) {
-            if (e.times != matchesFound) {
+            if (matchesFound != e.times) {
                 var errorString = new StringBuilder("""
-                        Wanted exactly %d exact matches, but found %d.
+                        Wanted exactly %d matches, but found %d.
                         Query:
                         %s(%s)
                         """.formatted(e.times, matchesFound, functionName, exactMatchFunctionArgument));
-                throw new AssertionError(errorString);
+                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+            }
+        } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
+            if (matchesFound >= a.times) {
+                var errorString = new StringBuilder("""
+                        Wanted at most %d matches, but found %d.
+                        Query:
+                        %s(%s)
+                        """.formatted(a.times, matchesFound, functionName, exactMatchFunctionArgument));
+                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+            }
+        } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
+            if (matchesFound <= a.times) {
+                var errorString = new StringBuilder("""
+                        Wanted at least %d matches, but found %d.
+                        Query:
+                        %s(%s)
+                        """.formatted(a.times, matchesFound, functionName, exactMatchFunctionArgument));
+                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
             }
         }
 
         if (matchesFound > 0) {
-            return;
+            return Map.of("ok", Map.of());
         }
 
         var errorString = new StringBuilder("""
@@ -235,10 +330,10 @@ class InternalMockServer {
                 errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
         }
-        throw new AssertionError(errorString);
+        return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
     }
 
-    static void verifyNoMoreInteractions(List<Invocation> invocations) {
+    static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
         var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
 
         if (invocationsNotVerified.size() > 0) {
@@ -249,7 +344,9 @@ class InternalMockServer {
             for (var invocation : invocationsNotVerified) {
                 errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
-            throw new AssertionError(errorString);
+            return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
         }
+
+        return Map.of("ok", Map.of());
     }
 }

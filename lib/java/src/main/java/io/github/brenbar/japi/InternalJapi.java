@@ -64,7 +64,7 @@ class InternalJApi {
             "                                                                   "
           ]
         ],
-        "mixin._Validation": [
+        "trait._Validated": [
           {},
           "->",
           {

@@ -349,21 +349,6 @@ class ValidationErrorReasons {
     public static final String UNKNOWN_RESULT_ENUM_VALUE = "UnknownResultEnumField";
 }
 
-class Mock {
-    final String whenFunctionName;
-    final Map<String, Object> whenFunctionArgument;
-    final boolean exactMatchArgument;
-    final Function<Map<String, Object>, Map<String, Object>> thenAnswerResult;
-
-    public Mock(String whenFunctionName, Map<String, Object> whenFunctionArgument, boolean exactMatchArgument,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerResult) {
-        this.whenFunctionName = whenFunctionName;
-        this.whenFunctionArgument = whenFunctionArgument;
-        this.exactMatchArgument = exactMatchArgument;
-        this.thenAnswerResult = thenAnswerResult;
-    }
-}
-
 class Invocation {
     final String functionName;
     final Map<String, Object> functionArgument;

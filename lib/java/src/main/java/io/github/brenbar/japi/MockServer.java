@@ -3,9 +3,7 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
-import java.util.function.Function;
 
 /**
  * A Mock instance of a jAPI server.
@@ -18,33 +16,8 @@ public class MockServer {
     public final Server processor;
     private final Random random;
 
-    private final List<Mock> mocks = new ArrayList<>();
+    private final List<MockStub> stubs = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
-
-    /**
-     * Applies a criteria to the number of times a verification should be matched.
-     */
-    public interface VerificationTimes {
-
-    }
-
-    /**
-     * Allows any number of matches for a verification query.
-     */
-    public static class UnlimitedNumberOfTimes implements VerificationTimes {
-
-    }
-
-    /**
-     * Allows only the given number of matches for a verification query.
-     */
-    public static class ExactNumberOfTimes implements VerificationTimes {
-        public final int times;
-
-        public ExactNumberOfTimes(int times) {
-            this.times = times;
-        }
-    }
 
     /**
      * Create a mock server with the given jAPI Schema.
@@ -52,7 +25,10 @@ public class MockServer {
      * @param jApiSchemaAsJson
      */
     public MockServer(String jApiSchemaAsJson) {
-        this.processor = new Server(jApiSchemaAsJson, this::handle);
+        var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
+                jApiSchemaAsJson,
+                InternalMockJApi.JSON));
+        this.processor = new Server(combinedSchemaJson, this::handle);
         this.random = new Random();
     }
 
@@ -78,105 +54,142 @@ public class MockServer {
     }
 
     private Map<String, Object> handle(Context context, Map<String, Object> argument) {
-        return InternalMockServer.handle(context, argument, this.processor.jApiSchema, this.random, this.mocks,
-                this.invocations);
+        context.requestHeaders.put("_mockJApiSchema", this.processor.jApiSchema);
+        context.requestHeaders.put("_mockRandom", this.random);
+        context.requestHeaders.put("_mockStubs", this.stubs);
+        context.requestHeaders.put("_mockInvocations", this.invocations);
+        return InternalMockServer.handle(context, argument);
     }
 
     /**
-     * Create a mock condition when the given function name matches and the given
-     * argument partially matches.
+     * Create a function stub that will cause matching function calls to return the
+     * result defined in the stub.
      * 
-     * @param whenFunctionName
-     * @param whenPartialMatchArgument
-     * @param thenAnswerResult
+     * @param stub
      */
-    public void mockPartial(String whenFunctionName, Map<String, Object> whenPartialMatchArgument,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerResult) {
-        mocks.add(0, new Mock(whenFunctionName, whenPartialMatchArgument, false, thenAnswerResult));
+    public void createStub(MockStub stub) {
+        var requestMessage = List.of(
+                "fn._createStub",
+                Map.of(),
+                Map.ofEntries(
+                        Map.entry("whenFunctionName", stub.whenFunctionName),
+                        Map.entry("whenArgument", stub.whenArgument),
+                        Map.entry("thenResult", stub.thenResult),
+                        Map.entry("allowArgumentPartialMatch", stub.allowArgumentPartialMatch),
+                        Map.entry("generateMissingResultFields", stub.generateMissingResultFields)));
+        var requestMessageJson = this.processor.serializer.serialize(requestMessage);
+        this.process(requestMessageJson);
     }
 
     /**
-     * Create a mock condition when the given function name matches and the given
-     * argument exactly matches.
+     * Verify an interaction occurred that matches the given verification criteria.
      * 
-     * @param whenFunctionName
-     * @param whenExactMatchArgument
-     * @param thenAnswerResult
+     * @param verification
      */
-    public void mockExact(String whenFunctionName, Map<String, Object> whenExactMatchArgument,
-            Function<Map<String, Object>, Map<String, Object>> thenAnswerResult) {
-        mocks.add(0, new Mock(whenFunctionName, whenExactMatchArgument, true, thenAnswerResult));
+    public void verify(MockVerification verification) {
+        Map<String, Object> verificationTimes;
+        if (verification.verificationTimes instanceof MockVerification.UnlimitedNumberOfTimes u) {
+            verificationTimes = Map.of("unlimited", Map.of());
+        } else if (verification.verificationTimes instanceof MockVerification.ExactNumberOfTimes e) {
+            verificationTimes = Map.of("exact", Map.of("times", e.times));
+        } else if (verification.verificationTimes instanceof MockVerification.AtMostNumberOfTimes e) {
+            verificationTimes = Map.of("atMost", Map.of("times", e.times));
+        } else if (verification.verificationTimes instanceof MockVerification.AtLeastNumberOfTimes e) {
+            verificationTimes = Map.of("atLeast", Map.of("times", e.times));
+        } else {
+            throw new JApiProcessError("Could not process verification times: %s"
+                    .formatted(verification.verificationTimes.getClass().getName()));
+        }
+
+        var request = List.of(
+                "fn._verify",
+                Map.of(),
+                Map.ofEntries(
+                        Map.entry("verifyFunctionName", verification.functionName),
+                        Map.entry("verifyArgument", verification.argument),
+                        Map.entry("allowArgumentPartialMatch", verification.allowArgumentPartialMatch),
+                        Map.entry("verificationTimes", verificationTimes)));
+
+        var requestJson = this.processor.serializer.serialize(request);
+        var responseJson = this.process(requestJson);
+        var response = this.processor.serializer.deserialize(responseJson);
+        var result = (Map<String, Object>) response.get(2);
+        var err = (Map<String, Object>) result.get("err");
+        if (err != null) {
+            var errEntry = err.entrySet().stream().findAny().get();
+
+            switch (errEntry.getKey()) {
+                case "verificationFailure" -> {
+                    var verificationFailureStruct = (Map<String, Object>) errEntry.getValue();
+                    var details = verificationFailureStruct.get("details");
+                    throw new AssertionError(details);
+                }
+            }
+            throw new JApiProcessError("Could not process result: %s".formatted(result));
+        }
     }
 
     /**
-     * Verify an interaction occurred that both matches the given function name and
-     * partially matches the given argument.
-     * 
-     * @param functionName
-     * @param partialMatchArgument
-     */
-    public void verifyPartial(String functionName, Map<String, Object> partialMatchArgument) {
-        verifyPartial(functionName, partialMatchArgument, new UnlimitedNumberOfTimes());
-    }
-
-    /**
-     * Verify an interaction occurred the given number of times that both matches
-     * the given function name and partially matches the given argument.
-     * 
-     * @param functionName
-     * @param partialMatchArgument
-     * @param verificationTimes
-     */
-    public void verifyPartial(String functionName, Map<String, Object> partialMatchArgument,
-            VerificationTimes verificationTimes) {
-        InternalMockServer.verifyPartial(functionName, partialMatchArgument, verificationTimes, this.invocations);
-    }
-
-    /**
-     * Verify an interaction occurred that both matches the given function name and
-     * exactly matches the given argument.
-     * 
-     * @param functionName
-     * @param exactMatchArgument
-     */
-    public void verifyExact(String functionName, Map<String, Object> exactMatchArgument) {
-        verifyExact(functionName, exactMatchArgument, new UnlimitedNumberOfTimes());
-    }
-
-    /**
-     * Verify an interaction occurred the given number of times that both matches
-     * the given function name and exactly matches the given argument.
-     * 
-     * @param functionName
-     * @param exactMatchFunctionArgument
-     * @param verificationTimes
-     */
-    public void verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
-            VerificationTimes verificationTimes) {
-        InternalMockServer.verifyExact(functionName, exactMatchFunctionArgument, verificationTimes, this.invocations);
-    }
-
-    /**
-     * Verify no more interactions occurred with this mock.
-     * 
-     * (This function implies that no interactions occurred or that all interactions
-     * up to this point have already been verified.)
+     * Verify that no interactions have occurred with this mock or that all
+     * interactions have been verified.
      */
     public void verifyNoMoreInteractions() {
-        InternalMockServer.verifyNoMoreInteractions(this.invocations);
+        var request = List.of(
+                "fn._verifyNoMoreInteractions",
+                Map.of(),
+                Map.of());
+        var requestJson = this.processor.serializer.serialize(request);
+        var responseJson = this.process(requestJson);
+        var response = this.processor.serializer.deserialize(responseJson);
+        var result = (Map<String, Object>) response.get(2);
+        var err = (Map<String, Object>) result.get("err");
+        if (err != null) {
+            var errEntry = err.entrySet().stream().findAny().get();
+
+            switch (errEntry.getKey()) {
+                case "verificationFailure" -> {
+                    var verificationFailureStruct = (Map<String, Object>) errEntry.getValue();
+                    var details = verificationFailureStruct.get("details");
+                    throw new AssertionError(details);
+                }
+            }
+            throw new JApiProcessError("Could not process result: %s".formatted(result));
+        }
     }
 
     /**
      * Clear all interaction data.
      */
     public void clearInvocations() {
-        this.invocations.clear();
+        var request = List.of(
+                "fn._clearInvocations",
+                Map.of(),
+                Map.of());
+        var requestJson = this.processor.serializer.serialize(request);
+        var responseJson = this.process(requestJson);
+        var response = this.processor.serializer.deserialize(responseJson);
+        var result = (Map<String, Object>) response.get(2);
+        var err = (Map<String, Object>) result.get("err");
+        if (err != null) {
+            throw new JApiProcessError("Could not process result: %s".formatted(result));
+        }
     }
 
     /**
-     * Clear all mock conditions.
+     * Clear all stub conditions.
      */
-    public void clearMocks() {
-        this.mocks.clear();
+    public void clearStubs() {
+        var request = List.of(
+                "fn._clearStubs",
+                Map.of(),
+                Map.of());
+        var requestJson = this.processor.serializer.serialize(request);
+        var responseJson = this.process(requestJson);
+        var response = this.processor.serializer.deserialize(responseJson);
+        var result = (Map<String, Object>) response.get(2);
+        var err = (Map<String, Object>) result.get("err");
+        if (err != null) {
+            throw new JApiProcessError("Could not process result: %s".formatted(result));
+        }
     }
 }

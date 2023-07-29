@@ -1,75 +1,68 @@
 package io.github.brenbar.japi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 class InternalParse {
 
     static JApiSchema newJApiSchemaWithInternalSchema(String jApiSchemaAsJson) {
-        var schema = newJApiSchema(jApiSchemaAsJson);
-        var internalSchema = newJApiSchema(InternalJApi.JSON);
+        var combinedSchemaJson = combineJsonSchemas(List.of(
+                jApiSchemaAsJson,
+                InternalJApi.JSON));
+        var schema = newJApiSchema(combinedSchemaJson);
 
-        schema.original.putAll(internalSchema.original);
-        schema.parsed.putAll(internalSchema.parsed);
+        return schema;
+    }
 
-        var mixins = new ArrayList<FunctionDefinition>();
-        for (var def : schema.parsed.entrySet()) {
-            if (def.getValue() instanceof FunctionDefinition f && def.getKey().startsWith("mixin.")) {
-                mixins.add(f);
+    static String combineJsonSchemas(List<String> jsonSchemas) {
+        var objectMapper = new ObjectMapper();
+        var finalJsonObject = new HashMap<String, Object>();
+
+        try {
+            var pseudoJsonSchemas = new ArrayList<Map<String, Object>>();
+            for (var jsonSchema : jsonSchemas) {
+                var pseudoJsonSchema = objectMapper.readValue(jsonSchema, new TypeReference<Map<String, Object>>() {
+                });
+                pseudoJsonSchemas.add(pseudoJsonSchema);
             }
-        }
 
-        // Apply mixin to all functions
-        for (var mixinDefinition : mixins) {
-
-            for (var parsedDefinition : schema.parsed.entrySet()) {
-                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
-                    for (var mixinArgumentField : mixinDefinition.argumentStruct.fields.entrySet()) {
-                        var newKey = mixinArgumentField.getKey();
-                        if (f.argumentStruct.fields.containsKey(newKey)) {
-                            throw new JApiSchemaParseError(
-                                    "Mixin argument field already in use: %s".formatted(newKey));
-                        }
-                        f.argumentStruct.fields.put(newKey, mixinArgumentField.getValue());
-                    }
-
-                    var mixinOkStruct = (Struct) mixinDefinition.resultEnum.values.get("ok");
-                    var okStruct = (Struct) f.resultEnum.values.get("ok");
-                    for (var mixinOkStructEntry : mixinOkStruct.fields.entrySet()) {
-                        var newKey = mixinOkStructEntry.getKey();
-                        if (okStruct.fields.containsKey(newKey)) {
-                            throw new JApiSchemaParseError(
-                                    "Mixin ok struct field already in use: %s".formatted(newKey));
-                        }
-
-                        okStruct.fields.put(newKey, mixinOkStructEntry.getValue());
-                    }
-
-                    var mixinErrEnum = (Map<String, Struct>) mixinDefinition.resultEnum.values
-                            .get("err");
-                    var errEnum = (Map<String, Struct>) f.resultEnum.values.get("err");
-                    for (var mixinErrStructEntry : mixinErrEnum.entrySet()) {
-                        var newEnumValue = mixinErrStructEntry.getKey();
-                        if (errEnum.containsKey(newEnumValue)) {
-                            throw new JApiSchemaParseError(
-                                    "Mixin err enum value (%s) already in use for (%s)".formatted(newEnumValue,
-                                            f.name));
-                        }
-
-                        errEnum.put(newEnumValue, mixinErrStructEntry.getValue());
+            var jsonSchemaKeys = new HashSet<String>();
+            var duplicatedJsonSchemaKeys = new HashSet<String>();
+            for (var pseudoJsonSchema : pseudoJsonSchemas) {
+                var keys = pseudoJsonSchema.keySet();
+                for (var key : keys) {
+                    if (jsonSchemaKeys.contains(key)) {
+                        duplicatedJsonSchemaKeys.add(key);
+                    } else {
+                        jsonSchemaKeys.add(key);
                     }
                 }
             }
-        }
 
-        return schema;
+            if (!duplicatedJsonSchemaKeys.isEmpty()) {
+                var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
+                throw new JApiSchemaParseError(
+                        "Cannot combine schemas due to duplicate keys: %s".formatted(sortedKeys));
+            }
+
+            for (var pseudoJsonSchema : pseudoJsonSchemas) {
+                finalJsonObject.putAll(pseudoJsonSchema);
+            }
+
+            return objectMapper.writeValueAsString(finalJsonObject);
+        } catch (JsonProcessingException e) {
+            throw new JApiSchemaParseError("Could not combine schemas", e);
+        }
     }
 
     private static JApiSchema newJApiSchema(String jApiSchemaAsJson) {
@@ -92,6 +85,63 @@ class InternalParse {
             throw new JApiSchemaParseError("Document root must be an object", e);
         }
 
+        var traits = new ArrayList<FunctionDefinition>();
+        for (var def : parsedDefinitions.entrySet()) {
+            if (def.getValue() instanceof FunctionDefinition f && def.getKey().startsWith("trait.")) {
+                traits.add(f);
+            }
+        }
+
+        // Apply trait to all functions
+        for (var traitDefinition : traits) {
+
+            for (var parsedDefinition : parsedDefinitions.entrySet()) {
+                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
+                    if (f.name.startsWith("fn._")) {
+                        // Only internal traits can change internal functions
+                        if (!traitDefinition.name.startsWith("trait._")) {
+                            continue;
+                        }
+                    }
+
+                    for (var traitArgumentField : traitDefinition.argumentStruct.fields.entrySet()) {
+                        var newKey = traitArgumentField.getKey();
+                        if (f.argumentStruct.fields.containsKey(newKey)) {
+                            throw new JApiSchemaParseError(
+                                    "Trait argument field already in use: %s".formatted(newKey));
+                        }
+                        f.argumentStruct.fields.put(newKey, traitArgumentField.getValue());
+                    }
+
+                    var traitOkStruct = (Struct) traitDefinition.resultEnum.values.get("ok");
+                    var okStruct = (Struct) f.resultEnum.values.get("ok");
+                    for (var traitOkStructEntry : traitOkStruct.fields.entrySet()) {
+                        var newKey = traitOkStructEntry.getKey();
+                        if (okStruct.fields.containsKey(newKey)) {
+                            throw new JApiSchemaParseError(
+                                    "Trait ok struct field already in use: %s".formatted(newKey));
+                        }
+
+                        okStruct.fields.put(newKey, traitOkStructEntry.getValue());
+                    }
+
+                    var traitErrEnum = (Map<String, Struct>) traitDefinition.resultEnum.values
+                            .get("err");
+                    var errEnum = (Map<String, Struct>) f.resultEnum.values.get("err");
+                    for (var traitErrStructEntry : traitErrEnum.entrySet()) {
+                        var newEnumValue = traitErrStructEntry.getKey();
+                        if (errEnum.containsKey(newEnumValue)) {
+                            throw new JApiSchemaParseError(
+                                    "Trait err enum value (%s) already in use for (%s)".formatted(newEnumValue,
+                                            f.name));
+                        }
+
+                        errEnum.put(newEnumValue, traitErrStructEntry.getValue());
+                    }
+                }
+            }
+        }
+
         return new JApiSchema((Map<String, Object>) (Object) japiSchemaAsParsedJson, parsedDefinitions);
     }
 
@@ -102,7 +152,7 @@ class InternalParse {
             throw new JApiSchemaParseError("Could not find definition for %s".formatted(definitionKey));
         }
 
-        var regex = Pattern.compile("^(struct|enum|fn|mixin|info).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
+        var regex = Pattern.compile("^(struct|enum|fn|trait|info).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
         var matcher = regex.matcher(definitionKey);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Invalid type definition name: %s".formatted(definitionKey));
@@ -113,7 +163,7 @@ class InternalParse {
             case "fn" ->
                 parseFunctionDefinition(definitionWithDocAsParsedJson, definitionKey, jApiSchemaAsParsedJson,
                         parsedDefinitions);
-            case "mixin" ->
+            case "trait" ->
                 parseFunctionDefinition(definitionWithDocAsParsedJson, definitionKey, jApiSchemaAsParsedJson,
                         parsedDefinitions);
             case "struct" ->
@@ -284,7 +334,7 @@ class InternalParse {
     private static FieldNameAndFieldDeclaration parseField(
             String fieldDeclaration,
             Object typeDeclarationValue,
-            boolean isForUnion,
+            boolean isForEnum,
             Map<String, List<Object>> jApiSchemaAsParsedJson,
             Map<String, Definition> parsedDefinitions) {
         var regex = Pattern.compile("^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$");
@@ -299,11 +349,12 @@ class InternalParse {
         try {
             typeDeclarationString = (String) typeDeclarationValue;
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError("Type declarations should be strings");
+            throw new JApiSchemaParseError(
+                    "Type declarations should be strings: %s %s".formatted(fieldDeclaration, typeDeclarationValue));
         }
 
-        if (optional && isForUnion) {
-            throw new JApiSchemaParseError("Union keys cannot be marked as optional");
+        if (optional && isForEnum) {
+            throw new JApiSchemaParseError("Enum keys cannot be marked as optional");
         }
 
         var typeDeclaration = parseType(typeDeclarationString, jApiSchemaAsParsedJson, parsedDefinitions);
