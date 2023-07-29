@@ -130,6 +130,12 @@ class InternalParse {
                     var errEnum = (Map<String, Struct>) f.resultEnum.values.get("err");
                     for (var traitErrStructEntry : traitErrEnum.entrySet()) {
                         var newEnumValue = traitErrStructEntry.getKey();
+
+                        // We can skip the _unknown error as it's already required
+                        if ("_unknown".equals(newEnumValue)) {
+                            continue;
+                        }
+
                         if (errEnum.containsKey(newEnumValue)) {
                             throw new JApiSchemaParseError(
                                     "Trait err enum value (%s) already in use for (%s)".formatted(newEnumValue,

@@ -23,18 +23,19 @@ public class MockTests {
                 processor.resetRandomSeed(0L);
                 var client = new Client((m, s) -> {
                         return CompletableFuture.supplyAsync(() -> s.deserialize(processor.process(s.serialize(m))));
-                });
+                })
+                                .setTimeoutMsDefault(600000);
 
-                client.submit(new Request("saveVariables", Map.of("variables", Map.of("a", 10))));
+                client.submit(new Request("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
 
-                var result = client.submit(new Request("compute",
+                var result = client.submit(new Request("fn.compute",
                                 Map.ofEntries(
-                                                Map.entry("x", Map.of("variable", Map.of("value", "a"))),
+                                                Map.entry("x", Map.of("variable", Map.of("name", "a"))),
                                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
                                                 Map.entry("op", Map.of("add", Map.of())))));
 
                 // This is the value per the given random seed
-                assertEquals(0.730967787376657, result.get("result"));
+                assertEquals(Map.of("ok", Map.of("result", 0.24053641567148587)), result);
         }
 
         @Test
@@ -54,17 +55,17 @@ public class MockTests {
                                                 Map.of("value", "a"))),
                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
                                 Map.entry("op", Map.of("add", Map.of()))),
-                                Map.of("result", 5)));
+                                Map.of("ok", Map.of("result", 5))));
 
-                client.submit(new Request("saveVariables", Map.of("variables", Map.of("a", 10))));
+                client.submit(new Request("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
 
-                var result = client.submit(new Request("compute",
+                var result = client.submit(new Request("fn.compute",
                                 Map.ofEntries(
-                                                Map.entry("x", Map.of("variable", Map.of("value", "a"))),
+                                                Map.entry("x", Map.of("variable", Map.of("name", "a"))),
                                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
                                                 Map.entry("op", Map.of("add", Map.of())))));
 
-                assertEquals(5, result.get("result"));
+                assertEquals(Map.of("ok", Map.of("result", 5)), result);
 
                 client.submit(new Request("exportVariables", Map.of()));
                 client.submit(new Request("exportVariables", Map.of()));

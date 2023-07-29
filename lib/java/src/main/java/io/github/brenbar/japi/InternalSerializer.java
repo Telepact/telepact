@@ -55,8 +55,14 @@ class InternalSerializer {
     static byte[] serialize(List<Object> message, BinaryEncodingStrategy binaryEncodingStrategy,
             SerializationStrategy serializationStrategy) {
         var headers = (Map<String, Object>) message.get(1);
-        var serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
-        var forceSendJson = Objects.equals(true, headers.remove("_serializeAsJson"));
+        boolean serializeAsBinary = false;
+        if (headers.containsKey("_serializeAsBinary")) {
+            serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
+        }
+        boolean forceSendJson = false;
+        if (headers.containsKey("_serializeAsJson")) {
+            forceSendJson = Objects.equals(true, headers.remove("_serializeAsJson"));
+        }
         if (serializeAsBinary && !forceSendJson) {
             try {
                 var encodedMessage = binaryEncodingStrategy.encode(message);

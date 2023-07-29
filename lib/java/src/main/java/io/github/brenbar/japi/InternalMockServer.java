@@ -75,7 +75,7 @@ class InternalMockServer {
                 for (var stub : stubs) {
                     if (Objects.equals(stub.whenFunctionName, context.functionName)) {
                         if (stub.allowArgumentPartialMatch) {
-                            if (isSubMap(stub.whenArgument, argument)) {
+                            if (isSubMap(argument, stub.whenArgument)) {
                                 return stub.thenResult;
                             }
                         } else {
@@ -86,7 +86,7 @@ class InternalMockServer {
                     }
                 }
 
-                var definition = jApiSchema.parsed.get("fn.%s".formatted(context.functionName));
+                var definition = jApiSchema.parsed.get(context.functionName);
 
                 if (definition instanceof FunctionDefinition f) {
                     return constructRandomEnum(f.resultEnum.values, random);
@@ -215,13 +215,11 @@ class InternalMockServer {
 
         if (enumData instanceof Map<?, ?> m) {
             return Map.of(enumValue, constructRandomEnum((Map<String, Object>) m, random));
-        } else {
-            var structReference = new HashMap<String, FieldDeclaration>();
-            for (var entry : enumValuesReference.entrySet()) {
-                structReference.put(entry.getKey(), (FieldDeclaration) entry.getValue());
-            }
+        } else if (enumData instanceof Struct s) {
             return Map.of(enumValue,
-                    constructRandomStruct(structReference, random));
+                    constructRandomStruct(s.fields, random));
+        } else {
+            throw new JApiProcessError("Unexpected enum data type");
         }
     }
 

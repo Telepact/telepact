@@ -10,12 +10,7 @@
   "enum.Value": [
     {
       "constant": {
-        "num": {
-          "value": "number"
-        },
-        "int": {
-          "value": "integer"
-        }
+        "value": "number"
       },
       "variable": {
         "name": "string"
