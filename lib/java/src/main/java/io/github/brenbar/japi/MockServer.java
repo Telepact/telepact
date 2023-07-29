@@ -78,7 +78,13 @@ public class MockServer {
                         Map.entry("allowArgumentPartialMatch", stub.allowArgumentPartialMatch),
                         Map.entry("generateMissingResultFields", stub.generateMissingResultFields)));
         var requestMessageJson = this.processor.serializer.serialize(requestMessage);
-        this.process(requestMessageJson);
+        var responseJson = this.process(requestMessageJson);
+        var response = this.processor.serializer.deserialize(responseJson);
+        var result = (Map<String, Object>) response.get(2);
+        var err = (Map<String, Object>) result.get("err");
+        if (err != null) {
+            throw new JApiProcessError(String.valueOf(result));
+        }
     }
 
     /**
@@ -107,8 +113,8 @@ public class MockServer {
                 Map.ofEntries(
                         Map.entry("verifyFunctionName", verification.functionName),
                         Map.entry("verifyArgument", verification.argument),
-                        Map.entry("allowArgumentPartialMatch", verification.allowArgumentPartialMatch),
-                        Map.entry("verificationTimes", verificationTimes)));
+                        Map.entry("verifyTimes", verificationTimes),
+                        Map.entry("allowArgumentPartialMatch", verification.allowArgumentPartialMatch)));
 
         var requestJson = this.processor.serializer.serialize(request);
         var responseJson = this.process(requestJson);
@@ -119,13 +125,13 @@ public class MockServer {
             var errEntry = err.entrySet().stream().findAny().get();
 
             switch (errEntry.getKey()) {
-                case "verificationFailure" -> {
+                case "_verificationFailure" -> {
                     var verificationFailureStruct = (Map<String, Object>) errEntry.getValue();
                     var details = verificationFailureStruct.get("details");
                     throw new AssertionError(details);
                 }
             }
-            throw new JApiProcessError("Could not process result: %s".formatted(result));
+            throw new JApiProcessError(String.valueOf(result));
         }
     }
 
@@ -147,13 +153,13 @@ public class MockServer {
             var errEntry = err.entrySet().stream().findAny().get();
 
             switch (errEntry.getKey()) {
-                case "verificationFailure" -> {
+                case "_verificationFailure" -> {
                     var verificationFailureStruct = (Map<String, Object>) errEntry.getValue();
                     var details = verificationFailureStruct.get("details");
                     throw new AssertionError(details);
                 }
             }
-            throw new JApiProcessError("Could not process result: %s".formatted(result));
+            throw new JApiProcessError(String.valueOf(result));
         }
     }
 
@@ -171,7 +177,7 @@ public class MockServer {
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {
-            throw new JApiProcessError("Could not process result: %s".formatted(result));
+            throw new JApiProcessError(String.valueOf(result));
         }
     }
 
@@ -189,7 +195,7 @@ public class MockServer {
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {
-            throw new JApiProcessError("Could not process result: %s".formatted(result));
+            throw new JApiProcessError(String.valueOf(result));
         }
     }
 }

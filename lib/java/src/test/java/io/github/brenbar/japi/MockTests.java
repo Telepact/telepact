@@ -48,11 +48,12 @@ public class MockTests {
                 mock.resetRandomSeed(0L);
                 var client = new Client((m, s) -> {
                         return CompletableFuture.supplyAsync(() -> s.deserialize(mock.process(s.serialize(m))));
-                });
+                })
+                                .setTimeoutMsDefault(600000);
 
                 mock.createStub(new MockStub("fn.compute", Map.ofEntries(
                                 Map.entry("x", Map.of("variable",
-                                                Map.of("value", "a"))),
+                                                Map.of("name", "a"))),
                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
                                 Map.entry("op", Map.of("add", Map.of()))),
                                 Map.of("ok", Map.of("result", 5))));
@@ -67,9 +68,9 @@ public class MockTests {
 
                 assertEquals(Map.of("ok", Map.of("result", 5)), result);
 
-                client.submit(new Request("exportVariables", Map.of()));
-                client.submit(new Request("exportVariables", Map.of()));
-                client.submit(new Request("exportVariables", Map.of()));
+                client.submit(new Request("fn.exportVariables", Map.of()));
+                client.submit(new Request("fn.exportVariables", Map.of()));
+                client.submit(new Request("fn.exportVariables", Map.of()));
 
                 var e1 = assertThrows(
                                 AssertionError.class,
@@ -78,9 +79,9 @@ public class MockTests {
                 assertEquals("""
                                 No matching invocations.
                                 Wanted exact match:
-                                saveVariables({variables={b=10}})
+                                fn.saveVariables({variables={b=10}})
                                 Available:
-                                saveVariables({variables={a=10}})
+                                fn.saveVariables({variables={a=10}})
                                 """, e1.getMessage());
                 var e2 = assertThrows(
                                 AssertionError.class,
@@ -89,9 +90,9 @@ public class MockTests {
                 assertEquals("""
                                 No matching invocations.
                                 Wanted exact match:
-                                saveVariables({variables={a=0}})
+                                fn.saveVariables({variables={a=0}})
                                 Available:
-                                saveVariables({variables={a=10}})
+                                fn.saveVariables({variables={a=10}})
                                 """, e2.getMessage());
 
                 mock.verify(new MockVerification("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
@@ -99,37 +100,43 @@ public class MockTests {
                 var e3 = assertThrows(
                                 AssertionError.class,
                                 () -> mock.verify(new MockVerification("fn.compute",
-                                                Map.of("x", Map.of("variable", Map.of("value", "b"))))));
+                                                Map.of("x", Map.of("variable", Map.of("name", "b"))))
+                                                .setAllowArgumentPartialMatch(true)));
                 assertEquals("""
                                 No matching invocations.
                                 Wanted partial match:
-                                compute({x={variable={value=b}}})
+                                fn.compute({x={variable={name=b}}})
                                 Available:
-                                compute({x={variable={value=a}}, y={constant={value=2}}, op={add={}}})
+                                fn.compute({op={add={}}, x={variable={name=a}}, y={constant={value=2}}})
                                 """, e3.getMessage());
                 var e4 = assertThrows(
                                 AssertionError.class,
-                                () -> mock.verify(new MockVerification("compute",
-                                                Map.of("x", Map.of("variable", Map.of("val", "a"))))));
+                                () -> mock.verify(new MockVerification("fn.compute",
+                                                Map.of("x", Map.of("variable", Map.of("namo", "a"))))
+                                                .setAllowArgumentPartialMatch(true)));
                 assertEquals("""
                                 No matching invocations.
                                 Wanted partial match:
-                                compute({x={variable={val=a}}})
+                                fn.compute({x={variable={namo=a}}})
                                 Available:
-                                compute({x={variable={value=a}}, y={constant={value=2}}, op={add={}}})
+                                fn.compute({op={add={}}, x={variable={name=a}}, y={constant={value=2}}})
                                 """, e4.getMessage());
 
-                mock.verify(new MockVerification("fn.compute", Map.of("x", Map.of("variable", Map.of("value", "a")))));
+                mock.verify(new MockVerification("fn.compute", Map.of("x", Map.of("variable", Map.of("name", "a"))))
+                                .setAllowArgumentPartialMatch(true));
 
                 var e5 = assertThrows(
                                 AssertionError.class,
                                 () -> mock.verify(
-                                                new MockVerification("exportVariables", Map.of()).setVerificationTimes(
-                                                                new MockVerification.ExactNumberOfTimes(2))));
+                                                new MockVerification("fn.exportVariables", Map.of())
+                                                                .setVerificationTimes(
+                                                                                new MockVerification.ExactNumberOfTimes(
+                                                                                                2))
+                                                                .setAllowArgumentPartialMatch(true)));
                 assertEquals("""
                                 Wanted exactly 2 partial matches, but found 3.
                                 Query:
-                                exportVariables({})
+                                fn.exportVariables({})
                                 """, e5.getMessage());
 
                 mock.verify(new MockVerification("fn.exportVariables", Map.of())

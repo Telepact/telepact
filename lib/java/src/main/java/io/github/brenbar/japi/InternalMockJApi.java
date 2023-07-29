@@ -8,9 +8,9 @@ class InternalMockJApi {
           {
             "whenFunctionName": "string",
             "whenArgument": "object<any>",
-            "allowArgumentPartialMatch!": "boolean",
             "thenResult": "object<any>",
-            "randomFillMissingResultFields!": "boolean"
+            "allowArgumentPartialMatch!": "boolean",
+            "generateMissingResultFields!": "boolean"
           },
           "->",
           {
@@ -49,8 +49,8 @@ class InternalMockJApi {
           {
             "verifyFunctionName": "string",
             "verifyArgument": "object<any>",
-            "allowArgumentPartialMatch": "boolean",
-            "verificationTimes": "enum._VerificationTimes"
+            "verifyTimes!": "enum._VerificationTimes",
+            "allowArgumentPartialMatch!": "boolean"
           },
           "->",
           {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.TreeMap;
 
 import io.github.brenbar.japi.MockVerification.AtLeastNumberOfTimes;
 import io.github.brenbar.japi.MockVerification.AtMostNumberOfTimes;
@@ -30,10 +31,11 @@ class InternalMockServer {
                 var whenArgument = (Map<String, Object>) argument.get("whenArgument");
                 var thenResult = (Map<String, Object>) argument
                         .get("thenResult");
-                var allowArgumentPartialMatch = (Boolean) argument.get("allowArgumentPartialMatch");
-                var randomFillMissingResultFields = (Boolean) argument.get("randomFillMissingResultFields");
+                var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("allowArgumentPartialMatch", false);
+                var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
+                        false);
 
-                var stub = new MockStub(whenFunctionName, whenArgument, thenResult);
+                var stub = new MockStub(whenFunctionName, new TreeMap<>(whenArgument), thenResult);
                 if (allowArgumentPartialMatch) {
                     stub.setAllowArgumentPartialMatch(allowArgumentPartialMatch);
                 }
@@ -42,13 +44,14 @@ class InternalMockServer {
                 }
 
                 stubs.add(stub);
-                return Map.of();
+                return Map.of("ok", Map.of());
             }
             case "fn._verify" -> {
                 var verifyFunctionName = (String) argument.get("verifyFunctionName");
                 var verifyArgument = (Map<String, Object>) argument.get("verifyArgument");
-                var verifyTimes = (Map<String, Object>) argument.get("verifyTimes");
-                var allowArgumentPartialMatch = (Boolean) argument.get("allowArgumentPartialMatch");
+                var verifyTimes = (Map<String, Object>) argument.getOrDefault("verifyTimes",
+                        Map.of("unliminted", Map.of()));
+                var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("allowArgumentPartialMatch", false);
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
 
@@ -70,12 +73,12 @@ class InternalMockServer {
                 return Map.of("ok", Map.of());
             }
             default -> {
-                invocations.add(new Invocation(context.functionName, argument));
+                invocations.add(new Invocation(context.functionName, new TreeMap<>(argument)));
 
                 for (var stub : stubs) {
                     if (Objects.equals(stub.whenFunctionName, context.functionName)) {
                         if (stub.allowArgumentPartialMatch) {
-                            if (isSubMap(argument, stub.whenArgument)) {
+                            if (isSubMap(stub.whenArgument, argument)) {
                                 return stub.thenResult;
                             }
                         } else {
@@ -237,12 +240,12 @@ class InternalMockServer {
 
         if (verificationTimes instanceof ExactNumberOfTimes e) {
             if (e.times != matchesFound) {
-                var errorString = new StringBuilder("""
+                var errorString = """
                         Wanted exactly %d partial matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, partialMatchArgument));
-                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+                        """.formatted(e.times, matchesFound, functionName, partialMatchArgument);
+                return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
             }
         }
 
@@ -265,7 +268,7 @@ class InternalMockServer {
                 errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
         }
-        return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+        return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
     }
 
     static Map<String, Object> verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
@@ -282,30 +285,30 @@ class InternalMockServer {
 
         if (verificationTimes instanceof ExactNumberOfTimes e) {
             if (matchesFound != e.times) {
-                var errorString = new StringBuilder("""
+                var errorString = """
                         Wanted exactly %d matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionArgument));
-                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+                        """.formatted(e.times, matchesFound, functionName, exactMatchFunctionArgument);
+                return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
             }
         } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
             if (matchesFound >= a.times) {
-                var errorString = new StringBuilder("""
+                var errorString = """
                         Wanted at most %d matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(a.times, matchesFound, functionName, exactMatchFunctionArgument));
-                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+                        """.formatted(a.times, matchesFound, functionName, exactMatchFunctionArgument);
+                return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
             }
         } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
             if (matchesFound <= a.times) {
-                var errorString = new StringBuilder("""
+                var errorString = """
                         Wanted at least %d matches, but found %d.
                         Query:
                         %s(%s)
-                        """.formatted(a.times, matchesFound, functionName, exactMatchFunctionArgument));
-                return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+                        """.formatted(a.times, matchesFound, functionName, exactMatchFunctionArgument);
+                return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
             }
         }
 
@@ -328,7 +331,7 @@ class InternalMockServer {
                 errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
         }
-        return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+        return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
     }
 
     static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
@@ -342,7 +345,7 @@ class InternalMockServer {
             for (var invocation : invocationsNotVerified) {
                 errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
             }
-            return Map.of("err", Map.of("verificationFailure", Map.of("details", errorString)));
+            return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
         }
 
         return Map.of("ok", Map.of());
