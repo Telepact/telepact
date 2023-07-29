@@ -11,18 +11,10 @@ import java.util.Map;
  */
 public class JApiError extends RuntimeException {
 
-    public final String target;
-    public final Map<String, Object> body;
+    public final Map<String, Object> result;
 
-    public JApiError(String target, Map<String, Object> body) {
-        super("%s: %s".formatted(target, body));
-        this.target = target;
-        this.body = body;
-    }
-
-    public JApiError(String target, Map<String, Object> body, Throwable cause) {
-        super("%s: %s".formatted(target, body), cause);
-        this.target = target;
-        this.body = body;
+    public JApiError(Map<String, Object> result) {
+        super(String.valueOf(result));
+        this.result = result;
     }
 }

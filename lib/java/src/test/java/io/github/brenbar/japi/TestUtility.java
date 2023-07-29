@@ -89,19 +89,10 @@ public class TestUtility {
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
-            if (expectedResponseJson.startsWith("[\"error.")) {
-                var e = assertThrows(JApiError.class,
-                        () -> client.submit(new Request(((String) requestAsParsedJson.get(0)),
-                                (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
-                                        (Map<String, Object>) requestAsParsedJson.get(1))));
-                assertEquals(expectedResponseAsParsedJson.get(0), e.target);
-                assertEquals(expectedResponseAsParsedJson.get(2), e.body);
-            } else {
-                var resultAsParsedJson = client.submit(new Request(((String) requestAsParsedJson.get(0)),
-                        (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
-                                (Map<String, Object>) requestAsParsedJson.get(1)));
-                assertEquals(expectedResponseAsParsedJson.get(2), resultAsParsedJson);
-            }
+            var resultAsParsedJson = client.submit(new Request(((String) requestAsParsedJson.get(0)),
+                    (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
+                            (Map<String, Object>) requestAsParsedJson.get(1)));
+            assertEquals(expectedResponseAsParsedJson.get(2), resultAsParsedJson);
         }
     }
 

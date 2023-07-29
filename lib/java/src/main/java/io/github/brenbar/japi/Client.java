@@ -50,6 +50,7 @@ public class Client {
     private Middleware middleware;
     boolean useBinaryDefault;
     boolean forceSendJsonDefault;
+    boolean throwOnError;
     long timeoutMsDefault;
 
     /**
@@ -63,6 +64,7 @@ public class Client {
         this.middleware = (m, n) -> n.apply(m);
         this.useBinaryDefault = false;
         this.forceSendJsonDefault = true;
+        this.throwOnError = false;
         this.timeoutMsDefault = 5000;
 
         this.serializer = new Serializer(new InternalDefaultSerializationStrategy(),
@@ -100,6 +102,11 @@ public class Client {
      */
     public Client setForceSendJsonDefault(boolean forceSendJson) {
         this.forceSendJsonDefault = forceSendJson;
+        return this;
+    }
+
+    public Client setThrowOnError(boolean throwOnError) {
+        this.throwOnError = throwOnError;
         return this;
     }
 
@@ -143,8 +150,8 @@ public class Client {
         var responseMessageType = (String) response.get(0);
         var result = (Map<String, Object>) response.get(2);
 
-        if (responseMessageType.startsWith("error.")) {
-            throw new JApiError(responseMessageType, result);
+        if (throwOnError && result.containsKey("err")) {
+            throw new JApiError(result);
         }
 
         return result;

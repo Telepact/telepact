@@ -94,7 +94,7 @@ class InternalMockServer {
                 if (definition instanceof FunctionDefinition f) {
                     return constructRandomEnum(f.resultEnum.values, random);
                 } else {
-                    throw new JApiError("error._UnknownFunction", Map.of());
+                    throw new JApiProcessError("Unexpected unknown function: %s".formatted(context.functionName));
                 }
             }
         }
