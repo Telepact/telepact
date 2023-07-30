@@ -337,7 +337,7 @@ class InternalServer {
 
     private static List<ValidationFailure> validateEnum(
             String path,
-            Map<String, Object> referenceValues,
+            Map<String, EnumType> referenceValues,
             Map<?, ?> actual) {
         if (actual.size() != 1) {
             return Collections.singletonList(
@@ -371,7 +371,7 @@ class InternalServer {
 
     private static List<ValidationFailure> validateEnumData(
             String path,
-            Map<String, Object> reference,
+            Map<String, EnumType> reference,
             String enumCase,
             Map<String, Object> actual) {
         var validationFailures = new ArrayList<ValidationFailure>();
@@ -381,15 +381,15 @@ class InternalServer {
             return Collections
                     .singletonList(new ValidationFailure(path,
                             ValidationErrorReasons.UNKNOWN_ENUM_VALUE));
-        } else if (referenceField instanceof Struct s) {
+        } else if (referenceField instanceof EnumStruct es) {
 
-            var nestedValidationFailures = validateStruct(path, s.fields,
+            var nestedValidationFailures = validateStruct(path, es.fields,
                     actual);
             validationFailures.addAll(nestedValidationFailures);
 
             return validationFailures;
-        } else if (referenceField instanceof Map<?, ?> m) {
-            return validateEnum(path, (Map<String, Object>) m, actual);
+        } else if (referenceField instanceof EnumNesting en) {
+            return validateEnum(path, en.values, actual);
         } else {
             throw new JApiProcessError("Unexpected enum reference type");
         }
@@ -632,7 +632,7 @@ class InternalServer {
         }
     }
 
-    static Object selectStructFieldsForEnum(Map<String, Object> enumReference, Object value,
+    static Object selectStructFieldsForEnum(Map<String, EnumType> enumReference, Object value,
             Map<String, List<String>> selectedStructFields) {
         var valueAsMap = (Map<String, Object>) value;
         var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
@@ -640,11 +640,11 @@ class InternalServer {
         var enumData = enumEntry.getValue();
 
         var enumEntryReference = enumReference.get(enumValue);
-        if (enumEntryReference instanceof Struct structReference) {
+        if (enumEntryReference instanceof EnumStruct structReference) {
             var structWithSelectedFields = selectStructFields(structReference, enumData, selectedStructFields);
             return Map.of(enumEntry.getKey(), structWithSelectedFields);
-        } else if (enumEntryReference instanceof Map<?, ?> m) {
-            var subSelect = selectStructFieldsForEnum((Map<String, Object>) m, enumData, selectedStructFields);
+        } else if (enumEntryReference instanceof EnumNesting m) {
+            var subSelect = selectStructFieldsForEnum(m.values, enumData, selectedStructFields);
             return Map.of(enumValue, subSelect);
         } else {
             throw new JApiProcessError("Unexpected enum reference type");

@@ -206,7 +206,7 @@ class InternalMockServer {
         return null;
     }
 
-    private static Map<String, Object> constructRandomEnum(Map<String, Object> enumValuesReference, Random random) {
+    private static Map<String, Object> constructRandomEnum(Map<String, EnumType> enumValuesReference, Random random) {
         var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
         Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
@@ -216,11 +216,11 @@ class InternalMockServer {
         var enumValue = enumEntry.getKey();
         var enumData = enumEntry.getValue();
 
-        if (enumData instanceof Map<?, ?> m) {
-            return Map.of(enumValue, constructRandomEnum((Map<String, Object>) m, random));
-        } else if (enumData instanceof Struct s) {
+        if (enumData instanceof EnumNesting m) {
+            return Map.of(enumValue, constructRandomEnum(m.values, random));
+        } else if (enumData instanceof EnumStruct es) {
             return Map.of(enumValue,
-                    constructRandomStruct(s.fields, random));
+                    constructRandomStruct(es.fields, random));
         } else {
             throw new JApiProcessError("Unexpected enum data type");
         }

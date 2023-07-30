@@ -221,11 +221,48 @@ class Struct implements Type {
 class Enum implements Type {
 
     public final String name;
-    public final Map<String, Object> values;
+    public final Map<String, EnumType> values;
 
-    public Enum(String name, Map<String, Object> values) {
+    public Enum(String name, Map<String, EnumType> values) {
         this.name = name;
         this.values = values;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}
+
+interface EnumType extends Type {
+
+}
+
+class EnumNesting implements EnumType {
+
+    public final String name;
+    public final Map<String, EnumType> values;
+
+    public EnumNesting(String name, Map<String, EnumType> values) {
+        this.name = name;
+        this.values = values;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+    }
+
+}
+
+class EnumStruct implements EnumType {
+    public final String name;
+    public final Map<String, FieldDeclaration> fields;
+
+    public EnumStruct(String name, Map<String, FieldDeclaration> fields) {
+        this.name = name;
+        this.fields = fields;
     }
 
     @Override

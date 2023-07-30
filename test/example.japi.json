@@ -105,7 +105,12 @@
 
   "enum.EnumExample": [
     {
-      "one": {},
+      "one": {
+        "a": {},
+        "b": {
+          "required": "boolean"
+        }
+      },
       "two": {
         "required": "boolean",
         "optional!": "boolean"

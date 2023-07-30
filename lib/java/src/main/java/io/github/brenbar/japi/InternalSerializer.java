@@ -176,13 +176,15 @@ class InternalSerializer {
         return decode(message, binaryEncoder.get());
     }
 
-    private static void addAllEnumValues(Set<String> allKeys, Map<String, Object> enumValues) {
+    private static void addAllEnumValues(Set<String> allKeys, Map<String, EnumType> enumValues) {
         for (var entry : enumValues.entrySet()) {
             var enumValue = entry.getKey();
             var enumData = entry.getValue();
             allKeys.add(enumValue);
-            if (enumData instanceof Map<?, ?> m) {
-                addAllEnumValues(allKeys, (Map<String, Object>) enumData);
+            if (enumData instanceof EnumStruct es) {
+                allKeys.addAll(es.fields.keySet());
+            } else if (enumData instanceof EnumNesting en) {
+                addAllEnumValues(allKeys, en.values);
             }
         }
     }
