@@ -608,6 +608,20 @@ class InternalServer {
                 }
             }
             return finalMap;
+        } else if (type instanceof EnumStruct s) {
+            var selectedFields = selectedStructFields.get(s.name);
+            var valueAsMap = (Map<String, Object>) value;
+            var finalMap = new HashMap<>();
+            for (var entry : valueAsMap.entrySet()) {
+                var fieldName = entry.getKey();
+                if (selectedFields == null || selectedFields.contains(fieldName)) {
+                    var field = s.fields.get(fieldName);
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
+                            selectedStructFields);
+                    finalMap.put(entry.getKey(), valueWithSelectedFields);
+                }
+            }
+            return finalMap;
         } else if (type instanceof Enum e) {
             return selectStructFieldsForEnum(e.values, value, selectedStructFields);
         } else if (type instanceof JsonObject o) {
@@ -640,8 +654,11 @@ class InternalServer {
         var enumData = enumEntry.getValue();
 
         var enumEntryReference = enumReference.get(enumValue);
-        if (enumEntryReference instanceof EnumStruct structReference) {
-            var structWithSelectedFields = selectStructFields(structReference, enumData, selectedStructFields);
+        if (enumEntryReference instanceof Struct s) {
+            var structWithSelectedFields = selectStructFields(s, enumData, selectedStructFields);
+            return Map.of(enumEntry.getKey(), structWithSelectedFields);
+        } else if (enumEntryReference instanceof EnumStruct es) {
+            var structWithSelectedFields = selectStructFields(es, enumData, selectedStructFields);
             return Map.of(enumEntry.getKey(), structWithSelectedFields);
         } else if (enumEntryReference instanceof EnumNesting m) {
             var subSelect = selectStructFieldsForEnum(m.values, enumData, selectedStructFields);
