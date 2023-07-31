@@ -50,7 +50,7 @@ public class GeneratedMockTests {
     
         {
             var argument = """
-            ["fn.test",{},{}]
+            ["fn.test",{},{"value":{"int":1}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -60,7 +60,7 @@ public class GeneratedMockTests {
         
         {
             var argument = """
-            ["fn.test",{},{"value":{"int":0}}]
+            ["fn.test",{},{"value":{"int":1,"str":"a"}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -126,7 +126,7 @@ public class GeneratedMockTests {
     
         {
             var argument = """
-            ["fn.test",{},{}]
+            ["fn.test",{},{"value":{"int":1}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -136,7 +136,37 @@ public class GeneratedMockTests {
         
         {
             var argument = """
-            ["fn.test",{},{"value":{"int":0}}]
+            ["fn.test",{},{"value":{"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":0,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"b"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -242,17 +272,7 @@ public class GeneratedMockTests {
     
         {
             var argument = """
-            ["fn.test",{},{}]
-            """.trim();
-            var expectedResult = """
-            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
-            """.trim();
-            TestUtility.generatedMockTest(argument, expectedResult, server);
-        }
-        
-        {
-            var argument = """
-            ["fn.test",{},{"value":{"int":0}}]
+            ["fn.test",{},{"value":{"int":1}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -318,7 +338,7 @@ public class GeneratedMockTests {
     
         {
             var argument = """
-            ["fn.test",{},{}]
+            ["fn.test",{},{"value":{"int":1}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -328,7 +348,7 @@ public class GeneratedMockTests {
         
         {
             var argument = """
-            ["fn.test",{},{"value":{"int":0}}]
+            ["fn.test",{},{"value":{"str":"a"}}]
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
@@ -432,6 +452,278 @@ public class GeneratedMockTests {
             """.trim();
             var expectedResult = """
             ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+    }
+    
+    @Test
+    public void test_testMixedPartialStrictMatchStub() throws IOException {
+        var server = TestUtility.generatedMockTestSetup();
+    
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"b"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1}},"strictMatch":false,"thenResult":{"ok":{"value":{"bool":true}}}}]
+            """.trim();
+            var expectedResult = """
+            ["fn._createStub",{},{"ok":{}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1,"str":"a"}},"strictMatch":true,"thenResult":{"ok":{"value":{"bool":false}}}}]
+            """.trim();
+            var expectedResult = """
+            ["fn._createStub",{},{"ok":{}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":0}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":false}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":0,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"b"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+    }
+    
+    @Test
+    public void test_testMixedStrictPartialMatchStub() throws IOException {
+        var server = TestUtility.generatedMockTestSetup();
+    
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"b"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1,"str":"a"}},"strictMatch":true,"thenResult":{"ok":{"value":{"bool":false}}}}]
+            """.trim();
+            var expectedResult = """
+            ["fn._createStub",{},{"ok":{}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1}},"strictMatch":false,"thenResult":{"ok":{"value":{"bool":true}}}}]
+            """.trim();
+            var expectedResult = """
+            ["fn._createStub",{},{"ok":{}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":0}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":0,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"int":1,"str":"b"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
+            """.trim();
+            TestUtility.generatedMockTest(argument, expectedResult, server);
+        }
+        
+        {
+            var argument = """
+            ["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]
+            """.trim();
+            var expectedResult = """
+            ["fn.test",{},{"ok":{"value":{"bool":true}}}]
             """.trim();
             TestUtility.generatedMockTest(argument, expectedResult, server);
         }
