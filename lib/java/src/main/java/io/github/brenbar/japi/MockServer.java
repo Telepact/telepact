@@ -3,7 +3,6 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -15,7 +14,7 @@ import java.util.function.Consumer;
 public class MockServer {
 
     public final Server server;
-    private final Random random;
+    private final MockRandom random;
     private boolean enableGeneratedDefaultStub;
 
     private final List<MockStub> stubs = new ArrayList<>();
@@ -31,7 +30,7 @@ public class MockServer {
                 jApiSchemaAsJson,
                 InternalMockJApi.JSON));
         this.server = new Server(combinedSchemaJson, this::handle);
-        this.random = new Random();
+        this.random = new MockRandom();
         this.enableGeneratedDefaultStub = true;
     }
 
@@ -41,7 +40,7 @@ public class MockServer {
      * @param seed
      * @return
      */
-    public MockServer resetRandomSeed(Long seed) {
+    public MockServer resetRandomSeed(int seed) {
         this.random.setSeed(seed);
         return this;
     }

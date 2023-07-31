@@ -20,7 +20,7 @@ public class MockTests {
                 processor.server.setOnError((Throwable e) -> {
                         e.printStackTrace();
                 });
-                processor.resetRandomSeed(0L);
+                processor.resetRandomSeed(0);
                 var client = new Client((m, s) -> {
                         return CompletableFuture.supplyAsync(() -> s.deserialize(processor.process(s.serialize(m))));
                 })
@@ -45,7 +45,7 @@ public class MockTests {
                 mock.server.setOnError((Throwable e) -> {
                         e.printStackTrace();
                 });
-                mock.resetRandomSeed(0L);
+                mock.resetRandomSeed(0);
                 var client = new Client((m, s) -> {
                         return CompletableFuture.supplyAsync(() -> s.deserialize(mock.process(s.serialize(m))));
                 })

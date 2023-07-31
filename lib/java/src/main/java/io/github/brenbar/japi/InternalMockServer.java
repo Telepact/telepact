@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.TreeMap;
 
 import io.github.brenbar.japi.MockVerification.AtLeastNumberOfTimes;
@@ -22,9 +20,10 @@ class InternalMockServer {
 
         var stubs = (List<MockStub>) context.requestHeaders.get("_mockStubs");
         var invocations = (List<Invocation>) context.requestHeaders.get("_mockInvocations");
-        var random = (Random) context.requestHeaders.get("_mockRandom");
+        var random = (MockRandom) context.requestHeaders.get("_mockRandom");
         var jApiSchema = (JApiSchema) context.requestHeaders.get("_mockJApiSchema");
         var enableGeneratedDefaultStub = (Boolean) context.requestHeaders.get("_mockEnableGeneratedDefaultStub");
+        var enableGenerationStub = (Boolean) context.requestHeaders.getOrDefault("_mockEnableGeneratedStub", false);
 
         switch (context.functionName) {
             case "fn._createStub" -> {
@@ -90,7 +89,7 @@ class InternalMockServer {
                     }
                 }
 
-                if (!enableGeneratedDefaultStub) {
+                if (!enableGeneratedDefaultStub && !enableGenerationStub) {
                     return Map.of("err", Map.of("_noMatchingStub", Map.of()));
                 }
 
@@ -157,12 +156,12 @@ class InternalMockServer {
     }
 
     private static Map<String, Object> constructRandomStruct(
-            Map<String, FieldDeclaration> referenceStruct, Random random) {
+            Map<String, FieldDeclaration> referenceStruct, MockRandom random) {
 
         var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-        var obj = new HashMap<String, Object>();
+        var obj = new TreeMap<String, Object>();
         for (var field : sortedReferenceStruct) {
             var fieldDeclaration = field.getValue();
             if (fieldDeclaration.optional && random.nextBoolean()) {
@@ -173,7 +172,7 @@ class InternalMockServer {
         return obj;
     }
 
-    private static Object constructRandomType(TypeDeclaration typeDeclaration, Random random) {
+    private static Object constructRandomType(TypeDeclaration typeDeclaration, MockRandom random) {
         if (typeDeclaration.nullable && random.nextBoolean()) {
             return null;
         } else if (typeDeclaration.type instanceof JsonBoolean b) {
@@ -183,9 +182,7 @@ class InternalMockServer {
         } else if (typeDeclaration.type instanceof JsonNumber n) {
             return random.nextDouble();
         } else if (typeDeclaration.type instanceof JsonString s) {
-            var bytes = ByteBuffer.allocate(Integer.BYTES);
-            bytes.putInt(random.nextInt());
-            return Base64.getEncoder().encodeToString(bytes.array());
+            return random.nextString();
         } else if (typeDeclaration.type instanceof JsonArray a) {
             var length = random.nextInt(3);
             var array = new ArrayList<Object>();
@@ -195,11 +192,9 @@ class InternalMockServer {
             return array;
         } else if (typeDeclaration.type instanceof JsonObject o) {
             var length = random.nextInt(3);
-            var obj = new HashMap<String, Object>();
+            var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
-                var bytes = ByteBuffer.allocate(Integer.BYTES);
-                bytes.putInt(random.nextInt());
-                var key = Base64.getUrlEncoder().encodeToString(bytes.array());
+                var key = random.nextString();
                 obj.put(key, constructRandomType(o.nestedType, random));
             }
             return obj;
@@ -210,9 +205,7 @@ class InternalMockServer {
             } else if (selectType == 1) {
                 return random.nextInt();
             } else {
-                var bytes = ByteBuffer.allocate(Integer.BYTES);
-                bytes.putInt(random.nextInt());
-                return Base64.getEncoder().encodeToString(bytes.array());
+                return random.nextString();
             }
         } else if (typeDeclaration.type instanceof Struct s) {
             return constructRandomStruct(s.fields, random);
@@ -223,7 +216,8 @@ class InternalMockServer {
         return null;
     }
 
-    private static Map<String, Object> constructRandomEnum(Map<String, EnumType> enumValuesReference, Random random) {
+    private static Map<String, Object> constructRandomEnum(Map<String, EnumType> enumValuesReference,
+            MockRandom random) {
         var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
         Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
