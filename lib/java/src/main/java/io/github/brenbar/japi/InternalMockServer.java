@@ -92,7 +92,9 @@ class InternalMockServer {
                 var definition = jApiSchema.parsed.get(context.functionName);
 
                 if (definition instanceof FunctionDefinition f) {
-                    return constructRandomEnum(f.resultEnum.values, random);
+                    var okStructRef = (EnumStruct) f.resultEnum.values.get("ok");
+                    var randomOkStruct = constructRandomStruct(okStructRef.fields, random);
+                    return Map.of("ok", randomOkStruct);
                 } else {
                     throw new JApiProcessError("Unexpected unknown function: %s".formatted(context.functionName));
                 }
@@ -193,10 +195,21 @@ class InternalMockServer {
             for (int i = 0; i < length; i += 1) {
                 var bytes = ByteBuffer.allocate(Integer.BYTES);
                 bytes.putInt(random.nextInt());
-                var key = Base64.getEncoder().encodeToString(bytes.array());
+                var key = Base64.getUrlEncoder().encodeToString(bytes.array());
                 obj.put(key, constructRandomType(o.nestedType, random));
             }
             return obj;
+        } else if (typeDeclaration.type instanceof JsonAny a) {
+            var selectType = random.nextInt(3);
+            if (selectType == 0) {
+                return random.nextBoolean();
+            } else if (selectType == 1) {
+                return random.nextInt();
+            } else {
+                var bytes = ByteBuffer.allocate(Integer.BYTES);
+                bytes.putInt(random.nextInt());
+                return Base64.getEncoder().encodeToString(bytes.array());
+            }
         } else if (typeDeclaration.type instanceof Struct s) {
             return constructRandomStruct(s.fields, random);
         } else if (typeDeclaration.type instanceof Enum e) {

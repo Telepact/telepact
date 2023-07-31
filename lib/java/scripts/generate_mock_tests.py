@@ -57,6 +57,7 @@ for name,cases in cases_by_name.items():
     test_file.write('''
     @Test
     public void test_{}() throws IOException {{
+        var server = TestUtility.generatedMockTestSetup();
     '''.format(name))
 
     for case in cases:
@@ -68,7 +69,7 @@ for name,cases in cases_by_name.items():
             var expectedResult = """
             {}
             """.trim();
-            TestUtility.generatedMockTest(argument, expectedResult);
+            TestUtility.generatedMockTest(argument, expectedResult, server);
         }}
         '''.format(case.argument, case.result))
 

@@ -96,23 +96,25 @@ public class TestUtility {
         }
     }
 
-    public static void generatedMockTest(String requestJson, String expectedResponseJson) throws IOException {
-        var objectMapper = new ObjectMapper();
+    public static MockServer generatedMockTestSetup() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var server = new MockServer(json).setOnError((e) -> e.printStackTrace());
+        return server;
+    }
+
+    public static void generatedMockTest(String requestJson, String expectedResponseJson, MockServer server)
+            throws IOException {
+        var objectMapper = new ObjectMapper();
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
-
-        {
-            var requestBytes = requestJson.getBytes(StandardCharsets.UTF_8);
-            System.out.println("--> %s".formatted(new String(requestBytes)));
-            var responseBytes = server.process(requestBytes);
-            System.out.println("<-- %s".formatted(new String(responseBytes)));
-            var responseAsParsedJson = objectMapper.readValue(responseBytes, new TypeReference<List<Object>>() {
-            });
-            assertEquals(expectedResponseAsParsedJson, responseAsParsedJson);
-        }
+        var requestBytes = requestJson.getBytes(StandardCharsets.UTF_8);
+        System.out.println("--> %s".formatted(new String(requestBytes)));
+        var responseBytes = server.process(requestBytes);
+        System.out.println("<-- %s".formatted(new String(responseBytes)));
+        var responseAsParsedJson = objectMapper.readValue(responseBytes, new TypeReference<List<Object>>() {
+        });
+        assertEquals(expectedResponseAsParsedJson, responseAsParsedJson);
     }
 
 }

@@ -1,4 +1,4 @@
 "testGenerate"
 
-["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"value":{"bool":true}}}]|["fn._createStub",{},{"ok":{}}]
+["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{"value":{"bool":true}}}}]|["fn._createStub",{},{"ok":{}}]
 ["fn.test",{},{}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
