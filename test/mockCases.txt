@@ -29,3 +29,26 @@
 ["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]|["fn.test",{},{"ok":{"value":{"bool":false}}}]
 
 "testStrictMatchStub"
+
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1}},"strictMatch":true,"thenResult":{"ok":{"value":{"bool":true}}}}]|["fn._createStub",{},{"ok":{}}]
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":1}}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
+["fn.test",{},{"value":{"int":1,"str":"a"}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+
+"testMultipleStrictMatchStub"
+
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1}},"strictMatch":true,"thenResult":{"ok":{"value":{"bool":true}}}}]|["fn._createStub",{},{"ok":{}}]
+["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"str":"a"}},"strictMatch":true,"thenResult":{"ok":{"value":{"bool":false}}}}]|["fn._createStub",{},{"ok":{}}]
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":1}}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
+["fn.test",{},{"value":{"int":1,"str":"a"}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"str":"a"}}]|["fn.test",{},{"ok":{"value":{"bool":false}}}]
+["fn.test",{},{"value":{"int":0,"str":"a"}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":1,"str":"b"}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"bool":false,"int":1,"str":"a"}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
