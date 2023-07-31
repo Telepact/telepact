@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * A Mock instance of a jAPI server.
@@ -13,7 +14,7 @@ import java.util.Random;
  */
 public class MockServer {
 
-    public final Server processor;
+    public final Server server;
     private final Random random;
 
     private final List<MockStub> stubs = new ArrayList<>();
@@ -28,7 +29,7 @@ public class MockServer {
         var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
                 InternalMockJApi.JSON));
-        this.processor = new Server(combinedSchemaJson, this::handle);
+        this.server = new Server(combinedSchemaJson, this::handle);
         this.random = new Random();
     }
 
@@ -44,17 +45,29 @@ public class MockServer {
     }
 
     /**
+     * Set an error handler to run on every error that occurs during request
+     * processing.
+     * 
+     * @param onError
+     * @return
+     */
+    public MockServer setOnError(Consumer<Throwable> onError) {
+        this.server.onError = onError;
+        return this;
+    }
+
+    /**
      * Process a given jAPI Request Message into a jAPI Response Message.
      * 
      * @param requestMessageBytes
      * @return
      */
     public byte[] process(byte[] message) {
-        return this.processor.process(message);
+        return this.server.process(message);
     }
 
     private Map<String, Object> handle(Context context, Map<String, Object> argument) {
-        context.requestHeaders.put("_mockJApiSchema", this.processor.jApiSchema);
+        context.requestHeaders.put("_mockJApiSchema", this.server.jApiSchema);
         context.requestHeaders.put("_mockRandom", this.random);
         context.requestHeaders.put("_mockStubs", this.stubs);
         context.requestHeaders.put("_mockInvocations", this.invocations);
@@ -75,11 +88,11 @@ public class MockServer {
                         Map.entry("whenFunctionName", stub.whenFunctionName),
                         Map.entry("whenArgument", stub.whenArgument),
                         Map.entry("thenResult", stub.thenResult),
-                        Map.entry("allowArgumentPartialMatch", stub.allowArgumentPartialMatch),
+                        Map.entry("strictMatch", !stub.allowArgumentPartialMatch),
                         Map.entry("generateMissingResultFields", stub.generateMissingResultFields)));
-        var requestMessageJson = this.processor.serializer.serialize(requestMessage);
+        var requestMessageJson = this.server.serializer.serialize(requestMessage);
         var responseJson = this.process(requestMessageJson);
-        var response = this.processor.serializer.deserialize(responseJson);
+        var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {
@@ -114,11 +127,11 @@ public class MockServer {
                         Map.entry("verifyFunctionName", verification.functionName),
                         Map.entry("verifyArgument", verification.argument),
                         Map.entry("verifyTimes", verificationTimes),
-                        Map.entry("allowArgumentPartialMatch", verification.allowArgumentPartialMatch)));
+                        Map.entry("strictMatch", !verification.allowArgumentPartialMatch)));
 
-        var requestJson = this.processor.serializer.serialize(request);
+        var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
-        var response = this.processor.serializer.deserialize(responseJson);
+        var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {
@@ -144,9 +157,9 @@ public class MockServer {
                 "fn._verifyNoMoreInteractions",
                 Map.of(),
                 Map.of());
-        var requestJson = this.processor.serializer.serialize(request);
+        var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
-        var response = this.processor.serializer.deserialize(responseJson);
+        var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {
@@ -171,9 +184,9 @@ public class MockServer {
                 "fn._clearInvocations",
                 Map.of(),
                 Map.of());
-        var requestJson = this.processor.serializer.serialize(request);
+        var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
-        var response = this.processor.serializer.deserialize(responseJson);
+        var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {
@@ -189,9 +202,9 @@ public class MockServer {
                 "fn._clearStubs",
                 Map.of(),
                 Map.of());
-        var requestJson = this.processor.serializer.serialize(request);
+        var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
-        var response = this.processor.serializer.deserialize(responseJson);
+        var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
         var err = (Map<String, Object>) result.get("err");
         if (err != null) {

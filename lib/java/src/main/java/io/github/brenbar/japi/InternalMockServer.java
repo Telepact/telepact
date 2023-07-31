@@ -31,7 +31,7 @@ class InternalMockServer {
                 var whenArgument = (Map<String, Object>) argument.get("whenArgument");
                 var thenResult = (Map<String, Object>) argument
                         .get("thenResult");
-                var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("allowArgumentPartialMatch", false);
+                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
                         false);
 
@@ -51,7 +51,7 @@ class InternalMockServer {
                 var verifyArgument = (Map<String, Object>) argument.get("verifyArgument");
                 var verifyTimes = (Map<String, Object>) argument.getOrDefault("verifyTimes",
                         Map.of("unliminted", Map.of()));
-                var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("allowArgumentPartialMatch", false);
+                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
 

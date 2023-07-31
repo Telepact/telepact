@@ -17,7 +17,7 @@ public class MockTests {
         public void testGeneratedValues() throws IOException {
                 var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
                 var processor = new MockServer(json);
-                processor.processor.setOnError((Throwable e) -> {
+                processor.server.setOnError((Throwable e) -> {
                         e.printStackTrace();
                 });
                 processor.resetRandomSeed(0L);
@@ -42,7 +42,7 @@ public class MockTests {
         public void testMocking() throws IOException {
                 var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
                 var mock = new MockServer(json);
-                mock.processor.setOnError((Throwable e) -> {
+                mock.server.setOnError((Throwable e) -> {
                         e.printStackTrace();
                 });
                 mock.resetRandomSeed(0L);
