@@ -98,7 +98,9 @@ public class TestUtility {
 
     public static MockServer generatedMockTestSetup() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var server = new MockServer(json).setOnError((e) -> e.printStackTrace());
+        var server = new MockServer(json)
+                .setOnError((e) -> e.printStackTrace())
+                .setEnableGeneratedDefaultStub(false);
         return server;
     }
 

@@ -16,6 +16,7 @@ public class MockServer {
 
     public final Server server;
     private final Random random;
+    private boolean enableGeneratedDefaultStub;
 
     private final List<MockStub> stubs = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
@@ -31,6 +32,7 @@ public class MockServer {
                 InternalMockJApi.JSON));
         this.server = new Server(combinedSchemaJson, this::handle);
         this.random = new Random();
+        this.enableGeneratedDefaultStub = true;
     }
 
     /**
@@ -56,6 +58,11 @@ public class MockServer {
         return this;
     }
 
+    public MockServer setEnableGeneratedDefaultStub(boolean enableGeneratedDefaultStub) {
+        this.enableGeneratedDefaultStub = enableGeneratedDefaultStub;
+        return this;
+    }
+
     /**
      * Process a given jAPI Request Message into a jAPI Response Message.
      * 
@@ -71,6 +78,7 @@ public class MockServer {
         context.requestHeaders.put("_mockRandom", this.random);
         context.requestHeaders.put("_mockStubs", this.stubs);
         context.requestHeaders.put("_mockInvocations", this.invocations);
+        context.requestHeaders.put("_mockEnableGeneratedDefaultStub", this.enableGeneratedDefaultStub);
         return InternalMockServer.handle(context, argument);
     }
 

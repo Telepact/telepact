@@ -1,4 +1,16 @@
-"testGenerate"
+"testPartialMatchStub1"
 
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
 ["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{"value":{"bool":true}}}}]|["fn._createStub",{},{"ok":{}}]
 ["fn.test",{},{}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
+
+"testPartialMatchStub2"
+
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn._createStub",{},{"whenFunctionName":"fn.test","whenArgument":{"value":{"int":1}},"strictMatch":false,"thenResult":{"ok":{"value":{"bool":true}}}}]|["fn._createStub",{},{"ok":{}}]
+["fn.test",{},{}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"err":{"_noMatchingStub":{}}}]
+["fn.test",{},{"value":{"int":1}}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
+["fn.test",{},{"value":{"int":1,"str":"diversion"}}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
+
+"testStrictMatchStub"

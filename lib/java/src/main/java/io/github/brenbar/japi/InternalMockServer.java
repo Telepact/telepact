@@ -24,6 +24,7 @@ class InternalMockServer {
         var invocations = (List<Invocation>) context.requestHeaders.get("_mockInvocations");
         var random = (Random) context.requestHeaders.get("_mockRandom");
         var jApiSchema = (JApiSchema) context.requestHeaders.get("_mockJApiSchema");
+        var enableGeneratedDefaultStub = (Boolean) context.requestHeaders.get("_mockEnableGeneratedDefaultStub");
 
         switch (context.functionName) {
             case "fn._createStub" -> {
@@ -89,6 +90,10 @@ class InternalMockServer {
                     }
                 }
 
+                if (!enableGeneratedDefaultStub) {
+                    return Map.of("err", Map.of("_noMatchingStub", Map.of()));
+                }
+
                 var definition = jApiSchema.parsed.get(context.functionName);
 
                 if (definition instanceof FunctionDefinition f) {
@@ -123,12 +128,11 @@ class InternalMockServer {
         };
     }
 
-    static boolean isSubMap(Map<String, Object> reference, Map<String, Object> actual) {
-        for (var actualEntry : actual.entrySet()) {
-            var actualKey = actualEntry.getKey();
-            var actualValue = actualEntry.getValue();
-            var referenceEntryValue = reference.get(actualKey);
-            var entryIsEqual = isSubMapEntryEqual(referenceEntryValue, actualValue);
+    static boolean isSubMap(Map<String, Object> sub, Map<String, Object> reference) {
+        for (var subKey : sub.keySet()) {
+            var referenceValue = reference.get(subKey);
+            var subValue = sub.get(subKey);
+            var entryIsEqual = isSubMapEntryEqual(subValue, referenceValue);
             if (!entryIsEqual) {
                 return false;
             }
