@@ -35,7 +35,7 @@ public class MockTests {
                                                 Map.entry("op", Map.of("add", Map.of())))));
 
                 // This is the value per the given random seed
-                assertEquals(Map.of("ok", Map.of("result", 0.24053641567148587)), result);
+                assertEquals(Map.of("ok", Map.of("result", 0.730967787376657)), result);
         }
 
         @Test

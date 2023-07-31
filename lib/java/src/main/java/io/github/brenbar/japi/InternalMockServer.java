@@ -248,7 +248,7 @@ class InternalMockServer {
         var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
-                if (InternalMockServer.isSubMap(invocation.functionArgument, partialMatchArgument)) {
+                if (InternalMockServer.isSubMap(partialMatchArgument, invocation.functionArgument)) {
                     invocation.verified = true;
                     matchesFound += 1;
                 }
