@@ -44,7 +44,7 @@ class InternalMockServer {
                     stub.setGenerateMissingResultFields(randomFillMissingResultFields);
                 }
 
-                stubs.add(stub);
+                stubs.add(0, stub);
                 return Map.of("ok", Map.of());
             }
             case "fn._verify" -> {
