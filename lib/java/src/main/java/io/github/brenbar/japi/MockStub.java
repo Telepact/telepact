@@ -3,15 +3,15 @@ package io.github.brenbar.japi;
 import java.util.Map;
 
 public class MockStub {
-    final String whenFunctionName;
+    final String whenFunction;
     final Map<String, Object> whenArgument;
     final Map<String, Object> thenResult;
     boolean allowArgumentPartialMatch;
     boolean generateMissingResultFields;
 
-    public MockStub(String whenFunctionName, Map<String, Object> whenArgument,
+    public MockStub(String whenFunction, Map<String, Object> whenArgument,
             Map<String, Object> thenResult) {
-        this.whenFunctionName = whenFunctionName;
+        this.whenFunction = whenFunction;
         this.whenArgument = whenArgument;
         this.thenResult = thenResult;
         this.allowArgumentPartialMatch = false;

@@ -6,7 +6,7 @@ class InternalMockJApi {
       {
         "fn._createStub": [
           {
-            "whenFunctionName": "string",
+            "whenFunction": "string",
             "whenArgument": "object<any>",
             "thenResult": "object<any>",
             "strictMatch!": "boolean",

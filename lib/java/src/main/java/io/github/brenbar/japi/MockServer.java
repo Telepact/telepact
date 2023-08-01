@@ -92,7 +92,7 @@ public class MockServer {
                 "fn._createStub",
                 Map.of(),
                 Map.ofEntries(
-                        Map.entry("whenFunctionName", stub.whenFunctionName),
+                        Map.entry("whenFunction", stub.whenFunction),
                         Map.entry("whenArgument", stub.whenArgument),
                         Map.entry("thenResult", stub.thenResult),
                         Map.entry("strictMatch", !stub.allowArgumentPartialMatch),

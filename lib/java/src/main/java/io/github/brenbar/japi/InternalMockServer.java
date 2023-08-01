@@ -27,7 +27,7 @@ class InternalMockServer {
 
         switch (context.functionName) {
             case "fn._createStub" -> {
-                var whenFunctionName = (String) argument.get("whenFunctionName");
+                var whenFunction = (String) argument.get("whenFunction");
                 var whenArgument = (Map<String, Object>) argument.get("whenArgument");
                 var thenResult = (Map<String, Object>) argument
                         .get("thenResult");
@@ -35,7 +35,7 @@ class InternalMockServer {
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
                         false);
 
-                var stub = new MockStub(whenFunctionName, new TreeMap<>(whenArgument), thenResult);
+                var stub = new MockStub(whenFunction, new TreeMap<>(whenArgument), thenResult);
                 if (allowArgumentPartialMatch) {
                     stub.setAllowArgumentPartialMatch(allowArgumentPartialMatch);
                 }
@@ -76,7 +76,7 @@ class InternalMockServer {
                 invocations.add(new Invocation(context.functionName, new TreeMap<>(argument)));
 
                 for (var stub : stubs) {
-                    if (Objects.equals(stub.whenFunctionName, context.functionName)) {
+                    if (Objects.equals(stub.whenFunction, context.functionName)) {
                         if (stub.allowArgumentPartialMatch) {
                             if (isSubMap(stub.whenArgument, argument)) {
                                 return stub.thenResult;
