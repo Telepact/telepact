@@ -104,3 +104,10 @@
 ["fn._verify",{},{"function":"fn.test","argument":{},"times":{"exact":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
 ["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atLeast":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
 ["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atMost":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
+
+"partialMatchVerify"
+
+["fn._createStub",{},{"whenFunction":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{}}}]|["fn._createStub",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}}}]|["fn._verify",{},{"err":{"_verificationFailure":{"details":"Wanted at least 1 matches, but found 0.\\nQuery:\\nfn.test({\\"value\\":{\\"int\\":0}})\\n"}}}]
+["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}}}]|["fn._verify",{},{"ok":{}}]
