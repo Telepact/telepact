@@ -57,11 +57,8 @@ class InternalMockServer {
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
 
-                if (allowArgumentPartialMatch) {
-                    return verifyPartial(verifyFunctionName, verifyArgument, verificationTimes, invocations);
-                } else {
-                    return verifyExact(verifyFunctionName, verifyArgument, verificationTimes, invocations);
-                }
+                return verify(verifyFunctionName, verifyArgument, allowArgumentPartialMatch, verificationTimes,
+                        invocations);
             }
             case "fn._verifyNoMoreInteractions" -> {
                 return verifyNoMoreInteractions(invocations);
@@ -239,121 +236,72 @@ class InternalMockServer {
         }
     }
 
-    static Map<String, Object> verifyPartial(String functionName, Map<String, Object> partialMatchArgument,
-            VerificationTimes verificationTimes, List<Invocation> invocations) {
-        try {
-
-            var objectMapper = new ObjectMapper();
-            var matchesFound = 0;
-            for (var invocation : invocations) {
-                if (Objects.equals(invocation.functionName, functionName)) {
-                    if (InternalMockServer.isSubMap(partialMatchArgument, invocation.functionArgument)) {
-                        invocation.verified = true;
-                        matchesFound += 1;
-                    }
-                }
-            }
-
-            if (verificationTimes instanceof ExactNumberOfTimes e) {
-                if (e.times != matchesFound) {
-                    var errorString = """
-                            Wanted exactly %d partial matches, but found %d.
-                            Query:
-                            %s(%s)
-                            """.formatted(e.times, matchesFound, functionName,
-                            objectMapper.writeValueAsString(partialMatchArgument));
-                    return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
-                }
-            }
-
-            if (matchesFound > 0) {
-                return Map.of("ok", Map.of());
-            }
-
-            var errorString = new StringBuilder("""
-                    No matching invocations.
-                    Wanted partial match:
-                    %s(%s)
-                    Available:
-                    """.formatted(functionName, objectMapper.writeValueAsString(partialMatchArgument)));
-            var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
-                    .toList();
-            if (functionInvocations.isEmpty()) {
-                errorString.append("<none>");
-            } else {
-                for (var invocation : functionInvocations) {
-                    errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
-                }
-            }
-            return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
-        } catch (Exception ex) {
-            throw new JApiProcessError(ex);
-        }
-    }
-
-    static Map<String, Object> verifyExact(String functionName, Map<String, Object> exactMatchFunctionArgument,
+    static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         try {
             var objectMapper = new ObjectMapper();
             var matchesFound = 0;
             for (var invocation : invocations) {
                 if (Objects.equals(invocation.functionName, functionName)) {
-                    if (Objects.equals(invocation.functionArgument, exactMatchFunctionArgument)) {
-                        invocation.verified = true;
-                        matchesFound += 1;
+                    if (exactMatch) {
+                        if (Objects.equals(invocation.functionArgument, argument)) {
+                            invocation.verified = true;
+                            matchesFound += 1;
+                        }
+                    } else {
+                        if (InternalMockServer.isSubMap(argument, invocation.functionArgument)) {
+                            invocation.verified = true;
+                            matchesFound += 1;
+                        }
                     }
                 }
             }
 
+            var matchType = exactMatch ? "exact" : "partial";
+            String matchPlurality;
+            String timesType;
+            int times;
+            boolean passed;
             if (verificationTimes instanceof ExactNumberOfTimes e) {
-                if (matchesFound != e.times) {
-                    var errorString = """
-                            Wanted exactly %d matches, but found %d.
-                            Query:
-                            %s(%s)
-                            """.formatted(e.times, matchesFound, functionName,
-                            objectMapper.writeValueAsString(exactMatchFunctionArgument));
-                    return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
-                }
+                timesType = "exactly";
+                times = e.times;
+                matchPlurality = e.times == 1 ? "match" : "matches";
+                passed = matchesFound == e.times;
             } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
-                if (matchesFound > a.times) {
-                    var errorString = """
-                            Wanted at most %d matches, but found %d.
-                            Query:
-                            %s(%s)
-                            """.formatted(a.times, matchesFound, functionName,
-                            objectMapper.writeValueAsString(exactMatchFunctionArgument));
-                    return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
-                }
+                timesType = "at most";
+                times = a.times;
+                matchPlurality = a.times == 1 ? "match" : "matches";
+                passed = matchesFound <= a.times;
             } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
-                if (matchesFound < a.times) {
-                    var errorString = """
-                            Wanted at least %d matches, but found %d.
-                            Query:
-                            %s(%s)
-                            """.formatted(a.times, matchesFound, functionName,
-                            objectMapper.writeValueAsString(exactMatchFunctionArgument));
-                    return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
-                }
+                timesType = "at least";
+                times = a.times;
+                matchPlurality = a.times == 1 ? "match" : "matches";
+                passed = matchesFound >= a.times;
+            } else {
+                throw new JApiProcessError("Unexpected verification times");
             }
 
-            if (matchesFound > 0) {
+            if (passed) {
                 return Map.of("ok", Map.of());
             }
 
+            String argumentJson = objectMapper.writeValueAsString(argument);
+
             var errorString = new StringBuilder("""
-                    No matching invocations.
-                    Wanted exact match:
-                    %s(%s)
+                    Wanted %s %d %s %s, but found %d.
+                    Query:
+                    %s %s
                     Available:
-                    """.formatted(functionName, objectMapper.writeValueAsString(exactMatchFunctionArgument)));
+                    """.formatted(timesType, times, matchType, matchPlurality, matchesFound, functionName,
+                    argumentJson));
             var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
                     .toList();
             if (functionInvocations.isEmpty()) {
-                errorString.append("<none>");
+                errorString.append("<none>\n");
             } else {
                 for (var invocation : functionInvocations) {
-                    errorString.append("%s(%s)\n".formatted(invocation.functionName, invocation.functionArgument));
+                    String invocationArgumentJson = objectMapper.writeValueAsString(invocation.functionArgument);
+                    errorString.append("%s %s\n".formatted(invocation.functionName, invocationArgumentJson));
                 }
             }
             return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
@@ -373,8 +321,9 @@ class InternalMockServer {
                         Available:
                         """);
                 for (var invocation : invocationsNotVerified) {
-                    errorString.append("%s(%s)\n".formatted(invocation.functionName,
-                            objectMapper.writeValueAsString(invocation.functionArgument)));
+                    var invocationArgumentJson = objectMapper.writeValueAsString(invocation.functionArgument);
+                    errorString.append("%s %s\n".formatted(invocation.functionName,
+                            invocationArgumentJson));
                 }
                 return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
             }
