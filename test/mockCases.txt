@@ -94,3 +94,13 @@
 ["fn.test",{"_mockEnableGeneratedStub":true},{}]|["fn.test",{},{"ok":{}}]
 ["fn.test",{"_mockEnableGeneratedStub":true},{}]|["fn.test",{},{"ok":{"value":{"arrAny":[],"arrInt":[534401262,447818127],"arrNullAny":[null],"arrNullArr":[null],"arrNullBool":[true,true],"arrNullNum":[],"arrNullObj":[{"OJe1EQ":1136890999,"fIyo5A":795771906}],"arrNum":[0.25314431022045375],"arrObj":[{"Gad/iw":"KD8EgQ"},{}],"nullAny":true,"nullBool":null,"nullEnum":{"one":{}},"nullFn":{"required":false},"nullObj":null,"nullStr":"X7EB5Q","nullStruct":null,"objArr":{},"objNullAny":{},"objNullBool":{"HkLQag":true,"YRFa0Q":null},"objNullEnum":{},"objNullNum":{"U+OTCQ":null},"objNullStr":{"EE2aQQ":null,"R+goGg":"DqgtKA"},"objNullStruct":{"Ac9Rvg":null,"dpiZfQ":{"optional":true,"required":true}},"objNum":{"UtUwWA":0.4006502499474109,"XSrLyg":0.32471232553521173},"objStr":{},"objStruct":{"Rbvcsw":{"required":true}},"str":"QI2RDw"}}}]
 ["fn.test",{"_mockEnableGeneratedStub":true},{}]|["fn.test",{},{"ok":{"value":{"arrBool":[true,false],"arrFn":[{"optional":true,"required":true},{"optional":true,"required":true}],"arrInt":[1854324881,1597135862],"arrNullAny":["Dj2wkw",null],"arrNullEnum":[{"two":{"optional":true,"required":false}}],"arrNullNum":[],"arrNullObj":[{"N4vsfg":"bD/iLA"},null],"arrNullStr":["civbcQ",null],"arrStruct":[{"optional":true,"required":false}],"enum":{"three":{"b":{"required":true}}},"fn":{"optional":false,"required":true},"nullAny":null,"nullArr":null,"nullBool":null,"nullFn":{"required":false},"nullInt":1394100151,"nullNum":null,"nullObj":{},"nullStruct":{"required":true},"num":0.3341164804340517,"obj":{},"objAny":{},"objEnum":{},"objInt":{"NfRpnw":20552428,"UUMOtQ":1560713546},"objNullArr":{},"objNullBool":{"NTpbhA":true,"U+/MMw":null},"objNullInt":{},"objNullStruct":{"Z/Oaxg":{"required":true}},"objNum":{},"objStr":{"f6ILlQ":"AcSEqg","fCcjfw":"fLT/TA"},"objStruct":{},"str":"Gj5Bdg"}}}]
+
+"emptyPartialMatchVerify"
+
+["fn._createStub",{},{"whenFunction":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{}}}]|["fn._createStub",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{}}]|["fn._verify",{},{"err":{"_verificationFailure":{"details":"Wanted at least 1 matches, but found 0.\\nQuery:\\nfn.test({})\\n"}}}]
+["fn.test",{},{}]|["fn.test",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{},"times":{"exact":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atLeast":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atMost":{"times":1}}}]|["fn._verify",{},{"ok":{}}]

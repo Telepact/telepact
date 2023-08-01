@@ -28,7 +28,6 @@ class InternalMockJApi {
         ],
         "enum._VerificationTimes": [
           {
-            "unlimited": {},
             "exact": {
               "times": "integer"
             },
@@ -47,10 +46,10 @@ class InternalMockJApi {
         ],
         "fn._verify": [
           {
-            "verifyFunctionName": "string",
-            "verifyArgument": "object<any>",
+            "function": "string",
+            "argument": "object<any>",
             "strictMatch!": "boolean",
-            "verifyTimes!": "enum._VerificationTimes"
+            "times!": "enum._VerificationTimes"
           },
           "->",
           {

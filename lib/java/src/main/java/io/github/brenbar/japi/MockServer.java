@@ -131,9 +131,9 @@ public class MockServer {
                 "fn._verify",
                 Map.of(),
                 Map.ofEntries(
-                        Map.entry("verifyFunctionName", verification.functionName),
-                        Map.entry("verifyArgument", verification.argument),
-                        Map.entry("verifyTimes", verificationTimes),
+                        Map.entry("function", verification.functionName),
+                        Map.entry("argument", verification.argument),
+                        Map.entry("times", verificationTimes),
                         Map.entry("strictMatch", !verification.allowArgumentPartialMatch)));
 
         var requestJson = this.server.serializer.serialize(request);

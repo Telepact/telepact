@@ -47,10 +47,10 @@ class InternalMockServer {
                 return Map.of("ok", Map.of());
             }
             case "fn._verify" -> {
-                var verifyFunctionName = (String) argument.get("verifyFunctionName");
-                var verifyArgument = (Map<String, Object>) argument.get("verifyArgument");
-                var verifyTimes = (Map<String, Object>) argument.getOrDefault("verifyTimes",
-                        Map.of("unliminted", Map.of()));
+                var verifyFunctionName = (String) argument.get("function");
+                var verifyArgument = (Map<String, Object>) argument.get("argument");
+                var verifyTimes = (Map<String, Object>) argument.getOrDefault("times",
+                        Map.of("atLeast", Map.of("times", 1)));
                 var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
@@ -304,7 +304,7 @@ class InternalMockServer {
                 return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
             }
         } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
-            if (matchesFound >= a.times) {
+            if (matchesFound > a.times) {
                 var errorString = """
                         Wanted at most %d matches, but found %d.
                         Query:
@@ -313,7 +313,7 @@ class InternalMockServer {
                 return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString)));
             }
         } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
-            if (matchesFound <= a.times) {
+            if (matchesFound < a.times) {
                 var errorString = """
                         Wanted at least %d matches, but found %d.
                         Query:
