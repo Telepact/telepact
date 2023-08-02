@@ -110,8 +110,7 @@ class InternalServer {
 
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
-            Map<String, Object> newErrorResult = Map.of("err",
-                    Map.of("_parseFailure", Map.of("reasons", parseFailures)));
+            Map<String, Object> newErrorResult = Map.of("_err_parseFailure", Map.of("reasons", parseFailures));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
@@ -124,8 +123,8 @@ class InternalServer {
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("err",
-                    Map.of("_invalidRequestHeaders", Map.of("cases", validationFailureCases)));
+            Map<String, Object> newErrorResult = Map.of("_err_invalidRequestHeaders",
+                    Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
@@ -144,8 +143,8 @@ class InternalServer {
                 functionDefinition.argumentStruct.fields, requestBody);
         if (!argumentValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("err",
-                    Map.of("_invalidRequestBody", Map.of("cases", validationFailureCases)));
+            Map<String, Object> newErrorResult = Map.of("_err_invalidRequestBody",
+                    Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
@@ -172,8 +171,8 @@ class InternalServer {
                 result);
         if (!resultValidationFailures.isEmpty() && !unsafeResponseEnabled) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("err",
-                    Map.of("_invalidResponseBody", Map.of("cases", validationFailureCases)));
+            Map<String, Object> newErrorResult = Map.of("_err_invalidResponseBody",
+                    Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(functionDefinition.name, functionDefinition,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
@@ -337,7 +336,7 @@ class InternalServer {
 
     private static List<ValidationFailure> validateEnum(
             String path,
-            Map<String, EnumType> referenceValues,
+            Map<String, Struct> referenceValues,
             Map<?, ?> actual) {
         if (actual.size() != 1) {
             return Collections.singletonList(
@@ -361,7 +360,7 @@ class InternalServer {
             return Collections.singletonList(new ValidationFailure(path,
                     ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
         } else if (enumData instanceof Map<?, ?> m2) {
-            return validateEnumData("%s.%s".formatted(path, enumValue), referenceValues, enumValue,
+            return validateEnumStruct("%s.%s".formatted(path, enumValue), referenceValues, enumValue,
                     (Map<String, Object>) m2);
         } else {
             return Collections.singletonList(new ValidationFailure(path,
@@ -369,30 +368,25 @@ class InternalServer {
         }
     }
 
-    private static List<ValidationFailure> validateEnumData(
+    private static List<ValidationFailure> validateEnumStruct(
             String path,
-            Map<String, EnumType> reference,
+            Map<String, Struct> reference,
             String enumCase,
             Map<String, Object> actual) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var referenceField = reference.get(enumCase);
-        if (referenceField == null) {
+        var referenceStruct = reference.get(enumCase);
+        if (referenceStruct == null) {
             return Collections
                     .singletonList(new ValidationFailure(path,
                             ValidationErrorReasons.UNKNOWN_ENUM_VALUE));
-        } else if (referenceField instanceof EnumStruct es) {
-
-            var nestedValidationFailures = validateStruct(path, es.fields,
-                    actual);
-            validationFailures.addAll(nestedValidationFailures);
-
-            return validationFailures;
-        } else if (referenceField instanceof EnumNesting en) {
-            return validateEnum(path, en.values, actual);
-        } else {
-            throw new JApiProcessError("Unexpected enum reference type");
         }
+
+        var nestedValidationFailures = validateStruct(path, referenceStruct.fields,
+                actual);
+        validationFailures.addAll(nestedValidationFailures);
+
+        return validationFailures;
     }
 
     private static List<ValidationFailure> validateType(String fieldName, TypeDeclaration typeDeclaration,
@@ -608,20 +602,6 @@ class InternalServer {
                 }
             }
             return finalMap;
-        } else if (type instanceof EnumStruct s) {
-            var selectedFields = selectedStructFields.get(s.name);
-            var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var fieldName = entry.getKey();
-                if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = s.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
-                            selectedStructFields);
-                    finalMap.put(entry.getKey(), valueWithSelectedFields);
-                }
-            }
-            return finalMap;
         } else if (type instanceof Enum e) {
             return selectStructFieldsForEnum(e.values, value, selectedStructFields);
         } else if (type instanceof JsonObject o) {
@@ -646,25 +626,15 @@ class InternalServer {
         }
     }
 
-    static Object selectStructFieldsForEnum(Map<String, EnumType> enumReference, Object value,
+    static Object selectStructFieldsForEnum(Map<String, Struct> enumReference, Object value,
             Map<String, List<String>> selectedStructFields) {
         var valueAsMap = (Map<String, Object>) value;
         var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
         var enumValue = enumEntry.getKey();
         var enumData = enumEntry.getValue();
 
-        var enumEntryReference = enumReference.get(enumValue);
-        if (enumEntryReference instanceof Struct s) {
-            var structWithSelectedFields = selectStructFields(s, enumData, selectedStructFields);
-            return Map.of(enumEntry.getKey(), structWithSelectedFields);
-        } else if (enumEntryReference instanceof EnumStruct es) {
-            var structWithSelectedFields = selectStructFields(es, enumData, selectedStructFields);
-            return Map.of(enumEntry.getKey(), structWithSelectedFields);
-        } else if (enumEntryReference instanceof EnumNesting m) {
-            var subSelect = selectStructFieldsForEnum(m.values, enumData, selectedStructFields);
-            return Map.of(enumValue, subSelect);
-        } else {
-            throw new JApiProcessError("Unexpected enum reference type");
-        }
+        var enumStructReference = enumReference.get(enumValue);
+        var structWithSelectedFields = selectStructFields(enumStructReference, enumData, selectedStructFields);
+        return Map.of(enumEntry.getKey(), structWithSelectedFields);
     }
 }

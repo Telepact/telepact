@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -23,13 +22,19 @@ class InternalSerializer {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof FunctionDefinition f) {
                 allKeys.addAll(f.argumentStruct.fields.keySet());
-                addAllEnumValues(allKeys, f.resultEnum.values);
+                allKeys.addAll(f.resultEnum.values.keySet());
+                for (var resultEnumStruct : f.resultEnum.values.values()) {
+                    allKeys.addAll(resultEnumStruct.fields.keySet());
+                }
             } else if (entry.getValue() instanceof TypeDefinition t) {
                 var type = t.type;
                 if (type instanceof Struct o) {
                     allKeys.addAll(o.fields.keySet());
                 } else if (type instanceof Enum e) {
-                    addAllEnumValues(allKeys, e.values);
+                    allKeys.addAll(e.values.keySet());
+                    for (var resultEnumStruct : e.values.values()) {
+                        allKeys.addAll(resultEnumStruct.fields.keySet());
+                    }
                 }
             } else if (entry.getValue() instanceof ErrorDefinition e) {
                 allKeys.addAll(e.fields.keySet());
@@ -174,19 +179,6 @@ class InternalSerializer {
         }
 
         return decode(message, binaryEncoder.get());
-    }
-
-    private static void addAllEnumValues(Set<String> allKeys, Map<String, EnumType> enumValues) {
-        for (var entry : enumValues.entrySet()) {
-            var enumValue = entry.getKey();
-            var enumData = entry.getValue();
-            allKeys.add(enumValue);
-            if (enumData instanceof EnumStruct es) {
-                allKeys.addAll(es.fields.keySet());
-            } else if (enumData instanceof EnumNesting en) {
-                addAllEnumValues(allKeys, en.values);
-            }
-        }
     }
 
     private static Optional<BinaryEncoder> findBinaryEncoder(Long checksum, Deque<BinaryEncoder> binaryEncoderStore) {

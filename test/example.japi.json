@@ -120,10 +120,7 @@
     },
     "->",
     {
-      "ok": {},
-      "err": {
-        "_unknown": {}
-      }
+      "ok": {}
     },
     [
       "                      ",
@@ -141,11 +138,8 @@
       "ok": {
         "value!": "struct.Value"
       },
-      "err": {
-        "_unknown": {},
-        "example": {
-          "property": "string"
-        }
+      "_err_example": {
+        "property": "string"
       }
     }
   ]

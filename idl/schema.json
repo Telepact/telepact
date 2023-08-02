@@ -234,7 +234,7 @@
         },
         {
           "type": "object",
-          "required": ["ok", "err"],
+          "required": ["ok"],
           "properties": {
             "ok": {
               "type": "object",
@@ -244,25 +244,15 @@
                   "$ref": "#/$defs/typeDeclaration"
                 }
               }
-            },
-            "err": {
+            }
+          },
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*?$": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["_unknown"],
-              "properties": {
-                "_unknown": {
-                  "const": {}
-                }
-              },
               "patternProperties": {
-                "^[a-zA-Z_]\\w*?$": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "patternProperties": {
-                    "^[a-zA-Z_]\\w*!?$": {
-                      "$ref": "#/$defs/typeDeclaration"
-                    }
-                  }
+                "^[a-zA-Z_]\\w*!?$": {
+                  "$ref": "#/$defs/typeDeclaration"
                 }
               }
             }

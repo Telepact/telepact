@@ -95,7 +95,7 @@ class InternalMockServer {
                 var definition = jApiSchema.parsed.get(context.functionName);
 
                 if (definition instanceof FunctionDefinition f) {
-                    var okStructRef = (EnumStruct) f.resultEnum.values.get("ok");
+                    var okStructRef = f.resultEnum.values.get("ok");
                     var randomOkStruct = constructRandomStruct(okStructRef.fields, random);
                     return Map.of("ok", randomOkStruct);
                 } else {
@@ -215,7 +215,7 @@ class InternalMockServer {
         return null;
     }
 
-    private static Map<String, Object> constructRandomEnum(Map<String, EnumType> enumValuesReference,
+    private static Map<String, Object> constructRandomEnum(Map<String, Struct> enumValuesReference,
             MockRandom random) {
         var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
         Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -226,14 +226,7 @@ class InternalMockServer {
         var enumValue = enumEntry.getKey();
         var enumData = enumEntry.getValue();
 
-        if (enumData instanceof EnumNesting m) {
-            return Map.of(enumValue, constructRandomEnum(m.values, random));
-        } else if (enumData instanceof EnumStruct es) {
-            return Map.of(enumValue,
-                    constructRandomStruct(es.fields, random));
-        } else {
-            throw new JApiProcessError("Unexpected enum data type");
-        }
+        return Map.of(enumValue, constructRandomStruct(enumData.fields, random));
     }
 
     static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,

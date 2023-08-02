@@ -8,10 +8,7 @@ class InternalJApi {
           {},
           "->",
           {
-            "ok": {},
-            "err": {
-              "_unknown": {}
-            }
+            "ok": {}
           },
           [
             "                  ",
@@ -25,9 +22,6 @@ class InternalJApi {
           {
             "ok": {
               "schema": "object<any>"
-            },
-            "err": {
-              "_unknown": {}
             }
           },
           [
@@ -42,9 +36,6 @@ class InternalJApi {
           {
             "ok": {
               "schema": "object<any>"
-            },
-            "err": {
-              "_unknown": {}
             }
           },
           [
@@ -68,23 +59,21 @@ class InternalJApi {
           {},
           "->",
           {
-            "ok": {},
-            "err": {
-              "_invalidRequestTarget": {
-                "reason": "string"
-              },
-              "_invalidRequestHeaders": {
-                "cases": "array<struct._ValidationFailure>"
-              },
-              "_invalidRequestBody": {
-                "cases": "array<struct._ValidationFailure>"
-              },
-              "_invalidResponseBody": {
-                "cases": "array<struct._ValidationFailure>"
-              },
-              "_parseFailure": {
-                "reasons": "array<string>"
-              }
+            "_err_unknown": {},
+            "_err_invalidRequestTarget": {
+              "reason": "string"
+            },
+            "_err_invalidRequestHeaders": {
+              "cases": "array<struct._ValidationFailure>"
+            },
+            "_err_invalidRequestBody": {
+              "cases": "array<struct._ValidationFailure>"
+            },
+            "_err_invalidResponseBody": {
+              "cases": "array<struct._ValidationFailure>"
+            },
+            "_err_parseFailure": {
+              "reasons": "array<string>"
             }
           },
           [

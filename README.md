@@ -205,29 +205,13 @@ simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
 
-### Why require API drafters to include `{"err":{"_unknown":{}}}` in every function?
+### Why can't I have a other non-error result enum values?
 
-jAPI functions are required to specify the full result enum, which must also
-include a valid error enum. In jAPI, redundancy is conventionally solved with
-traits, but the jAPI specifically forgoes traits in favor of an explicit
-`_unknown` error enum value duplicated across all functions.
-
-This design decision accomplishes a few things:
-
-- It increases recognizability of the result struct by ensuring both the `ok`
-  and `err` enum values are present (as opposed to omitting and assuming empty
-  `{}`).
-- It helps clarify that the `ok` field points to a struct while the `err` field
-  points to an enum.
-- It maintains the design continuity of enums, where an enum must have at least
-  1 value (whereas assuming empty `{}` would be a violation of that pattern)
-- It provides an error enum pattern that can be easily copied for cases that do
-  require additional errors.
-
-jAPI is designed to maximize design accessibility through copy-and-paste, and
-the modest verbosity tax of a required `_unknown` error duplicated across all
-functions achieves this goal by ensuring that each function can serve as a
-complete design reference for a jAPI function.
+The only required value for the function result enum is `ok`. All other values
+in the result enum that are not `ok` are, by definition, "not okay", and will be
+interpreted as an error in all circumstances. API designers are encouraged to
+prefix additional result enum values with `error` or equivalent to improve
+readability and recognition of errors.
 
 ### Is adding a new enum value a backwards compatible change?
 

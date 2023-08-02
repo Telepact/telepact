@@ -113,36 +113,13 @@ class InternalParse {
                         f.argumentStruct.fields.put(newKey, traitArgumentField.getValue());
                     }
 
-                    var traitOkStruct = (EnumStruct) traitDefinition.resultEnum.values.get("ok");
-                    var okStruct = (EnumStruct) f.resultEnum.values.get("ok");
-                    for (var traitOkStructEntry : traitOkStruct.fields.entrySet()) {
-                        var newKey = traitOkStructEntry.getKey();
-                        if (okStruct.fields.containsKey(newKey)) {
+                    for (var traitResultField : traitDefinition.resultEnum.values.entrySet()) {
+                        var newKey = traitResultField.getKey();
+                        if (f.resultEnum.values.containsKey(newKey)) {
                             throw new JApiSchemaParseError(
-                                    "Trait ok struct field already in use: %s".formatted(newKey));
+                                    "Trait argument field already in use: %s".formatted(newKey));
                         }
-
-                        okStruct.fields.put(newKey, traitOkStructEntry.getValue());
-                    }
-
-                    var traitErrEnum = (EnumNesting) traitDefinition.resultEnum.values
-                            .get("err");
-                    var errEnum = (EnumNesting) f.resultEnum.values.get("err");
-                    for (var traitErrStructEntry : traitErrEnum.values.entrySet()) {
-                        var newEnumValue = traitErrStructEntry.getKey();
-
-                        // We can skip the _unknown error as it's already required
-                        if ("_unknown".equals(newEnumValue)) {
-                            continue;
-                        }
-
-                        if (errEnum.values.containsKey(newEnumValue)) {
-                            throw new JApiSchemaParseError(
-                                    "Trait err enum value (%s) already in use for (%s)".formatted(newEnumValue,
-                                            f.name));
-                        }
-
-                        errEnum.values.put(newEnumValue, traitErrStructEntry.getValue());
+                        f.resultEnum.values.put(newKey, traitResultField.getValue());
                     }
                 }
             }
@@ -212,62 +189,32 @@ class InternalParse {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
         }
 
-        Map<String, Object> resultOkDefinitionAsParsedJson;
-        try {
-            resultOkDefinitionAsParsedJson = (Map<String, Object>) resultDefinitionAsParsedJson.get("ok");
-            resultOkDefinitionAsParsedJson.size();
-        } catch (ClassCastException | NullPointerException e) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
-        }
-
-        var okStructFields = new HashMap<String, FieldDeclaration>();
-        for (var entry : resultOkDefinitionAsParsedJson.entrySet()) {
-            var fieldDeclaration = entry.getKey();
-            var typeDeclarationValue = entry.getValue();
-            var parsedField = parseField(fieldDeclaration,
-                    typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
-            okStructFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
-        }
-
-        Map<String, Object> errorEnumAsParsedJson;
-        try {
-            errorEnumAsParsedJson = (Map<String, Object>) resultDefinitionAsParsedJson.getOrDefault("err",
-                    new HashMap<>());
-        } catch (ClassCastException e) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
-        }
-
-        var errorValues = new HashMap<String, EnumType>();
-        for (var entry : errorEnumAsParsedJson.entrySet()) {
-            var enumCase = entry.getKey();
-            Map<String, Object> enumStructDefinitionAsParsedJson;
+        var values = new HashMap<String, Struct>();
+        for (var entry : resultDefinitionAsParsedJson.entrySet()) {
+            Map<String, Object> enumValueData;
             try {
-                enumStructDefinitionAsParsedJson = (Map<String, Object>) entry.getValue();
+                enumValueData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
-                throw new JApiSchemaParseError("Invalid enum definition for %s".formatted(definitionKey));
+                throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
             }
+            var enumValue = entry.getKey();
 
             var fields = new HashMap<String, FieldDeclaration>();
-            for (var enumStructEntry : enumStructDefinitionAsParsedJson.entrySet()) {
-                var enumStructFieldDeclaration = enumStructEntry.getKey();
-                var enumStructTypeDeclarationValue = enumStructEntry.getValue();
-                var enumStructParsedField = parseField(
-                        enumStructFieldDeclaration, enumStructTypeDeclarationValue, false, jApiSchemaAsParsedJson,
-                        parsedDefinitions);
-                fields.put(enumStructParsedField.fieldName, enumStructParsedField.fieldDeclaration);
+            for (var structEntry : enumValueData.entrySet()) {
+                var fieldDeclaration = structEntry.getKey();
+                var typeDeclarationValue = structEntry.getValue();
+                var parsedField = parseField(fieldDeclaration,
+                        typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
+                fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
-            var errorValueStruct = new EnumStruct("%s.%s".formatted(definitionKey, enumCase), fields);
-            errorValues.put(enumCase, errorValueStruct);
+
+            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields);
+
+            values.put(enumValue, enumStruct);
         }
 
-        var argumentStruct = new Struct("%s".formatted(definitionKey), argumentFields);
-        var okStruct = new EnumStruct("%s.ok".formatted(definitionKey), okStructFields);
-
-        var errorEnum = new EnumNesting("%s.%s".formatted(definitionKey, "err"), errorValues);
-        var resultEnumValues = Map.of("ok", okStruct, "err", errorEnum);
-        var resultEnum = new Enum(definitionKey, resultEnumValues);
-
-        // TODO: Ensure that `_unknown` is defined.
+        var argumentStruct = new Struct(definitionKey, argumentFields);
+        var resultEnum = new Enum(definitionKey, values);
 
         return new FunctionDefinition(definitionKey, argumentStruct, resultEnum);
     }
@@ -310,69 +257,33 @@ class InternalParse {
             throw new JApiSchemaParseError("Invalid enum definition for %s".formatted(definitionKey));
         }
 
-        var values = new HashMap<String, EnumType>();
+        var values = new HashMap<String, Struct>();
         for (var entry : enumDefinitionAsParsedJson.entrySet()) {
-            Map<String, Object> enumValueData;
+            Map<String, Object> enumStructData;
             try {
-                enumValueData = (Map<String, Object>) entry.getValue();
+                enumStructData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
                 throw new JApiSchemaParseError("Invalid enum definition for %s".formatted(definitionKey));
             }
             var enumValue = entry.getKey();
 
-            var enumType = parseEnumValueData(enumValueData, "%s.%s".formatted(definitionKey, enumValue),
-                    jApiSchemaAsParsedJson,
-                    parsedDefinitions);
-
-            values.put(enumValue, enumType);
-        }
-
-        var type = new Enum(definitionKey, values);
-
-        return new TypeDefinition(definitionKey, type);
-    }
-
-    private static EnumType parseEnumValueData(
-            Map<String, Object> enumDataAsParsedJson,
-            String path,
-            Map<String, List<Object>> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
-        // Look ahead, and see if we need to treat this as an enum struct or nested enum
-        var anyEntry = enumDataAsParsedJson.entrySet().stream().findFirst();
-        if (anyEntry.isEmpty() || anyEntry.get().getValue() instanceof String) {
-
             var fields = new HashMap<String, FieldDeclaration>();
-            for (var entry : enumDataAsParsedJson.entrySet()) {
-                var fieldDeclaration = entry.getKey();
-                var typeDeclarationValue = entry.getValue();
+            for (var structEntry : enumStructData.entrySet()) {
+                var fieldDeclaration = structEntry.getKey();
+                var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
                         typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            return new EnumStruct(path, fields);
-        } else if (anyEntry.isPresent() && anyEntry.get().getValue() instanceof Map<?, ?> m) {
-            var nestedEnum = new HashMap<String, EnumType>();
-            for (var entry : enumDataAsParsedJson.entrySet()) {
-                var nestedEnumValue = entry.getKey();
+            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields);
 
-                Map<String, Object> nestedEnumData;
-                try {
-                    nestedEnumData = (Map<String, Object>) entry.getValue();
-                } catch (ClassCastException e) {
-                    throw new JApiSchemaParseError("Invalid enum definition for %s".formatted(path));
-                }
-
-                var parsedEnumData = parseEnumValueData(nestedEnumData, "%s.%s".formatted(path, nestedEnumValue),
-                        jApiSchemaAsParsedJson, parsedDefinitions);
-
-                nestedEnum.put(nestedEnumValue, parsedEnumData);
-            }
-
-            return new EnumNesting(path, nestedEnum);
-        } else {
-            throw new JApiSchemaParseError("Invalid enum definition for %s".formatted(path));
+            values.put(enumValue, enumStruct);
         }
+
+        var type = new Enum(definitionKey, values);
+
+        return new TypeDefinition(definitionKey, type);
     }
 
     private static FieldNameAndFieldDeclaration parseField(
