@@ -1082,8 +1082,6 @@
 ["fn.test",{"ok":{"value":{"enum":{"one":{}}}}},{"value":{"enum":{"one":{}}}}]|["fn.test",{},{"ok":{"value":{"enum":{"one":{}}}}}]
 ["fn.test",{"ok":{"value":{"enum":{"two":{"required":false}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"enum":{"two":{"required":false}}}}}]
 ["fn.test",{"ok":{"value":{"enum":{"two":{"optional":false,"required":false}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"enum":{"two":{"optional":false,"required":false}}}}}]
-["fn.test",{"ok":{"value":{"enum":{"three":{"a":{}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"enum":{"three":{"a":{}}}}}}]
-["fn.test",{"ok":{"value":{"enum":{"three":{"b":{"required":false}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"enum":{"three":{"b":{"required":false}}}}}}]
 
 ["fn.test",{},{"value":{"enum":null}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum","reason":"NullInvalidForNonNullType"}]}}}]
 
@@ -1091,9 +1089,6 @@
 ["fn.test",{},{"value":{"enum":{"one":{},"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"enum":{"a":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum.a","reason":"UnknownEnumField"}]}}}]
 ["fn.test",{},{"value":{"enum":{"two":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum.two.required","reason":"RequiredStructFieldMissing"}]}}}]
-["fn.test",{},{"value":{"enum":{"three":{"a":{},"b":{"required":true}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{},{"value":{"enum":{"three":{"c":{}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"enum":{"three":{"b":{}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{},{"value":{"enum":false}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{},{"value":{"enum":0}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.enum","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1107,9 +1102,6 @@
 ["fn.test",{"ok":{"value":{"enum":{"one":{},"two":{"optional":false,"required":false}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"enum":{"a":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum.a","reason":"UnknownEnumField"}]}}}]
 ["fn.test",{"ok":{"value":{"enum":{"two":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum.two.required","reason":"RequiredStructFieldMissing"}]}}}]
-["fn.test",{"ok":{"value":{"enum":{"three":{"a":{},"b":{"required":true}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{"ok":{"value":{"enum":{"three":{"c":{}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"enum":{"three":{"b":{}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{"ok":{"value":{"enum":false}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{"ok":{"value":{"enum":0}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.enum","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1122,15 +1114,10 @@
 ["fn.test",{"ok":{"value":{"nullEnum":null}}},{"value":{"nullEnum":null}}]|["fn.test",{},{"ok":{"value":{"nullEnum":null}}}]
 ["fn.test",{"ok":{"value":{"nullEnum":{"one":{}}}}},{"value":{"nullEnum":{"one":{}}}}]|["fn.test",{},{"ok":{"value":{"nullEnum":{"one":{}}}}}]
 ["fn.test",{"ok":{"value":{"nullEnum":{"two":{"optional":false,"required":false}}}}},{"value":{"nullEnum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"nullEnum":{"two":{"optional":false,"required":false}}}}}]
-["fn.test",{"ok":{"value":{"nullEnum":{"three":{"a":{}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"nullEnum":{"three":{"a":{}}}}}}]
-["fn.test",{"ok":{"value":{"nullEnum":{"three":{"b":{"required":false}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"nullEnum":{"three":{"b":{"required":false}}}}}}]
 
 ["fn.test",{},{"value":{"nullEnum":{}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"nullEnum":{"one":{},"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"nullEnum":{"a":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum.a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"nullEnum":{"three":{"a":{},"b":{"required":true}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{},{"value":{"nullEnum":{"three":{"c":{}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"nullEnum":{"three":{"b":{}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{},{"value":{"nullEnum":false}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{},{"value":{"nullEnum":0}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.nullEnum","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1141,9 +1128,6 @@
 ["fn.test",{"ok":{"value":{"nullEnum":{}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"nullEnum":{"one":{},"two":{"optional":false,"required":false}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"nullEnum":{"a":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum.a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"nullEnum":{"three":{"a":{},"b":{"required":true}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{"ok":{"value":{"nullEnum":{"three":{"c":{}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"nullEnum":{"three":{"b":{}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{"ok":{"value":{"nullEnum":false}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{"ok":{"value":{"nullEnum":0}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.nullEnum","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1157,17 +1141,12 @@
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}}]}}},{"value":{"arrEnum":[{"one":{}}]}}]|["fn.test",{},{"ok":{"value":{"arrEnum":[{"one":{}}]}}}]
 ["fn.test",{"ok":{"value":{"arrEnum":[{"two":{"optional":false,"required":false}}]}}},{"value":{"arrEnum":[{"two":{"optional":false,"required":false}}]}}]|["fn.test",{},{"ok":{"value":{"arrEnum":[{"two":{"optional":false,"required":false}}]}}}]
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{"two":{"optional":false,"required":false}}]}}},{"value":{"arrEnum":[{"one":{}},{"two":{"optional":false,"required":false}}]}}]|["fn.test",{},{"ok":{"value":{"arrEnum":[{"one":{}},{"two":{"optional":false,"required":false}}]}}}]
-["fn.test",{"ok":{"value":{"arrEnum":[{"three":{"a":{}}}]}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"arrEnum":[{"three":{"a":{}}}]}}}]
-["fn.test",{"ok":{"value":{"arrEnum":[{"three":{"b":{"required":false}}}]}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"arrEnum":[{"three":{"b":{"required":false}}}]}}}]
 
 ["fn.test",{},{"value":{"arrEnum":[{"one":{}},null]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1]","reason":"NullInvalidForNonNullType"}]}}}]
 
 ["fn.test",{},{"value":{"arrEnum":[{"one":{}},{}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"arrEnum":[{"one":{}},{"one":{},"two":{"optional":false,"required":false}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"arrEnum":[{"one":{}},{"a":{}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1].a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"arrEnum":[{"one":{}},{"three":{"a":{},"b":{"required":true}}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1].three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{},{"value":{"arrEnum":[{"one":{}},{"three":{"c":{}}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1].three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"arrEnum":[{"one":{}},{"three":{"b":{}}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1].three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{},{"value":{"arrEnum":[{"one":{}},false]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1]","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{},{"value":{"arrEnum":[{"one":{}},0]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrEnum[1]","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1180,9 +1159,6 @@
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{"one":{},"two":{"optional":false,"required":false}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{"a":{}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1].a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{"three":{"a":{},"b":{"required":true}}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1].three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{"three":{"c":{}}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1].three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},{"three":{"b":{}}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1].three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},false]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1]","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{"ok":{"value":{"arrEnum":[{"one":{}},0]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrEnum[1]","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1197,15 +1173,10 @@
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}}]}}},{"value":{"arrNullEnum":[{"one":{}}]}}]|["fn.test",{},{"ok":{"value":{"arrNullEnum":[{"one":{}}]}}}]
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"two":{"optional":false,"required":false}}]}}},{"value":{"arrNullEnum":[{"two":{"optional":false,"required":false}}]}}]|["fn.test",{},{"ok":{"value":{"arrNullEnum":[{"two":{"optional":false,"required":false}}]}}}]
 ["fn.test",{"ok":{"value":{"arrNullEnum":[null,{"one":{}},{"two":{"optional":false,"required":false}}]}}},{"value":{"arrNullEnum":[null,{"one":{}},{"two":{"optional":false,"required":false}}]}}]|["fn.test",{},{"ok":{"value":{"arrNullEnum":[null,{"one":{}},{"two":{"optional":false,"required":false}}]}}}]
-["fn.test",{"ok":{"value":{"arrNullEnum":[{"three":{"a":{}}}]}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"arrNullEnum":[{"three":{"a":{}}}]}}}]
-["fn.test",{"ok":{"value":{"arrNullEnum":[{"three":{"b":{"required":false}}}]}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"arrNullEnum":[{"three":{"b":{"required":false}}}]}}}]
 
 ["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},{}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},{"one":{},"two":{"optional":false,"required":false}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},{"a":{}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1].a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},{"three":{"a":{},"b":{"required":true}}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1].three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},{"three":{"c":{}}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1].three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},{"three":{"b":{}}}]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1].three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},false]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1]","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{},{"value":{"arrNullEnum":[{"one":{}},0]}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.arrNullEnum[1]","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1216,9 +1187,6 @@
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},{}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},{"one":{},"two":{"optional":false,"required":false}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1]","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},{"a":{}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1].a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},{"three":{"a":{},"b":{"required":true}}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1].three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},{"three":{"c":{}}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1].three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},{"three":{"b":{}}}]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1].three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},false]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1]","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{"ok":{"value":{"arrNullEnum":[{"one":{}},0]}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.arrNullEnum[1]","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1232,17 +1200,12 @@
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}}}}}},{"value":{"objEnum":{"a":{"one":{}}}}}]|["fn.test",{},{"ok":{"value":{"objEnum":{"a":{"one":{}}}}}}]
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"two":{"optional":false,"required":false}}}}}},{"value":{"objEnum":{"a":{"two":{"optional":false,"required":false}}}}}]|["fn.test",{},{"ok":{"value":{"objEnum":{"a":{"two":{"optional":false,"required":false}}}}}}]
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"two":{"optional":false,"required":false}}}}}},{"value":{"objEnum":{"a":{"one":{}},"b":{"two":{"optional":false,"required":false}}}}}]|["fn.test",{},{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"two":{"optional":false,"required":false}}}}}}]
-["fn.test",{"ok":{"value":{"objEnum":{"a":{"three":{"a":{}}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"objEnum":{"a":{"three":{"a":{}}}}}}}]
-["fn.test",{"ok":{"value":{"objEnum":{"a":{"three":{"b":{"required":false}}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"objEnum":{"a":{"three":{"b":{"required":false}}}}}}}]
 
 ["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":null}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}","reason":"NullInvalidForNonNullType"}]}}}]
 
 ["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":{"one":{},"two":{"optional":false,"required":false}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":{"a":{}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}.a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":{"three":{"a":{},"b":{"required":true}}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":{"three":{"c":{}}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":{"three":{"b":{}}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":false}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{},{"value":{"objEnum":{"a":{"one":{}},"b":0}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objEnum{b}","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1255,9 +1218,6 @@
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"one":{},"two":{"optional":false,"required":false}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"a":{}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}.a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"three":{"a":{},"b":{"required":true}}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"three":{"c":{}}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":{"three":{"b":{}}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":false}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{"ok":{"value":{"objEnum":{"a":{"one":{}},"b":0}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objEnum{b}","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1272,15 +1232,10 @@
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}}}}}},{"value":{"objNullEnum":{"a":{"one":{}}}}}]|["fn.test",{},{"ok":{"value":{"objNullEnum":{"a":{"one":{}}}}}}]
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"two":{"optional":false,"required":false}}}}}},{"value":{"objNullEnum":{"a":{"two":{"optional":false,"required":false}}}}}]|["fn.test",{},{"ok":{"value":{"objNullEnum":{"a":{"two":{"optional":false,"required":false}}}}}}]
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":null,"b":{"one":{}},"c":{"two":{"optional":false,"required":false}}}}}},{"value":{"objNullEnum":{"a":null,"b":{"one":{}},"c":{"two":{"optional":false,"required":false}}}}}]|["fn.test",{},{"ok":{"value":{"objNullEnum":{"a":null,"b":{"one":{}},"c":{"two":{"optional":false,"required":false}}}}}}]
-["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"three":{"a":{}}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"objNullEnum":{"a":{"three":{"a":{}}}}}}}]
-["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"three":{"b":{"required":false}}}}}}},{"value":{"enum":{"two":{"optional":false,"required":false}}}}]|["fn.test",{},{"ok":{"value":{"objNullEnum":{"a":{"three":{"b":{"required":false}}}}}}}]
 
 ["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":{}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":{"one":{},"two":{"optional":false,"required":false}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":{"a":{}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}.a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":{"three":{"a":{},"b":{"required":true}}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":{"three":{"c":{}}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":{"three":{"b":{}}}}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":false}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{},{"value":{"objNullEnum":{"a":{"one":{}},"b":0}}}]|["fn.test",{},{"err":{"_invalidRequestBody":{"cases":[{"path":"fn.test.value.objNullEnum{b}","reason":"NumberInvalidForEnumType"}]}}}]
@@ -1291,9 +1246,6 @@
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":{}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":{"one":{},"two":{"optional":false,"required":false}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":{"a":{}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}.a","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":{"three":{"a":{},"b":{"required":true}}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}.three","reason":"EnumDoesNotHaveExactlyOneField"}]}}}]
-["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":{"three":{"c":{}}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}.three.c","reason":"UnknownEnumField"}]}}}]
-["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":{"three":{"b":{}}}}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}.three.b.required","reason":"RequiredStructFieldMissing"}]}}}]
 
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":false}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}","reason":"BooleanInvalidForEnumType"}]}}}]
 ["fn.test",{"ok":{"value":{"objNullEnum":{"a":{"one":{}},"b":0}}}},{}]|["fn.test",{},{"err":{"_invalidResponseBody":{"cases":[{"path":"fn.test.ok.value.objNullEnum{b}","reason":"NumberInvalidForEnumType"}]}}}]
