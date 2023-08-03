@@ -63,16 +63,16 @@ class InternalJApi {
             "_err_invalidRequestTarget": {
               "reason": "string"
             },
-            "_err_invalidRequestHeaders": {
+            "_errorInvalidRequestHeaders": {
               "cases": "array<struct._ValidationFailure>"
             },
-            "_err_invalidRequestBody": {
+            "_errorInvalidRequestBody": {
               "cases": "array<struct._ValidationFailure>"
             },
-            "_err_invalidResponseBody": {
+            "_errorInvalidResponseBody": {
               "cases": "array<struct._ValidationFailure>"
             },
-            "_err_parseFailure": {
+            "_errorParseFailure": {
               "reasons": "array<string>"
             }
           },

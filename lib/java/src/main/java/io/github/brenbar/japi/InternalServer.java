@@ -110,7 +110,7 @@ class InternalServer {
 
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
-            Map<String, Object> newErrorResult = Map.of("_err_parseFailure", Map.of("reasons", parseFailures));
+            Map<String, Object> newErrorResult = Map.of("_errorParseFailure", Map.of("reasons", parseFailures));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
@@ -123,7 +123,7 @@ class InternalServer {
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_err_invalidRequestHeaders",
+            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
                     newErrorResult);
@@ -143,7 +143,7 @@ class InternalServer {
                 functionDefinition.argumentStruct.fields, requestBody);
         if (!argumentValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_err_invalidRequestBody",
+            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
                     newErrorResult);
@@ -171,7 +171,7 @@ class InternalServer {
                 result);
         if (!resultValidationFailures.isEmpty() && !unsafeResponseEnabled) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_err_invalidResponseBody",
+            Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(functionDefinition.name, functionDefinition,
                     newErrorResult);
