@@ -2,3 +2,7 @@
 src/test/java/io/github/brenbar/japi/GeneratedTests.java
 src/test/java/io/github/brenbar/japi/GeneratedMockTests.java
 target/
+src/main/resources/internal.japi.json
+src/main/resources/mock-internal.japi.json
+
+

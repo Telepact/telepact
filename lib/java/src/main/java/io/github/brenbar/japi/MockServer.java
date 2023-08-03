@@ -28,7 +28,7 @@ public class MockServer {
     public MockServer(String jApiSchemaAsJson) {
         var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
-                InternalMockJApi.JSON));
+                InternalMockJApi.getJson()));
         this.server = new Server(combinedSchemaJson, this::handle);
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = true;

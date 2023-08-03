@@ -1,4 +1,5 @@
 import shutil
+import os
 from dataclasses import dataclass
 
 def generate_tests():
@@ -173,7 +174,10 @@ def generate_mock_tests():
     }
     ''')
 
+if not os.path.exists('src/main/resources'):
+    os.makedirs('src/main/resources')
 shutil.copyfile('../../common/internal.japi.json', 'src/main/resources/internal.japi.json')
+shutil.copyfile('../../common/mock-internal.japi.json', 'src/main/resources/mock-internal.japi.json')
 
 generate_tests()
 generate_mock_tests()
