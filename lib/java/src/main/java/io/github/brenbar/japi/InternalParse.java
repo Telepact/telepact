@@ -18,7 +18,7 @@ class InternalParse {
     static JApiSchema newJApiSchemaWithInternalSchema(String jApiSchemaAsJson) {
         var combinedSchemaJson = combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
-                InternalJApi.JSON));
+                InternalJApi.getJson()));
         var schema = newJApiSchema(combinedSchemaJson);
 
         return schema;

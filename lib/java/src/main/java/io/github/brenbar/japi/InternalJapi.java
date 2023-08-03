@@ -1,90 +1,13 @@
 package io.github.brenbar.japi;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
 class InternalJApi {
 
-  static final String JSON = """
-      {
-        "fn._ping": [
-          {},
-          "->",
-          {
-            "ok": {}
-          },
-          [
-            "                  ",
-            " Ping the server. ",
-            "                  "
-          ]
-        ],
-        "fn._schema": [
-          {},
-          "->",
-          {
-            "ok": {
-              "schema": "object<any>"
-            }
-          },
-          [
-            "                                       ",
-            " Get the jAPI `schema` of this server. ",
-            "                                       "
-          ]
-        ],
-        "fn._unknown": [
-          {},
-          "->",
-          {
-            "ok": {
-              "schema": "object<any>"
-            }
-          },
-          [
-            "                                                                ",
-            " A placeholder function when the requested function is unknown. ",
-            "                                                                "
-          ]
-        ],
-        "struct._ValidationFailure": [
-          {
-            "path": "string",
-            "reason": "string"
-          },
-          [
-            "                                                                   ",
-            " A validation failure located at a `path` explained by a `reason`. ",
-            "                                                                   "
-          ]
-        ],
-        "trait._Validated": [
-          {},
-          "->",
-          {
-            "_errorUnknown": {},
-            "_errorInvalidRequestHeaders": {
-              "cases": "array<struct._ValidationFailure>"
-            },
-            "_errorInvalidRequestBody": {
-              "cases": "array<struct._ValidationFailure>"
-            },
-            "_errorInvalidResponseBody": {
-              "cases": "array<struct._ValidationFailure>"
-            },
-            "_errorParseFailure": {
-              "reasons": "array<string>"
-            }
-          },
-          [
-            "                                                                                                     ",
-            " All functions may return a validation error:                                                        ",
-            " - `_invalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
-            " - `_invalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
-            " - `_invalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
-            " - `_invalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
-            "     outlined by a list of `cases.                                                                   ",
-            " - `_parseFailure`: The Request could not be parsed as a jAPI Message.                               ",
-            "                                                                                                     "
-          ]
-        ]
-      }
-      """;
+  public static String getJson() {
+    var stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("internal.japi.json");
+    return new BufferedReader(new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
+  };
 }
