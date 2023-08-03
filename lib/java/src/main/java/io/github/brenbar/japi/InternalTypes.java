@@ -133,13 +133,6 @@ interface Type {
     public String getName();
 }
 
-class JsonNull implements Type {
-    @Override
-    public String getName() {
-        return "null";
-    }
-}
-
 class JsonBoolean implements Type {
     @Override
     public String getName() {

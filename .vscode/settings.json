@@ -1,0 +1,10 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "*.japi.json"
+            ],
+            "url": "./idl/schema.json"
+        }
+    ]
+}

@@ -320,7 +320,7 @@ class InternalParse {
     private static TypeDeclaration parseType(String typeDeclaration, Map<String, List<Object>> jApiSchemaAsParsedJson,
             Map<String, Definition> parsedDefinitions) {
         var regex = Pattern.compile(
-                "^((null|boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn)\\.([a-zA-Z_]\\w*)))(\\?)?$");
+                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn)\\.([a-zA-Z_]\\w*)))(\\?)?$");
         var matcher = regex.matcher(typeDeclaration);
         matcher.find();
 
@@ -332,7 +332,6 @@ class InternalParse {
                 throw new RuntimeException("Ignore: will try another type");
             }
             var type = switch (name) {
-                case "null" -> new JsonNull();
                 case "boolean" -> new JsonBoolean();
                 case "integer" -> new JsonInteger();
                 case "number" -> new JsonNumber();
@@ -340,13 +339,6 @@ class InternalParse {
                 case "any" -> new JsonAny();
                 default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(name));
             };
-
-            if (type instanceof JsonNull) {
-                if (nullable) {
-                    throw new JApiSchemaParseError("Cannot declare null type as nullable");
-                }
-                nullable = true;
-            }
 
             return new TypeDeclaration(type, nullable);
         } catch (Exception e) {
