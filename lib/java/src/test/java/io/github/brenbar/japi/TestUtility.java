@@ -27,10 +27,9 @@ public class TestUtility {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                } else if (context.requestHeaders.containsKey("err")) {
+                } else if (context.requestHeaders.containsKey("result")) {
                     try {
-                        var e = (Map<String, Object>) context.requestHeaders.get("err");
-                        yield Map.of("err", e);
+                        yield (Map<String, Object>) context.requestHeaders.get("result");
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
                     }

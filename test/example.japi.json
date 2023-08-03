@@ -138,7 +138,7 @@
       "ok": {
         "value!": "struct.Value"
       },
-      "_err_example": {
+      "errorExample": {
         "property": "string"
       }
     }
