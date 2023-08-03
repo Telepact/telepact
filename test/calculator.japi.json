@@ -52,10 +52,7 @@
     },
     "->",
     {
-      "ok": {},
-      "err": {
-        "_unknown": {}
-      }
+      "ok": {}
     },
     [
       "                                                                            ",
@@ -74,10 +71,7 @@
       "ok": {
         "result": "number"
       },
-      "err": {
-        "_unknown": {},
-        "cannotDivideByZero": {}
-      }
+      "errorCannotDivideByZero": {}
     },
     [
       "                                                       ",
@@ -93,9 +87,6 @@
     {
       "ok": {
         "variables": "array<struct.Variable>"
-      },
-      "err": {
-        "_unknown": {}
       }
     },
     [

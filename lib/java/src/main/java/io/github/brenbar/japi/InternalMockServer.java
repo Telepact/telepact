@@ -89,7 +89,7 @@ class InternalMockServer {
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return Map.of("err", Map.of("_noMatchingStub", Map.of()));
+                    return Map.of("_err_noMatchingStub", Map.of());
                 }
 
                 var definition = jApiSchema.parsed.get(context.functionName);
@@ -297,7 +297,7 @@ class InternalMockServer {
                     errorString.append("%s %s\n".formatted(invocation.functionName, invocationArgumentJson));
                 }
             }
-            return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
+            return Map.of("err_verificationFailure", Map.of("details", errorString.toString()));
         } catch (Exception ex) {
             throw new JApiProcessError(ex);
         }
@@ -318,7 +318,7 @@ class InternalMockServer {
                     errorString.append("%s %s\n".formatted(invocation.functionName,
                             invocationArgumentJson));
                 }
-                return Map.of("err", Map.of("_verificationFailure", Map.of("details", errorString.toString())));
+                return Map.of("err_verificationFailure", Map.of("details", errorString.toString()));
             }
 
             return Map.of("ok", Map.of());

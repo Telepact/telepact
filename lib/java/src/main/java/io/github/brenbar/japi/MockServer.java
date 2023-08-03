@@ -140,18 +140,14 @@ public class MockServer {
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
-        var err = (Map<String, Object>) result.get("err");
-        if (err != null) {
-            var errEntry = err.entrySet().stream().findAny().get();
-
-            switch (errEntry.getKey()) {
-                case "_verificationFailure" -> {
-                    var verificationFailureStruct = (Map<String, Object>) errEntry.getValue();
-                    var details = verificationFailureStruct.get("details");
-                    throw new AssertionError(details);
-                }
+        if (result.containsKey("err_verificationFailure")) {
+            try {
+                var verificationFailureStruct = (Map<String, Object>) result.get("err_verificationFailure");
+                var details = verificationFailureStruct.get("details");
+                throw new AssertionError(details);
+            } catch (Exception e2) {
+                throw new JApiProcessError(String.valueOf(result));
             }
-            throw new JApiProcessError(String.valueOf(result));
         }
     }
 
@@ -168,18 +164,14 @@ public class MockServer {
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
-        var err = (Map<String, Object>) result.get("err");
-        if (err != null) {
-            var errEntry = err.entrySet().stream().findAny().get();
-
-            switch (errEntry.getKey()) {
-                case "_verificationFailure" -> {
-                    var verificationFailureStruct = (Map<String, Object>) errEntry.getValue();
-                    var details = verificationFailureStruct.get("details");
-                    throw new AssertionError(details);
-                }
+        if (result.containsKey("err_verificationFailure")) {
+            try {
+                var verificationFailureStruct = (Map<String, Object>) result.get("err_verificationFailure");
+                var details = verificationFailureStruct.get("details");
+                throw new AssertionError(details);
+            } catch (Exception e2) {
+                throw new JApiProcessError(String.valueOf(result));
             }
-            throw new JApiProcessError(String.valueOf(result));
         }
     }
 
@@ -195,8 +187,7 @@ public class MockServer {
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
-        var err = (Map<String, Object>) result.get("err");
-        if (err != null) {
+        if (!result.containsKey("ok")) {
             throw new JApiProcessError(String.valueOf(result));
         }
     }
@@ -213,8 +204,7 @@ public class MockServer {
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
-        var err = (Map<String, Object>) result.get("err");
-        if (err != null) {
+        if (!result.containsKey("ok")) {
             throw new JApiProcessError(String.valueOf(result));
         }
     }

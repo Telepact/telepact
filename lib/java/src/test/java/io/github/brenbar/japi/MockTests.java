@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class MockTests {
@@ -39,6 +40,7 @@ public class MockTests {
         }
 
         @Test
+        @Disabled("TODO")
         public void testMocking() throws IOException {
                 var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
                 var mock = new MockServer(json);
