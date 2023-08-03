@@ -14,10 +14,7 @@ class InternalMockJApi {
           },
           "->",
           {
-            "ok": {},
-            "err": {
-              "_unknown": {}
-            }
+            "ok": {}
           },
           [
             "                                                                              ",
@@ -54,11 +51,8 @@ class InternalMockJApi {
           "->",
           {
             "ok": {},
-            "err": {
-              "_unknown": {},
-              "_verificationFailure": {
-                "details": "string"
-              }
+            "err_verificationFailure": {
+              "details": "string"
             }
           },
           [
@@ -72,11 +66,8 @@ class InternalMockJApi {
           "->",
           {
             "ok": {},
-            "err": {
-              "_unknown": {},
-              "_verificationFailure": {
-                "details": "string"
-              }
+            "err_verificationFailure": {
+              "details": "string"
             }
           },
           [
@@ -90,10 +81,7 @@ class InternalMockJApi {
           {},
           "->",
           {
-            "ok": {},
-            "err": {
-              "_unknown": {}
-            }
+            "ok": {}
           },
           [
             "                             ",
@@ -105,10 +93,7 @@ class InternalMockJApi {
           {},
           "->",
           {
-            "ok": {},
-            "err": {
-              "_unknown": {}
-            }
+            "ok": {}
           },
           [
             "                            ",
@@ -120,11 +105,7 @@ class InternalMockJApi {
           {},
           "->",
           {
-            "ok": {},
-            "err": {
-              "_unknown": {},
-              "_noMatchingStub": {}
-            }
+            "_err_noMatchingStub": {}
           },
           [
             "                                                                             ",
