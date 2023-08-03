@@ -1528,3 +1528,7 @@ false|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWit
 ["fn._ping",{"_bin":[""]},{}]|["fn._ping",{},{"_errorInvalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}]|skipBinary
 ["fn._ping",{"_bin":[[]]},{}]|["fn._ping",{},{"_errorInvalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}]|skipBinary
 ["fn._ping",{"_bin":[{}]},{}]|["fn._ping",{},{"_errorInvalidRequestHeaders":{"cases":[{"path":"headers{_bin}","reason":"BinaryHeaderMustBeArrayOfIntegers"}]}}]|skipBinary
+
+"testApplicationFailure"
+
+["fn.test",{"throw":true},{}]|["fn.test",{},{"_errorUnknown":{}}]

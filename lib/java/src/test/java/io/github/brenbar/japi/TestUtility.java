@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -33,12 +34,15 @@ public class TestUtility {
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
                     }
+                } else if (Objects.equals(true, context.requestHeaders.get("throw"))) {
+                    throw new RuntimeException();
                 } else {
                     yield Map.of();
                 }
             }
             default -> throw new RuntimeException();
         };
+
     }
 
     public static void test(String requestJson, String expectedResponseJson) throws IOException {

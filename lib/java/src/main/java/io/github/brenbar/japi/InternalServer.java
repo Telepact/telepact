@@ -163,7 +163,11 @@ class InternalServer {
         } else if (requestTarget.equals("fn._jApi")) {
             result = Map.of("ok", Map.of("jApi", jApiSchema.original));
         } else {
-            result = handler.apply(context, requestBody);
+            try {
+                result = handler.apply(context, requestBody);
+            } catch (Throwable t) {
+                result = Map.of("_errorUnknown", Map.of());
+            }
         }
 
         var resultValidationFailures = validateResultEnum(functionDefinition.name,

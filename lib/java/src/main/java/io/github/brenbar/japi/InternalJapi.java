@@ -59,7 +59,7 @@ class InternalJApi {
           {},
           "->",
           {
-            "_err_unknown": {},
+            "_errorUnknown": {},
             "_errorInvalidRequestHeaders": {
               "cases": "array<struct._ValidationFailure>"
             },
