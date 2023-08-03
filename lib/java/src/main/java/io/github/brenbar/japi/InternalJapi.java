@@ -60,9 +60,6 @@ class InternalJApi {
           "->",
           {
             "_err_unknown": {},
-            "_err_invalidRequestTarget": {
-              "reason": "string"
-            },
             "_errorInvalidRequestHeaders": {
               "cases": "array<struct._ValidationFailure>"
             },

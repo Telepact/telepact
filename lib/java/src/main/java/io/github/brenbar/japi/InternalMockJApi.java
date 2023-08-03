@@ -105,7 +105,7 @@ class InternalMockJApi {
           {},
           "->",
           {
-            "_err_noMatchingStub": {}
+            "_errorNoMatchingStub": {}
           },
           [
             "                                                                             ",

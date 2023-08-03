@@ -89,7 +89,7 @@ class InternalMockServer {
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return Map.of("_err_noMatchingStub", Map.of());
+                    return Map.of("_errorNoMatchingStub", Map.of());
                 }
 
                 var definition = jApiSchema.parsed.get(context.functionName);
