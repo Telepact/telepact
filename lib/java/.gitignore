@@ -1,3 +1,4 @@
 .idea/
 src/test/java/io/github/brenbar/japi/GeneratedTests.java
+src/test/java/io/github/brenbar/japi/GeneratedMockTests.java
 target/
