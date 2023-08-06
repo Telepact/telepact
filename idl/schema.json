@@ -2,12 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "properties": {
-    "test": {
-      "type": "string",
-      "description": "The value."
-    }
-  },
   "patternProperties": {
     "^info\\.[a-zA-Z_]\\w*$": {
       "type": "array",
@@ -283,7 +277,86 @@
                 "field2": "struct.Example2"
               },
               "err": {
-                "_unknown": {},
+                "custom": {
+                  "field1": "integer"
+                }
+              }
+            },
+            [
+              "                      ",
+              " A function template. ",
+              "                      "
+            ]
+          ]
+        }
+      ]
+    },
+    "^trait\\.[a-zA-Z_]\\w*": {
+      "type": "array",
+      "description": "A trait of common argument struct fields and result enum values that applies to all functions.",
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
+            }
+          }
+        },
+        {
+          "const": "->"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*!?$": {
+                  "$ref": "#/$defs/typeDeclaration"
+                }
+              }
+            }
+          },
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*?$": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*!?$": {
+                  "$ref": "#/$defs/typeDeclaration"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 4,
+      "defaultSnippets": [
+        {
+          "label": "Function template",
+          "body": [
+            {
+              "argumentField1": "boolean",
+              "argumentField2": "struct.Example1"
+            },
+            "->",
+            {
+              "ok": {
+                "field1": "string",
+                "field2": "struct.Example2"
+              },
+              "err": {
                 "custom": {
                   "field1": "integer"
                 }
