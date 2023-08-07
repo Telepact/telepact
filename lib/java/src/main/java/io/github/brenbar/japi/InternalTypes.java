@@ -1,8 +1,8 @@
 package io.github.brenbar.japi;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class JApiSchema {
@@ -55,6 +55,17 @@ class FunctionDefinition implements Definition {
     }
 }
 
+class AllFunctionsDefinition implements Definition {
+
+    public final Enum functions = new Enum("fn", new HashMap<>());
+
+    @Override
+    public String getName() {
+        return "fn";
+    }
+
+}
+
 class TypeDefinition implements Definition {
 
     public final String name;
@@ -65,24 +76,6 @@ class TypeDefinition implements Definition {
             Type type) {
         this.name = name;
         this.type = type;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-}
-
-class ErrorDefinition implements Definition {
-
-    public final String name;
-    public final Map<String, FieldDeclaration> fields;
-
-    public ErrorDefinition(
-            String name,
-            Map<String, FieldDeclaration> fields) {
-        this.name = name;
-        this.fields = fields;
     }
 
     @Override

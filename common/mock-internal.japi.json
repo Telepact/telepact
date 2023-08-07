@@ -18,7 +18,7 @@
       "                                                                              "
     ]
   ],
-  "enum._VerificationTimes": [
+  "enum._CallCountCriteria": [
     {
       "exact": {
         "times": "integer"
@@ -36,18 +36,37 @@
       "                                                         "
     ]
   ],
+  "enum._VerificationFailure": [
+    {
+      "tooFewMatchingCalls": {
+        "wanted": "enum._CallCountCriteria",
+        "found": "integer",
+        "allCalls": "array<fn>"
+      },
+      "tooManyMatchingCalls": {
+        "wanted": "enum._CallCountCriteria",
+        "found": "integer",
+        "allCalls": "array<fn>"
+      }
+    },
+    [
+      "                                                                      ",
+      " An enumeration of possible causes that a mock verification can fail. ",
+      "                                                                      "
+    ]
+  ],
   "fn._verify": [
     {
       "function": "string",
       "argument": "object<any>",
       "strictMatch!": "boolean",
-      "times!": "enum._VerificationTimes"
+      "times!": "enum._CallCountCriteria"
     },
     "->",
     {
       "ok": {},
-      "err_verificationFailure": {
-        "details": "string"
+      "errorVerificationFailure": {
+        "reason": "enum._VerificationFailure"
       }
     },
     [
@@ -61,8 +80,8 @@
     "->",
     {
       "ok": {},
-      "err_verificationFailure": {
-        "details": "string"
+      "errorVerificationFailure": {
+        "additionalUnverifiedCalls": "array<fn>"
       }
     },
     [

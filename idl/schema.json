@@ -63,15 +63,15 @@
         {
           "label": "Struct template",
           "body": [
-            [
-              "                    ",
-              " A struct template. ",
-              "                    "
-            ],
             {
               "field1$0": "boolean",
               "field2": "struct.Example1"
-            }
+            },
+            [
+              "                             ",
+              " A struct template.          ",
+              "                             "
+            ]
           ]
         }
       ]
@@ -375,7 +375,7 @@
   "$defs": {
     "typeDeclaration": {
       "type": "string",
-      "pattern": "^((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(any)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
+      "pattern": "^((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(any)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
       "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {

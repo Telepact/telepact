@@ -36,8 +36,6 @@ class InternalSerializer {
                         allKeys.addAll(resultEnumStruct.fields.keySet());
                     }
                 }
-            } else if (entry.getValue() instanceof ErrorDefinition e) {
-                allKeys.addAll(e.fields.keySet());
             }
         }
         var i = (long) 0;

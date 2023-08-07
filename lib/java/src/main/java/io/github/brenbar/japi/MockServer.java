@@ -140,9 +140,9 @@ public class MockServer {
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
-        if (result.containsKey("err_verificationFailure")) {
+        if (result.containsKey("errorVerificationFailure")) {
             try {
-                var verificationFailureStruct = (Map<String, Object>) result.get("err_verificationFailure");
+                var verificationFailureStruct = (Map<String, Object>) result.get("errorVerificationFailure");
                 var details = verificationFailureStruct.get("details");
                 throw new AssertionError(details);
             } catch (Exception e2) {
@@ -164,9 +164,9 @@ public class MockServer {
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
         var result = (Map<String, Object>) response.get(2);
-        if (result.containsKey("err_verificationFailure")) {
+        if (result.containsKey("errorVerificationFailure")) {
             try {
-                var verificationFailureStruct = (Map<String, Object>) result.get("err_verificationFailure");
+                var verificationFailureStruct = (Map<String, Object>) result.get("errorVerificationFailure");
                 var details = verificationFailureStruct.get("details");
                 throw new AssertionError(details);
             } catch (Exception e2) {

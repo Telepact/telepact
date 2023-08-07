@@ -125,11 +125,26 @@ class InternalParse {
             }
         }
 
+        // Finish setting up all functions definition
+        if (parsedDefinitions.containsKey("fn")) {
+            var functionsDefinition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
+            for (var parsedDefinition : parsedDefinitions.entrySet()) {
+                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
+                    functionsDefinition.functions.values.put(f.name, f.argumentStruct);
+                }
+            }
+
+        }
+
         return new JApiSchema((Map<String, Object>) (Object) japiSchemaAsParsedJson, parsedDefinitions);
     }
 
     private static Definition parseDefinition(String definitionKey, Map<String, List<Object>> jApiSchemaAsParsedJson,
             Map<String, Definition> parsedDefinitions) {
+        if ("fn".equals(definitionKey)) {
+            return new AllFunctionsDefinition();
+        }
+
         var definitionWithDocAsParsedJson = jApiSchemaAsParsedJson.get(definitionKey);
         if (definitionWithDocAsParsedJson == null) {
             throw new JApiSchemaParseError("Could not find definition for %s".formatted(definitionKey));
@@ -320,39 +335,28 @@ class InternalParse {
     private static TypeDeclaration parseType(String typeDeclaration, Map<String, List<Object>> jApiSchemaAsParsedJson,
             Map<String, Definition> parsedDefinitions) {
         var regex = Pattern.compile(
-                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn)\\.([a-zA-Z_]\\w*)))(\\?)?$");
+                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|(fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|)(\\?)?$");
         var matcher = regex.matcher(typeDeclaration);
         matcher.find();
 
-        boolean nullable = matcher.group(10) != null;
+        boolean nullable = matcher.group(11) != null;
 
-        try {
-            var name = matcher.group(2);
-            if (name == null) {
-                throw new RuntimeException("Ignore: will try another type");
-            }
-            var type = switch (name) {
+        var standardTypeName = matcher.group(2);
+        if (standardTypeName != null) {
+            var type = switch (standardTypeName) {
                 case "boolean" -> new JsonBoolean();
                 case "integer" -> new JsonInteger();
                 case "number" -> new JsonNumber();
                 case "string" -> new JsonString();
                 case "any" -> new JsonAny();
-                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(name));
+                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(standardTypeName));
             };
 
             return new TypeDeclaration(type, nullable);
-        } catch (Exception e) {
-            if (e instanceof JApiSchemaParseError e1) {
-                throw e1;
-            }
         }
 
-        try {
-            var name = matcher.group(4);
-            if (name == null) {
-                throw new RuntimeException("Ignore: will try another type");
-            }
-
+        var collectionTypeName = matcher.group(4);
+        if (collectionTypeName != null) {
             var nestedName = matcher.group(6);
 
             TypeDeclaration nestedType;
@@ -362,34 +366,39 @@ class InternalParse {
                 nestedType = new TypeDeclaration(new JsonAny(), false);
             }
 
-            var type = switch (name) {
+            var type = switch (collectionTypeName) {
                 case "array" -> new JsonArray(nestedType);
                 case "object" -> new JsonObject(nestedType);
-                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(name));
+                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(collectionTypeName));
             };
 
             return new TypeDeclaration(type, nullable);
-        } catch (Exception e) {
-            if (e instanceof JApiSchemaParseError e1) {
-                throw e1;
+        }
+
+        var functionRef = matcher.group(7);
+        if (functionRef != null) {
+            var definition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
+            if (definition == null) {
+                definition = (AllFunctionsDefinition) parseDefinition("fn", jApiSchemaAsParsedJson, parsedDefinitions);
+            }
+            return new TypeDeclaration(definition.functions, nullable);
+        }
+
+        var customTypeName = matcher.group(8);
+        if (customTypeName != null) {
+            var definition = parsedDefinitions.get(customTypeName);
+            if (definition == null) {
+                definition = parseDefinition(customTypeName, jApiSchemaAsParsedJson, parsedDefinitions);
+            }
+            if (definition instanceof TypeDefinition t) {
+                return new TypeDeclaration(t.type, nullable);
+            } else if (definition instanceof FunctionDefinition f) {
+                return new TypeDeclaration(f.argumentStruct, nullable);
+            } else {
+                throw new JApiSchemaParseError("Unknown definition: %s".formatted(typeDeclaration));
             }
         }
 
-        var name = matcher.group(7);
-        if (name == null) {
-            throw new JApiSchemaParseError("Invalid definition: %s".formatted(typeDeclaration));
-        }
-
-        var definition = parsedDefinitions.computeIfAbsent(name,
-                (k) -> parseDefinition(name, jApiSchemaAsParsedJson, parsedDefinitions));
-        if (definition instanceof TypeDefinition t) {
-            return new TypeDeclaration(t.type, nullable);
-        } else if (definition instanceof FunctionDefinition f) {
-            return new TypeDeclaration(f.argumentStruct, nullable);
-        } else if (definition instanceof ErrorDefinition e) {
-            throw new JApiSchemaParseError("Cannot reference an error in type declarations");
-        } else {
-            throw new JApiSchemaParseError("Unknown definition: %s".formatted(typeDeclaration));
-        }
+        throw new JApiSchemaParseError("Invalid definition: %s".formatted(typeDeclaration));
     }
 }

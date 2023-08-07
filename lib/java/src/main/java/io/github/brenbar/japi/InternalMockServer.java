@@ -1,9 +1,7 @@
 package io.github.brenbar.japi;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -250,54 +248,51 @@ class InternalMockServer {
                 }
             }
 
-            var matchType = exactMatch ? "exact" : "partial";
-            String matchPlurality;
-            String timesType;
-            int times;
-            boolean passed;
+            var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
+            for (var invocation : invocations) {
+                allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
+            }
+            Map<String, Object> verificationFailurePseudoJson = null;
             if (verificationTimes instanceof ExactNumberOfTimes e) {
-                timesType = "exactly";
-                times = e.times;
-                matchPlurality = e.times == 1 ? "match" : "matches";
-                passed = matchesFound == e.times;
+                if (matchesFound > e.times) {
+                    verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
+                            Map.ofEntries(
+                                    Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
+                                    Map.entry("found", matchesFound),
+                                    Map.entry("allCalls", allCallsPseudoJson)));
+                } else if (matchesFound < e.times) {
+                    verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
+                            Map.ofEntries(
+                                    Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
+                                    Map.entry("found", matchesFound),
+                                    Map.entry("allCalls", allCallsPseudoJson)));
+                }
             } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
-                timesType = "at most";
-                times = a.times;
-                matchPlurality = a.times == 1 ? "match" : "matches";
-                passed = matchesFound <= a.times;
+                if (matchesFound > a.times) {
+                    verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
+                            Map.ofEntries(
+                                    Map.entry("wanted", Map.of("atMost", Map.of("times", a.times))),
+                                    Map.entry("found", matchesFound),
+                                    Map.entry("allCalls", allCallsPseudoJson)));
+                }
             } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
-                timesType = "at least";
-                times = a.times;
-                matchPlurality = a.times == 1 ? "match" : "matches";
-                passed = matchesFound >= a.times;
+                if (matchesFound < a.times) {
+                    verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
+                            Map.ofEntries(
+                                    Map.entry("wanted", Map.of("atLeast", Map.of("times", a.times))),
+                                    Map.entry("found", matchesFound),
+                                    Map.entry("allCalls", allCallsPseudoJson)));
+
+                }
             } else {
                 throw new JApiProcessError("Unexpected verification times");
             }
 
-            if (passed) {
+            if (verificationFailurePseudoJson == null) {
                 return Map.of("ok", Map.of());
             }
 
-            String argumentJson = objectMapper.writeValueAsString(argument);
-
-            var errorString = new StringBuilder("""
-                    Wanted %s %d %s %s, but found %d.
-                    Query:
-                    %s %s
-                    Available:
-                    """.formatted(timesType, times, matchType, matchPlurality, matchesFound, functionName,
-                    argumentJson));
-            var functionInvocations = invocations.stream().filter(i -> Objects.equals(functionName, i.functionName))
-                    .toList();
-            if (functionInvocations.isEmpty()) {
-                errorString.append("<none>\n");
-            } else {
-                for (var invocation : functionInvocations) {
-                    String invocationArgumentJson = objectMapper.writeValueAsString(invocation.functionArgument);
-                    errorString.append("%s %s\n".formatted(invocation.functionName, invocationArgumentJson));
-                }
-            }
-            return Map.of("err_verificationFailure", Map.of("details", errorString.toString()));
+            return Map.of("errorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
         } catch (Exception ex) {
             throw new JApiProcessError(ex);
         }
@@ -309,16 +304,13 @@ class InternalMockServer {
             var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
 
             if (invocationsNotVerified.size() > 0) {
-                var errorString = new StringBuilder("""
-                        Expected no more interactions, but more were found.
-                        Available:
-                        """);
+                var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
                 for (var invocation : invocationsNotVerified) {
-                    var invocationArgumentJson = objectMapper.writeValueAsString(invocation.functionArgument);
-                    errorString.append("%s %s\n".formatted(invocation.functionName,
-                            invocationArgumentJson));
+                    var invocationArgumentPseudoJson = objectMapper.writeValueAsString(invocation.functionArgument);
+                    unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocationArgumentPseudoJson));
                 }
-                return Map.of("err_verificationFailure", Map.of("details", errorString.toString()));
+                return Map.of("errorVerificationFailure",
+                        Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
             }
 
             return Map.of("ok", Map.of());
