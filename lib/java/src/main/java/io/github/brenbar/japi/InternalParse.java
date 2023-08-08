@@ -127,10 +127,11 @@ class InternalParse {
 
         // Finish setting up all functions definition
         if (parsedDefinitions.containsKey("fn")) {
-            var functionsDefinition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
+            var allFunctionsDefinition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
             for (var parsedDefinition : parsedDefinitions.entrySet()) {
                 if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
-                    functionsDefinition.functions.values.put(f.name, f.argumentStruct);
+                    var functionNameMinusPrefix = f.name.substring(3);
+                    allFunctionsDefinition.functions.values.put(functionNameMinusPrefix, f.argumentStruct);
                 }
             }
 
@@ -380,6 +381,7 @@ class InternalParse {
             var definition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
             if (definition == null) {
                 definition = (AllFunctionsDefinition) parseDefinition("fn", jApiSchemaAsParsedJson, parsedDefinitions);
+                parsedDefinitions.put("fn", definition);
             }
             return new TypeDeclaration(definition.functions, nullable);
         }
@@ -389,6 +391,7 @@ class InternalParse {
             var definition = parsedDefinitions.get(customTypeName);
             if (definition == null) {
                 definition = parseDefinition(customTypeName, jApiSchemaAsParsedJson, parsedDefinitions);
+                parsedDefinitions.put(customTypeName, definition);
             }
             if (definition instanceof TypeDefinition t) {
                 return new TypeDeclaration(t.type, nullable);

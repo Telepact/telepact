@@ -107,11 +107,16 @@
 ["fn._verify",{},{"function":"fn.test","argument":{}}]|["fn._verify",{},{"ok":{}}]
 ["fn._verify",{},{"function":"fn.test","argument":{},"times":{"exact":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
 ["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atLeast":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
-["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atMost":{"times":0}}}]|["fn._verify",{},{"errorVerificationFailure":{"details":"Wanted at most 0 partial matches, but found 1.\\nQuery:\\nfn.test {}\\nAvailable:\\nfn.test {}\\n"}}]
+["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atLeast":{"times":2}}}]|["fn._verify",{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"allCalls":[{"test":{}}],"found":1,"wanted":{"atLeast":{"times":2}}}}}}]
+["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atMost":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{},"times":{"atMost":{"times":0}}}]|["fn._verify",{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"test":{}}],"found":1}}}}]
 
 "partialMatchVerify"
 
 ["fn._createStub",{},{"whenFunction":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{}}}]|["fn._createStub",{},{"ok":{}}]
-["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}}}]|["fn._verify",{},{"errorVerificationFailure":{"details":"Wanted at least 1 partial match, but found 0.\\nQuery:\\nfn.test {\\"value\\":{\\"int\\":0}}\\nAvailable:\\n<none>\\n"}}]
+["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}}}]|["fn._verify",{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
 ["fn.test",{},{"value":{"int":0}}]|["fn.test",{},{"ok":{}}]
 ["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}},"times":{"exact":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}},"times":{"atLeast":{"times":1}}}]|["fn._verify",{},{"ok":{}}]
+["fn._verify",{},{"function":"fn.test","argument":{"value":{"int":0}},"times":{"atMost":{"times":0}}}]|["fn._verify",{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"test":{"value":{"int":0}}}],"found":1}}}}]
