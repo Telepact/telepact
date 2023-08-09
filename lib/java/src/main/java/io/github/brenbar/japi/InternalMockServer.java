@@ -250,8 +250,7 @@ class InternalMockServer {
 
             var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
             for (var invocation : invocations) {
-                var functionNameMinusPrefix = invocation.functionName.substring(3);
-                allCallsPseudoJson.add(Map.of(functionNameMinusPrefix, invocation.functionArgument));
+                allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
             }
             Map<String, Object> verificationFailurePseudoJson = null;
             if (verificationTimes instanceof ExactNumberOfTimes e) {
