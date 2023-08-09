@@ -129,7 +129,8 @@ class InternalParse {
         if (parsedDefinitions.containsKey("fn")) {
             var allFunctionsDefinition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
             for (var parsedDefinition : parsedDefinitions.entrySet()) {
-                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")) {
+                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")
+                        && !f.name.startsWith("fn._")) {
                     allFunctionsDefinition.functions.values.put(f.name, f.argumentStruct);
                 }
             }
