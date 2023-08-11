@@ -1,55 +1,50 @@
 {
-  "fn._ping": [
-    {},
-    "->",
-    {
+  "fn._ping": {
+    "///": " Ping the server. ",
+
+    "arg": {},
+    "result": {
       "ok": {}
-    },
-    ["                  ", " Ping the server. ", "                  "]
-  ],
-  "fn._schema": [
-    {},
-    "->",
-    {
+    }
+  },
+
+  "fn._schema": {
+    "///": " Get the jAPI `schema` of this server. ",
+
+    "arg": {},
+    "result": {
       "ok": {
         "schema": "object<any>"
       }
-    },
-    [
-      "                                       ",
-      " Get the jAPI `schema` of this server. ",
-      "                                       "
-    ]
-  ],
-  "fn._unknown": [
-    {},
-    "->",
-    {
-      "ok": {
-        "schema": "object<any>"
-      }
-    },
-    [
-      "                                                                ",
-      " A placeholder function when the requested function is unknown. ",
-      "                                                                "
-    ]
-  ],
-  "struct._ValidationFailure": [
-    {
-      "path": "string",
-      "reason": "string"
-    },
-    [
-      "                                                                   ",
-      " A validation failure located at a `path` explained by a `reason`. ",
-      "                                                                   "
-    ]
-  ],
-  "trait._Validated": [
-    {},
-    "->",
-    {
+    }
+  },
+
+  "fn._unknown": {
+    "///": " A placeholder function when the requested function is unknown. ",
+
+    "arg": {},
+    "result": {
+      "ok": {}
+    }
+  },
+
+  "struct._ValidationFailure": {
+    "///": " A validation failure located at a `path` explained by a `reason`. ",
+
+    "path": "string",
+    "reason": "string"
+  },
+
+  "trait._Validated": {
+    "///": " All functions may return a validation error:                                                        ",
+    "//1": " - `_invalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
+    "//2": " - `_invalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
+    "//3": " - `_invalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
+    "//4": " - `_invalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
+    "//5": "     outlined by a list of `cases.                                                                   ",
+    "//6": " - `_parseFailure`: The Request could not be parsed as a jAPI Message.                               ",
+
+    "result": {
       "_errorUnknown": {},
       "_errorInvalidRequestHeaders": {
         "cases": "array<struct._ValidationFailure>"
@@ -63,17 +58,6 @@
       "_errorParseFailure": {
         "reasons": "array<string>"
       }
-    },
-    [
-      "                                                                                                     ",
-      " All functions may return a validation error:                                                        ",
-      " - `_invalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
-      " - `_invalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
-      " - `_invalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
-      " - `_invalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
-      "     outlined by a list of `cases.                                                                   ",
-      " - `_parseFailure`: The Request could not be parsed as a jAPI Message.                               ",
-      "                                                                                                     "
-    ]
-  ]
+    }
+  }
 }

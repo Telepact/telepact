@@ -1,132 +1,117 @@
 {
-  "fn._createStub": [
-    {
-      "whenFunction": "string",
-      "whenArgument": "object<any>",
-      "thenResult": "object<any>",
-      "strictMatch!": "boolean",
-      "generateMissingResultFields!": "boolean"
+  "fn._createStub": {
+    "///": " Create a function stub that will cause matching function calls to return the ",
+    "//1": " result defined in the stub.                                                  ",
+
+    "arg": {
+      "stub": "fn.*",
+      "allowPartialArgMatch": "boolean",
+      "generateMissingResultFields": "boolean"
     },
-    "->",
-    {
+    "result": {
       "ok": {}
+    }
+  },
+
+  "struct._CallMatchCriteria": {
+    "///": " An enum template. ",
+
+    "call": "fn.*.arg",
+    "allowPartialArgMatch": "boolean"
+  },
+
+  "enum._CallCountCriteria": {
+    "///": " The number of times a function is allowed to be called. ",
+
+    "exact": {
+      "times": "integer"
     },
-    [
-      "                                                                              ",
-      " Create a function stub that will cause matching function calls to return the ",
-      " result defined in the stub.                                                  ",
-      "                                                                              "
-    ]
-  ],
-  "enum._CallCountCriteria": [
-    {
-      "exact": {
-        "times": "integer"
-      },
-      "atMost": {
-        "times": "integer"
-      },
-      "atLeast": {
-        "times": "integer"
-      }
+    "atMost": {
+      "times": "integer"
     },
-    [
-      "                                                         ",
-      " The number of times a function is allowed to be called. ",
-      "                                                         "
-    ]
-  ],
-  "enum._VerificationFailure": [
-    {
-      "tooFewMatchingCalls": {
-        "wanted": "enum._CallCountCriteria",
-        "found": "integer",
-        "allCalls": "array<fn>"
-      },
-      "tooManyMatchingCalls": {
-        "wanted": "enum._CallCountCriteria",
-        "found": "integer",
-        "allCalls": "array<fn>"
-      }
+    "atLeast": {
+      "times": "integer"
+    }
+  },
+
+  "enum._VerificationFailure": {
+    "///": " An enumeration of possible causes that a mock verification can fail. ",
+
+    "tooFewMatchingCalls": {
+      "wanted": "enum._CallCountCriteria",
+      "found": "integer",
+      "allCalls": "array<fn.*.arg>"
     },
-    [
-      "                                                                      ",
-      " An enumeration of possible causes that a mock verification can fail. ",
-      "                                                                      "
-    ]
-  ],
-  "fn._verify": [
-    {
-      "function": "string",
-      "argument": "object<any>",
-      "strictMatch!": "boolean",
-      "times!": "enum._CallCountCriteria"
+    "tooManyMatchingCalls": {
+      "wanted": "enum._CallCountCriteria",
+      "found": "integer",
+      "allCalls": "array<fn.*.arg>"
+    }
+  },
+
+  "fn._verify": {
+    "///": " Verify an interaction occurred that matches the given verification criteria. ",
+
+    "arg": {
+      "call": "enum._CallMatchCriteria",
+      "multiplicity!": "enum._CallCountCriteria"
     },
-    "->",
-    {
+    "result": {
       "ok": {},
       "errorVerificationFailure": {
         "reason": "enum._VerificationFailure"
       }
-    },
-    [
-      "                                                                              ",
-      " Verify an interaction occurred that matches the given verification criteria. ",
-      "                                                                              "
-    ]
-  ],
-  "fn._verifyNoMoreInteractions": [
-    {},
-    "->",
-    {
+    }
+  },
+
+  "fn._verifyNoMoreInteractions": {
+    "///": " Verify that no interactions have occurred with this mock or that all ",
+    "//1": " interactions have been verified.                                     ",
+
+    "arg": {},
+    "result": {
       "ok": {},
       "errorVerificationFailure": {
         "additionalUnverifiedCalls": "array<fn>"
       }
-    },
-    [
-      "                                                                      ",
-      " Verify that no interactions have occurred with this mock or that all ",
-      " interactions have been verified.                                     ",
-      "                                                                      "
-    ]
-  ],
-  "fn._clearStubs": [
-    {},
-    "->",
-    {
+    }
+  },
+
+  "fn._clearStubs": {
+    "///": " Clear all stub conditions. ",
+
+    "arg": {},
+    "result": {
       "ok": {}
-    },
-    [
-      "                             ",
-      " Clear all interaction data. ",
-      "                             "
-    ]
-  ],
-  "fn._clearInvocations": [
-    {},
-    "->",
-    {
+    }
+  },
+
+  "fn._clearCalls": {
+    "///": " Clear all call data. ",
+
+    "arg": {},
+    "result": {
       "ok": {}
-    },
-    [
-      "                            ",
-      " Clear all stub conditions. ",
-      "                            "
-    ]
-  ],
-  "trait.Mockable": [
-    {},
-    "->",
-    {
+    }
+  },
+
+  "trait._Mockable": {
+    "///": " If random generation is disabled, functions may return a `_errorNoMatchingStub`  ",
+    "//1": " error, indicating that the mock could not return a result for that function call ",
+    "//2": " due to no matching stub being available.                                         ",
+
+    "excludes": [
+      "fn._clearCalls",
+      "fn._verifyNoMoreInteractions",
+      "fn._verify",
+      "fn._clearStubs",
+      "fn._createStub",
+      "fn._schema",
+      "fn._ping"
+    ],
+
+    "result": {
       "_errorNoMatchingStub": {}
-    },
-    [
-      "                                                                             ",
-      " If random generation is disabled, functions may return a `_noMatchingStub`  ",
-      " error, indicating that the mock could not return a result for that function ",
-      " call due to no matching stub being available.                               ",
-      "                                                                             "
-    ]
-  ]
+    }
+  }
 }

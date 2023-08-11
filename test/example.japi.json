@@ -1,140 +1,117 @@
 {
-  "info.Example": [
-    {},
-    [
-      " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
-      "                                                                                           ",
-      " As a reminder:                                                                            ",
-      " - ! means optional field                                                                  ",
-      " - ? means nullable type                                                                   ",
-      "                                                                                           "
-    ]
-  ],
-  "struct.Value": [
-    {
-      "bool!": "boolean",
-      "nullBool!": "boolean?",
-      "arrBool!": "array<boolean>",
-      "arrNullBool!": "array<boolean?>",
-      "objBool!": "object<boolean>",
-      "objNullBool!": "object<boolean?>",
+  "///": " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
+  "//1": "                                                                                           ",
+  "//2": " As a reminder:                                                                            ",
+  "//3": " - ! means optional field                                                                  ",
+  "//4": " - ? means nullable type                                                                   ",
 
-      "int!": "integer",
-      "nullInt!": "integer?",
-      "arrInt!": "array<integer>",
-      "arrNullInt!": "array<integer?>",
-      "objInt!": "object<integer>",
-      "objNullInt!": "object<integer?>",
+  "struct.Value": {
+    "///": " A struct value demonstrating all common type permutations. ",
 
-      "num!": "number",
-      "nullNum!": "number?",
-      "arrNum!": "array<number>",
-      "arrNullNum!": "array<number?>",
-      "objNum!": "object<number>",
-      "objNullNum!": "object<number?>",
+    "bool!": "boolean",
+    "nullBool!": "boolean?",
+    "arrBool!": "array<boolean>",
+    "arrNullBool!": "array<boolean?>",
+    "objBool!": "object<boolean>",
+    "objNullBool!": "object<boolean?>",
 
-      "str!": "string",
-      "nullStr!": "string?",
-      "arrStr!": "array<string>",
-      "arrNullStr!": "array<string?>",
-      "objStr!": "object<string>",
-      "objNullStr!": "object<string?>",
+    "int!": "integer",
+    "nullInt!": "integer?",
+    "arrInt!": "array<integer>",
+    "arrNullInt!": "array<integer?>",
+    "objInt!": "object<integer>",
+    "objNullInt!": "object<integer?>",
 
-      "arr!": "array<any>",
-      "nullArr!": "array<any>?",
-      "arrArr!": "array<array<any>>",
-      "arrNullArr!": "array<array<any>?>",
-      "objArr!": "object<array<any>>",
-      "objNullArr!": "object<array<any>?>",
+    "num!": "number",
+    "nullNum!": "number?",
+    "arrNum!": "array<number>",
+    "arrNullNum!": "array<number?>",
+    "objNum!": "object<number>",
+    "objNullNum!": "object<number?>",
 
-      "obj!": "object<any>",
-      "nullObj!": "object<any>?",
-      "arrObj!": "array<object<any>>",
-      "arrNullObj!": "array<object<any>?>",
-      "objObj!": "object<object<any>>",
-      "objNullObj!": "object<object<any>?>",
+    "str!": "string",
+    "nullStr!": "string?",
+    "arrStr!": "array<string>",
+    "arrNullStr!": "array<string?>",
+    "objStr!": "object<string>",
+    "objNullStr!": "object<string?>",
 
-      "any!": "any",
-      "nullAny!": "any?",
-      "arrAny!": "array<any>",
-      "arrNullAny!": "array<any?>",
-      "objAny!": "object<any>",
-      "objNullAny!": "object<any?>",
+    "arr!": "array<any>",
+    "nullArr!": "array<any>?",
+    "arrArr!": "array<array<any>>",
+    "arrNullArr!": "array<array<any>?>",
+    "objArr!": "object<array<any>>",
+    "objNullArr!": "object<array<any>?>",
 
-      "struct!": "struct.StructExample",
-      "nullStruct!": "struct.StructExample?",
-      "arrStruct!": "array<struct.StructExample>",
-      "arrNullStruct!": "array<struct.StructExample?>",
-      "objStruct!": "object<struct.StructExample>",
-      "objNullStruct!": "object<struct.StructExample?>",
+    "obj!": "object<any>",
+    "nullObj!": "object<any>?",
+    "arrObj!": "array<object<any>>",
+    "arrNullObj!": "array<object<any>?>",
+    "objObj!": "object<object<any>>",
+    "objNullObj!": "object<object<any>?>",
 
-      "enum!": "enum.EnumExample",
-      "nullEnum!": "enum.EnumExample?",
-      "arrEnum!": "array<enum.EnumExample>",
-      "arrNullEnum!": "array<enum.EnumExample?>",
-      "objEnum!": "object<enum.EnumExample>",
-      "objNullEnum!": "object<enum.EnumExample?>",
+    "any!": "any",
+    "nullAny!": "any?",
+    "arrAny!": "array<any>",
+    "arrNullAny!": "array<any?>",
+    "objAny!": "object<any>",
+    "objNullAny!": "object<any?>",
 
-      "fn!": "fn.example",
-      "nullFn!": "fn.example?",
-      "arrFn!": "array<fn.example>",
-      "arrNullFn!": "array<fn.example?>",
-      "objFn!": "object<fn.example>",
-      "objNullFn!": "object<fn.example?>"
-    },
-    [
-      "                                                            ",
-      " A struct value demonstrating all common type permutations. ",
-      "                                                            "
-    ]
-  ],
+    "struct!": "struct.StructExample",
+    "nullStruct!": "struct.StructExample?",
+    "arrStruct!": "array<struct.StructExample>",
+    "arrNullStruct!": "array<struct.StructExample?>",
+    "objStruct!": "object<struct.StructExample>",
+    "objNullStruct!": "object<struct.StructExample?>",
 
-  "struct.StructExample": [
-    {
+    "enum!": "enum.EnumExample",
+    "nullEnum!": "enum.EnumExample?",
+    "arrEnum!": "array<enum.EnumExample>",
+    "arrNullEnum!": "array<enum.EnumExample?>",
+    "objEnum!": "object<enum.EnumExample>",
+    "objNullEnum!": "object<enum.EnumExample?>",
+
+    "fn!": "fn.example",
+    "nullFn!": "fn.example?",
+    "arrFn!": "array<fn.example>",
+    "arrNullFn!": "array<fn.example?>",
+    "objFn!": "object<fn.example>",
+    "objNullFn!": "object<fn.example?>"
+  },
+
+  "struct.StructExample": {
+    "///": " The main struct example.                                                                ",
+    "//1": "                                                                                         ",
+    "//2": " The [required] field must be supplied. The optional field does not need to be supplied. ",
+
+    "required": "boolean",
+    "optional!": "boolean"
+  },
+
+  "enum.EnumExample": {
+    "one": {},
+    "two": {
       "required": "boolean",
       "optional!": "boolean"
-    },
-    [
-      "                                                                                         ",
-      " The main struct example.                                                                ",
-      "                                                                                         ",
-      " The [required] field must be supplied. The optional field does not need to be supplied. ",
-      "                                                                                         "
-    ]
-  ],
-
-  "enum.EnumExample": [
-    {
-      "one": {},
-      "two": {
-        "required": "boolean",
-        "optional!": "boolean"
-      }
     }
-  ],
+  },
 
-  "fn.example": [
-    {
+  "fn.example": {
+    "///": "An example function.",
+    "arg": {
       "required": "boolean",
       "optional!": "boolean"
     },
-    "->",
-    {
+    "result": {
       "ok": {}
-    },
-    [
-      "                      ",
-      " A function template. ",
-      "                      "
-    ]
-  ],
+    }
+  },
 
-  "fn.test": [
-    {
+  "fn.test": {
+    "arg": {
       "value!": "struct.Value"
     },
-    "->",
-    {
+    "result": {
       "ok": {
         "value!": "struct.Value"
       },
@@ -142,5 +119,5 @@
         "property": "string"
       }
     }
-  ]
+  }
 }

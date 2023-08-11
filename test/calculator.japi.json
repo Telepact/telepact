@@ -1,98 +1,70 @@
 {
-  "info.Calculator": [
-    {},
-    [
-      "                                                                     ",
-      " A calculator app that provides basic math computation capabilities. ",
-      "                                                                     "
-    ]
-  ],
-  "enum.Value": [
-    {
-      "constant": {
-        "value": "number"
-      },
-      "variable": {
-        "name": "string"
-      }
-    },
-    [
-      "                                                                           ",
-      " A value for computation that can take either a constant or variable form. ",
-      "                                                                           "
-    ]
-  ],
-  "enum.Operation": [
-    {
-      "add": {},
-      "sub": {},
-      "mul": {},
-      "div": {}
-    },
-    [
-      "                                 ",
-      " A basic mathematical operation. ",
-      "                                 "
-    ]
-  ],
-  "struct.Variable": [
-    {
-      "name": "string",
+  "///": "A calculator app that provides basic math computation capabilities.",
+
+  "enum.Value": {
+    "///": "A value for computation that can take either a constant or variable form.",
+
+    "constant": {
       "value": "number"
     },
-    [
-      "                                                                               ",
-      " A mathematical variable represented by a `name` that holds a certain `value`. ",
-      "                                                                               "
-    ]
-  ],
-  "fn.saveVariables": [
-    {
+    "variable": {
+      "name": "string"
+    }
+  },
+
+  "enum.Operation": {
+    "///": "A basic mathematical operation.",
+
+    "add": {},
+    "sub": {},
+    "mul": {},
+    "div": {}
+  },
+
+  "struct.Variable": {
+    "///": "A mathematical variable represented by a `name` that holds a certain `value`.",
+
+    "name": "string",
+    "value": "number"
+  },
+
+  "fn.saveVariables": {
+    "///": "Save a set of variables as a dynamic map of variable names to their value.",
+
+    "arg": {
       "variables": "object<number>"
     },
-    "->",
-    {
+    "result": {
       "ok": {}
-    },
-    [
-      "                                                                            ",
-      " Save a set of variables as a dynamic map of variable names to their value. ",
-      "                                                                            "
-    ]
-  ],
-  "fn.compute": [
-    {
+    }
+  },
+
+  "fn.compute": {
+    "///": "Compute the `result` of the given `x` and `y` values.",
+
+    "arg": {
       "x": "enum.Value",
       "y": "enum.Value",
       "op": "enum.Operation"
     },
-    "->",
-    {
+    "result": {
       "ok": {
         "result": "number"
       },
       "errorCannotDivideByZero": {}
-    },
-    [
-      "                                                       ",
-      " Compute the `result` of the given `x` and `y` values. ",
-      "                                                       "
-    ]
-  ],
-  "fn.exportVariables": [
-    {
+    }
+  },
+
+  "fn.exportVariables": {
+    "///": "Export all saved variables, up to an optional `limit`.",
+
+    "arg": {
       "limit!": "integer"
     },
-    "->",
-    {
+    "result": {
       "ok": {
         "variables": "array<struct.Variable>"
       }
-    },
-    [
-      "                                                        ",
-      " Export all saved variables, up to an optional `limit`. ",
-      "                                                        "
-    ]
-  ]
+    }
+  }
 }

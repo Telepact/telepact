@@ -3,371 +3,199 @@
   "type": "object",
   "additionalProperties": false,
   "patternProperties": {
-    "^info\\.[a-zA-Z_]\\w*$": {
-      "type": "array",
-      "prefixItems": [
-        {
-          "type": "object"
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      ],
-      "items": false,
-      "minItems": 1,
-      "maxItems": 2,
-      "defaultSnippets": [
-        {
-          "label": "Info template",
-          "body": [
-            [
-              "                   ",
-              " An info template. ",
-              "                   "
-            ],
-            {
-              "metadata1$0": "Some info",
-              "metadata2": "Some other info"
-            }
-          ]
-        }
-      ]
+    "^/[/|0-9][/|0-9]$": {
+      "type": "string"
     },
     "^struct\\.[a-zA-Z_]\\w*": {
-      "type": "array",
+      "type": "object",
       "description": "A struct with 0 or more fields.",
-      "prefixItems": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "patternProperties": {
-            "^[a-zA-Z_]\\w*!?$": {
-              "$ref": "#/$defs/typeDeclaration"
-            }
-          }
+      "additionalProperties": false,
+      "patternProperties": {
+        "^/[/|0-9][/|0-9]$": {
+          "type": "string"
         },
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "^[a-zA-Z_]\\w*!?$": {
+          "$ref": "#/$defs/typeDeclaration"
         }
-      ],
-      "items": false,
-      "minItems": 1,
-      "maxItems": 2,
+      },
       "defaultSnippets": [
         {
           "label": "Struct template",
-          "body": [
-            {
-              "field1$0": "boolean",
-              "field2": "struct.Example1"
-            },
-            [
-              "                             ",
-              " A struct template.          ",
-              "                             "
-            ]
-          ]
+          "body": {
+            "///": " A struct template.",
+            "field1$0": "boolean",
+            "field2": "struct.Example1"
+          }
         }
       ]
     },
     "enum\\.[a-zA-Z_]\\w*$": {
-      "type": "array",
+      "type": "object",
       "description": "An enum with 1 or more fields.",
-      "prefixItems": [
-        {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^/[/|0-9][/|0-9]$": {
+          "type": "string"
+        },
+        "^[a-zA-Z_]\\w*?$": {
           "type": "object",
-          "minProperties": 1,
           "additionalProperties": false,
           "patternProperties": {
-            "^[a-zA-Z_]\\w*?$": {
-              "oneOf": [
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "patternProperties": {
-                    "^[a-zA-Z_]\\w*!?$": {
-                      "$ref": "#/$defs/typeDeclaration"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "minProperties": 1,
-                  "additionalProperties": false,
-                  "patternProperties": {
-                    "^[a-zA-Z_]\\w*?$": {
-                      "oneOf": [
-                        {
-                          "type": "object",
-                          "additionalProperties": false,
-                          "patternProperties": {
-                            "^[a-zA-Z_]\\w*!?$": {
-                              "$ref": "#/$defs/typeDeclaration"
-                            }
-                          }
-                        },
-                        {
-                          "type": "object",
-                          "minProperties": 1,
-                          "additionalProperties": false,
-                          "patternProperties": {
-                            "^[a-zA-Z_]\\w*?$": {
-                              "oneOf": [
-                                {
-                                  "type": "object",
-                                  "additionalProperties": false,
-                                  "patternProperties": {
-                                    "^[a-zA-Z_]\\w*!?$": {
-                                      "$ref": "#/$defs/typeDeclaration"
-                                    }
-                                  }
-                                },
-                                {
-                                  "type": "object",
-                                  "minProperties": 1,
-                                  "additionalProperties": false,
-                                  "patternProperties": {
-                                    "^[a-zA-Z_]\\w*?$": {
-                                      "oneOf": [
-                                        {
-                                          "type": "object",
-                                          "additionalProperties": false,
-                                          "patternProperties": {
-                                            "^[a-zA-Z_]\\w*!?$": {
-                                              "$ref": "#/$defs/typeDeclaration"
-                                            }
-                                          }
-                                        },
-                                        {
-                                          "type": "object",
-                                          "minProperties": 1,
-                                          "additionalProperties": false,
-                                          "patternProperties": {
-                                            "^[a-zA-Z_]\\w*?$": {
-                                              "type": "object",
-                                              "additionalProperties": false,
-                                              "patternProperties": {
-                                                "^[a-zA-Z_]\\w*!?$": {
-                                                  "$ref": "#/$defs/typeDeclaration"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    }
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
+            "^/[/|0-9][/|0-9]$": {
+              "type": "string"
+            },
+            "^[a-zA-Z_]\\w*!?$": {
+              "$ref": "#/$defs/typeDeclaration"
             }
           }
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      ],
-      "items": {
-        "type": "array",
-        "items": {
-          "type": "string"
         }
       },
-      "minItems": 1,
-      "maxItems": 2,
       "defaultSnippets": [
         {
           "label": "enum template",
-          "body": [
-            [
-              "                   ",
-              " An enum template. ",
-              "                   "
-            ],
-            {
-              "value1$0": {
-                "field1": "boolean"
-              },
-              "value2": {}
-            }
-          ]
+          "body": {
+            "///": "An enum template.",
+            "value1$0": {
+              "field1": "boolean"
+            },
+            "value2": {}
+          }
         }
       ]
     },
     "^fn\\.[a-zA-Z_]\\w*": {
-      "type": "array",
       "description": "A function that accepts an argument argument and returns a result enum that is either an ok struct or an error enum.",
-      "prefixItems": [
-        {
+      "type": "object",
+      "required": ["arg", "result"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^/[/|0-9][/|0-9]$": {
+          "type": "string"
+        }
+      },
+      "properties": {
+        "arg": {
           "type": "object",
           "additionalProperties": false,
           "patternProperties": {
+            "^/[/|0-9][/|0-9]$": {
+              "type": "string"
+            },
             "^[a-zA-Z_]\\w*!?$": {
               "$ref": "#/$defs/typeDeclaration"
             }
           }
         },
-        {
-          "const": "->"
-        },
-        {
+        "result": {
           "type": "object",
           "required": ["ok"],
-          "properties": {
-            "ok": {
-              "type": "object",
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z_]\\w*!?$": {
-                  "$ref": "#/$defs/typeDeclaration"
-                }
-              }
-            }
-          },
           "patternProperties": {
+            "^/[/|0-9][/|0-9]$": {
+              "type": "string"
+            },
             "^[a-zA-Z_]\\w*?$": {
               "type": "object",
               "additionalProperties": false,
               "patternProperties": {
+                "^/[/|0-9][/|0-9]$": {
+                  "type": "string"
+                },
                 "^[a-zA-Z_]\\w*!?$": {
                   "$ref": "#/$defs/typeDeclaration"
                 }
               }
             }
           }
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
-      ],
-      "items": false,
-      "minItems": 3,
-      "maxItems": 4,
+      },
       "defaultSnippets": [
         {
           "label": "Function template",
-          "body": [
-            {
+          "body": {
+            "///": "A function template.",
+            "arg": {
               "argumentField1": "boolean",
               "argumentField2": "struct.Example1"
             },
-            "->",
-            {
+            "result": {
               "ok": {
                 "field1": "string",
                 "field2": "struct.Example2"
               },
-              "err": {
-                "custom": {
-                  "field1": "integer"
-                }
+              "errorCustom": {
+                "field1": "integer"
               }
-            },
-            [
-              "                      ",
-              " A function template. ",
-              "                      "
-            ]
-          ]
+            }
+          }
         }
       ]
     },
     "^trait\\.[a-zA-Z_]\\w*": {
-      "type": "array",
+      "type": "object",
       "description": "A trait of common argument struct fields and result enum values that applies to all functions.",
-      "prefixItems": [
-        {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^/[/|0-9][/|0-9]$": {
+          "type": "string"
+        }
+      },
+      "properties": {
+        "excludes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "arg": {
           "type": "object",
-          "additionalProperties": false,
           "patternProperties": {
+            "^/[/|0-9][/|0-9]$": {
+              "type": "string"
+            },
             "^[a-zA-Z_]\\w*!?$": {
               "$ref": "#/$defs/typeDeclaration"
             }
           }
         },
-        {
-          "const": "->"
-        },
-        {
+        "result": {
           "type": "object",
-          "properties": {
-            "ok": {
-              "type": "object",
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z_]\\w*!?$": {
-                  "$ref": "#/$defs/typeDeclaration"
-                }
-              }
-            }
-          },
           "patternProperties": {
+            "^/[/|0-9][/|0-9]$": {
+              "type": "string"
+            },
             "^[a-zA-Z_]\\w*?$": {
               "type": "object",
               "additionalProperties": false,
               "patternProperties": {
+                "^/[/|0-9][/|0-9]$": {
+                  "type": "string"
+                },
                 "^[a-zA-Z_]\\w*!?$": {
                   "$ref": "#/$defs/typeDeclaration"
                 }
               }
             }
           }
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
-      ],
-      "items": false,
-      "minItems": 3,
-      "maxItems": 4,
+      },
       "defaultSnippets": [
         {
           "label": "Function template",
-          "body": [
-            {
+          "body": {
+            "arg": {
               "argumentField1": "boolean",
               "argumentField2": "struct.Example1"
             },
-            "->",
-            {
+            "result": {
               "ok": {
                 "field1": "string",
                 "field2": "struct.Example2"
               },
-              "err": {
-                "custom": {
-                  "field1": "integer"
-                }
+              "errorCustom": {
+                "field1": "integer"
               }
-            },
-            [
-              "                      ",
-              " A function template. ",
-              "                      "
-            ]
-          ]
+            }
+          }
         }
       ]
     }
@@ -375,7 +203,7 @@
   "$defs": {
     "typeDeclaration": {
       "type": "string",
-      "pattern": "^((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any|fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|((array|object)<(any)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
+      "pattern": "^((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn(\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn(\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn(\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn(\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn(\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn(\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)?)|((array|object)<any>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
       "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {

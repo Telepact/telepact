@@ -55,6 +55,27 @@ class FunctionDefinition implements Definition {
     }
 }
 
+class TraitDefinition implements Definition {
+
+    public final String name;
+    public final Struct argumentStruct;
+    public final Enum resultEnum;
+
+    public TraitDefinition(
+            String name,
+            Struct argumentStruct,
+            Enum resultEnum) {
+        this.name = name;
+        this.argumentStruct = argumentStruct;
+        this.resultEnum = resultEnum;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}
+
 class AllFunctionsDefinition implements Definition {
 
     public final Enum functions = new Enum("fn", new HashMap<>());
