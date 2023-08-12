@@ -1,23 +1,24 @@
 {
   "fn._createStub": {
-    "///": " Create a function stub that will cause matching function calls to return the ",
-    "//1": " result defined in the stub.                                                  ",
+    "///": " Create a function stub that will cause the server to return the `stub` result when the `stub` argument  ",
+    "//1": " matches the function argument on a request.                                                             ",
+    "//2": "                                                                                                         ",
+    "//3": " If `allowPartialArgMatch` is `true`, then the server will skip field omission validation on the `stub`  ",
+    "//4": " argument, and the stub will match calls where the given `stub` argument is exactly a json sub-structure ",
+    "//5": " of the request function argument.                                                                       ",
+    "//6": "                                                                                                         ",
+    "//7": " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the  ",
+    "//8": " `stub` result, and the server will generate the necessary data required to make the `result` pass on    ",
+    "//9": " response validation. ",
 
     "arg": {
       "stub": "fn.*",
-      "allowPartialArgMatch": "boolean",
-      "generateMissingResultFields": "boolean"
+      "allowPartialArgMatch!": "boolean",
+      "generateMissingResultFields!": "boolean"
     },
     "result": {
       "ok": {}
     }
-  },
-
-  "struct._CallMatchCriteria": {
-    "///": " An enum template. ",
-
-    "call": "fn.*.arg",
-    "allowPartialArgMatch": "boolean"
   },
 
   "enum._CallCountCriteria": {
@@ -50,10 +51,13 @@
   },
 
   "fn._verify": {
-    "///": " Verify an interaction occurred that matches the given verification criteria. ",
+    "///": " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
+    "//1": " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
+    "//2": " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    ",
 
     "arg": {
-      "call": "enum._CallMatchCriteria",
+      "call": "call.fn.*",
+      "allowPartialArgMatch!": "boolean",
       "multiplicity!": "enum._CallCountCriteria"
     },
     "result": {
@@ -72,7 +76,7 @@
     "result": {
       "ok": {},
       "errorVerificationFailure": {
-        "additionalUnverifiedCalls": "array<fn>"
+        "additionalUnverifiedCalls": "array<fn.*>"
       }
     }
   },

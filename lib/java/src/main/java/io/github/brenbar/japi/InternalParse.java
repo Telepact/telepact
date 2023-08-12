@@ -66,131 +66,135 @@ class InternalParse {
     }
 
     private static JApiSchema newJApiSchema(String jApiSchemaAsJson) {
-        var parsedDefinitions = new HashMap<String, Definition>();
+        var parsedTypes = new HashMap<String, Type>();
 
         var objectMapper = new ObjectMapper();
         Map<String, Object> japiSchemaAsParsedJson;
         try {
             japiSchemaAsParsedJson = objectMapper.readValue(jApiSchemaAsJson, new TypeReference<>() {
             });
-
-            for (var entry : japiSchemaAsParsedJson.entrySet()) {
-                var definitionKey = entry.getKey();
-                if (!parsedDefinitions.containsKey(definitionKey)) {
-                    if (!definitionKey.startsWith("//")) {
-                        var definition = parseDefinition(definitionKey, japiSchemaAsParsedJson, parsedDefinitions);
-                        parsedDefinitions.put(definitionKey, definition);
-                    }
-                }
-            }
         } catch (IOException e) {
             throw new JApiSchemaParseError("Document root must be an object", e);
         }
 
-        var traits = new ArrayList<TraitDefinition>();
-        for (var def : parsedDefinitions.entrySet()) {
-            if (def.getValue() instanceof TraitDefinition t) {
-                traits.add(t);
+        var schemaKeys = japiSchemaAsParsedJson.keySet();
+
+        var traitSchemaKeys = new HashSet<String>();
+
+        for (var schemaKey : schemaKeys) {
+            if (schemaKey.startsWith("//")) {
+                continue;
             }
+
+            if (schemaKey.startsWith("trait.")) {
+                traitSchemaKeys.add(schemaKey);
+                continue;
+            }
+
+            getOrParseType(schemaKey, japiSchemaAsParsedJson, parsedTypes);
         }
 
         // Apply trait to all functions
-        for (var traitDefinition : traits) {
+        for (var traitSchemaKey : traitSchemaKeys) {
 
-            for (var parsedDefinition : parsedDefinitions.entrySet()) {
-                if (parsedDefinition.getValue() instanceof FunctionDefinition f) {
+            Map<String, Object> traitDefinition;
+            try {
+                traitDefinition = (Map<String, Object>) japiSchemaAsParsedJson.get(traitSchemaKey);
+            } catch (ClassCastException e) {
+                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
+            }
+
+            var traitArg = (Struct) parseFunctionArgumentType(traitSchemaKey, japiSchemaAsParsedJson, parsedTypes,
+                    false);
+            var traitResult = (Enum) parseFunctionResultType(traitSchemaKey, japiSchemaAsParsedJson, parsedTypes,
+                    false);
+
+            for (var parsedType : parsedTypes.entrySet()) {
+                if (parsedType.getKey().startsWith("fn") && parsedType.getValue() instanceof Struct f) {
                     if (f.name.startsWith("fn._")) {
                         // Only internal traits can change internal functions
-                        if (!traitDefinition.name.startsWith("trait._")) {
+                        if (!traitSchemaKey.startsWith("trait._")) {
                             continue;
                         }
                     }
 
-                    for (var traitArgumentField : traitDefinition.argumentStruct.fields.entrySet()) {
+                    for (var traitArgumentField : traitArg.fields.entrySet()) {
                         var newKey = traitArgumentField.getKey();
-                        if (f.argumentStruct.fields.containsKey(newKey)) {
-                            throw new JApiSchemaParseError(
-                                    "Trait argument field already in use: %s".formatted(newKey));
+                        var argField = f.fields.get("arg");
+                        if (argField.typeDeclaration.type instanceof Struct s) {
+                            if (s.fields.containsKey(newKey)) {
+                                throw new JApiSchemaParseError(
+                                        "Trait argument field already in use: %s".formatted(newKey));
+                            }
+                            s.fields.put(newKey, traitArgumentField.getValue());
                         }
-                        f.argumentStruct.fields.put(newKey, traitArgumentField.getValue());
                     }
 
-                    for (var traitResultField : traitDefinition.resultEnum.values.entrySet()) {
+                    for (var traitResultField : traitResult.values.entrySet()) {
                         var newKey = traitResultField.getKey();
-                        if (f.resultEnum.values.containsKey(newKey)) {
-                            throw new JApiSchemaParseError(
-                                    "Trait argument field already in use: %s".formatted(newKey));
+                        var resultField = f.fields.get("result");
+
+                        if (resultField.typeDeclaration.type instanceof Enum e) {
+                            if (e.values.containsKey(newKey)) {
+                                throw new JApiSchemaParseError(
+                                        "Trait argument field already in use: %s".formatted(newKey));
+                            }
+                            e.values.put(newKey, traitResultField.getValue());
                         }
-                        f.resultEnum.values.put(newKey, traitResultField.getValue());
                     }
                 }
             }
         }
 
         // Finish setting up all functions definition
-        if (parsedDefinitions.containsKey("fn")) {
-            var allFunctionsDefinition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
-            for (var parsedDefinition : parsedDefinitions.entrySet()) {
-                if (parsedDefinition.getValue() instanceof FunctionDefinition f && f.name.startsWith("fn.")
+        if (parsedTypes.containsKey("fn.*")) {
+            var allFunctionsDefinition = (Enum) parsedTypes.get("fn.*");
+            for (var parsedDefinition : parsedTypes.entrySet()) {
+                if (parsedDefinition.getKey().startsWith("fn.") && parsedDefinition.getValue() instanceof Struct f
                         && !f.name.startsWith("fn._")) {
-                    allFunctionsDefinition.functions.values.put(f.name, f.argumentStruct);
+                    allFunctionsDefinition.values.put(f.name, f);
                 }
             }
-
         }
 
-        return new JApiSchema((Map<String, Object>) (Object) japiSchemaAsParsedJson, parsedDefinitions);
+        // Finish setting up all functions definition
+        if (parsedTypes.containsKey("fn.*.arg")) {
+            var allFunctionArgsDefinition = (Enum) parsedTypes.get("fn.*.arg");
+            for (var parsedDefinition : parsedTypes.entrySet()) {
+                if (parsedDefinition.getKey().endsWith(".arg") && parsedDefinition.getValue() instanceof Struct a
+                        && !a.name.startsWith("fn._")) {
+                    allFunctionArgsDefinition.values.put(a.name, a);
+                }
+            }
+        }
+
+        return new JApiSchema((Map<String, Object>) (Object) japiSchemaAsParsedJson, parsedTypes);
     }
 
-    private static Definition parseDefinition(String definitionKey,
+    private static Type parseFunctionArgumentType(
+            String schemaKey,
             Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
-        if ("fn".equals(definitionKey)) {
-            return new AllFunctionsDefinition();
+            Map<String, Type> parsedTypes,
+            boolean isForTrait) {
+        Map<String, Object> definitionObject;
+        try {
+            definitionObject = (Map<String, Object>) jApiSchemaAsParsedJson.get(schemaKey);
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
 
-        var definitionWithDocAsParsedJson = (Map<String, Object>) jApiSchemaAsParsedJson.get(definitionKey);
-        if (definitionWithDocAsParsedJson == null) {
-            throw new JApiSchemaParseError("Could not find definition for %s".formatted(definitionKey));
+        var typeName = "%s.arg".formatted(schemaKey);
+        if (isForTrait) {
+            if (!definitionObject.containsKey("arg")) {
+                return new Struct(typeName, new HashMap<>());
+            }
         }
 
-        var regex = Pattern.compile("^(struct|enum|fn|trait|info).([a-zA-Z_]+[a-zA-Z0-9_]*)$");
-        var matcher = regex.matcher(definitionKey);
-        if (!matcher.find()) {
-            throw new JApiSchemaParseError("Invalid type definition name: %s".formatted(definitionKey));
-        }
-        var keyword = matcher.group(1);
-
-        var parsedDefinition = switch (keyword) {
-            case "fn" ->
-                parseFunctionDefinition(definitionWithDocAsParsedJson, definitionKey, jApiSchemaAsParsedJson,
-                        parsedDefinitions);
-            case "trait" ->
-                parseTraitDefinition(definitionWithDocAsParsedJson, definitionKey, jApiSchemaAsParsedJson,
-                        parsedDefinitions);
-            case "struct" ->
-                parseStructDefinition(definitionWithDocAsParsedJson, definitionKey, jApiSchemaAsParsedJson,
-                        parsedDefinitions);
-            case "enum" ->
-                parseEnumDefinition(definitionWithDocAsParsedJson, definitionKey, jApiSchemaAsParsedJson,
-                        parsedDefinitions);
-            case "info" -> new TitleDefinition(definitionKey);
-            default -> throw new JApiSchemaParseError("Unrecognized japi keyword %s".formatted(keyword));
-        };
-
-        return parsedDefinition;
-    }
-
-    private static FunctionDefinition parseFunctionDefinition(
-            Map<String, Object> definitionObject,
-            String definitionKey,
-            Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
         Map<String, Object> argumentDefinitionAsParsedJson;
         try {
             argumentDefinitionAsParsedJson = (Map<String, Object>) definitionObject.get("arg");
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
+            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
         var argumentFields = new HashMap<String, FieldDeclaration>();
         for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
@@ -200,19 +204,47 @@ class InternalParse {
             }
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
-                    typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
+                    typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes);
             argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+        }
+
+        var type = new Struct(typeName, argumentFields);
+
+        if (!isForTrait) {
+            parsedTypes.put(typeName, type);
+        }
+
+        return type;
+    }
+
+    private static Type parseFunctionResultType(
+            String schemaKey,
+            Map<String, Object> jApiSchemaAsParsedJson,
+            Map<String, Type> parsedTypes,
+            boolean isForTrait) {
+        Map<String, Object> definitionObject;
+        try {
+            definitionObject = (Map<String, Object>) jApiSchemaAsParsedJson.get(schemaKey);
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
+        }
+
+        var typeName = "%s.result".formatted(schemaKey);
+        if (isForTrait) {
+            if (!definitionObject.containsKey("result")) {
+                return new Enum(typeName, new HashMap<>());
+            }
         }
 
         Map<String, Object> resultDefinitionAsParsedJson;
         try {
             resultDefinitionAsParsedJson = (Map<String, Object>) definitionObject.get("result");
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
+            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
 
         if (!resultDefinitionAsParsedJson.containsKey("ok")) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
+            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
 
         var values = new HashMap<String, Struct>();
@@ -221,7 +253,7 @@ class InternalParse {
             try {
                 enumValueData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
-                throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
+                throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
             }
             var enumValue = entry.getKey();
 
@@ -233,94 +265,53 @@ class InternalParse {
                 }
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
-                        typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
+                        typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes);
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields);
+            var enumStruct = new Struct("%s.%s".formatted(schemaKey, enumValue), fields);
 
             values.put(enumValue, enumStruct);
         }
 
-        var argumentStruct = new Struct(definitionKey, argumentFields);
-        var resultEnum = new Enum(definitionKey, values);
+        var type = new Enum(typeName, values);
 
-        return new FunctionDefinition(definitionKey, argumentStruct, resultEnum);
+        if (!isForTrait) {
+            parsedTypes.put(typeName, type);
+        }
+
+        return type;
     }
 
-    private static TraitDefinition parseTraitDefinition(
-            Map<String, Object> definitionObject,
-            String definitionKey,
+    private static Type parseFunctionType(
+            String schemaKey,
             Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
-        Map<String, Object> argumentDefinitionAsParsedJson;
-        try {
-            argumentDefinitionAsParsedJson = (Map<String, Object>) definitionObject.get("arg");
-        } catch (ClassCastException e) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
-        }
-        var argumentFields = new HashMap<String, FieldDeclaration>();
-        if (argumentDefinitionAsParsedJson != null) {
-            for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
-                var fieldDeclaration = entry.getKey();
-                if (fieldDeclaration.startsWith("//")) {
-                    continue;
-                }
-                var typeDeclarationValue = entry.getValue();
-                var parsedField = parseField(fieldDeclaration,
-                        typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
-                argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
-            }
+            Map<String, Type> parsedTypes) {
+        var argumentStructType = getOrParseType("%s.arg".formatted(schemaKey), jApiSchemaAsParsedJson,
+                parsedTypes);
+        var resultEnumType = (Enum) getOrParseType("%s.result".formatted(schemaKey), jApiSchemaAsParsedJson,
+                parsedTypes);
+
+        if (!resultEnumType.values.containsKey("ok")) {
+            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
 
-        Map<String, Object> resultDefinitionAsParsedJson;
-        try {
-            resultDefinitionAsParsedJson = (Map<String, Object>) definitionObject.get("result");
-        } catch (ClassCastException e) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
-        }
+        var fields = Map.ofEntries(
+                Map.entry("arg", new FieldDeclaration(new TypeDeclaration(argumentStructType, false), false)),
+                Map.entry("result", new FieldDeclaration(new TypeDeclaration(resultEnumType, false), false)));
 
-        var values = new HashMap<String, Struct>();
+        var type = new Struct(schemaKey, fields);
 
-        if (resultDefinitionAsParsedJson != null) {
-            for (var entry : resultDefinitionAsParsedJson.entrySet()) {
-                Map<String, Object> enumValueData;
-                try {
-                    enumValueData = (Map<String, Object>) entry.getValue();
-                } catch (ClassCastException e) {
-                    throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
-                }
-                var enumValue = entry.getKey();
+        parsedTypes.put(schemaKey, type);
 
-                var fields = new HashMap<String, FieldDeclaration>();
-                for (var structEntry : enumValueData.entrySet()) {
-                    var fieldDeclaration = structEntry.getKey();
-                    if (fieldDeclaration.startsWith("//")) {
-                        continue;
-                    }
-                    var typeDeclarationValue = structEntry.getValue();
-                    var parsedField = parseField(fieldDeclaration,
-                            typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
-                    fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
-                }
-
-                var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields);
-
-                values.put(enumValue, enumStruct);
-            }
-        }
-
-        var argumentStruct = new Struct(definitionKey, argumentFields);
-        var resultEnum = new Enum(definitionKey, values);
-
-        return new TraitDefinition(definitionKey, argumentStruct, resultEnum);
+        return type;
     }
 
-    private static TypeDefinition parseStructDefinition(
+    private static Type parseStructType(
             Map<String, Object> structDefinitionAsParsedJson,
             String definitionKey,
             Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
+            Map<String, Type> parsedTypes) {
         var fields = new HashMap<String, FieldDeclaration>();
         for (var entry : structDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
@@ -329,20 +320,22 @@ class InternalParse {
             }
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
-                    typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
+                    typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes);
             fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
         var type = new Struct(definitionKey, fields);
 
-        return new TypeDefinition(definitionKey, type);
+        parsedTypes.put(definitionKey, type);
+
+        return type;
     }
 
-    private static TypeDefinition parseEnumDefinition(
+    private static Type parseEnumType(
             Map<String, Object> enumDefinitionAsParsedJson,
             String definitionKey,
             Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
+            Map<String, Type> parsedTypes) {
 
         var values = new HashMap<String, Struct>();
         for (var entry : enumDefinitionAsParsedJson.entrySet()) {
@@ -362,7 +355,7 @@ class InternalParse {
                 }
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
-                        typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedDefinitions);
+                        typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes);
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
@@ -373,7 +366,9 @@ class InternalParse {
 
         var type = new Enum(definitionKey, values);
 
-        return new TypeDefinition(definitionKey, type);
+        parsedTypes.put(definitionKey, type);
+
+        return type;
     }
 
     private static FieldNameAndFieldDeclaration parseField(
@@ -381,7 +376,7 @@ class InternalParse {
             Object typeDeclarationValue,
             boolean isForEnum,
             Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
+            Map<String, Type> parsedTypes) {
         var regex = Pattern.compile("^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$");
         var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
@@ -404,24 +399,45 @@ class InternalParse {
             throw new JApiSchemaParseError("Enum keys cannot be marked as optional");
         }
 
-        var typeDeclaration = parseType(typeDeclarationString, jApiSchemaAsParsedJson, parsedDefinitions);
+        var typeDeclaration = parseTypeDeclaration(typeDeclarationString, jApiSchemaAsParsedJson, parsedTypes);
 
         return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
     }
 
-    private static TypeDeclaration parseType(String typeDeclaration,
+    private static TypeDeclaration parseTypeDeclaration(String typeDeclaration,
             Map<String, Object> jApiSchemaAsParsedJson,
-            Map<String, Definition> parsedDefinitions) {
-        var regex = Pattern.compile(
-                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|(fn)|((enum|struct|fn)\\.([a-zA-Z_]\\w*))|)(\\?)?$");
+            Map<String, Type> parsedTypes) {
+        var regex = Pattern.compile("^(.*)(\\?)?$");
         var matcher = regex.matcher(typeDeclaration);
-        matcher.find();
+        if (!matcher.find()) {
+            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclaration));
+        }
 
-        boolean nullable = matcher.group(11) != null;
+        var typeName = matcher.group(1);
+        var nullable = matcher.group(2) != null;
+
+        var type = getOrParseType(typeName, jApiSchemaAsParsedJson, parsedTypes);
+
+        return new TypeDeclaration(type, nullable);
+    }
+
+    private static Type getOrParseType(String typeName, Map<String, Object> jApiSchemaAsParsedJson,
+            Map<String, Type> parsedTypes) {
+        var existingType = parsedTypes.get(typeName);
+        if (existingType != null) {
+            return existingType;
+        }
+
+        var regex = Pattern.compile(
+                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.(arg|result))?))$");
+        var matcher = regex.matcher(typeName);
+        if (!matcher.find()) {
+            throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
+        }
 
         var standardTypeName = matcher.group(2);
         if (standardTypeName != null) {
-            var type = switch (standardTypeName) {
+            return switch (standardTypeName) {
                 case "boolean" -> new JsonBoolean();
                 case "integer" -> new JsonInteger();
                 case "number" -> new JsonNumber();
@@ -429,8 +445,6 @@ class InternalParse {
                 case "any" -> new JsonAny();
                 default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(standardTypeName));
             };
-
-            return new TypeDeclaration(type, nullable);
         }
 
         var collectionTypeName = matcher.group(4);
@@ -439,46 +453,64 @@ class InternalParse {
 
             TypeDeclaration nestedType;
             if (nestedName != null) {
-                nestedType = parseType(nestedName, jApiSchemaAsParsedJson, parsedDefinitions);
+                nestedType = parseTypeDeclaration(nestedName, jApiSchemaAsParsedJson, parsedTypes);
             } else {
                 nestedType = new TypeDeclaration(new JsonAny(), false);
             }
 
-            var type = switch (collectionTypeName) {
+            return switch (collectionTypeName) {
                 case "array" -> new JsonArray(nestedType);
                 case "object" -> new JsonObject(nestedType);
                 default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(collectionTypeName));
             };
-
-            return new TypeDeclaration(type, nullable);
         }
 
-        var functionRef = matcher.group(7);
-        if (functionRef != null) {
-            var definition = (AllFunctionsDefinition) parsedDefinitions.get("fn");
-            if (definition == null) {
-                definition = (AllFunctionsDefinition) parseDefinition("fn", jApiSchemaAsParsedJson, parsedDefinitions);
-                parsedDefinitions.put("fn", definition);
-            }
-            return new TypeDeclaration(definition.functions, nullable);
-        }
-
-        var customTypeName = matcher.group(8);
+        var customTypeName = matcher.group(7);
         if (customTypeName != null) {
-            var definition = parsedDefinitions.get(customTypeName);
-            if (definition == null) {
-                definition = parseDefinition(customTypeName, jApiSchemaAsParsedJson, parsedDefinitions);
-                parsedDefinitions.put(customTypeName, definition);
-            }
-            if (definition instanceof TypeDefinition t) {
-                return new TypeDeclaration(t.type, nullable);
-            } else if (definition instanceof FunctionDefinition f) {
-                return new TypeDeclaration(f.argumentStruct, nullable);
+            var typePrefix = matcher.group(8);
+            var typeDefinition = (Map<String, Object>) jApiSchemaAsParsedJson.get(customTypeName);
+            return switch (typePrefix) {
+                case "struct" ->
+                    parseStructType(typeDefinition, customTypeName, jApiSchemaAsParsedJson, parsedTypes);
+                case "enum" -> parseEnumType(typeDefinition, typeName, jApiSchemaAsParsedJson, parsedTypes);
+                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(collectionTypeName));
+            };
+        }
+
+        var functionTypeName = matcher.group(10);
+        if (functionTypeName != null) {
+            var isAllFunctions = matcher.group(11);
+            var isJustArg = matcher.group(13);
+
+            if (isAllFunctions == null) {
+                if (isJustArg == null) {
+                    return parseFunctionType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes);
+                } else {
+                    if (".arg".equals(isJustArg)) {
+                        return parseFunctionArgumentType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, true);
+                    } else if (".result".equals(isJustArg)) {
+                        return parseFunctionResultType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, true);
+                    }
+                }
             } else {
-                throw new JApiSchemaParseError("Unknown definition: %s".formatted(typeDeclaration));
+                if (isJustArg == null) {
+                    var allFunctionsType = parsedTypes.get(functionTypeName);
+                    if (allFunctionsType == null) {
+                        allFunctionsType = new Enum(functionTypeName, new HashMap<>());
+                        parsedTypes.put(functionTypeName, allFunctionsType);
+                    }
+                    return allFunctionsType;
+                } else {
+                    var allFunctionArgsType = parsedTypes.get(functionTypeName);
+                    if (allFunctionArgsType == null) {
+                        allFunctionArgsType = new Enum(functionTypeName, new HashMap<>());
+                        parsedTypes.put(functionTypeName, allFunctionArgsType);
+                    }
+                    return allFunctionArgsType;
+                }
             }
         }
 
-        throw new JApiSchemaParseError("Invalid definition: %s".formatted(typeDeclaration));
+        throw new JApiSchemaParseError("Invalid type: %s".formatted(typeName));
     }
 }

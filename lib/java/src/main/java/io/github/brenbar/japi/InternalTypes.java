@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 class JApiSchema {
     public final Map<String, Object> original;
-    public final Map<String, Definition> parsed;
+    public final Map<String, Type> parsed;
 
-    public JApiSchema(Map<String, Object> original, Map<String, Definition> parsed) {
+    public JApiSchema(Map<String, Object> original, Map<String, Type> parsed) {
         this.original = original;
         this.parsed = parsed;
     }
@@ -78,11 +78,22 @@ class TraitDefinition implements Definition {
 
 class AllFunctionsDefinition implements Definition {
 
-    public final Enum functions = new Enum("fn", new HashMap<>());
+    public final Enum functions = new Enum("fn.*", new HashMap<>());
 
     @Override
     public String getName() {
-        return "fn";
+        return "fn.*";
+    }
+
+}
+
+class AllFunctionArgsDefinition implements Definition {
+
+    public final Enum functionArgs = new Enum("fn.*.arg", new HashMap<>());
+
+    @Override
+    public String getName() {
+        return "fn.*.arg";
     }
 
 }
