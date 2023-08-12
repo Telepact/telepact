@@ -105,9 +105,9 @@ class InternalParse {
             }
 
             var traitArg = (Struct) parseFunctionArgumentType(traitSchemaKey, japiSchemaAsParsedJson, parsedTypes,
-                    false);
+                    true);
             var traitResult = (Enum) parseFunctionResultType(traitSchemaKey, japiSchemaAsParsedJson, parsedTypes,
-                    false);
+                    true);
 
             for (var parsedType : parsedTypes.entrySet()) {
                 if (parsedType.getKey().startsWith("fn") && parsedType.getValue() instanceof Struct f) {
@@ -243,7 +243,7 @@ class InternalParse {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
 
-        if (!resultDefinitionAsParsedJson.containsKey("ok")) {
+        if (!isForTrait && !resultDefinitionAsParsedJson.containsKey("ok")) {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(schemaKey));
         }
 
@@ -339,6 +339,9 @@ class InternalParse {
 
         var values = new HashMap<String, Struct>();
         for (var entry : enumDefinitionAsParsedJson.entrySet()) {
+            if (entry.getKey().startsWith("//")) {
+                continue;
+            }
             Map<String, Object> enumStructData;
             try {
                 enumStructData = (Map<String, Object>) entry.getValue();
@@ -407,7 +410,7 @@ class InternalParse {
     private static TypeDeclaration parseTypeDeclaration(String typeDeclaration,
             Map<String, Object> jApiSchemaAsParsedJson,
             Map<String, Type> parsedTypes) {
-        var regex = Pattern.compile("^(.*)(\\?)?$");
+        var regex = Pattern.compile("^(.*?)(\\?)?$");
         var matcher = regex.matcher(typeDeclaration);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclaration));
@@ -487,9 +490,9 @@ class InternalParse {
                     return parseFunctionType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes);
                 } else {
                     if (".arg".equals(isJustArg)) {
-                        return parseFunctionArgumentType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, true);
+                        return parseFunctionArgumentType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, false);
                     } else if (".result".equals(isJustArg)) {
-                        return parseFunctionResultType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, true);
+                        return parseFunctionResultType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, false);
                     }
                 }
             } else {
