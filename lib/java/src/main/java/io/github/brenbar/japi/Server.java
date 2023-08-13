@@ -125,6 +125,6 @@ public class Server {
     }
 
     private Message processMessage(Message requestMessage) {
-        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler);
+        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler, this.onError);
     }
 }

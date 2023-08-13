@@ -110,7 +110,7 @@ class InternalParse {
                     true);
 
             for (var parsedType : parsedTypes.entrySet()) {
-                if (parsedType.getKey().startsWith("fn") && parsedType.getValue() instanceof Struct f) {
+                if (parsedType.getKey().matches("^fn\\.[a-zA-Z_]\\w*") && parsedType.getValue() instanceof Struct f) {
                     if (f.name.startsWith("fn._")) {
                         // Only internal traits can change internal functions
                         if (!traitSchemaKey.startsWith("trait._")) {
@@ -432,7 +432,7 @@ class InternalParse {
         }
 
         var regex = Pattern.compile(
-                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.(arg|result))?))$");
+                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*))|((fn\\.(([a-zA-Z_]\\w*)|(\\*)))(\\.(arg|result))?))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
@@ -480,10 +480,10 @@ class InternalParse {
             };
         }
 
-        var functionTypeName = matcher.group(10);
+        var functionTypeName = matcher.group(11);
         if (functionTypeName != null) {
-            var isAllFunctions = matcher.group(11);
-            var isJustArg = matcher.group(13);
+            var isAllFunctions = matcher.group(14);
+            var isJustArg = matcher.group(15);
 
             if (isAllFunctions == null) {
                 if (isJustArg == null) {

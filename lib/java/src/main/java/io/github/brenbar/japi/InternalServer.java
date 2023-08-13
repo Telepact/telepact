@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 class InternalServer {
@@ -50,7 +51,7 @@ class InternalServer {
                 var matcher = regex.matcher(givenTarget);
                 if (matcher.matches()) {
                     var functionDef = jApiSchema.parsed.get(givenTarget);
-                    if (functionDef instanceof FunctionDefinition f) {
+                    if (functionDef != null) {
                         requestTarget = givenTarget;
                     } else {
                         parseFailures.add("UnknownFunction");
@@ -86,19 +87,14 @@ class InternalServer {
 
     static Message processMessage(Message requestMessage,
             JApiSchema jApiSchema,
-            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler) {
-        var responseMessage = processMessageWithoutResultValidation(requestMessage, jApiSchema, handler);
-
-        return responseMessage;
-    }
-
-    static Message processMessageWithoutResultValidation(Message requestMessage,
-            JApiSchema jApiSchema,
-            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler) {
+            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
+            Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = new HashMap<String, Object>();
         var requestTarget = (String) requestMessage.target;
-        var functionDefinition = (FunctionDefinition) jApiSchema.parsed.get(requestTarget);
+        var functionType = (Struct) jApiSchema.parsed.get(requestTarget);
+        var resultEnumType = (Enum) functionType.fields.get("result").typeDeclaration.type;
+        var argStructType = (Struct) functionType.fields.get("arg").typeDeclaration.type;
         var requestHeaders = (Map<String, Object>) requestMessage.headers;
         var requestBody = (Map<String, Object>) requestMessage.body;
 
@@ -111,7 +107,7 @@ class InternalServer {
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure", Map.of("reasons", parseFailures));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
+            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -125,7 +121,7 @@ class InternalServer {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
+            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -139,13 +135,13 @@ class InternalServer {
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
-        var argumentValidationFailures = validateStruct(functionDefinition.name,
-                functionDefinition.argumentStruct.fields, requestBody);
+        var argumentValidationFailures = validateStruct(functionType.name,
+                argStructType.fields, requestBody);
         if (!argumentValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, functionDefinition,
+            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -166,18 +162,23 @@ class InternalServer {
             try {
                 result = handler.apply(context, requestBody);
             } catch (Throwable t) {
+                try {
+                    onError.accept(t);
+                } catch (Throwable ignored) {
+
+                }
                 result = Map.of("_errorUnknown", Map.of());
             }
         }
 
-        var resultValidationFailures = validateResultEnum(functionDefinition.name,
-                functionDefinition,
+        var resultValidationFailures = validateResultEnum(functionType.name,
+                resultEnumType,
                 result);
         if (!resultValidationFailures.isEmpty() && !unsafeResponseEnabled) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(functionDefinition.name, functionDefinition,
+            var newErrorResultValidationFailures = validateResultEnum(functionType.name, resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -189,7 +190,7 @@ class InternalServer {
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResult = (Map<String, Object>) selectStructFields(functionDefinition.resultEnum, result,
+            finalResult = (Map<String, Object>) selectStructFields(resultEnumType, result,
                     selectStructFieldsHeader);
         } else {
             finalResult = result;
@@ -292,9 +293,9 @@ class InternalServer {
 
     private static List<ValidationFailure> validateResultEnum(
             String path,
-            FunctionDefinition functionDefinition,
+            Enum resultEnumType,
             Map<String, Object> actualResult) {
-        return validateEnum(path, functionDefinition.resultEnum.values, actualResult);
+        return validateEnum(path, resultEnumType.values, actualResult);
     }
 
     private static List<ValidationFailure> validateStruct(

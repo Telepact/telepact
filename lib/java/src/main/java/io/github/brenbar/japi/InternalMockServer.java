@@ -27,8 +27,10 @@ class InternalMockServer {
 
         switch (context.functionName) {
             case "fn._createStub" -> {
-                var whenFunction = (String) argument.get("whenFunction");
-                var whenArgument = (Map<String, Object>) argument.get("whenArgument");
+                var givenStub = (Map<String, Object>) argument.get("stub");
+                var entry = givenStub.entrySet().stream().findFirst().get();
+                var whenFunction = entry.getKey();
+                var whenArgument = (Map<String, Object>) entry.getValue();
                 var thenResult = (Map<String, Object>) argument
                         .get("thenResult");
                 var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));

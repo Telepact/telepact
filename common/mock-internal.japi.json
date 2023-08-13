@@ -56,7 +56,7 @@
     "//2": " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    ",
 
     "arg": {
-      "call": "call.fn.*",
+      "call": "fn.*.arg",
       "allowPartialArgMatch!": "boolean",
       "multiplicity!": "enum._CallCountCriteria"
     },
