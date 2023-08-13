@@ -13,7 +13,7 @@
 
     "arg": {
       "stub": "fn.*",
-      "allowPartialArgMatch!": "boolean",
+      "ignoreMissingArgFields!": "boolean",
       "generateMissingResultFields!": "boolean"
     },
     "result": {

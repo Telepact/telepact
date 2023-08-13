@@ -30,10 +30,11 @@ class InternalMockServer {
                 var givenStub = (Map<String, Object>) argument.get("stub");
                 var entry = givenStub.entrySet().stream().findFirst().get();
                 var whenFunction = entry.getKey();
-                var whenArgument = (Map<String, Object>) entry.getValue();
-                var thenResult = (Map<String, Object>) argument
-                        .get("thenResult");
-                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
+                var functionStruct = (Map<String, Object>) entry.getValue();
+                var whenArgument = (Map<String, Object>) functionStruct.get("arg");
+                var thenResult = (Map<String, Object>) functionStruct
+                        .get("result");
+                var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("ignoreMissingArgFields", false);
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
                         false);
 

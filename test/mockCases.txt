@@ -1,5 +1,5 @@
 "emptyPartialMatchStub"
 
 ["fn.test",{},{}]|["fn.test",{},{"_errorNoMatchingStub":{}}]
-["fn._createStub",{},{"stub":{"fn.test":{"arg":{},"result":{"ok":{"value":{"bool":true}}}}},"allowPartialArgMatch":true}]|["fn._createStub",{},{"ok":{}}]
+["fn._createStub",{},{"stub":{"fn.test":{"arg":{},"result":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}]|["fn._createStub",{},{"ok":{}}]
 ["fn.test",{},{}]|["fn.test",{},{"ok":{"value":{"bool":true}}}]
