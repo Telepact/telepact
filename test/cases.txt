@@ -1499,6 +1499,7 @@
 
 "testParseFailure"
 
+[}|["fn._unknown",{},{"_errorParseFailure":{"reasons":["InvalidJson"]}}]|skipBinary
 false|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}]|skipBinary
 0|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}]|skipBinary
 ""|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithThreeElements"]}}]|skipBinary

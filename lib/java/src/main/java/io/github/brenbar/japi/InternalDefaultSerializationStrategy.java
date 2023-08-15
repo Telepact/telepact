@@ -9,6 +9,7 @@ import java.util.Set;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.msgpack.jackson.dataformat.MessagePackParser;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -102,6 +103,8 @@ class InternalDefaultSerializationStrategy implements SerializationStrategy {
         try {
             return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
             });
+        } catch (JsonParseException e) {
+            throw new DeserializationError(new InvalidJsonError(e));
         } catch (JsonMappingException e) {
             if (e.getMessage().contains("out of range")) {
                 throw new DeserializationError(new NumberOutOfRangeError());

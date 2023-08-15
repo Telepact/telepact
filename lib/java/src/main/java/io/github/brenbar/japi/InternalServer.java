@@ -34,8 +34,10 @@ class InternalServer {
                 parseFailures.add("BinaryDecodeFailure");
             } else if (cause instanceof BinaryEncoderMissingEncoding e2) {
                 parseFailures.add("BinaryDecodeFailure");
-            } else {
+            } else if (cause instanceof InvalidJsonError e2) {
                 parseFailures.add("InvalidJson");
+            } else {
+                parseFailures.add("MessageMustBeArrayWithThreeElements");
             }
 
             if (!parseFailures.isEmpty()) {
