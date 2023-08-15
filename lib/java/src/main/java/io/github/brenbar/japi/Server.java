@@ -104,7 +104,7 @@ public class Server {
         try {
             try {
                 var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
-                        this.jApiSchema);
+                        this.jApiSchema, this.onError);
 
                 var responseMessage = this.middleware.apply(requestMessage, this::processMessage);
 

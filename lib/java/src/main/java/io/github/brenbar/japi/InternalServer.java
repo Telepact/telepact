@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 
 class InternalServer {
 
-    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema) {
+    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
+            Consumer<Throwable> onError) {
         var requestTarget = "fn._unknown";
         var requestHeaders = new HashMap<String, Object>();
         var parseFailures = new ArrayList<String>();
@@ -23,6 +24,10 @@ class InternalServer {
         try {
             requestMessageArray = serializer.deserialize(requestMessageBytes);
         } catch (DeserializationError e) {
+            try {
+                onError.accept(e);
+            } catch (Throwable ignored) {
+            }
             var cause = e.getCause();
 
             if (cause instanceof BinaryEncoderUnavailableError e2) {
@@ -30,7 +35,7 @@ class InternalServer {
             } else if (cause instanceof BinaryEncoderMissingEncoding e2) {
                 parseFailures.add("BinaryDecodeFailure");
             } else {
-                parseFailures.add("MessageMustBeArrayWithThreeElements");
+                parseFailures.add("InvalidJson");
             }
 
             if (!parseFailures.isEmpty()) {
