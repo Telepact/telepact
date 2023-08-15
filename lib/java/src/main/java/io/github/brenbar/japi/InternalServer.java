@@ -253,7 +253,7 @@ class InternalServer {
                             "SelectHeaderKeyMustBeStructReference"));
                     continue;
                 }
-                var structReference = jApiSchema.parsed.get(structName);
+                var structReference = (Struct) jApiSchema.parsed.get(structName);
                 if (structReference == null) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "UnknownStruct"));
@@ -279,14 +279,10 @@ class InternalServer {
                                 "SelectHeaderFieldMustBeString"));
                         continue;
                     }
-                    if (structReference instanceof TypeDefinition d) {
-                        if (d.type instanceof Struct s) {
-                            if (!s.fields.containsKey(stringField)) {
-                                validationFailures.add(new ValidationFailure(
-                                        "headers{_sel}{%s}[%d]".formatted(structName, i),
-                                        "UnknownStructField"));
-                            }
-                        }
+                    if (!structReference.fields.containsKey(stringField)) {
+                        validationFailures.add(new ValidationFailure(
+                                "headers{_sel}{%s}[%d]".formatted(structName, i),
+                                "UnknownStructField"));
                     }
                 }
             }
