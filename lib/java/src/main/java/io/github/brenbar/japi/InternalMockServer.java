@@ -93,10 +93,11 @@ class InternalMockServer {
                     return Map.of("_errorNoMatchingStub", Map.of());
                 }
 
-                var definition = jApiSchema.parsed.get(context.functionName);
+                var definition = (Struct) jApiSchema.parsed.get(context.functionName);
 
-                if (definition instanceof FunctionDefinition f) {
-                    var okStructRef = f.resultEnum.values.get("ok");
+                if (definition != null) {
+                    var resultEnum = (Enum) definition.fields.get("result").typeDeclaration.type;
+                    var okStructRef = resultEnum.values.get("ok");
                     var randomOkStruct = constructRandomStruct(okStructRef.fields, random);
                     return Map.of("ok", randomOkStruct);
                 } else {
