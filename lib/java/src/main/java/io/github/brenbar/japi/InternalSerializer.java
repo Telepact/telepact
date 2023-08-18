@@ -20,21 +20,13 @@ class InternalSerializer {
         var allKeys = new TreeSet<String>();
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
-            if (entry.getValue() instanceof FunctionDefinition f) {
-                allKeys.addAll(f.argumentStruct.fields.keySet());
-                allKeys.addAll(f.resultEnum.values.keySet());
-                for (var resultEnumStruct : f.resultEnum.values.values()) {
-                    allKeys.addAll(resultEnumStruct.fields.keySet());
-                }
-            } else if (entry.getValue() instanceof TypeDefinition t) {
-                var type = t.type;
-                if (type instanceof Struct o) {
-                    allKeys.addAll(o.fields.keySet());
-                } else if (type instanceof Enum e) {
-                    allKeys.addAll(e.values.keySet());
-                    for (var resultEnumStruct : e.values.values()) {
-                        allKeys.addAll(resultEnumStruct.fields.keySet());
-                    }
+            if (entry.getValue() instanceof Struct s) {
+                allKeys.addAll(s.fields.keySet());
+            } else if (entry.getValue() instanceof Enum e) {
+                for (var entry2 : e.values.entrySet()) {
+                    allKeys.add(entry2.getKey());
+                    var struct = entry2.getValue();
+                    allKeys.addAll(struct.fields.keySet());
                 }
             }
         }

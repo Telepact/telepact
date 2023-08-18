@@ -166,7 +166,8 @@ class InternalMockServer {
         for (var field : sortedReferenceStruct) {
             var fieldDeclaration = field.getValue();
             if (fieldDeclaration.optional && random.nextBoolean()) {
-                continue;
+                // TODO: put back
+                // continue;
             }
             obj.put(field.getKey(), constructRandomType(fieldDeclaration.typeDeclaration, random));
         }
@@ -185,14 +186,19 @@ class InternalMockServer {
         } else if (typeDeclaration.type instanceof JsonString s) {
             return random.nextString();
         } else if (typeDeclaration.type instanceof JsonArray a) {
-            var length = random.nextInt(3);
+            // TODO: put back
+            // var length = random.nextInt(3);
+
+            var length = 1000;
             var array = new ArrayList<Object>();
             for (int i = 0; i < length; i += 1) {
                 array.add(constructRandomType(a.nestedType, random));
             }
             return array;
         } else if (typeDeclaration.type instanceof JsonObject o) {
-            var length = random.nextInt(3);
+            // TODO: put back
+            // var length = random.nextInt(3);
+            var length = 100;
             var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
                 var key = random.nextString();
