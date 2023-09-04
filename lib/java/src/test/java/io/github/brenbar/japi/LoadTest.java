@@ -27,7 +27,7 @@ public class LoadTest {
                 .setOnError((e) -> e.printStackTrace())
                 .setEnableGeneratedDefaultStub(true);
 
-        var natsUrl = "nats://35.177.87.170:4222";
+        var natsUrl = "nats://127.0.0.1:4222";
 
         var metrics = new MetricRegistry();
         var metricsReporter = ConsoleReporter.forRegistry(metrics).build();

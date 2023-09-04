@@ -3,6 +3,7 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -29,7 +30,20 @@ public class MockServer {
         var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
                 InternalMockJApi.getJson()));
-        this.server = new Server(combinedSchemaJson, this::handle);
+        this.server = new Server(combinedSchemaJson, this::handle)
+                .setShouldValidateArgument((context, argument) -> {
+                    if ("fn._createStub".equals(context.functionName)
+                            && Objects.equals(argument.get("ignoreMissingArgFields"), true)) {
+                        return true;
+
+                    } else if ("fn._verify".equals(context.functionName)
+                            && Objects.equals(argument.get("ignoreMissingArgFields"), true)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = true;
     }

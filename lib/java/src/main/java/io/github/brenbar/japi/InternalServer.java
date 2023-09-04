@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -95,6 +96,7 @@ class InternalServer {
     static Message processMessage(Message requestMessage,
             JApiSchema jApiSchema,
             BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
+            BiFunction<Context, Map<String, Object>, Boolean> shouldValidateArgument,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = new HashMap<String, Object>();
@@ -109,6 +111,24 @@ class InternalServer {
         var callId = requestHeaders.get("_id");
         if (callId != null) {
             responseHeaders.put("_id", callId);
+        }
+
+        Map<String, Object> features = null;
+        if (requestHeaders.containsKey("_features")) {
+            try {
+                features = (Map<String, Object>) requestHeaders.get("_features");
+            } catch (ClassCastException e) {
+                throw new JApiProcessError("Invalid header. Path: headers{_features}");
+            }
+        }
+
+        boolean featureIgnoreMissingArgStructFields = false;
+        if (features != null) {
+            try {
+                featureIgnoreMissingArgStructFields = (Boolean) features.get("ignoreMissingStructFields");
+            } catch (ClassCastException | NullPointerException e) {
+                throw new JApiProcessError("Invalid header. Path: headers{_features}{ignoreMissingStructFields}");
+            }
         }
 
         if (requestHeaders.containsKey("_parseFailures")) {
@@ -142,21 +162,32 @@ class InternalServer {
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
+        var context = new Context(requestTarget, requestHeaders);
+
         var argumentValidationFailures = validateStruct(functionType.name,
                 argStructType.fields, requestBody);
         if (!argumentValidationFailures.isEmpty()) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
-                    Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
-                    newErrorResult);
-            if (!newErrorResultValidationFailures.isEmpty()) {
-                throw new JApiProcessError("Failed internal jAPI validation");
-            }
-            return new Message(requestTarget, responseHeaders, newErrorResult);
-        }
+            var allErrorsAreMissingStructFields = argumentValidationFailures.stream()
+                    .allMatch(e -> e.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING));
 
-        var context = new Context(requestTarget, requestHeaders);
+            // TODO: Complete this feature
+            // var shouldValidate = !shouldValidateArgument.apply(context, requestBody) ||
+            // !allErrorsAreMissingStructFields;
+            var shouldValidate = true;
+
+            if (shouldValidate) {
+                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
+                Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
+                        Map.of("cases", validationFailureCases));
+                var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
+                        newErrorResult);
+                if (!newErrorResultValidationFailures.isEmpty()) {
+                    throw new JApiProcessError("Failed internal jAPI validation");
+                }
+
+                return new Message(requestTarget, responseHeaders, newErrorResult);
+            }
+        }
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
@@ -178,19 +209,22 @@ class InternalServer {
             }
         }
 
-        var resultValidationFailures = validateResultEnum(functionType.name,
-                resultEnumType,
-                result);
-        if (!resultValidationFailures.isEmpty() && !unsafeResponseEnabled) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
-                    Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(functionType.name, resultEnumType,
-                    newErrorResult);
-            if (!newErrorResultValidationFailures.isEmpty()) {
-                throw new JApiProcessError("Failed internal jAPI validation");
+        var skipResultValidation = unsafeResponseEnabled;
+        if (!skipResultValidation) {
+            var resultValidationFailures = validateResultEnum(functionType.name,
+                    resultEnumType,
+                    result);
+            if (!resultValidationFailures.isEmpty()) {
+                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
+                Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
+                        Map.of("cases", validationFailureCases));
+                var newErrorResultValidationFailures = validateResultEnum(functionType.name, resultEnumType,
+                        newErrorResult);
+                if (!newErrorResultValidationFailures.isEmpty()) {
+                    throw new JApiProcessError("Failed internal jAPI validation");
+                }
+                return new Message(requestTarget, responseHeaders, newErrorResult);
             }
-            return new Message(requestTarget, responseHeaders, newErrorResult);
         }
 
         Map<String, Object> finalResult;

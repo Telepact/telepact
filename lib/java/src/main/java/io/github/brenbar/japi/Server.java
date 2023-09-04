@@ -3,7 +3,6 @@ package io.github.brenbar.japi;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * A jAPI Server.
@@ -26,26 +25,10 @@ public class Server {
     interface Handler extends BiFunction<Context, Map<String, Object>, Map<String, Object>> {
     }
 
-    /**
-     * A Middleware layer that allows for customized Request/Response processing on
-     * all requests.
-     * 
-     * Example:
-     * 
-     * <pre>
-     * var middleware = (message, next) -> {
-     *     // Custom logic here
-     *     next.apply(message);
-     * };
-     * </pre>
-     */
-    interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
-    }
-
     JApiSchema jApiSchema;
     Handler handler;
-    Middleware middleware;
     Consumer<Throwable> onError;
+    BiFunction<Context, Map<String, Object>, Boolean> shouldValidateArgument;
     Serializer serializer;
 
     /**
@@ -59,7 +42,7 @@ public class Server {
         this.handler = handler;
         this.onError = (e) -> {
         };
-        this.middleware = (m, n) -> n.apply(m);
+        this.shouldValidateArgument = (c, a) -> true;
 
         var binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
         var serializationStrategy = new InternalDefaultSerializationStrategy();
@@ -90,6 +73,11 @@ public class Server {
         return this;
     }
 
+    public Server setShouldValidateArgument(BiFunction<Context, Map<String, Object>, Boolean> shouldValidateArgument) {
+        this.shouldValidateArgument = shouldValidateArgument;
+        return this;
+    }
+
     /**
      * Process a given jAPI Request Message into a jAPI Response Message.
      * 
@@ -102,29 +90,25 @@ public class Server {
 
     private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
-            try {
-                var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
-                        this.jApiSchema, this.onError);
+            var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
+                    this.jApiSchema, this.onError);
 
-                var responseMessage = this.middleware.apply(requestMessage, this::processMessage);
+            var responseMessage = processMessage(requestMessage);
 
-                return this.serializer
-                        .serialize(List.of(responseMessage.target, responseMessage.headers, responseMessage.body));
-            } catch (Exception e) {
-                try {
-                    this.onError.accept(e);
-                } catch (Exception ignored) {
-                }
-                throw e;
-            }
-        } catch (InternalJApiError e) {
-            return this.serializer.serialize(List.of(e.target, e.headers, e.body));
+            return this.serializer
+                    .serialize(List.of(responseMessage.target, responseMessage.headers, responseMessage.body));
         } catch (Exception e) {
-            return this.serializer.serialize(List.of("error._JApiFailure", new HashMap<>(), Map.of()));
+            try {
+                this.onError.accept(e);
+            } catch (Exception ignored) {
+            }
+            return this.serializer
+                    .serialize(List.of("fn._unknown", new HashMap<>(), Map.of("_errorUnknown", Map.of())));
         }
     }
 
     private Message processMessage(Message requestMessage) {
-        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler, this.onError);
+        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler, this.shouldValidateArgument,
+                this.onError);
     }
 }

@@ -1,15 +1,15 @@
 {
   "fn._createStub": {
-    "///": " Create a function stub that will cause the server to return the `stub` result when the `stub` argument  ",
-    "//1": " matches the function argument on a request.                                                             ",
-    "//2": "                                                                                                         ",
-    "//3": " If `allowPartialArgMatch` is `true`, then the server will skip field omission validation on the `stub`  ",
-    "//4": " argument, and the stub will match calls where the given `stub` argument is exactly a json sub-structure ",
-    "//5": " of the request function argument.                                                                       ",
-    "//6": "                                                                                                         ",
-    "//7": " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the  ",
-    "//8": " `stub` result, and the server will generate the necessary data required to make the `result` pass on    ",
-    "//9": " response validation. ",
+    "///": " Create a function stub that will cause the server to return the `stub` result when the `stub` argument   ",
+    "//1": " matches the function argument on a request.                                                              ",
+    "//2": "                                                                                                          ",
+    "//3": " If `ignoreMissingArgFields` is `true`, then the server will skip field omission validation on the `stub` ",
+    "//4": " argument, and the stub will match calls where the given `stub` argument is exactly a json sub-structure  ",
+    "//5": " of the request function argument.                                                                        ",
+    "//6": "                                                                                                          ",
+    "//7": " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the   ",
+    "//8": " `stub` result, and the server will generate the necessary data required to make the `result` pass on     ",
+    "//9": " response validation.                                                                                     ",
 
     "arg": {
       "stub": "fn.*",
