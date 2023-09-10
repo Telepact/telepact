@@ -147,8 +147,7 @@ public class Client {
 
         var response = this.middleware.apply(requestMessage, this::processMessage);
 
-        var responseMessageType = (String) response.get(0);
-        var result = (Map<String, Object>) response.get(2);
+        var result = (Map<String, Object>) response.get(1);
 
         if (throwOnError && result.containsKey("err")) {
             throw new JApiError(result);

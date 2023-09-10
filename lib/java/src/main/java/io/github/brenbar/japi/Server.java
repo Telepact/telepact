@@ -96,7 +96,7 @@ public class Server {
             var responseMessage = processMessage(requestMessage);
 
             return this.serializer
-                    .serialize(List.of(responseMessage.target, responseMessage.headers, responseMessage.body));
+                    .serialize(List.of(responseMessage.headers, responseMessage.body));
         } catch (Exception e) {
             try {
                 this.onError.accept(e);

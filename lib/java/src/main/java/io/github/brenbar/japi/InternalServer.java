@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -17,7 +16,6 @@ class InternalServer {
 
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
-        var requestTarget = "fn._unknown";
         var requestHeaders = new HashMap<String, Object>();
         var parseFailures = new ArrayList<String>();
 
@@ -38,49 +36,45 @@ class InternalServer {
             } else if (cause instanceof InvalidJsonError e2) {
                 parseFailures.add("InvalidJson");
             } else {
-                parseFailures.add("MessageMustBeArrayWithThreeElements");
+                parseFailures.add("MessageMustBeArrayWithTwoElements");
             }
 
             if (!parseFailures.isEmpty()) {
                 requestHeaders.put("_parseFailures", parseFailures);
             }
 
-            return new Message(requestTarget, requestHeaders, Map.of());
+            return new Message(requestHeaders, Map.of());
         }
 
         Map<String, Object> body = new HashMap<>();
-        if (requestMessageArray.size() != 3) {
-            parseFailures.add("MessageMustBeArrayWithThreeElements");
+        if (requestMessageArray.size() != 2) {
+            parseFailures.add("MessageMustBeArrayWithTwoElements");
         } else {
             try {
-                var givenTarget = (String) requestMessageArray.get(0);
-
-                var regex = Pattern.compile("^fn\\.([a-zA-Z_]\\w*)");
-                var matcher = regex.matcher(givenTarget);
-                if (matcher.matches()) {
-                    var functionDef = jApiSchema.parsed.get(givenTarget);
-                    if (functionDef != null) {
-                        requestTarget = givenTarget;
-                    } else {
-                        parseFailures.add("UnknownFunction");
-                    }
-                } else {
-                    parseFailures.add("TargetStringMustBeFunction");
-                }
-
-            } catch (ClassCastException e) {
-                parseFailures.add("TargetMustBeString");
-            }
-
-            try {
-                var headers = (Map<String, Object>) requestMessageArray.get(1);
+                var headers = (Map<String, Object>) requestMessageArray.get(0);
                 requestHeaders.putAll(headers);
             } catch (ClassCastException e) {
                 parseFailures.add("HeadersMustBeObject");
             }
 
             try {
-                body = (Map<String, Object>) requestMessageArray.get(2);
+                body = (Map<String, Object>) requestMessageArray.get(1);
+                if (body.size() != 1) {
+                    parseFailures.add("BodyMustBeUnionType");
+                } else {
+                    var givenTarget = body.keySet().stream().findAny().get();
+
+                    var regex = Pattern.compile("^fn\\.([a-zA-Z_]\\w*)");
+                    var matcher = regex.matcher(givenTarget);
+                    if (matcher.matches()) {
+                        var functionDef = jApiSchema.parsed.get(givenTarget);
+                        if (functionDef == null) {
+                            parseFailures.add("UnknownFunction");
+                        }
+                    } else {
+                        parseFailures.add("BodyTargetMustBeFunction");
+                    }
+                }
             } catch (ClassCastException e) {
                 parseFailures.add("BodyMustBeObject");
             }
@@ -90,7 +84,7 @@ class InternalServer {
             requestHeaders.put("_parseFailures", parseFailures);
         }
 
-        return new Message(requestTarget, requestHeaders, body);
+        return new Message(requestHeaders, body);
     }
 
     static Message processMessage(Message requestMessage,
@@ -100,12 +94,13 @@ class InternalServer {
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = new HashMap<String, Object>();
-        var requestTarget = (String) requestMessage.target;
+        var requestHeaders = (Map<String, Object>) requestMessage.headers;
+        var requestBody = (Map<String, Object>) requestMessage.body;
+        var requestTarget = (String) requestBody.keySet().stream().findAny().get();
+        var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().get();
         var functionType = (Struct) jApiSchema.parsed.get(requestTarget);
         var resultEnumType = (Enum) functionType.fields.get("result").typeDeclaration.type;
         var argStructType = (Struct) functionType.fields.get("arg").typeDeclaration.type;
-        var requestHeaders = (Map<String, Object>) requestMessage.headers;
-        var requestBody = (Map<String, Object>) requestMessage.body;
 
         // Reflect call id
         var callId = requestHeaders.get("_id");
@@ -139,7 +134,7 @@ class InternalServer {
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
             }
-            return new Message(requestTarget, responseHeaders, newErrorResult);
+            return new Message(responseHeaders, newErrorResult);
         }
 
         var headerValidationFailures = validateHeaders(requestHeaders, jApiSchema);
@@ -153,7 +148,7 @@ class InternalServer {
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
             }
-            return new Message(requestTarget, responseHeaders, newErrorResult);
+            return new Message(responseHeaders, newErrorResult);
         }
 
         if (requestHeaders.containsKey("_bin")) {
@@ -165,7 +160,7 @@ class InternalServer {
         var context = new Context(requestTarget, requestHeaders);
 
         var argumentValidationFailures = validateStruct(functionType.name,
-                argStructType.fields, requestBody);
+                argStructType.fields, requestPayload);
         if (!argumentValidationFailures.isEmpty()) {
             var allErrorsAreMissingStructFields = argumentValidationFailures.stream()
                     .allMatch(e -> e.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING));
@@ -185,7 +180,7 @@ class InternalServer {
                     throw new JApiProcessError("Failed internal jAPI validation");
                 }
 
-                return new Message(requestTarget, responseHeaders, newErrorResult);
+                return new Message(responseHeaders, newErrorResult);
             }
         }
 
@@ -198,7 +193,7 @@ class InternalServer {
             result = Map.of("ok", Map.of("jApi", jApiSchema.original));
         } else {
             try {
-                result = handler.apply(context, requestBody);
+                result = handler.apply(context, requestPayload);
             } catch (Throwable t) {
                 try {
                     onError.accept(t);
@@ -223,7 +218,7 @@ class InternalServer {
                 if (!newErrorResultValidationFailures.isEmpty()) {
                     throw new JApiProcessError("Failed internal jAPI validation");
                 }
-                return new Message(requestTarget, responseHeaders, newErrorResult);
+                return new Message(responseHeaders, newErrorResult);
             }
         }
 
@@ -237,7 +232,7 @@ class InternalServer {
             finalResult = result;
         }
 
-        return new Message(requestTarget, responseHeaders, finalResult);
+        return new Message(responseHeaders, finalResult);
     }
 
     private static List<Map<String, String>> mapValidationFailuresToInvalidFieldCases(

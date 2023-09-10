@@ -273,12 +273,10 @@ interface BinaryEncodingStrategy {
 }
 
 class Message {
-    public final String target;
     public final Map<String, Object> headers;
     public final Map<String, Object> body;
 
-    public Message(String target, Map<String, Object> headers, Map<String, Object> body) {
-        this.target = target;
+    public Message(Map<String, Object> headers, Map<String, Object> body) {
         this.headers = headers;
         this.body = body;
     }

@@ -1,6 +1,7 @@
 package io.github.brenbar.japi;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
@@ -46,8 +47,7 @@ class InternalClient {
             headers.put("_serializeAsBinary", true);
         }
 
-        var messageType = request.functionName;
-        return List.of(messageType, headers, request.functionArgument);
+        return List.of(headers, Map.of(request.functionName, request.functionArgument));
     }
 
     static List<Object> processRequestObject(List<Object> request,

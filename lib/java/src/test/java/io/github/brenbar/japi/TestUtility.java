@@ -91,10 +91,16 @@ public class TestUtility {
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
-            var resultAsParsedJson = client.submit(new Request(((String) requestAsParsedJson.get(0)),
-                    (Map<String, Object>) requestAsParsedJson.get(2)).addHeaders(
-                            (Map<String, Object>) requestAsParsedJson.get(1)));
-            assertEquals(expectedResponseAsParsedJson.get(2), resultAsParsedJson);
+            var requestHeadersPseudoJson = (Map<String, Object>) requestAsParsedJson.get(0);
+            var requestBodyPseudoJson = (Map<String, Object>) requestAsParsedJson.get(1);
+            var requestTargetPseudoJson = requestBodyPseudoJson.keySet().stream().findAny().get();
+            var requestPayloadPseudoJson = (Map<String, Object>) requestBodyPseudoJson.values().stream().findAny()
+                    .get();
+
+            var resultAsParsedJson = client.submit(new Request(requestTargetPseudoJson,
+                    requestPayloadPseudoJson).addHeaders(
+                            requestHeadersPseudoJson));
+            assertEquals(expectedResponseAsParsedJson.get(1), resultAsParsedJson);
         }
     }
 

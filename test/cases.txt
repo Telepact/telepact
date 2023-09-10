@@ -1,7 +1,7 @@
 "testBoolean"
 
-[{"ok":{"value":{"bool":false}}},{"fn.test":{"value":{"bool":false}}}]|[{},{"fn.test":{"ok":{"value":{"bool":false}}}}]
-[{"ok":{"value":{"bool":true}}},{"fn.test":{"value":{"bool":true}}}]|[{},{"fn.test":{"ok":{"value":{"bool":true}}}}]
+[{"ok":{"value":{"bool":false}}},{"fn.test":{"value":{"bool":false}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{"ok":{"value":{"bool":true}}},{"fn.test":{"value":{"bool":true}}}]|[{},{"ok":{"value":{"bool":true}}}]
 
 [{},{"fn.test":{"value":{"bool":null}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.bool","reason":"NullInvalidForNonNullType"}]}}]
 
