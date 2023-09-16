@@ -87,12 +87,8 @@ public class MockServer {
     }
 
     private Map<String, Object> handle(Context context, Map<String, Object> argument) {
-        context.requestHeaders.put("_mockJApiSchema", this.server.jApiSchema);
-        context.requestHeaders.put("_mockRandom", this.random);
-        context.requestHeaders.put("_mockStubs", this.stubs);
-        context.requestHeaders.put("_mockInvocations", this.invocations);
-        context.requestHeaders.put("_mockEnableGeneratedDefaultStub", this.enableGeneratedDefaultStub);
-        return InternalMockServer.handle(context, argument);
+        return InternalMockServer.handle(context, argument, this.stubs, this.invocations, this.random,
+                this.server.jApiSchema, this.enableGeneratedDefaultStub);
     }
 
     /**

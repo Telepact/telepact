@@ -16,13 +16,10 @@ import io.github.brenbar.japi.MockVerification.VerificationTimes;
 
 class InternalMockServer {
 
-    static Map<String, Object> handle(Context context, Map<String, Object> argument) {
+    static Map<String, Object> handle(Context context, Map<String, Object> argument, List<MockStub> stubs,
+            List<Invocation> invocations, MockRandom random, JApiSchema jApiSchema,
+            boolean enableGeneratedDefaultStub) {
 
-        var stubs = (List<MockStub>) context.requestHeaders.get("_mockStubs");
-        var invocations = (List<Invocation>) context.requestHeaders.get("_mockInvocations");
-        var random = (MockRandom) context.requestHeaders.get("_mockRandom");
-        var jApiSchema = (JApiSchema) context.requestHeaders.get("_mockJApiSchema");
-        var enableGeneratedDefaultStub = (Boolean) context.requestHeaders.get("_mockEnableGeneratedDefaultStub");
         var enableGenerationStub = (Boolean) context.requestHeaders.getOrDefault("_mockEnableGeneratedStub", false);
 
         switch (context.functionName) {
