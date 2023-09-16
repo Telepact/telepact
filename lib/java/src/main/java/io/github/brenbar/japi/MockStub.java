@@ -5,12 +5,12 @@ import java.util.Map;
 public class MockStub {
     final String whenFunction;
     final Map<String, Object> whenArgument;
-    final Map<String, Object> thenResult;
+    final Map<String, Map<String, Object>> thenResult;
     boolean allowArgumentPartialMatch;
     boolean generateMissingResultFields;
 
     public MockStub(String whenFunction, Map<String, Object> whenArgument,
-            Map<String, Object> thenResult) {
+            Map<String, Map<String, Object>> thenResult) {
         this.whenFunction = whenFunction;
         this.whenArgument = whenArgument;
         this.thenResult = thenResult;

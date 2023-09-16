@@ -31,7 +31,7 @@ class InternalMockServer {
                 var whenFunction = entry.getKey();
                 var functionStruct = (Map<String, Object>) entry.getValue();
                 var whenArgument = (Map<String, Object>) functionStruct.get("arg");
-                var thenResult = (Map<String, Object>) functionStruct
+                var thenResult = (Map<String, Map<String, Object>>) functionStruct
                         .get("result");
                 var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("ignoreMissingArgFields", false);
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
@@ -46,7 +46,7 @@ class InternalMockServer {
                 }
 
                 stubs.add(0, stub);
-                return Map.of("ok", Map.of());
+                return new Message(Map.of("ok", Map.of()));
             }
             case "fn._verify" -> {
                 var verifyFunctionName = (String) argument.get("function");
@@ -57,50 +57,53 @@ class InternalMockServer {
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
 
-                return verify(verifyFunctionName, verifyArgument, allowArgumentPartialMatch, verificationTimes,
+                var verificationResult = verify(verifyFunctionName, verifyArgument, allowArgumentPartialMatch,
+                        verificationTimes,
                         invocations);
+                return new Message(verificationResult);
             }
             case "fn._verifyNoMoreInteractions" -> {
-                return verifyNoMoreInteractions(invocations);
+                var verificationResult = verifyNoMoreInteractions(invocations);
+                return new Message(verificationResult);
             }
             case "fn._clearInvocations" -> {
                 invocations.clear();
-                return Map.of("ok", Map.of());
+                return new Message(Map.of("ok", Map.of()));
             }
             case "fn._clearStubs" -> {
                 stubs.clear();
-                return Map.of("ok", Map.of());
+                return new Message(Map.of("ok", Map.of()));
             }
             default -> {
-                invocations.add(new Invocation(context.functionName, new TreeMap<>(argument)));
+                invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
 
                 for (var stub : stubs) {
-                    if (Objects.equals(stub.whenFunction, context.functionName)) {
+                    if (Objects.equals(stub.whenFunction, functionName)) {
                         if (stub.allowArgumentPartialMatch) {
                             if (isSubMap(stub.whenArgument, argument)) {
-                                return stub.thenResult;
+                                return new Message(stub.thenResult);
                             }
                         } else {
                             if (Objects.equals(stub.whenArgument, argument)) {
-                                return stub.thenResult;
+                                return new Message(stub.thenResult);
                             }
                         }
                     }
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return Map.of("_errorNoMatchingStub", Map.of());
+                    return new Message(Map.of("_errorNoMatchingStub", Map.of()));
                 }
 
-                var definition = (Struct) jApiSchema.parsed.get(context.functionName);
+                var definition = (Struct) jApiSchema.parsed.get(functionName);
 
                 if (definition != null) {
                     var resultEnum = (Enum) definition.fields.get("result").typeDeclaration.type;
                     var okStructRef = resultEnum.values.get("ok");
                     var randomOkStruct = constructRandomStruct(okStructRef.fields, random);
-                    return Map.of("ok", randomOkStruct);
+                    return new Message(Map.of("ok", randomOkStruct));
                 } else {
-                    throw new JApiProcessError("Unexpected unknown function: %s".formatted(context.functionName));
+                    throw new JApiProcessError("Unexpected unknown function: %s".formatted(functionName));
                 }
             }
         }
@@ -230,10 +233,10 @@ class InternalMockServer {
         return Map.of(enumValue, constructRandomStruct(enumData.fields, random));
     }
 
-    static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,
+    static Map<String, Map<String, Object>> verify(String functionName, Map<String, Object> argument,
+            boolean exactMatch,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         try {
-            var objectMapper = new ObjectMapper();
             var matchesFound = 0;
             for (var invocation : invocations) {
                 if (Objects.equals(invocation.functionName, functionName)) {
@@ -301,7 +304,7 @@ class InternalMockServer {
         }
     }
 
-    static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
+    static Map<String, Map<String, Object>> verifyNoMoreInteractions(List<Invocation> invocations) {
         try {
             var objectMapper = new ObjectMapper();
             var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();

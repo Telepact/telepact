@@ -99,7 +99,7 @@ class InternalServer {
             Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
-        var responseHeaders = new HashMap<String, Object>();
+        var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         var requestHeaders = requestMessage.header;
         var requestBody = requestMessage.body;
         var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().orElse(Map.of());
@@ -182,7 +182,7 @@ class InternalServer {
 
             if (shouldValidate) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
-                Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
+                Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidRequestBody",
                         Map.of("cases", validationFailureCases));
                 var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                         newErrorResult);
@@ -213,8 +213,9 @@ class InternalServer {
                 responseMessage = new Message(Map.of("_errorUnknown", Map.of()));
             }
         }
-        Map<String, Object> result = responseMessage.body;
-        responseHeaders.putAll(responseMessage.header);
+        Map<String, Map<String, Object>> result = responseMessage.body;
+        responseMessage.header.putAll(responseHeaders);
+        responseHeaders = responseMessage.header;
 
         var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
@@ -223,7 +224,7 @@ class InternalServer {
                     result);
             if (!resultValidationFailures.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-                Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
+                Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
                 var newErrorResultValidationFailures = validateResultEnum(functionType.name, resultEnumType,
                         newErrorResult);
@@ -234,11 +235,11 @@ class InternalServer {
             }
         }
 
-        Map<String, Object> finalResult;
+        Map<String, Map<String, Object>> finalResult;
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResult = (Map<String, Object>) selectStructFields(resultEnumType, result,
+            finalResult = (Map<String, Map<String, Object>>) selectStructFields(resultEnumType, result,
                     selectStructFieldsHeader);
         } else {
             finalResult = result;

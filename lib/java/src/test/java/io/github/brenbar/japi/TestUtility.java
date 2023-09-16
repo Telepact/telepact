@@ -18,26 +18,29 @@ import io.github.brenbar.japi.Client.Adapter;
 
 public class TestUtility {
 
-    private static Map<String, Object> handle(Context context, Map<String, Object> body) {
-        return switch (context.functionName) {
+    private static Message handle(Message requestMessage) {
+        var requestHeaders = requestMessage.header;
+        var functionName = requestMessage.body.keySet().stream().findAny().get();
+        return switch (functionName) {
             case "fn.test" -> {
-                if (context.requestHeaders.containsKey("ok")) {
+                if (requestHeaders.containsKey("ok")) {
                     try {
-                        var o = (Map<String, Object>) context.requestHeaders.get("ok");
-                        yield Map.of("ok", o);
+                        var o = (Map<String, Object>) requestHeaders.get("ok");
+                        yield new Message(Map.of("ok", o));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                } else if (context.requestHeaders.containsKey("result")) {
+                } else if (requestHeaders.containsKey("result")) {
                     try {
-                        yield (Map<String, Object>) context.requestHeaders.get("result");
+                        var r = (Map<String, Map<String, Object>>) requestHeaders.get("result");
+                        yield new Message(r);
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
                     }
-                } else if (Objects.equals(true, context.requestHeaders.get("throw"))) {
+                } else if (Objects.equals(true, requestHeaders.get("throw"))) {
                     throw new RuntimeException();
                 } else {
-                    yield Map.of();
+                    yield new Message(Map.of());
                 }
             }
             default -> throw new RuntimeException();
