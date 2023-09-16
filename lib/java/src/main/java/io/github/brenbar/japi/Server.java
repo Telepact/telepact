@@ -103,7 +103,7 @@ public class Server {
             } catch (Exception ignored) {
             }
             return this.serializer
-                    .serialize(List.of("fn._unknown", new HashMap<>(), Map.of("_errorUnknown", Map.of())));
+                    .serialize(List.of(new HashMap<>(), Map.of("_errorUnknown", Map.of())));
         }
     }
 
