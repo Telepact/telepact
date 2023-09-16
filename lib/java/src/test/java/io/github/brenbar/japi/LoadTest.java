@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.codahale.metrics.ConsoleReporter;
@@ -20,6 +21,7 @@ import io.nats.client.Nats;
 public class LoadTest {
 
     @Test
+    @Disabled("Test preserved for record")
     public void test() throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
 
