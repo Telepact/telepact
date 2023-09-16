@@ -1443,12 +1443,6 @@
 
 [{},{"fn.notFound":{}}]|[{},{"_errorParseFailure":{"reasons":["UnknownFunction"]}}]|skipBinary
 
-[false,{},{}]|["fn._unknown",{},{"_errorParseFailure":{"reasons":["TargetMustBeString"]}}]|skipBinary
-[0,{},{}]|["fn._unknown",{},{"_errorParseFailure":{"reasons":["TargetMustBeString"]}}]|skipBinary
-[{},{"":{}}]|[{},{"_errorParseFailure":{"reasons":["TargetStringMustBeFunction"]}}]|skipBinary
-[[],{},{}]|["fn._unknown",{},{"_errorParseFailure":{"reasons":["TargetMustBeString"]}}]|skipBinary
-[{},{},{}]|["fn._unknown",{},{"_errorParseFailure":{"reasons":["TargetMustBeString"]}}]|skipBinary
-
 "testErrors"
 
 [{"result":{"errorExample":{"property":"a"}}},{"fn.test":{}}]|[{},{"errorExample":{"property":"a"}}]
@@ -1499,23 +1493,22 @@
 
 "testParseFailure"
 
-[}|["fn._unknown",{},{"_errorParseFailure":{"reasons":["InvalidJson"]}}]|skipBinary
-false|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
-0|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
-""|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
-{}|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
-[{},{}]|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
-["fn._ping",{}]|["fn._unknown",{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
+[}|[{},{"_errorParseFailure":{"reasons":["InvalidJson"]}}]|skipBinary
+false|[{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
+0|[{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
+""|[{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
+{}|[{},{"_errorParseFailure":{"reasons":["MessageMustBeArrayWithTwoElements"]}}]|skipBinary
+[{},{}]|[{},{"_errorParseFailure":{"reasons":["BodyMustBeUnionType"]}}]|skipBinary
 
-["fn._ping",false,{}]|["fn._ping",{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
-["fn._ping",0,{}]|["fn._ping",{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
-["fn._ping","",{}]|["fn._ping",{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
-["fn._ping",[],{}]|["fn._ping",{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
+[false,{"fn._ping":{}}]|[{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
+[0,{"fn._ping":{}}]|[{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
+["",{"fn._ping":{}}]|[{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
+[[],{"fn._ping":{}}]|[{},{"_errorParseFailure":{"reasons":["HeadersMustBeObject"]}}]|skipBinary
 
-["fn._ping",{},false]|["fn._ping",{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
-["fn._ping",{},0]|["fn._ping",{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
-["fn._ping",{},""]|["fn._ping",{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
-["fn._ping",{},[]]|["fn._ping",{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
+[{},false]|[{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
+[{},0]|[{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
+[{},""]|[{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
+[{},[]]|[{},{"_errorParseFailure":{"reasons":["BodyMustBeObject"]}}]|skipBinary
 
 "testBinaryHeader"
 

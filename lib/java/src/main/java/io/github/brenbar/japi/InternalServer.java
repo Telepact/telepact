@@ -96,8 +96,11 @@ class InternalServer {
         var responseHeaders = new HashMap<String, Object>();
         var requestHeaders = (Map<String, Object>) requestMessage.headers;
         var requestBody = (Map<String, Object>) requestMessage.body;
-        var requestTarget = (String) requestBody.keySet().stream().findAny().get();
-        var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().get();
+        var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().orElse(Map.of());
+        var requestTarget = (String) requestBody.keySet().stream().findAny().orElse("fn._unknown");
+        if (!jApiSchema.parsed.containsKey(requestTarget)) {
+            requestTarget = "fn._unknown";
+        }
         var functionType = (Struct) jApiSchema.parsed.get(requestTarget);
         var resultEnumType = (Enum) functionType.fields.get("result").typeDeclaration.type;
         var argStructType = (Struct) functionType.fields.get("arg").typeDeclaration.type;
