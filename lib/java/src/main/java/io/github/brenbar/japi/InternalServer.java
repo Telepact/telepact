@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 class InternalServer {
@@ -46,7 +47,7 @@ class InternalServer {
             return new Message(requestHeaders, Map.of());
         }
 
-        Map<String, Object> body = new HashMap<>();
+        Map<String, Map<String, Object>> body = new HashMap<>();
         if (requestMessageArray.size() != 2) {
             parseFailures.add("MessageMustBeArrayWithTwoElements");
         } else {
@@ -58,7 +59,7 @@ class InternalServer {
             }
 
             try {
-                body = (Map<String, Object>) requestMessageArray.get(1);
+                body = (Map<String, Map<String, Object>>) requestMessageArray.get(1);
                 if (body.size() != 1) {
                     parseFailures.add("BodyMustBeUnionType");
                 } else {
@@ -73,6 +74,12 @@ class InternalServer {
                         }
                     } else {
                         parseFailures.add("BodyTargetMustBeFunction");
+                    }
+
+                    try {
+                        var givenPayload = (Map<String, Object>) body.values().stream().findAny().get();
+                    } catch (ClassCastException e) {
+                        parseFailures.add("TargetMustBeObject");
                     }
                 }
             } catch (ClassCastException e) {
@@ -89,13 +96,12 @@ class InternalServer {
 
     static Message processMessage(Message requestMessage,
             JApiSchema jApiSchema,
-            BiFunction<Context, Map<String, Object>, Map<String, Object>> handler,
-            BiFunction<Context, Map<String, Object>, Boolean> shouldValidateArgument,
+            Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = new HashMap<String, Object>();
-        var requestHeaders = (Map<String, Object>) requestMessage.headers;
-        var requestBody = (Map<String, Object>) requestMessage.body;
+        var requestHeaders = requestMessage.header;
+        var requestBody = requestMessage.body;
         var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().orElse(Map.of());
         var requestTarget = (String) requestBody.keySet().stream().findAny().orElse("fn._unknown");
         if (!jApiSchema.parsed.containsKey(requestTarget)) {
@@ -131,7 +137,8 @@ class InternalServer {
 
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
-            Map<String, Object> newErrorResult = Map.of("_errorParseFailure", Map.of("reasons", parseFailures));
+            Map<String, Map<String, Object>> newErrorResult = Map.of("_errorParseFailure",
+                    Map.of("reasons", parseFailures));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
@@ -144,7 +151,7 @@ class InternalServer {
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
+            Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
@@ -189,23 +196,25 @@ class InternalServer {
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
-        Map<String, Object> result;
+        Message responseMessage;
         if (requestTarget.equals("fn._ping")) {
-            result = Map.of("ok", Map.of());
+            responseMessage = new Message(Map.of("ok", Map.of()));
         } else if (requestTarget.equals("fn._jApi")) {
-            result = Map.of("ok", Map.of("jApi", jApiSchema.original));
+            responseMessage = new Message(Map.of("ok", Map.of("jApi", jApiSchema.original)));
         } else {
             try {
-                result = handler.apply(context, requestPayload);
+                responseMessage = handler.apply(requestMessage);
             } catch (Throwable t) {
                 try {
                     onError.accept(t);
                 } catch (Throwable ignored) {
 
                 }
-                result = Map.of("_errorUnknown", Map.of());
+                responseMessage = new Message(Map.of("_errorUnknown", Map.of()));
             }
         }
+        Map<String, Object> result = responseMessage.body;
+        responseHeaders.putAll(responseMessage.header);
 
         var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
@@ -329,7 +338,7 @@ class InternalServer {
     private static List<ValidationFailure> validateResultEnum(
             String path,
             Enum resultEnumType,
-            Map<String, Object> actualResult) {
+            Map<String, Map<String, Object>> actualResult) {
         return validateEnum(path, resultEnumType.values, actualResult);
     }
 

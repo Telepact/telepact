@@ -272,16 +272,6 @@ interface BinaryEncodingStrategy {
     List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
 }
 
-class Message {
-    public final Map<String, Object> headers;
-    public final Map<String, Object> body;
-
-    public Message(Map<String, Object> headers, Map<String, Object> body) {
-        this.headers = headers;
-        this.body = body;
-    }
-}
-
 class ValidationFailure {
     public final String path;
     public final String reason;

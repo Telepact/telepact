@@ -30,19 +30,7 @@ public class MockServer {
         var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
                 InternalMockJApi.getJson()));
-        this.server = new Server(combinedSchemaJson, this::handle)
-                .setShouldValidateArgument((context, argument) -> {
-                    if ("fn._createStub".equals(context.functionName)
-                            && Objects.equals(argument.get("ignoreMissingArgFields"), true)) {
-                        return true;
-
-                    } else if ("fn._verify".equals(context.functionName)
-                            && Objects.equals(argument.get("ignoreMissingArgFields"), true)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
+        this.server = new Server(combinedSchemaJson, this::handle);
 
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = true;
@@ -86,8 +74,8 @@ public class MockServer {
         return this.server.process(message);
     }
 
-    private Map<String, Object> handle(Context context, Map<String, Object> argument) {
-        return InternalMockServer.handle(context, argument, this.stubs, this.invocations, this.random,
+    private Message handle(Message requestMessage) {
+        return InternalMockServer.handle(requestMessage, this.stubs, this.invocations, this.random,
                 this.server.jApiSchema, this.enableGeneratedDefaultStub);
     }
 

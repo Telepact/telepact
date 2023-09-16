@@ -3,32 +3,16 @@ package io.github.brenbar.japi;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A jAPI Server.
  */
 public class Server {
 
-    /**
-     * A Handler that defines how a jAPI Result is defined from the given
-     * server context and jAPI Argument.
-     * 
-     * Example:
-     * 
-     * <pre>
-     * var handler = (context, argument) -> {
-     *     // TODO: Return a map compliant with your jAPI schema.
-     *     return Map.of();
-     * };
-     * </pre>
-     */
-    interface Handler extends BiFunction<Context, Map<String, Object>, Map<String, Object>> {
-    }
-
     JApiSchema jApiSchema;
-    Handler handler;
+    Function<Message, Message> handler;
     Consumer<Throwable> onError;
-    BiFunction<Context, Map<String, Object>, Boolean> shouldValidateArgument;
     Serializer serializer;
 
     /**
@@ -37,12 +21,11 @@ public class Server {
      * @param jApiSchemaAsJson
      * @param handler
      */
-    public Server(String jApiSchemaAsJson, Handler handler) {
+    public Server(String jApiSchemaAsJson, Function<Message, Message> handler) {
         this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson);
         this.handler = handler;
         this.onError = (e) -> {
         };
-        this.shouldValidateArgument = (c, a) -> true;
 
         var binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
         var serializationStrategy = new InternalDefaultSerializationStrategy();
@@ -73,11 +56,6 @@ public class Server {
         return this;
     }
 
-    public Server setShouldValidateArgument(BiFunction<Context, Map<String, Object>, Boolean> shouldValidateArgument) {
-        this.shouldValidateArgument = shouldValidateArgument;
-        return this;
-    }
-
     /**
      * Process a given jAPI Request Message into a jAPI Response Message.
      * 
@@ -96,7 +74,7 @@ public class Server {
             var responseMessage = processMessage(requestMessage);
 
             return this.serializer
-                    .serialize(List.of(responseMessage.headers, responseMessage.body));
+                    .serialize(List.of(responseMessage.header, responseMessage.body));
         } catch (Exception e) {
             try {
                 this.onError.accept(e);
@@ -108,7 +86,7 @@ public class Server {
     }
 
     private Message processMessage(Message requestMessage) {
-        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler, this.shouldValidateArgument,
+        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler,
                 this.onError);
     }
 }
