@@ -1,7 +1,6 @@
 package io.github.brenbar.japi;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

@@ -2,8 +2,6 @@ package io.github.brenbar.japi;
 
 import java.util.Map;
 
-import io.github.brenbar.japi.MockVerification.VerificationTimes;
-
 public class MockVerification {
     final String functionName;
     final Map<String, Object> argument;

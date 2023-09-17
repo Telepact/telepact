@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -167,8 +166,6 @@ class InternalServer {
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
-        var context = new Context(requestTarget, requestHeaders);
-
         var argumentValidationFailures = validateStruct(functionType.name,
                 argStructType.fields, requestPayload);
         if (!argumentValidationFailures.isEmpty()) {
@@ -178,20 +175,17 @@ class InternalServer {
             // TODO: Complete this feature
             // var shouldValidate = !shouldValidateArgument.apply(context, requestBody) ||
             // !allErrorsAreMissingStructFields;
-            var shouldValidate = true;
 
-            if (shouldValidate) {
-                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
-                Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidRequestBody",
-                        Map.of("cases", validationFailureCases));
-                var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
-                        newErrorResult);
-                if (!newErrorResultValidationFailures.isEmpty()) {
-                    throw new JApiProcessError("Failed internal jAPI validation");
-                }
-
-                return new Message(responseHeaders, newErrorResult);
+            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
+            Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidRequestBody",
+                    Map.of("cases", validationFailureCases));
+            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
+                    newErrorResult);
+            if (!newErrorResultValidationFailures.isEmpty()) {
+                throw new JApiProcessError("Failed internal jAPI validation");
             }
+
+            return new Message(responseHeaders, newErrorResult);
         }
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
