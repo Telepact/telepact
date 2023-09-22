@@ -26,7 +26,7 @@ public class Client {
      * };
      * </pre>
      */
-    interface Adapter extends BiFunction<List<Object>, Serializer, Future<List<Object>>> {
+    interface Adapter extends BiFunction<Message, Serializer, Future<Message>> {
     }
 
     /**
@@ -42,7 +42,7 @@ public class Client {
      * };
      * </pre>
      */
-    interface Middleware extends BiFunction<List<Object>, Function<List<Object>, List<Object>>, List<Object>> {
+    interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
     }
 
     private Adapter adapter;
@@ -139,7 +139,7 @@ public class Client {
      * @param request
      * @return
      */
-    public Map<String, Object> submit(
+    public Map<String, Object> request(
             Request request) {
 
         var requestMessage = InternalClient.constructRequestMessage(request, useBinaryDefault,
@@ -147,16 +147,17 @@ public class Client {
 
         var response = this.middleware.apply(requestMessage, this::processMessage);
 
-        var result = (Map<String, Object>) response.get(1);
+        var result = response.body;
+        var target = result.keySet().stream().findAny().get();
 
-        if (throwOnError && result.containsKey("err")) {
+        if ("ok".equals(target)) {
+            return result.values().stream().findAny().get();
+        } else {
             throw new JApiError(result);
         }
-
-        return result;
     }
 
-    private List<Object> processMessage(List<Object> message) {
+    private Message processMessage(Message message) {
         return InternalClient.processRequestObject(message, this.adapter, this.serializer,
                 this.timeoutMsDefault);
     }

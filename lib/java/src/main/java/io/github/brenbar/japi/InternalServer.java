@@ -36,7 +36,7 @@ class InternalServer {
             } else if (cause instanceof InvalidJsonError e2) {
                 parseFailures.add("InvalidJson");
             } else {
-                parseFailures.add("MessageMustBeArrayWithTwoElements");
+                parseFailures.add("InvalidMessageFormat");
             }
 
             if (!parseFailures.isEmpty()) {
@@ -95,7 +95,7 @@ class InternalServer {
 
     static Message processMessage(Message requestMessage,
             JApiSchema jApiSchema,
-            Function<Message, Message> handler,
+            Function<FnMessage, FnMessage> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
@@ -136,7 +136,7 @@ class InternalServer {
 
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
-            Map<String, Map<String, Object>> newErrorResult = Map.of("_errorParseFailure",
+            Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
                     Map.of("reasons", parseFailures));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
@@ -150,7 +150,7 @@ class InternalServer {
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
-            Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidRequestHeaders",
+            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
@@ -177,7 +177,7 @@ class InternalServer {
             // !allErrorsAreMissingStructFields;
 
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
-            Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidRequestBody",
+            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
                     newErrorResult);
@@ -190,26 +190,29 @@ class InternalServer {
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
-        Message responseMessage;
+        var callMessage = new FnMessage(requestHeaders, requestTarget, requestPayload);
+
+        FnMessage resultMessage;
         if (requestTarget.equals("fn._ping")) {
-            responseMessage = new Message(Map.of("ok", Map.of()));
+            resultMessage = new FnMessage("ok", Map.of());
         } else if (requestTarget.equals("fn._jApi")) {
-            responseMessage = new Message(Map.of("ok", Map.of("jApi", jApiSchema.original)));
+            resultMessage = new FnMessage("ok", Map.of("jApi", jApiSchema.original));
         } else {
             try {
-                responseMessage = handler.apply(requestMessage);
+                var fnMessage = handler.apply(callMessage);
+                resultMessage = new FnMessage(fnMessage.header, fnMessage.target, fnMessage.payload);
             } catch (Throwable t) {
                 try {
                     onError.accept(t);
                 } catch (Throwable ignored) {
 
                 }
-                responseMessage = new Message(Map.of("_errorUnknown", Map.of()));
+                resultMessage = new FnMessage("_errorUnknown", Map.of());
             }
         }
-        Map<String, Map<String, Object>> result = responseMessage.body;
-        responseMessage.header.putAll(responseHeaders);
-        responseHeaders = responseMessage.header;
+        Map<String, Object> result = resultMessage.payload;
+        resultMessage.header.putAll(responseHeaders);
+        responseHeaders = resultMessage.header;
 
         var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
@@ -218,7 +221,7 @@ class InternalServer {
                     result);
             if (!resultValidationFailures.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-                Map<String, Map<String, Object>> newErrorResult = Map.of("_errorInvalidResponseBody",
+                Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
                 var newErrorResultValidationFailures = validateResultEnum(functionType.name, resultEnumType,
                         newErrorResult);
@@ -229,11 +232,11 @@ class InternalServer {
             }
         }
 
-        Map<String, Map<String, Object>> finalResult;
+        Map<String, Object> finalResult;
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResult = (Map<String, Map<String, Object>>) selectStructFields(resultEnumType, result,
+            finalResult = (Map<String, Object>) selectStructFields(resultEnumType, result,
                     selectStructFieldsHeader);
         } else {
             finalResult = result;
@@ -333,7 +336,7 @@ class InternalServer {
     private static List<ValidationFailure> validateResultEnum(
             String path,
             Enum resultEnumType,
-            Map<String, Map<String, Object>> actualResult) {
+            Map<String, Object> actualResult) {
         return validateEnum(path, resultEnumType.values, actualResult);
     }
 

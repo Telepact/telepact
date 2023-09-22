@@ -67,7 +67,9 @@ public class LoadTest {
 
                     System.out.println("<-- %s".formatted(new String(responseBytes)));
                     List<Object> response = s.deserialize(responseBytes);
-                    return response;
+                    var header = (Map<String, Object>) response.get(0);
+                    var body = (Map<String, Map<String, Object>>) response.get(1);
+                    return new Message(header, body);
                 });
             };
 
@@ -75,13 +77,13 @@ public class LoadTest {
                     .setTimeoutMsDefault(600000);
 
             // warmup
-            client.submit(new Request("fn.getPaperTape", Map.of()));
+            client.request(new Request("fn.getPaperTape", Map.of()));
 
             var jsonTimers = metrics.timer("roundtrip-json");
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = jsonTimers.time()) {
-                    client.submit(new Request("fn.getPaperTape", Map.of()).setUseBinary(false));
+                    client.request(new Request("fn.getPaperTape", Map.of()).setUseBinary(false));
                 }
             }
 
@@ -89,7 +91,7 @@ public class LoadTest {
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = binaryTimers.time()) {
-                    client.submit(new Request("fn.getPaperTape", Map.of()).addHeader("b", true));
+                    client.request(new Request("fn.getPaperTape", Map.of()).addHeader("b", true));
                 }
             }
 

@@ -252,6 +252,31 @@ class Enum implements Type {
     }
 }
 
+class MessageParseException extends Exception {
+    public MessageParseException(Throwable cause) {
+        super(cause);
+    }
+}
+
+class Serializer {
+
+    SerializationStrategy serializationStrategy;
+    private BinaryEncodingStrategy binaryEncodingStrategy;
+
+    Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncodingStrategy) {
+        this.serializationStrategy = serializationStrategy;
+        this.binaryEncodingStrategy = binaryEncodingStrategy;
+    }
+
+    public byte[] serialize(Message message) {
+        return InternalSerializer.serialize(message, this.binaryEncodingStrategy, this.serializationStrategy);
+    }
+
+    public Message deserialize(byte[] messageBytes) {
+        return InternalSerializer.deserialize(messageBytes, this.serializationStrategy, this.binaryEncodingStrategy);
+    }
+}
+
 class BinaryEncoder {
 
     public final Map<String, Long> encodeMap;

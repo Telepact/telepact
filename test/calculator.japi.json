@@ -67,16 +67,20 @@
       }
     }
   },
+
   "struct.Computation": {
     "///": " A computation. ",
+
     "firstOperand": "enum.Value",
     "secondOperand": "enum.Value",
     "operation": "enum.Operation",
     "timestamp": "integer",
     "successful": "boolean"
   },
+
   "fn.getPaperTape": {
     "///": "A function template.",
+
     "arg": {},
     "result": {
       "ok": {
