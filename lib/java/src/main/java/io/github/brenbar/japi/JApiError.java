@@ -11,14 +11,12 @@ import java.util.Map;
  */
 public class JApiError extends RuntimeException {
 
-    public final Map<String, Map<String, Object>> result;
+    public final String target;
+    public final Map<String, Object> payload;
 
-    public JApiError(Map<String, Map<String, Object>> result) {
-        super(String.valueOf(result));
-        this.result = result;
-    }
-
-    public String getErrorType() {
-        return result.keySet().stream().findAny().get();
+    public JApiError(String target, Map<String, Object> payload) {
+        super(target);
+        this.target = target;
+        this.payload = payload;
     }
 }

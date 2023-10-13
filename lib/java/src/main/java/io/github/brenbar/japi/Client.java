@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
@@ -42,7 +41,7 @@ public class Client {
      * };
      * </pre>
      */
-    interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
+    interface Middleware extends BiFunction<FnMessage, Function<FnMessage, FnMessage>, FnMessage> {
     }
 
     private Adapter adapter;
@@ -147,17 +146,14 @@ public class Client {
 
         var response = this.middleware.apply(requestMessage, this::processMessage);
 
-        var result = response.body;
-        var target = result.keySet().stream().findAny().get();
-
-        if ("ok".equals(target)) {
-            return result.values().stream().findAny().get();
+        if ("ok".equals(response.target)) {
+            return response.payload;
         } else {
-            throw new JApiError(result);
+            throw new JApiError(response.target, response.payload);
         }
     }
 
-    private Message processMessage(Message message) {
+    private FnMessage processMessage(FnMessage message) {
         return InternalClient.processRequestObject(message, this.adapter, this.serializer,
                 this.timeoutMsDefault);
     }

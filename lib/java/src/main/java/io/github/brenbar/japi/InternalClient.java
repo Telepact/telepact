@@ -1,13 +1,12 @@
 package io.github.brenbar.japi;
 
-import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 class InternalClient {
 
-    static Message constructRequestMessage(Request request, boolean useBinaryDefault, boolean forceSendJsonDefault,
+    static FnMessage constructRequestMessage(Request request, boolean useBinaryDefault, boolean forceSendJsonDefault,
             long timeoutMsDefault) {
         boolean finalUseBinary;
         if (request.useBinary.isPresent()) {
@@ -46,13 +45,15 @@ class InternalClient {
             headers.put("_serializeAsBinary", true);
         }
 
-        return new Message(headers, Map.of(request.functionName, request.functionArgument));
+        return new FnMessage(headers, request.functionName, request.functionArgument);
     }
 
-    static Message processRequestObject(Message request,
+    static FnMessage processRequestObject(FnMessage request,
             BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMs) {
         try {
-            return adapter.apply(request, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
+            var requestMessage = InternalMessage.convertFnMessage(request);
+            var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
+            return InternalMessage.convertMessage(responseMessage);
         } catch (Exception e) {
             throw new ClientProcessError(e);
         }
