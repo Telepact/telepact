@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -41,7 +40,7 @@ public class Client {
      * };
      * </pre>
      */
-    interface Middleware extends BiFunction<FnMessage, Function<FnMessage, FnMessage>, FnMessage> {
+    interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
     }
 
     private Adapter adapter;
@@ -131,29 +130,22 @@ public class Client {
         return this;
     }
 
+    public Message createRequestMessage(Request request) {
+        return InternalClient.constructRequestMessage(request, useBinaryDefault,
+                forceSendJsonDefault, timeoutMsDefault);
+    }
+
     /**
-     * Submit a jAPI Request Message. Returns a jAPI Response Message Body or throws
-     * jAPI error.
+     * Submit a jAPI Request Message. Returns a jAPI Response Message.
      * 
      * @param request
      * @return
      */
-    public Map<String, Object> request(
-            Request request) {
-
-        var requestMessage = InternalClient.constructRequestMessage(request, useBinaryDefault,
-                forceSendJsonDefault, timeoutMsDefault);
-
-        var response = this.middleware.apply(requestMessage, this::processMessage);
-
-        if ("ok".equals(response.target)) {
-            return response.payload;
-        } else {
-            throw new JApiError(response.target, response.payload);
-        }
+    public Message send(Message requestMessage) {
+        return this.middleware.apply(requestMessage, this::processMessage);
     }
 
-    private FnMessage processMessage(FnMessage message) {
+    private Message processMessage(Message message) {
         return InternalClient.processRequestObject(message, this.adapter, this.serializer,
                 this.timeoutMsDefault);
     }

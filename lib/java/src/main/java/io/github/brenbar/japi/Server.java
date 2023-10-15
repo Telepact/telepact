@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class Server {
 
     JApiSchema jApiSchema;
-    Function<FnMessage, FnMessage> handler;
+    Function<Message, Message> handler;
     Consumer<Throwable> onError;
     Serializer serializer;
 
@@ -20,7 +20,7 @@ public class Server {
      * @param jApiSchemaAsJson
      * @param handler
      */
-    public Server(String jApiSchemaAsJson, Function<FnMessage, FnMessage> handler) {
+    public Server(String jApiSchemaAsJson, Function<Message, Message> handler) {
         this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson);
         this.handler = handler;
         this.onError = (e) -> {

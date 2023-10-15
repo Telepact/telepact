@@ -6,7 +6,8 @@ import java.util.function.BiFunction;
 
 class InternalClient {
 
-    static FnMessage constructRequestMessage(Request request, boolean useBinaryDefault, boolean forceSendJsonDefault,
+    static Message constructRequestMessage(Request request, boolean useBinaryDefault,
+            boolean forceSendJsonDefault,
             long timeoutMsDefault) {
         boolean finalUseBinary;
         if (request.useBinary.isPresent()) {
@@ -45,15 +46,14 @@ class InternalClient {
             headers.put("_serializeAsBinary", true);
         }
 
-        return new FnMessage(headers, request.functionName, request.functionArgument);
+        return new Message(headers, request.functionName, request.functionArgument);
     }
 
-    static FnMessage processRequestObject(FnMessage request,
+    static Message processRequestObject(Message requestMessage,
             BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMs) {
         try {
-            var requestMessage = InternalMessage.convertFnMessage(request);
             var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
-            return InternalMessage.convertMessage(responseMessage);
+            return responseMessage;
         } catch (Exception e) {
             throw new ClientProcessError(e);
         }

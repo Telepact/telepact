@@ -46,7 +46,7 @@ class InternalServer {
             return new Message(requestHeaders, Map.of());
         }
 
-        Map<String, Map<String, Object>> body = new HashMap<>();
+        Map<String, Object> body = new HashMap<>();
         if (requestMessageArray.size() != 2) {
             parseFailures.add("MessageMustBeArrayWithTwoElements");
         } else {
@@ -58,7 +58,7 @@ class InternalServer {
             }
 
             try {
-                body = (Map<String, Map<String, Object>>) requestMessageArray.get(1);
+                body = (Map<String, Object>) requestMessageArray.get(1);
                 if (body.size() != 1) {
                     parseFailures.add("BodyMustBeUnionType");
                 } else {
@@ -95,7 +95,7 @@ class InternalServer {
 
     static Message processMessage(Message requestMessage,
             JApiSchema jApiSchema,
-            Function<FnMessage, FnMessage> handler,
+            Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
         var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
@@ -190,27 +190,26 @@ class InternalServer {
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
-        var callMessage = new FnMessage(requestHeaders, requestTarget, requestPayload);
+        var callMessage = new Message(requestHeaders, requestTarget, requestPayload);
 
-        FnMessage resultMessage;
+        Message resultMessage;
         if (requestTarget.equals("fn._ping")) {
-            resultMessage = new FnMessage("ok", Map.of());
+            resultMessage = new Message("ok", Map.of());
         } else if (requestTarget.equals("fn._jApi")) {
-            resultMessage = new FnMessage("ok", Map.of("jApi", jApiSchema.original));
+            resultMessage = new Message("ok", Map.of("jApi", jApiSchema.original));
         } else {
             try {
-                var fnMessage = handler.apply(callMessage);
-                resultMessage = new FnMessage(fnMessage.header, fnMessage.target, fnMessage.payload);
+                resultMessage = handler.apply(callMessage);
             } catch (Throwable t) {
                 try {
                     onError.accept(t);
                 } catch (Throwable ignored) {
 
                 }
-                resultMessage = new FnMessage("_errorUnknown", Map.of());
+                resultMessage = new Message("_errorUnknown", Map.of());
             }
         }
-        Map<String, Object> result = resultMessage.payload;
+        Map<String, Object> result = resultMessage.getBodyPayload();
         resultMessage.header.putAll(responseHeaders);
         responseHeaders = resultMessage.header;
 

@@ -85,9 +85,9 @@ public class MockServer {
      * @param stub
      */
     public void createStub(MockStub stub) {
-        var requestMessage = List.of(
-                "fn._createStub",
+        var requestMessage = new Message(
                 Map.of(),
+                "fn._createStub",
                 Map.ofEntries(
                         Map.entry("whenFunction", stub.whenFunction),
                         Map.entry("whenArgument", stub.whenArgument),
@@ -97,9 +97,8 @@ public class MockServer {
         var requestMessageJson = this.server.serializer.serialize(requestMessage);
         var responseJson = this.process(requestMessageJson);
         var response = this.server.serializer.deserialize(responseJson);
-        var result = (Map<String, Object>) response.get(2);
-        var err = (Map<String, Object>) result.get("err");
-        if (err != null) {
+        var result = response.body;
+        if (!response.getBodyTarget().equals("ok")) {
             throw new JApiProcessError(String.valueOf(result));
         }
     }
@@ -124,9 +123,9 @@ public class MockServer {
                     .formatted(verification.verificationTimes.getClass().getName()));
         }
 
-        var request = List.of(
-                "fn._verify",
+        var request = new Message(
                 Map.of(),
+                "fn._verify",
                 Map.ofEntries(
                         Map.entry("function", verification.functionName),
                         Map.entry("argument", verification.argument),
@@ -136,7 +135,7 @@ public class MockServer {
         var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
-        var result = (Map<String, Object>) response.get(2);
+        var result = response.body;
         if (result.containsKey("errorVerificationFailure")) {
             try {
                 var verificationFailureStruct = (Map<String, Object>) result.get("errorVerificationFailure");
@@ -153,14 +152,14 @@ public class MockServer {
      * interactions have been verified.
      */
     public void verifyNoMoreInteractions() {
-        var request = List.of(
-                "fn._verifyNoMoreInteractions",
+        var request = new Message(
                 Map.of(),
+                "fn._verifyNoMoreInteractions",
                 Map.of());
         var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
-        var result = (Map<String, Object>) response.get(2);
+        var result = response.body;
         if (result.containsKey("errorVerificationFailure")) {
             try {
                 var verificationFailureStruct = (Map<String, Object>) result.get("errorVerificationFailure");
@@ -176,14 +175,14 @@ public class MockServer {
      * Clear all interaction data.
      */
     public void clearInvocations() {
-        var request = List.of(
-                "fn._clearInvocations",
+        var request = new Message(
                 Map.of(),
+                "fn._clearInvocations",
                 Map.of());
         var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
-        var result = (Map<String, Object>) response.get(2);
+        var result = response.body;
         if (!result.containsKey("ok")) {
             throw new JApiProcessError(String.valueOf(result));
         }
@@ -193,14 +192,14 @@ public class MockServer {
      * Clear all stub conditions.
      */
     public void clearStubs() {
-        var request = List.of(
-                "fn._clearStubs",
+        var request = new Message(
                 Map.of(),
+                "fn._clearStubs",
                 Map.of());
         var requestJson = this.server.serializer.serialize(request);
         var responseJson = this.process(requestJson);
         var response = this.server.serializer.deserialize(responseJson);
-        var result = (Map<String, Object>) response.get(2);
+        var result = response.body;
         if (!result.containsKey("ok")) {
             throw new JApiProcessError(String.valueOf(result));
         }

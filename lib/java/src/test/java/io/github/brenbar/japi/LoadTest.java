@@ -77,13 +77,13 @@ public class LoadTest {
                     .setTimeoutMsDefault(600000);
 
             // warmup
-            client.request(new Request("fn.getPaperTape", Map.of()));
+            client.send(new RequestOptions("fn.getPaperTape", Map.of()));
 
             var jsonTimers = metrics.timer("roundtrip-json");
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = jsonTimers.time()) {
-                    client.request(new Request("fn.getPaperTape", Map.of()).setUseBinary(false));
+                    client.send(new RequestOptions("fn.getPaperTape", Map.of()).setUseBinary(false));
                 }
             }
 
@@ -91,7 +91,7 @@ public class LoadTest {
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = binaryTimers.time()) {
-                    client.request(new Request("fn.getPaperTape", Map.of()).addHeader("b", true));
+                    client.send(new RequestOptions("fn.getPaperTape", Map.of()).addHeader("b", true));
                 }
             }
 

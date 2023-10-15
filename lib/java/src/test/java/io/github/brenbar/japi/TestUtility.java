@@ -90,7 +90,7 @@ public class TestUtility {
             };
             var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true)
                     .setTimeoutMsDefault(600000);
-            client.request(new Request("fn._ping", Map.of())); // warmup
+            client.send(new RequestOptions("fn._ping", Map.of())); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
@@ -100,7 +100,7 @@ public class TestUtility {
             var requestPayloadPseudoJson = (Map<String, Object>) requestBodyPseudoJson.values().stream().findAny()
                     .get();
 
-            var resultAsParsedJson = client.request(new Request(requestTargetPseudoJson,
+            var resultAsParsedJson = client.send(new RequestOptions(requestTargetPseudoJson,
                     requestPayloadPseudoJson).addHeaders(
                             requestHeadersPseudoJson));
             assertEquals(expectedResponseAsParsedJson.get(1), resultAsParsedJson);

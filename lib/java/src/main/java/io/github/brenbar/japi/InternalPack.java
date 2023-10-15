@@ -5,13 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InternalPack {
+class InternalPack {
 
-    public static class Undefined {
+    static class Undefined {
 
     }
 
-    public static Map<String, Object> packBody(Map<String, Object> body) {
+    static class Packed {
+    }
+
+    static Map<String, Object> packBody(Map<String, Object> body) {
         var result = new HashMap<String, Object>();
 
         for (var entry : body.entrySet()) {
@@ -22,7 +25,18 @@ public class InternalPack {
         return result;
     }
 
-    public static Object pack(Object value) {
+    static Map<String, Object> unpackBody(Map<String, Object> body) {
+        var result = new HashMap<String, Object>();
+
+        for (var entry : body.entrySet()) {
+            var unpackedValue = pack(entry.getValue());
+            result.put(entry.getKey(), unpackedValue);
+        }
+
+        return result;
+    }
+
+    static Object pack(Object value) {
         if (value instanceof List l) {
             return packList(l);
         } else {
@@ -30,9 +44,19 @@ public class InternalPack {
         }
     }
 
-    public static List<Object> packList(List<Object> list) {
+    static Object unpack(Object value) {
+        if (value instanceof List l) {
+            return unpackList(l);
+        } else {
+            return value;
+        }
+    }
+
+    static List<Object> packList(List<Object> list) {
         var packedList = new ArrayList<Object>();
-        packedList.add(new ArrayList<String>());
+        packedList.add(new Packed());
+        var headers = new ArrayList<String>();
+        packedList.add(headers);
         var keyIndexMap = new HashMap<String, Integer>();
         var index = 0;
         for (var e : list) {
@@ -44,7 +68,6 @@ public class InternalPack {
                         // This is an untyped map, abort
                         return list;
                     }
-                    var headers = (List<String>) packedList.get(0);
                     var keyIndex = keyIndexMap.get(key);
                     if (keyIndex == null) {
                         headers.add(key);
@@ -64,5 +87,31 @@ public class InternalPack {
             }
         }
         return packedList;
+    }
+
+    static List<Object> unpackList(List<Object> list) {
+        if (list.size() == 0) {
+            return list;
+        }
+
+        if (!(list.get(0) instanceof Packed)) {
+            return list;
+        }
+
+        var unpackedList = new ArrayList<Object>();
+
+        var headers = (List<String>) list.get(1);
+        for (int i = 2; i < list.size(); i += 1) {
+            var row = (List<Object>) list.get(i);
+            var m = new HashMap<String, Object>();
+            for (int j = 0; j < row.size(); j += 1) {
+                var key = headers.get(j);
+                var value = row.get(j);
+                m.put(key, value);
+            }
+            unpackedList.add(m);
+        }
+
+        return unpackedList;
     }
 }

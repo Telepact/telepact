@@ -21,8 +21,8 @@ class InternalMockServer {
             boolean enableGeneratedDefaultStub) {
 
         var enableGenerationStub = (Boolean) requestMessage.header.getOrDefault("_mockEnableGeneratedStub", false);
-        var functionName = requestMessage.body.keySet().stream().findAny().get();
-        var argument = requestMessage.body.values().stream().findAny().get();
+        var functionName = requestMessage.getBodyTarget();
+        var argument = requestMessage.getBodyPayload();
 
         switch (functionName) {
             case "fn._createStub" -> {
@@ -31,7 +31,7 @@ class InternalMockServer {
                 var whenFunction = entry.getKey();
                 var functionStruct = (Map<String, Object>) entry.getValue();
                 var whenArgument = (Map<String, Object>) functionStruct.get("arg");
-                var thenResult = (Map<String, Map<String, Object>>) functionStruct
+                var thenResult = (Map<String, Object>) functionStruct
                         .get("result");
                 var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("ignoreMissingArgFields", false);
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
@@ -233,7 +233,7 @@ class InternalMockServer {
         return Map.of(enumValue, constructRandomStruct(enumData.fields, random));
     }
 
-    static Map<String, Map<String, Object>> verify(String functionName, Map<String, Object> argument,
+    static Map<String, Object> verify(String functionName, Map<String, Object> argument,
             boolean exactMatch,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
         try {
@@ -304,7 +304,7 @@ class InternalMockServer {
         }
     }
 
-    static Map<String, Map<String, Object>> verifyNoMoreInteractions(List<Invocation> invocations) {
+    static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
         try {
             var objectMapper = new ObjectMapper();
             var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
