@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 class InternalSerializer {
@@ -74,23 +76,51 @@ class InternalSerializer {
 
     static Message deserialize(byte[] messageBytes, SerializationStrategy serializationStrategy,
             BinaryEncodingStrategy binaryEncodingStrategy) {
+        List<Object> messageAsPseudoJson;
         if (messageBytes[0] == '[') {
-            var messageAsPseudoJson = serializationStrategy.fromJson(messageBytes);
-            var header = (Map<String, Object>) messageAsPseudoJson.get(0);
-            var body = (Map<String, Object>) messageAsPseudoJson.get(1);
-            return new Message(header, body);
+            messageAsPseudoJson = serializationStrategy.fromJson(messageBytes);
         } else {
             var encodedMessage = serializationStrategy.fromMsgPack(messageBytes);
-            List<Object> messageAsPseudoJson;
             try {
                 messageAsPseudoJson = binaryEncodingStrategy.decode(encodedMessage);
             } catch (BinaryEncoderUnavailableError e) {
                 throw new DeserializationError(e);
             }
-            var header = (Map<String, Object>) messageAsPseudoJson.get(0);
-            var body = (Map<String, Object>) messageAsPseudoJson.get(1);
-            return new Message(header, body);
         }
+
+        var parseFailures = new ArrayList<String>();
+        Map<String, Object> headers = null;
+        Map<String, Object> body = null;
+        if (messageAsPseudoJson.size() != 2) {
+            parseFailures.add("MessageMustBeArrayWithTwoElements");
+        } else {
+            try {
+                headers = (Map<String, Object>) messageAsPseudoJson.get(0);
+            } catch (ClassCastException e) {
+                parseFailures.add("HeadersMustBeObject");
+            }
+
+            try {
+                body = (Map<String, Object>) messageAsPseudoJson.get(1);
+                if (body.size() != 1) {
+                    parseFailures.add("BodyMustBeUnionType");
+                } else {
+                    try {
+                        var givenPayload = (Map<String, Object>) body.values().stream().findAny().get();
+                    } catch (ClassCastException e) {
+                        parseFailures.add("BodyPayloadMustBeObject");
+                    }
+                }
+            } catch (ClassCastException e) {
+                parseFailures.add("BodyMustBeObject");
+            }
+        }
+
+        if (parseFailures.size() > 0) {
+            throw new MessageParseError(parseFailures);
+        }
+
+        return new Message(headers, body);
     }
 
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoder binaryEncoder) {

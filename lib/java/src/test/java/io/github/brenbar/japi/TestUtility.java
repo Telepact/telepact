@@ -32,7 +32,7 @@ public class TestUtility {
                     }
                 } else if (requestHeaders.containsKey("result")) {
                     try {
-                        var r = (Map<String, Map<String, Object>>) requestHeaders.get("result");
+                        var r = (Map<String, Object>) requestHeaders.get("result");
                         yield new Message(r);
                     } catch (ClassCastException e) {
                         throw new RuntimeException(e);
@@ -84,13 +84,13 @@ public class TestUtility {
                     System.out.println("--> %s".formatted(new String(requestBytes)));
                     var responseBytes = server.process(requestBytes);
                     System.out.println("<-- %s".formatted(new String(responseBytes)));
-                    List<Object> response = s.deserialize(responseBytes);
+                    Message response = s.deserialize(responseBytes);
                     return response;
                 });
             };
             var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true)
                     .setTimeoutMsDefault(600000);
-            client.send(new RequestOptions("fn._ping", Map.of())); // warmup
+            client.send(client.createRequestMessage(new Request("fn._ping", Map.of()))); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
@@ -100,9 +100,9 @@ public class TestUtility {
             var requestPayloadPseudoJson = (Map<String, Object>) requestBodyPseudoJson.values().stream().findAny()
                     .get();
 
-            var resultAsParsedJson = client.send(new RequestOptions(requestTargetPseudoJson,
+            var resultAsParsedJson = client.send(client.createRequestMessage(new Request(requestTargetPseudoJson,
                     requestPayloadPseudoJson).addHeaders(
-                            requestHeadersPseudoJson));
+                            requestHeadersPseudoJson)));
             assertEquals(expectedResponseAsParsedJson.get(1), resultAsParsedJson);
         }
     }

@@ -27,9 +27,9 @@ public class MockTests {
                 })
                                 .setTimeoutMsDefault(600000);
 
-                client.send(new RequestOptions("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
+                client.createRequestMessage(new Request("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
 
-                var result = client.send(new RequestOptions("fn.compute",
+                var result = client.createRequestMessage(new Request("fn.compute",
                                 Map.ofEntries(
                                                 Map.entry("x", Map.of("variable", Map.of("name", "a"))),
                                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
@@ -60,9 +60,10 @@ public class MockTests {
                                 Map.entry("op", Map.of("add", Map.of()))),
                                 Map.of("ok", Map.of("result", 5))));
 
-                client.send(new RequestOptions("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
+                client.send(client.createRequestMessage(
+                                new Request("fn.saveVariables", Map.of("variables", Map.of("a", 10)))));
 
-                var result = client.send(new RequestOptions("fn.compute",
+                var result = client.createRequestMessage(new Request("fn.compute",
                                 Map.ofEntries(
                                                 Map.entry("x", Map.of("variable", Map.of("name", "a"))),
                                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
@@ -70,9 +71,9 @@ public class MockTests {
 
                 assertEquals(Map.of("ok", Map.of("result", 5)), result);
 
-                client.send(new RequestOptions("fn.exportVariables", Map.of()));
-                client.send(new RequestOptions("fn.exportVariables", Map.of()));
-                client.send(new RequestOptions("fn.exportVariables", Map.of()));
+                client.send(client.createRequestMessage(new Request("fn.exportVariables", Map.of())));
+                client.send(client.createRequestMessage(new Request("fn.exportVariables", Map.of())));
+                client.send(client.createRequestMessage(new Request("fn.exportVariables", Map.of())));
 
                 var e1 = assertThrows(
                                 AssertionError.class,

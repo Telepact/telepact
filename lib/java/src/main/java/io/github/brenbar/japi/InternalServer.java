@@ -19,9 +19,9 @@ class InternalServer {
         var requestHeaders = new HashMap<String, Object>();
         var parseFailures = new ArrayList<String>();
 
-        List<Object> requestMessageArray;
+        Message requestMessage;
         try {
-            requestMessageArray = serializer.deserialize(requestMessageBytes);
+            requestMessage = serializer.deserialize(requestMessageBytes);
         } catch (DeserializationError e) {
             try {
                 onError.accept(e);
@@ -35,6 +35,8 @@ class InternalServer {
                 parseFailures.add("BinaryDecodeFailure");
             } else if (cause instanceof InvalidJsonError e2) {
                 parseFailures.add("InvalidJson");
+            } else if (cause instanceof MessageParseError e2) {
+                parseFailures.addAll(e2.failures);
             } else {
                 parseFailures.add("InvalidMessageFormat");
             }
@@ -46,51 +48,13 @@ class InternalServer {
             return new Message(requestHeaders, Map.of());
         }
 
-        Map<String, Object> body = new HashMap<>();
-        if (requestMessageArray.size() != 2) {
-            parseFailures.add("MessageMustBeArrayWithTwoElements");
-        } else {
-            try {
-                var headers = (Map<String, Object>) requestMessageArray.get(0);
-                requestHeaders.putAll(headers);
-            } catch (ClassCastException e) {
-                parseFailures.add("HeadersMustBeObject");
-            }
-
-            try {
-                body = (Map<String, Object>) requestMessageArray.get(1);
-                if (body.size() != 1) {
-                    parseFailures.add("BodyMustBeUnionType");
-                } else {
-                    var givenTarget = body.keySet().stream().findAny().get();
-
-                    var regex = Pattern.compile("^fn\\.([a-zA-Z_]\\w*)");
-                    var matcher = regex.matcher(givenTarget);
-                    if (matcher.matches()) {
-                        var functionDef = jApiSchema.parsed.get(givenTarget);
-                        if (functionDef == null) {
-                            parseFailures.add("UnknownFunction");
-                        }
-                    } else {
-                        parseFailures.add("BodyTargetMustBeFunction");
-                    }
-
-                    try {
-                        var givenPayload = (Map<String, Object>) body.values().stream().findAny().get();
-                    } catch (ClassCastException e) {
-                        parseFailures.add("TargetMustBeObject");
-                    }
-                }
-            } catch (ClassCastException e) {
-                parseFailures.add("BodyMustBeObject");
-            }
-        }
-
         if (!parseFailures.isEmpty()) {
             requestHeaders.put("_parseFailures", parseFailures);
         }
 
-        return new Message(requestHeaders, body);
+        requestMessage.header.putAll(requestHeaders);
+
+        return requestMessage;
     }
 
     static Message processMessage(Message requestMessage,

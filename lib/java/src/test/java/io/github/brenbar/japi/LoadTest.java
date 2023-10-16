@@ -59,17 +59,14 @@ public class LoadTest {
                     }
                     var responseBytes = responseMessage.getData();
 
-                    if (Objects.equals(((Map<String, Object>) m.get(1)).get("b"), true)) {
+                    if (Objects.equals(((Map<String, Object>) m.body).get("b"), true)) {
                         binarySize.update(responseBytes.length);
                     } else {
                         jsonSize.update(responseBytes.length);
                     }
 
                     System.out.println("<-- %s".formatted(new String(responseBytes)));
-                    List<Object> response = s.deserialize(responseBytes);
-                    var header = (Map<String, Object>) response.get(0);
-                    var body = (Map<String, Map<String, Object>>) response.get(1);
-                    return new Message(header, body);
+                    return s.deserialize(responseBytes);
                 });
             };
 
@@ -77,13 +74,16 @@ public class LoadTest {
                     .setTimeoutMsDefault(600000);
 
             // warmup
-            client.send(new RequestOptions("fn.getPaperTape", Map.of()));
+            var requestMessage = client.createRequestMessage(new Request("fn.getPaperTape", Map.of()));
+            client.send(requestMessage);
 
             var jsonTimers = metrics.timer("roundtrip-json");
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = jsonTimers.time()) {
-                    client.send(new RequestOptions("fn.getPaperTape", Map.of()).setUseBinary(false));
+                    var requestMessage2 = client
+                            .createRequestMessage(new Request("fn.getPaperTape", Map.of()).setUseBinary(false));
+                    client.send(requestMessage2);
                 }
             }
 
@@ -91,7 +91,9 @@ public class LoadTest {
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = binaryTimers.time()) {
-                    client.send(new RequestOptions("fn.getPaperTape", Map.of()).addHeader("b", true));
+                    var requestMessage3 = client
+                            .createRequestMessage(new Request("fn.getPaperTape", Map.of()).addHeader("b", true));
+                    client.send(requestMessage3);
                 }
             }
 
