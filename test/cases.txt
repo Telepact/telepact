@@ -1446,8 +1446,8 @@
 "testErrors"
 
 [{"result":{"errorExample":{"property":"a"}}},{"fn.test":{}}]|[{},{"errorExample":{"property":"a"}}]
-[{"result":{"errorExample":{"wrong":"a"}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"fn.test.errorExample.property","reason":"RequiredStructFieldMissing"},{"path":"fn.test.errorExample.wrong","reason":"UnknownStructField"}]}}]
-[{"result":{"errorUnknown":{"property":"a"}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"fn.test.errorUnknown","reason":"UnknownEnumField"}]}}]
+[{"result":{"errorExample":{"wrong":"a"}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"errorExample.property","reason":"RequiredStructFieldMissing"},{"path":"errorExample.wrong","reason":"UnknownStructField"}]}}]
+[{"result":{"errorUnknown":{"property":"a"}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"errorUnknown","reason":"UnknownEnumField"}]}}]
 
 "testSelectFields"
 
