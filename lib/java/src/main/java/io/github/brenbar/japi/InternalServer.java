@@ -38,7 +38,7 @@ class InternalServer {
             } else if (cause instanceof MessageParseError e2) {
                 parseFailures.addAll(e2.failures);
             } else {
-                parseFailures.add("InvalidMessageFormat");
+                parseFailures.add("MessageMustBeArrayWithTwoElements");
             }
 
             if (!parseFailures.isEmpty()) {

@@ -77,15 +77,15 @@ class InternalSerializer {
     static Message deserialize(byte[] messageBytes, SerializationStrategy serializationStrategy,
             BinaryEncodingStrategy binaryEncodingStrategy) {
         List<Object> messageAsPseudoJson;
-        if (messageBytes[0] == '[') {
-            messageAsPseudoJson = serializationStrategy.fromJson(messageBytes);
-        } else {
+        if (messageBytes[0] == (byte) 0x92) { // MsgPack
             var encodedMessage = serializationStrategy.fromMsgPack(messageBytes);
             try {
                 messageAsPseudoJson = binaryEncodingStrategy.decode(encodedMessage);
             } catch (BinaryEncoderUnavailableError e) {
                 throw new DeserializationError(e);
             }
+        } else {
+            messageAsPseudoJson = serializationStrategy.fromJson(messageBytes);
         }
 
         var parseFailures = new ArrayList<String>();
@@ -117,7 +117,7 @@ class InternalSerializer {
         }
 
         if (parseFailures.size() > 0) {
-            throw new MessageParseError(parseFailures);
+            throw new DeserializationError(new MessageParseError(parseFailures));
         }
 
         return new Message(headers, body);
