@@ -100,10 +100,11 @@ public class TestUtility {
             var requestPayloadPseudoJson = (Map<String, Object>) requestBodyPseudoJson.values().stream().findAny()
                     .get();
 
-            var resultAsParsedJson = client.send(client.createRequestMessage(new Request(requestTargetPseudoJson,
+            var responseMessage = client.send(client.createRequestMessage(new Request(requestTargetPseudoJson,
                     requestPayloadPseudoJson).addHeaders(
                             requestHeadersPseudoJson)));
-            assertEquals(expectedResponseAsParsedJson.get(1), resultAsParsedJson);
+            var resultAsPseudoJson = responseMessage.body;
+            assertEquals(expectedResponseAsParsedJson.get(1), resultAsPseudoJson);
         }
     }
 

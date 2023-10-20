@@ -102,7 +102,7 @@ class InternalServer {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
                     Map.of("reasons", parseFailures));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
+            var newErrorResultValidationFailures = validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -116,7 +116,7 @@ class InternalServer {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
+            var newErrorResultValidationFailures = validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -143,7 +143,7 @@ class InternalServer {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = validateResultEnum(requestTarget, resultEnumType,
+            var newErrorResultValidationFailures = validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -173,20 +173,16 @@ class InternalServer {
                 resultMessage = new Message("_errorUnknown", Map.of());
             }
         }
-        Map<String, Object> result = resultMessage.getBodyPayload();
-        resultMessage.header.putAll(responseHeaders);
-        responseHeaders = resultMessage.header;
-
         var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
-            var resultValidationFailures = validateResultEnum(functionType.name,
+            var resultValidationFailures = validateResultEnum(
                     resultEnumType,
-                    result);
+                    resultMessage.body);
             if (!resultValidationFailures.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
                 Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
-                var newErrorResultValidationFailures = validateResultEnum(functionType.name, resultEnumType,
+                var newErrorResultValidationFailures = validateResultEnum(resultEnumType,
                         newErrorResult);
                 if (!newErrorResultValidationFailures.isEmpty()) {
                     throw new JApiProcessError("Failed internal jAPI validation");
@@ -195,17 +191,21 @@ class InternalServer {
             }
         }
 
-        Map<String, Object> finalResult;
+        Map<String, Object> resultEnum = resultMessage.body;
+        resultMessage.header.putAll(responseHeaders);
+        responseHeaders = resultMessage.header;
+
+        Map<String, Object> finalResultEnum;
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResult = (Map<String, Object>) selectStructFields(resultEnumType, result,
+            finalResultEnum = (Map<String, Object>) selectStructFields(resultEnumType, resultEnum,
                     selectStructFieldsHeader);
         } else {
-            finalResult = result;
+            finalResultEnum = resultEnum;
         }
 
-        return new Message(responseHeaders, finalResult);
+        return new Message(responseHeaders, finalResultEnum);
     }
 
     private static List<Map<String, String>> mapValidationFailuresToInvalidFieldCases(
@@ -297,10 +297,9 @@ class InternalServer {
     }
 
     private static List<ValidationFailure> validateResultEnum(
-            String path,
             Enum resultEnumType,
             Map<String, Object> actualResult) {
-        return validateEnum(path, resultEnumType.values, actualResult);
+        return validateEnum("", resultEnumType.values, actualResult);
     }
 
     private static List<ValidationFailure> validateStruct(
@@ -354,26 +353,28 @@ class InternalServer {
                             ValidationErrorReasons.MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
         }
         var entry = actual.entrySet().stream().findFirst().get();
-        var enumValue = (String) entry.getKey();
-        var enumData = entry.getValue();
+        var enumTarget = (String) entry.getKey();
+        var enumPayload = entry.getValue();
 
-        if (enumData instanceof Boolean) {
-            return Collections.singletonList(new ValidationFailure(path,
+        var nextPath = !"".equals(path) ? "%s.%s".formatted(path, enumTarget) : enumTarget;
+
+        if (enumPayload instanceof Boolean) {
+            return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
-        } else if (enumData instanceof Number) {
-            return Collections.singletonList(new ValidationFailure(path,
+        } else if (enumPayload instanceof Number) {
+            return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.NUMBER_INVALID_FOR_ENUM_STRUCT_TYPE));
-        } else if (enumData instanceof String) {
-            return Collections.singletonList(new ValidationFailure(path,
+        } else if (enumPayload instanceof String) {
+            return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.STRING_INVALID_FOR_ENUM_STRUCT_TYPE));
-        } else if (enumData instanceof List) {
-            return Collections.singletonList(new ValidationFailure(path,
+        } else if (enumPayload instanceof List) {
+            return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
-        } else if (enumData instanceof Map<?, ?> m2) {
-            return validateEnumStruct("%s.%s".formatted(path, enumValue), referenceValues, enumValue,
+        } else if (enumPayload instanceof Map<?, ?> m2) {
+            return validateEnumStruct(nextPath, referenceValues, enumTarget,
                     (Map<String, Object>) m2);
         } else {
-            return Collections.singletonList(new ValidationFailure(path,
+            return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
         }
     }
