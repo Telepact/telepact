@@ -67,7 +67,9 @@ class InternalServer {
         var requestBody = requestMessage.body;
         var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().orElse(Map.of());
         var requestTarget = (String) requestBody.keySet().stream().findAny().orElse("fn._unknown");
+        var unknownTarget = (String) null;
         if (!jApiSchema.parsed.containsKey(requestTarget)) {
+            unknownTarget = requestTarget;
             requestTarget = "fn._unknown";
         }
         var functionType = (Struct) jApiSchema.parsed.get(requestTarget);
@@ -128,6 +130,17 @@ class InternalServer {
             List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
             responseHeaders.put("_serializeAsBinary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+        }
+
+        if (unknownTarget != null) {
+            Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
+                    Map.of("reasons", List.of("UnknownFunction")));
+            var newErrorResultValidationFailures = validateResultEnum(resultEnumType,
+                    newErrorResult);
+            if (!newErrorResultValidationFailures.isEmpty()) {
+                throw new JApiProcessError("Failed internal jAPI validation");
+            }
+            return new Message(responseHeaders, newErrorResult);
         }
 
         var argumentValidationFailures = validateStruct(functionType.name,
