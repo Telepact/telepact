@@ -29,11 +29,14 @@ public class MockTests {
 
                 client.createRequestMessage(new Request("fn.saveVariables", Map.of("variables", Map.of("a", 10))));
 
-                var result = client.createRequestMessage(new Request("fn.compute",
+                var request = client.createRequestMessage(new Request("fn.compute",
                                 Map.ofEntries(
                                                 Map.entry("x", Map.of("variable", Map.of("name", "a"))),
                                                 Map.entry("y", Map.of("constant", Map.of("value", 2))),
                                                 Map.entry("op", Map.of("add", Map.of())))));
+
+                var response = client.send(request);
+                var result = response.body;
 
                 // This is the value per the given random seed
                 assertEquals(Map.of("ok", Map.of("result", 0.2000036788562655)), result);
