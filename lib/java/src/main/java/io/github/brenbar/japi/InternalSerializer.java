@@ -272,7 +272,12 @@ class InternalSerializer {
         if (given instanceof Map<?, ?> m) {
             var newMap = new HashMap<String, Object>();
             m.entrySet().stream().forEach(e -> {
-                var key = (String) get(e.getKey(), binaryEncoder.decodeMap);
+                String key;
+                if (e.getKey() instanceof String s) {
+                    key = s;
+                } else {
+                    key = (String) get(e.getKey(), binaryEncoder.decodeMap);
+                }
                 var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
                 newMap.put(key, encodedValue);
             });
