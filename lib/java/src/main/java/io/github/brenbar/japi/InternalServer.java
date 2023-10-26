@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 class InternalServer {
 
@@ -38,6 +37,7 @@ class InternalServer {
             } else if (cause instanceof MessageParseError e2) {
                 parseFailures.addAll(e2.failures);
             } else {
+                // TODO: Change this to something like "CouldNotParse"
                 parseFailures.add("MessageMustBeArrayWithTwoElements");
             }
 

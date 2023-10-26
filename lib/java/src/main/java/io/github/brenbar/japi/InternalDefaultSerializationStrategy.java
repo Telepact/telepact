@@ -109,7 +109,7 @@ class InternalDefaultSerializationStrategy implements SerializationStrategy {
             if (e.getMessage().contains("out of range")) {
                 throw new DeserializationError(new NumberOutOfRangeError());
             } else {
-                throw new DeserializationError(e);
+                throw new DeserializationError(new InvalidJsonError(e));
             }
         } catch (IOException e) {
             throw new DeserializationError(e);
