@@ -1,53 +1,57 @@
-{
-  "///": "A calculator app that provides basic math computation capabilities.",
+[
+  {
+    "///": "A calculator app that provides basic math computation capabilities.",
+    "japi.Calculator": {}
+  },
 
-  "enum.Value": {
+  {
     "///": "A value for computation that can take either a constant or variable form.",
-
-    "constant": {
-      "value": "number"
-    },
-    "variable": {
-      "name": "string"
+    "enum.Value": {
+      "constant": {
+        "value": "number"
+      },
+      "variable": {
+        "name": "string"
+      }
     }
   },
 
-  "enum.Operation": {
+  {
     "///": "A basic mathematical operation.",
-
-    "add": {},
-    "sub": {},
-    "mul": {},
-    "div": {}
+    "enum.Operation": {
+      "add": {},
+      "sub": {},
+      "mul": {},
+      "div": {}
+    }
   },
 
-  "struct.Variable": {
+  {
     "///": "A mathematical variable represented by a `name` that holds a certain `value`.",
-
-    "name": "string",
-    "value": "number"
+    "struct.Variable": {
+      "name": "string",
+      "value": "number"
+    }
   },
 
-  "fn.saveVariables": {
+  {
     "///": "Save a set of variables as a dynamic map of variable names to their value.",
-
-    "arg": {
+    "fn.saveVariables": {
       "variables": "object<number>"
     },
-    "result": {
+    "->": {
       "ok": {}
     }
   },
 
-  "fn.compute": {
+  {
     "///": "Compute the `result` of the given `x` and `y` values.",
-
-    "arg": {
-      "x": "enum.Value",
-      "y": "enum.Value",
-      "op": "enum.Operation"
+    "fn.compute": {
+      "x": "enum:Value",
+      "y": "enum:Value",
+      "op": "enum:Operation"
     },
-    "result": {
+    "->": {
       "ok": {
         "result": "number"
       },
@@ -55,37 +59,36 @@
     }
   },
 
-  "fn.exportVariables": {
+  {
     "///": "Export all saved variables, up to an optional `limit`.",
-
-    "arg": {
+    "fn.exportVariables": {
       "limit!": "integer"
     },
-    "result": {
+    "->": {
       "ok": {
-        "variables": "array<struct.Variable>"
+        "variables": "array<struct:Variable>"
       }
     }
   },
 
-  "struct.Computation": {
-    "///": " A computation. ",
-
-    "firstOperand": "enum.Value",
-    "secondOperand": "enum.Value",
-    "operation": "enum.Operation",
-    "timestamp": "integer",
-    "successful": "boolean"
+  {
+    "///": "A function template.",
+    "fn.getPaperTape": {},
+    "->": {
+      "ok": {
+        "tape": "array<struct:Computation>"
+      }
+    }
   },
 
-  "fn.getPaperTape": {
-    "///": "A function template.",
-
-    "arg": {},
-    "result": {
-      "ok": {
-        "tape": "array<struct.Computation>"
-      }
+  {
+    "///": " A computation. ",
+    "struct.Computation": {
+      "firstOperand": "enum::Value",
+      "secondOperand": "enum::Value",
+      "operation": "enum::Operation",
+      "timestamp": "integer",
+      "successful": "boolean"
     }
   }
-}
+]

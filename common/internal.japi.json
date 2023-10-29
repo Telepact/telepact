@@ -1,41 +1,39 @@
-{
-  "fn._ping": {
+[
+  {
     "///": " Ping the server. ",
-
-    "arg": {},
-    "result": {
+    "fn._ping": {},
+    "->": {
       "ok": {}
     }
   },
 
-  "fn._schema": {
+  {
     "///": " Get the jAPI `schema` of this server. ",
-
-    "arg": {},
-    "result": {
+    "fn._schema": {},
+    "->": {
       "ok": {
         "schema": "object<any>"
       }
     }
   },
 
-  "fn._unknown": {
+  {
     "///": " A placeholder function when the requested function is unknown. ",
-
-    "arg": {},
-    "result": {
+    "fn._unknown": {},
+    "->": {
       "ok": {}
     }
   },
 
-  "struct._ValidationFailure": {
+  {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
-
-    "path": "string",
-    "reason": "string"
+    "struct._ValidationFailure": {
+      "path": "string",
+      "reason": "string"
+    }
   },
 
-  "trait._Validated": {
+  {
     "///": " All functions may return a validation error:                                                        ",
     "//1": " - `_invalidRequestTarget`: The Target on the Request is invalid due to a `reason`                   ",
     "//2": " - `_invalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
@@ -43,21 +41,23 @@
     "//4": " - `_invalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
     "//5": "     outlined by a list of `cases.                                                                   ",
     "//6": " - `_parseFailure`: The Request could not be parsed as a jAPI Message.                               ",
-
-    "result": {
-      "_errorUnknown": {},
-      "_errorInvalidRequestHeaders": {
-        "cases": "array<struct._ValidationFailure>"
-      },
-      "_errorInvalidRequestBody": {
-        "cases": "array<struct._ValidationFailure>"
-      },
-      "_errorInvalidResponseBody": {
-        "cases": "array<struct._ValidationFailure>"
-      },
-      "_errorParseFailure": {
-        "reasons": "array<string>"
+    "trait._Validated": {
+      "fn\\..*": {},
+      "->": {
+        "_errorUnknown": {},
+        "_errorInvalidRequestHeaders": {
+          "cases": "array<struct._ValidationFailure>"
+        },
+        "_errorInvalidRequestBody": {
+          "cases": "array<struct._ValidationFailure>"
+        },
+        "_errorInvalidResponseBody": {
+          "cases": "array<struct._ValidationFailure>"
+        },
+        "_errorParseFailure": {
+          "reasons": "array<string>"
+        }
       }
     }
   }
-}
+]

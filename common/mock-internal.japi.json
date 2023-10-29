@@ -1,5 +1,50 @@
-{
-  "fn._createStub": {
+[
+  {
+    "///": " The number of times a function is allowed to be called. ",
+    "enum._CallCountCriteria": {
+      "exact": {
+        "times": "integer"
+      },
+      "atMost": {
+        "times": "integer"
+      },
+      "atLeast": {
+        "times": "integer"
+      }
+    }
+  },
+  {
+    "///": " An enumeration of possible causes for a mock verification to fail. ",
+    "enum._VerificationFailure": {
+      "tooFewMatchingCalls": {
+        "wanted": "enum._CallCountCriteria",
+        "found": "integer",
+        "allCalls": "array<fn.*.arg>"
+      },
+      "tooManyMatchingCalls": {
+        "wanted": "enum._CallCountCriteria",
+        "found": "integer",
+        "allCalls": "array<fn.*.arg>"
+      }
+    }
+  },
+  {
+    "///": " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
+    "//1": " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
+    "//2": " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    ",
+    "fn._verify": {
+      "call": "fn.*.arg",
+      "allowPartialArgMatch!": "boolean",
+      "multiplicity!": "enum._CallCountCriteria"
+    },
+    "->": {
+      "ok": {},
+      "errorVerificationFailure": {
+        "reason": "enum._VerificationFailure"
+      }
+    }
+  },
+  {
     "///": " Create a function stub that will cause the server to return the `stub` result when the `stub` argument   ",
     "//1": " matches the function argument on a request.                                                              ",
     "//2": "                                                                                                          ",
@@ -10,112 +55,49 @@
     "//7": " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the   ",
     "//8": " `stub` result, and the server will generate the necessary data required to make the `result` pass on     ",
     "//9": " response validation.                                                                                     ",
-
-    "arg": {
+    "fn._createStub": {
       "stub": "fn.*",
       "ignoreMissingArgFields!": "boolean",
       "generateMissingResultFields!": "boolean"
     },
-    "result": {
+    "->": {
       "ok": {}
     }
   },
-
-  "enum._CallCountCriteria": {
-    "///": " The number of times a function is allowed to be called. ",
-
-    "exact": {
-      "times": "integer"
-    },
-    "atMost": {
-      "times": "integer"
-    },
-    "atLeast": {
-      "times": "integer"
-    }
-  },
-
-  "enum._VerificationFailure": {
-    "///": " An enumeration of possible causes that a mock verification can fail. ",
-
-    "tooFewMatchingCalls": {
-      "wanted": "enum._CallCountCriteria",
-      "found": "integer",
-      "allCalls": "array<fn.*.arg>"
-    },
-    "tooManyMatchingCalls": {
-      "wanted": "enum._CallCountCriteria",
-      "found": "integer",
-      "allCalls": "array<fn.*.arg>"
-    }
-  },
-
-  "fn._verify": {
-    "///": " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
-    "//1": " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
-    "//2": " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    ",
-
-    "arg": {
-      "call": "fn.*.arg",
-      "allowPartialArgMatch!": "boolean",
-      "multiplicity!": "enum._CallCountCriteria"
-    },
-    "result": {
-      "ok": {},
-      "errorVerificationFailure": {
-        "reason": "enum._VerificationFailure"
-      }
-    }
-  },
-
-  "fn._verifyNoMoreInteractions": {
+  {
     "///": " Verify that no interactions have occurred with this mock or that all ",
     "//1": " interactions have been verified.                                     ",
-
-    "arg": {},
-    "result": {
+    "fn._verifyNoMoreInteractions": {},
+    "->": {
       "ok": {},
       "errorVerificationFailure": {
         "additionalUnverifiedCalls": "array<fn.*>"
       }
     }
   },
-
-  "fn._clearStubs": {
+  {
     "///": " Clear all stub conditions. ",
-
-    "arg": {},
-    "result": {
+    "fn._clearStubs": {},
+    "->": {
       "ok": {}
     }
   },
-
-  "fn._clearCalls": {
+  {
     "///": " Clear all call data. ",
-
-    "arg": {},
-    "result": {
+    "fn._clearCalls": {},
+    "->": {
       "ok": {}
     }
   },
-
-  "trait._Mockable": {
+  {
     "///": " If random generation is disabled, functions may return a `_errorNoMatchingStub`  ",
     "//1": " error, indicating that the mock could not return a result for that function call ",
     "//2": " due to no matching stub being available.                                         ",
-
-    "excludes": [
-      "fn._clearCalls",
-      "fn._verifyNoMoreInteractions",
-      "fn._verify",
-      "fn._clearStubs",
-      "fn._createStub",
-      "fn._schema",
-      "fn._ping"
-    ],
-
-    "result": {
-      "_errorNoMatchingStub": {}
+    "trait._Mockable": {
+      "fn\\.[a-zA-Z].*": {},
+      "->": {
+        "_errorNoMatchingStub": {}
+      }
     }
   }
-}
+]
