@@ -1,14 +1,14 @@
 "emptyPartialMatchStub"
 
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{},"result":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":true}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":true}}}]
 
 "partialMatchStub"
 
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1}},"result":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1},"->":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -21,8 +21,8 @@
 [{},{"fn.test":{"value":{"int":0,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1}},"result":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"str":"a"}},"result":{"ok":{"value":{"bool":false}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1},"->":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"str":"a"},"->":{"ok":{"value":{"bool":false}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -34,7 +34,7 @@
 "strictMatchStub"
 
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1}},"result":{"ok":{"value":{"bool":true}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1},"->":{"ok":{"value":{"bool":true}}}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -44,8 +44,8 @@
 
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1}},"result":{"ok":{"value":{"bool":true}}}}}}}]|[{},{"ok":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"str":"a"}},"result":{"ok":{"value":{"bool":false}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1},"->":{"ok":{"value":{"bool":true}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"str":"a"},"->":{"ok":{"value":{"bool":false}}}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -61,8 +61,8 @@
 [{},{"fn.test":{"value":{"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1}},"result":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1,"str":"a"}},"result":{"ok":{"value":{"bool":false}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1},"->":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1,"str":"a"},"->":{"ok":{"value":{"bool":false}}}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -77,8 +77,8 @@
 [{},{"fn.test":{"value":{"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1,"str":"a"}},"result":{"ok":{"value":{"bool":false}}}}}}}]|[{},{"ok":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{"value":{"int":1}},"result":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1,"str":"a"},"->":{"ok":{"value":{"bool":false}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1},"->":{"ok":{"value":{"bool":true}}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -98,7 +98,7 @@
 
 "emptyPartialMatchVerify"
 
-[{},{"fn._createStub":{"stub":{"fn.test":{"arg":{},"result":{"ok":{}}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"allCalls":[],"found":0,"wanted":{"atLeast":{"times":1}}}}}}]
 [{},{"fn._verify":{"function":"fn.test","argument":{},"times":{"exact":{"times":1}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"allCalls":[],"found":0,"wanted":{"exact":{"times":1}}}}}}]
 [{},{"fn._verify":{"function":"fn.test","argument":{},"times":{"atLeast":{"times":1}}}}]|[{},{"fn._verify":{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"allCalls":[],"wanted":{"atLeast":{"times":1}},"found":0}}}}}]
@@ -111,7 +111,7 @@
 [{},{"fn._verify":{"function":"fn.test","argument":{},"times":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"function":"fn.test","argument":{},"times":{"atMost":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{}}],"found":1}}}}]
 
-"partialMatchVerify"
+"TODOpartialMatchVerify"
 
 [{},{"fn._createStub":{"whenFunction":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"function":"fn.test","argument":{"value":{"int":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]

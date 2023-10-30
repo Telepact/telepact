@@ -30,24 +30,6 @@
   },
   {
     "///": [
-      " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
-      " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
-      " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    "
-    ],
-    "fn._verify": {
-      "call": "fn.*.arg",
-      "allowPartialArgMatch!": "boolean",
-      "multiplicity!": "enum._CallCountCriteria"
-    },
-    "->": {
-      "ok": {},
-      "errorVerificationFailure": {
-        "reason": "enum._VerificationFailure"
-      }
-    }
-  },
-  {
-    "///": [
       " Create a function stub that will cause the server to return the `stub` result when the `stub` argument   ",
       " matches the function argument on a request.                                                              ",
       "                                                                                                          ",
@@ -66,6 +48,24 @@
     },
     "->": {
       "ok": {}
+    }
+  },
+  {
+    "///": [
+      " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
+      " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
+      " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    "
+    ],
+    "fn._verify": {
+      "call": "fn.*.arg",
+      "allowPartialArgMatch!": "boolean",
+      "multiplicity!": "enum._CallCountCriteria"
+    },
+    "->": {
+      "ok": {},
+      "errorVerificationFailure": {
+        "reason": "enum._VerificationFailure"
+      }
     }
   },
   {

@@ -65,16 +65,33 @@ class InternalParse {
         }
     }
 
+    private static String findSchemaKey(Map<String, Object> definition) {
+        for (var e : definition.keySet()) {
+            if (e.matches("^(struct|enum|fn|trait)\\..*")) {
+                return e;
+            }
+        }
+        throw new JApiSchemaParseError(
+                "Invalid definition. Each definition should have one key matching the regex ^(struct|enum|fn|trait)\\..*");
+    }
+
     private static JApiSchema newJApiSchema(String jApiSchemaAsJson) {
         var parsedTypes = new HashMap<String, Type>();
 
         var objectMapper = new ObjectMapper();
-        Map<String, Object> japiSchemaAsParsedJson;
+        List<Map<String, Object>> initialJapiSchemaAsParsedJson;
         try {
-            japiSchemaAsParsedJson = objectMapper.readValue(jApiSchemaAsJson, new TypeReference<>() {
+            initialJapiSchemaAsParsedJson = objectMapper.readValue(jApiSchemaAsJson, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new JApiSchemaParseError("Document root must be an object", e);
+            throw new JApiSchemaParseError("Document root must be an array of objects", e);
+        }
+
+        var japiSchemaAsParsedJson = new HashMap<String, Object>();
+
+        for (var definition : initialJapiSchemaAsParsedJson) {
+            String schemaKey = findSchemaKey(definition);
+            japiSchemaAsParsedJson.put(schemaKey, definition);
         }
 
         var schemaKeys = japiSchemaAsParsedJson.keySet();
@@ -82,10 +99,6 @@ class InternalParse {
         var traitSchemaKeys = new HashSet<String>();
 
         for (var schemaKey : schemaKeys) {
-            if (schemaKey.startsWith("//")) {
-                continue;
-            }
-
             if (schemaKey.startsWith("trait.")) {
                 traitSchemaKeys.add(schemaKey);
                 continue;
@@ -432,7 +445,7 @@ class InternalParse {
         }
 
         var regex = Pattern.compile(
-                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*))|((fn\\.(([a-zA-Z_]\\w*)|(\\*)))(\\.(arg|result))?))$");
+                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct)\\.([a-zA-Z_]\\w*))|((fn\\.(([a-zA-Z_]\\w*)|(\\*)))))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
@@ -471,7 +484,8 @@ class InternalParse {
         var customTypeName = matcher.group(7);
         if (customTypeName != null) {
             var typePrefix = matcher.group(8);
-            var typeDefinition = (Map<String, Object>) jApiSchemaAsParsedJson.get(customTypeName);
+            var definition = (Map<String, Object>) jApiSchemaAsParsedJson.get(customTypeName);
+            var typeDefinition = (Map<String, Object>) definition.get(customTypeName);
             return switch (typePrefix) {
                 case "struct" ->
                     parseStructType(typeDefinition, customTypeName, jApiSchemaAsParsedJson, parsedTypes);
@@ -483,34 +497,15 @@ class InternalParse {
         var functionTypeName = matcher.group(11);
         if (functionTypeName != null) {
             var isAllFunctions = matcher.group(14);
-            var isJustArg = matcher.group(15);
-
             if (isAllFunctions == null) {
-                if (isJustArg == null) {
-                    return parseFunctionType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes);
-                } else {
-                    if (".arg".equals(isJustArg)) {
-                        return parseFunctionArgumentType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, false);
-                    } else if (".result".equals(isJustArg)) {
-                        return parseFunctionResultType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, false);
-                    }
-                }
+                return parseFunctionArgumentType(functionTypeName, jApiSchemaAsParsedJson, parsedTypes, false);
             } else {
-                if (isJustArg == null) {
-                    var allFunctionsType = parsedTypes.get(functionTypeName);
-                    if (allFunctionsType == null) {
-                        allFunctionsType = new Enum(functionTypeName, new HashMap<>());
-                        parsedTypes.put(functionTypeName, allFunctionsType);
-                    }
-                    return allFunctionsType;
-                } else {
-                    var allFunctionArgsType = parsedTypes.get(functionTypeName);
-                    if (allFunctionArgsType == null) {
-                        allFunctionArgsType = new Enum(functionTypeName, new HashMap<>());
-                        parsedTypes.put(functionTypeName, allFunctionArgsType);
-                    }
-                    return allFunctionArgsType;
+                var allFunctionArgsType = parsedTypes.get(functionTypeName);
+                if (allFunctionArgsType == null) {
+                    allFunctionArgsType = new Enum(functionTypeName, new HashMap<>());
+                    parsedTypes.put(functionTypeName, allFunctionArgsType);
                 }
+                return allFunctionArgsType;
             }
         }
 
