@@ -29,9 +29,11 @@
     }
   },
   {
-    "///": " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
-    "//1": " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
-    "//2": " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    ",
+    "///": [
+      " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
+      " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
+      " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    "
+    ],
     "fn._verify": {
       "call": "fn.*.arg",
       "allowPartialArgMatch!": "boolean",
@@ -45,16 +47,18 @@
     }
   },
   {
-    "///": " Create a function stub that will cause the server to return the `stub` result when the `stub` argument   ",
-    "//1": " matches the function argument on a request.                                                              ",
-    "//2": "                                                                                                          ",
-    "//3": " If `ignoreMissingArgFields` is `true`, then the server will skip field omission validation on the `stub` ",
-    "//4": " argument, and the stub will match calls where the given `stub` argument is exactly a json sub-structure  ",
-    "//5": " of the request function argument.                                                                        ",
-    "//6": "                                                                                                          ",
-    "//7": " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the   ",
-    "//8": " `stub` result, and the server will generate the necessary data required to make the `result` pass on     ",
-    "//9": " response validation.                                                                                     ",
+    "///": [
+      " Create a function stub that will cause the server to return the `stub` result when the `stub` argument   ",
+      " matches the function argument on a request.                                                              ",
+      "                                                                                                          ",
+      " If `ignoreMissingArgFields` is `true`, then the server will skip field omission validation on the `stub` ",
+      " argument, and the stub will match calls where the given `stub` argument is exactly a json sub-structure  ",
+      " of the request function argument.                                                                        ",
+      "                                                                                                          ",
+      " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the   ",
+      " `stub` result, and the server will generate the necessary data required to make the `result` pass on     ",
+      " response validation.                                                                                     "
+    ],
     "fn._createStub": {
       "stub": "fn.*",
       "ignoreMissingArgFields!": "boolean",
@@ -65,8 +69,10 @@
     }
   },
   {
-    "///": " Verify that no interactions have occurred with this mock or that all ",
-    "//1": " interactions have been verified.                                     ",
+    "///": [
+      " Verify that no interactions have occurred with this mock or that all ",
+      " interactions have been verified.                                     "
+    ],
     "fn._verifyNoMoreInteractions": {},
     "->": {
       "ok": {},
@@ -90,9 +96,11 @@
     }
   },
   {
-    "///": " If random generation is disabled, functions may return a `_errorNoMatchingStub`  ",
-    "//1": " error, indicating that the mock could not return a result for that function call ",
-    "//2": " due to no matching stub being available.                                         ",
+    "///": [
+      " If random generation is disabled, functions may return a `_errorNoMatchingStub`  ",
+      " error, indicating that the mock could not return a result for that function call ",
+      " due to no matching stub being available.                                         "
+    ],
     "trait._Mockable": {
       "fn\\.[a-zA-Z].*": {},
       "->": {

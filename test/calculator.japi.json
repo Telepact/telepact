@@ -47,9 +47,9 @@
   {
     "///": "Compute the `result` of the given `x` and `y` values.",
     "fn.compute": {
-      "x": "enum:Value",
-      "y": "enum:Value",
-      "op": "enum:Operation"
+      "x": "enum.Value",
+      "y": "enum.Value",
+      "op": "enum.Operation"
     },
     "->": {
       "ok": {
@@ -66,7 +66,7 @@
     },
     "->": {
       "ok": {
-        "variables": "array<struct:Variable>"
+        "variables": "array<struct.Variable>"
       }
     }
   },
@@ -76,7 +76,7 @@
     "fn.getPaperTape": {},
     "->": {
       "ok": {
-        "tape": "array<struct:Computation>"
+        "tape": "array<struct.Computation>"
       }
     }
   },
@@ -84,9 +84,9 @@
   {
     "///": " A computation. ",
     "struct.Computation": {
-      "firstOperand": "enum::Value",
-      "secondOperand": "enum::Value",
-      "operation": "enum::Operation",
+      "firstOperand": "enum.Value",
+      "secondOperand": "enum.Value",
+      "operation": "enum.Operation",
       "timestamp": "integer",
       "successful": "boolean"
     }

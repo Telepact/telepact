@@ -1,10 +1,12 @@
 [
   {
-    "///": " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
-    "//1": "                                                                                           ",
-    "//2": " As a reminder:                                                                            ",
-    "//3": " - ! means optional field                                                                  ",
-    "//4": " - ? means nullable type                                                                   ",
+    "///": [
+      " This is the example schema. It is focussed on outlining type edge cases for use in tests. ",
+      "                                                                                           ",
+      " As a reminder:                                                                            ",
+      " - ! means optional field                                                                  ",
+      " - ? means nullable type                                                                   "
+    ],
     "japi.Example": {}
   },
 
@@ -84,9 +86,11 @@
   },
 
   {
-    "///": " The main struct example.                                                                ",
-    "//1": "                                                                                         ",
-    "//2": " The [required] field must be supplied. The optional field does not need to be supplied. ",
+    "///": [
+      " The main struct example.                                                                ",
+      "                                                                                         ",
+      " The [required] field must be supplied. The optional field does not need to be supplied. "
+    ],
     "struct.StructExample": {
       "required": "boolean",
       "optional!": "boolean"

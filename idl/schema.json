@@ -5,9 +5,7 @@
     "oneOf": [
       {
         "type": "object",
-        "additionalProperties": {
-          "type": "string"
-        },
+        "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
           "^struct\\.[a-zA-Z_]\\w*": {
@@ -20,13 +18,19 @@
               }
             }
           }
+        },
+        "properties": {
+          "///": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
         }
       },
       {
         "type": "object",
-        "additionalProperties": {
-          "type": "string"
-        },
+        "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
           "enum\\.[a-zA-Z_]\\w*$": {
@@ -49,13 +53,19 @@
               }
             }
           }
+        },
+        "properties": {
+          "///": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
         }
       },
       {
         "type": "object",
-        "additionalProperties": {
-          "type": "string"
-        },
+        "additionalProperties": false,
         "minProperties": 2,
         "patternProperties": {
           "^fn\\.[a-zA-Z_]\\w*": {
@@ -85,14 +95,18 @@
                 }
               }
             }
+          },
+          "///": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
           }
         }
       },
       {
         "type": "object",
-        "additionalProperties": {
-          "type": "string"
-        },
+        "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
           "^trait\\.[a-zA-Z_]\\w*": {
@@ -112,7 +126,6 @@
             "properties": {
               "->": {
                 "type": "object",
-                "required": ["ok"],
                 "patternProperties": {
                   "^[a-zA-Z_]\\w*?$": {
                     "type": "object",
@@ -126,6 +139,14 @@
                 }
               }
             }
+          }
+        },
+        "properties": {
+          "///": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
           }
         }
       }
