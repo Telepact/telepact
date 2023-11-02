@@ -1,5 +1,13 @@
 [
   {
+    "///": " A stubbed result for matching input. ",
+    "ext._Stub": {}
+  },
+  {
+    "///": " A call of a function. ",
+    "ext._Call": {}
+  },
+  {
     "///": " The number of times a function is allowed to be called. ",
     "enum._CallCountCriteria": {
       "exact": {
@@ -42,7 +50,7 @@
       " response validation.                                                                                     "
     ],
     "fn._createStub": {
-      "stub": "fn.*",
+      "stub": "ext._Stub",
       "ignoreMissingArgFields!": "boolean",
       "generateMissingResultFields!": "boolean"
     },
@@ -57,7 +65,7 @@
       " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    "
     ],
     "fn._verify": {
-      "call": "fn.*.arg",
+      "call": "ext._Call",
       "allowPartialArgMatch!": "boolean",
       "multiplicity!": "enum._CallCountCriteria"
     },
@@ -102,7 +110,7 @@
       " due to no matching stub being available.                                         "
     ],
     "trait._Mockable": {
-      "fn.*": {},
+      "^fn\\.[a-zA-Z]": {},
       "->": {
         "_errorNoMatchingStub": {}
       }

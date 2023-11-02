@@ -252,6 +252,25 @@ class Enum implements Type {
     }
 }
 
+class Fn implements Type {
+
+    public final String name;
+    public final Struct input;
+    public final Enum output;
+
+    public Fn(String name, Struct input, Enum output) {
+        this.name = name;
+        this.input = input;
+        this.output = output;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+}
+
 class MessageParseException extends Exception {
     public MessageParseException(Throwable cause) {
         super(cause);
