@@ -18,29 +18,49 @@ public class MockStubTypeExtension implements TypeExtension {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Map<String, Object> given) {
-
+    public List<ValidationFailure> validate(String path, Object givenObj) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        if (!given.containsKey("->")) {
-            validationFailures.add(new ValidationFailure(path, "StubMissingOutput"));
-        }
+        Map<String, Object> givenMap;
+        try {
+            givenMap = (Map<String, Object>) givenObj;
 
-        var functionName = (String) null;
-        for (var key : given.keySet()) {
-            if (key.startsWith("fn.")) {
-                functionName = key;
-                break;
+            if (!givenMap.containsKey("->")) {
+                validationFailures.add(new ValidationFailure(path, "StubMissingOutput"));
             }
-        }
-        if (functionName == null) {
-            validationFailures.add(new ValidationFailure(path, "StubMissingCall"));
-        }
 
-        var call = given.get(functionName);
-        var functionDef = this.jApiSchema.parsed.get(functionName);
+            var functionName = (String) null;
+            for (var key : givenMap.keySet()) {
+                if (key.startsWith("fn.")) {
+                    functionName = key;
+                    break;
+                }
+            }
+            if (functionName == null) {
+                validationFailures.add(new ValidationFailure(path, "StubMissingCall"));
+            }
 
-        InternalServer.validateStruct(path, null, given)
+            var input = (Map<String, Object>) givenMap.get(functionName);
+            var output = (Map<String, Object>) givenMap.get("->");
+            var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
+
+            var inputFailures = InternalServer.validateStruct(path, functionDef.input.fields, input);
+            var outputFailures = InternalServer.validateEnum(path, functionDef.output.values, output);
+            var failures = new ArrayList<ValidationFailure>();
+            failures.addAll(inputFailures);
+            failures.addAll(outputFailures);
+
+            var validFailures = new ArrayList<>();
+            for (var inputFailure : failures) {
+                if (inputFailure.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING)) {
+                    continue;
+                }
+                validFailures.add(inputFailure);
+            }
+
+        } catch (ClassCastException e) {
+            validationFailures.add(new ValidationFailure(path, "StubTypeRequired"));
+        }
 
         return validationFailures;
     }

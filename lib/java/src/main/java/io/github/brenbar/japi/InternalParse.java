@@ -117,9 +117,14 @@ class InternalParse {
                 throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
             }
 
-            var traitArg = (Struct) parseFunctionType(traitSchemaKey, japiSchemaAsParsedJson, parsedTypes,
-                    true);
-            var traitResult = (Enum) parseFunctionResultType(traitSchemaKey, japiSchemaAsParsedJson, parsedTypes,
+            Map<String, Object> def;
+            try {
+                def = (Map<String, Object>) traitDefinition.get(traitSchemaKey);
+            } catch (ClassCastException e) {
+                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
+            }
+
+            var traitFunction = parseFunctionType("fn", def, parsedTypes,
                     true);
 
             for (var parsedType : parsedTypes.entrySet()) {
@@ -131,7 +136,7 @@ class InternalParse {
                         }
                     }
 
-                    for (var traitArgumentField : traitArg.fields.entrySet()) {
+                    for (var traitArgumentField : traitFunction.input.fields.entrySet()) {
                         var newKey = traitArgumentField.getKey();
                         var argField = f.fields.get("arg");
                         if (argField.typeDeclaration.type instanceof Struct s) {
@@ -143,7 +148,7 @@ class InternalParse {
                         }
                     }
 
-                    for (var traitResultField : traitResult.values.entrySet()) {
+                    for (var traitResultField : traitFunction.output.values.entrySet()) {
                         var newKey = traitResultField.getKey();
                         var resultField = f.fields.get("result");
 
@@ -184,7 +189,7 @@ class InternalParse {
         return new JApiSchema((Map<String, Object>) (Object) japiSchemaAsParsedJson, parsedTypes);
     }
 
-    private static Type parseFunctionType(
+    private static Fn parseFunctionType(
             String schemaKey,
             Map<String, Object> jApiSchemaAsParsedJson,
             Map<String, Type> parsedTypes,

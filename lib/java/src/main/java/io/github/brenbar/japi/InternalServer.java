@@ -356,7 +356,7 @@ class InternalServer {
         return validationFailures;
     }
 
-    private static List<ValidationFailure> validateEnum(
+    static List<ValidationFailure> validateEnum(
             String path,
             Map<String, Struct> referenceValues,
             Map<?, ?> actual) {
