@@ -7,7 +7,7 @@
       " - ! means optional field                                                                  ",
       " - ? means nullable type                                                                   "
     ],
-    "japi.Example": {}
+    "info.Example": {}
   },
 
   {
@@ -76,12 +76,12 @@
       "objEnum!": "object<enum.EnumExample>",
       "objNullEnum!": "object<enum.EnumExample?>",
 
-      "fn!": "fn.example.arg",
-      "nullFn!": "fn.example.arg?",
-      "arrFn!": "array<fn.example.arg>",
-      "arrNullFn!": "array<fn.example.arg?>",
-      "objFn!": "object<fn.example.arg>",
-      "objNullFn!": "object<fn.example.arg?>"
+      "fn!": "fn.example",
+      "nullFn!": "fn.example?",
+      "arrFn!": "array<fn.example>",
+      "arrNullFn!": "array<fn.example?>",
+      "objFn!": "object<fn.example>",
+      "objNullFn!": "object<fn.example?>"
     }
   },
 

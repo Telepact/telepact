@@ -268,7 +268,19 @@ class Fn implements Type {
     public String getName() {
         return name;
     }
+}
 
+class Info implements Type {
+    public final String name;
+
+    public Info(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 }
 
 class MessageParseException extends Exception {
