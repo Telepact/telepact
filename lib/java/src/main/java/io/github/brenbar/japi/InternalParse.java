@@ -128,7 +128,16 @@ class InternalParse {
                 throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
             }
 
-            var traitFunction = parseFunctionType(def, "fn", japiSchemaAsParsedJson, parsedTypes,
+            String traitFunctionKey;
+            if (def.containsKey("^fn\\.[a-zA-Z]")) {
+                traitFunctionKey = "^fn\\.[a-zA-Z]";
+            } else if (def.containsKey("^fn\\.[a-zA-Z_]")) {
+                traitFunctionKey = "^fn\\.[a-zA-Z_]";
+            } else {
+                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
+            }
+
+            var traitFunction = parseFunctionType(def, traitFunctionKey, japiSchemaAsParsedJson, parsedTypes,
                     true);
 
             for (var parsedType : parsedTypes.entrySet()) {
@@ -226,8 +235,10 @@ class InternalParse {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
         }
 
-        if (!resultDefinitionAsParsedJson.containsKey("ok")) {
-            throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
+        if (!isForTrait) {
+            if (!resultDefinitionAsParsedJson.containsKey("ok")) {
+                throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
+            }
         }
 
         var values = new HashMap<String, Struct>();
@@ -260,6 +271,8 @@ class InternalParse {
         var resultType = new Enum("%s.->".formatted(definitionKey), values);
 
         var type = new Fn(definitionKey, argType, resultType);
+
+        parsedTypes.put(definitionKey, type);
 
         return type;
     }
