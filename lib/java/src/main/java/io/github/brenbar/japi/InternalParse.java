@@ -132,6 +132,9 @@ class InternalParse {
             if (def.containsKey("^fn\\.[a-zA-Z]")) {
                 traitFunctionKey = "^fn\\.[a-zA-Z]";
             } else if (def.containsKey("^fn\\.[a-zA-Z_]")) {
+                if (!traitSchemaKey.startsWith("trait._")) {
+                    throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
+                }
                 traitFunctionKey = "^fn\\.[a-zA-Z_]";
             } else {
                 throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
@@ -141,7 +144,7 @@ class InternalParse {
                     true);
 
             for (var parsedType : parsedTypes.entrySet()) {
-                if (parsedType.getKey().matches("^fn\\.[a-zA-Z_]\\w*") && parsedType.getValue() instanceof Struct f) {
+                if (parsedType.getKey().matches(traitFunctionKey) && parsedType.getValue() instanceof Fn f) {
                     if (f.name.startsWith("fn._")) {
                         // Only internal traits can change internal functions
                         if (!traitSchemaKey.startsWith("trait._")) {
@@ -151,27 +154,20 @@ class InternalParse {
 
                     for (var traitArgumentField : traitFunction.input.fields.entrySet()) {
                         var newKey = traitArgumentField.getKey();
-                        var argField = f.fields.get("arg");
-                        if (argField.typeDeclaration.type instanceof Struct s) {
-                            if (s.fields.containsKey(newKey)) {
-                                throw new JApiSchemaParseError(
-                                        "Trait argument field already in use: %s".formatted(newKey));
-                            }
-                            s.fields.put(newKey, traitArgumentField.getValue());
+                        if (f.input.fields.containsKey(newKey)) {
+                            throw new JApiSchemaParseError(
+                                    "Trait argument field already in use: %s".formatted(newKey));
                         }
+                        f.input.fields.put(newKey, traitArgumentField.getValue());
                     }
 
                     for (var traitResultField : traitFunction.output.values.entrySet()) {
                         var newKey = traitResultField.getKey();
-                        var resultField = f.fields.get("result");
-
-                        if (resultField.typeDeclaration.type instanceof Enum e) {
-                            if (e.values.containsKey(newKey)) {
-                                throw new JApiSchemaParseError(
-                                        "Trait argument field already in use: %s".formatted(newKey));
-                            }
-                            e.values.put(newKey, traitResultField.getValue());
+                        if (f.output.values.containsKey(newKey)) {
+                            throw new JApiSchemaParseError(
+                                    "Trait argument field already in use: %s".formatted(newKey));
                         }
+                        f.output.values.put(newKey, traitResultField.getValue());
                     }
                 }
             }
