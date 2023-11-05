@@ -1,4 +1,5 @@
 import shutil
+import subprocess
 import os
 from dataclasses import dataclass
 
@@ -181,3 +182,4 @@ shutil.copyfile('../../common/mock-internal.japi.json', 'src/main/resources/mock
 
 generate_tests()
 generate_mock_tests()
+subprocess.run(['mvn','package'])

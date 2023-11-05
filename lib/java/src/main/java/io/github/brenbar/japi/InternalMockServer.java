@@ -51,7 +51,7 @@ class InternalMockServer {
             case "fn._verify" -> {
                 var verifyFunctionName = (String) argument.get("function");
                 var verifyArgument = (Map<String, Object>) argument.get("argument");
-                var verifyTimes = (Map<String, Object>) argument.getOrDefault("times",
+                var verifyTimes = (Map<String, Object>) argument.getOrDefault("count",
                         Map.of("atLeast", Map.of("times", 1)));
                 var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
 
@@ -264,32 +264,32 @@ class InternalMockServer {
             if (verificationTimes instanceof ExactNumberOfTimes e) {
                 if (matchesFound > e.times) {
                     verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
-                            Map.ofEntries(
+                            new TreeMap<>(Map.ofEntries(
                                     Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
                                     Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson)));
+                                    Map.entry("allCalls", allCallsPseudoJson))));
                 } else if (matchesFound < e.times) {
                     verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
-                            Map.ofEntries(
+                            new TreeMap<>(Map.ofEntries(
                                     Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
                                     Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson)));
+                                    Map.entry("allCalls", allCallsPseudoJson))));
                 }
             } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
                 if (matchesFound > a.times) {
                     verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
-                            Map.ofEntries(
+                            new TreeMap<>(Map.ofEntries(
                                     Map.entry("wanted", Map.of("atMost", Map.of("times", a.times))),
                                     Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson)));
+                                    Map.entry("allCalls", allCallsPseudoJson))));
                 }
             } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
                 if (matchesFound < a.times) {
                     verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
-                            Map.ofEntries(
+                            new TreeMap<>(Map.ofEntries(
                                     Map.entry("wanted", Map.of("atLeast", Map.of("times", a.times))),
                                     Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson)));
+                                    Map.entry("allCalls", allCallsPseudoJson))));
 
                 }
             } else {

@@ -67,7 +67,7 @@
     "fn._verify": {
       "call": "ext._Call",
       "allowPartialArgMatch!": "boolean",
-      "multiplicity!": "enum._CallCountCriteria"
+      "count!": "enum._CallCountCriteria"
     },
     "->": {
       "ok": {},
