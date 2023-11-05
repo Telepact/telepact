@@ -602,6 +602,8 @@ class InternalServer {
                     return Collections.singletonList(
                             new ValidationFailure(path, ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_TYPE));
                 }
+            } else if (expectedType instanceof Fn f) {
+                return validateType(path, new TypeDeclaration(f.arg, false), value);
             } else if (expectedType instanceof JsonAny a) {
                 // all values are valid for any
                 return Collections.emptyList();
