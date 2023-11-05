@@ -270,7 +270,7 @@ class InternalParse {
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields);
+            var enumStruct = new Struct("->.%s".formatted(enumValue), fields);
 
             values.put(enumValue, enumStruct);
         }

@@ -112,7 +112,7 @@ class InternalServer {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var headerValidationFailures = validateHeaders(requestHeaders, jApiSchema);
+        var headerValidationFailures = validateHeaders(requestHeaders, jApiSchema, functionType);
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
@@ -234,7 +234,7 @@ class InternalServer {
     }
 
     private static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, JApiSchema jApiSchema) {
+            Map<String, Object> headers, JApiSchema jApiSchema, Fn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
@@ -265,12 +265,20 @@ class InternalServer {
             }
             for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
                 var structName = entry.getKey();
-                if (!structName.startsWith("struct.")) {
+                if (!structName.startsWith("struct.") && !structName.startsWith("->.")) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "SelectHeaderKeyMustBeStructReference"));
                     continue;
                 }
-                var structReference = (Struct) jApiSchema.parsed.get(structName);
+
+                Struct structReference;
+                if (structName.startsWith("->.")) {
+                    var resultEnumValue = structName.split("->.")[1];
+                    structReference = functionType.result.values.get(resultEnumValue);
+                } else {
+                    structReference = (Struct) jApiSchema.parsed.get(structName);
+                }
+
                 if (structReference == null) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "UnknownStruct"));
@@ -307,6 +315,7 @@ class InternalServer {
         }
 
         return validationFailures;
+
     }
 
     private static List<ValidationFailure> validateResultEnum(
