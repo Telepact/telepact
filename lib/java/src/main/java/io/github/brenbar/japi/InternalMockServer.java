@@ -49,15 +49,19 @@ class InternalMockServer {
                 return new Message(Map.of("ok", Map.of()));
             }
             case "fn._verify" -> {
-                var verifyFunctionName = (String) argument.get("function");
-                var verifyArgument = (Map<String, Object>) argument.get("argument");
+                var givenCall = (Map<String, Object>) argument.get("call");
+
+                var call = givenCall.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                        .findAny().get();
+                var callFunctionName = call.getKey();
+                var callArg = (Map<String, Object>) call.getValue();
                 var verifyTimes = (Map<String, Object>) argument.getOrDefault("count",
                         Map.of("atLeast", Map.of("times", 1)));
                 var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
 
-                var verificationResult = verify(verifyFunctionName, verifyArgument, allowArgumentPartialMatch,
+                var verificationResult = verify(callFunctionName, callArg, allowArgumentPartialMatch,
                         verificationTimes,
                         invocations);
                 return new Message(verificationResult);
