@@ -144,31 +144,42 @@ class InternalParse {
                     true);
 
             for (var parsedType : parsedTypes.entrySet()) {
-                if (parsedType.getKey().matches(traitFunctionKey) && parsedType.getValue() instanceof Fn f) {
-                    if (f.name.startsWith("fn._")) {
-                        // Only internal traits can change internal functions
-                        if (!traitSchemaKey.startsWith("trait._")) {
-                            continue;
-                        }
-                    }
+                Fn f;
+                try {
+                    f = (Fn) parsedType.getValue();
+                } catch (ClassCastException e) {
+                    continue;
+                }
 
-                    for (var traitArgumentField : traitFunction.input.fields.entrySet()) {
-                        var newKey = traitArgumentField.getKey();
-                        if (f.input.fields.containsKey(newKey)) {
-                            throw new JApiSchemaParseError(
-                                    "Trait argument field already in use: %s".formatted(newKey));
-                        }
-                        f.input.fields.put(newKey, traitArgumentField.getValue());
-                    }
+                var regex = Pattern.compile(traitFunctionKey);
+                var matcher = regex.matcher(f.name);
+                if (!matcher.find()) {
+                    continue;
+                }
 
-                    for (var traitResultField : traitFunction.output.values.entrySet()) {
-                        var newKey = traitResultField.getKey();
-                        if (f.output.values.containsKey(newKey)) {
-                            throw new JApiSchemaParseError(
-                                    "Trait argument field already in use: %s".formatted(newKey));
-                        }
-                        f.output.values.put(newKey, traitResultField.getValue());
+                if (f.name.startsWith("fn._")) {
+                    // Only internal traits can change internal functions
+                    if (!traitSchemaKey.startsWith("trait._")) {
+                        continue;
                     }
+                }
+
+                for (var traitArgumentField : traitFunction.arg.fields.entrySet()) {
+                    var newKey = traitArgumentField.getKey();
+                    if (f.arg.fields.containsKey(newKey)) {
+                        throw new JApiSchemaParseError(
+                                "Trait argument field already in use: %s".formatted(newKey));
+                    }
+                    f.arg.fields.put(newKey, traitArgumentField.getValue());
+                }
+
+                for (var traitResultField : traitFunction.result.values.entrySet()) {
+                    var newKey = traitResultField.getKey();
+                    if (f.result.values.containsKey(newKey)) {
+                        throw new JApiSchemaParseError(
+                                "Trait argument field already in use: %s".formatted(newKey));
+                    }
+                    f.result.values.put(newKey, traitResultField.getValue());
                 }
             }
         }
@@ -268,8 +279,6 @@ class InternalParse {
 
         var type = new Fn(definitionKey, argType, resultType);
 
-        parsedTypes.put(definitionKey, type);
-
         return type;
     }
 
@@ -293,8 +302,6 @@ class InternalParse {
         }
 
         var type = new Struct(definitionKey, fields);
-
-        parsedTypes.put(definitionKey, type);
 
         return type;
     }
@@ -337,8 +344,6 @@ class InternalParse {
         }
 
         var type = new Enum(definitionKey, values);
-
-        parsedTypes.put(definitionKey, type);
 
         return type;
     }
@@ -441,7 +446,7 @@ class InternalParse {
         if (customTypeName != null) {
             var typePrefix = matcher.group(8);
             var definition = (Map<String, Object>) jApiSchemaAsParsedJson.get(customTypeName);
-            return switch (typePrefix) {
+            var type = switch (typePrefix) {
                 case "struct" ->
                     parseStructType(definition, customTypeName, jApiSchemaAsParsedJson, parsedTypes);
                 case "enum" -> parseEnumType(definition, typeName, jApiSchemaAsParsedJson, parsedTypes);
@@ -449,6 +454,10 @@ class InternalParse {
                 case "info" -> new Info(customTypeName);
                 default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(collectionTypeName));
             };
+
+            parsedTypes.put(customTypeName, type);
+
+            return type;
         }
 
         throw new JApiSchemaParseError("Invalid type: %s".formatted(typeName));

@@ -255,13 +255,13 @@ class Enum implements Type {
 class Fn implements Type {
 
     public final String name;
-    public final Struct input;
-    public final Enum output;
+    public final Struct arg;
+    public final Enum result;
 
     public Fn(String name, Struct input, Enum output) {
         this.name = name;
-        this.input = input;
-        this.output = output;
+        this.arg = input;
+        this.result = output;
     }
 
     @Override

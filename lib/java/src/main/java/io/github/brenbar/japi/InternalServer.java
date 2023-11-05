@@ -73,8 +73,8 @@ class InternalServer {
             requestTarget = "fn._unknown";
         }
         var functionType = (Fn) jApiSchema.parsed.get(requestTarget);
-        var resultEnumType = functionType.output;
-        var argStructType = (Struct) functionType.input;
+        var resultEnumType = functionType.result;
+        var argStructType = (Struct) functionType.arg;
 
         // Reflect call id
         var callId = requestHeaders.get("_id");
