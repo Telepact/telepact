@@ -54,11 +54,16 @@ public class MockServer {
                 jApiSchemaAsJson,
                 InternalMockJApi.getJson()));
 
-        options.addTypeExtension("ext._Call", new MockCallTypeExtension());
-        options.addTypeExtension("ext._Stub", new MockStubTypeExtension());
+        var jApiSchemaCopy = new JApiSchema(new HashMap<>(), new HashMap<>());
+
+        options.addTypeExtension("ext._Call", new MockCallTypeExtension(jApiSchemaCopy));
+        options.addTypeExtension("ext._Stub", new MockStubTypeExtension(jApiSchemaCopy));
 
         this.server = new Server(combinedSchemaJson, this::handle,
                 new Server.Options().setOnError(options.onError).setTypeExtensions(options.typeExtensions));
+
+        jApiSchemaCopy.original.putAll(this.server.jApiSchema.original);
+        jApiSchemaCopy.parsed.putAll(this.server.jApiSchema.parsed);
 
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;

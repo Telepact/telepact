@@ -6,8 +6,14 @@ import java.util.Map;
 
 public class MockCallTypeExtension implements TypeExtension {
 
+    public final JApiSchema jApiSchema;
+
+    public MockCallTypeExtension(JApiSchema jApiSchema) {
+        this.jApiSchema = jApiSchema;
+    }
+
     @Override
-    public List<ValidationFailure> validate(String path, Object givenObj, JApiSchema jApiSchema) {
+    public List<ValidationFailure> validate(String path, Object givenObj) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         Map<String, Object> givenMap;
@@ -26,7 +32,7 @@ public class MockCallTypeExtension implements TypeExtension {
             }
 
             var input = (Map<String, Object>) givenMap.get(functionName);
-            var functionDef = (Fn) jApiSchema.parsed.get(functionName);
+            var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
 
             var inputFailures = InternalServer.validateStruct(path, functionDef.arg.fields, input);
             var failures = new ArrayList<ValidationFailure>();

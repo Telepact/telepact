@@ -613,6 +613,8 @@ class InternalServer {
                 }
             } else if (expectedType instanceof Fn f) {
                 return validateType(path, new TypeDeclaration(f.arg, false), value);
+            } else if (expectedType instanceof Ext e) {
+                return e.typeExtension.validate(path, value);
             } else if (expectedType instanceof JsonAny a) {
                 // all values are valid for any
                 return Collections.emptyList();

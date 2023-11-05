@@ -6,8 +6,14 @@ import java.util.Map;
 
 public class MockStubTypeExtension implements TypeExtension {
 
+    public final JApiSchema jApiSchema;
+
+    public MockStubTypeExtension(JApiSchema jApiSchema) {
+        this.jApiSchema = jApiSchema;
+    }
+
     @Override
-    public List<ValidationFailure> validate(String path, Object givenObj, JApiSchema jApiSchema) {
+    public List<ValidationFailure> validate(String path, Object givenObj) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         Map<String, Object> givenMap;
@@ -31,7 +37,7 @@ public class MockStubTypeExtension implements TypeExtension {
 
             var input = (Map<String, Object>) givenMap.get(functionName);
             var output = (Map<String, Object>) givenMap.get("->");
-            var functionDef = (Fn) jApiSchema.parsed.get(functionName);
+            var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
 
             var inputFailures = InternalServer.validateStruct(path, functionDef.arg.fields, input);
             var outputFailures = InternalServer.validateEnum(path, functionDef.result.values, output);
