@@ -27,17 +27,17 @@ class InternalMockServer {
         switch (functionName) {
             case "fn._createStub" -> {
                 var givenStub = (Map<String, Object>) argument.get("stub");
-                var entry = givenStub.entrySet().stream().findFirst().get();
-                var whenFunction = entry.getKey();
-                var functionStruct = (Map<String, Object>) entry.getValue();
-                var whenArgument = (Map<String, Object>) functionStruct.get("arg");
-                var thenResult = (Map<String, Object>) functionStruct
-                        .get("result");
+
+                var stubCall = givenStub.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                        .findAny().get();
+                var stubFunctionName = stubCall.getKey();
+                var stubArg = (Map<String, Object>) stubCall.getValue();
+                var stubResult = (Map<String, Object>) givenStub.get("->");
                 var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("ignoreMissingArgFields", false);
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
                         false);
 
-                var stub = new MockStub(whenFunction, new TreeMap<>(whenArgument), thenResult);
+                var stub = new MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult);
                 if (allowArgumentPartialMatch) {
                     stub.setAllowArgumentPartialMatch(allowArgumentPartialMatch);
                 }
