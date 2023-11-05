@@ -27,12 +27,12 @@
       "tooFewMatchingCalls": {
         "wanted": "enum._CallCountCriteria",
         "found": "integer",
-        "allCalls": "array<fn.*.arg>"
+        "allCalls": "array<ext._Call>"
       },
       "tooManyMatchingCalls": {
         "wanted": "enum._CallCountCriteria",
         "found": "integer",
-        "allCalls": "array<fn.*.arg>"
+        "allCalls": "array<ext._Call>"
       }
     }
   },
@@ -85,7 +85,7 @@
     "->": {
       "ok": {},
       "errorVerificationFailure": {
-        "additionalUnverifiedCalls": "array<fn.*>"
+        "additionalUnverifiedCalls": "array<ext._Call>"
       }
     }
   },

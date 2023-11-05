@@ -8,6 +8,26 @@
         "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
+          "^info\\.[a-zA-Z_]\\w*": {
+            "type": "object",
+            "description": "Information about the API.",
+            "additionalProperties": false
+          }
+        },
+        "properties": {
+          "///": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
+        }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "patternProperties": {
           "^struct\\.[a-zA-Z_]\\w*": {
             "type": "object",
             "description": "A struct with 0 or more fields.",
@@ -149,13 +169,33 @@
             ]
           }
         }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "patternProperties": {
+          "^ext\\.[a-zA-Z_]\\w*": {
+            "type": "object",
+            "description": "A type extension.",
+            "additionalProperties": false
+          }
+        },
+        "properties": {
+          "///": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
+        }
       }
     ]
   },
   "$defs": {
     "typeDeclaration": {
       "type": "string",
-      "pattern": "^((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)|((array|object)<(((boolean|integer|number|string|any)|((enum|struct)\\.([a-zA-Z_]\\w*))|(fn\\.(([a-zA-Z_]\\w*)|\\*)(\\.arg)?)|((array|object)<any>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
+      "pattern": "^((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<any>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
       "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {

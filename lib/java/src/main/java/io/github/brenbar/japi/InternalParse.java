@@ -71,12 +71,12 @@ class InternalParse {
 
     private static String findSchemaKey(Map<String, Object> definition) {
         for (var e : definition.keySet()) {
-            if (e.matches("^(struct|enum|fn|trait|info)\\..*")) {
+            if (e.matches("^(struct|enum|fn|trait|info|ext)\\..*")) {
                 return e;
             }
         }
         throw new JApiSchemaParseError(
-                "Invalid definition. Each definition should have one key matching the regex ^(struct|enum|fn|trait|info)\\..* but was %s"
+                "Invalid definition. Each definition should have one key matching the regex ^(struct|enum|fn|trait|info|ext)\\..* but was %s"
                         .formatted(definition));
     }
 
