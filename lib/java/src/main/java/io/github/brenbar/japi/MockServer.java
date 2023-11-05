@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import io.github.brenbar.japi.Server.Options;
-
 /**
  * A Mock instance of a jAPI server.
  * 
@@ -55,7 +53,12 @@ public class MockServer {
         var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
                 InternalMockJApi.getJson()));
-        this.server = new Server(combinedSchemaJson, this::handle, new Server.Options().setOnError(options.onError));
+
+        options.addTypeExtension("ext._Call", new MockCallTypeExtension());
+        options.addTypeExtension("ext._Stub", new MockStubTypeExtension());
+
+        this.server = new Server(combinedSchemaJson, this::handle,
+                new Server.Options().setOnError(options.onError).setTypeExtensions(options.typeExtensions));
 
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;

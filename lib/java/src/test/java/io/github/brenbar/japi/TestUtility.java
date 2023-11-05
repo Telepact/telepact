@@ -113,8 +113,7 @@ public class TestUtility {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var server = new MockServer(json,
                 new io.github.brenbar.japi.MockServer.Options().setOnError((e) -> e.printStackTrace())
-                        .setEnableGeneratedDefaultStub(false)
-                        .addTypeExtension("ext._Stub", new MockStubTypeExtension()));
+                        .setEnableGeneratedDefaultStub(false));
         return server;
     }
 

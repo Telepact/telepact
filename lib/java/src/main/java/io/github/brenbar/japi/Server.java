@@ -25,8 +25,8 @@ public class Server {
             return this;
         }
 
-        public Options addTypeExtension(String definitionKey, TypeExtension typeExtension) {
-            this.typeExtensions.put(definitionKey, typeExtension);
+        public Options setTypeExtensions(Map<String, TypeExtension> typeExtensions) {
+            this.typeExtensions = typeExtensions;
             return this;
         }
     }
