@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.japi.Client.Adapter;
+import io.github.brenbar.japi.Server.Options;
 
 public class TestUtility {
 
@@ -51,7 +52,7 @@ public class TestUtility {
     public static void test(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var server = new Server(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
+        var server = new Server(json, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
@@ -71,7 +72,7 @@ public class TestUtility {
     public static void testBinary(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var server = new Server(json, TestUtility::handle).setOnError((e) -> e.printStackTrace());
+        var server = new Server(json, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
@@ -110,9 +111,10 @@ public class TestUtility {
 
     public static MockServer generatedMockTestSetup() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var server = new MockServer(json)
-                .setOnError((e) -> e.printStackTrace())
-                .setEnableGeneratedDefaultStub(false);
+        var server = new MockServer(json,
+                new io.github.brenbar.japi.MockServer.Options().setOnError((e) -> e.printStackTrace())
+                        .setEnableGeneratedDefaultStub(false)
+                        .addTypeExtension("ext._Stub", new MockStubTypeExtension()));
         return server;
     }
 

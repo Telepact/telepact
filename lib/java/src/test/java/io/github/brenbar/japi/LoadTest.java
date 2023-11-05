@@ -16,6 +16,7 @@ import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 
 import io.github.brenbar.japi.Client.Adapter;
+import io.github.brenbar.japi.MockServer.Options;
 import io.nats.client.Nats;
 
 public class LoadTest {
@@ -25,7 +26,7 @@ public class LoadTest {
     public void test() throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
 
-        var server = new MockServer(json)
+        var server = new MockServer(json, new Options())
                 .setOnError((e) -> e.printStackTrace())
                 .setEnableGeneratedDefaultStub(true);
 

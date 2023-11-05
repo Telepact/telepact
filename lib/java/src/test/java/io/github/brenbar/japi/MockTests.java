@@ -12,15 +12,16 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import io.github.brenbar.japi.MockServer.Options;
+
 public class MockTests {
 
         @Test
         public void testGeneratedValues() throws IOException {
                 var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
-                var processor = new MockServer(json);
-                processor.server.setOnError((Throwable e) -> {
+                var processor = new MockServer(json, new Options().setOnError((Throwable e) -> {
                         e.printStackTrace();
-                });
+                }));
                 processor.resetRandomSeed(0);
                 var client = new Client((m, s) -> {
                         return CompletableFuture.supplyAsync(() -> s.deserialize(processor.process(s.serialize(m))));
@@ -46,10 +47,9 @@ public class MockTests {
         @Disabled("TODO")
         public void testMocking() throws IOException {
                 var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
-                var mock = new MockServer(json);
-                mock.server.setOnError((Throwable e) -> {
+                var mock = new MockServer(json, new Options().setOnError((Throwable e) -> {
                         e.printStackTrace();
-                });
+                }));
                 mock.resetRandomSeed(0);
                 var client = new Client((m, s) -> {
                         return CompletableFuture.supplyAsync(() -> s.deserialize(mock.process(s.serialize(m))));

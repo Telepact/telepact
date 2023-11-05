@@ -232,7 +232,7 @@ class Struct implements Type {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 }
 
@@ -248,7 +248,7 @@ class Enum implements Type {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 }
 
@@ -266,7 +266,7 @@ class Fn implements Type {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 }
 
@@ -279,8 +279,24 @@ class Info implements Type {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
+}
+
+class Ext implements Type {
+    public final String name;
+    public final TypeExtension typeExtension;
+
+    public Ext(String name, TypeExtension typeExtension) {
+        this.name = name;
+        this.typeExtension = typeExtension;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
 }
 
 class MessageParseException extends Exception {

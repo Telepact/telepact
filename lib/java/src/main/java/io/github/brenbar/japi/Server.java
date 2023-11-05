@@ -9,6 +9,28 @@ import java.util.function.Function;
  */
 public class Server {
 
+    public static class Options {
+        public Consumer<Throwable> onError = (e) -> {
+        };
+        public SerializationStrategy serializationStrategy = new InternalDefaultSerializationStrategy();
+        public Map<String, TypeExtension> typeExtensions = new HashMap<>();
+
+        public Options setOnError(Consumer<Throwable> onError) {
+            this.onError = onError;
+            return this;
+        }
+
+        public Options setSerializationStrategy(SerializationStrategy serializationStrategy) {
+            this.serializationStrategy = serializationStrategy;
+            return this;
+        }
+
+        public Options addTypeExtension(String definitionKey, TypeExtension typeExtension) {
+            this.typeExtensions.put(definitionKey, typeExtension);
+            return this;
+        }
+    }
+
     JApiSchema jApiSchema;
     Function<Message, Message> handler;
     Consumer<Throwable> onError;
@@ -20,39 +42,15 @@ public class Server {
      * @param jApiSchemaAsJson
      * @param handler
      */
-    public Server(String jApiSchemaAsJson, Function<Message, Message> handler) {
-        this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson);
+    public Server(String jApiSchemaAsJson, Function<Message, Message> handler, Options options) {
+        this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson, options.typeExtensions);
         this.handler = handler;
-        this.onError = (e) -> {
-        };
+
+        this.onError = options.onError;
 
         var binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
-        var serializationStrategy = new InternalDefaultSerializationStrategy();
         var binaryEncodingStrategy = new InternalServerBinaryEncodingStrategy(binaryEncoder);
-        this.serializer = new Serializer(serializationStrategy, binaryEncodingStrategy);
-    }
-
-    /**
-     * Set an error handler to run on every error that occurs during request
-     * processing.
-     * 
-     * @param onError
-     * @return
-     */
-    public Server setOnError(Consumer<Throwable> onError) {
-        this.onError = onError;
-        return this;
-    }
-
-    /**
-     * Set an alternative serialization implementation.
-     * 
-     * @param strategy
-     * @return
-     */
-    public Server setSerializationStrategy(SerializationStrategy strategy) {
-        this.serializer.serializationStrategy = strategy;
-        return this;
+        this.serializer = new Serializer(options.serializationStrategy, binaryEncodingStrategy);
     }
 
     /**

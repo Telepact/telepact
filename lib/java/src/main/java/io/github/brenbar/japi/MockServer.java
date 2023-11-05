@@ -1,9 +1,12 @@
 package io.github.brenbar.japi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import io.github.brenbar.japi.Server.Options;
 
 /**
  * A Mock instance of a jAPI server.
@@ -12,6 +15,29 @@ import java.util.function.Consumer;
  * interact with a functional jAPI with common mocking strategies.
  */
 public class MockServer {
+
+    public static class Options {
+        public Consumer<Throwable> onError = (e) -> {
+        };
+        public Map<String, TypeExtension> typeExtensions = new HashMap<>();
+        public boolean enableGeneratedDefaultStub = true;
+
+        public Options setOnError(Consumer<Throwable> onError) {
+            this.onError = onError;
+            return this;
+        }
+
+        public Options addTypeExtension(String definitionKey, TypeExtension typeExtension) {
+            this.typeExtensions.put(definitionKey, typeExtension);
+            return this;
+        }
+
+        public Options setEnableGeneratedDefaultStub(boolean enableGeneratedDefaultStub) {
+            this.enableGeneratedDefaultStub = enableGeneratedDefaultStub;
+            return this;
+        }
+
+    }
 
     public final Server server;
     private final MockRandom random;
@@ -25,14 +51,14 @@ public class MockServer {
      * 
      * @param jApiSchemaAsJson
      */
-    public MockServer(String jApiSchemaAsJson) {
+    public MockServer(String jApiSchemaAsJson, Options options) {
         var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
                 InternalMockJApi.getJson()));
-        this.server = new Server(combinedSchemaJson, this::handle);
+        this.server = new Server(combinedSchemaJson, this::handle, new Server.Options().setOnError(options.onError));
 
         this.random = new MockRandom();
-        this.enableGeneratedDefaultStub = true;
+        this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
     }
 
     /**
