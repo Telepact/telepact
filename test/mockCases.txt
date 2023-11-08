@@ -113,10 +113,10 @@
 
 "TODOpartialMatchVerify"
 
-[{},{"fn._createStub":{"whenFunction":"fn.test","whenArgument":{},"strictMatch":false,"thenResult":{"ok":{}}}}]|[{},{"ok":{}}]
-[{},{"fn._verify":{"function":"fn.test","argument":{"value":{"int":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}},"ignoreMissingArgFields":true}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"ok":{}}]
-[{},{"fn._verify":{"function":"fn.test","argument":{"value":{"int":0}}}}]|[{},{"ok":{}}]
-[{},{"fn._verify":{"function":"fn.test","argument":{"value":{"int":0}}},"times":{"exact":{"times":1}}}]|[{},{"ok":{}}]
-[{},{"fn._verify":{"function":"fn.test","argument":{"value":{"int":0}}},"times":{"atLeast":{"times":1}}}]|[{},{"ok":{}}]
-[{},{"fn._verify":{"function":"fn.test","argument":{"value":{"int":0}}},"times":{"atMost":{"times":0}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
