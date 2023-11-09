@@ -33,7 +33,7 @@ class InternalMockServer {
                 var stubFunctionName = stubCall.getKey();
                 var stubArg = (Map<String, Object>) stubCall.getValue();
                 var stubResult = (Map<String, Object>) givenStub.get("->");
-                var allowArgumentPartialMatch = (Boolean) argument.getOrDefault("ignoreMissingArgFields", false);
+                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", false));
                 var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
                         false);
 
