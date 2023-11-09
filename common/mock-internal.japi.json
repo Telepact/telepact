@@ -51,8 +51,7 @@
     ],
     "fn._createStub": {
       "stub": "ext._Stub",
-      "strictMatch!": "boolean",
-      "generateMissingResultFields!": "boolean"
+      "strictMatch!": "boolean"
     },
     "->": {
       "ok": {}

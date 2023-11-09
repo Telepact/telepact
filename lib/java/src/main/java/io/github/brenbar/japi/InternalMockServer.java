@@ -34,15 +34,10 @@ class InternalMockServer {
                 var stubArg = (Map<String, Object>) stubCall.getValue();
                 var stubResult = (Map<String, Object>) givenStub.get("->");
                 var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", false));
-                var randomFillMissingResultFields = (Boolean) argument.getOrDefault("generateMissingResultFields",
-                        false);
 
                 var stub = new MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult);
                 if (allowArgumentPartialMatch) {
                     stub.setAllowArgumentPartialMatch(allowArgumentPartialMatch);
-                }
-                if (randomFillMissingResultFields) {
-                    stub.setGenerateMissingResultFields(randomFillMissingResultFields);
                 }
 
                 stubs.add(0, stub);
