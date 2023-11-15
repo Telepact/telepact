@@ -1,8 +1,8 @@
 "emptyPartialMatchStub"
 
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":true}}}}}}]|[{},{"ok":{}}]
-[{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":true}}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":true,"struct":{"optional":true}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":true,"struct":{"optional":true,"required":false}}}}]
 
 "partialMatchStub"
 
