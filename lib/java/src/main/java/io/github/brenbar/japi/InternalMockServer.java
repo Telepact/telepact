@@ -2,6 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,15 +77,23 @@ class InternalMockServer {
             default -> {
                 invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
 
+                var definition = (Fn) jApiSchema.parsed.get(functionName);
+
                 for (var stub : stubs) {
                     if (Objects.equals(stub.whenFunction, functionName)) {
                         if (stub.allowArgumentPartialMatch) {
                             if (isSubMap(stub.whenArgument, argument)) {
-                                return new Message(stub.thenResult);
+                                var includeRandomOptionalFields = false;
+                                var result = constructRandomEnum(definition.result.values, stub.thenResult,
+                                        includeRandomOptionalFields, random);
+                                return new Message(result);
                             }
                         } else {
                             if (Objects.equals(stub.whenArgument, argument)) {
-                                return new Message(stub.thenResult);
+                                var includeRandomOptionalFields = false;
+                                var result = constructRandomEnum(definition.result.values, stub.thenResult,
+                                        includeRandomOptionalFields, random);
+                                return new Message(result);
                             }
                         }
                     }
@@ -94,12 +103,12 @@ class InternalMockServer {
                     return new Message(Map.of("_errorNoMatchingStub", Map.of()));
                 }
 
-                var definition = (Fn) jApiSchema.parsed.get(functionName);
-
                 if (definition != null) {
                     var resultEnum = (Enum) definition.result;
                     var okStructRef = resultEnum.values.get("ok");
-                    var randomOkStruct = constructRandomStruct(okStructRef.fields, random);
+                    var includeRandomOptionalFields = true;
+                    var randomOkStruct = constructRandomStruct(okStructRef.fields, new HashMap<>(),
+                            includeRandomOptionalFields, random);
                     return new Message(Map.of("ok", randomOkStruct));
                 } else {
                     throw new JApiProcessError("Unexpected unknown function: %s".formatted(functionName));
@@ -158,48 +167,116 @@ class InternalMockServer {
     }
 
     private static Map<String, Object> constructRandomStruct(
-            Map<String, FieldDeclaration> referenceStruct, MockRandom random) {
+            Map<String, FieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
+            boolean includeRandomOptionalFields, MockRandom random) {
 
         var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
         var obj = new TreeMap<String, Object>();
         for (var field : sortedReferenceStruct) {
+            var fieldName = field.getKey();
             var fieldDeclaration = field.getValue();
-            if (fieldDeclaration.optional && random.nextBoolean()) {
-                continue;
+            var startingValue = startingStruct.get(fieldName);
+            var useStartingValue = startingStruct.containsKey(fieldName);
+            Object value;
+            if (useStartingValue) {
+                value = constructRandomType(fieldDeclaration.typeDeclaration, startingValue, useStartingValue,
+                        includeRandomOptionalFields, random);
+            } else {
+                if (!fieldDeclaration.optional) {
+                    value = constructRandomType(fieldDeclaration.typeDeclaration, null, false,
+                            includeRandomOptionalFields,
+                            random);
+                } else {
+                    if (!includeRandomOptionalFields) {
+                        continue;
+                    }
+                    if (random.nextBoolean()) {
+                        continue;
+                    }
+                    value = constructRandomType(fieldDeclaration.typeDeclaration, null, false,
+                            includeRandomOptionalFields,
+                            random);
+                }
             }
-            obj.put(field.getKey(), constructRandomType(fieldDeclaration.typeDeclaration, random));
+            obj.put(fieldName, value);
         }
         return obj;
     }
 
-    private static Object constructRandomType(TypeDeclaration typeDeclaration, MockRandom random) {
-        if (typeDeclaration.nullable && random.nextBoolean()) {
+    private static Object constructRandomType(TypeDeclaration typeDeclaration, Object startingValue,
+            boolean useStartingValue,
+            boolean includeRandomOptionalFields,
+            MockRandom random) {
+
+        if (typeDeclaration.nullable && !useStartingValue && random.nextBoolean()) {
             return null;
         } else if (typeDeclaration.type instanceof JsonBoolean b) {
-            return random.nextBoolean();
+            if (useStartingValue) {
+                return startingValue;
+            } else {
+                return random.nextBoolean();
+            }
         } else if (typeDeclaration.type instanceof JsonInteger i) {
-            return random.nextInt();
+            if (useStartingValue) {
+                return startingValue;
+            } else {
+                return random.nextInt();
+            }
         } else if (typeDeclaration.type instanceof JsonNumber n) {
-            return random.nextDouble();
+            if (useStartingValue) {
+                return startingValue;
+            } else {
+                return random.nextDouble();
+            }
         } else if (typeDeclaration.type instanceof JsonString s) {
-            return random.nextString();
+            if (useStartingValue) {
+                return startingValue;
+            } else {
+                return random.nextString();
+            }
         } else if (typeDeclaration.type instanceof JsonArray a) {
-            var length = random.nextInt(3);
-            var array = new ArrayList<Object>();
-            for (int i = 0; i < length; i += 1) {
-                array.add(constructRandomType(a.nestedType, random));
+            if (useStartingValue) {
+                var startingArray = (List<Object>) startingValue;
+                var array = new ArrayList<Object>();
+                for (var startingArrayValue : startingArray) {
+                    var value = constructRandomType(a.nestedType, startingArrayValue, true, includeRandomOptionalFields,
+                            random);
+                    array.add(value);
+                }
+                return array;
+            } else {
+                var length = random.nextInt(3);
+                var array = new ArrayList<Object>();
+                for (int i = 0; i < length; i += 1) {
+                    var value = constructRandomType(a.nestedType, null, false, includeRandomOptionalFields, random);
+                    array.add(value);
+                }
+                return array;
             }
-            return array;
         } else if (typeDeclaration.type instanceof JsonObject o) {
-            var length = random.nextInt(3);
-            var obj = new TreeMap<String, Object>();
-            for (int i = 0; i < length; i += 1) {
-                var key = random.nextString();
-                obj.put(key, constructRandomType(o.nestedType, random));
+            if (useStartingValue) {
+                var startingObj = (Map<String, Object>) startingValue;
+                var obj = new TreeMap<String, Object>();
+                for (var startingObjEntry : startingObj.entrySet()) {
+                    var key = startingObjEntry.getKey();
+                    var startingObjValue = startingObjEntry.getValue();
+                    var value = constructRandomType(o.nestedType, startingObjValue, true, includeRandomOptionalFields,
+                            random);
+                    obj.put(key, value);
+                }
+                return obj;
+            } else {
+                var length = random.nextInt(3);
+                var obj = new TreeMap<String, Object>();
+                for (int i = 0; i < length; i += 1) {
+                    var key = random.nextString();
+                    var value = constructRandomType(o.nestedType, null, false, includeRandomOptionalFields, random);
+                    obj.put(key, value);
+                }
+                return obj;
             }
-            return obj;
         } else if (typeDeclaration.type instanceof JsonAny a) {
             var selectType = random.nextInt(3);
             if (selectType == 0) {
@@ -210,28 +287,57 @@ class InternalMockServer {
                 return random.nextString();
             }
         } else if (typeDeclaration.type instanceof Struct s) {
-            return constructRandomStruct(s.fields, random);
+            if (useStartingValue) {
+                var startingStructValue = (Map<String, Object>) startingValue;
+                return constructRandomStruct(s.fields, startingStructValue, includeRandomOptionalFields, random);
+            } else {
+                return constructRandomStruct(s.fields, new HashMap<>(), includeRandomOptionalFields, random);
+            }
         } else if (typeDeclaration.type instanceof Enum e) {
-            return constructRandomEnum(e.values, random);
+            if (useStartingValue) {
+                var startingEnumValue = (Map<String, Object>) startingValue;
+                return constructRandomEnum(e.values, startingEnumValue, includeRandomOptionalFields, random);
+            } else {
+                return constructRandomEnum(e.values, new HashMap<>(), includeRandomOptionalFields, random);
+            }
         } else if (typeDeclaration.type instanceof Fn f) {
-            return constructRandomStruct(f.arg.fields, random);
+            if (useStartingValue) {
+                var startingFnValue = (Map<String, Object>) startingValue;
+                return constructRandomStruct(f.arg.fields, startingFnValue, includeRandomOptionalFields, random);
+            } else {
+                return constructRandomStruct(f.arg.fields, new HashMap<>(), includeRandomOptionalFields, random);
+            }
+        } else {
+            throw new RuntimeException("Unexpected type: %s".formatted(typeDeclaration.type));
         }
-
-        return null;
     }
 
     private static Map<String, Object> constructRandomEnum(Map<String, Struct> enumValuesReference,
+            Map<String, Object> startingEnum,
+            boolean includeRandomOptionalFields,
             MockRandom random) {
-        var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
-        Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+        var existingEnumValue = startingEnum.keySet().stream().findAny();
+        if (existingEnumValue.isPresent()) {
+            var enumValue = existingEnumValue.get();
+            var enumStructType = enumValuesReference.get(enumValue);
+            var enumStartingStruct = (Map<String, Object>) startingEnum.get(enumValue);
 
-        var randomIndex = random.nextInt(sortedEnumValuesReference.size());
-        var enumEntry = sortedEnumValuesReference.get(randomIndex);
+            return Map.of(enumValue, constructRandomStruct(enumStructType.fields, enumStartingStruct,
+                    includeRandomOptionalFields, random));
+        } else {
+            var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
+            Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-        var enumValue = enumEntry.getKey();
-        var enumData = enumEntry.getValue();
+            var randomIndex = random.nextInt(sortedEnumValuesReference.size());
+            var enumEntry = sortedEnumValuesReference.get(randomIndex);
 
-        return Map.of(enumValue, constructRandomStruct(enumData.fields, random));
+            var enumValue = enumEntry.getKey();
+            var enumData = enumEntry.getValue();
+
+            return Map.of(enumValue,
+                    constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields, random));
+        }
+
     }
 
     static Map<String, Object> verify(String functionName, Map<String, Object> argument,
