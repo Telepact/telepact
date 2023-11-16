@@ -55,7 +55,7 @@ class InternalParse {
             if (!duplicatedJsonSchemaKeys.isEmpty()) {
                 var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
                 throw new JApiSchemaParseError(
-                        "Cannot combine schemas due to duplicate keys: %s".formatted(sortedKeys));
+                        "Final schema has duplicate keys: %s".formatted(sortedKeys));
             }
 
             for (var pseudoJsonSchema : pseudoJsonSchemas) {
