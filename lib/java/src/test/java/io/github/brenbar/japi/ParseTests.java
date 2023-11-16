@@ -26,4 +26,14 @@ public class ParseTests {
                 () -> new Server(json, this::handle, new Options().setOnError((e1) -> e1.printStackTrace())));
         Assertions.assertTrue(e.getMessage().contains("Final schema has duplicate keys"));
     }
+
+    @Test
+    public void testInvalidDefinition() throws IOException {
+        var json = Files
+                .readString(FileSystems.getDefault().getPath("../../test/parse", "invalid_definition.japi.json"));
+        var e = assertThrows(JApiSchemaParseError.class,
+                () -> new Server(json, this::handle, new Options().setOnError((e1) -> e1.printStackTrace())));
+        Assertions.assertTrue(
+                e.getMessage().contains("Invalid definition. Each definition should have one key matching the regex"));
+    }
 }
