@@ -29,40 +29,45 @@ class InternalParse {
         var objectMapper = new ObjectMapper();
         var finalJsonList = new ArrayList<Object>();
 
-        try {
-            var pseudoJsonSchemas = new ArrayList<Object>();
-            for (var jsonSchema : jsonSchemas) {
-                var pseudoJsonSchema = objectMapper.readValue(jsonSchema, new TypeReference<List<Object>>() {
+        var pseudoJsonSchemas = new ArrayList<Object>();
+        for (var jsonSchema : jsonSchemas) {
+            List<Object> pseudoJsonSchema;
+            try {
+                pseudoJsonSchema = objectMapper.readValue(jsonSchema, new TypeReference<List<Object>>() {
                 });
-                pseudoJsonSchemas.add(pseudoJsonSchema);
+            } catch (JsonProcessingException e) {
+                throw new JApiSchemaParseError("Document root must be an array of objects", e);
             }
+            pseudoJsonSchemas.add(pseudoJsonSchema);
+        }
 
-            var jsonSchemaKeys = new HashSet<String>();
-            var duplicatedJsonSchemaKeys = new HashSet<String>();
-            for (var pseudoJsonSchema : pseudoJsonSchemas) {
-                var definitions = (List<Object>) pseudoJsonSchema;
-                for (var definition : definitions) {
-                    var definitionAsPsuedoJson = (Map<String, Object>) definition;
-                    var key = findSchemaKey(definitionAsPsuedoJson);
-                    if (jsonSchemaKeys.contains(key)) {
-                        duplicatedJsonSchemaKeys.add(key);
-                    } else {
-                        jsonSchemaKeys.add(key);
-                    }
+        var jsonSchemaKeys = new HashSet<String>();
+        var duplicatedJsonSchemaKeys = new HashSet<String>();
+        for (var pseudoJsonSchema : pseudoJsonSchemas) {
+            var definitions = (List<Object>) pseudoJsonSchema;
+            for (var definition : definitions) {
+                var definitionAsPsuedoJson = (Map<String, Object>) definition;
+                var key = findSchemaKey(definitionAsPsuedoJson);
+                if (jsonSchemaKeys.contains(key)) {
+                    duplicatedJsonSchemaKeys.add(key);
+                } else {
+                    jsonSchemaKeys.add(key);
                 }
             }
+        }
 
-            if (!duplicatedJsonSchemaKeys.isEmpty()) {
-                var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
-                throw new JApiSchemaParseError(
-                        "Final schema has duplicate keys: %s".formatted(sortedKeys));
-            }
+        if (!duplicatedJsonSchemaKeys.isEmpty()) {
+            var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
+            throw new JApiSchemaParseError(
+                    "Final schema has duplicate keys: %s".formatted(sortedKeys));
+        }
 
-            for (var pseudoJsonSchema : pseudoJsonSchemas) {
-                var definitions = (List<Object>) pseudoJsonSchema;
-                finalJsonList.addAll(definitions);
-            }
+        for (var pseudoJsonSchema : pseudoJsonSchemas) {
+            var definitions = (List<Object>) pseudoJsonSchema;
+            finalJsonList.addAll(definitions);
+        }
 
+        try {
             return objectMapper.writeValueAsString(finalJsonList);
         } catch (JsonProcessingException e) {
             throw new JApiSchemaParseError("Could not combine schemas", e);
