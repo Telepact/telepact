@@ -125,3 +125,7 @@
 
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":false,"int":0,"num":0.1,"str":"","arrBool":[false],"objBool":{"a":false},"struct":{"required":false},"enum":{"two":{"required":false}},"fn":{"required":false}}}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":false,"int":0,"num":0.1,"str":"","arrBool":[false],"objBool":{"a":false},"struct":{"required":false},"enum":{"two":{"required":false}},"fn":{"required":false}}}}]
+
+"invalidResult"
+
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"wrong":false}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.wrong","reason":"UnknownEnumField"}]}}]

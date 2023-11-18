@@ -40,17 +40,17 @@ public class MockStubTypeExtension implements TypeExtension {
             var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
 
             var inputFailures = InternalServer.validateStruct(path, functionDef.arg.fields, input);
-            var outputFailures = InternalServer.validateEnum(path, functionDef.result.values, output);
+            var outputFailures = InternalServer.validateEnum("%s.->".formatted(path), functionDef.result.values,
+                    output);
             var failures = new ArrayList<ValidationFailure>();
             failures.addAll(inputFailures);
             failures.addAll(outputFailures);
 
-            var validFailures = new ArrayList<>();
-            for (var inputFailure : failures) {
-                if (inputFailure.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING)) {
+            for (var failure : failures) {
+                if (failure.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING)) {
                     continue;
                 }
-                validFailures.add(inputFailure);
+                validationFailures.add(failure);
             }
 
         } catch (ClassCastException e) {

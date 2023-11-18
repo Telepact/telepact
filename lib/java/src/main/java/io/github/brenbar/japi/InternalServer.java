@@ -380,6 +380,13 @@ class InternalServer {
 
         var nextPath = !"".equals(path) ? "%s.%s".formatted(path, enumTarget) : enumTarget;
 
+        var referenceStruct = referenceValues.get(enumTarget);
+        if (referenceStruct == null) {
+            return Collections
+                    .singletonList(new ValidationFailure(nextPath,
+                            ValidationErrorReasons.UNKNOWN_ENUM_VALUE));
+        }
+
         if (enumPayload instanceof Boolean) {
             return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_STRUCT_TYPE));
@@ -393,7 +400,7 @@ class InternalServer {
             return Collections.singletonList(new ValidationFailure(nextPath,
                     ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
         } else if (enumPayload instanceof Map<?, ?> m2) {
-            return validateEnumStruct(nextPath, referenceValues, enumTarget,
+            return validateEnumStruct(nextPath, referenceStruct, enumTarget,
                     (Map<String, Object>) m2);
         } else {
             return Collections.singletonList(new ValidationFailure(nextPath,
@@ -403,19 +410,12 @@ class InternalServer {
 
     private static List<ValidationFailure> validateEnumStruct(
             String path,
-            Map<String, Struct> reference,
+            Struct enumStruct,
             String enumCase,
             Map<String, Object> actual) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var referenceStruct = reference.get(enumCase);
-        if (referenceStruct == null) {
-            return Collections
-                    .singletonList(new ValidationFailure(path,
-                            ValidationErrorReasons.UNKNOWN_ENUM_VALUE));
-        }
-
-        var nestedValidationFailures = validateStruct(path, referenceStruct.fields,
+        var nestedValidationFailures = validateStruct(path, enumStruct.fields,
                 actual);
         validationFailures.addAll(nestedValidationFailures);
 
