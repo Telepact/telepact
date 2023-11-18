@@ -1,8 +1,8 @@
 "emptyPartialMatchStub"
 
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":true,"struct":{"optional":true}}}}}}}]|[{},{"ok":{}}]
-[{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":true,"struct":{"optional":true,"required":false}}}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"ok":{}}]
 
 "partialMatchStub"
 
@@ -121,8 +121,15 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
 
-"stubWithStartingValue"
+"resultAutogeneratesMissingRequiredFields"
 
+[{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":true,"struct":{"optional":true}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":true,"struct":{"optional":true,"required":false}}}}]
+
+"resultWithStartingValue"
+
+[{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":false,"int":0,"num":0.1,"str":"","arrBool":[false],"objBool":{"a":false},"struct":{"required":false},"enum":{"two":{"required":false}},"fn":{"required":false}}}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":false,"int":0,"num":0.1,"str":"","arrBool":[false],"objBool":{"a":false},"struct":{"required":false},"enum":{"two":{"required":false}},"fn":{"required":false}}}}]
 
