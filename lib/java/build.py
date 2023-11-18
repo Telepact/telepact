@@ -182,4 +182,4 @@ shutil.copyfile('../../common/mock-internal.japi.json', 'src/main/resources/mock
 
 generate_tests()
 generate_mock_tests()
-subprocess.run(['mvn','package'])
+subprocess.run(['mvn','verify'])

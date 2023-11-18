@@ -120,3 +120,8 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
+
+"stubWithStartingValue"
+
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"bool":false,"int":0,"num":0.1,"str":"","arrBool":[false],"objBool":{"a":false},"struct":{"required":false},"enum":{"two":{"required":false}},"fn":{"required":false}}}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"ok":{"value":{"bool":false,"int":0,"num":0.1,"str":"","arrBool":[false],"objBool":{"a":false},"struct":{"required":false},"enum":{"two":{"required":false}},"fn":{"required":false}}}}]
