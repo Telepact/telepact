@@ -150,3 +150,9 @@
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"int":""}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.int","reason":"StringInvalidForIntegerType"}]}}]
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"int":[]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.int","reason":"ArrayInvalidForIntegerType"}]}}]
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"int":{}}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.int","reason":"ObjectInvalidForIntegerType"}]}}]
+
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"num":null}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.num","reason":"NullInvalidForNonNullType"}]}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"num":false}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.num","reason":"BooleanInvalidForNumberType"}]}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"num":""}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.num","reason":"StringInvalidForNumberType"}]}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"num":[]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.num","reason":"ArrayInvalidForNumberType"}]}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{"value":{"num":{}}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn._createStub.stub.->.ok.value.num","reason":"ObjectInvalidForNumberType"}]}}]
