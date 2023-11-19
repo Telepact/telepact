@@ -90,5 +90,16 @@
       "timestamp": "integer",
       "successful": "boolean"
     }
+  },
+
+  {
+    "trait.Authenticated": {
+      "fn.*": {
+        "token": "string"
+      },
+      "->": {
+        "errorInvalidToken": {}
+      }
+    }
   }
 ]

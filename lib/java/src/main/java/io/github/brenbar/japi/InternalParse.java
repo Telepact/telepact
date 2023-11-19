@@ -217,9 +217,6 @@ class InternalParse {
         var argumentFields = new HashMap<String, FieldDeclaration>();
         for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
-            if (fieldDeclaration.startsWith("//")) {
-                continue;
-            }
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
                     typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
@@ -254,9 +251,6 @@ class InternalParse {
             var fields = new HashMap<String, FieldDeclaration>();
             for (var structEntry : enumValueData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
-                if (fieldDeclaration.startsWith("//")) {
-                    continue;
-                }
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
                         typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
@@ -286,9 +280,6 @@ class InternalParse {
         var fields = new HashMap<String, FieldDeclaration>();
         for (var entry : definition.entrySet()) {
             var fieldDeclaration = entry.getKey();
-            if (fieldDeclaration.startsWith("//")) {
-                continue;
-            }
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
                     typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
@@ -310,9 +301,6 @@ class InternalParse {
 
         var values = new HashMap<String, Struct>();
         for (var entry : definition.entrySet()) {
-            if (entry.getKey().startsWith("//")) {
-                continue;
-            }
             Map<String, Object> enumStructData;
             try {
                 enumStructData = (Map<String, Object>) entry.getValue();
@@ -324,9 +312,6 @@ class InternalParse {
             var fields = new HashMap<String, FieldDeclaration>();
             for (var structEntry : enumStructData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
-                if (fieldDeclaration.startsWith("//")) {
-                    continue;
-                }
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
                         typeDeclarationValue, false, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);

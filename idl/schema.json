@@ -63,9 +63,6 @@
                 "type": "object",
                 "additionalProperties": false,
                 "patternProperties": {
-                  "^/[/|0-9][/|0-9]$": {
-                    "type": "string"
-                  },
                   "^[a-zA-Z_]\\w*!?$": {
                     "$ref": "#/$defs/typeDeclaration"
                   }
