@@ -109,7 +109,7 @@
       " due to no matching stub being available.                                         "
     ],
     "trait._Mockable": {
-      "^fn\\.[a-zA-Z]": {},
+      "fn.*": {},
       "->": {
         "_errorNoMatchingStub": {}
       }

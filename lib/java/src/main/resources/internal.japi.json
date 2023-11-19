@@ -43,7 +43,7 @@
       " - `_errorParseFailure`: The Request could not be parsed as a jAPI Message.                               "
     ],
     "trait._Validated": {
-      "^fn\\.[a-zA-Z_]": {},
+      "fn._?*": {},
       "->": {
         "_errorUnknown": {},
         "_errorInvalidRequestHeaders": {

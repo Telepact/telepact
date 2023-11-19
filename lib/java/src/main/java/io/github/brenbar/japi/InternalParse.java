@@ -120,12 +120,7 @@ class InternalParse {
         // Apply trait to all functions
         for (var traitSchemaKey : traitSchemaKeys) {
 
-            Map<String, Object> traitDefinition;
-            try {
-                traitDefinition = (Map<String, Object>) japiSchemaAsParsedJson.get(traitSchemaKey);
-            } catch (ClassCastException e) {
-                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
-            }
+            var traitDefinition = (Map<String, Object>) japiSchemaAsParsedJson.get(traitSchemaKey);
 
             Map<String, Object> def;
             try {
@@ -134,14 +129,17 @@ class InternalParse {
                 throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
             }
 
+            String traitFunctionRegex;
             String traitFunctionKey;
-            if (def.containsKey("^fn\\.[a-zA-Z]")) {
-                traitFunctionKey = "^fn\\.[a-zA-Z]";
-            } else if (def.containsKey("^fn\\.[a-zA-Z_]")) {
+            if (def.containsKey("fn.*")) {
+                traitFunctionKey = "fn.*";
+                traitFunctionRegex = "^fn\\.[a-zA-Z]";
+            } else if (def.containsKey("fn._?*")) {
                 if (!traitSchemaKey.startsWith("trait._")) {
                     throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
                 }
-                traitFunctionKey = "^fn\\.[a-zA-Z_]";
+                traitFunctionKey = "fn._?*";
+                traitFunctionRegex = "^fn\\.[a-zA-Z_]";
             } else {
                 throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
             }
@@ -158,7 +156,7 @@ class InternalParse {
                     continue;
                 }
 
-                var regex = Pattern.compile(traitFunctionKey);
+                var regex = Pattern.compile(traitFunctionRegex);
                 var matcher = regex.matcher(f.name);
                 if (!matcher.find()) {
                     continue;
