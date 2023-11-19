@@ -86,10 +86,40 @@ public class ParseTests {
         }
 
         @Test
-        public void testInvalidTrait0() throws IOException {
+        public void testInvalidTraitDef() throws IOException {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_trait_def.japi.json"));
+                var e = assertThrows(JApiSchemaParseError.class,
+                                () -> new Server(json, this::handle,
+                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+
+                Assertions.assertTrue(
+                                e.getMessage().contains(
+                                                "Invalid trait definition"));
+
+        }
+
+        @Test
+        public void testInvalidTraitFnKey() throws IOException {
+                var json = Files
+                                .readString(FileSystems.getDefault().getPath("../../test/parse",
+                                                "invalid_trait_fn_key.japi.json"));
+                var e = assertThrows(JApiSchemaParseError.class,
+                                () -> new Server(json, this::handle,
+                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+
+                Assertions.assertTrue(
+                                e.getMessage().contains(
+                                                "Invalid trait definition"));
+
+        }
+
+        @Test
+        public void testInvalidTraitInternalFnKey() throws IOException {
+                var json = Files
+                                .readString(FileSystems.getDefault().getPath("../../test/parse",
+                                                "invalid_trait_internal_fn_key.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class,
                                 () -> new Server(json, this::handle,
                                                 new Options().setOnError((e1) -> e1.printStackTrace())));
