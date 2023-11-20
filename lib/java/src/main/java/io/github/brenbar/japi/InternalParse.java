@@ -173,7 +173,7 @@ class InternalParse {
                     var newKey = traitArgumentField.getKey();
                     if (f.arg.fields.containsKey(newKey)) {
                         throw new JApiSchemaParseError(
-                                "Trait argument field already in use: %s".formatted(newKey));
+                                "Argument field already in use: %s".formatted(newKey));
                     }
                     f.arg.fields.put(newKey, traitArgumentField.getValue());
                 }
@@ -182,7 +182,7 @@ class InternalParse {
                     var newKey = traitResultField.getKey();
                     if (f.result.values.containsKey(newKey)) {
                         throw new JApiSchemaParseError(
-                                "Trait argument field already in use: %s".formatted(newKey));
+                                "Result value already in use: %s".formatted(newKey));
                     }
                     f.result.values.put(newKey, traitResultField.getValue());
                 }

@@ -1,0 +1,20 @@
+[
+  {
+    "fn.example": {},
+    "->": {
+      "ok": {
+        "result1": "boolean"
+      }
+    }
+  },
+  {
+    "trait.Collide": {
+      "fn.*": {},
+      "->": {
+        "ok": {
+          "result1": "boolean"
+        }
+      }
+    }
+  }
+]

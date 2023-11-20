@@ -139,4 +139,34 @@ public class ParseTests {
                 new Options().setOnError((e1) -> e1.printStackTrace()));
 
     }
+
+    @Test
+    public void testInvalidTraitCollideArg() throws IOException {
+        var json = Files
+                .readString(FileSystems.getDefault().getPath("../../test/parse",
+                        "invalid_trait_collide_arg.japi.json"));
+        var e = assertThrows(JApiSchemaParseError.class,
+                () -> new Server(json, this::handle,
+                        new Options().setOnError((e1) -> e1.printStackTrace())));
+
+        Assertions.assertTrue(
+                e.getMessage().contains(
+                        "Argument field already in use"));
+
+    }
+
+    @Test
+    public void testInvalidTraitCollideResult() throws IOException {
+        var json = Files
+                .readString(FileSystems.getDefault().getPath("../../test/parse",
+                        "invalid_trait_collide_result.japi.json"));
+        var e = assertThrows(JApiSchemaParseError.class,
+                () -> new Server(json, this::handle,
+                        new Options().setOnError((e1) -> e1.printStackTrace())));
+
+        Assertions.assertTrue(
+                e.getMessage().contains(
+                        "Result value already in use"));
+
+    }
 }
