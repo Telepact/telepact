@@ -24,7 +24,7 @@ public class Client {
      * };
      * </pre>
      */
-    interface Adapter extends BiFunction<Message, Marshaller, Future<Message>> {
+    interface Adapter extends BiFunction<Message, Serializer, Future<Message>> {
     }
 
     /**
@@ -43,96 +43,105 @@ public class Client {
     interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
     }
 
+    public static class Options {
+        Middleware middleware = (m, n) -> n.apply(m);
+        boolean useBinaryDefault = false;
+        boolean forceSendJsonDefault = true;
+        boolean throwOnError = false;
+        long timeoutMsDefault = 5000;
+        SerializationImpl serializationImpl;
+
+        /**
+         * Set a new middleware for this client.
+         * 
+         * @param middleware
+         * @return
+         */
+        public Options setMiddleware(Middleware middleware) {
+            this.middleware = middleware;
+            return this;
+        }
+
+        /**
+         * Set if this client should use binary serialization for communication.
+         * 
+         * @param useBinary
+         * @return
+         */
+        public Options setUseBinaryDefault(boolean useBinary) {
+            this.useBinaryDefault = useBinary;
+            return this;
+        }
+
+        /**
+         * Set if this client should always send requests as JSON, even if receiving
+         * responses as binary.
+         * 
+         * @param forceSendJson
+         * @return
+         */
+        public Options setForceSendJsonDefault(boolean forceSendJson) {
+            this.forceSendJsonDefault = forceSendJson;
+            return this;
+        }
+
+        public Options setThrowOnError(boolean throwOnError) {
+            this.throwOnError = throwOnError;
+            return this;
+        }
+
+        /**
+         * Set the default timeout for all requests.
+         * 
+         * @param timeoutMs
+         * @return
+         */
+        public Options setTimeoutMsDefault(long timeoutMs) {
+            this.timeoutMsDefault = timeoutMs;
+            return this;
+        }
+
+        /**
+         * Set an alternative serialization implementation.
+         * 
+         * @param serializer
+         * @return
+         */
+        public Options setSerializationImpl(SerializationImpl serializationImpl) {
+            this.serializationImpl = serializationImpl;
+            return this;
+        }
+    }
+
     private Adapter adapter;
-    private Marshaller serializer;
+    private Serializer serializer;
     private Middleware middleware;
-    boolean useBinaryDefault;
-    boolean forceSendJsonDefault;
-    boolean throwOnError;
-    long timeoutMsDefault;
+    private boolean useBinaryDefault;
+    private boolean forceSendJsonDefault;
+    private boolean throwOnError;
+    private long timeoutMsDefault;
 
     /**
      * Create a client with the given transport adapter.
      * 
      * @param adapter
      */
-    public Client(Adapter adapter) {
+    public Client(Adapter adapter, Options options) {
         this.adapter = adapter;
 
-        this.middleware = (m, n) -> n.apply(m);
-        this.useBinaryDefault = false;
-        this.forceSendJsonDefault = true;
-        this.throwOnError = false;
-        this.timeoutMsDefault = 5000;
+        this.middleware = options.middleware;
+        this.useBinaryDefault = options.useBinaryDefault;
+        this.forceSendJsonDefault = options.forceSendJsonDefault;
+        this.throwOnError = options.throwOnError;
+        this.timeoutMsDefault = options.timeoutMsDefault;
 
-        this.serializer = new Marshaller(new InternalDefaultSerializer(),
+        this.serializer = new Serializer(new InternalDefaultSerializer(),
                 new InternalClientBinaryEncoder());
     }
 
-    /**
-     * Set a new middleware for this client.
-     * 
-     * @param middleware
-     * @return
-     */
-    public Client setMiddleware(Middleware middleware) {
-        this.middleware = middleware;
-        return this;
-    }
-
-    /**
-     * Set if this client should use binary serialization for communication.
-     * 
-     * @param useBinary
-     * @return
-     */
-    public Client setUseBinaryDefault(boolean useBinary) {
-        this.useBinaryDefault = useBinary;
-        return this;
-    }
-
-    /**
-     * Set if this client should always send requests as JSON, even if receiving
-     * responses as binary.
-     * 
-     * @param forceSendJson
-     * @return
-     */
-    public Client setForceSendJsonDefault(boolean forceSendJson) {
-        this.forceSendJsonDefault = forceSendJson;
-        return this;
-    }
-
-    public Client setThrowOnError(boolean throwOnError) {
-        this.throwOnError = throwOnError;
-        return this;
-    }
-
-    /**
-     * Set the default timeout for all requests.
-     * 
-     * @param timeoutMs
-     * @return
-     */
-    public Client setTimeoutMsDefault(long timeoutMs) {
-        this.timeoutMsDefault = timeoutMs;
-        return this;
-    }
-
-    /**
-     * Set an alternative serialization implementation.
-     * 
-     * @param serializer
-     * @return
-     */
-    public Client setSerializer(Serializer serializer) {
-        this.serializer.serializer = serializer;
-        return this;
-    }
-
     public Message createRequestMessage(Request request) {
-        return InternalClient.constructRequestMessage(request, useBinaryDefault,
-                forceSendJsonDefault, timeoutMsDefault);
+        return InternalClient.constructRequestMessage(request, this.useBinaryDefault,
+                this.forceSendJsonDefault, this.timeoutMsDefault);
     }
 
     /**

@@ -49,7 +49,7 @@ class InternalSerializer {
     }
 
     static byte[] serialize(Message message, BinaryEncoder binaryEncoder,
-            Serializer serializer) {
+            SerializationImpl serializer) {
         var headers = message.header;
         boolean serializeAsBinary = false;
         if (headers.containsKey("_serializeAsBinary")) {
@@ -73,7 +73,7 @@ class InternalSerializer {
         }
     }
 
-    static Message deserialize(byte[] messageBytes, Serializer serializer,
+    static Message deserialize(byte[] messageBytes, SerializationImpl serializer,
             BinaryEncoder binaryEncoder) {
         Object messageAsPseudoJson;
         boolean isMsgPack = false;

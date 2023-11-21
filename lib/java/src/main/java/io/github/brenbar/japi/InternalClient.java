@@ -50,7 +50,7 @@ class InternalClient {
     }
 
     static Message processRequestObject(Message requestMessage,
-            BiFunction<Message, Marshaller, Future<Message>> adapter, Marshaller serializer, long timeoutMs) {
+            BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMs) {
         try {
             var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
             return responseMessage;

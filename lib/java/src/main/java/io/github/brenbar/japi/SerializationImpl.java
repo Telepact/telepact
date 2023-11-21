@@ -3,7 +3,7 @@ package io.github.brenbar.japi;
 /**
  * A serialization implementation.
  */
-public interface Serializer {
+public interface SerializationImpl {
 
     byte[] toJson(Object japiMessage);
 

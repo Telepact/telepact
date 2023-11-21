@@ -71,8 +71,9 @@ public class LoadTest {
                 });
             };
 
-            var client = new Client(adapter).setForceSendJsonDefault(false).setUseBinaryDefault(true)
-                    .setTimeoutMsDefault(600000);
+            var client = new Client(adapter,
+                    new Client.Options().setForceSendJsonDefault(false).setUseBinaryDefault(true)
+                            .setTimeoutMsDefault(600000));
 
             // warmup
             var requestMessage = client.createRequestMessage(new Request("fn.getPaperTape", Map.of()));

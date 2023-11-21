@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 class InternalServer {
 
-    static Message parseRequestMessage(byte[] requestMessageBytes, Marshaller serializer, JApiSchema jApiSchema,
+    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
         var requestHeaders = new HashMap<String, Object>();
         var parseFailures = new ArrayList<String>();

@@ -305,22 +305,22 @@ class MessageParseException extends Exception {
     }
 }
 
-class Marshaller {
+class Serializer {
 
-    Serializer serializer;
+    private SerializationImpl serializationImpl;
     private BinaryEncoder binaryEncoder;
 
-    Marshaller(Serializer serializer, BinaryEncoder binaryEncoder) {
-        this.serializer = serializer;
+    Serializer(SerializationImpl serializationImpl, BinaryEncoder binaryEncoder) {
+        this.serializationImpl = serializationImpl;
         this.binaryEncoder = binaryEncoder;
     }
 
     public byte[] serialize(Message message) {
-        return InternalSerializer.serialize(message, this.binaryEncoder, this.serializer);
+        return InternalSerializer.serialize(message, this.binaryEncoder, this.serializationImpl);
     }
 
     public Message deserialize(byte[] messageBytes) {
-        return InternalSerializer.deserialize(messageBytes, this.serializer, this.binaryEncoder);
+        return InternalSerializer.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
     }
 }
 
