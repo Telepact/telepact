@@ -305,25 +305,6 @@ class MessageParseException extends Exception {
     }
 }
 
-class Serializer {
-
-    private SerializationImpl serializationImpl;
-    private BinaryEncoder binaryEncoder;
-
-    Serializer(SerializationImpl serializationImpl, BinaryEncoder binaryEncoder) {
-        this.serializationImpl = serializationImpl;
-        this.binaryEncoder = binaryEncoder;
-    }
-
-    public byte[] serialize(Message message) {
-        return InternalSerializer.serialize(message, this.binaryEncoder, this.serializationImpl);
-    }
-
-    public Message deserialize(byte[] messageBytes) {
-        return InternalSerializer.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
-    }
-}
-
 class BinaryEncoding {
 
     public final Map<String, Long> encodeMap;
