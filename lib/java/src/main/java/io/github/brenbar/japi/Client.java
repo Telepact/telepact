@@ -16,9 +16,9 @@ public class Client {
      * <pre>
      * var transport = (requestMessage, serializer) -> {
      *     return CompletableFuture.supplyAsync(() -> {
-     *         var requestMessageBytes = s.serialize(requestMessage);
+     *         var requestMessageBytes = serializer.serialize(requestMessage);
      *         var responseMessageBytes = YOUR_TRANSPORT.transport(requestMessageBytes);
-     *         responseMessage = s.deserialize(responseMessageBytes);
+     *         responseMessage = serializer.deserialize(responseMessageBytes);
      *         return responseMessage;
      *     });
      * };
