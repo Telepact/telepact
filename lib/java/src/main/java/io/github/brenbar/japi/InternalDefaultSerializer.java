@@ -82,7 +82,7 @@ class InternalDefaultSerializer implements Serializer {
                     .addDeserializer(Map.class, new MessagePackMapDeserializer()));
 
     @Override
-    public byte[] toJson(List<Object> japiMessage) {
+    public byte[] toJson(Object japiMessage) {
         try {
             return jsonMapper.writeValueAsBytes(japiMessage);
         } catch (JsonProcessingException e) {
@@ -90,7 +90,7 @@ class InternalDefaultSerializer implements Serializer {
         }
     }
 
-    public byte[] toMsgPack(List<Object> japiMessage) {
+    public byte[] toMsgPack(Object japiMessage) {
         try {
             return binaryMapper.writeValueAsBytes(japiMessage);
         } catch (JsonProcessingException e) {
@@ -99,9 +99,9 @@ class InternalDefaultSerializer implements Serializer {
     }
 
     @Override
-    public List<Object> fromJson(byte[] bytes) {
+    public Object fromJson(byte[] bytes) {
         try {
-            return jsonMapper.readValue(bytes, new TypeReference<List<Object>>() {
+            return jsonMapper.readValue(bytes, new TypeReference<Object>() {
             });
         } catch (JsonParseException e) {
             throw new DeserializationError(new InvalidJsonError(e));
@@ -117,9 +117,9 @@ class InternalDefaultSerializer implements Serializer {
     }
 
     @Override
-    public List<Object> fromMsgPack(byte[] bytes) {
+    public Object fromMsgPack(byte[] bytes) {
         try {
-            return binaryMapper.readValue(bytes, new TypeReference<List<Object>>() {
+            return binaryMapper.readValue(bytes, new TypeReference<Object>() {
             });
         } catch (IOException e) {
             throw new DeserializationError(e);

@@ -1,17 +1,15 @@
 package io.github.brenbar.japi;
 
-import java.util.List;
-
 /**
  * A serialization implementation.
  */
 public interface Serializer {
 
-    byte[] toJson(List<Object> japiMessage);
+    byte[] toJson(Object japiMessage);
 
-    byte[] toMsgPack(List<Object> japiMessage);
+    byte[] toMsgPack(Object japiMessage);
 
-    List<Object> fromJson(byte[] bytes);
+    Object fromJson(byte[] bytes);
 
-    List<Object> fromMsgPack(byte[] bytes);
+    Object fromMsgPack(byte[] bytes);
 }

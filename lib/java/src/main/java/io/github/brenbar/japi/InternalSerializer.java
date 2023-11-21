@@ -75,44 +75,60 @@ class InternalSerializer {
 
     static Message deserialize(byte[] messageBytes, Serializer serializer,
             BinaryEncoder binaryEncoder) {
-        List<Object> messageAsPseudoJson;
+        Object messageAsPseudoJson;
+        boolean isMsgPack = false;
         if (messageBytes[0] == (byte) 0x92) { // MsgPack
-            var encodedMessage = serializer.fromMsgPack(messageBytes);
+            isMsgPack = true;
+            messageAsPseudoJson = serializer.fromMsgPack(messageBytes);
+        } else {
+            messageAsPseudoJson = serializer.fromJson(messageBytes);
+        }
+
+        List<Object> messageAsPseudoJsonList;
+        try {
+            messageAsPseudoJsonList = (List<Object>) messageAsPseudoJson;
+        } catch (ClassCastException e) {
+            throw new DeserializationError(new MessageParseError(List.of("MessageMustBeArrayWithTwoElements")));
+        }
+
+        if (messageAsPseudoJsonList.size() != 2) {
+            throw new DeserializationError(new MessageParseError(List.of("MessageMustBeArrayWithTwoElements")));
+        }
+
+        List<Object> finalMessageAsPseudoJsonList;
+        if (isMsgPack) {
             try {
-                messageAsPseudoJson = binaryEncoder.decode(encodedMessage);
+                finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
             } catch (BinaryEncoderUnavailableError e) {
                 throw new DeserializationError(e);
             }
         } else {
-            messageAsPseudoJson = serializer.fromJson(messageBytes);
+            finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
         }
 
         var parseFailures = new ArrayList<String>();
         Map<String, Object> headers = null;
         Map<String, Object> body = null;
-        if (messageAsPseudoJson.size() != 2) {
-            parseFailures.add("MessageMustBeArrayWithTwoElements");
-        } else {
-            try {
-                headers = (Map<String, Object>) messageAsPseudoJson.get(0);
-            } catch (ClassCastException e) {
-                parseFailures.add("HeadersMustBeObject");
-            }
 
-            try {
-                body = (Map<String, Object>) messageAsPseudoJson.get(1);
-                if (body.size() != 1) {
-                    parseFailures.add("BodyMustBeUnionType");
-                } else {
-                    try {
-                        var givenPayload = (Map<String, Object>) body.values().stream().findAny().get();
-                    } catch (ClassCastException e) {
-                        parseFailures.add("BodyPayloadMustBeObject");
-                    }
+        try {
+            headers = (Map<String, Object>) finalMessageAsPseudoJsonList.get(0);
+        } catch (ClassCastException e) {
+            parseFailures.add("HeadersMustBeObject");
+        }
+
+        try {
+            body = (Map<String, Object>) finalMessageAsPseudoJsonList.get(1);
+            if (body.size() != 1) {
+                parseFailures.add("BodyMustBeUnionType");
+            } else {
+                try {
+                    var givenPayload = (Map<String, Object>) body.values().stream().findAny().get();
+                } catch (ClassCastException e) {
+                    parseFailures.add("BodyPayloadMustBeObject");
                 }
-            } catch (ClassCastException e) {
-                parseFailures.add("BodyMustBeObject");
             }
+        } catch (ClassCastException e) {
+            parseFailures.add("BodyMustBeObject");
         }
 
         if (parseFailures.size() > 0) {
