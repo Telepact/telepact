@@ -16,7 +16,7 @@ class InternalServerBinaryEncoder implements BinaryEncoder {
     }
 
     @Override
-    public List<Object> decode(List<Object> message) throws BinaryEncodingUnavailableError {
+    public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
         return InternalSerializer.serverBinaryDecode(message, binaryEncoder);
     }
 

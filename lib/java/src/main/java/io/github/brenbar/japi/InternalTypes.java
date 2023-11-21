@@ -339,9 +339,9 @@ class BinaryEncoding {
 }
 
 interface BinaryEncoder {
-    List<Object> encode(List<Object> message) throws BinaryEncodingUnavailableError;
+    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
 
-    List<Object> decode(List<Object> message) throws BinaryEncodingUnavailableError;
+    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
 }
 
 class ValidationFailure {
