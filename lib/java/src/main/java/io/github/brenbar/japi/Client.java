@@ -24,7 +24,7 @@ public class Client {
      * };
      * </pre>
      */
-    interface Adapter extends BiFunction<Message, Serializer, Future<Message>> {
+    interface Adapter extends BiFunction<Message, Marshaller, Future<Message>> {
     }
 
     /**
@@ -44,7 +44,7 @@ public class Client {
     }
 
     private Adapter adapter;
-    private Serializer serializer;
+    private Marshaller serializer;
     private Middleware middleware;
     boolean useBinaryDefault;
     boolean forceSendJsonDefault;
@@ -65,8 +65,8 @@ public class Client {
         this.throwOnError = false;
         this.timeoutMsDefault = 5000;
 
-        this.serializer = new Serializer(new InternalDefaultSerializationStrategy(),
-                new InternalClientBinaryEncodingStrategy());
+        this.serializer = new Marshaller(new InternalDefaultSerializer(),
+                new InternalClientBinaryEncoder());
     }
 
     /**
@@ -122,11 +122,11 @@ public class Client {
     /**
      * Set an alternative serialization implementation.
      * 
-     * @param serializationStrategy
+     * @param serializer
      * @return
      */
-    public Client setSerializationStrategy(SerializationStrategy serializationStrategy) {
-        this.serializer.serializationStrategy = serializationStrategy;
+    public Client setSerializer(Serializer serializer) {
+        this.serializer.serializer = serializer;
         return this;
     }
 

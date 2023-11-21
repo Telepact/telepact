@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 class InternalSerializer {
 
-    static BinaryEncoder constructBinaryEncoder(JApiSchema jApiSchema) {
+    static BinaryEncoding constructBinaryEncoding(JApiSchema jApiSchema) {
         var allKeys = new TreeSet<String>();
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
@@ -46,11 +46,11 @@ class InternalSerializer {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        return new BinaryEncoder(binaryEncoding, binaryHash);
+        return new BinaryEncoding(binaryEncoding, binaryHash);
     }
 
-    static byte[] serialize(Message message, BinaryEncodingStrategy binaryEncodingStrategy,
-            SerializationStrategy serializationStrategy) {
+    static byte[] serialize(Message message, BinaryEncoder binaryEncoder,
+            Serializer serializer) {
         var headers = message.header;
         boolean serializeAsBinary = false;
         if (headers.containsKey("_serializeAsBinary")) {
@@ -63,29 +63,29 @@ class InternalSerializer {
         List<Object> messageAsPseudoJson = List.of(message.header, message.body);
         if (serializeAsBinary && !forceSendJson) {
             try {
-                var encodedMessage = binaryEncodingStrategy.encode(messageAsPseudoJson);
-                return serializationStrategy.toMsgPack(encodedMessage);
-            } catch (BinaryEncoderUnavailableError e) {
+                var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
+                return serializer.toMsgPack(encodedMessage);
+            } catch (BinaryEncodingUnavailableError e) {
                 // We can still submit as json
-                return serializationStrategy.toJson(messageAsPseudoJson);
+                return serializer.toJson(messageAsPseudoJson);
             }
         } else {
-            return serializationStrategy.toJson(messageAsPseudoJson);
+            return serializer.toJson(messageAsPseudoJson);
         }
     }
 
-    static Message deserialize(byte[] messageBytes, SerializationStrategy serializationStrategy,
-            BinaryEncodingStrategy binaryEncodingStrategy) {
+    static Message deserialize(byte[] messageBytes, Serializer serializer,
+            BinaryEncoder binaryEncoder) {
         List<Object> messageAsPseudoJson;
         if (messageBytes[0] == (byte) 0x92) { // MsgPack
-            var encodedMessage = serializationStrategy.fromMsgPack(messageBytes);
+            var encodedMessage = serializer.fromMsgPack(messageBytes);
             try {
-                messageAsPseudoJson = binaryEncodingStrategy.decode(encodedMessage);
-            } catch (BinaryEncoderUnavailableError e) {
+                messageAsPseudoJson = binaryEncoder.decode(encodedMessage);
+            } catch (BinaryEncodingUnavailableError e) {
                 throw new DeserializationError(e);
             }
         } else {
-            messageAsPseudoJson = serializationStrategy.fromJson(messageBytes);
+            messageAsPseudoJson = serializer.fromJson(messageBytes);
         }
 
         var parseFailures = new ArrayList<String>();
@@ -123,7 +123,7 @@ class InternalSerializer {
         return new Message(headers, body);
     }
 
-    static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoder binaryEncoder) {
+    static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         var headers = (Map<String, Object>) message.get(0);
 
         var clientKnownBinaryChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
@@ -141,8 +141,8 @@ class InternalSerializer {
         return List.of(headers, encodedMessageBody);
     }
 
-    static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoder binaryEncoder)
-            throws BinaryEncoderUnavailableError {
+    static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder)
+            throws BinaryEncodingUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
         var clientKnownBinaryChecksums = (List<Long>) headers.get("_bin");
@@ -150,7 +150,7 @@ class InternalSerializer {
         var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
         if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
-            throw new BinaryEncoderUnavailableError();
+            throw new BinaryEncodingUnavailableError();
         }
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
@@ -160,18 +160,18 @@ class InternalSerializer {
         return List.of(headers, messageBody);
     }
 
-    static List<Object> clientBinaryEncode(List<Object> message, Deque<BinaryEncoder> recentBinaryEncoders)
-            throws BinaryEncoderUnavailableError {
+    static List<Object> clientBinaryEncode(List<Object> message, Deque<BinaryEncoding> recentBinaryEncoders)
+            throws BinaryEncodingUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
         var checksums = recentBinaryEncoders.stream().map(be -> be.checksum).toList();
         headers.put("_bin", checksums);
 
-        BinaryEncoder binaryEncoder;
+        BinaryEncoding binaryEncoder;
         try {
             binaryEncoder = recentBinaryEncoders.getFirst();
         } catch (NoSuchElementException e) {
-            throw new BinaryEncoderUnavailableError();
+            throw new BinaryEncodingUnavailableError();
         }
 
         var messageBody = (Map<String, Object>) message.get(1);
@@ -181,8 +181,8 @@ class InternalSerializer {
         return List.of(headers, encodedMessageBody);
     }
 
-    static List<Object> clientBinaryDecode(List<Object> message, Deque<BinaryEncoder> recentBinaryEncoders)
-            throws BinaryEncoderUnavailableError {
+    static List<Object> clientBinaryDecode(List<Object> message, Deque<BinaryEncoding> recentBinaryEncoders)
+            throws BinaryEncodingUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
         var binaryChecksums = (List<Long>) headers.get("_bin");
@@ -203,7 +203,7 @@ class InternalSerializer {
                             throw new RuntimeException("Unexpected type");
                         }
                     }));
-            var newBinaryEncoder = new BinaryEncoder(binaryEncoding, binaryChecksum);
+            var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
             recentBinaryEncoders.add(newBinaryEncoder);
 
             // We need to maintain 2 binary encodings in case a server is undergoing an API
@@ -215,7 +215,7 @@ class InternalSerializer {
 
         var binaryEncoder = findBinaryEncoder(binaryChecksum, recentBinaryEncoders);
         if (!binaryEncoder.isPresent()) {
-            throw new BinaryEncoderUnavailableError();
+            throw new BinaryEncodingUnavailableError();
         }
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
@@ -225,7 +225,7 @@ class InternalSerializer {
         return List.of(headers, messageBody);
     }
 
-    private static Optional<BinaryEncoder> findBinaryEncoder(Long checksum, Deque<BinaryEncoder> binaryEncoderStore) {
+    private static Optional<BinaryEncoding> findBinaryEncoder(Long checksum, Deque<BinaryEncoding> binaryEncoderStore) {
         for (var binaryEncoder : binaryEncoderStore) {
             if (Objects.equals(binaryEncoder.checksum, checksum)) {
                 return Optional.of(binaryEncoder);
@@ -234,12 +234,12 @@ class InternalSerializer {
         return Optional.empty();
     }
 
-    private static Map<Object, Object> encode(Map<String, Object> messageBody, BinaryEncoder binaryEncoder) {
+    private static Map<Object, Object> encode(Map<String, Object> messageBody, BinaryEncoding binaryEncoder) {
         var encodedMessageBody = (Map<Object, Object>) encodeKeys(messageBody, binaryEncoder);
         return encodedMessageBody;
     }
 
-    static Map<String, Object> decode(Map<Object, Object> encodedMessageBody, BinaryEncoder binaryEncoder) {
+    static Map<String, Object> decode(Map<Object, Object> encodedMessageBody, BinaryEncoding binaryEncoder) {
         return (Map<String, Object>) decodeKeys(encodedMessageBody, binaryEncoder);
         // TODO: move this logic somewhere else
         // if (this.checksum != null && !givenChecksums.contains(this.checksum)) {
@@ -247,7 +247,7 @@ class InternalSerializer {
         // }
     }
 
-    private static Object encodeKeys(Object given, BinaryEncoder binaryEncoder) {
+    private static Object encodeKeys(Object given, BinaryEncoding binaryEncoder) {
         if (given == null) {
             return given;
         } else if (given instanceof Map<?, ?> m) {
@@ -268,7 +268,7 @@ class InternalSerializer {
         }
     }
 
-    private static Object decodeKeys(Object given, BinaryEncoder binaryEncoder) {
+    private static Object decodeKeys(Object given, BinaryEncoding binaryEncoder) {
         if (given instanceof Map<?, ?> m) {
             var newMap = new HashMap<String, Object>();
             m.entrySet().stream().forEach(e -> {

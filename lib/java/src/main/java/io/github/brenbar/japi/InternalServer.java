@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 class InternalServer {
 
-    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
+    static Message parseRequestMessage(byte[] requestMessageBytes, Marshaller serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
         var requestHeaders = new HashMap<String, Object>();
         var parseFailures = new ArrayList<String>();
@@ -28,7 +28,7 @@ class InternalServer {
             }
             var cause = e.getCause();
 
-            if (cause instanceof BinaryEncoderUnavailableError e2) {
+            if (cause instanceof BinaryEncodingUnavailableError e2) {
                 parseFailures.add("BinaryDecodeFailure");
             } else if (cause instanceof BinaryEncoderMissingEncoding e2) {
                 parseFailures.add("BinaryDecodeFailure");

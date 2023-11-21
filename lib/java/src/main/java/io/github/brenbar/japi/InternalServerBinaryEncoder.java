@@ -2,11 +2,11 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-class InternalServerBinaryEncodingStrategy implements BinaryEncodingStrategy {
+class InternalServerBinaryEncoder implements BinaryEncoder {
 
-    private BinaryEncoder binaryEncoder;
+    private BinaryEncoding binaryEncoder;
 
-    public InternalServerBinaryEncodingStrategy(BinaryEncoder binaryEncoder) {
+    public InternalServerBinaryEncoder(BinaryEncoding binaryEncoder) {
         this.binaryEncoder = binaryEncoder;
     }
 
@@ -16,7 +16,7 @@ class InternalServerBinaryEncodingStrategy implements BinaryEncodingStrategy {
     }
 
     @Override
-    public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
+    public List<Object> decode(List<Object> message) throws BinaryEncodingUnavailableError {
         return InternalSerializer.serverBinaryDecode(message, binaryEncoder);
     }
 

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-class InternalDefaultSerializationStrategy implements SerializationStrategy {
+class InternalDefaultSerializer implements Serializer {
 
     static class MessagePackMapDeserializer extends MapDeserializer {
 

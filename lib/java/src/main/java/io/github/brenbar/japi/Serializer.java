@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * A serialization implementation.
  */
-public interface SerializationStrategy {
+public interface Serializer {
 
     byte[] toJson(List<Object> japiMessage);
 

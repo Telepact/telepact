@@ -305,32 +305,32 @@ class MessageParseException extends Exception {
     }
 }
 
-class Serializer {
+class Marshaller {
 
-    SerializationStrategy serializationStrategy;
-    private BinaryEncodingStrategy binaryEncodingStrategy;
+    Serializer serializer;
+    private BinaryEncoder binaryEncoder;
 
-    Serializer(SerializationStrategy serializationStrategy, BinaryEncodingStrategy binaryEncodingStrategy) {
-        this.serializationStrategy = serializationStrategy;
-        this.binaryEncodingStrategy = binaryEncodingStrategy;
+    Marshaller(Serializer serializer, BinaryEncoder binaryEncoder) {
+        this.serializer = serializer;
+        this.binaryEncoder = binaryEncoder;
     }
 
     public byte[] serialize(Message message) {
-        return InternalSerializer.serialize(message, this.binaryEncodingStrategy, this.serializationStrategy);
+        return InternalSerializer.serialize(message, this.binaryEncoder, this.serializer);
     }
 
     public Message deserialize(byte[] messageBytes) {
-        return InternalSerializer.deserialize(messageBytes, this.serializationStrategy, this.binaryEncodingStrategy);
+        return InternalSerializer.deserialize(messageBytes, this.serializer, this.binaryEncoder);
     }
 }
 
-class BinaryEncoder {
+class BinaryEncoding {
 
     public final Map<String, Long> encodeMap;
     public final Map<Long, String> decodeMap;
     public final Long checksum;
 
-    public BinaryEncoder(Map<String, Long> binaryEncoding, Long binaryHash) {
+    public BinaryEncoding(Map<String, Long> binaryEncoding, Long binaryHash) {
         this.encodeMap = binaryEncoding;
         this.decodeMap = binaryEncoding.entrySet().stream()
                 .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
@@ -338,10 +338,10 @@ class BinaryEncoder {
     }
 }
 
-interface BinaryEncodingStrategy {
-    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
+interface BinaryEncoder {
+    List<Object> encode(List<Object> message) throws BinaryEncodingUnavailableError;
 
-    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
+    List<Object> decode(List<Object> message) throws BinaryEncodingUnavailableError;
 }
 
 class ValidationFailure {

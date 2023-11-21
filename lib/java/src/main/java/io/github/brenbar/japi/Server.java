@@ -12,7 +12,7 @@ public class Server {
     public static class Options {
         public Consumer<Throwable> onError = (e) -> {
         };
-        public SerializationStrategy serializationStrategy = new InternalDefaultSerializationStrategy();
+        public Serializer serializer = new InternalDefaultSerializer();
         public Map<String, TypeExtension> typeExtensions = new HashMap<>();
 
         public Options setOnError(Consumer<Throwable> onError) {
@@ -20,8 +20,8 @@ public class Server {
             return this;
         }
 
-        public Options setSerializationStrategy(SerializationStrategy serializationStrategy) {
-            this.serializationStrategy = serializationStrategy;
+        public Options setSerializer(Serializer serializer) {
+            this.serializer = serializer;
             return this;
         }
 
@@ -34,7 +34,7 @@ public class Server {
     JApiSchema jApiSchema;
     Function<Message, Message> handler;
     Consumer<Throwable> onError;
-    Serializer serializer;
+    Marshaller serializer;
 
     /**
      * Create a server with the given jAPI schema and handler.
@@ -48,9 +48,9 @@ public class Server {
 
         this.onError = options.onError;
 
-        var binaryEncoder = InternalSerializer.constructBinaryEncoder(this.jApiSchema);
-        var binaryEncodingStrategy = new InternalServerBinaryEncodingStrategy(binaryEncoder);
-        this.serializer = new Serializer(options.serializationStrategy, binaryEncodingStrategy);
+        var binaryEncoding = InternalSerializer.constructBinaryEncoding(this.jApiSchema);
+        var binaryEncoder = new InternalServerBinaryEncoder(binaryEncoding);
+        this.serializer = new Marshaller(options.serializer, binaryEncoder);
     }
 
     /**
