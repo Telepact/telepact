@@ -1458,6 +1458,7 @@
 [{"_sel":{"struct.StructExample":[]},"ok":{"value":{"struct":{"optional":false,"required":false}}}},{"fn.test":{}}]|[{},{"ok":{"value":{"struct":{}}}}]
 [{"_sel":{"struct.StructExample":[]},"ok":{"value":{"struct":{"required":false}}}},{"fn.test":{}}]|[{},{"ok":{"value":{"struct":{}}}}]
 [{"_sel":{"->.ok":[]},"ok":{"value":{"struct":{"optional":false,"required":false}}}},{"fn.test":{}}]|[{},{"ok":{}}]
+[{"_sel":{"fn.example":["optional"]},"ok":{"value":{"fn":{"required":true,"optional":true}}}},{"fn.test":{}}]|[{},{"ok":{"value":{"fn":{"optional":true}}}}]
 
 [{"_sel":{"struct.StructExample":["optional"]},"ok":{"value":{"arrStruct":[{"required":false},{"optional":false,"required":false}]}}},{"fn.test":{}}]|[{},{"ok":{"value":{"arrStruct":[{},{"optional":false}]}}}]
 

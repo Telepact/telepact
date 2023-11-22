@@ -265,7 +265,8 @@ class InternalServer {
             }
             for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
                 var structName = entry.getKey();
-                if (!structName.startsWith("struct.") && !structName.startsWith("->.")) {
+                if (!structName.startsWith("struct.") && !structName.startsWith("->.")
+                        && !structName.startsWith("fn.")) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
                             "SelectHeaderKeyMustBeStructReference"));
                     continue;
@@ -275,6 +276,9 @@ class InternalServer {
                 if (structName.startsWith("->.")) {
                     var resultEnumValue = structName.split("->.")[1];
                     structReference = functionType.result.values.get(resultEnumValue);
+                } else if (structName.startsWith("fn.")) {
+                    var functionRef = (Fn) jApiSchema.parsed.get(structName);
+                    structReference = functionRef.arg;
                 } else {
                     structReference = (Struct) jApiSchema.parsed.get(structName);
                 }
@@ -633,6 +637,20 @@ class InternalServer {
                 var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
                     var field = s.fields.get(fieldName);
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
+                            selectedStructFields);
+                    finalMap.put(entry.getKey(), valueWithSelectedFields);
+                }
+            }
+            return finalMap;
+        } else if (type instanceof Fn f) {
+            var selectedFields = selectedStructFields.get(f.name);
+            var valueAsMap = (Map<String, Object>) value;
+            var finalMap = new HashMap<>();
+            for (var entry : valueAsMap.entrySet()) {
+                var fieldName = entry.getKey();
+                if (selectedFields == null || selectedFields.contains(fieldName)) {
+                    var field = f.arg.fields.get(fieldName);
                     var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
