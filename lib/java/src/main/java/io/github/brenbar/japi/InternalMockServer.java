@@ -419,8 +419,7 @@ class InternalMockServer {
             if (invocationsNotVerified.size() > 0) {
                 var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
                 for (var invocation : invocationsNotVerified) {
-                    var invocationArgumentPseudoJson = objectMapper.writeValueAsString(invocation.functionArgument);
-                    unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocationArgumentPseudoJson));
+                    unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
                 }
                 return Map.of("errorVerificationFailure",
                         Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
