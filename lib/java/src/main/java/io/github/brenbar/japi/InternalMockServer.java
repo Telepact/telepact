@@ -66,7 +66,7 @@ class InternalMockServer {
                 var verificationResult = verifyNoMoreInteractions(invocations);
                 return new Message(verificationResult);
             }
-            case "fn._clearInvocations" -> {
+            case "fn._clearCalls" -> {
                 invocations.clear();
                 return new Message(Map.of("ok", Map.of()));
             }

@@ -87,6 +87,14 @@
 [{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
 [{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"ok":{"value":{"bool":true}}}]
 
+"clearStubs"
+
+[{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"ok":{}}]
+[{},{"fn._clearStubs":{}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
+
 "generation"
 
 [{"_mockEnableGeneratedStub":true},{"fn.test":{}}]|[{},{"ok":{"value":{"arrArr":[[794471793,"L+Uz1w"],[]],"arrFn":[],"arrInt":[996984527,1157490780],"arrNullEnum":[{"two":{"required":false}}],"arrNullFn":[{"optional":false,"required":true}],"arrNullInt":[],"arrNullStr":["fFlptw",null],"arrNullStruct":[{"required":false},null],"arrNum":[0.36801382462084165,0.2692544383297682],"arrObj":[],"arrStr":["L2Iupw","Ey7vVA"],"arrStruct":[],"bool":true,"fn":{"optional":true,"required":true},"int":662438587,"nullArr":null,"nullEnum":null,"nullFn":{"required":false},"nullNum":null,"nullStruct":{"required":false},"obj":{"HucnUg":"FDaLIA","dF0s2Q":false},"objArr":{},"objBool":{},"objEnum":{},"objFn":{"HyYKTQ":{"required":true},"JBL8UA":{"optional":true,"required":true}},"objNullArr":{"MGjeJg":[477410994],"fmoFaA":null},"objNullInt":{"SPhqCg":1608358040,"ULNNrA":null},"objNullStruct":{"OiQwYg":null},"objNum":{},"objObj":{"dft53A":{"VIdpug":1353996232},"fDiAYQ":{}}}}}]
@@ -147,7 +155,7 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":2}}}}]|[{},{"ok":{}}]
 [{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
 
-"TODOstrictMatchVerify"
+"strictMatchVerify"
 
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
@@ -164,7 +172,7 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
 
-"TODOmultipleStrictMatchVerify"
+"multipleStrictMatchVerify"
 
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
@@ -183,6 +191,15 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":2}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"wanted":{"atLeast":{"times":2}},"allCalls":[{"fn.test":{"value":{"int":0}}},{"fn.test":{"value":{"int":0,"str":"a"}}}],"found":1}}}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
+
+"clearCalls"
+
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
+[{},{"fn.test":{}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{}}}}]|[{},{"ok":{}}]
+[{},{"fn._clearCalls":{}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
 
 "resultSuppliesMissingRequiredFields"
 
