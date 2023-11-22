@@ -60,11 +60,11 @@
 [{},{"fn._createStub":{"stub":{"fn.test":{"value":{"arrStruct":[{"required":true}]}},"->":{"ok":{"value":{"bool":false}}}}}}]|[{},{"ok":{}}]
 [{},{"fn._createStub":{"stub":{"fn.example":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn.test":{"value":{"arrStruct":[{"optional":false,"required":false}]}}}]|[{},{"_errorNoMatchingStub":{}}]
-[{},{"fn.test":{"value":{"arrStruct":[{"optional":true,"required":false}]}}}]|[{},{"ok":{"value":{"bool":true}}}]
-[{},{"fn.test":{"value":{"arrStruct":[{"optional":true,"required":true}]}}}]|[{},{"ok":{"value":{"bool":false}}}]
-[{},{"fn.test":{"value":{"arrStruct":[{"optional":false,"required":true}]}}}]|[{},{"ok":{"value":{"bool":false}}}]
-[{},{"fn.test":{"value":{"arrStruct":[{"optional":true,"required":false}],"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"optional":false,"required":false}]}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"optional":true,"required":false}]}}}]|[{},{"ok":{"value":{"bool":true}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"optional":true,"required":true}]}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"optional":false,"required":true}]}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"optional":true,"required":false}],"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
 
 "strictMatchStub"
 
@@ -224,7 +224,7 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
 
-"nestedPartialMatchVerify"
+"multipleNestedPartialMatchVerify"
 
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
@@ -237,7 +237,7 @@
 [{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"struct":{"optional":true}}}},"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
 
-"reallyNestedPartialMatchVerify"
+"multipleReallyNestedPartialMatchVerify"
 
 [{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
