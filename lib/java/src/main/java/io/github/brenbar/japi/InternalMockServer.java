@@ -53,11 +53,11 @@ class InternalMockServer {
                 var callArg = (Map<String, Object>) call.getValue();
                 var verifyTimes = (Map<String, Object>) argument.getOrDefault("count",
                         Map.of("atLeast", Map.of("times", 1)));
-                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", true));
+                var strictMatch = (Boolean) argument.getOrDefault("strictMatch", false);
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
 
-                var verificationResult = verify(callFunctionName, callArg, allowArgumentPartialMatch,
+                var verificationResult = verify(callFunctionName, callArg, strictMatch,
                         verificationTimes,
                         invocations);
                 return new Message(verificationResult);
