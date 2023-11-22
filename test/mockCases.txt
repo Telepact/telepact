@@ -155,7 +155,6 @@
 [{},{"fn._verify":{"call":{"fn.test":{}},"count":{"atLeast":{"times":2}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"allCalls":[{"fn.test":{}}],"found":1,"wanted":{"atLeast":{"times":2}}}}}}]
 [{},{"fn._verify":{"call":{"fn.test":{}},"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{}},"count":{"atMost":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{}}],"found":1}}}}]
-[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
 
 "partialMatchVerify"
 
@@ -168,7 +167,6 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":0}},"allCalls":[{"fn.test":{"value":{"int":0,"str":"a"}}}],"found":1}}}}]
-[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
 
 "multiplePartialMatchVerify"
 
@@ -188,7 +186,6 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":1}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"atMost":{"times":1}},"allCalls":[{"fn.test":{"value":{"int":0,"bool":true}}},{"fn.test":{"value":{"int":0,"str":"a"}}},{"fn.test":{"value":{"int":1}}}],"found":2}}}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"count":{"atMost":{"times":2}}}}]|[{},{"ok":{}}]
-[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
 
 "strictMatchVerify"
 
@@ -227,7 +224,30 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
 
-"TODOnestedVerify"
+"nestedPartialMatchVerify"
+
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
+[{},{"fn.test":{"value":{"struct":{"required":true}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{"value":{"struct":{"required":true,"optional":true}}}}]|[{},{"ok":{}}]
+[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"errorVerificationFailure":{"additionalUnverifiedCalls":[{"fn.test":{"value":{"struct":{"required":true}}}},{"fn.test":{"value":{"struct":{"required":true,"optional":true}}}}]}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"struct":{"optional":true}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"errorVerificationFailure":{"additionalUnverifiedCalls":[{"fn.test":{"value":{"struct":{"required":true}}}}]}}]
+[{},{"fn._verify":{"call":{"fn.test":{}}}}]|[{},{"ok":{}}]
+[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"struct":{"optional":true}}}},"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
+
+"reallyNestedPartialMatchVerify"
+
+[{},{"fn._createStub":{"stub":{"fn.test":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[],"wanted":{"atLeast":{"times":1}}}}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"required":true}]}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"required":false},{"required":true,"optional":true}]}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"arrStruct":[{"optional":true}]}}}}}]|[{},{"ok":{}}]
+[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"errorVerificationFailure":{"additionalUnverifiedCalls":[{"fn.test":{"value":{"arrStruct":[{"required":false},{"required":true}]}}}]}}]
+[{},{"fn._verify":{"call":{"fn.test":{}}}}]|[{},{"ok":{}}]
+[{},{"fn._verifyNoMoreInteractions":{}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"arrStruct":[{"optional":true}]}}},"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
 
 "clearCalls"
 
