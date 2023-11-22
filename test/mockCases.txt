@@ -49,6 +49,23 @@
 [{},{"fn.test":{"value":{"struct":{"optional":false,"required":true}}}}]|[{},{"ok":{"value":{"bool":false}}}]
 [{},{"fn.test":{"value":{"struct":{"optional":true,"required":false},"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
 
+"multipleReallyNestedPartialMatchStub"
+
+[{},{"fn.test":{"value":{"int":1}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"int":0,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"arrStruct":[{"optional":true}]}},"->":{"ok":{"value":{"bool":true}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"arrStruct":[{"required":true}]}},"->":{"ok":{"value":{"bool":false}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.example":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"optional":false,"required":false}]}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"optional":true,"required":false}]}}}]|[{},{"ok":{"value":{"bool":true}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"optional":true,"required":true}]}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"optional":false,"required":true}]}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{},{"fn.test":{"value":{"arrStruct":[{"optional":true,"required":false}],"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
+
 "strictMatchStub"
 
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"_errorNoMatchingStub":{}}]
@@ -209,6 +226,8 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":2}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"wanted":{"atLeast":{"times":2}},"allCalls":[{"fn.test":{"value":{"int":0}}},{"fn.test":{"value":{"int":0,"str":"a"}}}],"found":1}}}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
+
+"TODOnestedVerify"
 
 "clearCalls"
 

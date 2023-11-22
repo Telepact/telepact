@@ -138,11 +138,11 @@ class InternalMockServer {
         };
     }
 
-    static boolean isSubMap(Map<String, Object> sub, Map<String, Object> reference) {
-        for (var subKey : sub.keySet()) {
-            var referenceValue = reference.get(subKey);
-            var subValue = sub.get(subKey);
-            var entryIsEqual = isSubMapEntryEqual(subValue, referenceValue);
+    static boolean isSubMap(Map<String, Object> part, Map<String, Object> whole) {
+        for (var partKey : part.keySet()) {
+            var wholeValue = whole.get(partKey);
+            var partValue = part.get(partKey);
+            var entryIsEqual = isSubMapEntryEqual(partValue, wholeValue);
             if (!entryIsEqual) {
                 return false;
             }
@@ -150,20 +150,27 @@ class InternalMockServer {
         return true;
     }
 
-    private static boolean isSubMapEntryEqual(Object reference, Object actual) {
-        if (reference instanceof Map m1 && actual instanceof Map m2) {
+    private static boolean isSubMapEntryEqual(Object partValue, Object wholeValue) {
+        if (partValue instanceof Map m1 && wholeValue instanceof Map m2) {
             return isSubMap(m1, m2);
-        } else if (reference instanceof List referenceList && actual instanceof List actualList) {
-            for (int i = 0; i < referenceList.size(); i += 1) {
-                var referenceElement = referenceList.get(i);
-                var actualElement = actualList.get(i);
-                var isEqual = isSubMapEntryEqual(referenceElement, actualElement);
-                if (!isEqual) {
+        } else if (partValue instanceof List partList && wholeValue instanceof List wholeList) {
+            for (int i = 0; i < partList.size(); i += 1) {
+                var partElement = partList.get(i);
+                var partMatches = false;
+                for (var wholeElement : wholeList) {
+                    if (isSubMapEntryEqual(partElement, wholeElement)) {
+                        partMatches = true;
+                        break;
+                    }
+                }
+                if (!partMatches) {
                     return false;
                 }
             }
+            return true;
+        } else {
+            return Objects.equals(partValue, wholeValue);
         }
-        return Objects.equals(reference, actual);
     }
 
     private static Map<String, Object> constructRandomStruct(
