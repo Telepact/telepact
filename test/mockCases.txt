@@ -23,6 +23,7 @@
 [{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn._createStub":{"stub":{"fn.test":{"value":{"int":1}},"->":{"ok":{"value":{"bool":true}}}}}}]|[{},{"ok":{}}]
 [{},{"fn._createStub":{"stub":{"fn.test":{"value":{"str":"a"}},"->":{"ok":{"value":{"bool":false}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.example":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
 [{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":0}}}]|[{},{"_errorNoMatchingStub":{}}]
 [{},{"fn.test":{"value":{"int":1}}}]|[{},{"ok":{"value":{"bool":true}}}]
@@ -30,6 +31,23 @@
 [{},{"fn.test":{"value":{"int":0,"str":"a"}}}]|[{},{"ok":{"value":{"bool":false}}}]
 [{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
 [{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"ok":{"value":{"bool":false}}}]
+
+"multipleNestedPartialMatchStub"
+
+[{},{"fn.test":{"value":{"int":1}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"int":0,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"int":1,"str":"b"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"bool":false,"int":1,"str":"a"}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"struct":{"optional":true}}},"->":{"ok":{"value":{"bool":true}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.test":{"value":{"struct":{"required":true}}},"->":{"ok":{"value":{"bool":false}}}}}}]|[{},{"ok":{}}]
+[{},{"fn._createStub":{"stub":{"fn.example":{},"->":{"ok":{}}}}}]|[{},{"ok":{}}]
+[{},{"fn.test":{}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"struct":{"optional":false,"required":false}}}}]|[{},{"_errorNoMatchingStub":{}}]
+[{},{"fn.test":{"value":{"struct":{"optional":true,"required":false}}}}]|[{},{"ok":{"value":{"bool":true}}}]
+[{},{"fn.test":{"value":{"struct":{"optional":true,"required":true}}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{},{"fn.test":{"value":{"struct":{"optional":false,"required":true}}}}]|[{},{"ok":{"value":{"bool":false}}}]
+[{},{"fn.test":{"value":{"struct":{"optional":true,"required":false},"str":"b"}}}]|[{},{"ok":{"value":{"bool":true}}}]
 
 "strictMatchStub"
 
