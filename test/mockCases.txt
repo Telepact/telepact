@@ -158,6 +158,11 @@
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":1}}},"strictMatch":true}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[{"fn.test":{"value":{"int":0}}}],"wanted":{"atLeast":{"times":1}}}}}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0,"str":"a"}}},"strictMatch":true}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"found":0,"allCalls":[{"fn.test":{"value":{"int":0}}}],"wanted":{"atLeast":{"times":1}}}}}}]
 [{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"exact":{"times":0}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooManyMatchingCalls":{"wanted":{"exact":{"times":0}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"exact":{"times":2}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"wanted":{"exact":{"times":2}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"exact":{"times":1}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":2}}}}]|[{},{"errorVerificationFailure":{"reason":{"tooFewMatchingCalls":{"wanted":{"atLeast":{"times":2}},"allCalls":[{"fn.test":{"value":{"int":0}}}],"found":1}}}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atLeast":{"times":1}}}}]|[{},{"ok":{}}]
+[{},{"fn._verify":{"call":{"fn.test":{"value":{"int":0}}},"strictMatch":true,"count":{"atMost":{"times":1}}}}]|[{},{"ok":{}}]
 
 
 "TODOmultipleStrictMatchVerify"
