@@ -67,15 +67,15 @@ available with limitations.
 
 ## Why not gRPC?
 
-gRPC APIs are highly efficient and leverages critical improvements offered by
-the HTTP/2 specification. They are also type-safe through generated code
-boundaries derived from a wholistic IDL that does not leak transport details.
-However, gRPC lacks overall accessibility due to reliance on libraries in a
-finite number of programming languages and expectation to generate code. And
-there are some API design limitations with gRPC, such as prohibitive rules with
-lists (i.e. repeated values), a lack of distinction between null and undefined,
-and a weak error model at the protocol layer which has prompted patching at the
-library level with limited coverage across the gRPC ecosystem.
+gRPC APIs are highly efficient and leverage critical improvements offered by the
+HTTP/2 specification. They are also type-safe through generated code boundaries
+derived from a wholistic IDL that does not leak transport details. However, gRPC
+lacks overall accessibility due to reliance on libraries in a finite number of
+programming languages and expectation to generate code. And there are some API
+design limitations with gRPC, such as prohibitive rules with lists (i.e.
+repeated values), a lack of distinction between null and undefined, and a weak
+error model at the protocol layer which has prompted patching at the library
+level with limited coverage across the gRPC ecosystem.
 
 ## Why not GraphQL?
 
@@ -127,10 +127,10 @@ the API. jAPI leverages optionality to accomplish the expressiveness of
 `undefined` in languages like TypeScript. While `null` is a value that can be
 passed around like a string or number, `undefined` or optionality can not be
 passed around but is rather an incidental property of the shape of the data
-itself. This is especially useful in update APIs where you want to erase just
-one field of a model, where null can be used to indicate the erasure of data,
-and optionality can be used to omit all fields except the one field you want to
-erase.
+itself. This is especially useful in update APIs where, for example, if you want
+to erase just one field of a model, where null can be used to indicate the
+erasure of data, and optionality can be used to omit all fields except the one
+field you want to erase.
 
 ### Why do functions in jAPI not support positional arguments?
 
@@ -230,10 +230,10 @@ backwards compatible change, on the basis of the following:
 
 - Enums are powerful typing constructs that replace otherwise type unsafe
   patterns, and classifying evolution of an enum as backwards incompatible
-  discourages use, violating jAPI's core principles of encouraging the strongest
-  of type patterns.
+  discourages use in favor of far more flimsy data types like strings, violating
+  jAPI's core principles of encouraging the strongest of type patterns.
 - jAPI does not run the risk of build-time failures with enums since jAPI enums
-  are represented as special objects rather than native enums.
+  are represented as special objects in generated code rather than native enums.
 - Clients are capable of implementing error-prone code regardless of how a
   server evolves it's API, and jAPI cannot uphold its core principle of enabling
   API evolution if it holds servers accountable for client-side design failures.
@@ -247,7 +247,8 @@ backwards compatible change, on the basis of the following:
   failed to highlight such invalid assumptions. And in the same way that a
   client should not make assumptions about patterns in strings or neglect `else`
   cases on its critical paths, a client should not make assumptions about
-  patterns in enums or neglect enum default branch logic.
+  patterns in enums or neglect default branch logic in `switch` or `match`
+  statements.
 
 ## Glossary
 

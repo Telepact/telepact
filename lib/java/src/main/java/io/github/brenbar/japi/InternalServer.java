@@ -29,7 +29,7 @@ class InternalServer {
             var cause = e.getCause();
 
             if (cause instanceof BinaryEncoderUnavailableError e2) {
-                parseFailures.add("BinaryDecodeFailure");
+                parseFailures.add("IncompatibleBinaryEncoding");
             } else if (cause instanceof BinaryEncodingMissing e2) {
                 parseFailures.add("BinaryDecodeFailure");
             } else if (cause instanceof InvalidJsonError e2) {
