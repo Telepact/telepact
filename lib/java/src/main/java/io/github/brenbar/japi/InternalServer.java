@@ -125,8 +125,8 @@ class InternalServer {
         }
 
         if (unknownTarget != null) {
-            Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
-                    Map.of("reasons", List.of("UnknownFunction")));
+            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
+                    Map.of("cases", List.of(Map.of("path", unknownTarget, "reason", "UnknownFunction"))));
             var newErrorResultValidationFailures = validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {

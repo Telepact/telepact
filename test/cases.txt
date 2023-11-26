@@ -1441,7 +1441,7 @@
 
 "testUnknownFunction"
 
-[{},{"fn.notFound":{}}]|[{},{"_errorParseFailure":{"reasons":["UnknownFunction"]}}]|skipBinary
+[{},{"fn.notFound":{}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.notFound","reason":"UnknownFunction"}]}}]|skipBinary
 
 "testErrors"
 
