@@ -99,7 +99,7 @@ class InternalSerializer {
         if (isMsgPack) {
             try {
                 finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
-            } catch (BinaryEncoderUnavailableError e) {
+            } catch (Exception e) {
                 throw new DeserializationError(e);
             }
         } else {
