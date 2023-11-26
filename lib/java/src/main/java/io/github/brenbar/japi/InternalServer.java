@@ -120,13 +120,6 @@ class InternalServer {
         var argumentValidationFailures = validateStruct(functionType.name,
                 argStructType.fields, requestPayload);
         if (!argumentValidationFailures.isEmpty()) {
-            var allErrorsAreMissingStructFields = argumentValidationFailures.stream()
-                    .allMatch(e -> e.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING));
-
-            // TODO: Complete this feature
-            // var shouldValidate = !shouldValidateArgument.apply(context, requestBody) ||
-            // !allErrorsAreMissingStructFields;
-
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
