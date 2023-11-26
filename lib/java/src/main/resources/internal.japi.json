@@ -9,10 +9,10 @@
 
   {
     "///": " Get the jAPI `schema` of this server. ",
-    "fn._schema": {},
+    "fn._api": {},
     "->": {
       "ok": {
-        "schema": "object<any>"
+        "api": "object<any>"
       }
     }
   },

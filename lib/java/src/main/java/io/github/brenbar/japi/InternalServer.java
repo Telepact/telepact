@@ -139,8 +139,8 @@ class InternalServer {
         Message resultMessage;
         if (requestTarget.equals("fn._ping")) {
             resultMessage = new Message("ok", Map.of());
-        } else if (requestTarget.equals("fn._jApi")) {
-            resultMessage = new Message("ok", Map.of("jApi", jApiSchema.original));
+        } else if (requestTarget.equals("fn._api")) {
+            resultMessage = new Message("ok", Map.of("api", jApiSchema.original));
         } else {
             try {
                 resultMessage = handler.apply(callMessage);
