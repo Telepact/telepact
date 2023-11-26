@@ -1,14 +1,12 @@
 package io.github.brenbar.japi;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -113,22 +111,16 @@ public class TestUtility {
         }
     }
 
-    public static void testBinaryExact(byte[] requestBytes, String expectedResponseJson) throws IOException {
-        var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
+    public static void testBinaryExact(byte[] requestBytes, byte[] expectedResponseBytes) throws IOException {
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test/binary", "binary.japi.json"));
         var server = new Server(json, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
-        var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
-                new TypeReference<List<Object>>() {
-                });
 
         // test json
         {
             System.out.println("--> %s".formatted(new String(requestBytes)));
             var responseBytes = server.process(requestBytes);
             System.out.println("<-- %s".formatted(new String(responseBytes)));
-            var responseAsParsedJson = objectMapper.readValue(responseBytes, new TypeReference<List<Object>>() {
-            });
-            assertEquals(expectedResponseAsParsedJson, responseAsParsedJson);
+            assertArrayEquals(expectedResponseBytes, responseBytes);
         }
     }
 

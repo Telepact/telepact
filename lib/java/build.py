@@ -124,8 +124,11 @@ def generate_binary_exact_tests():
             argument_as_bytes = ", ".join(
                 ['(byte) {}'.format(hex(ord(x))) for x in argument])
 
+            result_as_bytes = ", ".join(
+                ['(byte) {}'.format(hex(ord(x))) for x in result])
+
             case = Case('{}_{}'.format(current_test_name, counter),
-                        argument_as_bytes, result)
+                        argument_as_bytes, result_as_bytes)
 
             cases.append(case)
 
@@ -151,9 +154,9 @@ def generate_binary_exact_tests():
             var argument = new byte[] {{
             {}
             }};
-            var expectedResult = """
+            var expectedResult = new byte[] {{
             {}
-            """.trim();
+            }};
             TestUtility.testBinaryExact(argument, expectedResult);
         }}
         '''.format(case.name, case.argument, case.result))

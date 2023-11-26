@@ -1,0 +1,11 @@
+[
+  {
+    "fn.example": {
+      "one": "boolean",
+      "two": "boolean"
+    },
+    "->": {
+      "ok": {}
+    }
+  }
+]
