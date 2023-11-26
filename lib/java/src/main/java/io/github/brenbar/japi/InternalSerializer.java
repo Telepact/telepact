@@ -37,15 +37,15 @@ class InternalSerializer {
             binaryEncoding.put(key, i++);
         }
         var finalString = String.join("\n", allKeys);
-        long binaryHash;
+        int checksum;
         try {
             var hash = MessageDigest.getInstance("SHA-256").digest(finalString.getBytes(StandardCharsets.UTF_8));
             var buffer = ByteBuffer.wrap(hash);
-            binaryHash = buffer.getLong();
+            checksum = buffer.getInt();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        return new BinaryEncoding(binaryEncoding, binaryHash);
+        return new BinaryEncoding(binaryEncoding, checksum);
     }
 
     static byte[] serialize(Message message, BinaryEncoder binaryEncoder,
@@ -141,7 +141,7 @@ class InternalSerializer {
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         var headers = (Map<String, Object>) message.get(0);
 
-        var clientKnownBinaryChecksums = (List<Long>) headers.remove("_clientKnownBinaryChecksums");
+        var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
             headers.put("_enc", binaryEncoder.encodeMap);
@@ -160,7 +160,7 @@ class InternalSerializer {
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
-        var clientKnownBinaryChecksums = (List<Long>) headers.get("_bin");
+        var clientKnownBinaryChecksums = (List<Integer>) headers.get("_bin");
 
         var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
@@ -200,7 +200,7 @@ class InternalSerializer {
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
-        var binaryChecksums = (List<Long>) headers.get("_bin");
+        var binaryChecksums = (List<Integer>) headers.get("_bin");
         var binaryChecksum = binaryChecksums.get(0);
 
         // If there is a binary encoding included on this message, cache it
@@ -240,7 +240,8 @@ class InternalSerializer {
         return List.of(headers, messageBody);
     }
 
-    private static Optional<BinaryEncoding> findBinaryEncoder(Long checksum, Deque<BinaryEncoding> binaryEncoderStore) {
+    private static Optional<BinaryEncoding> findBinaryEncoder(Integer checksum,
+            Deque<BinaryEncoding> binaryEncoderStore) {
         for (var binaryEncoder : binaryEncoderStore) {
             if (Objects.equals(binaryEncoder.checksum, checksum)) {
                 return Optional.of(binaryEncoder);

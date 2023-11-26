@@ -2,7 +2,6 @@ package io.github.brenbar.japi;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,7 +13,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.KeyDeserializer;
@@ -80,8 +78,7 @@ class InternalDefaultSerializer implements SerializationImpl {
             .registerModule(new SimpleModule()
                     .addDeserializer(Object.class,
                             (JsonDeserializer<Object>) new MessagePackUntypedObjectDeserializer())
-                    .addDeserializer(Map.class, new MessagePackMapDeserializer()))
-            .configure(DeserializationFeature.USE_LONG_FOR_INTS, true);
+                    .addDeserializer(Map.class, new MessagePackMapDeserializer()));
 
     @Override
     public byte[] toJson(Object japiMessage) {

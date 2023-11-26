@@ -19,5 +19,16 @@
             TestUtility.testBinaryExact(argument, expectedResult);
         }
         
+        @Test
+        public void testBinary_binary_1() throws IOException {
+            var argument = new byte[] {
+            (byte) 0x80
+            };
+            var expectedResult = """
+            [{},{"_errorParseFailure":{"reasons":["InvalidJson"]}}]
+            """.trim();
+            TestUtility.testBinaryExact(argument, expectedResult);
+        }
+        
     }
     

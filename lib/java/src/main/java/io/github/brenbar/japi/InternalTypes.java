@@ -309,13 +309,13 @@ class BinaryEncoding {
 
     public final Map<String, Long> encodeMap;
     public final Map<Long, String> decodeMap;
-    public final Long checksum;
+    public final Integer checksum;
 
-    public BinaryEncoding(Map<String, Long> binaryEncoding, Long binaryHash) {
+    public BinaryEncoding(Map<String, Long> binaryEncoding, Integer checksum) {
         this.encodeMap = binaryEncoding;
         this.decodeMap = binaryEncoding.entrySet().stream()
                 .collect(Collectors.toMap(e -> Long.valueOf(e.getValue()), e -> e.getKey()));
-        this.checksum = binaryHash;
+        this.checksum = checksum;
     }
 }
 
