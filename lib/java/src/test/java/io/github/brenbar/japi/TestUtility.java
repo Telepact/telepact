@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -120,8 +122,16 @@ public class TestUtility {
             System.out.println("--> %s".formatted(new String(requestBytes)));
             var responseBytes = server.process(requestBytes);
             System.out.println("<-- %s".formatted(new String(responseBytes)));
-            assertArrayEquals(expectedResponseBytes, responseBytes);
+            assertEquals(convertToList(expectedResponseBytes), convertToList(responseBytes));
         }
+    }
+
+    private static List<Byte> convertToList(byte[] bytes) {
+        var list = new ArrayList<Byte>();
+        for (var b : bytes) {
+            list.add(b);
+        }
+        return list;
     }
 
     public static MockServer generatedMockTestSetup() throws IOException {

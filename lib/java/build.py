@@ -119,7 +119,7 @@ def generate_binary_exact_tests():
         elif line.__contains__('|'):
             lines = line.split('|')
             argument = bytes(lines[0], 'utf-8').decode('unicode_escape')
-            result = lines[1]
+            result = bytes(lines[1], 'utf-8').decode('unicode_escape')
 
             argument_as_bytes = ", ".join(
                 ['(byte) {}'.format(hex(ord(x))) for x in argument])
