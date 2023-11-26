@@ -74,24 +74,6 @@ class InternalServer {
             responseHeaders.put("_id", callId);
         }
 
-        Map<String, Object> features = null;
-        if (requestHeaders.containsKey("_features")) {
-            try {
-                features = (Map<String, Object>) requestHeaders.get("_features");
-            } catch (ClassCastException e) {
-                throw new JApiProcessError("Invalid header. Path: headers{_features}");
-            }
-        }
-
-        boolean featureIgnoreMissingArgStructFields = false;
-        if (features != null) {
-            try {
-                featureIgnoreMissingArgStructFields = (Boolean) features.get("ignoreMissingStructFields");
-            } catch (ClassCastException | NullPointerException e) {
-                throw new JApiProcessError("Invalid header. Path: headers{_features}{ignoreMissingStructFields}");
-            }
-        }
-
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
