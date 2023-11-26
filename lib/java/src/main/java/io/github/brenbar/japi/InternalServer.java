@@ -15,8 +15,6 @@ class InternalServer {
 
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
-        var requestHeaders = new HashMap<String, Object>();
-        var parseFailures = new ArrayList<String>();
 
         Message requestMessage;
         try {
@@ -28,31 +26,25 @@ class InternalServer {
             }
             var cause = e.getCause();
 
+            List<String> parseFailures;
             if (cause instanceof BinaryEncoderUnavailableError e2) {
-                parseFailures.add("IncompatibleBinaryEncoding");
+                parseFailures = List.of("IncompatibleBinaryEncoding");
             } else if (cause instanceof BinaryEncodingMissing e2) {
-                parseFailures.add("BinaryDecodeFailure");
+                parseFailures = List.of("BinaryDecodeFailure");
             } else if (cause instanceof InvalidJsonError e2) {
-                parseFailures.add("InvalidJson");
+                parseFailures = List.of("InvalidJson");
             } else if (cause instanceof MessageParseError e2) {
-                parseFailures.addAll(e2.failures);
+                parseFailures = e2.failures;
             } else {
                 // TODO: Change this to something like "CouldNotParse"
-                parseFailures.add("MessageMustBeArrayWithTwoElements");
+                parseFailures = List.of("MessageMustBeArrayWithTwoElements");
             }
 
-            if (!parseFailures.isEmpty()) {
-                requestHeaders.put("_parseFailures", parseFailures);
-            }
+            var requestHeaders = new HashMap<String, Object>();
+            requestHeaders.put("_parseFailures", parseFailures);
 
             return new Message(requestHeaders, Map.of());
         }
-
-        if (!parseFailures.isEmpty()) {
-            requestHeaders.put("_parseFailures", parseFailures);
-        }
-
-        requestMessage.header.putAll(requestHeaders);
 
         return requestMessage;
     }
