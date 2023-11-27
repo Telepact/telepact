@@ -26,7 +26,9 @@ public class LoadTest {
     public void test() throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
 
-        var server = new MockServer(json, new Options())
+        var jApiSchema = new JApiSchema(json);
+
+        var server = new MockServer(jApiSchema, new Options())
                 .setOnError((e) -> e.printStackTrace())
                 .setEnableGeneratedDefaultStub(true);
 

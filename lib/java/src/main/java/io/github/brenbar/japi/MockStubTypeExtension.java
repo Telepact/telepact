@@ -6,10 +6,10 @@ import java.util.Map;
 
 public class MockStubTypeExtension implements TypeExtension {
 
-    public final JApiSchema jApiSchema;
+    public final Map<String, Type> types;
 
-    public MockStubTypeExtension(JApiSchema jApiSchema) {
-        this.jApiSchema = jApiSchema;
+    public MockStubTypeExtension(Map<String, Type> types) {
+        this.types = types;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class MockStubTypeExtension implements TypeExtension {
 
             var input = (Map<String, Object>) givenMap.get(functionName);
             var output = (Map<String, Object>) givenMap.get("->");
-            var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
+            var functionDef = (Fn) this.types.get(functionName);
 
             var inputFailures = InternalValidate.validateStructFields(path, functionDef.arg.fields, input);
             var outputFailures = InternalValidate.validateEnumValues("%s.->".formatted(path), functionDef.result.values,

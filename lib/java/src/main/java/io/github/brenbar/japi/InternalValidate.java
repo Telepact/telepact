@@ -11,7 +11,7 @@ import java.util.Map;
 public class InternalValidate {
 
     static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, JApiSchema jApiSchema, Fn functionType) {
+            Map<String, Object> headers, JApiSchemaTuple jApiSchema, Fn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {

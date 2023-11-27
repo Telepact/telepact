@@ -3,7 +3,6 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -17,16 +16,10 @@ public class MockServer {
     public static class Options {
         public Consumer<Throwable> onError = (e) -> {
         };
-        public Map<String, TypeExtension> typeExtensions = new HashMap<>();
         public boolean enableGeneratedDefaultStub = true;
 
         public Options setOnError(Consumer<Throwable> onError) {
             this.onError = onError;
-            return this;
-        }
-
-        public Options addTypeExtension(String definitionKey, TypeExtension typeExtension) {
-            this.typeExtensions.put(definitionKey, typeExtension);
             return this;
         }
 
@@ -49,21 +42,20 @@ public class MockServer {
      * 
      * @param jApiSchemaAsJson
      */
-    public MockServer(String jApiSchemaAsJson, Options options) {
-        var combinedSchemaJson = InternalParse.combineJsonSchemas(List.of(
-                jApiSchemaAsJson,
-                InternalMockJApi.getJson()));
+    public MockServer(JApiSchema jApiSchema, Options options) {
+        var parsedTypes = new HashMap<String, Type>();
 
-        var jApiSchemaCopy = new JApiSchema(new HashMap<>(), new HashMap<>());
+        var typeExtensions = new HashMap<String, TypeExtension>();
+        typeExtensions.put("ext._Call", new MockCallTypeExtension(parsedTypes));
+        typeExtensions.put("ext._Stub", new MockStubTypeExtension(parsedTypes));
 
-        options.addTypeExtension("ext._Call", new MockCallTypeExtension(jApiSchemaCopy));
-        options.addTypeExtension("ext._Stub", new MockStubTypeExtension(jApiSchemaCopy));
+        var mockJApiSchema = new JApiSchema(InternalMockJApi.getJson(), typeExtensions);
+        var combinedJApiSchema = new JApiSchema(jApiSchema, mockJApiSchema);
 
-        this.server = new Server(combinedSchemaJson, this::handle,
-                new Server.Options().setOnError(options.onError).setTypeExtensions(options.typeExtensions));
+        this.server = new Server(combinedJApiSchema, this::handle,
+                new Server.Options().setOnError(options.onError));
 
-        jApiSchemaCopy.original.putAll(this.server.jApiSchema.original);
-        jApiSchemaCopy.parsed.putAll(this.server.jApiSchema.parsed);
+        parsedTypes.putAll(server.jApiSchema.schemas.parsed);
 
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
@@ -109,6 +101,6 @@ public class MockServer {
 
     private Message handle(Message requestMessage) {
         return InternalMockServer.handle(requestMessage, this.stubs, this.invocations, this.random,
-                this.server.jApiSchema, this.enableGeneratedDefaultStub);
+                this.server.jApiSchema.schemas, this.enableGeneratedDefaultStub);
     }
 }

@@ -13,7 +13,6 @@ public class Server {
         public Consumer<Throwable> onError = (e) -> {
         };
         public SerializationImpl serializer = new InternalDefaultSerializer();
-        public Map<String, TypeExtension> typeExtensions = new HashMap<>();
 
         public Options setOnError(Consumer<Throwable> onError) {
             this.onError = onError;
@@ -22,11 +21,6 @@ public class Server {
 
         public Options setSerializer(SerializationImpl serializer) {
             this.serializer = serializer;
-            return this;
-        }
-
-        public Options setTypeExtensions(Map<String, TypeExtension> typeExtensions) {
-            this.typeExtensions = typeExtensions;
             return this;
         }
     }
@@ -42,13 +36,14 @@ public class Server {
      * @param jApiSchemaAsJson
      * @param handler
      */
-    public Server(String jApiSchemaAsJson, Function<Message, Message> handler, Options options) {
-        this.jApiSchema = InternalParse.newJApiSchemaWithInternalSchema(jApiSchemaAsJson, options.typeExtensions);
+    public Server(JApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
+        var internalJApiSchema = new JApiSchema(InternalJApi.getJson());
+        this.jApiSchema = new JApiSchema(jApiSchema, internalJApiSchema);
         this.handler = handler;
 
         this.onError = options.onError;
 
-        var binaryEncoding = InternalSerializer.constructBinaryEncoding(this.jApiSchema);
+        var binaryEncoding = InternalSerializer.constructBinaryEncoding(this.jApiSchema.schemas);
         var binaryEncoder = new InternalServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }
@@ -66,7 +61,7 @@ public class Server {
     private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
             var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
-                    this.jApiSchema, this.onError);
+                    this.jApiSchema.schemas, this.onError);
 
             var responseMessage = processMessage(requestMessage);
 
@@ -82,7 +77,7 @@ public class Server {
     }
 
     private Message processMessage(Message requestMessage) {
-        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler,
+        return InternalServer.processMessage(requestMessage, this.jApiSchema.schemas, this.handler,
                 this.onError);
     }
 }

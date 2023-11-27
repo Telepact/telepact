@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class JApiSchema {
+class JApiSchemaTuple {
     public final Map<String, Object> original;
     public final Map<String, Type> parsed;
 
-    public JApiSchema(Map<String, Object> original, Map<String, Type> parsed) {
+    public JApiSchemaTuple(Map<String, Object> original, Map<String, Type> parsed) {
         this.original = original;
         this.parsed = parsed;
     }
@@ -262,6 +262,23 @@ class Fn implements Type {
         this.name = name;
         this.arg = input;
         this.result = output;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+}
+
+class Trait implements Type {
+    public final String name;
+    public final Fn fn;
+    public final String regex;
+
+    public Trait(String name, Fn fn, String regex) {
+        this.name = name;
+        this.fn = fn;
+        this.regex = regex;
     }
 
     @Override

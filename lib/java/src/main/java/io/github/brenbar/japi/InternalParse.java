@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 class InternalParse {
 
-    static JApiSchema newJApiSchemaWithInternalSchema(String jApiSchemaAsJson,
+    static JApiSchemaTuple newJApiSchemaWithInternalSchema(String jApiSchemaAsJson,
             Map<String, TypeExtension> typeExtensions) {
         var combinedSchemaJson = combineJsonSchemas(List.of(
                 jApiSchemaAsJson,
@@ -85,7 +85,7 @@ class InternalParse {
                         .formatted(definition));
     }
 
-    private static JApiSchema newJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
+    static JApiSchemaTuple newJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
         var parsedTypes = new HashMap<String, Type>();
 
         var objectMapper = new ObjectMapper();
@@ -97,14 +97,14 @@ class InternalParse {
             throw new JApiSchemaParseError("Document root must be an array of objects", e);
         }
 
-        var japiSchemaAsParsedJson = new HashMap<String, Object>();
+        var jApiSchemaAsParsedJson = new HashMap<String, Object>();
 
         for (var definition : initialJapiSchemaAsParsedJson) {
             String schemaKey = findSchemaKey(definition);
-            japiSchemaAsParsedJson.put(schemaKey, definition);
+            jApiSchemaAsParsedJson.put(schemaKey, definition);
         }
 
-        var schemaKeys = japiSchemaAsParsedJson.keySet();
+        var schemaKeys = jApiSchemaAsParsedJson.keySet();
 
         var traitSchemaKeys = new HashSet<String>();
 
@@ -114,79 +114,21 @@ class InternalParse {
                 continue;
             }
 
-            getOrParseType(schemaKey, japiSchemaAsParsedJson, parsedTypes, typeExtensions);
+            getOrParseType(schemaKey, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
         }
 
         // Apply trait to all functions
         for (var traitSchemaKey : traitSchemaKeys) {
 
-            var traitDefinition = (Map<String, Object>) japiSchemaAsParsedJson.get(traitSchemaKey);
+            var traitDefinition = (Map<String, Object>) jApiSchemaAsParsedJson.get(traitSchemaKey);
 
-            Map<String, Object> def;
-            try {
-                def = (Map<String, Object>) traitDefinition.get(traitSchemaKey);
-            } catch (ClassCastException e) {
-                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
-            }
+            var trait = parseTraitType(traitDefinition, traitSchemaKey, jApiSchemaAsParsedJson,
+                    parsedTypes,
+                    typeExtensions);
 
-            String traitFunctionRegex;
-            String traitFunctionKey;
-            if (def.containsKey("fn.*")) {
-                traitFunctionKey = "fn.*";
-                traitFunctionRegex = "^fn\\.[a-zA-Z]";
-            } else if (def.containsKey("fn._?*")) {
-                if (!traitSchemaKey.startsWith("trait._")) {
-                    throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
-                }
-                traitFunctionKey = "fn._?*";
-                traitFunctionRegex = "^fn\\.[a-zA-Z_]";
-            } else {
-                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(traitSchemaKey));
-            }
+            applyTraitToParsedTypes(trait, parsedTypes);
 
-            var traitFunction = parseFunctionType(def, traitFunctionKey, japiSchemaAsParsedJson, parsedTypes,
-                    typeExtensions,
-                    true);
-
-            for (var parsedType : parsedTypes.entrySet()) {
-                Fn f;
-                try {
-                    f = (Fn) parsedType.getValue();
-                } catch (ClassCastException e) {
-                    continue;
-                }
-
-                var regex = Pattern.compile(traitFunctionRegex);
-                var matcher = regex.matcher(f.name);
-                if (!matcher.find()) {
-                    continue;
-                }
-
-                if (f.name.startsWith("fn._")) {
-                    // Only internal traits can change internal functions
-                    if (!traitSchemaKey.startsWith("trait._")) {
-                        continue;
-                    }
-                }
-
-                for (var traitArgumentField : traitFunction.arg.fields.entrySet()) {
-                    var newKey = traitArgumentField.getKey();
-                    if (f.arg.fields.containsKey(newKey)) {
-                        throw new JApiSchemaParseError(
-                                "Argument field already in use: %s".formatted(newKey));
-                    }
-                    f.arg.fields.put(newKey, traitArgumentField.getValue());
-                }
-
-                for (var traitResultField : traitFunction.result.values.entrySet()) {
-                    var newKey = traitResultField.getKey();
-                    if (f.result.values.containsKey(newKey)) {
-                        throw new JApiSchemaParseError(
-                                "Result value already in use: %s".formatted(newKey));
-                    }
-                    f.result.values.put(newKey, traitResultField.getValue());
-                }
-            }
+            parsedTypes.put(trait.name, trait);
         }
 
         // Ensure all type extensions are defined
@@ -198,7 +140,84 @@ class InternalParse {
             }
         }
 
-        return new JApiSchema((Map<String, Object>) (Object) japiSchemaAsParsedJson, parsedTypes);
+        return new JApiSchemaTuple((Map<String, Object>) (Object) jApiSchemaAsParsedJson, parsedTypes);
+    }
+
+    static void applyTraitToParsedTypes(Trait trait, Map<String, Type> parsedTypes) {
+        for (var parsedType : parsedTypes.entrySet()) {
+            Fn f;
+            try {
+                f = (Fn) parsedType.getValue();
+            } catch (ClassCastException e) {
+                continue;
+            }
+
+            var regex = Pattern.compile(trait.regex);
+            var matcher = regex.matcher(f.name);
+            if (!matcher.find()) {
+                continue;
+            }
+
+            if (f.name.startsWith("fn._")) {
+                // Only internal traits can change internal functions
+                if (!trait.name.startsWith("trait._")) {
+                    continue;
+                }
+            }
+
+            for (var traitArgumentField : trait.fn.arg.fields.entrySet()) {
+                var newKey = traitArgumentField.getKey();
+                if (f.arg.fields.containsKey(newKey)) {
+                    throw new JApiSchemaParseError(
+                            "Argument field already in use: %s".formatted(newKey));
+                }
+                f.arg.fields.put(newKey, traitArgumentField.getValue());
+            }
+
+            for (var traitResultField : trait.fn.result.values.entrySet()) {
+                var newKey = traitResultField.getKey();
+                if (f.result.values.containsKey(newKey)) {
+                    throw new JApiSchemaParseError(
+                            "Result value already in use: %s".formatted(newKey));
+                }
+                f.result.values.put(newKey, traitResultField.getValue());
+            }
+        }
+    }
+
+    public static Trait parseTraitType(
+            Map<String, Object> traitDefinitionAsParsedJson,
+            String definitionKey,
+            Map<String, Object> jApiSchemaAsParsedJson,
+            Map<String, Type> parsedTypes,
+            Map<String, TypeExtension> typeExtensions) {
+        Map<String, Object> def;
+        try {
+            def = (Map<String, Object>) traitDefinitionAsParsedJson.get(definitionKey);
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError("Invalid trait definition %s".formatted(definitionKey));
+        }
+
+        String traitFunctionRegex;
+        String traitFunctionKey;
+        if (def.containsKey("fn.*")) {
+            traitFunctionKey = "fn.*";
+            traitFunctionRegex = "^fn\\.[a-zA-Z]";
+        } else if (def.containsKey("fn._?*")) {
+            if (!definitionKey.startsWith("trait._")) {
+                throw new JApiSchemaParseError("Invalid trait definition %s".formatted(definitionKey));
+            }
+            traitFunctionKey = "fn._?*";
+            traitFunctionRegex = "^fn\\.[a-zA-Z_]";
+        } else {
+            throw new JApiSchemaParseError("Invalid trait definition %s".formatted(definitionKey));
+        }
+
+        var traitFunction = parseFunctionType(def, traitFunctionKey, jApiSchemaAsParsedJson, parsedTypes,
+                typeExtensions,
+                true);
+
+        return new Trait(definitionKey, traitFunction, traitFunctionRegex);
     }
 
     private static Fn parseFunctionType(
