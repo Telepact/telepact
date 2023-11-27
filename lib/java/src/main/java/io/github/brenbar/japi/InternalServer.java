@@ -117,7 +117,7 @@ class InternalServer {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var argumentValidationFailures = validateStruct(functionType.name,
+        var argumentValidationFailures = validateStructFields(functionType.name,
                 argStructType.fields, requestPayload);
         if (!argumentValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
@@ -292,10 +292,10 @@ class InternalServer {
     private static List<ValidationFailure> validateResultEnum(
             Enum resultEnumType,
             Map<String, Object> actualResult) {
-        return validateEnum("", resultEnumType.values, actualResult);
+        return validateEnumValues("", resultEnumType.values, actualResult);
     }
 
-    static List<ValidationFailure> validateStruct(
+    static List<ValidationFailure> validateStructFields(
             String path,
             Map<String, FieldDeclaration> referenceStruct,
             Map<String, Object> actualStruct) {
@@ -336,7 +336,7 @@ class InternalServer {
         return validationFailures;
     }
 
-    static List<ValidationFailure> validateEnum(
+    static List<ValidationFailure> validateEnumValues(
             String path,
             Map<String, Struct> referenceValues,
             Map<?, ?> actual) {
@@ -386,7 +386,7 @@ class InternalServer {
             Map<String, Object> actual) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var nestedValidationFailures = validateStruct(path, enumStruct.fields,
+        var nestedValidationFailures = validateStructFields(path, enumStruct.fields,
                 actual);
         validationFailures.addAll(nestedValidationFailures);
 
@@ -545,6 +545,48 @@ class InternalServer {
         }
     }
 
+    private static List<ValidationFailure> validateStruct(String path, Object value, Struct s) {
+        if (value instanceof Boolean) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.BOOLEAN_INVALID_FOR_STRUCT_TYPE));
+        } else if (value instanceof Number) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.NUMBER_INVALID_FOR_STRUCT_TYPE));
+        } else if (value instanceof String) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.STRING_INVALID_FOR_STRUCT_TYPE));
+        } else if (value instanceof List) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.ARRAY_INVALID_FOR_STRUCT_TYPE));
+        } else if (value instanceof Map<?, ?> m) {
+            return validateStructFields(path, s.fields, (Map<String, Object>) m);
+        } else {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.VALUE_INVALID_FOR_STRUCT_TYPE));
+        }
+    }
+
+    private static List<ValidationFailure> validateEnum(String path, Object value, Enum e) {
+        if (value instanceof Boolean) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_TYPE));
+        } else if (value instanceof Number) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.NUMBER_INVALID_FOR_ENUM_TYPE));
+        } else if (value instanceof String) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.STRING_INVALID_FOR_ENUM_TYPE));
+        } else if (value instanceof List) {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_TYPE));
+        } else if (value instanceof Map<?, ?> m) {
+            return validateEnumValues(path, e.values, m);
+        } else {
+            return Collections.singletonList(
+                    new ValidationFailure(path, ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_TYPE));
+        }
+    }
+
     private static List<ValidationFailure> validateType(String path, TypeDeclaration typeDeclaration,
             Object value) {
         if (value == null) {
@@ -569,43 +611,9 @@ class InternalServer {
             } else if (expectedType instanceof JsonObject o) {
                 return validateObject(path, value, o);
             } else if (expectedType instanceof Struct s) {
-                if (value instanceof Boolean) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.BOOLEAN_INVALID_FOR_STRUCT_TYPE));
-                } else if (value instanceof Number) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.NUMBER_INVALID_FOR_STRUCT_TYPE));
-                } else if (value instanceof String) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.STRING_INVALID_FOR_STRUCT_TYPE));
-                } else if (value instanceof List) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.ARRAY_INVALID_FOR_STRUCT_TYPE));
-                } else if (value instanceof Map<?, ?> m) {
-                    return validateStruct(path, s.fields, (Map<String, Object>) m);
-                } else {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.VALUE_INVALID_FOR_STRUCT_TYPE));
-                }
+                return validateStruct(path, value, s);
             } else if (expectedType instanceof Enum e) {
-                if (value instanceof Boolean) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.BOOLEAN_INVALID_FOR_ENUM_TYPE));
-                } else if (value instanceof Number) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.NUMBER_INVALID_FOR_ENUM_TYPE));
-                } else if (value instanceof String) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.STRING_INVALID_FOR_ENUM_TYPE));
-                } else if (value instanceof List) {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.ARRAY_INVALID_FOR_ENUM_TYPE));
-                } else if (value instanceof Map<?, ?> m) {
-                    return validateEnum(path, e.values, m);
-                } else {
-                    return Collections.singletonList(
-                            new ValidationFailure(path, ValidationErrorReasons.VALUE_INVALID_FOR_ENUM_TYPE));
-                }
+                return validateEnum(path, value, e);
             } else if (expectedType instanceof Fn f) {
                 return validateType(path, new TypeDeclaration(f.arg, false), value);
             } else if (expectedType instanceof Ext e) {
