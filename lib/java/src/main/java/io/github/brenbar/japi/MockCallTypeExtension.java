@@ -34,7 +34,7 @@ public class MockCallTypeExtension implements TypeExtension {
             var input = (Map<String, Object>) givenMap.get(functionName);
             var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
 
-            var inputFailures = InternalServer.validateStructFields(path, functionDef.arg.fields, input);
+            var inputFailures = InternalValidate.validateStructFields(path, functionDef.arg.fields, input);
             var failures = new ArrayList<ValidationFailure>();
             failures.addAll(inputFailures);
 

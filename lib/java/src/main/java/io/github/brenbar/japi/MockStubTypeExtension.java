@@ -39,8 +39,8 @@ public class MockStubTypeExtension implements TypeExtension {
             var output = (Map<String, Object>) givenMap.get("->");
             var functionDef = (Fn) this.jApiSchema.parsed.get(functionName);
 
-            var inputFailures = InternalServer.validateStructFields(path, functionDef.arg.fields, input);
-            var outputFailures = InternalServer.validateEnumValues("%s.->".formatted(path), functionDef.result.values,
+            var inputFailures = InternalValidate.validateStructFields(path, functionDef.arg.fields, input);
+            var outputFailures = InternalValidate.validateEnumValues("%s.->".formatted(path), functionDef.result.values,
                     output);
             var failures = new ArrayList<ValidationFailure>();
             failures.addAll(inputFailures);
