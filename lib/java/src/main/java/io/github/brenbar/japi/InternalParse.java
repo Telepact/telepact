@@ -1,78 +1,16 @@
 package io.github.brenbar.japi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 class InternalParse {
-
-    static JApiSchemaTuple newJApiSchemaWithInternalSchema(String jApiSchemaAsJson,
-            Map<String, TypeExtension> typeExtensions) {
-        var combinedSchemaJson = combineJsonSchemas(List.of(
-                jApiSchemaAsJson,
-                InternalJApi.getJson()));
-        var schema = newJApiSchema(combinedSchemaJson, typeExtensions);
-
-        return schema;
-    }
-
-    static String combineJsonSchemas(List<String> jsonSchemas) {
-        var objectMapper = new ObjectMapper();
-        var finalJsonList = new ArrayList<Object>();
-
-        var pseudoJsonSchemas = new ArrayList<Object>();
-        for (var jsonSchema : jsonSchemas) {
-            List<Object> pseudoJsonSchema;
-            try {
-                pseudoJsonSchema = objectMapper.readValue(jsonSchema, new TypeReference<List<Object>>() {
-                });
-            } catch (JsonProcessingException e) {
-                throw new JApiSchemaParseError("Document root must be an array of objects", e);
-            }
-            pseudoJsonSchemas.add(pseudoJsonSchema);
-        }
-
-        var jsonSchemaKeys = new HashSet<String>();
-        var duplicatedJsonSchemaKeys = new HashSet<String>();
-        for (var pseudoJsonSchema : pseudoJsonSchemas) {
-            var definitions = (List<Object>) pseudoJsonSchema;
-            for (var definition : definitions) {
-                var definitionAsPsuedoJson = (Map<String, Object>) definition;
-                var key = findSchemaKey(definitionAsPsuedoJson);
-                if (jsonSchemaKeys.contains(key)) {
-                    duplicatedJsonSchemaKeys.add(key);
-                } else {
-                    jsonSchemaKeys.add(key);
-                }
-            }
-        }
-
-        if (!duplicatedJsonSchemaKeys.isEmpty()) {
-            var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
-            throw new JApiSchemaParseError(
-                    "Final schema has duplicate keys: %s".formatted(sortedKeys));
-        }
-
-        for (var pseudoJsonSchema : pseudoJsonSchemas) {
-            var definitions = (List<Object>) pseudoJsonSchema;
-            finalJsonList.addAll(definitions);
-        }
-
-        try {
-            return objectMapper.writeValueAsString(finalJsonList);
-        } catch (JsonProcessingException e) {
-            throw new JApiSchemaParseError("Could not combine schemas", e);
-        }
-    }
 
     private static String findSchemaKey(Map<String, Object> definition) {
         for (var e : definition.keySet()) {
@@ -99,9 +37,19 @@ class InternalParse {
 
         var jApiSchemaAsParsedJson = new HashMap<String, Object>();
 
+        var existingKeys = new HashSet<String>();
+        var duplicateKeys = new HashSet<String>();
         for (var definition : initialJapiSchemaAsParsedJson) {
             String schemaKey = findSchemaKey(definition);
+            if (existingKeys.contains(schemaKey)) {
+                duplicateKeys.add(schemaKey);
+            }
             jApiSchemaAsParsedJson.put(schemaKey, definition);
+            existingKeys.add(schemaKey);
+        }
+
+        if (!duplicateKeys.isEmpty()) {
+            throw new JApiSchemaParseError("Schema has duplicate keys %s".formatted(duplicateKeys));
         }
 
         var schemaKeys = jApiSchemaAsParsedJson.keySet();

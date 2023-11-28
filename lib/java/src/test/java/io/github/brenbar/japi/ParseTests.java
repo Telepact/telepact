@@ -22,11 +22,8 @@ public class ParseTests {
         public void testDuplicateKeys() throws IOException {
                 var json = Files.readString(
                                 FileSystems.getDefault().getPath("../../test/parse", "duplicate_keys.japi.json"));
-                var jApi = new JApiSchema(json);
-                var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
-                Assertions.assertTrue(e.getMessage().contains("Final schema has duplicate keys"));
+                var e = assertThrows(JApiSchemaParseError.class, () -> new JApiSchema(json));
+                Assertions.assertTrue(e.getMessage().contains("Schema has duplicate keys"));
         }
 
         @Test
@@ -34,10 +31,8 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_definition.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+                                () -> new JApiSchema(json));
                 Assertions.assertTrue(
                                 e.getMessage().contains(
                                                 "Invalid definition. Each definition should have one key matching the regex"));
@@ -48,10 +43,8 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_root_boolean.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+                                () -> new JApiSchema(json));
                 Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
         }
 
@@ -60,10 +53,8 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_root_number.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+                                () -> new JApiSchema(json));
                 Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
         }
 
@@ -72,10 +63,8 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_root_string.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+                                () -> new JApiSchema(json));
                 Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
         }
 
@@ -84,10 +73,8 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_root_object.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
+                                () -> new JApiSchema(json));
                 Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
         }
 
@@ -96,15 +83,11 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_trait_def.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
-
+                                () -> new JApiSchema(json));
                 Assertions.assertTrue(
                                 e.getMessage().contains(
                                                 "Invalid trait definition"));
-
         }
 
         @Test
@@ -112,15 +95,11 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_trait_fn_key.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
-
+                                () -> new JApiSchema(json));
                 Assertions.assertTrue(
                                 e.getMessage().contains(
                                                 "Invalid trait definition"));
-
         }
 
         @Test
@@ -128,15 +107,11 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_trait_internal_fn_key.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
-
+                                () -> new JApiSchema(json));
                 Assertions.assertTrue(
                                 e.getMessage().contains(
                                                 "Invalid trait definition"));
-
         }
 
         @Test
@@ -147,7 +122,6 @@ public class ParseTests {
                 var jApi = new JApiSchema(json);
                 var server = new Server(jApi, this::handle,
                                 new Options().setOnError((e1) -> e1.printStackTrace()));
-
         }
 
         @Test
@@ -155,15 +129,11 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_trait_collide_arg.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
-
+                                () -> new JApiSchema(json));
                 Assertions.assertTrue(
                                 e.getMessage().contains(
                                                 "Argument field already in use"));
-
         }
 
         @Test
@@ -171,14 +141,10 @@ public class ParseTests {
                 var json = Files
                                 .readString(FileSystems.getDefault().getPath("../../test/parse",
                                                 "invalid_trait_collide_result.japi.json"));
-                var jApi = new JApiSchema(json);
                 var e = assertThrows(JApiSchemaParseError.class,
-                                () -> new Server(jApi, this::handle,
-                                                new Options().setOnError((e1) -> e1.printStackTrace())));
-
+                                () -> new JApiSchema(json));
                 Assertions.assertTrue(
                                 e.getMessage().contains(
                                                 "Result value already in use"));
-
         }
 }
