@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,29 +55,18 @@ class InternalParse {
 
         var schemaKeys = jApiSchemaAsParsedJson.keySet();
 
-        var traitSchemaKeys = new HashSet<String>();
+        var traits = new ArrayList<Trait>();
 
         for (var schemaKey : schemaKeys) {
-            if (schemaKey.startsWith("trait.")) {
-                traitSchemaKeys.add(schemaKey);
-                continue;
+            var typ = getOrParseType(schemaKey, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
+            if (typ instanceof Trait t) {
+                traits.add(t);
             }
-
-            getOrParseType(schemaKey, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
         }
 
         // Apply trait to all functions
-        for (var traitSchemaKey : traitSchemaKeys) {
-
-            var traitDefinition = (Map<String, Object>) jApiSchemaAsParsedJson.get(traitSchemaKey);
-
-            var trait = parseTraitType(traitDefinition, traitSchemaKey, jApiSchemaAsParsedJson,
-                    parsedTypes,
-                    typeExtensions);
-
+        for (var trait : traits) {
             applyTraitToParsedTypes(trait, parsedTypes);
-
-            parsedTypes.put(trait.name, trait);
         }
 
         // Ensure all type extensions are defined
@@ -355,7 +345,7 @@ class InternalParse {
         }
 
         var regex = Pattern.compile(
-                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*)))$");
+                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn|trait|info|ext)\\.([a-zA-Z_]\\w*)))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
@@ -398,9 +388,12 @@ class InternalParse {
             var type = switch (typePrefix) {
                 case "struct" ->
                     parseStructType(definition, customTypeName, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
-                case "enum" -> parseEnumType(definition, typeName, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
+                case "enum" ->
+                    parseEnumType(definition, customTypeName, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
                 case "fn" -> parseFunctionType(definition, customTypeName, jApiSchemaAsParsedJson, parsedTypes,
                         typeExtensions, false);
+                case "trait" ->
+                    parseTraitType(definition, customTypeName, jApiSchemaAsParsedJson, parsedTypes, typeExtensions);
                 case "info" -> new Info(customTypeName);
                 case "ext" -> {
                     var typeExtension = typeExtensions.get(customTypeName);
