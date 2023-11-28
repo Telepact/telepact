@@ -40,7 +40,7 @@ public class MockCallTypeExtension implements TypeExtension {
 
             var validFailures = new ArrayList<>();
             for (var inputFailure : failures) {
-                if (inputFailure.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING)) {
+                if (inputFailure.reason.equals(InternalValidate.REQUIRED_STRUCT_FIELD_MISSING)) {
                     continue;
                 }
                 validFailures.add(inputFailure);

@@ -47,7 +47,7 @@ public class MockStubTypeExtension implements TypeExtension {
             failures.addAll(outputFailures);
 
             for (var failure : failures) {
-                if (failure.reason.equals(ValidationErrorReasons.REQUIRED_STRUCT_FIELD_MISSING)) {
+                if (failure.reason.equals(InternalValidate.REQUIRED_STRUCT_FIELD_MISSING)) {
                     continue;
                 }
                 validationFailures.add(failure);
