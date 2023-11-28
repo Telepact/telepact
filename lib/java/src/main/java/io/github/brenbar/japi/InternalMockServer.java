@@ -350,91 +350,82 @@ class InternalMockServer {
     static Map<String, Object> verify(String functionName, Map<String, Object> argument,
             boolean exactMatch,
             VerificationTimes verificationTimes, List<Invocation> invocations) {
-        try {
-            var matchesFound = 0;
-            for (var invocation : invocations) {
-                if (Objects.equals(invocation.functionName, functionName)) {
-                    if (exactMatch) {
-                        if (Objects.equals(invocation.functionArgument, argument)) {
-                            invocation.verified = true;
-                            matchesFound += 1;
-                        }
-                    } else {
-                        if (InternalMockServer.isSubMap(argument, invocation.functionArgument)) {
-                            invocation.verified = true;
-                            matchesFound += 1;
-                        }
+        var matchesFound = 0;
+        for (var invocation : invocations) {
+            if (Objects.equals(invocation.functionName, functionName)) {
+                if (exactMatch) {
+                    if (Objects.equals(invocation.functionArgument, argument)) {
+                        invocation.verified = true;
+                        matchesFound += 1;
+                    }
+                } else {
+                    if (InternalMockServer.isSubMap(argument, invocation.functionArgument)) {
+                        invocation.verified = true;
+                        matchesFound += 1;
                     }
                 }
             }
-
-            var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
-            for (var invocation : invocations) {
-                allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
-            }
-            Map<String, Object> verificationFailurePseudoJson = null;
-            if (verificationTimes instanceof ExactNumberOfTimes e) {
-                if (matchesFound > e.times) {
-                    verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
-                            new TreeMap<>(Map.ofEntries(
-                                    Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
-                                    Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson))));
-                } else if (matchesFound < e.times) {
-                    verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
-                            new TreeMap<>(Map.ofEntries(
-                                    Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
-                                    Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson))));
-                }
-            } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
-                if (matchesFound > a.times) {
-                    verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
-                            new TreeMap<>(Map.ofEntries(
-                                    Map.entry("wanted", Map.of("atMost", Map.of("times", a.times))),
-                                    Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson))));
-                }
-            } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
-                if (matchesFound < a.times) {
-                    verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
-                            new TreeMap<>(Map.ofEntries(
-                                    Map.entry("wanted", Map.of("atLeast", Map.of("times", a.times))),
-                                    Map.entry("found", matchesFound),
-                                    Map.entry("allCalls", allCallsPseudoJson))));
-
-                }
-            } else {
-                throw new JApiProcessError("Unexpected verification times");
-            }
-
-            if (verificationFailurePseudoJson == null) {
-                return Map.of("ok", Map.of());
-            }
-
-            return Map.of("errorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
-        } catch (Exception ex) {
-            throw new JApiProcessError(ex);
         }
+
+        var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
+        for (var invocation : invocations) {
+            allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
+        }
+        Map<String, Object> verificationFailurePseudoJson = null;
+        if (verificationTimes instanceof ExactNumberOfTimes e) {
+            if (matchesFound > e.times) {
+                verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+            } else if (matchesFound < e.times) {
+                verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+            }
+        } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
+            if (matchesFound > a.times) {
+                verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("atMost", Map.of("times", a.times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+            }
+        } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
+            if (matchesFound < a.times) {
+                verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("atLeast", Map.of("times", a.times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+
+            }
+        } else {
+            throw new JApiProcessError("Unexpected verification times");
+        }
+
+        if (verificationFailurePseudoJson == null) {
+            return Map.of("ok", Map.of());
+        }
+
+        return Map.of("errorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
     }
 
     static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
-        try {
-            var objectMapper = new ObjectMapper();
-            var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
+        var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
 
-            if (invocationsNotVerified.size() > 0) {
-                var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
-                for (var invocation : invocationsNotVerified) {
-                    unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
-                }
-                return Map.of("errorVerificationFailure",
-                        Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
+        if (invocationsNotVerified.size() > 0) {
+            var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
+            for (var invocation : invocationsNotVerified) {
+                unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
             }
-
-            return Map.of("ok", Map.of());
-        } catch (Exception ex) {
-            throw new JApiProcessError(ex);
+            return Map.of("errorVerificationFailure",
+                    Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
         }
+
+        return Map.of("ok", Map.of());
     }
 }
