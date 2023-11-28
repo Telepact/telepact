@@ -405,7 +405,8 @@ class InternalParse {
                 case "ext" -> {
                     var typeExtension = typeExtensions.get(customTypeName);
                     if (typeExtension == null) {
-                        throw new JApiSchemaParseError("Type extensions must be configured in Server.Options");
+                        throw new JApiSchemaParseError(
+                                "Missing type extension implementation %s".formatted(customTypeName));
                     }
                     yield new Ext(customTypeName, typeExtension);
                 }
