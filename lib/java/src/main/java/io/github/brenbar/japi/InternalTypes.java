@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,10 +12,6 @@ class JApiSchemaTuple {
         this.original = original;
         this.parsed = parsed;
     }
-}
-
-interface Definition {
-    public String getName();
 }
 
 class FieldNameAndFieldDeclaration {
@@ -58,35 +53,18 @@ class TypeDeclaration {
 }
 
 interface Type {
-    public String getName();
 }
 
 class JsonBoolean implements Type {
-    @Override
-    public String getName() {
-        return "boolean";
-    }
 }
 
 class JsonInteger implements Type {
-    @Override
-    public String getName() {
-        return "integer";
-    }
 }
 
 class JsonNumber implements Type {
-    @Override
-    public String getName() {
-        return "number";
-    }
 }
 
 class JsonString implements Type {
-    @Override
-    public String getName() {
-        return "string";
-    }
 }
 
 class JsonArray implements Type {
@@ -94,11 +72,6 @@ class JsonArray implements Type {
 
     public JsonArray(TypeDeclaration nestedType) {
         this.nestedType = nestedType;
-    }
-
-    @Override
-    public String getName() {
-        return "array";
     }
 }
 
@@ -109,18 +82,9 @@ class JsonObject implements Type {
     public JsonObject(TypeDeclaration nestedType) {
         this.nestedType = nestedType;
     }
-
-    @Override
-    public String getName() {
-        return "object";
-    }
 }
 
 class JsonAny implements Type {
-    @Override
-    public String getName() {
-        return "any";
-    }
 }
 
 class Struct implements Type {
@@ -132,11 +96,6 @@ class Struct implements Type {
         this.name = name;
         this.fields = fields;
     }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
 }
 
 class Enum implements Type {
@@ -147,11 +106,6 @@ class Enum implements Type {
     public Enum(String name, Map<String, Struct> values) {
         this.name = name;
         this.values = values;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 }
 
@@ -166,11 +120,6 @@ class Fn implements Type {
         this.arg = input;
         this.result = output;
     }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
 }
 
 class Trait implements Type {
@@ -183,11 +132,6 @@ class Trait implements Type {
         this.fn = fn;
         this.regex = regex;
     }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
 }
 
 class Info implements Type {
@@ -195,11 +139,6 @@ class Info implements Type {
 
     public Info(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 }
 
@@ -211,12 +150,6 @@ class Ext implements Type {
         this.name = name;
         this.typeExtension = typeExtension;
     }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
 }
 
 class MessageParseException extends Exception {
