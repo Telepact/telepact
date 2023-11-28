@@ -64,7 +64,6 @@ class InternalParse {
             }
         }
 
-        // Apply trait to all functions
         for (var trait : traits) {
             applyTraitToParsedTypes(trait, parsedTypes);
         }
@@ -74,7 +73,7 @@ class InternalParse {
             var typeExtensionName = entry.getKey();
             var typeExtension = (Ext) parsedTypes.get(typeExtensionName);
             if (typeExtension == null) {
-                throw new JApiSchemaParseError("Undefined extension %s".formatted(typeExtensionName));
+                throw new JApiSchemaParseError("Undefined type extension %s".formatted(typeExtensionName));
             }
         }
 
