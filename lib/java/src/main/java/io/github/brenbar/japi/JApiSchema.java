@@ -1,5 +1,6 @@
 package io.github.brenbar.japi;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,8 +44,8 @@ public class JApiSchema {
 
         // Check for duplicates
         var duplicatedJsonSchemaKeys = new HashSet<String>();
-        for (var key : first.schemas.original.keySet()) {
-            if (second.schemas.original.containsKey(key)) {
+        for (var key : first.schemas.parsed.keySet()) {
+            if (second.schemas.parsed.containsKey(key)) {
                 duplicatedJsonSchemaKeys.add(key);
             }
         }
@@ -54,9 +55,9 @@ public class JApiSchema {
                     "Final schema has duplicate keys: %s".formatted(sortedKeys));
         }
 
-        var original = new HashMap<String, Object>();
-        original.putAll(first.schemas.original);
-        original.putAll(second.schemas.original);
+        var original = new ArrayList<Object>();
+        original.addAll(first.schemas.original);
+        original.addAll(second.schemas.original);
 
         var parsed = new HashMap<String, Type>();
         parsed.putAll(first.schemas.parsed);

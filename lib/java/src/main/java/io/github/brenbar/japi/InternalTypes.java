@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 class JApiSchemaTuple {
-    public final Map<String, Object> original;
+    public final List<Object> original;
     public final Map<String, Type> parsed;
 
-    public JApiSchemaTuple(Map<String, Object> original, Map<String, Type> parsed) {
+    public JApiSchemaTuple(List<Object> original, Map<String, Type> parsed) {
         this.original = original;
         this.parsed = parsed;
     }
