@@ -4,7 +4,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
-class InternalClient {
+class _ClientUtil {
 
     static Message constructRequestMessage(Request request, boolean useBinaryDefault,
             boolean forceSendJsonDefault,

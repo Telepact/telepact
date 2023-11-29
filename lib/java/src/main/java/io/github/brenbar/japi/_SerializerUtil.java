@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-class InternalSerializer {
+class _SerializerUtil {
 
     static BinaryEncoding constructBinaryEncoding(JApiSchema jApiSchema) {
         var allKeys = new TreeSet<String>();

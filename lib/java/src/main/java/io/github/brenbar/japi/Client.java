@@ -135,12 +135,12 @@ public class Client {
         this.throwOnError = options.throwOnError;
         this.timeoutMsDefault = options.timeoutMsDefault;
 
-        this.serializer = new Serializer(new InternalDefaultSerializer(),
-                new InternalClientBinaryEncoder());
+        this.serializer = new Serializer(new _DefaultSerializer(),
+                new _ClientBinaryEncoder());
     }
 
     public Message createRequestMessage(Request request) {
-        return InternalClient.constructRequestMessage(request, this.useBinaryDefault,
+        return _ClientUtil.constructRequestMessage(request, this.useBinaryDefault,
                 this.forceSendJsonDefault, this.timeoutMsDefault);
     }
 
@@ -155,7 +155,7 @@ public class Client {
     }
 
     private Message processMessage(Message message) {
-        return InternalClient.processRequestObject(message, this.adapter, this.serializer,
+        return _ClientUtil.processRequestObject(message, this.adapter, this.serializer,
                 this.timeoutMsDefault);
     }
 

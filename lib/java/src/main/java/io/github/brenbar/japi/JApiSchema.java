@@ -13,13 +13,13 @@ public class JApiSchema {
     final Map<String, Type> parsed;
 
     public JApiSchema(String jApiSchemaJson) {
-        var tuple = InternalParse.newJApiSchema(jApiSchemaJson, new HashMap<>());
+        var tuple = _ParseUtil.newJApiSchema(jApiSchemaJson, new HashMap<>());
         this.original = tuple.original;
         this.parsed = tuple.parsed;
     }
 
     public JApiSchema(String jApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
-        var tuple = InternalParse.newJApiSchema(jApiSchemaJson, typeExtensions);
+        var tuple = _ParseUtil.newJApiSchema(jApiSchemaJson, typeExtensions);
         this.original = tuple.original;
         this.parsed = tuple.parsed;
     }
@@ -33,7 +33,7 @@ public class JApiSchema {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
                 }
-                InternalParse.applyTraitToParsedTypes(t, second.parsed);
+                _ParseUtil.applyTraitToParsedTypes(t, second.parsed);
             }
         }
 
@@ -44,7 +44,7 @@ public class JApiSchema {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
                 }
-                InternalParse.applyTraitToParsedTypes(t, first.parsed);
+                _ParseUtil.applyTraitToParsedTypes(t, first.parsed);
             }
         }
 

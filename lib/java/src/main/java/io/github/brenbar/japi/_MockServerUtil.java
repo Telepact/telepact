@@ -15,7 +15,7 @@ import io.github.brenbar.japi.MockVerification.AtMostNumberOfTimes;
 import io.github.brenbar.japi.MockVerification.ExactNumberOfTimes;
 import io.github.brenbar.japi.MockVerification.VerificationTimes;
 
-class InternalMockServer {
+class _MockServerUtil {
 
     static Message handle(Message requestMessage, List<MockStub> stubs,
             List<Invocation> invocations, MockRandom random, JApiSchema jApiSchema,
@@ -359,7 +359,7 @@ class InternalMockServer {
                         matchesFound += 1;
                     }
                 } else {
-                    if (InternalMockServer.isSubMap(argument, invocation.functionArgument)) {
+                    if (_MockServerUtil.isSubMap(argument, invocation.functionArgument)) {
                         invocation.verified = true;
                         matchesFound += 1;
                     }

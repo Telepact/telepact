@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InternalValidate {
+public class _ValidateUtil {
 
     public static final String NULL_INVALID_FOR_NON_NULL_TYPE = "NullInvalidForNonNullType";
 

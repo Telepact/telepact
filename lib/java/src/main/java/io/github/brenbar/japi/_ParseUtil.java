@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-class InternalParse {
-
+class _ParseUtil {
     private static String findSchemaKey(Map<String, Object> definition) {
         for (var e : definition.keySet()) {
             if (e.matches("^(struct|enum|fn|trait|info|ext)\\..*")) {

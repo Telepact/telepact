@@ -34,13 +34,13 @@ public class MockCallTypeExtension implements TypeExtension {
             var input = (Map<String, Object>) givenMap.get(functionName);
             var functionDef = (Fn) this.types.get(functionName);
 
-            var inputFailures = InternalValidate.validateStructFields(path, functionDef.arg.fields, input);
+            var inputFailures = _ValidateUtil.validateStructFields(path, functionDef.arg.fields, input);
             var failures = new ArrayList<ValidationFailure>();
             failures.addAll(inputFailures);
 
             var validFailures = new ArrayList<>();
             for (var inputFailure : failures) {
-                if (inputFailure.reason.equals(InternalValidate.REQUIRED_STRUCT_FIELD_MISSING)) {
+                if (inputFailure.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)) {
                     continue;
                 }
                 validFailures.add(inputFailure);

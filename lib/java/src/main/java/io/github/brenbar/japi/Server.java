@@ -12,7 +12,7 @@ public class Server {
     public static class Options {
         public Consumer<Throwable> onError = (e) -> {
         };
-        public SerializationImpl serializer = new InternalDefaultSerializer();
+        public SerializationImpl serializer = new _DefaultSerializer();
 
         public Options setOnError(Consumer<Throwable> onError) {
             this.onError = onError;
@@ -37,14 +37,14 @@ public class Server {
      * @param handler
      */
     public Server(JApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
-        var internalJApiSchema = new JApiSchema(InternalJApi.getJson());
+        var internalJApiSchema = new JApiSchema(_InternalJApiUtil.getJson());
         this.jApiSchema = new JApiSchema(jApiSchema, internalJApiSchema);
         this.handler = handler;
 
         this.onError = options.onError;
 
-        var binaryEncoding = InternalSerializer.constructBinaryEncoding(this.jApiSchema);
-        var binaryEncoder = new InternalServerBinaryEncoder(binaryEncoding);
+        var binaryEncoding = _SerializerUtil.constructBinaryEncoding(this.jApiSchema);
+        var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }
 
@@ -60,7 +60,7 @@ public class Server {
 
     private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
-            var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
+            var requestMessage = _ServerUtil.parseRequestMessage(requestMessageBytes, this.serializer,
                     this.jApiSchema, this.onError);
 
             var responseMessage = processMessage(requestMessage);
@@ -77,7 +77,7 @@ public class Server {
     }
 
     private Message processMessage(Message requestMessage) {
-        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler,
+        return _ServerUtil.processMessage(requestMessage, this.jApiSchema, this.handler,
                 this.onError);
     }
 }

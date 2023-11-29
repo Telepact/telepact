@@ -49,7 +49,7 @@ public class MockServer {
         typeExtensions.put("ext._Call", new MockCallTypeExtension(parsedTypes));
         typeExtensions.put("ext._Stub", new MockStubTypeExtension(parsedTypes));
 
-        var mockJApiSchema = new JApiSchema(InternalMockJApi.getJson(), typeExtensions);
+        var mockJApiSchema = new JApiSchema(_InternalMockJApiUtil.getJson(), typeExtensions);
         var combinedJApiSchema = new JApiSchema(jApiSchema, mockJApiSchema);
 
         this.server = new Server(combinedJApiSchema, this::handle,
@@ -100,7 +100,7 @@ public class MockServer {
     }
 
     private Message handle(Message requestMessage) {
-        return InternalMockServer.handle(requestMessage, this.stubs, this.invocations, this.random,
+        return _MockServerUtil.handle(requestMessage, this.stubs, this.invocations, this.random,
                 this.server.jApiSchema, this.enableGeneratedDefaultStub);
     }
 }

@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-class InternalServer {
+class _ServerUtil {
 
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
@@ -75,7 +75,7 @@ class InternalServer {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
                     Map.of("reasons", parseFailures));
-            var newErrorResultValidationFailures = InternalValidate.validateResultEnum(resultEnumType,
+            var newErrorResultValidationFailures = _ValidateUtil.validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -83,13 +83,13 @@ class InternalServer {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var headerValidationFailures = InternalValidate.validateHeaders(requestHeaders, jApiSchema, functionType);
+        var headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders, jApiSchema, functionType);
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = InternalValidate.validateResultEnum(resultEnumType,
+            var newErrorResultValidationFailures = _ValidateUtil.validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -106,7 +106,7 @@ class InternalServer {
         if (unknownTarget != null) {
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", List.of(Map.of("path", unknownTarget, "reason", "UnknownFunction"))));
-            var newErrorResultValidationFailures = InternalValidate.validateResultEnum(resultEnumType,
+            var newErrorResultValidationFailures = _ValidateUtil.validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -114,13 +114,13 @@ class InternalServer {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var argumentValidationFailures = InternalValidate.validateStructFields(functionType.name,
+        var argumentValidationFailures = _ValidateUtil.validateStructFields(functionType.name,
                 argStructType.fields, requestPayload);
         if (!argumentValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = InternalValidate.validateResultEnum(resultEnumType,
+            var newErrorResultValidationFailures = _ValidateUtil.validateResultEnum(resultEnumType,
                     newErrorResult);
             if (!newErrorResultValidationFailures.isEmpty()) {
                 throw new JApiProcessError("Failed internal jAPI validation");
@@ -152,14 +152,14 @@ class InternalServer {
         }
         var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
-            var resultValidationFailures = InternalValidate.validateResultEnum(
+            var resultValidationFailures = _ValidateUtil.validateResultEnum(
                     resultEnumType,
                     resultMessage.body);
             if (!resultValidationFailures.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
                 Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
-                var newErrorResultValidationFailures = InternalValidate.validateResultEnum(resultEnumType,
+                var newErrorResultValidationFailures = _ValidateUtil.validateResultEnum(resultEnumType,
                         newErrorResult);
                 if (!newErrorResultValidationFailures.isEmpty()) {
                     throw new JApiProcessError("Failed internal jAPI validation");
