@@ -55,7 +55,7 @@ public class MockServer {
         this.server = new Server(combinedJApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));
 
-        parsedTypes.putAll(server.jApiSchema.schemas.parsed);
+        parsedTypes.putAll(server.jApiSchema.parsed);
 
         this.random = new MockRandom();
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
@@ -101,6 +101,6 @@ public class MockServer {
 
     private Message handle(Message requestMessage) {
         return InternalMockServer.handle(requestMessage, this.stubs, this.invocations, this.random,
-                this.server.jApiSchema.schemas, this.enableGeneratedDefaultStub);
+                this.server.jApiSchema, this.enableGeneratedDefaultStub);
     }
 }

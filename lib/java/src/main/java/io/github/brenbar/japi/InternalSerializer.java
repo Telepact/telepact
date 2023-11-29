@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 class InternalSerializer {
 
-    static BinaryEncoding constructBinaryEncoding(JApiSchemaTuple jApiSchema) {
+    static BinaryEncoding constructBinaryEncoding(JApiSchema jApiSchema) {
         var allKeys = new TreeSet<String>();
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());

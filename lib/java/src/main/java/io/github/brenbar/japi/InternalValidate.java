@@ -82,7 +82,7 @@ public class InternalValidate {
     public static final String UNKNOWN_RESULT_ENUM_VALUE = "UnknownResultEnumField";
 
     static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, JApiSchemaTuple jApiSchema, Fn functionType) {
+            Map<String, Object> headers, JApiSchema jApiSchema, Fn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {

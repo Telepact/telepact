@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 class InternalServer {
 
-    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchemaTuple jApiSchema,
+    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
 
         Message requestMessage;
@@ -47,7 +47,7 @@ class InternalServer {
     }
 
     static Message processMessage(Message requestMessage,
-            JApiSchemaTuple jApiSchema,
+            JApiSchema jApiSchema,
             Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;

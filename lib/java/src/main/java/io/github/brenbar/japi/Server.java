@@ -43,7 +43,7 @@ public class Server {
 
         this.onError = options.onError;
 
-        var binaryEncoding = InternalSerializer.constructBinaryEncoding(this.jApiSchema.schemas);
+        var binaryEncoding = InternalSerializer.constructBinaryEncoding(this.jApiSchema);
         var binaryEncoder = new InternalServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }
@@ -61,7 +61,7 @@ public class Server {
     private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
         try {
             var requestMessage = InternalServer.parseRequestMessage(requestMessageBytes, this.serializer,
-                    this.jApiSchema.schemas, this.onError);
+                    this.jApiSchema, this.onError);
 
             var responseMessage = processMessage(requestMessage);
 
@@ -77,7 +77,7 @@ public class Server {
     }
 
     private Message processMessage(Message requestMessage) {
-        return InternalServer.processMessage(requestMessage, this.jApiSchema.schemas, this.handler,
+        return InternalServer.processMessage(requestMessage, this.jApiSchema, this.handler,
                 this.onError);
     }
 }

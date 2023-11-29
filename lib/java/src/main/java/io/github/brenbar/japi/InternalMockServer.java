@@ -18,7 +18,7 @@ import io.github.brenbar.japi.MockVerification.VerificationTimes;
 class InternalMockServer {
 
     static Message handle(Message requestMessage, List<MockStub> stubs,
-            List<Invocation> invocations, MockRandom random, JApiSchemaTuple jApiSchema,
+            List<Invocation> invocations, MockRandom random, JApiSchema jApiSchema,
             boolean enableGeneratedDefaultStub) {
 
         var enableGenerationStub = (Boolean) requestMessage.header.getOrDefault("_mockEnableGeneratedStub", false);

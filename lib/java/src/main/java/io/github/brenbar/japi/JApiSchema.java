@@ -3,49 +3,55 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
 public class JApiSchema {
 
-    JApiSchemaTuple schemas;
+    final List<Object> original;
+    final Map<String, Type> parsed;
 
     public JApiSchema(String jApiSchemaJson) {
-        this.schemas = InternalParse.newJApiSchema(jApiSchemaJson, new HashMap<>());
+        var tuple = InternalParse.newJApiSchema(jApiSchemaJson, new HashMap<>());
+        this.original = tuple.original;
+        this.parsed = tuple.parsed;
     }
 
     public JApiSchema(String jApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
-        this.schemas = InternalParse.newJApiSchema(jApiSchemaJson, typeExtensions);
+        var tuple = InternalParse.newJApiSchema(jApiSchemaJson, typeExtensions);
+        this.original = tuple.original;
+        this.parsed = tuple.parsed;
     }
 
     public JApiSchema(JApiSchema first, JApiSchema second) {
 
         // Any traits in the first schema need to be applied to the second
-        for (var e : first.schemas.parsed.entrySet()) {
+        for (var e : first.parsed.entrySet()) {
             if (e.getValue() instanceof Trait t) {
-                if (second.schemas.parsed.containsKey(t.name)) {
+                if (second.parsed.containsKey(t.name)) {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
                 }
-                InternalParse.applyTraitToParsedTypes(t, second.schemas.parsed);
+                InternalParse.applyTraitToParsedTypes(t, second.parsed);
             }
         }
 
         // And vice versa
-        for (var e : second.schemas.parsed.entrySet()) {
+        for (var e : second.parsed.entrySet()) {
             if (e.getValue() instanceof Trait t) {
-                if (first.schemas.parsed.containsKey(t.name)) {
+                if (first.parsed.containsKey(t.name)) {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
                 }
-                InternalParse.applyTraitToParsedTypes(t, first.schemas.parsed);
+                InternalParse.applyTraitToParsedTypes(t, first.parsed);
             }
         }
 
         // Check for duplicates
         var duplicatedJsonSchemaKeys = new HashSet<String>();
-        for (var key : first.schemas.parsed.keySet()) {
-            if (second.schemas.parsed.containsKey(key)) {
+        for (var key : first.parsed.keySet()) {
+            if (second.parsed.containsKey(key)) {
                 duplicatedJsonSchemaKeys.add(key);
             }
         }
@@ -56,13 +62,14 @@ public class JApiSchema {
         }
 
         var original = new ArrayList<Object>();
-        original.addAll(first.schemas.original);
-        original.addAll(second.schemas.original);
+        original.addAll(first.original);
+        original.addAll(second.original);
 
         var parsed = new HashMap<String, Type>();
-        parsed.putAll(first.schemas.parsed);
-        parsed.putAll(second.schemas.parsed);
+        parsed.putAll(first.parsed);
+        parsed.putAll(second.parsed);
 
-        this.schemas = new JApiSchemaTuple(original, parsed);
+        this.original = original;
+        this.parsed = parsed;
     }
 }
