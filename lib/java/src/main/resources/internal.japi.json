@@ -12,7 +12,7 @@
     "fn._api": {},
     "->": {
       "ok": {
-        "api": "object<any>"
+        "api": "array<object<any>>"
       }
     }
   },
