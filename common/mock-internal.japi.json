@@ -11,13 +11,13 @@
     "///": " The number of times a function is allowed to be called. ",
     "enum._CallCountCriteria": {
       "exact": {
-        "times": "integer"
+        "times": ["integer"]
       },
       "atMost": {
-        "times": "integer"
+        "times": ["integer"]
       },
       "atLeast": {
-        "times": "integer"
+        "times": ["integer"]
       }
     }
   },
@@ -25,14 +25,14 @@
     "///": " An enumeration of possible causes for a mock verification to fail. ",
     "enum._VerificationFailure": {
       "tooFewMatchingCalls": {
-        "wanted": "enum._CallCountCriteria",
-        "found": "integer",
-        "allCalls": "array<ext._Call>"
+        "wanted": ["enum._CallCountCriteria"],
+        "found": ["integer"],
+        "allCalls": ["array", ["ext._Call"]]
       },
       "tooManyMatchingCalls": {
-        "wanted": "enum._CallCountCriteria",
-        "found": "integer",
-        "allCalls": "array<ext._Call>"
+        "wanted": ["enum._CallCountCriteria"],
+        "found": ["integer"],
+        "allCalls": ["array", ["ext._Call"]]
       }
     }
   },
@@ -50,8 +50,8 @@
       " response validation.                                                                                     "
     ],
     "fn._createStub": {
-      "stub": "ext._Stub",
-      "strictMatch!": "boolean"
+      "stub": ["ext._Stub"],
+      "strictMatch!": ["boolean"]
     },
     "->": {
       "ok": {}
@@ -64,14 +64,14 @@
       " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    "
     ],
     "fn._verify": {
-      "call": "ext._Call",
-      "strictMatch!": "boolean",
-      "count!": "enum._CallCountCriteria"
+      "call": ["ext._Call"],
+      "strictMatch!": ["boolean"],
+      "count!": ["enum._CallCountCriteria"]
     },
     "->": {
       "ok": {},
       "errorVerificationFailure": {
-        "reason": "enum._VerificationFailure"
+        "reason": ["enum._VerificationFailure"]
       }
     }
   },
@@ -84,7 +84,7 @@
     "->": {
       "ok": {},
       "errorVerificationFailure": {
-        "additionalUnverifiedCalls": "array<ext._Call>"
+        "additionalUnverifiedCalls": ["array", ["ext._Call"]]
       }
     }
   },

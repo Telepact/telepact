@@ -1,7 +1,7 @@
 [
   {
     "fn.example": {
-      "arg1": "boolean"
+      "arg1": ["boolean"]
     },
     "->": {
       "ok": {}
@@ -10,7 +10,7 @@
   {
     "trait.Collide": {
       "fn.*": {
-        "arg1": "boolean"
+        "arg1": ["boolean"]
       },
       "->": {}
     }

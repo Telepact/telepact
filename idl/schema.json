@@ -191,13 +191,48 @@
   },
   "$defs": {
     "typeDeclaration": {
-      "type": "string",
-      "pattern": "^((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<(((boolean|integer|number|string|any)|((enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))|((array|object)<any>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?)>))(\\?)?$",
+      "oneOf": [
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "string",
+              "pattern": "^(boolean|integer|number|string|any)(\\?)?"
+            }
+          ],
+          "items": false
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "string",
+              "pattern": "^(array|object)(\\?)?"
+            }
+          ],
+          "items": { "$ref": "#/$defs/typeDeclaration" },
+          "minContains": 1,
+          "maxContains": 2
+        },
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "string",
+              "pattern": "^(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*)(\\?)?$"
+            }
+          ],
+          "items": { "$ref": "#/$defs/typeDeclaration" },
+          "minContains": 1
+        }
+      ],
       "description": "A field declaration.\nThe field name must be a legal JavaScript identifier, which can be appended by `!` to indicate optionality.\nThe value must be a jAPI type string that is (1) a standard type (e.g. boolean, string), (2) a custom type (e.g. struct.Example1, enum.Example2) defined within the scope of this jAPI description, or (3) a collection type of a recursive instance of another jAPI type string (e.g. array&lt;integer&gt;, object<array<struct.Example>>), which can be appended by `?` to indicate nullability.",
       "defaultSnippets": [
         {
           "label": "jAPI type declaration",
-          "body": "${1|boolean,integer,number,string,any,array<any>,object<any>,struct.Example,enum.Example|}"
+          "body": [
+            "${1|boolean,integer,number,string,any,array<any>,object<any>,struct.Example,enum.Example|}"
+          ]
         }
       ]
     }

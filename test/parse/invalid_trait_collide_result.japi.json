@@ -3,7 +3,7 @@
     "fn.example": {},
     "->": {
       "ok": {
-        "result1": "boolean"
+        "result1": ["boolean"]
       }
     }
   },
@@ -12,7 +12,7 @@
       "fn.*": {},
       "->": {
         "ok": {
-          "result1": "boolean"
+          "result1": ["boolean"]
         }
       }
     }

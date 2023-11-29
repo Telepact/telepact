@@ -13,75 +13,75 @@
   {
     "///": " A struct value demonstrating all common type permutations. ",
     "struct.Value": {
-      "bool!": "boolean",
-      "nullBool!": "boolean?",
-      "arrBool!": "array<boolean>",
-      "arrNullBool!": "array<boolean?>",
-      "objBool!": "object<boolean>",
-      "objNullBool!": "object<boolean?>",
+      "bool!": ["boolean"],
+      "nullBool!": ["boolean?"],
+      "arrBool!": ["array", ["boolean"]],
+      "arrNullBool!": ["array", ["boolean?"]],
+      "objBool!": ["object", ["boolean"]],
+      "objNullBool!": ["object", ["boolean?"]],
 
-      "int!": "integer",
-      "nullInt!": "integer?",
-      "arrInt!": "array<integer>",
-      "arrNullInt!": "array<integer?>",
-      "objInt!": "object<integer>",
-      "objNullInt!": "object<integer?>",
+      "int!": ["integer"],
+      "nullInt!": ["integer?"],
+      "arrInt!": ["array", ["integer"]],
+      "arrNullInt!": ["array", ["integer?"]],
+      "objInt!": ["object", ["integer"]],
+      "objNullInt!": ["object", ["integer?"]],
 
-      "num!": "number",
-      "nullNum!": "number?",
-      "arrNum!": "array<number>",
-      "arrNullNum!": "array<number?>",
-      "objNum!": "object<number>",
-      "objNullNum!": "object<number?>",
+      "num!": ["number"],
+      "nullNum!": ["number?"],
+      "arrNum!": ["array", ["number"]],
+      "arrNullNum!": ["array", ["number?"]],
+      "objNum!": ["object", ["number"]],
+      "objNullNum!": ["object", ["number?"]],
 
-      "str!": "string",
-      "nullStr!": "string?",
-      "arrStr!": "array<string>",
-      "arrNullStr!": "array<string?>",
-      "objStr!": "object<string>",
-      "objNullStr!": "object<string?>",
+      "str!": ["string"],
+      "nullStr!": ["string?"],
+      "arrStr!": ["array", ["string>"]],
+      "arrNullStr!": ["array", ["string?"]],
+      "objStr!": ["object", ["string"]],
+      "objNullStr!": ["object", ["string?"]],
 
-      "arr!": "array<any>",
-      "nullArr!": "array<any>?",
-      "arrArr!": "array<array<any>>",
-      "arrNullArr!": "array<array<any>?>",
-      "objArr!": "object<array<any>>",
-      "objNullArr!": "object<array<any>?>",
+      "arr!": ["array", ["any"]],
+      "nullArr!": ["array?", ["any"]],
+      "arrArr!": ["array", ["array", ["any"]]],
+      "arrNullArr!": ["array", ["array?", ["any"]]],
+      "objArr!": ["object", ["array", ["any"]]],
+      "objNullArr!": ["object", ["array?", ["any"]]],
 
-      "obj!": "object<any>",
-      "nullObj!": "object<any>?",
-      "arrObj!": "array<object<any>>",
-      "arrNullObj!": "array<object<any>?>",
-      "objObj!": "object<object<any>>",
-      "objNullObj!": "object<object<any>?>",
+      "obj!": ["object", ["any"]],
+      "nullObj!": ["object?", ["any"]],
+      "arrObj!": ["array", ["object", ["any"]]],
+      "arrNullObj!": ["array", ["object?", ["any"]]],
+      "objObj!": ["object", ["object", ["any"]]],
+      "objNullObj!": ["object", ["object?", ["any"]]],
 
-      "any!": "any",
-      "nullAny!": "any?",
-      "arrAny!": "array<any>",
-      "arrNullAny!": "array<any?>",
-      "objAny!": "object<any>",
-      "objNullAny!": "object<any?>",
+      "any!": ["any"],
+      "nullAny!": ["any?"],
+      "arrAny!": ["array", ["any"]],
+      "arrNullAny!": ["array", ["any?"]],
+      "objAny!": ["object", ["any"]],
+      "objNullAny!": ["object", ["any?"]],
 
-      "struct!": "struct.StructExample",
-      "nullStruct!": "struct.StructExample?",
-      "arrStruct!": "array<struct.StructExample>",
-      "arrNullStruct!": "array<struct.StructExample?>",
-      "objStruct!": "object<struct.StructExample>",
-      "objNullStruct!": "object<struct.StructExample?>",
+      "struct!": ["struct.StructExample"],
+      "nullStruct!": ["struct.StructExample?"],
+      "arrStruct!": ["array", ["struct.StructExample"]],
+      "arrNullStruct!": ["array", ["struct.StructExample?"]],
+      "objStruct!": ["object", ["struct.StructExample"]],
+      "objNullStruct!": ["object", ["struct.StructExample?"]],
 
-      "enum!": "enum.EnumExample",
-      "nullEnum!": "enum.EnumExample?",
-      "arrEnum!": "array<enum.EnumExample>",
-      "arrNullEnum!": "array<enum.EnumExample?>",
-      "objEnum!": "object<enum.EnumExample>",
-      "objNullEnum!": "object<enum.EnumExample?>",
+      "enum!": ["enum.EnumExample"],
+      "nullEnum!": ["enum.EnumExample?"],
+      "arrEnum!": ["array", ["enum.EnumExample"]],
+      "arrNullEnum!": ["array", ["enum.EnumExample?"]],
+      "objEnum!": ["object", ["enum.EnumExample"]],
+      "objNullEnum!": ["object", ["enum.EnumExample?"]],
 
-      "fn!": "fn.example",
-      "nullFn!": "fn.example?",
-      "arrFn!": "array<fn.example>",
-      "arrNullFn!": "array<fn.example?>",
-      "objFn!": "object<fn.example>",
-      "objNullFn!": "object<fn.example?>"
+      "fn!": ["fn.example"],
+      "nullFn!": ["fn.example?"],
+      "arrFn!": ["array", ["fn.example"]],
+      "arrNullFn!": ["array", ["fn.example?"]],
+      "objFn!": ["object", ["fn.example"]],
+      "objNullFn!": ["object", ["fn.example?"]]
     }
   },
 
@@ -92,8 +92,8 @@
       " The [required] field must be supplied. The optional field does not need to be supplied. "
     ],
     "struct.StructExample": {
-      "required": "boolean",
-      "optional!": "boolean"
+      "required": ["boolean"],
+      "optional!": ["boolean"]
     }
   },
 
@@ -101,8 +101,8 @@
     "enum.EnumExample": {
       "one": {},
       "two": {
-        "required": "boolean",
-        "optional!": "boolean"
+        "required": ["boolean"],
+        "optional!": ["boolean"]
       }
     }
   },
@@ -110,10 +110,9 @@
   {
     "///": "An example function.",
     "fn.example": {
-      "required": "boolean",
-      "optional!": "boolean"
+      "required": ["boolean"],
+      "optional!": ["boolean"]
     },
-
     "->": {
       "ok": {}
     }
@@ -121,14 +120,14 @@
 
   {
     "fn.test": {
-      "value!": "struct.Value"
+      "value!": ["struct.Value"]
     },
     "->": {
       "ok": {
-        "value!": "struct.Value"
+        "value!": ["struct.Value"]
       },
       "errorExample": {
-        "property": "string"
+        "property": ["string"]
       }
     }
   }

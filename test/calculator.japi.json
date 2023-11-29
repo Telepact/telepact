@@ -8,10 +8,10 @@
     "///": "A value for computation that can take either a constant or variable form.",
     "enum.Value": {
       "constant": {
-        "value": "number"
+        "value": ["number"]
       },
       "variable": {
-        "name": "string"
+        "name": ["string"]
       }
     }
   },
@@ -29,15 +29,15 @@
   {
     "///": "A mathematical variable represented by a `name` that holds a certain `value`.",
     "struct.Variable": {
-      "name": "string",
-      "value": "number"
+      "name": ["string"],
+      "value": ["number"]
     }
   },
 
   {
     "///": "Save a set of variables as a dynamic map of variable names to their value.",
     "fn.saveVariables": {
-      "variables": "object<number>"
+      "variables": ["object", ["number"]]
     },
     "->": {
       "ok": {}
@@ -47,13 +47,13 @@
   {
     "///": "Compute the `result` of the given `x` and `y` values.",
     "fn.compute": {
-      "x": "enum.Value",
-      "y": "enum.Value",
-      "op": "enum.Operation"
+      "x": ["enum.Value"],
+      "y": ["enum.Value"],
+      "op": ["enum.Operation"]
     },
     "->": {
       "ok": {
-        "result": "number"
+        "result": ["number"]
       },
       "errorCannotDivideByZero": {}
     }
@@ -62,11 +62,11 @@
   {
     "///": "Export all saved variables, up to an optional `limit`.",
     "fn.exportVariables": {
-      "limit!": "integer"
+      "limit!": ["integer"]
     },
     "->": {
       "ok": {
-        "variables": "array<struct.Variable>"
+        "variables": ["array", ["struct.Variable"]]
       }
     }
   },
@@ -76,7 +76,7 @@
     "fn.getPaperTape": {},
     "->": {
       "ok": {
-        "tape": "array<struct.Computation>"
+        "tape": ["array", ["struct.Computation"]]
       }
     }
   },
@@ -84,18 +84,18 @@
   {
     "///": " A computation. ",
     "struct.Computation": {
-      "firstOperand": "enum.Value",
-      "secondOperand": "enum.Value",
-      "operation": "enum.Operation",
-      "timestamp": "integer",
-      "successful": "boolean"
+      "firstOperand": ["enum.Value"],
+      "secondOperand": ["enum.Value"],
+      "operation": ["enum.Operation"],
+      "timestamp": ["integer"],
+      "successful": ["boolean"]
     }
   },
 
   {
     "trait.Authenticated": {
       "fn.*": {
-        "token": "string"
+        "token": ["string"]
       },
       "->": {
         "errorInvalidToken": {}
