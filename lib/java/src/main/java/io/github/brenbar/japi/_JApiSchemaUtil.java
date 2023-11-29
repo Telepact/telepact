@@ -61,7 +61,7 @@ class _JApiSchemaUtil {
         return new JApiSchemaTuple(original, parsed);
     }
 
-    static JApiSchemaTuple newJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
+    static JApiSchemaTuple parseJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
         var parsedTypes = new HashMap<String, Type>();
 
         var objectMapper = new ObjectMapper();
