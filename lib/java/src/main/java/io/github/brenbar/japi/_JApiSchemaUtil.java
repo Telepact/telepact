@@ -9,18 +9,56 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-class _ParseUtil {
-    private static String findSchemaKey(Map<String, Object> definition) {
-        for (var e : definition.keySet()) {
-            if (e.matches("^(struct|enum|fn|trait|info|ext)\\..*")) {
-                return e;
+class _JApiSchemaUtil {
+
+    static JApiSchemaTuple combineJApiSchemas(JApiSchema first, JApiSchema second) {
+        // Any traits in the first schema need to be applied to the second
+        for (var e : first.parsed.entrySet()) {
+            if (e.getValue() instanceof Trait t) {
+                if (second.parsed.containsKey(t.name)) {
+                    throw new JApiSchemaParseError(
+                            "Could not combine schemas due to duplicate trait %s".formatted(t.name));
+                }
+                _JApiSchemaUtil.applyTraitToParsedTypes(t, second.parsed);
             }
         }
-        throw new JApiSchemaParseError(
-                "Invalid definition. Each definition should have one key matching the regex ^(struct|enum|fn|trait|info|ext)\\..* but was %s"
-                        .formatted(definition));
+
+        // And vice versa
+        for (var e : second.parsed.entrySet()) {
+            if (e.getValue() instanceof Trait t) {
+                if (first.parsed.containsKey(t.name)) {
+                    throw new JApiSchemaParseError(
+                            "Could not combine schemas due to duplicate trait %s".formatted(t.name));
+                }
+                _JApiSchemaUtil.applyTraitToParsedTypes(t, first.parsed);
+            }
+        }
+
+        // Check for duplicates
+        var duplicatedJsonSchemaKeys = new HashSet<String>();
+        for (var key : first.parsed.keySet()) {
+            if (second.parsed.containsKey(key)) {
+                duplicatedJsonSchemaKeys.add(key);
+            }
+        }
+        if (!duplicatedJsonSchemaKeys.isEmpty()) {
+            var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
+            throw new JApiSchemaParseError(
+                    "Final schema has duplicate keys: %s".formatted(sortedKeys));
+        }
+
+        var original = new ArrayList<Object>();
+        original.addAll(first.original);
+        original.addAll(second.original);
+
+        var parsed = new HashMap<String, Type>();
+        parsed.putAll(first.parsed);
+        parsed.putAll(second.parsed);
+
+        return new JApiSchemaTuple(original, parsed);
     }
 
     static JApiSchemaTuple newJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
@@ -83,6 +121,17 @@ class _ParseUtil {
         }
 
         return new JApiSchemaTuple(originalJApiSchema, parsedTypes);
+    }
+
+    private static String findSchemaKey(Map<String, Object> definition) {
+        for (var e : definition.keySet()) {
+            if (e.matches("^(struct|enum|fn|trait|info|ext)\\..*")) {
+                return e;
+            }
+        }
+        throw new JApiSchemaParseError(
+                "Invalid definition. Each definition should have one key matching the regex ^(struct|enum|fn|trait|info|ext)\\..* but was %s"
+                        .formatted(definition));
     }
 
     static void applyTraitToParsedTypes(Trait trait, Map<String, Type> parsedTypes) {
