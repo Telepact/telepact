@@ -19,12 +19,8 @@
       "arrNullBool!": ["array", ["boolean?"]],
       "objBool!": ["object", ["boolean"]],
       "objNullBool!": ["object", ["boolean?"]],
-      "paramStructBool!": ["struct<2>.ParamStruct", ["boolean"], ["boolean"]],
-      "paramStructNullBool!": [
-        "struct<2>.ParamStruct",
-        ["boolean"],
-        ["boolean?"]
-      ],
+      "pStrBool!": ["struct<1>.PStr", ["boolean"]],
+      "pStrNullBool!": ["struct<1>.PStr", ["boolean?"]],
 
       "int!": ["integer"],
       "nullInt!": ["integer?"],
@@ -32,6 +28,8 @@
       "arrNullInt!": ["array", ["integer?"]],
       "objInt!": ["object", ["integer"]],
       "objNullInt!": ["object", ["integer?"]],
+      "pStrInt!": ["struct<1>.PStr", ["integer"]],
+      "pStrNullInt!": ["struct<1>.PStr", ["integer?"]],
 
       "num!": ["number"],
       "nullNum!": ["number?"],
@@ -39,6 +37,8 @@
       "arrNullNum!": ["array", ["number?"]],
       "objNum!": ["object", ["number"]],
       "objNullNum!": ["object", ["number?"]],
+      "pStrNum!": ["struct<1>.PStr", ["number"]],
+      "pStrNullNum!": ["struct<1>.PStr", ["number?"]],
 
       "str!": ["string"],
       "nullStr!": ["string?"],
@@ -46,6 +46,8 @@
       "arrNullStr!": ["array", ["string?"]],
       "objStr!": ["object", ["string"]],
       "objNullStr!": ["object", ["string?"]],
+      "pStrStr!": ["struct<1>.PStr", ["string"]],
+      "pStrNullStr!": ["struct<1>.PStr", ["string?"]],
 
       "arr!": ["array", ["any"]],
       "nullArr!": ["array?", ["any"]],
@@ -53,6 +55,8 @@
       "arrNullArr!": ["array", ["array?", ["any"]]],
       "objArr!": ["object", ["array", ["any"]]],
       "objNullArr!": ["object", ["array?", ["any"]]],
+      "pStrArr!": ["struct<1>.PStr", ["array", ["any"]]],
+      "pStrNullArr!": ["struct<1>.PStr", ["array?", ["any"]]],
 
       "obj!": ["object", ["any"]],
       "nullObj!": ["object?", ["any"]],
@@ -60,6 +64,8 @@
       "arrNullObj!": ["array", ["object?", ["any"]]],
       "objObj!": ["object", ["object", ["any"]]],
       "objNullObj!": ["object", ["object?", ["any"]]],
+      "pStrObj!": ["struct<1>.PStr", ["object", ["any"]]],
+      "pStrNullObj!": ["struct<1>.PStr", ["object?", ["any"]]],
 
       "any!": ["any"],
       "nullAny!": ["any?"],
@@ -67,27 +73,56 @@
       "arrNullAny!": ["array", ["any?"]],
       "objAny!": ["object", ["any"]],
       "objNullAny!": ["object", ["any?"]],
+      "pStrAny!": ["struct<1>.PStr", ["any"]],
+      "pStrNullAny!": ["struct<1>.PStr", ["any?"]],
 
-      "struct!": ["struct.StructExample"],
-      "nullStruct!": ["struct.StructExample?"],
-      "arrStruct!": ["array", ["struct.StructExample"]],
-      "arrNullStruct!": ["array", ["struct.StructExample?"]],
-      "objStruct!": ["object", ["struct.StructExample"]],
-      "objNullStruct!": ["object", ["struct.StructExample?"]],
+      "struct!": ["struct.ExStruct"],
+      "nullStruct!": ["struct.ExStruct?"],
+      "arrStruct!": ["array", ["struct.ExStruct"]],
+      "arrNullStruct!": ["array", ["struct.ExStruct?"]],
+      "objStruct!": ["object", ["struct.ExStruct"]],
+      "objNullStruct!": ["object", ["struct.ExStruct?"]],
+      "pStrStruct!": ["struct<1>.PStr", ["struct.ExStruct"]],
+      "pStrNullStruct!": ["struct<1>.PStr", ["struct.ExStruct?"]],
 
-      "enum!": ["enum.EnumExample"],
-      "nullEnum!": ["enum.EnumExample?"],
-      "arrEnum!": ["array", ["enum.EnumExample"]],
-      "arrNullEnum!": ["array", ["enum.EnumExample?"]],
-      "objEnum!": ["object", ["enum.EnumExample"]],
-      "objNullEnum!": ["object", ["enum.EnumExample?"]],
+      "enum!": ["enum.ExEnum"],
+      "nullEnum!": ["enum.ExEnum?"],
+      "arrEnum!": ["array", ["enum.ExEnum"]],
+      "arrNullEnum!": ["array", ["enum.ExEnum?"]],
+      "objEnum!": ["object", ["enum.ExEnum"]],
+      "objNullEnum!": ["object", ["enum.ExEnum?"]],
+      "pStrEnum!": ["struct<1>.PStr", ["enum.ExEnum"]],
+      "pStrNullEnum!": ["struct<1>.PStr", ["enum.ExEnum?"]],
 
       "fn!": ["fn.example"],
       "nullFn!": ["fn.example?"],
       "arrFn!": ["array", ["fn.example"]],
       "arrNullFn!": ["array", ["fn.example?"]],
       "objFn!": ["object", ["fn.example"]],
-      "objNullFn!": ["object", ["fn.example?"]]
+      "objNullFn!": ["object", ["fn.example?"]],
+      "pStrFn!": ["struct<1>.PStr", ["fn.example"]],
+      "pStrNullFn!": ["struct<1>.PStr", ["fn.example?"]],
+
+      "p2Str!": ["struct<2>.PStruct", ["boolean"], ["integer"]],
+      "nullP2Str!": ["struct<2>.PStruct?", ["boolean"], ["integer"]],
+      "arrP2Str!": ["array", ["struct<2>.PStruct", ["boolean"], ["integer"]]],
+      "arrNullP2Str!": [
+        "array",
+        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+      ],
+      "objP2Str!": ["object", ["struct<2>.PStruct", ["boolean"], ["integer"]]],
+      "objNullP2Str!": [
+        "object",
+        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+      ],
+      "pStrP2Str!": [
+        "struct<1>.PStr",
+        ["struct<2>.PStruct", ["boolean"], ["integer"]]
+      ],
+      "pStrNullP2Str!": [
+        "struct<1>.PStr",
+        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+      ]
     }
   },
 
@@ -97,14 +132,14 @@
       "                                                                                         ",
       " The [required] field must be supplied. The optional field does not need to be supplied. "
     ],
-    "struct.StructExample": {
+    "struct.ExStruct": {
       "required": ["boolean"],
       "optional!": ["boolean"]
     }
   },
 
   {
-    "enum.EnumExample": {
+    "enum.ExEnum": {
       "one": {},
       "two": {
         "required": ["boolean"],
@@ -114,9 +149,15 @@
   },
 
   {
-    "struct<2>.ParamStruct": {
-      "one": ["array", ["T.1"]],
-      "two": ["T.0"]
+    "struct<1>.PStr": {
+      "wrap": ["T.0"]
+    }
+  },
+
+  {
+    "struct<2>.P2Str": {
+      "wrap": ["T.0"],
+      "nest": ["array", ["T.1"]]
     }
   },
 
