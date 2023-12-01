@@ -19,6 +19,12 @@
       "arrNullBool!": ["array", ["boolean?"]],
       "objBool!": ["object", ["boolean"]],
       "objNullBool!": ["object", ["boolean?"]],
+      "paramStructBool!": ["struct<2>.ParamStruct", ["boolean"], ["boolean"]],
+      "paramStructNullBool!": [
+        "struct<2>.ParamStruct",
+        ["boolean"],
+        ["boolean?"]
+      ],
 
       "int!": ["integer"],
       "nullInt!": ["integer?"],
@@ -36,7 +42,7 @@
 
       "str!": ["string"],
       "nullStr!": ["string?"],
-      "arrStr!": ["array", ["string>"]],
+      "arrStr!": ["array", ["string"]],
       "arrNullStr!": ["array", ["string?"]],
       "objStr!": ["object", ["string"]],
       "objNullStr!": ["object", ["string?"]],
@@ -104,6 +110,13 @@
         "required": ["boolean"],
         "optional!": ["boolean"]
       }
+    }
+  },
+
+  {
+    "struct<2>.ParamStruct": {
+      "one": ["array", ["T.1"]],
+      "two": ["T.1"]
     }
   },
 

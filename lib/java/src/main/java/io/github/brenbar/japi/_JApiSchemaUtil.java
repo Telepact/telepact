@@ -381,6 +381,42 @@ class _JApiSchemaUtil {
         return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
     }
 
+    private static TypeDeclaration parseTypeDeclaration3(List<Object> typeDeclarationArray) {
+        var index = 0;
+        String rootType;
+        for (var e : typeDeclarationArray) {
+            if (index == 0) {
+                try {
+                    rootType = (String) typeDeclarationArray.get(0);
+                } catch (ClassCastException ex) {
+                    throw new JApiSchemaParseError("First element of a type declaration array must be of type string");
+                }
+            } else {
+
+            }
+            index += 1;
+        }
+    }
+
+    private static TypeDeclaration parseTypeDeclaration2(String typeDeclarationString,
+            List<Object> nestedTypeDeclarationStrings,
+            List<Object> originalJApiSchema,
+            Map<String, Integer> schemaKeysToIndex,
+            Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
+
+        var nestedTypeDeclarations = new ArrayList<>();
+        for (var nestedTypeDeclarationString : nestedTypeDeclarationStrings) {
+            if (nestedTypeDeclarationString instanceof String s) {
+                var nestedTypeDeclaration = parseTypeDeclaration2(s, List.of(), originalJApiSchema, schemaKeysToIndex,
+                        parsedTypes, typeExtensions);
+            } else if (nestedTypeDeclarationString instanceof List l) {
+
+            }
+        }
+
+        return new TypeDeclaration(null, false);
+    }
+
     private static TypeDeclaration parseTypeDeclaration(String typeDeclaration,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
