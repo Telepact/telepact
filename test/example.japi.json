@@ -21,6 +21,8 @@
       "objNullBool!": ["object", ["boolean?"]],
       "pStrBool!": ["struct<1>.PStr", ["boolean"]],
       "pStrNullBool!": ["struct<1>.PStr", ["boolean?"]],
+      "pEnumBool!": ["enum<1>.PEnum", ["boolean"]],
+      "pEnumNullBool!": ["enum<1>.PEnum", ["boolean?"]],
 
       "int!": ["integer"],
       "nullInt!": ["integer?"],
@@ -30,6 +32,8 @@
       "objNullInt!": ["object", ["integer?"]],
       "pStrInt!": ["struct<1>.PStr", ["integer"]],
       "pStrNullInt!": ["struct<1>.PStr", ["integer?"]],
+      "pEnumInt!": ["enum<1>.PEnum", ["integer"]],
+      "pEnumNullInt!": ["enum<1>.PEnum", ["integer?"]],
 
       "num!": ["number"],
       "nullNum!": ["number?"],
@@ -39,6 +43,8 @@
       "objNullNum!": ["object", ["number?"]],
       "pStrNum!": ["struct<1>.PStr", ["number"]],
       "pStrNullNum!": ["struct<1>.PStr", ["number?"]],
+      "pEnumNum!": ["enum<1>.PEnum", ["number"]],
+      "pEnumNullNum!": ["enum<1>.PEnum", ["number?"]],
 
       "str!": ["string"],
       "nullStr!": ["string?"],
@@ -48,6 +54,8 @@
       "objNullStr!": ["object", ["string?"]],
       "pStrStr!": ["struct<1>.PStr", ["string"]],
       "pStrNullStr!": ["struct<1>.PStr", ["string?"]],
+      "pEnumStr!": ["enum<1>.PEnum", ["string"]],
+      "pEnumNullStr!": ["enum<1>.PEnum", ["string?"]],
 
       "arr!": ["array", ["any"]],
       "nullArr!": ["array?", ["any"]],
@@ -57,6 +65,8 @@
       "objNullArr!": ["object", ["array?", ["any"]]],
       "pStrArr!": ["struct<1>.PStr", ["array", ["any"]]],
       "pStrNullArr!": ["struct<1>.PStr", ["array?", ["any"]]],
+      "pEnumArr!": ["enum<1>.PEnum", ["array", ["any"]]],
+      "pEnumNullArr!": ["enum<1>.PEnum", ["array?", ["any"]]],
 
       "obj!": ["object", ["any"]],
       "nullObj!": ["object?", ["any"]],
@@ -66,6 +76,8 @@
       "objNullObj!": ["object", ["object?", ["any"]]],
       "pStrObj!": ["struct<1>.PStr", ["object", ["any"]]],
       "pStrNullObj!": ["struct<1>.PStr", ["object?", ["any"]]],
+      "pEnumObj!": ["enum<1>.PEnum", ["object", ["any"]]],
+      "pEnumNullObj!": ["enum<1>.PEnum", ["object?", ["any"]]],
 
       "any!": ["any"],
       "nullAny!": ["any?"],
@@ -75,6 +87,8 @@
       "objNullAny!": ["object", ["any?"]],
       "pStrAny!": ["struct<1>.PStr", ["any"]],
       "pStrNullAny!": ["struct<1>.PStr", ["any?"]],
+      "pEnumAny!": ["enum<1>.PEnum", ["any"]],
+      "pEnumNullAny!": ["enum<1>.PEnum", ["any?"]],
 
       "struct!": ["struct.ExStruct"],
       "nullStruct!": ["struct.ExStruct?"],
@@ -84,6 +98,8 @@
       "objNullStruct!": ["object", ["struct.ExStruct?"]],
       "pStrStruct!": ["struct<1>.PStr", ["struct.ExStruct"]],
       "pStrNullStruct!": ["struct<1>.PStr", ["struct.ExStruct?"]],
+      "pEnumStruct!": ["enum<1>.PEnum", ["struct.ExStruct"]],
+      "pEnumNullStruct!": ["enum<1>.PEnum", ["struct.ExStruct?"]],
 
       "enum!": ["enum.ExEnum"],
       "nullEnum!": ["enum.ExEnum?"],
@@ -93,6 +109,8 @@
       "objNullEnum!": ["object", ["enum.ExEnum?"]],
       "pStrEnum!": ["struct<1>.PStr", ["enum.ExEnum"]],
       "pStrNullEnum!": ["struct<1>.PStr", ["enum.ExEnum?"]],
+      "pEnumEnum!": ["enum<1>.PEnum", ["enum.ExEnum"]],
+      "pEnumNullEnum!": ["enum<1>.PEnum", ["enum.ExEnum?"]],
 
       "fn!": ["fn.example"],
       "nullFn!": ["fn.example?"],
@@ -102,6 +120,8 @@
       "objNullFn!": ["object", ["fn.example?"]],
       "pStrFn!": ["struct<1>.PStr", ["fn.example"]],
       "pStrNullFn!": ["struct<1>.PStr", ["fn.example?"]],
+      "pEnumFn!": ["enum<1>.PEnum", ["fn.example"]],
+      "pEnumNullFn!": ["enum<1>.PEnum", ["fn.example?"]],
 
       "p2Str!": ["struct<2>.PStruct", ["boolean"], ["integer"]],
       "nullP2Str!": ["struct<2>.PStruct?", ["boolean"], ["integer"]],
@@ -122,6 +142,43 @@
       "pStrNullP2Str!": [
         "struct<1>.PStr",
         ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+      ],
+      "pEnumP2Str!": [
+        "enum<1>.PEnum",
+        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+      ],
+      "pEnumNullP2Str!": [
+        "enum<1>.PEnum",
+        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+      ],
+
+      "p2Enum!": ["enum<2>.P2Enum", ["boolean"], ["integer"]],
+      "nullP2Enum!": ["enum<2>.P2Enum?", ["boolean"], ["integer"]],
+      "arrP2Enum!": ["array", ["enum<2>.P2Enum", ["boolean"], ["integer"]]],
+      "arrNullP2Enum!": [
+        "array",
+        ["enum<2>.P2Enum?", ["boolean"], ["integer"]]
+      ],
+      "objP2Enum!": ["object", ["enum<2>.P2Enum", ["boolean"], ["integer"]]],
+      "objNullP2Enum!": [
+        "object",
+        ["enum<2>.P2Enum?", ["boolean"], ["integer"]]
+      ],
+      "pStrP2Enum!": [
+        "struct<1>.PStr",
+        ["enum<2>.P2Enum", ["boolean"], ["integer"]]
+      ],
+      "pStrNullP2Enum!": [
+        "struct<1>.PStr",
+        ["enum<2>.P2Enum?", ["boolean"], ["integer"]]
+      ],
+      "pEnumP2Enum!": [
+        "enum<1>.PEnum",
+        ["enum<2>.P2Enum", ["boolean"], ["integer"]]
+      ],
+      "pEnumNullP2Enum!": [
+        "enum<1>.PEnum",
+        ["enum<2>.P2Enum?", ["boolean"], ["integer"]]
       ]
     }
   },
@@ -158,6 +215,25 @@
     "struct<2>.P2Str": {
       "wrap": ["T.0"],
       "nest": ["array", ["T.1"]]
+    }
+  },
+
+  {
+    "enum<1>.PEnum": {
+      "one": {},
+      "two": {
+        "wrap": ["T.0"]
+      }
+    }
+  },
+
+  {
+    "enum<2>.P2Enum": {
+      "one": {},
+      "two": {
+        "wrap": ["T.0"],
+        "nest": ["array", ["T.1"]]
+      }
     }
   },
 

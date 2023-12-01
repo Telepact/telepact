@@ -99,6 +99,57 @@
                 }
               }
             }
+          },
+          "enum<1>\\.[a-zA-Z_]\\w*$": {
+            "type": "object",
+            "description": "An enum with 1 or more fields.",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "patternProperties": {
+              "^[a-zA-Z_]\\w*?$": {
+                "type": "object",
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^[a-zA-Z_]\\w*!?$": {
+                    "$ref": "#/$defs/typeDeclarationParam1"
+                  }
+                }
+              }
+            }
+          },
+          "enum<2>\\.[a-zA-Z_]\\w*$": {
+            "type": "object",
+            "description": "An enum with 1 or more fields.",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "patternProperties": {
+              "^[a-zA-Z_]\\w*?$": {
+                "type": "object",
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^[a-zA-Z_]\\w*!?$": {
+                    "$ref": "#/$defs/typeDeclarationParam2"
+                  }
+                }
+              }
+            }
+          },
+          "enum<3>\\.[a-zA-Z_]\\w*$": {
+            "type": "object",
+            "description": "An enum with 1 or more fields.",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "patternProperties": {
+              "^[a-zA-Z_]\\w*?$": {
+                "type": "object",
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^[a-zA-Z_]\\w*!?$": {
+                    "$ref": "#/$defs/typeDeclarationParam3"
+                  }
+                }
+              }
+            }
           }
         },
         "properties": {
