@@ -116,7 +116,7 @@
   {
     "struct<2>.ParamStruct": {
       "one": ["array", ["T.1"]],
-      "two": ["T.1"]
+      "two": ["T.0"]
     }
   },
 

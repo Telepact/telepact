@@ -226,7 +226,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any)|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any)|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -234,7 +234,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any)|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any)|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -246,7 +246,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -254,7 +254,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclaration" },
@@ -266,7 +266,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -274,7 +274,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclaration" },
@@ -286,7 +286,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -294,7 +294,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclaration" },
@@ -305,7 +305,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any)|(array|object)|(enum|struct|fn|info|ext)(<[0-3]>)?\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|array|object)|(fn|(enum|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
@@ -319,7 +319,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -327,7 +327,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -339,7 +339,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -347,7 +347,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclarationParam1" },
@@ -359,7 +359,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -367,7 +367,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclarationParam1" },
@@ -379,7 +379,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -387,7 +387,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclarationParam1" },
@@ -398,7 +398,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any||T\\.0)|(array|object)|(enum|struct|fn|info|ext)(<[0-3]>)?\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|T\\.0|array|object)|(fn|(enum|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
@@ -412,7 +412,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -420,7 +420,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -432,7 +432,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -440,7 +440,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclarationParam2" },
@@ -452,7 +452,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -460,7 +460,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclarationParam2" },
@@ -472,7 +472,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -480,7 +480,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclarationParam2" },
@@ -491,7 +491,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any||T\\.[0-1])|(array|object)|(enum|struct|fn|info|ext)(<[0-3]>)?\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|T\\.[0-1]|array|object)|(fn|(enum|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
@@ -505,7 +505,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -513,7 +513,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(enum|struct|fn|info|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|enum|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -525,7 +525,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -533,7 +533,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(enum|struct|fn|info|ext)<1>\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(enum|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclarationParam3" },
@@ -545,7 +545,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -553,7 +553,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(enum|struct|fn|info|ext)<2>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(enum|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclarationParam3" },
@@ -565,7 +565,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -573,7 +573,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(enum|struct|fn|info|ext)<3>\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(enum|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclarationParam3" },
@@ -584,7 +584,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any||T\\.[0-2])|(array|object)|(enum|struct|fn|info|ext)(<[0-3]>)?\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|T\\.[0-2]|array|object)|(fn|(enum|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
