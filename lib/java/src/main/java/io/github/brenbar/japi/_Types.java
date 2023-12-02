@@ -43,8 +43,22 @@ class FieldDeclaration {
 class TypeDeclaration {
     public final Type type;
     public final boolean nullable;
+    public final List<TypeDeclaration> typeParameters;
 
     public TypeDeclaration(
+            Type type,
+            boolean nullable, List<TypeDeclaration> typeParameters) {
+        this.type = type;
+        this.nullable = nullable;
+        this.typeParameters = typeParameters;
+    }
+}
+
+class TypeDeclarationRoot {
+    public final Type type;
+    public final boolean nullable;
+
+    public TypeDeclarationRoot(
             Type type,
             boolean nullable) {
         this.type = type;
@@ -53,48 +67,89 @@ class TypeDeclaration {
 }
 
 interface Type {
+    public int getTypeParameterCount();
 }
 
 class JsonBoolean implements Type {
+
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class JsonInteger implements Type {
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class JsonNumber implements Type {
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class JsonString implements Type {
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class JsonArray implements Type {
-    public final TypeDeclaration nestedType;
 
-    public JsonArray(TypeDeclaration nestedType) {
-        this.nestedType = nestedType;
+    @Override
+    public int getTypeParameterCount() {
+        return 1;
     }
 }
 
 class JsonObject implements Type {
 
-    public final TypeDeclaration nestedType;
-
-    public JsonObject(TypeDeclaration nestedType) {
-        this.nestedType = nestedType;
+    @Override
+    public int getTypeParameterCount() {
+        return 1;
     }
 }
 
 class JsonAny implements Type {
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
+}
+
+class Generic implements Type {
+    public final int index;
+
+    public Generic(int index) {
+        this.index = index;
+    }
+
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class Struct implements Type {
 
     public final String name;
     public final Map<String, FieldDeclaration> fields;
+    public final int typeParameterCount;
 
-    public Struct(String name, Map<String, FieldDeclaration> fields) {
+    public Struct(String name, Map<String, FieldDeclaration> fields, int typeParameterCount) {
         this.name = name;
         this.fields = fields;
+        this.typeParameterCount = typeParameterCount;
+    }
+
+    @Override
+    public int getTypeParameterCount() {
+        return this.typeParameterCount;
     }
 }
 
@@ -102,10 +157,17 @@ class Enum implements Type {
 
     public final String name;
     public final Map<String, Struct> values;
+    public final int typeParameterCount;
 
-    public Enum(String name, Map<String, Struct> values) {
+    public Enum(String name, Map<String, Struct> values, int typeParameterCount) {
         this.name = name;
         this.values = values;
+        this.typeParameterCount = typeParameterCount;
+    }
+
+    @Override
+    public int getTypeParameterCount() {
+        return this.typeParameterCount;
     }
 }
 
@@ -120,6 +182,11 @@ class Fn implements Type {
         this.arg = input;
         this.result = output;
     }
+
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class Trait implements Type {
@@ -132,6 +199,11 @@ class Trait implements Type {
         this.fn = fn;
         this.regex = regex;
     }
+
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class Info implements Type {
@@ -140,15 +212,27 @@ class Info implements Type {
     public Info(String name) {
         this.name = name;
     }
+
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
 }
 
 class Ext implements Type {
     public final String name;
     public final TypeExtension typeExtension;
+    public final int typeParameterCount;
 
-    public Ext(String name, TypeExtension typeExtension) {
+    public Ext(String name, TypeExtension typeExtension, int typeParameterCount) {
         this.name = name;
         this.typeExtension = typeExtension;
+        this.typeParameterCount = typeParameterCount;
+    }
+
+    @Override
+    public int getTypeParameterCount() {
+        return this.typeParameterCount;
     }
 }
 

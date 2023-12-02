@@ -176,7 +176,9 @@ class _ServerUtil {
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResultEnum = (Map<String, Object>) selectStructFields(resultEnumType, resultEnum,
+            finalResultEnum = (Map<String, Object>) selectStructFields(
+                    new TypeDeclaration(resultEnumType, false, List.of()),
+                    resultEnum,
                     selectStructFieldsHeader);
         } else {
             finalResultEnum = resultEnum;
@@ -197,8 +199,9 @@ class _ServerUtil {
         return validationFailureCases;
     }
 
-    static Object selectStructFields(Type type, Object value, Map<String, List<String>> selectedStructFields) {
-        if (type instanceof Struct s) {
+    static Object selectStructFields(TypeDeclaration typeDeclaration, Object value,
+            Map<String, List<String>> selectedStructFields) {
+        if (typeDeclaration.type instanceof Struct s) {
             var selectedFields = selectedStructFields.get(s.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -206,13 +209,13 @@ class _ServerUtil {
                 var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
                     var field = s.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
             return finalMap;
-        } else if (type instanceof Fn f) {
+        } else if (typeDeclaration.type instanceof Fn f) {
             var selectedFields = selectedStructFields.get(f.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -220,45 +223,54 @@ class _ServerUtil {
                 var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
                     var field = f.arg.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration.type, entry.getValue(),
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
             return finalMap;
-        } else if (type instanceof Enum e) {
-            return selectStructFieldsForEnum(e.values, value, selectedStructFields);
-        } else if (type instanceof JsonObject o) {
+        } else if (typeDeclaration.type instanceof Enum e) {
+            var valueAsMap = (Map<String, Object>) value;
+            var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
+            var enumValue = enumEntry.getKey();
+            var enumData = (Map<String, Object>) enumEntry.getValue();
+
+            var enumStructReference = e.values.get(enumValue);
+
+            var selectedFields = selectedStructFields.get(enumStructReference.name);
+            var finalMap = new HashMap<>();
+            for (var entry : enumData.entrySet()) {
+                var fieldName = entry.getKey();
+                if (selectedFields == null || selectedFields.contains(fieldName)) {
+                    var field = enumStructReference.fields.get(fieldName);
+                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
+                            selectedStructFields);
+                    finalMap.put(entry.getKey(), valueWithSelectedFields);
+                }
+            }
+
+            return Map.of(enumEntry.getKey(), finalMap);
+        } else if (typeDeclaration.type instanceof JsonObject o) {
+            var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(o.nestedType.type, entry.getValue(),
+                var valueWithSelectedFields = selectStructFields(nestedTypeDeclaration, entry.getValue(),
                         selectedStructFields);
                 finalMap.put(entry.getKey(), valueWithSelectedFields);
             }
             return finalMap;
-        } else if (type instanceof JsonArray a) {
+        } else if (typeDeclaration.type instanceof JsonArray a) {
+            var nestedType = typeDeclaration.typeParameters.get(0);
             var valueAsList = (List<Object>) value;
             var finalList = new ArrayList<>();
             for (var entry : valueAsList) {
-                var valueWithSelectedFields = selectStructFields(a.nestedType.type, entry, selectedStructFields);
+                var valueWithSelectedFields = selectStructFields(nestedType, entry, selectedStructFields);
                 finalList.add(valueWithSelectedFields);
             }
             return finalList;
         } else {
             return value;
         }
-    }
-
-    static Object selectStructFieldsForEnum(Map<String, Struct> enumReference, Object value,
-            Map<String, List<String>> selectedStructFields) {
-        var valueAsMap = (Map<String, Object>) value;
-        var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-        var enumValue = enumEntry.getKey();
-        var enumData = enumEntry.getValue();
-
-        var enumStructReference = enumReference.get(enumValue);
-        var structWithSelectedFields = selectStructFields(enumStructReference, enumData, selectedStructFields);
-        return Map.of(enumEntry.getKey(), structWithSelectedFields);
     }
 }

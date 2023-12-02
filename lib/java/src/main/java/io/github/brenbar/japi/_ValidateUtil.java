@@ -369,7 +369,8 @@ public class _ValidateUtil {
         }
     }
 
-    private static List<ValidationFailure> validateArray(String path, Object value, JsonArray a) {
+    private static List<ValidationFailure> validateArray(String path, Object value, JsonArray a,
+            TypeDeclaration nestedTypeDeclaration) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure(path, BOOLEAN_INVALID_FOR_ARRAY_TYPE));
@@ -383,7 +384,7 @@ public class _ValidateUtil {
             var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 var element = l.get(i);
-                var nestedValidationFailures = validateType("%s[%s]".formatted(path, i), a.nestedType,
+                var nestedValidationFailures = validateType("%s[%s]".formatted(path, i), nestedTypeDeclaration,
                         element);
                 validationFailures.addAll(nestedValidationFailures);
             }
@@ -397,7 +398,8 @@ public class _ValidateUtil {
         }
     }
 
-    private static List<ValidationFailure> validateObject(String path, Object value, JsonObject o) {
+    private static List<ValidationFailure> validateObject(String path, Object value, JsonObject o,
+            TypeDeclaration nestedTypeDeclaration) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure(path, BOOLEAN_INVALID_FOR_OBJECT_TYPE));
@@ -415,7 +417,7 @@ public class _ValidateUtil {
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 var k = (String) entry.getKey();
                 var v = entry.getValue();
-                var nestedValidationFailures = validateType("%s{%s}".formatted(path, k), o.nestedType,
+                var nestedValidationFailures = validateType("%s{%s}".formatted(path, k), nestedTypeDeclaration,
                         v);
                 validationFailures.addAll(nestedValidationFailures);
             }
@@ -488,15 +490,17 @@ public class _ValidateUtil {
             } else if (expectedType instanceof JsonString) {
                 return validateString(path, value);
             } else if (expectedType instanceof JsonArray a) {
-                return validateArray(path, value, a);
+                var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
+                return validateArray(path, value, a, nestedTypeDeclaration);
             } else if (expectedType instanceof JsonObject o) {
-                return validateObject(path, value, o);
+                var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
+                return validateObject(path, value, o, nestedTypeDeclaration);
             } else if (expectedType instanceof Struct s) {
                 return validateStruct(path, value, s);
             } else if (expectedType instanceof Enum e) {
                 return validateEnum(path, value, e);
             } else if (expectedType instanceof Fn f) {
-                return validateType(path, new TypeDeclaration(f.arg, false), value);
+                return validateStruct(path, value, f.arg);
             } else if (expectedType instanceof Ext e) {
                 return e.typeExtension.validate(path, value);
             } else if (expectedType instanceof JsonAny a) {

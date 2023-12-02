@@ -222,7 +222,7 @@
     "enum<1>.PEnum": {
       "one": {},
       "two": {
-        "wrap": ["T.0"]
+        "ewrap": ["T.0"]
       }
     }
   },
@@ -231,8 +231,8 @@
     "enum<2>.P2Enum": {
       "one": {},
       "two": {
-        "wrap": ["T.0"],
-        "nest": ["array", ["T.1"]]
+        "ewrap": ["T.0"],
+        "enest": ["array", ["T.1"]]
       }
     }
   },

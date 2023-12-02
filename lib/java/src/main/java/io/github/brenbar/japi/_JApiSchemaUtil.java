@@ -100,8 +100,10 @@ class _JApiSchemaUtil {
 
         var traits = new ArrayList<Trait>();
 
+        var rootTypeParameterCount = 0;
         for (var schemaKey : schemaKeys) {
-            var typ = getOrParseType(schemaKey, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions);
+            var typ = getOrParseType(schemaKey, rootTypeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                    parsedTypes, typeExtensions);
             if (typ instanceof Trait t) {
                 traits.add(t);
             }
@@ -227,15 +229,19 @@ class _JApiSchemaUtil {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
         }
         var argumentFields = new HashMap<String, FieldDeclaration>();
+        var isForEnum = false;
+        var typeParameterCount = 0;
         for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
-                    typeDeclarationValue, false, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions);
+                    typeDeclarationValue, isForEnum, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                    parsedTypes,
+                    typeExtensions);
             argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
-        var argType = new Struct(definitionKey, argumentFields);
+        var argType = new Struct(definitionKey, argumentFields, typeParameterCount);
 
         Map<String, Object> resultDefinitionAsParsedJson;
         try {
@@ -265,17 +271,18 @@ class _JApiSchemaUtil {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
-                        typeDeclarationValue, false, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        typeDeclarationValue, isForEnum, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                        parsedTypes,
                         typeExtensions);
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new Struct("->.%s".formatted(enumValue), fields);
+            var enumStruct = new Struct("->.%s".formatted(enumValue), fields, typeParameterCount);
 
             values.put(enumValue, enumStruct);
         }
 
-        var resultType = new Enum("%s.->".formatted(definitionKey), values);
+        var resultType = new Enum("%s.->".formatted(definitionKey), values, typeParameterCount);
 
         var type = new Fn(definitionKey, argType, resultType);
 
@@ -285,6 +292,7 @@ class _JApiSchemaUtil {
     private static Struct parseStructType(
             Map<String, Object> structDefinitionAsParsedJson,
             String definitionKey,
+            int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes,
@@ -296,11 +304,12 @@ class _JApiSchemaUtil {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(fieldDeclaration,
-                    typeDeclarationValue, false, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions);
+                    typeDeclarationValue, false, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                    typeExtensions);
             fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
-        var type = new Struct(definitionKey, fields);
+        var type = new Struct(definitionKey, fields, typeParameterCount);
 
         return type;
     }
@@ -308,6 +317,7 @@ class _JApiSchemaUtil {
     private static Enum parseEnumType(
             Map<String, Object> enumDefinitionAsParsedJson,
             String definitionKey,
+            int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes,
@@ -329,17 +339,18 @@ class _JApiSchemaUtil {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(fieldDeclaration,
-                        typeDeclarationValue, false, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        typeDeclarationValue, false, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                        parsedTypes,
                         typeExtensions);
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields);
+            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields, typeParameterCount);
 
             values.put(enumValue, enumStruct);
         }
 
-        var type = new Enum(definitionKey, values);
+        var type = new Enum(definitionKey, values, typeParameterCount);
 
         return type;
     }
@@ -348,6 +359,7 @@ class _JApiSchemaUtil {
             String fieldDeclaration,
             Object typeDeclarationValue,
             boolean isForEnum,
+            int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes,
@@ -362,9 +374,9 @@ class _JApiSchemaUtil {
 
         boolean optional = matcher.group(2) != null;
 
-        String typeDeclarationString;
+        List<Object> typeDeclarationArray;
         try {
-            typeDeclarationString = (String) typeDeclarationValue;
+            typeDeclarationArray = (List<Object>) typeDeclarationValue;
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     "Type declarations should be strings: %s %s".formatted(fieldDeclaration, typeDeclarationValue));
@@ -374,68 +386,64 @@ class _JApiSchemaUtil {
             throw new JApiSchemaParseError("Enum keys cannot be marked as optional");
         }
 
-        var typeDeclaration = parseTypeDeclaration(typeDeclarationString, originalJApiSchema, schemaKeysToIndex,
+        var typeDeclaration = parseTypeDeclaration(typeDeclarationArray, typeParameterCount, originalJApiSchema,
+                schemaKeysToIndex,
                 parsedTypes,
                 typeExtensions);
 
         return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
     }
 
-    private static TypeDeclaration parseTypeDeclaration3(List<Object> typeDeclarationArray) {
-        var index = 0;
-        String rootType;
-        for (var e : typeDeclarationArray) {
-            if (index == 0) {
-                try {
-                    rootType = (String) typeDeclarationArray.get(0);
-                } catch (ClassCastException ex) {
-                    throw new JApiSchemaParseError("First element of a type declaration array must be of type string");
-                }
-            } else {
-
-            }
-            index += 1;
-        }
-    }
-
-    private static TypeDeclaration parseTypeDeclaration2(String typeDeclarationString,
-            List<Object> nestedTypeDeclarationStrings,
+    private static TypeDeclaration parseTypeDeclaration(List<Object> typeDeclarationArray, int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
-
-        var nestedTypeDeclarations = new ArrayList<>();
-        for (var nestedTypeDeclarationString : nestedTypeDeclarationStrings) {
-            if (nestedTypeDeclarationString instanceof String s) {
-                var nestedTypeDeclaration = parseTypeDeclaration2(s, List.of(), originalJApiSchema, schemaKeysToIndex,
-                        parsedTypes, typeExtensions);
-            } else if (nestedTypeDeclarationString instanceof List l) {
-
-            }
+        if (typeDeclarationArray.size() == 0) {
+            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
         }
 
-        return new TypeDeclaration(null, false);
-    }
+        String rootTypeString;
+        try {
+            rootTypeString = (String) typeDeclarationArray.get(0);
+        } catch (ClassCastException ex) {
+            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+        }
 
-    private static TypeDeclaration parseTypeDeclaration(String typeDeclaration,
-            List<Object> originalJApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         var regex = Pattern.compile("^(.*?)(\\?)?$");
-        var matcher = regex.matcher(typeDeclaration);
+        var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclaration));
+            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
         }
 
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
 
-        var type = getOrParseType(typeName, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions);
+        var type = getOrParseType(typeName, thisTypeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                typeExtensions);
 
-        return new TypeDeclaration(type, nullable);
+        var givenTypeParameterCount = typeDeclarationArray.size() - 1;
+        if (type.getTypeParameterCount() != givenTypeParameterCount) {
+            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+        }
+
+        var typeParameters = new ArrayList<TypeDeclaration>();
+        var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
+        for (var e : givenTypeParameters) {
+            List<Object> l;
+            try {
+                l = (List<Object>) e;
+            } catch (ClassCastException ex) {
+                throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+            }
+            var typeParameterTypeDeclaration = parseTypeDeclaration(l, thisTypeParameterCount, originalJApiSchema,
+                    schemaKeysToIndex, parsedTypes, typeExtensions);
+            typeParameters.add(typeParameterTypeDeclaration);
+        }
+
+        return new TypeDeclaration(type, nullable, typeParameters);
     }
 
-    private static Type getOrParseType(String typeName, List<Object> originalJApiSchema,
+    private static Type getOrParseType(String typeName, int thisTypeParameterCount, List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         var existingType = parsedTypes.get(typeName);
@@ -444,72 +452,82 @@ class _JApiSchemaUtil {
         }
 
         var regex = Pattern.compile(
-                "^((boolean|integer|number|string|any)|((array|object)(<(.*)>)?)|((enum|struct|fn|trait|info|ext)\\.([a-zA-Z_]\\w*)))$");
+                "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((fn|(enum|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
         }
 
-        var standardTypeName = matcher.group(2);
+        var standardTypeName = matcher.group(1);
         if (standardTypeName != null) {
             return switch (standardTypeName) {
                 case "boolean" -> new JsonBoolean();
                 case "integer" -> new JsonInteger();
                 case "number" -> new JsonNumber();
                 case "string" -> new JsonString();
+                case "array" -> new JsonArray();
+                case "object" -> new JsonObject();
                 case "any" -> new JsonAny();
-                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(standardTypeName));
+                default -> {
+                    var genericParameterIndexString = matcher.group(2);
+                    if (genericParameterIndexString != null) {
+                        var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
+                        if (genericParameterIndex >= thisTypeParameterCount) {
+                            throw new JApiSchemaParseError(
+                                    "Generic index (%d) too high for this type: %s".formatted(genericParameterIndex,
+                                            typeName));
+                        }
+                        yield new Generic(genericParameterIndex);
+                    } else {
+                        throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
+                    }
+                }
             };
         }
 
-        var collectionTypeName = matcher.group(4);
-        if (collectionTypeName != null) {
-            var nestedName = matcher.group(6);
-
-            TypeDeclaration nestedType;
-            if (nestedName != null) {
-                nestedType = parseTypeDeclaration(nestedName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
-                        typeExtensions);
-            } else {
-                nestedType = new TypeDeclaration(new JsonAny(), false);
-            }
-
-            return switch (collectionTypeName) {
-                case "array" -> new JsonArray(nestedType);
-                case "object" -> new JsonObject(nestedType);
-                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(collectionTypeName));
-            };
-        }
-
-        var customTypeName = matcher.group(7);
+        var customTypeName = matcher.group(3);
         if (customTypeName != null) {
-            var typePrefix = matcher.group(8);
             var index = schemaKeysToIndex.get(customTypeName);
             var definition = (Map<String, Object>) originalJApiSchema.get(index);
-            var type = switch (typePrefix) {
-                case "struct" ->
-                    parseStructType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
-                            typeExtensions);
-                case "enum" ->
-                    parseEnumType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
-                            typeExtensions);
-                case "fn" ->
-                    parseFunctionType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
-                            typeExtensions, false);
-                case "trait" ->
-                    parseTraitType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
-                            typeExtensions);
-                case "info" -> new Info(customTypeName);
-                case "ext" -> {
-                    var typeExtension = typeExtensions.get(customTypeName);
-                    if (typeExtension == null) {
-                        throw new JApiSchemaParseError(
-                                "Missing type extension implementation %s".formatted(customTypeName));
-                    }
-                    yield new Ext(customTypeName, typeExtension);
+
+            var typeParameterCountString = matcher.group(7);
+            int typeParameterCount = 0;
+            if (typeParameterCountString != null) {
+                try {
+                    typeParameterCount = Integer.parseInt(typeParameterCountString);
+                } catch (NumberFormatException e) {
+                    throw new JApiSchemaParseError(
+                            "Type parameter count must match regex (<([1-3])>)?".formatted(standardTypeName));
                 }
-                default -> throw new JApiSchemaParseError("Unrecognized type: %s".formatted(collectionTypeName));
-            };
+            }
+
+            Type type;
+            if (customTypeName.startsWith("struct")) {
+                type = parseStructType(definition, customTypeName, typeParameterCount, originalJApiSchema,
+                        schemaKeysToIndex, parsedTypes,
+                        typeExtensions);
+            } else if (customTypeName.startsWith("enum")) {
+                type = parseEnumType(definition, customTypeName, typeParameterCount, originalJApiSchema,
+                        schemaKeysToIndex, parsedTypes,
+                        typeExtensions);
+            } else if (customTypeName.startsWith("fn")) {
+                type = parseFunctionType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        typeExtensions, false);
+            } else if (customTypeName.startsWith("trait")) {
+                type = parseTraitType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        typeExtensions);
+            } else if (customTypeName.startsWith("info")) {
+                type = new Info(customTypeName);
+            } else if (customTypeName.startsWith("ext")) {
+                var typeExtension = typeExtensions.get(customTypeName);
+                if (typeExtension == null) {
+                    throw new JApiSchemaParseError(
+                            "Missing type extension implementation %s".formatted(customTypeName));
+                }
+                type = new Ext(customTypeName, typeExtension, typeParameterCount);
+            } else {
+                throw new JApiSchemaParseError("Unrecognized type: %s".formatted(customTypeName));
+            }
 
             parsedTypes.put(customTypeName, type);
 

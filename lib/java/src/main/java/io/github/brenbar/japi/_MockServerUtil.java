@@ -244,11 +244,13 @@ class _MockServerUtil {
                 return random.nextString();
             }
         } else if (typeDeclaration.type instanceof JsonArray a) {
+            var nestedType = typeDeclaration.typeParameters.get(0);
             if (useStartingValue) {
                 var startingArray = (List<Object>) startingValue;
                 var array = new ArrayList<Object>();
                 for (var startingArrayValue : startingArray) {
-                    var value = constructRandomType(a.nestedType, startingArrayValue, true, includeRandomOptionalFields,
+                    var value = constructRandomType(nestedType, startingArrayValue, true,
+                            includeRandomOptionalFields,
                             random);
                     array.add(value);
                 }
@@ -257,19 +259,20 @@ class _MockServerUtil {
                 var length = random.nextInt(3);
                 var array = new ArrayList<Object>();
                 for (int i = 0; i < length; i += 1) {
-                    var value = constructRandomType(a.nestedType, null, false, includeRandomOptionalFields, random);
+                    var value = constructRandomType(nestedType, null, false, includeRandomOptionalFields, random);
                     array.add(value);
                 }
                 return array;
             }
         } else if (typeDeclaration.type instanceof JsonObject o) {
+            var nestedType = typeDeclaration.typeParameters.get(0);
             if (useStartingValue) {
                 var startingObj = (Map<String, Object>) startingValue;
                 var obj = new TreeMap<String, Object>();
                 for (var startingObjEntry : startingObj.entrySet()) {
                     var key = startingObjEntry.getKey();
                     var startingObjValue = startingObjEntry.getValue();
-                    var value = constructRandomType(o.nestedType, startingObjValue, true, includeRandomOptionalFields,
+                    var value = constructRandomType(nestedType, startingObjValue, true, includeRandomOptionalFields,
                             random);
                     obj.put(key, value);
                 }
@@ -279,7 +282,7 @@ class _MockServerUtil {
                 var obj = new TreeMap<String, Object>();
                 for (int i = 0; i < length; i += 1) {
                     var key = random.nextString();
-                    var value = constructRandomType(o.nestedType, null, false, includeRandomOptionalFields, random);
+                    var value = constructRandomType(nestedType, null, false, includeRandomOptionalFields, random);
                     obj.put(key, value);
                 }
                 return obj;
