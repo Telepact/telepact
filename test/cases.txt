@@ -415,6 +415,7 @@
 
 "testPEnumInteger"
 
+[{"ok":{"value":{"pEnumInt":{"one":{}}}}},{"fn.test":{"value":{"pEnumInt":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumInt":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumInt":{"two":{"wrap":0}}}}},{"fn.test":{"value":{"pEnumInt":{"two":{"wrap":0}}}}}]|[{},{"ok":{"value":{"pEnumInt":{"two":{"wrap":0}}}}}]
 [{"ok":{"value":{"pEnumInt":{"two":{"wrap":-1}}}}},{"fn.test":{"value":{"pEnumInt":{"two":{"wrap":-1}}}}}]|[{},{"ok":{"value":{"pEnumInt":{"two":{"wrap":-1}}}}}]
 [{"ok":{"value":{"pEnumInt":{"two":{"wrap":1}}}}},{"fn.test":{"value":{"pEnumInt":{"two":{"wrap":1}}}}}]|[{},{"ok":{"value":{"pEnumInt":{"two":{"wrap":1}}}}}]
@@ -443,6 +444,7 @@
 
 "testPEnumNullInteger"
 
+[{"ok":{"value":{"pEnumNullInt":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullInt":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullInt":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullInt":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullInt":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullInt":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullInt":{"two":{"wrap":0}}}}},{"fn.test":{"value":{"pEnumNullInt":{"two":{"wrap":0}}}}}]|[{},{"ok":{"value":{"pEnumNullInt":{"two":{"wrap":0}}}}}]
 [{"ok":{"value":{"pEnumNullInt":{"two":{"wrap":-1}}}}},{"fn.test":{"value":{"pEnumNullInt":{"two":{"wrap":-1}}}}}]|[{},{"ok":{"value":{"pEnumNullInt":{"two":{"wrap":-1}}}}}]
@@ -673,6 +675,7 @@
 
 "testPEnumNumber"
 
+[{"ok":{"value":{"pEnumNum":{"one":{}}}}},{"fn.test":{"value":{"pEnumNum":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNum":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNum":{"two":{"wrap":0}}}}},{"fn.test":{"value":{"pEnumNum":{"two":{"wrap":0}}}}}]|[{},{"ok":{"value":{"pEnumNum":{"two":{"wrap":0}}}}}]
 [{"ok":{"value":{"pEnumNum":{"two":{"wrap":-1}}}}},{"fn.test":{"value":{"pEnumNum":{"two":{"wrap":-1}}}}}]|[{},{"ok":{"value":{"pEnumNum":{"two":{"wrap":-1}}}}}]
 [{"ok":{"value":{"pEnumNum":{"two":{"wrap":1}}}}},{"fn.test":{"value":{"pEnumNum":{"two":{"wrap":1}}}}}]|[{},{"ok":{"value":{"pEnumNum":{"two":{"wrap":1}}}}}]
@@ -697,6 +700,7 @@
 
 "testPEnumNullNumber"
 
+[{"ok":{"value":{"pEnumNullNum":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullNum":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullNum":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullNum":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullNum":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullNum":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullNum":{"two":{"wrap":0}}}}},{"fn.test":{"value":{"pEnumNullNum":{"two":{"wrap":0}}}}}]|[{},{"ok":{"value":{"pEnumNullNum":{"two":{"wrap":0}}}}}]
 [{"ok":{"value":{"pEnumNullNum":{"two":{"wrap":-1}}}}},{"fn.test":{"value":{"pEnumNullNum":{"two":{"wrap":-1}}}}}]|[{},{"ok":{"value":{"pEnumNullNum":{"two":{"wrap":-1}}}}}]
@@ -886,6 +890,7 @@
 
 "testPEnumString"
 
+[{"ok":{"value":{"pEnumStr":{"one":{}}}}},{"fn.test":{"value":{"pEnumStr":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumStr":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumStr":{"two":{"wrap":""}}}}},{"fn.test":{"value":{"pEnumStr":{"two":{"wrap":""}}}}}]|[{},{"ok":{"value":{"pEnumStr":{"two":{"wrap":""}}}}}]
 [{"ok":{"value":{"pEnumStr":{"two":{"wrap":"abc"}}}}},{"fn.test":{"value":{"pEnumStr":{"two":{"wrap":"abc"}}}}}]|[{},{"ok":{"value":{"pEnumStr":{"two":{"wrap":"abc"}}}}}]
 
@@ -905,6 +910,7 @@
 
 "testPEnumNullString"
 
+[{"ok":{"value":{"pEnumNullStr":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullStr":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullStr":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullStr":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullStr":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullStr":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullStr":{"two":{"wrap":""}}}}},{"fn.test":{"value":{"pEnumNullStr":{"two":{"wrap":""}}}}}]|[{},{"ok":{"value":{"pEnumNullStr":{"two":{"wrap":""}}}}}]
 [{"ok":{"value":{"pEnumNullStr":{"two":{"wrap":"abc"}}}}},{"fn.test":{"value":{"pEnumNullStr":{"two":{"wrap":"abc"}}}}}]|[{},{"ok":{"value":{"pEnumNullStr":{"two":{"wrap":"abc"}}}}}]
@@ -1086,6 +1092,7 @@
 
 "testPEnumArray"
 
+[{"ok":{"value":{"pEnumArr":{"one":{}}}}},{"fn.test":{"value":{"pEnumArr":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumArr":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumArr":{"two":{"wrap":[]}}}}},{"fn.test":{"value":{"pEnumArr":{"two":{"wrap":[]}}}}}]|[{},{"ok":{"value":{"pEnumArr":{"two":{"wrap":[]}}}}}]
 [{"ok":{"value":{"pEnumArr":{"two":{"wrap":[false,0,0.1,""]}}}}},{"fn.test":{"value":{"pEnumArr":{"two":{"wrap":[false,0,0.1,""]}}}}}]|[{},{"ok":{"value":{"pEnumArr":{"two":{"wrap":[false,0,0.1,""]}}}}}]
 
@@ -1105,6 +1112,7 @@
 
 "testPEnumNullArray"
 
+[{"ok":{"value":{"pEnumNullArr":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullArr":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullArr":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullArr":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullArr":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullArr":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullArr":{"two":{"wrap":[]}}}}},{"fn.test":{"value":{"pEnumNullArr":{"two":{"wrap":[]}}}}}]|[{},{"ok":{"value":{"pEnumNullArr":{"two":{"wrap":[]}}}}}]
 [{"ok":{"value":{"pEnumNullArr":{"two":{"wrap":[false,0,0.1,""]}}}}},{"fn.test":{"value":{"pEnumNullArr":{"two":{"wrap":[false,0,0.1,""]}}}}}]|[{},{"ok":{"value":{"pEnumNullArr":{"two":{"wrap":[false,0,0.1,""]}}}}}]
@@ -1291,6 +1299,7 @@
 
 "testPEnumObject"
 
+[{"ok":{"value":{"pEnumObj":{"one":{}}}}},{"fn.test":{"value":{"pEnumObj":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumObj":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumObj":{"two":{"wrap":{}}}}}},{"fn.test":{"value":{"pEnumObj":{"two":{"wrap":{}}}}}}]|[{},{"ok":{"value":{"pEnumObj":{"two":{"wrap":{}}}}}}]
 [{"ok":{"value":{"pEnumObj":{"two":{"wrap":{"a":false,"b":0,"c":0.1,"d":""}}}}}},{"fn.test":{"value":{"pEnumObj":{"two":{"wrap":{"a":false,"b":0,"c":0.1,"d":""}}}}}}]|[{},{"ok":{"value":{"pEnumObj":{"two":{"wrap":{"a":false,"b":0,"c":0.1,"d":""}}}}}}]
 
@@ -1310,6 +1319,7 @@
 
 "testPEnumNullObject"
 
+[{"ok":{"value":{"pEnumNullObj":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullObj":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullObj":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullObj":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullObj":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullObj":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullObj":{"two":{"wrap":{}}}}}},{"fn.test":{"value":{"pEnumNullObj":{"two":{"wrap":{}}}}}}]|[{},{"ok":{"value":{"pEnumNullObj":{"two":{"wrap":{}}}}}}]
 [{"ok":{"value":{"pEnumNullObj":{"two":{"wrap":{"a":false,"b":0,"c":0.1,"d":""}}}}}},{"fn.test":{"value":{"pEnumNullObj":{"two":{"wrap":{"a":false,"b":0,"c":0.1,"d":""}}}}}}]|[{},{"ok":{"value":{"pEnumNullObj":{"two":{"wrap":{"a":false,"b":0,"c":0.1,"d":""}}}}}}]
@@ -1425,6 +1435,7 @@
 
 "testPEnumAny"
 
+[{"ok":{"value":{"pEnumAny":{"one":{}}}}},{"fn.test":{"value":{"pEnumAny":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumAny":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumAny":{"two":{"wrap":false}}}}},{"fn.test":{"value":{"pEnumAny":{"two":{"wrap":false}}}}}]|[{},{"ok":{"value":{"pEnumAny":{"two":{"wrap":false}}}}}]
 [{"ok":{"value":{"pEnumAny":{"two":{"wrap":0}}}}},{"fn.test":{"value":{"pEnumAny":{"two":{"wrap":0}}}}}]|[{},{"ok":{"value":{"pEnumAny":{"two":{"wrap":0}}}}}]
 [{"ok":{"value":{"pEnumAny":{"two":{"wrap":0.1}}}}},{"fn.test":{"value":{"pEnumAny":{"two":{"wrap":0.1}}}}}]|[{},{"ok":{"value":{"pEnumAny":{"two":{"wrap":0.1}}}}}]
@@ -1435,6 +1446,7 @@
 
 "testPEnumNullAny"
 
+[{"ok":{"value":{"pEnumNullAny":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullAny":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullAny":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullAny":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullAny":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullAny":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullAny":{"two":{"wrap":false}}}}},{"fn.test":{"value":{"pEnumNullAny":{"two":{"wrap":false}}}}}]|[{},{"ok":{"value":{"pEnumNullAny":{"two":{"wrap":false}}}}}]
 [{"ok":{"value":{"pEnumNullAny":{"two":{"wrap":0}}}}},{"fn.test":{"value":{"pEnumNullAny":{"two":{"wrap":0}}}}}]|[{},{"ok":{"value":{"pEnumNullAny":{"two":{"wrap":0}}}}}]
@@ -1668,6 +1680,7 @@
 
 "testPEnumStruct"
 
+[{"ok":{"value":{"pEnumStruct":{"one":{}}}}},{"fn.test":{"value":{"pEnumStruct":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumStruct":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumStruct":{"two":{"wrap":{"required":false}}}}}},{"fn.test":{"value":{"pEnumStruct":{"two":{"wrap":{"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumStruct":{"two":{"wrap":{"required":false}}}}}}]
 [{"ok":{"value":{"pEnumStruct":{"two":{"wrap":{"optional":false,"required":false}}}}}},{"fn.test":{"value":{"pEnumStruct":{"two":{"wrap":{"optional":false,"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumStruct":{"two":{"wrap":{"optional":false,"required":false}}}}}}]
 
@@ -1695,6 +1708,7 @@
 
 "testPEnumNullStruct"
 
+[{"ok":{"value":{"pEnumNullStruct":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullStruct":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullStruct":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullStruct":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullStruct":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullStruct":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullStruct":{"two":{"wrap":{"required":false}}}}}},{"fn.test":{"value":{"pEnumNullStruct":{"two":{"wrap":{"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumNullStruct":{"two":{"wrap":{"required":false}}}}}}]
 [{"ok":{"value":{"pEnumNullStruct":{"two":{"wrap":{"optional":false,"required":false}}}}}},{"fn.test":{"value":{"pEnumNullStruct":{"two":{"wrap":{"optional":false,"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumNullStruct":{"two":{"wrap":{"optional":false,"required":false}}}}}}]
@@ -2044,6 +2058,7 @@
 
 "testPEnumEnum"
 
+[{"ok":{"value":{"pEnumEnum":{"one":{}}}}},{"fn.test":{"value":{"pEnumEnum":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumEnum":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumEnum":{"two":{"wrap":{"one":{}}}}}}},{"fn.test":{"value":{"pEnumEnum":{"two":{"wrap":{"one":{}}}}}}}]|[{},{"ok":{"value":{"pEnumEnum":{"two":{"wrap":{"one":{}}}}}}}]
 [{"ok":{"value":{"pEnumEnum":{"two":{"wrap":{"two":{"optional":false,"required":false}}}}}}},{"fn.test":{"value":{"pEnumEnum":{"two":{"wrap":{"two":{"optional":false,"required":false}}}}}}}]|[{},{"ok":{"value":{"pEnumEnum":{"two":{"wrap":{"two":{"optional":false,"required":false}}}}}}}]
 
@@ -2083,6 +2098,7 @@
 
 "testPEnumNullEnum"
 
+[{"ok":{"value":{"pEnumNullEnum":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullEnum":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullEnum":{"one":{}}}}}]
 [{"ok":{"value":{"pEnumNullEnum":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullEnum":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullEnum":{"two":{"wrap":null}}}}}]
 [{"ok":{"value":{"pEnumNullEnum":{"two":{"wrap":{"one":{}}}}}}},{"fn.test":{"value":{"pEnumNullEnum":{"two":{"wrap":{"one":{}}}}}}}]|[{},{"ok":{"value":{"pEnumNullEnum":{"two":{"wrap":{"one":{}}}}}}}]
 [{"ok":{"value":{"pEnumNullEnum":{"two":{"wrap":{"two":{"optional":false,"required":false}}}}}}},{"fn.test":{"value":{"pEnumNullEnum":{"two":{"wrap":{"two":{"optional":false,"required":false}}}}}}}]|[{},{"ok":{"value":{"pEnumNullEnum":{"two":{"wrap":{"two":{"optional":false,"required":false}}}}}}}]
@@ -2337,6 +2353,59 @@
 [{"ok":{"value":{"pStrNullFn":{"wrap":0.1}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullFn.wrap","reason":"NumberInvalidForStructType"}]}}]
 [{"ok":{"value":{"pStrNullFn":{"wrap":""}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullFn.wrap","reason":"StringInvalidForStructType"}]}}]
 [{"ok":{"value":{"pStrNullFn":{"wrap":[]}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullFn.wrap","reason":"ArrayInvalidForStructType"}]}}]
+
+"testPEnumFn"
+
+[{"ok":{"value":{"pEnumFn":{"one":{}}}}},{"fn.test":{"value":{"pEnumFn":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumFn":{"one":{}}}}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":{"required":false}}}}}},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":{"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumFn":{"two":{"wrap":{"required":false}}}}}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":{"optional":false,"required":false}}}}}},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":{"optional":false,"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumFn":{"two":{"wrap":{"optional":false,"required":false}}}}}}]
+
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":null}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap","reason":"NullInvalidForNonNullType"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":{}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap.required","reason":"RequiredStructFieldMissing"}]}}]
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":{"required":false,"wrap":false}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap.a","reason":"UnknownStructField"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":false}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap","reason":"BooleanInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":0}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":0.1}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":""}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap","reason":"StringInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumFn":{"two":{"wrap":[]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumFn.two.wrap","reason":"ArrayInvalidForStructType"}]}}]
+
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":null}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap","reason":"NullInvalidForNonNullType"}]}}]
+
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":{}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap.required","reason":"RequiredStructFieldMissing"}]}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":{"required":false,"wrap":false}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap.a","reason":"UnknownStructField"}]}}]
+
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":false}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap","reason":"BooleanInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":0}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":0.1}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":""}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap","reason":"StringInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumFn":{"two":{"wrap":[]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumFn.two.wrap","reason":"ArrayInvalidForStructType"}]}}]
+
+"testPEnumNullFn"
+
+[{"ok":{"value":{"pEnumNullFn":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullFn":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullFn":{"one":{}}}}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":null}}}}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":{"required":false}}}}}},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":{"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":{"required":false}}}}}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":{"optional":false,"required":false}}}}}},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":{"optional":false,"required":false}}}}}}]|[{},{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":{"optional":false,"required":false}}}}}}]
+
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":{}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap.required","reason":"RequiredStructFieldMissing"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":{"required":false,"wrap":false}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap.a","reason":"UnknownStructField"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":false}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap","reason":"BooleanInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":0}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":0.1}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":""}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap","reason":"StringInvalidForStructType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullFn":{"two":{"wrap":[]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullFn.two.wrap","reason":"ArrayInvalidForStructType"}]}}]
+
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":{}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap.required","reason":"RequiredStructFieldMissing"}]}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":{"required":false,"wrap":false}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap.a","reason":"UnknownStructField"}]}}]
+
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":false}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap","reason":"BooleanInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":0}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":0.1}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap","reason":"NumberInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":""}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap","reason":"StringInvalidForStructType"}]}}]
+[{"ok":{"value":{"pEnumNullFn":{"two":{"wrap":[]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullFn.two.wrap","reason":"ArrayInvalidForStructType"}]}}]
 
 
 
@@ -2683,6 +2752,92 @@
 [{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
 [{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
 [{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+
+"testPEnumP2Str"
+
+[{"ok":{"value":{"pEnumP2Str":{"one":{}}}}},{"fn.test":{"value":{"pEnumP2Str":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumP2Str":{"one":{}}}}}]
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":false,"nest":[0]}}}}}},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":false,"nest":[0]}}}}}}]|[{},{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":false,"nest":[0]}}}}}}]
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":true,"nest":[1]}}}}}},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":true,"nest":[1]}}}}}}]|[{},{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":true,"nest":[1]}}}}}}]
+
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":null}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap","reason":"NullInvalidForNonNullType"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":false}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap","reason":"BooleanInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":0}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":0.1}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":""}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap","reason":"StringInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":[]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap","reason":"ArrayInvalidForObjectType"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.wrap","reason":"IntegerInvalidForBooleanType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":"","nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.wrap","reason":"StringInvalidForBooleanType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":[],"nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":{}},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,false]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,""]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,[]]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,{}]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":null}}}}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap","reason":"NullInvalidForNonNullType"}]}}]
+
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":false}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap","reason":"BooleanInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":0}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":0.1}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":""}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap","reason":"StringInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumP2Str":{"two":{"wrap":[]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap","reason":"ArrayInvalidForObjectType"}]}}]
+
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.wrap","reason":"IntegerInvalidForBooleanType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":"","nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.wrap","reason":"StringInvalidForBooleanType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":[],"nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":{}},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
+
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,false]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,""]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,[]]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,{}]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+
+"testPEnumNullP2Str"
+
+[{"ok":{"value":{"pEnumNullP2Str":{"one":{}}}}},{"fn.test":{"value":{"pEnumNullP2Str":{"one":{}}}}}]|[{},{"ok":{"value":{"pEnumNullP2Str":{"one":{}}}}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":null}}}}},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":null}}}}}]|[{},{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":null}}}}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":false,"nest":[0]}}}}}},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":false,"nest":[0]}}}}}}]|[{},{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":false,"nest":[0]}}}}}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":true,"nest":[1]}}}}}},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":true,"nest":[1]}}}}}}]|[{},{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":true,"nest":[1]}}}}}}]
+
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":false}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap","reason":"BooleanInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":0}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":0.1}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":""}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap","reason":"StringInvalidForObjectType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":[]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap","reason":"ArrayInvalidForObjectType"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.wrap","reason":"IntegerInvalidForBooleanType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":"","nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.wrap","reason":"StringInvalidForBooleanType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":[],"nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":{}},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
+
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,false]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,""]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,[]]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,{}]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":false}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap","reason":"BooleanInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":0}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":0.1}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap","reason":"NumberInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":""}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap","reason":"StringInvalidForObjectType"}]}}]
+[{"ok":{"value":{"pEnumNullP2Str":{"two":{"wrap":[]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap","reason":"ArrayInvalidForObjectType"}]}}]
+
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.wrap","reason":"IntegerInvalidForBooleanType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":"","nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.wrap","reason":"StringInvalidForBooleanType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":[],"nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":{}},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
+
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,false]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,""]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,[]]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"wrap":{"wrap":0,"nest":[0,{}]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+
 
 
 
