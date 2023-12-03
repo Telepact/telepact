@@ -145,7 +145,7 @@
       ],
       "pEnumP2Str!": [
         "enum<1>.PEnum",
-        ["struct<2>.P2Str?", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str", ["boolean"], ["integer"]]
       ],
       "pEnumNullP2Str!": [
         "enum<1>.PEnum",

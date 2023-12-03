@@ -2745,7 +2745,7 @@
 [{"ok":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
 [{"ok":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
 [{"ok":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"ok:{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
 [{"ok":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 "testPEnumP2Str"

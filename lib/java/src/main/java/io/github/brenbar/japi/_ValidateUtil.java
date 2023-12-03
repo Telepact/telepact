@@ -73,7 +73,7 @@ public class _ValidateUtil {
     public static final String REQUIRED_STRUCT_FIELD_MISSING = "RequiredStructFieldMissing";
     public static final String EXTRA_STRUCT_FIELD_NOT_ALLOWED = "UnknownStructField";
 
-    public static final String MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE = "EnumDoesNotHaveExactlyOneField";
+    public static final String ENUM_DOES_NOT_HAVE_EXACTLY_ONE_FIELD = "EnumDoesNotHaveExactlyOneField";
     public static final String UNKNOWN_ENUM_VALUE = "UnknownEnumField";
 
     public static final String NUMBER_OUT_OF_RANGE = "NumberOutOfRange";
@@ -200,7 +200,7 @@ public class _ValidateUtil {
 
         for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
             var fieldName = entry.getKey();
-            var field = entry.getValue();
+            var fieldValue = entry.getValue();
             var referenceField = referenceStruct.get(fieldName);
             if (referenceField == null) {
                 var validationFailure = new ValidationFailure("%s.%s".formatted(path, fieldName),
@@ -210,7 +210,7 @@ public class _ValidateUtil {
                 continue;
             }
             var nestedValidationFailures = validateType("%s.%s".formatted(path, fieldName),
-                    referenceField.typeDeclaration, field, typeParameters);
+                    referenceField.typeDeclaration, fieldValue, typeParameters);
             validationFailures.addAll(nestedValidationFailures);
         }
 
@@ -224,7 +224,7 @@ public class _ValidateUtil {
         if (actual.size() != 1) {
             return Collections.singletonList(
                     new ValidationFailure(path,
-                            MULTI_ENTRY_OBJECT_INVALID_FOR_ENUM_TYPE));
+                            ENUM_DOES_NOT_HAVE_EXACTLY_ONE_FIELD));
         }
         var entry = actual.entrySet().stream().findFirst().get();
         var enumTarget = (String) entry.getKey();
