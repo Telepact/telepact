@@ -370,7 +370,7 @@ public class _ValidateUtil {
     }
 
     private static List<ValidationFailure> validateArray(String path, Object value, JsonArray a,
-            TypeDeclaration nestedTypeDeclaration) {
+            TypeDeclaration nestedTypeDeclaration, List<TypeDeclaration> thisTypeParameters) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure(path, BOOLEAN_INVALID_FOR_ARRAY_TYPE));
@@ -385,7 +385,7 @@ public class _ValidateUtil {
             for (var i = 0; i < l.size(); i += 1) {
                 var element = l.get(i);
                 var nestedValidationFailures = validateType("%s[%s]".formatted(path, i), nestedTypeDeclaration,
-                        element, List.of());
+                        element, thisTypeParameters);
                 validationFailures.addAll(nestedValidationFailures);
             }
             return validationFailures;
@@ -399,7 +399,7 @@ public class _ValidateUtil {
     }
 
     private static List<ValidationFailure> validateObject(String path, Object value, JsonObject o,
-            TypeDeclaration nestedTypeDeclaration) {
+            TypeDeclaration nestedTypeDeclaration, List<TypeDeclaration> thisTypeParameters) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure(path, BOOLEAN_INVALID_FOR_OBJECT_TYPE));
@@ -418,7 +418,7 @@ public class _ValidateUtil {
                 var k = (String) entry.getKey();
                 var v = entry.getValue();
                 var nestedValidationFailures = validateType("%s{%s}".formatted(path, k), nestedTypeDeclaration,
-                        v, List.of());
+                        v, thisTypeParameters);
                 validationFailures.addAll(nestedValidationFailures);
             }
             return validationFailures;
@@ -499,10 +499,10 @@ public class _ValidateUtil {
                 return validateString(path, value);
             } else if (expectedType instanceof JsonArray a) {
                 var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
-                return validateArray(path, value, a, nestedTypeDeclaration);
+                return validateArray(path, value, a, nestedTypeDeclaration, thisTypeParameters);
             } else if (expectedType instanceof JsonObject o) {
                 var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
-                return validateObject(path, value, o, nestedTypeDeclaration);
+                return validateObject(path, value, o, nestedTypeDeclaration, thisTypeParameters);
             } else if (expectedType instanceof Struct s) {
                 var typeParameters = typeDeclaration.typeParameters;
                 return validateStruct(path, value, s, typeParameters);
