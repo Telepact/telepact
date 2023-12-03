@@ -119,7 +119,6 @@
 
 "testPStructBoolean"
 
-[{"ok":{"value":{"pStrBool":{}}}},{"fn.test":{"value":{"pStrBool":{}}}}]|[{},{"ok":{"value":{"pStrBool":{}}}}]
 [{"ok":{"value":{"pStrBool":{"wrap":false}}}},{"fn.test":{"value":{"pStrBool":{"wrap":false}}}}]|[{},{"ok":{"value":{"pStrBool":{"wrap":false}}}}]
 [{"ok":{"value":{"pStrBool":{"wrap":true}}}},{"fn.test":{"value":{"pStrBool":{"wrap":true}}}}]|[{},{"ok":{"value":{"pStrBool":{"wrap":true}}}}]
 

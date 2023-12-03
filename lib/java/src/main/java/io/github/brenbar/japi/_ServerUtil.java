@@ -115,7 +115,7 @@ class _ServerUtil {
         }
 
         var argumentValidationFailures = _ValidateUtil.validateStructFields(functionType.name,
-                argStructType.fields, requestPayload);
+                argStructType.fields, requestPayload, List.of());
         if (!argumentValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",

@@ -173,13 +173,13 @@ public class _ValidateUtil {
     static List<ValidationFailure> validateResultEnum(
             Enum resultEnumType,
             Map<String, Object> actualResult) {
-        return validateEnumValues("", resultEnumType.values, actualResult);
+        return validateEnumValues("", resultEnumType.values, actualResult, List.of());
     }
 
     static List<ValidationFailure> validateStructFields(
             String path,
             Map<String, FieldDeclaration> referenceStruct,
-            Map<String, Object> actualStruct) {
+            Map<String, Object> actualStruct, List<TypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         var missingFields = new ArrayList<String>();
@@ -210,7 +210,7 @@ public class _ValidateUtil {
                 continue;
             }
             var nestedValidationFailures = validateType("%s.%s".formatted(path, fieldName),
-                    referenceField.typeDeclaration, field);
+                    referenceField.typeDeclaration, field, typeParameters);
             validationFailures.addAll(nestedValidationFailures);
         }
 
@@ -220,7 +220,7 @@ public class _ValidateUtil {
     static List<ValidationFailure> validateEnumValues(
             String path,
             Map<String, Struct> referenceValues,
-            Map<?, ?> actual) {
+            Map<?, ?> actual, List<TypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
                     new ValidationFailure(path,
@@ -253,7 +253,7 @@ public class _ValidateUtil {
                     ARRAY_INVALID_FOR_ENUM_STRUCT_TYPE));
         } else if (enumPayload instanceof Map<?, ?> m2) {
             return validateEnumStruct(nextPath, referenceStruct, enumTarget,
-                    (Map<String, Object>) m2);
+                    (Map<String, Object>) m2, typeParameters);
         } else {
             return Collections.singletonList(new ValidationFailure(nextPath,
                     VALUE_INVALID_FOR_ENUM_STRUCT_TYPE));
@@ -264,11 +264,11 @@ public class _ValidateUtil {
             String path,
             Struct enumStruct,
             String enumCase,
-            Map<String, Object> actual) {
+            Map<String, Object> actual, List<TypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         var nestedValidationFailures = validateStructFields(path, enumStruct.fields,
-                actual);
+                actual, typeParameters);
         validationFailures.addAll(nestedValidationFailures);
 
         return validationFailures;
@@ -385,7 +385,7 @@ public class _ValidateUtil {
             for (var i = 0; i < l.size(); i += 1) {
                 var element = l.get(i);
                 var nestedValidationFailures = validateType("%s[%s]".formatted(path, i), nestedTypeDeclaration,
-                        element);
+                        element, List.of());
                 validationFailures.addAll(nestedValidationFailures);
             }
             return validationFailures;
@@ -418,7 +418,7 @@ public class _ValidateUtil {
                 var k = (String) entry.getKey();
                 var v = entry.getValue();
                 var nestedValidationFailures = validateType("%s{%s}".formatted(path, k), nestedTypeDeclaration,
-                        v);
+                        v, List.of());
                 validationFailures.addAll(nestedValidationFailures);
             }
             return validationFailures;
@@ -428,7 +428,8 @@ public class _ValidateUtil {
         }
     }
 
-    private static List<ValidationFailure> validateStruct(String path, Object value, Struct s) {
+    private static List<ValidationFailure> validateStruct(String path, Object value, Struct s,
+            List<TypeDeclaration> typeParameters) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure(path, BOOLEAN_INVALID_FOR_STRUCT_TYPE));
@@ -442,14 +443,15 @@ public class _ValidateUtil {
             return Collections.singletonList(
                     new ValidationFailure(path, ARRAY_INVALID_FOR_STRUCT_TYPE));
         } else if (value instanceof Map<?, ?> m) {
-            return validateStructFields(path, s.fields, (Map<String, Object>) m);
+            return validateStructFields(path, s.fields, (Map<String, Object>) m, typeParameters);
         } else {
             return Collections.singletonList(
                     new ValidationFailure(path, VALUE_INVALID_FOR_STRUCT_TYPE));
         }
     }
 
-    private static List<ValidationFailure> validateEnum(String path, Object value, Enum e) {
+    private static List<ValidationFailure> validateEnum(String path, Object value, Enum e,
+            List<TypeDeclaration> typeParameters) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure(path, BOOLEAN_INVALID_FOR_ENUM_TYPE));
@@ -463,7 +465,7 @@ public class _ValidateUtil {
             return Collections.singletonList(
                     new ValidationFailure(path, ARRAY_INVALID_FOR_ENUM_TYPE));
         } else if (value instanceof Map<?, ?> m) {
-            return validateEnumValues(path, e.values, m);
+            return validateEnumValues(path, e.values, m, typeParameters);
         } else {
             return Collections.singletonList(
                     new ValidationFailure(path, VALUE_INVALID_FOR_ENUM_TYPE));
@@ -471,7 +473,7 @@ public class _ValidateUtil {
     }
 
     private static List<ValidationFailure> validateType(String path, TypeDeclaration typeDeclaration,
-            Object value) {
+            Object value, List<TypeDeclaration> thisTypeParameters) {
         if (value == null) {
             if (!typeDeclaration.nullable) {
                 return Collections.singletonList(new ValidationFailure(path,
@@ -496,16 +498,21 @@ public class _ValidateUtil {
                 var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
                 return validateObject(path, value, o, nestedTypeDeclaration);
             } else if (expectedType instanceof Struct s) {
-                return validateStruct(path, value, s);
+                var typeParameters = typeDeclaration.typeParameters;
+                return validateStruct(path, value, s, typeParameters);
             } else if (expectedType instanceof Enum e) {
-                return validateEnum(path, value, e);
+                var typeParameters = typeDeclaration.typeParameters;
+                return validateEnum(path, value, e, typeParameters);
             } else if (expectedType instanceof Fn f) {
-                return validateStruct(path, value, f.arg);
+                return validateStruct(path, value, f.arg, List.of());
             } else if (expectedType instanceof Ext e) {
                 return e.typeExtension.validate(path, value);
             } else if (expectedType instanceof JsonAny a) {
                 // all values are valid for any
                 return Collections.emptyList();
+            } else if (expectedType instanceof Generic g) {
+                var genericType = thisTypeParameters.get(g.index);
+                return validateType(path, genericType, value, List.of());
             } else {
                 return Collections.singletonList(new ValidationFailure(path, INVALID_TYPE));
             }
