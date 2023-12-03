@@ -2945,9 +2945,9 @@
 [{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":{},"enest":[0]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.ewrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
 [{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,false]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,0.1]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,""]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,[]]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,0.1]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,""]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,[]]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
 [{},{"fn.test":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},{"two":{"ewrap":false,"enest":[0,{}]}}]}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.arrP2Enum[1].two.enest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"arrP2Enum":[{"two":{"ewrap":false,"enest":[0]}},null]}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.arrP2Enum[1]","reason":"NullInvalidForNonNullType"}]}}]
