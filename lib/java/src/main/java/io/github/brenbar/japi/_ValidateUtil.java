@@ -475,7 +475,13 @@ public class _ValidateUtil {
     private static List<ValidationFailure> validateType(String path, TypeDeclaration typeDeclaration,
             Object value, List<TypeDeclaration> thisTypeParameters) {
         if (value == null) {
-            if (!typeDeclaration.nullable) {
+            TypeDeclaration typeDeclarationToCheck;
+            if (typeDeclaration.type instanceof Generic g) {
+                typeDeclarationToCheck = thisTypeParameters.get(g.index);
+            } else {
+                typeDeclarationToCheck = typeDeclaration;
+            }
+            if (!typeDeclarationToCheck.nullable) {
                 return Collections.singletonList(new ValidationFailure(path,
                         NULL_INVALID_FOR_NON_NULL_TYPE));
             } else {
