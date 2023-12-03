@@ -179,7 +179,9 @@
       "pEnumNullP2Enum!": [
         "enum<1>.PEnum",
         ["enum<2>.P2Enum?", ["boolean"], ["integer"]]
-      ]
+      ],
+
+      "pdStr!": ["struct<1>.PdStr", ["struct<1>.PStr", ["boolean"]]]
     }
   },
 
@@ -208,6 +210,12 @@
   {
     "struct<1>.PStr": {
       "wrap": ["T.0"]
+    }
+  },
+
+  {
+    "struct<1>.PdStr": {
+      "dwrap": ["struct<1>.PStr", ["boolean"]]
     }
   },
 
