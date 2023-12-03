@@ -2599,11 +2599,11 @@
 [{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":"","nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":null}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}","reason":"NullInvalidForNonNullType"}]}}]
 
@@ -2618,11 +2618,11 @@
 [{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":"","nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 "testObjectNullP2Str"
 
@@ -2642,11 +2642,11 @@
 [{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":"","nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.objNullP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":false}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullObj{b}","reason":"BooleanInvalidForStructType"}]}}]
 [{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":0}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullObj{b}","reason":"NumberInvalidForStructType"}]}}]
@@ -2659,11 +2659,11 @@
 [{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":0,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":"","nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":[],"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":{},"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"ok":{"value":{"objNullP2Str":{"a":{"wrap":false,"nest":[0]},"b":{"wrap":false,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.objNullP2Str{b}.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 "testPStructP2Str"
 
@@ -2683,11 +2683,11 @@
 [{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":[],"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":{},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"pStrP2Str":{"wrap":null}}}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap","reason":"NullInvalidForNonNullType"}]}}]
 
@@ -2702,11 +2702,11 @@
 [{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":[],"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":{},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":0,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrP2Str":{"wrap":{"wrap":false,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 "testPStructNullP2Str"
 
@@ -2725,11 +2725,11 @@
 [{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":[],"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":{},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,false]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,0.1]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,""]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,[]]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,{}]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pStrNullP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"pStrNullP2Str":{"wrap":false}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap","reason":"BooleanInvalidForStructType"}]}}]
 [{"ok":{"value":{"pStrNullP2Str":{"wrap":0}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap","reason":"NumberInvalidForStructType"}]}}]
@@ -2742,11 +2742,11 @@
 [{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":[],"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":{},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":0,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,false]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,0.1]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,""]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,[]]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pStrNullP2Str":{"wrap":{"wrap":false,"nest":[0,{}]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pStrNullP2Str.wrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 "testPEnumP2Str"
 
@@ -2767,11 +2767,11 @@
 [{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":[],"nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":{}},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,false]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,0.1]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,""]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,[]]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,{}]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,false]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,0.1]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,""]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,[]]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,{}]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"pEnumP2Str":{"two":{"ewrap":null}}}}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap","reason":"NullInvalidForNonNullType"}]}}]
 
@@ -2786,11 +2786,11 @@
 [{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":[],"nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":{}},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,false]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,0.1]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,""]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,[]]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,{}]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,false]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,0.1]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,""]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,[]]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,{}]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 "testPEnumNullP2Str"
 
@@ -2810,11 +2810,11 @@
 [{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":[],"nest":[0]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":{}},"nest":[0]}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,false]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,0.1]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,""]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,[]]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,{}]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,false]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,0.1]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,""]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,[]]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{},{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,{}]}}}}}}]|[{},{"_errorInvalidRequestBody":{"cases":[{"path":"fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 [{"ok":{"value":{"pEnumNullP2Str":{"two":{"ewrap":false}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap","reason":"BooleanInvalidForStructType"}]}}]
 [{"ok":{"value":{"pEnumNullP2Str":{"two":{"ewrap":0}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap","reason":"NumberInvalidForStructType"}]}}]
@@ -2827,11 +2827,11 @@
 [{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":[],"nest":[0]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.wrap","reason":"ArrayInvalidForBooleanType"}]}}]
 [{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":{}},"nest":[0]}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.wrap","reason":"ObjectInvalidForBooleanType"}]}}]
 
-[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,false]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,0.1]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,""]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,[]]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
-[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":0,"nest":[0,{}]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,false]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"BooleanInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,0.1]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"NumberInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,""]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"StringInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,[]]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ArrayInvalidForIntegerType"}]}}]
+[{"fn.test":{"value":{"pEnumNullP2Str":{"two":{"ewrap":{"wrap":false,"nest":[0,{}]}}}}}},{"fn.test":{}}]|[{},{"_errorInvalidResponseBody":{"cases":[{"path":"ok.value.pEnumNullP2Str.two.ewrap.nest[1]","reason":"ObjectInvalidForIntegerType"}]}}]
 
 
 
