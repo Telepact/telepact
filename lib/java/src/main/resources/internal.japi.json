@@ -12,7 +12,7 @@
     "fn._api": {},
     "->": {
       "ok": {
-        "api": "array<object<any>>"
+        "api": ["array", ["object", ["any"]]]
       }
     }
   },
@@ -28,8 +28,8 @@
   {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
     "struct._ValidationFailure": {
-      "path": "string",
-      "reason": "string"
+      "path": ["string"],
+      "reason": ["string"]
     }
   },
 
@@ -47,16 +47,16 @@
       "->": {
         "_errorUnknown": {},
         "_errorInvalidRequestHeaders": {
-          "cases": "array<struct._ValidationFailure>"
+          "cases": ["array", ["struct._ValidationFailure"]]
         },
         "_errorInvalidRequestBody": {
-          "cases": "array<struct._ValidationFailure>"
+          "cases": ["array", ["struct._ValidationFailure"]]
         },
         "_errorInvalidResponseBody": {
-          "cases": "array<struct._ValidationFailure>"
+          "cases": ["array", ["struct._ValidationFailure"]]
         },
         "_errorParseFailure": {
-          "reasons": "array<string>"
+          "reasons": ["array", ["string"]]
         }
       }
     }

@@ -101,8 +101,10 @@ class _JApiSchemaUtil {
         var traits = new ArrayList<Trait>();
 
         var rootTypeParameterCount = 0;
+        boolean allowTraitsAndInfo = true;
         for (var schemaKey : schemaKeys) {
-            var typ = getOrParseType(schemaKey, rootTypeParameterCount, originalJApiSchema, schemaKeysToIndex,
+            var typ = getOrParseType(schemaKey, rootTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
+                    schemaKeysToIndex,
                     parsedTypes, typeExtensions);
             if (typ instanceof Trait t) {
                 traits.add(t);
@@ -127,7 +129,7 @@ class _JApiSchemaUtil {
 
     private static String findSchemaKey(Map<String, Object> definition) {
         for (var e : definition.keySet()) {
-            if (e.matches("^(struct|enum|fn|trait|info|ext)\\..*")) {
+            if (e.matches("^((fn|trait|info)|((struct|enum|ext)(<[0-2]>)?))\\..*")) {
                 return e;
             }
         }
@@ -418,7 +420,9 @@ class _JApiSchemaUtil {
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
 
-        var type = getOrParseType(typeName, thisTypeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+        boolean allowTraitsAndInfo = false;
+        var type = getOrParseType(typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
+                schemaKeysToIndex, parsedTypes,
                 typeExtensions);
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
@@ -443,7 +447,8 @@ class _JApiSchemaUtil {
         return new TypeDeclaration(type, nullable, typeParameters);
     }
 
-    private static Type getOrParseType(String typeName, int thisTypeParameterCount, List<Object> originalJApiSchema,
+    private static Type getOrParseType(String typeName, int thisTypeParameterCount, boolean allowTraitsAndInfo,
+            List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         var existingType = parsedTypes.get(typeName);
@@ -452,7 +457,7 @@ class _JApiSchemaUtil {
         }
 
         var regex = Pattern.compile(
-                "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((fn|(enum|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
+                "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(enum|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
@@ -488,6 +493,9 @@ class _JApiSchemaUtil {
         var customTypeName = matcher.group(3);
         if (customTypeName != null) {
             var index = schemaKeysToIndex.get(customTypeName);
+            if (index == null) {
+                throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
+            }
             var definition = (Map<String, Object>) originalJApiSchema.get(index);
 
             var typeParameterCountString = matcher.group(7);
@@ -513,10 +521,10 @@ class _JApiSchemaUtil {
             } else if (customTypeName.startsWith("fn")) {
                 type = parseFunctionType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions, false);
-            } else if (customTypeName.startsWith("trait")) {
+            } else if (allowTraitsAndInfo && customTypeName.startsWith("trait")) {
                 type = parseTraitType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions);
-            } else if (customTypeName.startsWith("info")) {
+            } else if (allowTraitsAndInfo && customTypeName.startsWith("info")) {
                 type = new Info(customTypeName);
             } else if (customTypeName.startsWith("ext")) {
                 var typeExtension = typeExtensions.get(customTypeName);

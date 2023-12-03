@@ -123,33 +123,33 @@
       "pEnumFn!": ["enum<1>.PEnum", ["fn.example"]],
       "pEnumNullFn!": ["enum<1>.PEnum", ["fn.example?"]],
 
-      "p2Str!": ["struct<2>.PStruct", ["boolean"], ["integer"]],
-      "nullP2Str!": ["struct<2>.PStruct?", ["boolean"], ["integer"]],
-      "arrP2Str!": ["array", ["struct<2>.PStruct", ["boolean"], ["integer"]]],
+      "p2Str!": ["struct<2>.P2Str", ["boolean"], ["integer"]],
+      "nullP2Str!": ["struct<2>.P2Str?", ["boolean"], ["integer"]],
+      "arrP2Str!": ["array", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
       "arrNullP2Str!": [
         "array",
-        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str?", ["boolean"], ["integer"]]
       ],
-      "objP2Str!": ["object", ["struct<2>.PStruct", ["boolean"], ["integer"]]],
+      "objP2Str!": ["object", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
       "objNullP2Str!": [
         "object",
-        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str?", ["boolean"], ["integer"]]
       ],
       "pStrP2Str!": [
         "struct<1>.PStr",
-        ["struct<2>.PStruct", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str", ["boolean"], ["integer"]]
       ],
       "pStrNullP2Str!": [
         "struct<1>.PStr",
-        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str?", ["boolean"], ["integer"]]
       ],
       "pEnumP2Str!": [
         "enum<1>.PEnum",
-        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str?", ["boolean"], ["integer"]]
       ],
       "pEnumNullP2Str!": [
         "enum<1>.PEnum",
-        ["struct<2>.PStruct?", ["boolean"], ["integer"]]
+        ["struct<2>.P2Str?", ["boolean"], ["integer"]]
       ],
 
       "p2Enum!": ["enum<2>.P2Enum", ["boolean"], ["integer"]],
