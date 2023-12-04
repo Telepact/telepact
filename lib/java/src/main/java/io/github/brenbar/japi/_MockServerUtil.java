@@ -85,14 +85,14 @@ class _MockServerUtil {
                             if (isSubMap(stub.whenArgument, argument)) {
                                 var includeRandomOptionalFields = false;
                                 var result = constructRandomEnum(definition.result.values, stub.thenResult,
-                                        includeRandomOptionalFields, random);
+                                        includeRandomOptionalFields, List.of(), random);
                                 return new Message(result);
                             }
                         } else {
                             if (Objects.equals(stub.whenArgument, argument)) {
                                 var includeRandomOptionalFields = false;
                                 var result = constructRandomEnum(definition.result.values, stub.thenResult,
-                                        includeRandomOptionalFields, random);
+                                        includeRandomOptionalFields, List.of(), random);
                                 return new Message(result);
                             }
                         }
@@ -108,7 +108,7 @@ class _MockServerUtil {
                     var okStructRef = resultEnum.values.get("ok");
                     var includeRandomOptionalFields = true;
                     var randomOkStruct = constructRandomStruct(okStructRef.fields, new HashMap<>(),
-                            includeRandomOptionalFields, random);
+                            includeRandomOptionalFields, List.of(), random);
                     return new Message(Map.of("ok", randomOkStruct));
                 } else {
                     throw new JApiProcessError("Unexpected unknown function: %s".formatted(functionName));
@@ -175,7 +175,7 @@ class _MockServerUtil {
 
     private static Map<String, Object> constructRandomStruct(
             Map<String, FieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
-            boolean includeRandomOptionalFields, MockRandom random) {
+            boolean includeRandomOptionalFields, List<TypeDeclaration> thisTypeParameters, MockRandom random) {
 
         var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -189,12 +189,11 @@ class _MockServerUtil {
             Object value;
             if (useStartingValue) {
                 value = constructRandomType(fieldDeclaration.typeDeclaration, startingValue, useStartingValue,
-                        includeRandomOptionalFields, random);
+                        includeRandomOptionalFields, thisTypeParameters, random);
             } else {
                 if (!fieldDeclaration.optional) {
                     value = constructRandomType(fieldDeclaration.typeDeclaration, null, false,
-                            includeRandomOptionalFields,
-                            random);
+                            includeRandomOptionalFields, thisTypeParameters, random);
                 } else {
                     if (!includeRandomOptionalFields) {
                         continue;
@@ -203,8 +202,7 @@ class _MockServerUtil {
                         continue;
                     }
                     value = constructRandomType(fieldDeclaration.typeDeclaration, null, false,
-                            includeRandomOptionalFields,
-                            random);
+                            includeRandomOptionalFields, thisTypeParameters, random);
                 }
             }
             obj.put(fieldName, value);
@@ -215,6 +213,7 @@ class _MockServerUtil {
     private static Object constructRandomType(TypeDeclaration typeDeclaration, Object startingValue,
             boolean useStartingValue,
             boolean includeRandomOptionalFields,
+            List<TypeDeclaration> thisTypeParameters,
             MockRandom random) {
 
         if (typeDeclaration.nullable && !useStartingValue && random.nextBoolean()) {
@@ -250,8 +249,7 @@ class _MockServerUtil {
                 var array = new ArrayList<Object>();
                 for (var startingArrayValue : startingArray) {
                     var value = constructRandomType(nestedType, startingArrayValue, true,
-                            includeRandomOptionalFields,
-                            random);
+                            includeRandomOptionalFields, thisTypeParameters, random);
                     array.add(value);
                 }
                 return array;
@@ -259,7 +257,8 @@ class _MockServerUtil {
                 var length = random.nextInt(3);
                 var array = new ArrayList<Object>();
                 for (int i = 0; i < length; i += 1) {
-                    var value = constructRandomType(nestedType, null, false, includeRandomOptionalFields, random);
+                    var value = constructRandomType(nestedType, null, false, includeRandomOptionalFields,
+                            thisTypeParameters, random);
                     array.add(value);
                 }
                 return array;
@@ -273,7 +272,7 @@ class _MockServerUtil {
                     var key = startingObjEntry.getKey();
                     var startingObjValue = startingObjEntry.getValue();
                     var value = constructRandomType(nestedType, startingObjValue, true, includeRandomOptionalFields,
-                            random);
+                            nestedType.typeParameters, random);
                     obj.put(key, value);
                 }
                 return obj;
@@ -282,7 +281,8 @@ class _MockServerUtil {
                 var obj = new TreeMap<String, Object>();
                 for (int i = 0; i < length; i += 1) {
                     var key = random.nextString();
-                    var value = constructRandomType(nestedType, null, false, includeRandomOptionalFields, random);
+                    var value = constructRandomType(nestedType, null, false, includeRandomOptionalFields,
+                            nestedType.typeParameters, random);
                     obj.put(key, value);
                 }
                 return obj;
@@ -299,24 +299,34 @@ class _MockServerUtil {
         } else if (typeDeclaration.type instanceof Struct s) {
             if (useStartingValue) {
                 var startingStructValue = (Map<String, Object>) startingValue;
-                return constructRandomStruct(s.fields, startingStructValue, includeRandomOptionalFields, random);
+                return constructRandomStruct(s.fields, startingStructValue, includeRandomOptionalFields,
+                        typeDeclaration.typeParameters, random);
             } else {
-                return constructRandomStruct(s.fields, new HashMap<>(), includeRandomOptionalFields, random);
+                return constructRandomStruct(s.fields, new HashMap<>(), includeRandomOptionalFields,
+                        typeDeclaration.typeParameters, random);
             }
         } else if (typeDeclaration.type instanceof Enum e) {
             if (useStartingValue) {
                 var startingEnumValue = (Map<String, Object>) startingValue;
-                return constructRandomEnum(e.values, startingEnumValue, includeRandomOptionalFields, random);
+                return constructRandomEnum(e.values, startingEnumValue, includeRandomOptionalFields,
+                        typeDeclaration.typeParameters, random);
             } else {
-                return constructRandomEnum(e.values, new HashMap<>(), includeRandomOptionalFields, random);
+                return constructRandomEnum(e.values, new HashMap<>(), includeRandomOptionalFields,
+                        typeDeclaration.typeParameters, random);
             }
         } else if (typeDeclaration.type instanceof Fn f) {
             if (useStartingValue) {
                 var startingFnValue = (Map<String, Object>) startingValue;
-                return constructRandomStruct(f.arg.fields, startingFnValue, includeRandomOptionalFields, random);
+                return constructRandomStruct(f.arg.fields, startingFnValue, includeRandomOptionalFields, List.of(),
+                        random);
             } else {
-                return constructRandomStruct(f.arg.fields, new HashMap<>(), includeRandomOptionalFields, random);
+                return constructRandomStruct(f.arg.fields, new HashMap<>(), includeRandomOptionalFields, List.of(),
+                        random);
             }
+        } else if (typeDeclaration.type instanceof Generic g) {
+            var genericType = thisTypeParameters.get(g.index);
+            return constructRandomType(genericType, startingValue, useStartingValue, includeRandomOptionalFields,
+                    typeDeclaration.typeParameters, random);
         } else {
             throw new RuntimeException("Unexpected type: %s".formatted(typeDeclaration.type));
         }
@@ -325,6 +335,7 @@ class _MockServerUtil {
     private static Map<String, Object> constructRandomEnum(Map<String, Struct> enumValuesReference,
             Map<String, Object> startingEnum,
             boolean includeRandomOptionalFields,
+            List<TypeDeclaration> thisTypeParameters,
             MockRandom random) {
         var existingEnumValue = startingEnum.keySet().stream().findAny();
         if (existingEnumValue.isPresent()) {
@@ -333,7 +344,7 @@ class _MockServerUtil {
             var enumStartingStruct = (Map<String, Object>) startingEnum.get(enumValue);
 
             return Map.of(enumValue, constructRandomStruct(enumStructType.fields, enumStartingStruct,
-                    includeRandomOptionalFields, random));
+                    includeRandomOptionalFields, thisTypeParameters, random));
         } else {
             var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
             Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -345,7 +356,8 @@ class _MockServerUtil {
             var enumData = enumEntry.getValue();
 
             return Map.of(enumValue,
-                    constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields, random));
+                    constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields,
+                            thisTypeParameters, random));
         }
 
     }
