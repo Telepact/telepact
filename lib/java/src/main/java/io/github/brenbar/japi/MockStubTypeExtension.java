@@ -39,9 +39,8 @@ public class MockStubTypeExtension implements TypeExtension {
             var output = (Map<String, Object>) givenMap.get("->");
             var functionDef = (Fn) this.types.get(functionName);
 
-            var inputFailures = _ValidateUtil.validateStructFields(path, functionDef.arg.fields, input, List.of());
-            var outputFailures = _ValidateUtil.validateEnumValues("%s.->".formatted(path), functionDef.result.values,
-                    output, List.of());
+            var inputFailures = functionDef.arg.validate(path, input, List.of(), List.of());
+            var outputFailures = functionDef.result.validate(path, output, List.of(), List.of());
             var failures = new ArrayList<ValidationFailure>();
             failures.addAll(inputFailures);
             failures.addAll(outputFailures);

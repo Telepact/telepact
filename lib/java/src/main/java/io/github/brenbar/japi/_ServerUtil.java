@@ -177,7 +177,7 @@ class _ServerUtil {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
             finalResultEnum = (Map<String, Object>) selectStructFields(
-                    new TypeDeclaration(resultEnumType, false, List.of()),
+                    new TypeDeclaration("ok", resultEnumType, false, List.of()),
                     resultEnum,
                     selectStructFieldsHeader);
         } else {
