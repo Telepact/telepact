@@ -156,8 +156,12 @@ class _ServerUtil {
         if (!skipResultValidation) {
             var resultValidationFailures = resultEnumType.validate(
                     resultMessage.body, List.of(), List.of());
-            if (!resultValidationFailures.isEmpty()) {
-                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
+            var resultValidationFailuresTrimmed = resultValidationFailures
+                    .stream()
+                    .map(f -> f.path.startsWith(".") ? new ValidationFailure(f.path.substring(1), f.reason) : f)
+                    .toList();
+            if (!resultValidationFailuresTrimmed.isEmpty()) {
+                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailuresTrimmed);
                 Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
                 var newErrorResultValidationFailures = resultEnumType.validate(
