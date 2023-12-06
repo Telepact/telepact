@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 class JApiSchemaTuple {
@@ -72,6 +74,17 @@ class TypeDeclaration {
             return this.type.validate(value, this.typeParameters, generics);
         }
     }
+
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (this.nullable && !useStartingValue && random.nextBoolean()) {
+            return null;
+        } else {
+            return this.type.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+                    this.typeParameters, generics, random);
+        }
+    }
 }
 
 class TypeDeclarationRoot {
@@ -91,6 +104,11 @@ interface Type {
 
     public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics);
+
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random);
 }
 
 class JsonBoolean implements Type {
@@ -120,6 +138,18 @@ class JsonBoolean implements Type {
         } else {
             return Collections.singletonList(
                     new ValidationFailure("", "ValueInvalidForBooleanType"));
+        }
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return random.nextBoolean();
         }
     }
 
@@ -161,6 +191,18 @@ class JsonInteger implements Type {
                     new ValidationFailure("", "ValueInvalidForIntegerType"));
         }
     }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return random.nextInt();
+        }
+    }
 }
 
 class JsonNumber implements Type {
@@ -194,6 +236,18 @@ class JsonNumber implements Type {
                     new ValidationFailure("", "ValueInvalidForNumberType"));
         }
     }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return random.nextDouble();
+        }
+    }
 }
 
 class JsonString implements Type {
@@ -222,6 +276,18 @@ class JsonString implements Type {
         } else {
             return Collections.singletonList(
                     new ValidationFailure("", "ValueInvalidForStringType"));
+        }
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return random.nextString();
         }
     }
 }
@@ -267,6 +333,34 @@ class JsonArray implements Type {
                     new ValidationFailure("", "ValueInvalidForArrayType"));
         }
     }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        var nestedTypeDeclaration = typeParameters.get(0);
+        if (useStartingValue) {
+            var startingArray = (List<Object>) startingValue;
+            var array = new ArrayList<Object>();
+            for (var startingArrayValue : startingArray) {
+                var value = nestedTypeDeclaration.generateRandomValue(startingArrayValue, true,
+                        includeRandomOptionalFields, generics, random);
+                array.add(value);
+            }
+            return array;
+        } else {
+            var length = random.nextInt(3);
+            var array = new ArrayList<Object>();
+            for (int i = 0; i < length; i += 1) {
+                var value = nestedTypeDeclaration.generateRandomValue(null, false,
+                        includeRandomOptionalFields,
+                        generics, random);
+                array.add(value);
+            }
+            return array;
+        }
+    }
 }
 
 class JsonObject implements Type {
@@ -310,6 +404,36 @@ class JsonObject implements Type {
                     new ValidationFailure("", "ValueInvalidForObjectType"));
         }
     }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        var nestedTypeDeclaration = typeParameters.get(0);
+        if (useStartingValue) {
+            var startingObj = (Map<String, Object>) startingValue;
+            var obj = new TreeMap<String, Object>();
+            for (var startingObjEntry : startingObj.entrySet()) {
+                var key = startingObjEntry.getKey();
+                var startingObjValue = startingObjEntry.getValue();
+                var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
+                        includeRandomOptionalFields, generics, random);
+                obj.put(key, value);
+            }
+            return obj;
+        } else {
+            var length = random.nextInt(3);
+            var obj = new TreeMap<String, Object>();
+            for (int i = 0; i < length; i += 1) {
+                var key = random.nextString();
+                var value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields,
+                        generics, random);
+                obj.put(key, value);
+            }
+            return obj;
+        }
+    }
 }
 
 class JsonAny implements Type {
@@ -322,6 +446,21 @@ class JsonAny implements Type {
     public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         return List.of();
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        var selectType = random.nextInt(3);
+        if (selectType == 0) {
+            return random.nextBoolean();
+        } else if (selectType == 1) {
+            return random.nextInt();
+        } else {
+            return random.nextString();
+        }
     }
 }
 
@@ -342,6 +481,16 @@ class Generic implements Type {
             List<TypeDeclaration> generics) {
         var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, List.of());
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        var genericTypeDeclaration = generics.get(this.index);
+        return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
+                includeRandomOptionalFields, List.of(), random);
     }
 }
 
@@ -426,6 +575,60 @@ class Struct implements Type {
         }
 
         return validationFailures;
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            var startingStructValue = (Map<String, Object>) startingValue;
+            return constructRandomStruct(this.fields, startingStructValue, includeRandomOptionalFields,
+                    typeParameters, random);
+        } else {
+            return constructRandomStruct(this.fields, new HashMap<>(), includeRandomOptionalFields,
+                    typeParameters, random);
+        }
+    }
+
+    public static Map<String, Object> constructRandomStruct(
+            Map<String, FieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            MockRandom random) {
+
+        var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
+        Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+
+        var obj = new TreeMap<String, Object>();
+        for (var field : sortedReferenceStruct) {
+            var fieldName = field.getKey();
+            var fieldDeclaration = field.getValue();
+            var startingValue = startingStruct.get(fieldName);
+            var useStartingValue = startingStruct.containsKey(fieldName);
+            Object value;
+            if (useStartingValue) {
+                value = fieldDeclaration.typeDeclaration.generateRandomValue(startingValue, useStartingValue,
+                        includeRandomOptionalFields, typeParameters,
+                        random);
+            } else {
+                if (!fieldDeclaration.optional) {
+                    value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
+                            includeRandomOptionalFields, typeParameters, random);
+                } else {
+                    if (!includeRandomOptionalFields) {
+                        continue;
+                    }
+                    if (random.nextBoolean()) {
+                        continue;
+                    }
+                    value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
+                            includeRandomOptionalFields, typeParameters, random);
+                }
+            }
+            obj.put(fieldName, value);
+        }
+        return obj;
     }
 }
 
@@ -526,6 +729,51 @@ class Enum implements Type {
 
         return validationFailures;
     }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            var startingEnumValue = (Map<String, Object>) startingValue;
+            return constructRandomEnum(this.values, startingEnumValue, includeRandomOptionalFields,
+                    typeParameters, random);
+        } else {
+            return constructRandomEnum(this.values, new HashMap<>(), includeRandomOptionalFields,
+                    typeParameters, random);
+        }
+    }
+
+    private static Map<String, Object> constructRandomEnum(Map<String, Struct> enumValuesReference,
+            Map<String, Object> startingEnum,
+            boolean includeRandomOptionalFields,
+            List<TypeDeclaration> typeParameters,
+            MockRandom random) {
+        var existingEnumValue = startingEnum.keySet().stream().findAny();
+        if (existingEnumValue.isPresent()) {
+            var enumValue = existingEnumValue.get();
+            var enumStructType = enumValuesReference.get(enumValue);
+            var enumStartingStruct = (Map<String, Object>) startingEnum.get(enumValue);
+
+            return Map.of(enumValue, Struct.constructRandomStruct(enumStructType.fields, enumStartingStruct,
+                    includeRandomOptionalFields, typeParameters, random));
+        } else {
+            var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
+            Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+
+            var randomIndex = random.nextInt(sortedEnumValuesReference.size());
+            var enumEntry = sortedEnumValuesReference.get(randomIndex);
+
+            var enumValue = enumEntry.getKey();
+            var enumData = enumEntry.getValue();
+
+            return Map.of(enumValue,
+                    Struct.constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields,
+                            typeParameters, random));
+        }
+
+    }
 }
 
 class Fn implements Type {
@@ -549,6 +797,23 @@ class Fn implements Type {
     public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         return this.arg.validate(value, typeParameters, generics);
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            List<TypeDeclaration> generics,
+            MockRandom random) {
+        if (useStartingValue) {
+            var startingFnValue = (Map<String, Object>) startingValue;
+            return Struct.constructRandomStruct(this.arg.fields, startingFnValue, includeRandomOptionalFields,
+                    List.of(),
+                    random);
+        } else {
+            return Struct.constructRandomStruct(this.arg.fields, new HashMap<>(), includeRandomOptionalFields,
+                    List.of(),
+                    random);
+        }
     }
 }
 
@@ -575,6 +840,14 @@ class Trait implements Type {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'validate'");
     }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
+            MockRandom random) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+    }
 }
 
 // TODO: info is not a type
@@ -595,6 +868,14 @@ class Info implements Type {
             List<TypeDeclaration> generics) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'validate'");
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
+            MockRandom random) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
 }
 
@@ -618,6 +899,14 @@ class Ext implements Type {
     public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         return this.typeExtension.validate(value);
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
+            MockRandom random) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
 }
 
