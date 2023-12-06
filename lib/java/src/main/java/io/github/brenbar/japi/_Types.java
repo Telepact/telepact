@@ -398,7 +398,7 @@ class Struct implements Type {
         }
 
         for (var missingField : missingFields) {
-            var validationFailure = new ValidationFailure(missingField,
+            var validationFailure = new ValidationFailure(".%s".formatted(missingField),
                     "RequiredStructFieldMissing");
             validationFailures
                     .add(validationFailure);
@@ -409,7 +409,7 @@ class Struct implements Type {
             var fieldValue = entry.getValue();
             var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new ValidationFailure(fieldName,
+                var validationFailure = new ValidationFailure(".%s".formatted(fieldName),
                         "UnknownStructField");
                 validationFailures
                         .add(validationFailure);
@@ -482,21 +482,21 @@ class Enum implements Type {
         var referenceStruct = referenceValues.get(enumTarget);
         if (referenceStruct == null) {
             return Collections
-                    .singletonList(new ValidationFailure(enumTarget,
+                    .singletonList(new ValidationFailure(".%s".formatted(enumTarget),
                             "UnknownEnumField"));
         }
 
         if (enumPayload instanceof Boolean) {
-            return Collections.singletonList(new ValidationFailure(enumTarget,
+            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
                     "BooleanInvalidForEnumStructType"));
         } else if (enumPayload instanceof Number) {
-            return Collections.singletonList(new ValidationFailure(enumTarget,
+            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
                     "NumberInvalidForEnumStructType"));
         } else if (enumPayload instanceof String) {
-            return Collections.singletonList(new ValidationFailure(enumTarget,
+            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
                     "StringInvalidForEnumStructType"));
         } else if (enumPayload instanceof List) {
-            return Collections.singletonList(new ValidationFailure(enumTarget,
+            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
                     "ArrayInvalidForEnumStructType"));
         } else if (enumPayload instanceof Map<?, ?> m2) {
             var nestedValidationFailures = validateEnumStruct(referenceStruct, enumTarget,
@@ -507,7 +507,7 @@ class Enum implements Type {
                     .toList();
             return nestedValidationFailuresWithPath;
         } else {
-            return Collections.singletonList(new ValidationFailure(enumTarget,
+            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
                     "ValueInvalidForEnumStructType"));
         }
     }
