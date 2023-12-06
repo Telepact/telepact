@@ -13,47 +13,52 @@ public class MockStubTypeExtension implements TypeExtension {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object givenObj) {
+    public List<ValidationFailure> validate(Object givenObj) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         Map<String, Object> givenMap;
         try {
             givenMap = (Map<String, Object>) givenObj;
 
-            if (!givenMap.containsKey("->")) {
-                validationFailures.add(new ValidationFailure(path, "StubMissingResult"));
-            }
+            var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.startsWith("fn.")).findAny();
+            if (optionalFunctionName.isEmpty()) {
+                validationFailures.add(new ValidationFailure("", "StubMissingCall"));
 
-            var functionName = (String) null;
-            for (var key : givenMap.keySet()) {
-                if (key.startsWith("fn.")) {
-                    functionName = key;
-                    break;
+            } else {
+                var functionName = optionalFunctionName.get();
+                var functionDef = (Fn) this.types.get(functionName);
+
+                var input = (Map<String, Object>) givenMap.get(functionName);
+
+                var inputFailures = functionDef.arg.validate(input, List.of(), List.of());
+                var inputFailuresWithPath = inputFailures.stream()
+                        .map(f -> new ValidationFailure(".%s%s".formatted(functionName, f.path), f.reason))
+                        .toList();
+
+                var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
+                        .filter(f -> !f.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)).toList();
+
+                validationFailures.addAll(inputFailuresWithoutMissingRequired);
+
+                if (!givenMap.containsKey("->")) {
+                    validationFailures.add(new ValidationFailure("", "StubMissingResult"));
+                } else {
+
+                    var output = (Map<String, Object>) givenMap.get("->");
+
+                    var outputFailures = functionDef.result.validate(output, List.of(), List.of());
+                    var outputFailuresWithPath = outputFailures.stream()
+                            .map(f -> new ValidationFailure(".%s%s".formatted("->", f.path), f.reason)).toList();
+                    var failuresWithoutMissingRequired = outputFailuresWithPath
+                            .stream().filter(f -> !f.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING))
+                            .toList();
+
+                    validationFailures.addAll(failuresWithoutMissingRequired);
                 }
-            }
-            if (functionName == null) {
-                validationFailures.add(new ValidationFailure(path, "StubMissingCall"));
-            }
-
-            var input = (Map<String, Object>) givenMap.get(functionName);
-            var output = (Map<String, Object>) givenMap.get("->");
-            var functionDef = (Fn) this.types.get(functionName);
-
-            var inputFailures = functionDef.arg.validate(path, input, List.of(), List.of());
-            var outputFailures = functionDef.result.validate(path, output, List.of(), List.of());
-            var failures = new ArrayList<ValidationFailure>();
-            failures.addAll(inputFailures);
-            failures.addAll(outputFailures);
-
-            for (var failure : failures) {
-                if (failure.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)) {
-                    continue;
-                }
-                validationFailures.add(failure);
             }
 
         } catch (ClassCastException e) {
-            validationFailures.add(new ValidationFailure(path, "StubTypeRequired"));
+            validationFailures.add(new ValidationFailure("", "StubTypeRequired"));
         }
 
         return validationFailures;

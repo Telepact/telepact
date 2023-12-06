@@ -45,16 +45,13 @@ class FieldDeclaration {
 }
 
 class TypeDeclaration {
-    public final String path;
     public final Type type;
     public final boolean nullable;
     public final List<TypeDeclaration> typeParameters;
 
     public TypeDeclaration(
-            String path,
             Type type,
             boolean nullable, List<TypeDeclaration> typeParameters) {
-        this.path = path;
         this.type = type;
         this.nullable = nullable;
         this.typeParameters = typeParameters;
@@ -63,13 +60,13 @@ class TypeDeclaration {
     public List<ValidationFailure> validate(Object value, List<TypeDeclaration> generics) {
         if (value == null) {
             if (!this.nullable) {
-                return Collections.singletonList(new ValidationFailure(this.path,
+                return Collections.singletonList(new ValidationFailure("",
                         "NullInvalidForNonNullType"));
             } else {
                 return Collections.emptyList();
             }
         } else {
-            return this.type.validate(this.path, value, this.typeParameters, generics);
+            return this.type.validate(value, this.typeParameters, generics);
         }
     }
 }
@@ -89,7 +86,7 @@ class TypeDeclarationRoot {
 interface Type {
     public int getTypeParameterCount();
 
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics);
 }
 
@@ -101,25 +98,25 @@ class JsonBoolean implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.emptyList();
         } else if (value instanceof Number) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberInvalidForBooleanType"));
+                    new ValidationFailure("", "NumberInvalidForBooleanType"));
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForBooleanType"));
+                    new ValidationFailure("", "StringInvalidForBooleanType"));
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForBooleanType"));
+                    new ValidationFailure("", "ArrayInvalidForBooleanType"));
         } else if (value instanceof Map) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ObjectInvalidForBooleanType"));
+                    new ValidationFailure("", "ObjectInvalidForBooleanType"));
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForBooleanType"));
+                    new ValidationFailure("", "ValueInvalidForBooleanType"));
         }
     }
 
@@ -132,33 +129,33 @@ class JsonInteger implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForIntegerType"));
+                    new ValidationFailure("", "BooleanInvalidForIntegerType"));
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberOutOfRange"));
+                    new ValidationFailure("", "NumberOutOfRange"));
         } else if (value instanceof Number) {
             if (value instanceof Long || value instanceof Integer) {
                 return Collections.emptyList();
             } else {
-                return Collections.singletonList(new ValidationFailure(path,
+                return Collections.singletonList(new ValidationFailure("",
                         "NumberInvalidForIntegerType"));
             }
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForIntegerType"));
+                    new ValidationFailure("", "StringInvalidForIntegerType"));
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForIntegerType"));
+                    new ValidationFailure("", "ArrayInvalidForIntegerType"));
         } else if (value instanceof Map) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ObjectInvalidForIntegerType"));
+                    new ValidationFailure("", "ObjectInvalidForIntegerType"));
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForIntegerType"));
+                    new ValidationFailure("", "ValueInvalidForIntegerType"));
         }
     }
 }
@@ -170,28 +167,28 @@ class JsonNumber implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForNumberType"));
+                    new ValidationFailure("", "BooleanInvalidForNumberType"));
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberOutOfRange"));
+                    new ValidationFailure("", "NumberOutOfRange"));
         } else if (value instanceof Number) {
             return Collections.emptyList();
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForNumberType"));
+                    new ValidationFailure("", "StringInvalidForNumberType"));
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForNumberType"));
+                    new ValidationFailure("", "ArrayInvalidForNumberType"));
         } else if (value instanceof Map) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ObjectInvalidForNumberType"));
+                    new ValidationFailure("", "ObjectInvalidForNumberType"));
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForNumberType"));
+                    new ValidationFailure("", "ValueInvalidForNumberType"));
         }
     }
 }
@@ -203,25 +200,25 @@ class JsonString implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForStringType"));
+                    new ValidationFailure("", "BooleanInvalidForStringType"));
         } else if (value instanceof Number) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberInvalidForStringType"));
+                    new ValidationFailure("", "NumberInvalidForStringType"));
         } else if (value instanceof String) {
             return Collections.emptyList();
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForStringType"));
+                    new ValidationFailure("", "ArrayInvalidForStringType"));
         } else if (value instanceof Map) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ObjectInvalidForStringType"));
+                    new ValidationFailure("", "ObjectInvalidForStringType"));
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForStringType"));
+                    new ValidationFailure("", "ValueInvalidForStringType"));
         }
     }
 }
@@ -234,32 +231,37 @@ class JsonArray implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForArrayType"));
+                    new ValidationFailure("", "BooleanInvalidForArrayType"));
         } else if (value instanceof Number) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberInvalidForArrayType"));
+                    new ValidationFailure("", "NumberInvalidForArrayType"));
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForArrayType"));
+                    new ValidationFailure("", "StringInvalidForArrayType"));
         } else if (value instanceof List l) {
             var nestedTypeDeclaration = typeParameters.get(0);
             var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 var element = l.get(i);
                 var nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
-                validationFailures.addAll(nestedValidationFailures);
+                final var index = i;
+                var nestedValidationFailuresWithPath = nestedValidationFailures
+                        .stream()
+                        .map(f -> new ValidationFailure("[%d]%s".formatted(index, f.path), f.reason))
+                        .toList();
+                validationFailures.addAll(nestedValidationFailuresWithPath);
             }
             return validationFailures;
         } else if (value instanceof Map) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ObjectInvalidForArrayType"));
+                    new ValidationFailure("", "ObjectInvalidForArrayType"));
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForArrayType"));
+                    new ValidationFailure("", "ValueInvalidForArrayType"));
         }
     }
 }
@@ -272,20 +274,20 @@ class JsonObject implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForObjectType"));
+                    new ValidationFailure("", "BooleanInvalidForObjectType"));
         } else if (value instanceof Number) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberInvalidForObjectType"));
+                    new ValidationFailure("", "NumberInvalidForObjectType"));
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForObjectType"));
+                    new ValidationFailure("", "StringInvalidForObjectType"));
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForObjectType"));
+                    new ValidationFailure("", "ArrayInvalidForObjectType"));
         } else if (value instanceof Map<?, ?> m) {
             var nestedTypeDeclaration = typeParameters.get(0);
             var validationFailures = new ArrayList<ValidationFailure>();
@@ -293,12 +295,16 @@ class JsonObject implements Type {
                 var k = (String) entry.getKey();
                 var v = entry.getValue();
                 var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
-                validationFailures.addAll(nestedValidationFailures);
+                var nestedValidationFailuresWithPath = nestedValidationFailures
+                        .stream()
+                        .map(f -> new ValidationFailure("{%s}%s".formatted(k, f.path), f.reason))
+                        .toList();
+                validationFailures.addAll(nestedValidationFailuresWithPath);
             }
             return validationFailures;
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForObjectType"));
+                    new ValidationFailure("", "ValueInvalidForObjectType"));
         }
     }
 }
@@ -310,7 +316,7 @@ class JsonAny implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         return List.of();
     }
@@ -329,7 +335,7 @@ class Generic implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, List.of());
@@ -354,30 +360,29 @@ class Struct implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForStructType"));
+                    new ValidationFailure("", "BooleanInvalidForStructType"));
         } else if (value instanceof Number) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberInvalidForStructType"));
+                    new ValidationFailure("", "NumberInvalidForStructType"));
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForStructType"));
+                    new ValidationFailure("", "StringInvalidForStructType"));
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForStructType"));
+                    new ValidationFailure("", "ArrayInvalidForStructType"));
         } else if (value instanceof Map<?, ?> m) {
-            return validateStructFields(path, this.fields, (Map<String, Object>) m, typeParameters);
+            return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForStructType"));
+                    new ValidationFailure("", "ValueInvalidForStructType"));
         }
     }
 
     public static List<ValidationFailure> validateStructFields(
-            String path,
             Map<String, FieldDeclaration> fields,
             Map<String, Object> actualStruct, List<TypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
@@ -392,7 +397,7 @@ class Struct implements Type {
         }
 
         for (var missingField : missingFields) {
-            var validationFailure = new ValidationFailure("%s.%s".formatted(path, missingField),
+            var validationFailure = new ValidationFailure(missingField,
                     "RequiredStructFieldMissing");
             validationFailures
                     .add(validationFailure);
@@ -403,13 +408,17 @@ class Struct implements Type {
             var fieldValue = entry.getValue();
             var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new ValidationFailure("%s.%s".formatted(path, fieldName),
+                var validationFailure = new ValidationFailure(fieldName,
                         "UnknownStructField");
                 validationFailures
                         .add(validationFailure);
                 continue;
             }
             var nestedValidationFailures = referenceField.typeDeclaration.validate(fieldValue, typeParameters);
+            var nestedValidationFailuresWithPath = nestedValidationFailures
+                    .stream()
+                    .map(f -> new ValidationFailure(".%s%s".formatted(fieldName, f.path), f.reason))
+                    .toList();
             validationFailures.addAll(nestedValidationFailures);
         }
 
@@ -435,79 +444,80 @@ class Enum implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "BooleanInvalidForEnumType"));
+                    new ValidationFailure("", "BooleanInvalidForEnumType"));
         } else if (value instanceof Number) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "NumberInvalidForEnumType"));
+                    new ValidationFailure("", "NumberInvalidForEnumType"));
         } else if (value instanceof String) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "StringInvalidForEnumType"));
+                    new ValidationFailure("", "StringInvalidForEnumType"));
         } else if (value instanceof List) {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ArrayInvalidForEnumType"));
+                    new ValidationFailure("", "ArrayInvalidForEnumType"));
         } else if (value instanceof Map<?, ?> m) {
-            return validateEnumValues(path, this.values, m, typeParameters);
+            return validateEnumValues(this.values, m, typeParameters);
         } else {
             return Collections.singletonList(
-                    new ValidationFailure(path, "ValueInvalidForEnumType"));
+                    new ValidationFailure("", "ValueInvalidForEnumType"));
         }
     }
 
     private List<ValidationFailure> validateEnumValues(
-            String path,
             Map<String, Struct> referenceValues,
             Map<?, ?> actual, List<TypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
-                    new ValidationFailure(path,
+                    new ValidationFailure("",
                             "EnumDoesNotHaveExactlyOneField"));
         }
         var entry = actual.entrySet().stream().findFirst().get();
         var enumTarget = (String) entry.getKey();
         var enumPayload = entry.getValue();
 
-        var nextPath = !"".equals(path) ? "%s.%s".formatted(path, enumTarget) : enumTarget;
-
         var referenceStruct = referenceValues.get(enumTarget);
         if (referenceStruct == null) {
             return Collections
-                    .singletonList(new ValidationFailure(nextPath,
+                    .singletonList(new ValidationFailure(enumTarget,
                             "UnknownEnumField"));
         }
 
         if (enumPayload instanceof Boolean) {
-            return Collections.singletonList(new ValidationFailure(nextPath,
+            return Collections.singletonList(new ValidationFailure(enumTarget,
                     "BooleanInvalidForEnumStructType"));
         } else if (enumPayload instanceof Number) {
-            return Collections.singletonList(new ValidationFailure(nextPath,
+            return Collections.singletonList(new ValidationFailure(enumTarget,
                     "NumberInvalidForEnumStructType"));
         } else if (enumPayload instanceof String) {
-            return Collections.singletonList(new ValidationFailure(nextPath,
+            return Collections.singletonList(new ValidationFailure(enumTarget,
                     "StringInvalidForEnumStructType"));
         } else if (enumPayload instanceof List) {
-            return Collections.singletonList(new ValidationFailure(nextPath,
+            return Collections.singletonList(new ValidationFailure(enumTarget,
                     "ArrayInvalidForEnumStructType"));
         } else if (enumPayload instanceof Map<?, ?> m2) {
-            return validateEnumStruct(nextPath, referenceStruct, enumTarget,
+            var nestedValidationFailures = validateEnumStruct(referenceStruct, enumTarget,
                     (Map<String, Object>) m2, typeParameters);
+            var nestedValidationFailuresWithPath = nestedValidationFailures
+                    .stream()
+                    .map(f -> new ValidationFailure(".%s%s".formatted(enumTarget, f.path), f.reason))
+                    .toList();
+            return nestedValidationFailuresWithPath;
         } else {
-            return Collections.singletonList(new ValidationFailure(nextPath,
+            return Collections.singletonList(new ValidationFailure(enumTarget,
                     "ValueInvalidForEnumStructType"));
         }
     }
 
     private static List<ValidationFailure> validateEnumStruct(
-            String path,
             Struct enumStruct,
             String enumCase,
             Map<String, Object> actual, List<TypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var nestedValidationFailures = Struct.validateStructFields(path, enumStruct.fields,
+        var nestedValidationFailures = Struct.validateStructFields(enumStruct.fields,
                 actual, typeParameters);
         validationFailures.addAll(nestedValidationFailures);
 
@@ -533,9 +543,9 @@ class Fn implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
-        return this.arg.validate(currentPath, value, typeParameters, generics);
+        return this.arg.validate(value, typeParameters, generics);
     }
 }
 
@@ -557,7 +567,7 @@ class Trait implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'validate'");
@@ -578,7 +588,7 @@ class Info implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'validate'");
@@ -602,9 +612,9 @@ class Ext implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(String currentPath, Object value, List<TypeDeclaration> typeParameters,
+    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics) {
-        return this.typeExtension.validate(currentPath, value);
+        return this.typeExtension.validate(value);
     }
 }
 

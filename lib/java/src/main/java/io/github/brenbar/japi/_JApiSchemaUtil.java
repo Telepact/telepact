@@ -396,7 +396,7 @@ class _JApiSchemaUtil {
         return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
     }
 
-    private static TypeDeclaration parseTypeDeclaration(String currentPath, List<Object> typeDeclarationArray,
+    private static TypeDeclaration parseTypeDeclaration(List<Object> typeDeclarationArray,
             int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,

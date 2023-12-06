@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface TypeExtension {
 
-    List<ValidationFailure> validate(String path, Object given);
+    List<ValidationFailure> validate(Object given);
 
 }

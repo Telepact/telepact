@@ -13,41 +13,34 @@ public class MockCallTypeExtension implements TypeExtension {
     }
 
     @Override
-    public List<ValidationFailure> validate(String path, Object givenObj) {
+    public List<ValidationFailure> validate(Object givenObj) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         Map<String, Object> givenMap;
         try {
             givenMap = (Map<String, Object>) givenObj;
 
-            var functionName = (String) null;
-            for (var key : givenMap.keySet()) {
-                if (key.startsWith("fn.")) {
-                    functionName = key;
-                    break;
-                }
-            }
-            if (functionName == null) {
-                validationFailures.add(new ValidationFailure(path, "InvalidCall"));
-            }
+            var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.startsWith("fn.")).findAny();
+            if (optionalFunctionName.isEmpty()) {
+                validationFailures.add(new ValidationFailure("", "StubMissingCall"));
+            } else {
+                var functionName = optionalFunctionName.get();
+                var functionDef = (Fn) this.types.get(functionName);
 
-            var input = (Map<String, Object>) givenMap.get(functionName);
-            var functionDef = (Fn) this.types.get(functionName);
+                var input = (Map<String, Object>) givenMap.get(functionName);
 
-            var inputFailures = functionDef.arg.validate(path, input, List.of(), List.of());
-            var failures = new ArrayList<ValidationFailure>();
-            failures.addAll(inputFailures);
+                var inputFailures = functionDef.arg.validate(input, List.of(), List.of());
+                var inputFailuresWithPath = inputFailures.stream()
+                        .map(f -> new ValidationFailure(".%s%s".formatted(functionName, f.path), f.reason))
+                        .toList();
+                var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
+                        .filter(f -> !f.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)).toList();
 
-            var validFailures = new ArrayList<>();
-            for (var inputFailure : failures) {
-                if (inputFailure.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)) {
-                    continue;
-                }
-                validFailures.add(inputFailure);
+                validationFailures.addAll(inputFailuresWithoutMissingRequired);
             }
 
         } catch (ClassCastException e) {
-            validationFailures.add(new ValidationFailure(path, "CallTypeRequired"));
+            validationFailures.add(new ValidationFailure("", "CallTypeRequired"));
         }
 
         return validationFailures;
