@@ -115,8 +115,11 @@ class _ServerUtil {
         }
 
         var argumentValidationFailures = argStructType.validate(requestPayload, List.of(), List.of());
-        if (!argumentValidationFailures.isEmpty()) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailures);
+        var argumentValidationFailuresWithPath = argumentValidationFailures
+                .stream().map(f -> new ValidationFailure("%s%s".formatted(functionType.name, f.path), f.reason))
+                .toList();
+        if (!argumentValidationFailuresWithPath.isEmpty()) {
+            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
             var newErrorResultValidationFailures = resultEnumType.validate(

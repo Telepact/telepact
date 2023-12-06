@@ -419,7 +419,7 @@ class Struct implements Type {
                     .stream()
                     .map(f -> new ValidationFailure(".%s%s".formatted(fieldName, f.path), f.reason))
                     .toList();
-            validationFailures.addAll(nestedValidationFailures);
+            validationFailures.addAll(nestedValidationFailuresWithPath);
         }
 
         return validationFailures;
