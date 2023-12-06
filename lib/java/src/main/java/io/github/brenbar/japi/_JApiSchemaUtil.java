@@ -402,20 +402,20 @@ class _JApiSchemaUtil {
             Map<String, Integer> schemaKeysToIndex,
             Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         if (typeDeclarationArray.size() == 0) {
-            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
 
         String rootTypeString;
         try {
             rootTypeString = (String) typeDeclarationArray.get(0);
         } catch (ClassCastException ex) {
-            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
 
         var regex = Pattern.compile("^(.*?)(\\?)?$");
         var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
 
         var typeName = matcher.group(1);
@@ -426,9 +426,13 @@ class _JApiSchemaUtil {
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions);
 
+        if (type instanceof Generic && nullable) {
+            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+        }
+
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
 
         var typeParameters = new ArrayList<TypeDeclaration>();
@@ -438,7 +442,7 @@ class _JApiSchemaUtil {
             try {
                 l = (List<Object>) e;
             } catch (ClassCastException ex) {
-                throw new JApiSchemaParseError("Could not parse type declaration: %s".formatted(typeDeclarationArray));
+                throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
             }
             var typeParameterTypeDeclaration = parseTypeDeclaration(l, thisTypeParameterCount, originalJApiSchema,
                     schemaKeysToIndex, parsedTypes, typeExtensions);
