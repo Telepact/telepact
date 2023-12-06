@@ -59,7 +59,9 @@ class TypeDeclaration {
 
     public List<ValidationFailure> validate(Object value, List<TypeDeclaration> generics) {
         if (value == null) {
-            var isNullable = this.type instanceof Generic g ? generics.get(g.index).nullable : this.nullable;
+            var isNullable = this.type instanceof Generic g
+                    ? generics.get(g.index).nullable
+                    : this.nullable;
             if (!isNullable) {
                 return Collections.singletonList(new ValidationFailure("",
                         "NullInvalidForNonNullType"));
