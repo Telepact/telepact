@@ -85,6 +85,10 @@ class TypeDeclaration {
                     this.typeParameters, generics, random);
         }
     }
+
+    public String generateCode() {
+        return this.type.generateTypeDeclarationCode(this.typeParameters);
+    }
 }
 
 class TypeDeclarationRoot {
@@ -109,6 +113,8 @@ interface Type {
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
             MockRandom random);
+
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters);
 }
 
 class JsonBoolean implements Type {
@@ -151,6 +157,11 @@ class JsonBoolean implements Type {
         } else {
             return random.nextBoolean();
         }
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        return "Boolean";
     }
 
 }
@@ -203,6 +214,11 @@ class JsonInteger implements Type {
             return random.nextInt();
         }
     }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        return "Integer";
+    }
 }
 
 class JsonNumber implements Type {
@@ -248,6 +264,11 @@ class JsonNumber implements Type {
             return random.nextDouble();
         }
     }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        return "Number";
+    }
 }
 
 class JsonString implements Type {
@@ -289,6 +310,11 @@ class JsonString implements Type {
         } else {
             return random.nextString();
         }
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        return "String";
     }
 }
 
@@ -360,6 +386,13 @@ class JsonArray implements Type {
             }
             return array;
         }
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        var typeParametersString = typeParameters.stream().map(t -> t.generateCode())
+                .collect(Collectors.joining(","));
+        return "List<%s>".formatted(typeParametersString);
     }
 }
 
@@ -434,6 +467,13 @@ class JsonObject implements Type {
             return obj;
         }
     }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        var typeParametersString = typeParameters.stream().map(t -> t.generateCode())
+                .collect(Collectors.joining(","));
+        return "Map<String, %s>".formatted(typeParametersString);
+    }
 }
 
 class JsonAny implements Type {
@@ -461,6 +501,11 @@ class JsonAny implements Type {
         } else {
             return random.nextString();
         }
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        return "Object";
     }
 }
 
@@ -491,6 +536,11 @@ class Generic implements Type {
         var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
                 includeRandomOptionalFields, List.of(), random);
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        return "T%d".formatted(index);
     }
 }
 
@@ -629,6 +679,13 @@ class Struct implements Type {
             obj.put(fieldName, value);
         }
         return obj;
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        var typeParametersString = typeParameters.stream().map(t -> t.generateCode())
+                .collect(Collectors.joining(","));
+        return "Struct%s<%s>".formatted(this.name, typeParametersString);
     }
 }
 
@@ -772,7 +829,13 @@ class Enum implements Type {
                     Struct.constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields,
                             typeParameters, random));
         }
+    }
 
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        var typeParametersString = typeParameters.stream().map(t -> t.generateCode())
+                .collect(Collectors.joining(","));
+        return "Enum%s<%s>".formatted(this.name, typeParametersString);
     }
 }
 
@@ -815,6 +878,13 @@ class Fn implements Type {
                     random);
         }
     }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        var typeParametersString = typeParameters.stream().map(t -> t.generateCode())
+                .collect(Collectors.joining(","));
+        return "FnArgument%s<%s>".formatted(this.name, typeParametersString);
+    }
 }
 
 // TODO: trait is not a type
@@ -848,6 +918,12 @@ class Trait implements Type {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateTypeDeclarationCode'");
+    }
 }
 
 // TODO: info is not a type
@@ -876,6 +952,12 @@ class Info implements Type {
             MockRandom random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateTypeDeclarationCode'");
     }
 }
 
@@ -907,6 +989,13 @@ class Ext implements Type {
             MockRandom random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+    }
+
+    @Override
+    public String generateTypeDeclarationCode(List<TypeDeclaration> typeParameters) {
+        var typeParametersString = typeParameters.stream().map(t -> t.generateCode())
+                .collect(Collectors.joining(","));
+        return "Ext%s<%s>".formatted(this.name, typeParametersString);
     }
 }
 
