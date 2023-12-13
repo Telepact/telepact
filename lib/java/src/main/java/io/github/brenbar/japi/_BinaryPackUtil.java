@@ -55,19 +55,19 @@ class _BinaryPackUtil {
     static List<Object> packList(List<Object> list) {
         var packedList = new ArrayList<Object>();
         packedList.add(new Packed());
-        var headers = new ArrayList<String>();
+        var headers = new ArrayList<Integer>();
         packedList.add(headers);
-        var keyIndexMap = new HashMap<String, Integer>();
+        var keyIndexMap = new HashMap<Integer, Integer>();
         var index = 0;
         for (var e : list) {
             if (e instanceof Map<?, ?> m) {
                 var row = new ArrayList<Object>();
                 for (var entry : m.entrySet()) {
-                    var key = (String) entry.getKey();
-                    if (key.startsWith(".")) {
+                    if (entry.getKey() instanceof String s) {
                         // This is an untyped map, abort
                         return list;
                     }
+                    var key = (Integer) entry.getKey();
                     var keyIndex = keyIndexMap.get(key);
                     if (keyIndex == null) {
                         headers.add(key);
@@ -100,10 +100,10 @@ class _BinaryPackUtil {
 
         var unpackedList = new ArrayList<Object>();
 
-        var headers = (List<String>) list.get(1);
+        var headers = (List<Integer>) list.get(1);
         for (int i = 2; i < list.size(); i += 1) {
             var row = (List<Object>) list.get(i);
-            var m = new HashMap<String, Object>();
+            var m = new HashMap<Integer, Object>();
             for (int j = 0; j < row.size(); j += 1) {
                 var key = headers.get(j);
                 var value = row.get(j);
