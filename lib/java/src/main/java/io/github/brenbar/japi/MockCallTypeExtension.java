@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class MockCallTypeExtension implements TypeExtension {
 
-    public final Map<String, Type> types;
+    public final Map<String, UType> types;
 
-    public MockCallTypeExtension(Map<String, Type> types) {
+    public MockCallTypeExtension(Map<String, UType> types) {
         this.types = types;
     }
 
@@ -25,7 +25,7 @@ public class MockCallTypeExtension implements TypeExtension {
                 validationFailures.add(new ValidationFailure("", "StubMissingCall"));
             } else {
                 var functionName = optionalFunctionName.get();
-                var functionDef = (Fn) this.types.get(functionName);
+                var functionDef = (UFn) this.types.get(functionName);
 
                 var input = (Map<String, Object>) givenMap.get(functionName);
 

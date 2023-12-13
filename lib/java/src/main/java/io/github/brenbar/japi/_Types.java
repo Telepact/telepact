@@ -10,58 +10,58 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-class JApiSchemaTuple {
+class UApiSchemaTuple {
     public final List<Object> original;
-    public final Map<String, Type> parsed;
+    public final Map<String, UType> parsed;
 
-    public JApiSchemaTuple(List<Object> original, Map<String, Type> parsed) {
+    public UApiSchemaTuple(List<Object> original, Map<String, UType> parsed) {
         this.original = original;
         this.parsed = parsed;
     }
 }
 
-class FieldNameAndFieldDeclaration {
+class UFieldNameAndFieldDeclaration {
 
     public final String fieldName;
-    public final FieldDeclaration fieldDeclaration;
+    public final UFieldDeclaration fieldDeclaration;
 
-    public FieldNameAndFieldDeclaration(
+    public UFieldNameAndFieldDeclaration(
             String fieldName,
-            FieldDeclaration fieldDeclaration) {
+            UFieldDeclaration fieldDeclaration) {
         this.fieldName = fieldName;
         this.fieldDeclaration = fieldDeclaration;
     }
 }
 
-class FieldDeclaration {
+class UFieldDeclaration {
 
-    public final TypeDeclaration typeDeclaration;
+    public final UTypeDeclaration typeDeclaration;
     public final boolean optional;
 
-    public FieldDeclaration(
-            TypeDeclaration typeDeclaration,
+    public UFieldDeclaration(
+            UTypeDeclaration typeDeclaration,
             boolean optional) {
         this.typeDeclaration = typeDeclaration;
         this.optional = optional;
     }
 }
 
-class TypeDeclaration {
-    public final Type type;
+class UTypeDeclaration {
+    public final UType type;
     public final boolean nullable;
-    public final List<TypeDeclaration> typeParameters;
+    public final List<UTypeDeclaration> typeParameters;
 
-    public TypeDeclaration(
-            Type type,
-            boolean nullable, List<TypeDeclaration> typeParameters) {
+    public UTypeDeclaration(
+            UType type,
+            boolean nullable, List<UTypeDeclaration> typeParameters) {
         this.type = type;
         this.nullable = nullable;
         this.typeParameters = typeParameters;
     }
 
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> generics) {
         if (value == null) {
-            var isNullable = this.type instanceof Generic g
+            var isNullable = this.type instanceof UGeneric g
                     ? generics.get(g.index).nullable
                     : this.nullable;
             if (!isNullable) {
@@ -76,7 +76,7 @@ class TypeDeclaration {
     }
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (this.nullable && !useStartingValue && random.nextBoolean()) {
             return null;
@@ -87,31 +87,19 @@ class TypeDeclaration {
     }
 }
 
-class TypeDeclarationRoot {
-    public final Type type;
-    public final boolean nullable;
-
-    public TypeDeclarationRoot(
-            Type type,
-            boolean nullable) {
-        this.type = type;
-        this.nullable = nullable;
-    }
-}
-
-interface Type {
+interface UType {
     public int getTypeParameterCount();
 
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics);
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics);
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random);
 }
 
-class JsonBoolean implements Type {
+class UBoolean implements UType {
 
     @Override
     public int getTypeParameterCount() {
@@ -119,8 +107,8 @@ class JsonBoolean implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.emptyList();
         } else if (value instanceof Number) {
@@ -143,8 +131,8 @@ class JsonBoolean implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
@@ -155,15 +143,15 @@ class JsonBoolean implements Type {
 
 }
 
-class JsonInteger implements Type {
+class UInteger implements UType {
     @Override
     public int getTypeParameterCount() {
         return 0;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForIntegerType"));
@@ -194,8 +182,8 @@ class JsonInteger implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
@@ -205,15 +193,15 @@ class JsonInteger implements Type {
     }
 }
 
-class JsonNumber implements Type {
+class UNumber implements UType {
     @Override
     public int getTypeParameterCount() {
         return 0;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForNumberType"));
@@ -239,8 +227,8 @@ class JsonNumber implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
@@ -250,15 +238,15 @@ class JsonNumber implements Type {
     }
 }
 
-class JsonString implements Type {
+class UString implements UType {
     @Override
     public int getTypeParameterCount() {
         return 0;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForStringType"));
@@ -281,8 +269,8 @@ class JsonString implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
@@ -292,7 +280,7 @@ class JsonString implements Type {
     }
 }
 
-class JsonArray implements Type {
+class UArray implements UType {
 
     @Override
     public int getTypeParameterCount() {
@@ -300,8 +288,8 @@ class JsonArray implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForArrayType"));
@@ -336,8 +324,8 @@ class JsonArray implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         var nestedTypeDeclaration = typeParameters.get(0);
         if (useStartingValue) {
@@ -363,7 +351,7 @@ class JsonArray implements Type {
     }
 }
 
-class JsonObject implements Type {
+class UObject implements UType {
 
     @Override
     public int getTypeParameterCount() {
@@ -371,8 +359,8 @@ class JsonObject implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForObjectType"));
@@ -407,8 +395,8 @@ class JsonObject implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         var nestedTypeDeclaration = typeParameters.get(0);
         if (useStartingValue) {
@@ -437,22 +425,22 @@ class JsonObject implements Type {
 
 }
 
-class JsonAny implements Type {
+class UAny implements UType {
     @Override
     public int getTypeParameterCount() {
         return 0;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         return List.of();
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         var selectType = random.nextInt(3);
         if (selectType == 0) {
@@ -465,10 +453,10 @@ class JsonAny implements Type {
     }
 }
 
-class Generic implements Type {
+class UGeneric implements UType {
     public final int index;
 
-    public Generic(int index) {
+    public UGeneric(int index) {
         this.index = index;
     }
 
@@ -478,16 +466,16 @@ class Generic implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, List.of());
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
@@ -495,13 +483,13 @@ class Generic implements Type {
     }
 }
 
-class Struct implements Type {
+class UStruct implements UType {
 
     public final String name;
-    public final Map<String, FieldDeclaration> fields;
+    public final Map<String, UFieldDeclaration> fields;
     public final int typeParameterCount;
 
-    public Struct(String name, Map<String, FieldDeclaration> fields, int typeParameterCount) {
+    public UStruct(String name, Map<String, UFieldDeclaration> fields, int typeParameterCount) {
         this.name = name;
         this.fields = fields;
         this.typeParameterCount = typeParameterCount;
@@ -513,8 +501,8 @@ class Struct implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForStructType"));
@@ -536,12 +524,12 @@ class Struct implements Type {
     }
 
     public static List<ValidationFailure> validateStructFields(
-            Map<String, FieldDeclaration> fields,
-            Map<String, Object> actualStruct, List<TypeDeclaration> typeParameters) {
+            Map<String, UFieldDeclaration> fields,
+            Map<String, Object> actualStruct, List<UTypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         var missingFields = new ArrayList<String>();
-        for (Map.Entry<String, FieldDeclaration> entry : fields.entrySet()) {
+        for (Map.Entry<String, UFieldDeclaration> entry : fields.entrySet()) {
             var fieldName = entry.getKey();
             var fieldDeclaration = entry.getValue();
             if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional) {
@@ -580,8 +568,8 @@ class Struct implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             var startingStructValue = (Map<String, Object>) startingValue;
@@ -594,8 +582,8 @@ class Struct implements Type {
     }
 
     public static Map<String, Object> constructRandomStruct(
-            Map<String, FieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
+            Map<String, UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
             RandomGenerator random) {
 
         var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
@@ -633,13 +621,13 @@ class Struct implements Type {
     }
 }
 
-class Enum implements Type {
+class UEnum implements UType {
 
     public final String name;
-    public final Map<String, Struct> values;
+    public final Map<String, UStruct> values;
     public final int typeParameterCount;
 
-    public Enum(String name, Map<String, Struct> values, int typeParameterCount) {
+    public UEnum(String name, Map<String, UStruct> values, int typeParameterCount) {
         this.name = name;
         this.values = values;
         this.typeParameterCount = typeParameterCount;
@@ -651,8 +639,8 @@ class Enum implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.singletonList(
                     new ValidationFailure("", "BooleanInvalidForEnumType"));
@@ -674,8 +662,8 @@ class Enum implements Type {
     }
 
     private List<ValidationFailure> validateEnumValues(
-            Map<String, Struct> referenceValues,
-            Map<?, ?> actual, List<TypeDeclaration> typeParameters) {
+            Map<String, UStruct> referenceValues,
+            Map<?, ?> actual, List<UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
                     new ValidationFailure("",
@@ -719,12 +707,12 @@ class Enum implements Type {
     }
 
     private static List<ValidationFailure> validateEnumStruct(
-            Struct enumStruct,
+            UStruct enumStruct,
             String enumCase,
-            Map<String, Object> actual, List<TypeDeclaration> typeParameters) {
+            Map<String, Object> actual, List<UTypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var nestedValidationFailures = Struct.validateStructFields(enumStruct.fields,
+        var nestedValidationFailures = UStruct.validateStructFields(enumStruct.fields,
                 actual, typeParameters);
         validationFailures.addAll(nestedValidationFailures);
 
@@ -733,8 +721,8 @@ class Enum implements Type {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             var startingEnumValue = (Map<String, Object>) startingValue;
@@ -746,10 +734,10 @@ class Enum implements Type {
         }
     }
 
-    private static Map<String, Object> constructRandomEnum(Map<String, Struct> enumValuesReference,
+    private static Map<String, Object> constructRandomEnum(Map<String, UStruct> enumValuesReference,
             Map<String, Object> startingEnum,
             boolean includeRandomOptionalFields,
-            List<TypeDeclaration> typeParameters,
+            List<UTypeDeclaration> typeParameters,
             RandomGenerator random) {
         var existingEnumValue = startingEnum.keySet().stream().findAny();
         if (existingEnumValue.isPresent()) {
@@ -757,7 +745,7 @@ class Enum implements Type {
             var enumStructType = enumValuesReference.get(enumValue);
             var enumStartingStruct = (Map<String, Object>) startingEnum.get(enumValue);
 
-            return Map.of(enumValue, Struct.constructRandomStruct(enumStructType.fields, enumStartingStruct,
+            return Map.of(enumValue, UStruct.constructRandomStruct(enumStructType.fields, enumStartingStruct,
                     includeRandomOptionalFields, typeParameters, random));
         } else {
             var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
@@ -770,19 +758,19 @@ class Enum implements Type {
             var enumData = enumEntry.getValue();
 
             return Map.of(enumValue,
-                    Struct.constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields,
+                    UStruct.constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields,
                             typeParameters, random));
         }
     }
 }
 
-class Fn implements Type {
+class UFn implements UType {
 
     public final String name;
-    public final Struct arg;
-    public final Enum result;
+    public final UStruct arg;
+    public final UEnum result;
 
-    public Fn(String name, Struct input, Enum output) {
+    public UFn(String name, UStruct input, UEnum output) {
         this.name = name;
         this.arg = input;
         this.result = output;
@@ -794,23 +782,23 @@ class Fn implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         return this.arg.validate(value, typeParameters, generics);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             var startingFnValue = (Map<String, Object>) startingValue;
-            return Struct.constructRandomStruct(this.arg.fields, startingFnValue, includeRandomOptionalFields,
+            return UStruct.constructRandomStruct(this.arg.fields, startingFnValue, includeRandomOptionalFields,
                     List.of(),
                     random);
         } else {
-            return Struct.constructRandomStruct(this.arg.fields, new HashMap<>(), includeRandomOptionalFields,
+            return UStruct.constructRandomStruct(this.arg.fields, new HashMap<>(), includeRandomOptionalFields,
                     List.of(),
                     random);
         }
@@ -818,12 +806,12 @@ class Fn implements Type {
 }
 
 // TODO: trait is not a type
-class Trait implements Type {
+class UTrait implements UType {
     public final String name;
-    public final Fn fn;
+    public final UFn fn;
     public final String regex;
 
-    public Trait(String name, Fn fn, String regex) {
+    public UTrait(String name, UFn fn, String regex) {
         this.name = name;
         this.fn = fn;
         this.regex = regex;
@@ -835,15 +823,15 @@ class Trait implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'validate'");
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
             RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
@@ -851,10 +839,10 @@ class Trait implements Type {
 }
 
 // TODO: info is not a type
-class Info implements Type {
+class UInfo implements UType {
     public final String name;
 
-    public Info(String name) {
+    public UInfo(String name) {
         this.name = name;
     }
 
@@ -864,27 +852,27 @@ class Info implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'validate'");
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
             RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
 }
 
-class Ext implements Type {
+class UExt implements UType {
     public final String name;
     public final TypeExtension typeExtension;
     public final int typeParameterCount;
 
-    public Ext(String name, TypeExtension typeExtension, int typeParameterCount) {
+    public UExt(String name, TypeExtension typeExtension, int typeParameterCount) {
         this.name = name;
         this.typeExtension = typeExtension;
         this.typeParameterCount = typeParameterCount;
@@ -896,14 +884,14 @@ class Ext implements Type {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<TypeDeclaration> typeParameters,
-            List<TypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         return this.typeExtension.validate(value);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
             RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");

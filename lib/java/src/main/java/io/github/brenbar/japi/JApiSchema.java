@@ -7,7 +7,7 @@ import java.util.Map;
 public class JApiSchema {
 
     final List<Object> original;
-    final Map<String, Type> parsed;
+    final Map<String, UType> parsed;
 
     public JApiSchema(String jApiSchemaJson) {
         var tuple = _JApiSchemaUtil.parseJApiSchema(jApiSchemaJson, new HashMap<>());

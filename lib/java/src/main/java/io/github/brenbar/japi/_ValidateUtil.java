@@ -82,7 +82,7 @@ public class _ValidateUtil {
     public static final String UNKNOWN_RESULT_ENUM_VALUE = "UnknownResultEnumField";
 
     static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, JApiSchema jApiSchema, Fn functionType) {
+            Map<String, Object> headers, JApiSchema jApiSchema, UFn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
@@ -120,15 +120,15 @@ public class _ValidateUtil {
                     continue;
                 }
 
-                Struct structReference;
+                UStruct structReference;
                 if (structName.startsWith("->.")) {
                     var resultEnumValue = structName.split("->.")[1];
                     structReference = functionType.result.values.get(resultEnumValue);
                 } else if (structName.startsWith("fn.")) {
-                    var functionRef = (Fn) jApiSchema.parsed.get(structName);
+                    var functionRef = (UFn) jApiSchema.parsed.get(structName);
                     structReference = functionRef.arg;
                 } else {
-                    structReference = (Struct) jApiSchema.parsed.get(structName);
+                    structReference = (UStruct) jApiSchema.parsed.get(structName);
                 }
 
                 if (structReference == null) {

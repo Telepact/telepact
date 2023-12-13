@@ -21,9 +21,9 @@ class _SerializerUtil {
         var allKeys = new TreeSet<String>();
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
-            if (entry.getValue() instanceof Struct s) {
+            if (entry.getValue() instanceof UStruct s) {
                 allKeys.addAll(s.fields.keySet());
-            } else if (entry.getValue() instanceof Enum e) {
+            } else if (entry.getValue() instanceof UEnum e) {
                 for (var entry2 : e.values.entrySet()) {
                     allKeys.add(entry2.getKey());
                     var struct = entry2.getValue();

@@ -61,9 +61,9 @@ class _ServerUtil {
             unknownTarget = requestTarget;
             requestTarget = "fn._unknown";
         }
-        var functionType = (Fn) jApiSchema.parsed.get(requestTarget);
+        var functionType = (UFn) jApiSchema.parsed.get(requestTarget);
         var resultEnumType = functionType.result;
-        var argStructType = (Struct) functionType.arg;
+        var argStructType = (UStruct) functionType.arg;
 
         // Reflect call id
         var callId = requestHeaders.get("_id");
@@ -182,7 +182,7 @@ class _ServerUtil {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
             finalResultEnum = (Map<String, Object>) selectStructFields(
-                    new TypeDeclaration(resultEnumType, false, List.of()),
+                    new UTypeDeclaration(resultEnumType, false, List.of()),
                     resultEnum,
                     selectStructFieldsHeader);
         } else {
@@ -204,9 +204,9 @@ class _ServerUtil {
         return validationFailureCases;
     }
 
-    static Object selectStructFields(TypeDeclaration typeDeclaration, Object value,
+    static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
             Map<String, List<String>> selectedStructFields) {
-        if (typeDeclaration.type instanceof Struct s) {
+        if (typeDeclaration.type instanceof UStruct s) {
             var selectedFields = selectedStructFields.get(s.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -220,7 +220,7 @@ class _ServerUtil {
                 }
             }
             return finalMap;
-        } else if (typeDeclaration.type instanceof Fn f) {
+        } else if (typeDeclaration.type instanceof UFn f) {
             var selectedFields = selectedStructFields.get(f.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -234,7 +234,7 @@ class _ServerUtil {
                 }
             }
             return finalMap;
-        } else if (typeDeclaration.type instanceof Enum e) {
+        } else if (typeDeclaration.type instanceof UEnum e) {
             var valueAsMap = (Map<String, Object>) value;
             var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
             var enumValue = enumEntry.getKey();
@@ -255,7 +255,7 @@ class _ServerUtil {
             }
 
             return Map.of(enumEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof JsonObject o) {
+        } else if (typeDeclaration.type instanceof UObject o) {
             var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -265,7 +265,7 @@ class _ServerUtil {
                 finalMap.put(entry.getKey(), valueWithSelectedFields);
             }
             return finalMap;
-        } else if (typeDeclaration.type instanceof JsonArray a) {
+        } else if (typeDeclaration.type instanceof UArray a) {
             var nestedType = typeDeclaration.typeParameters.get(0);
             var valueAsList = (List<Object>) value;
             var finalList = new ArrayList<>();

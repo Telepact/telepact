@@ -77,7 +77,7 @@ class _MockServerUtil {
             default -> {
                 invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
 
-                var definition = (Fn) jApiSchema.parsed.get(functionName);
+                var definition = (UFn) jApiSchema.parsed.get(functionName);
 
                 for (var stub : stubs) {
                     if (Objects.equals(stub.whenFunction, functionName)) {
@@ -108,7 +108,7 @@ class _MockServerUtil {
                 }
 
                 if (definition != null) {
-                    var resultEnum = (Enum) definition.result;
+                    var resultEnum = (UEnum) definition.result;
                     var okStructRef = resultEnum.values.get("ok");
                     var useStartingValue = true;
                     var includeRandomOptionalFields = true;

@@ -14,15 +14,15 @@ import java.util.regex.Pattern;
 
 class _JApiSchemaUtil {
 
-    static JApiSchemaTuple combineJApiSchemas(JApiSchema first, JApiSchema second) {
+    static UApiSchemaTuple combineJApiSchemas(JApiSchema first, JApiSchema second) {
         List<Object> firstOriginal = first.original;
         List<Object> secondOriginal = second.original;
-        Map<String, Type> firstParsed = first.parsed;
-        Map<String, Type> secondParsed = second.parsed;
+        Map<String, UType> firstParsed = first.parsed;
+        Map<String, UType> secondParsed = second.parsed;
 
         // Any traits in the first schema need to be applied to the second
         for (var e : firstParsed.entrySet()) {
-            if (e.getValue() instanceof Trait t) {
+            if (e.getValue() instanceof UTrait t) {
                 if (secondParsed.containsKey(t.name)) {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
@@ -33,7 +33,7 @@ class _JApiSchemaUtil {
 
         // And vice versa
         for (var e : secondParsed.entrySet()) {
-            if (e.getValue() instanceof Trait t) {
+            if (e.getValue() instanceof UTrait t) {
                 if (firstParsed.containsKey(t.name)) {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
@@ -59,15 +59,15 @@ class _JApiSchemaUtil {
         original.addAll(firstOriginal);
         original.addAll(secondOriginal);
 
-        var parsed = new HashMap<String, Type>();
+        var parsed = new HashMap<String, UType>();
         parsed.putAll(firstParsed);
         parsed.putAll(secondParsed);
 
-        return new JApiSchemaTuple(original, parsed);
+        return new UApiSchemaTuple(original, parsed);
     }
 
-    static JApiSchemaTuple parseJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
-        var parsedTypes = new HashMap<String, Type>();
+    static UApiSchemaTuple parseJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
+        var parsedTypes = new HashMap<String, UType>();
 
         var objectMapper = new ObjectMapper();
         List<Object> originalJApiSchema;
@@ -103,7 +103,7 @@ class _JApiSchemaUtil {
             throw new JApiSchemaParseError("Schema has duplicate keys %s".formatted(duplicateKeys));
         }
 
-        var traits = new ArrayList<Trait>();
+        var traits = new ArrayList<UTrait>();
 
         var rootTypeParameterCount = 0;
         boolean allowTraitsAndInfo = true;
@@ -111,7 +111,7 @@ class _JApiSchemaUtil {
             var typ = getOrParseType(schemaKey, rootTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
                     schemaKeysToIndex,
                     parsedTypes, typeExtensions);
-            if (typ instanceof Trait t) {
+            if (typ instanceof UTrait t) {
                 traits.add(t);
             }
         }
@@ -123,13 +123,13 @@ class _JApiSchemaUtil {
         // Ensure all type extensions are defined
         for (var entry : typeExtensions.entrySet()) {
             var typeExtensionName = entry.getKey();
-            var typeExtension = (Ext) parsedTypes.get(typeExtensionName);
+            var typeExtension = (UExt) parsedTypes.get(typeExtensionName);
             if (typeExtension == null) {
                 throw new JApiSchemaParseError("Undefined type extension %s".formatted(typeExtensionName));
             }
         }
 
-        return new JApiSchemaTuple(originalJApiSchema, parsedTypes);
+        return new UApiSchemaTuple(originalJApiSchema, parsedTypes);
     }
 
     private static String findSchemaKey(Map<String, Object> definition) {
@@ -143,11 +143,11 @@ class _JApiSchemaUtil {
                         .formatted(definition));
     }
 
-    static void applyTraitToParsedTypes(Trait trait, Map<String, Type> parsedTypes) {
+    static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes) {
         for (var parsedType : parsedTypes.entrySet()) {
-            Fn f;
+            UFn f;
             try {
-                f = (Fn) parsedType.getValue();
+                f = (UFn) parsedType.getValue();
             } catch (ClassCastException e) {
                 continue;
             }
@@ -162,15 +162,15 @@ class _JApiSchemaUtil {
             }
 
             String traitName = trait.name;
-            Struct fnArg = f.arg;
-            Map<String, FieldDeclaration> fnArgFields = fnArg.fields;
-            Enum fnResult = f.result;
-            Map<String, Struct> fnResultValues = fnResult.values;
-            Fn traitFn = trait.fn;
-            Struct traitFnArg = traitFn.arg;
-            Map<String, FieldDeclaration> traitFnArgFields = traitFnArg.fields;
-            Enum traitFnResult = traitFn.result;
-            Map<String, Struct> traitFnResultValues = traitFnResult.values;
+            UStruct fnArg = f.arg;
+            Map<String, UFieldDeclaration> fnArgFields = fnArg.fields;
+            UEnum fnResult = f.result;
+            Map<String, UStruct> fnResultValues = fnResult.values;
+            UFn traitFn = trait.fn;
+            UStruct traitFnArg = traitFn.arg;
+            Map<String, UFieldDeclaration> traitFnArgFields = traitFnArg.fields;
+            UEnum traitFnResult = traitFn.result;
+            Map<String, UStruct> traitFnResultValues = traitFnResult.values;
 
             if (fnName.startsWith("fn._")) {
                 // Only internal traits can change internal functions
@@ -199,12 +199,12 @@ class _JApiSchemaUtil {
         }
     }
 
-    public static Trait parseTraitType(
+    public static UTrait parseTraitType(
             Map<String, Object> traitDefinitionAsParsedJson,
             String definitionKey,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes,
+            Map<String, UType> parsedTypes,
             Map<String, TypeExtension> typeExtensions) {
         Map<String, Object> def;
         try {
@@ -232,15 +232,15 @@ class _JApiSchemaUtil {
                 typeExtensions,
                 true);
 
-        return new Trait(definitionKey, traitFunction, traitFunctionRegex);
+        return new UTrait(definitionKey, traitFunction, traitFunctionRegex);
     }
 
-    private static Fn parseFunctionType(
+    private static UFn parseFunctionType(
             Map<String, Object> functionDefinitionAsParsedJson,
             String definitionKey,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes,
+            Map<String, UType> parsedTypes,
             Map<String, TypeExtension> typeExtensions,
             boolean isForTrait) {
         Map<String, Object> argumentDefinitionAsParsedJson;
@@ -249,7 +249,7 @@ class _JApiSchemaUtil {
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError("Invalid function definition for %s".formatted(definitionKey));
         }
-        var argumentFields = new HashMap<String, FieldDeclaration>();
+        var argumentFields = new HashMap<String, UFieldDeclaration>();
         var isForEnum = false;
         var typeParameterCount = 0;
         for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
@@ -262,7 +262,7 @@ class _JApiSchemaUtil {
             argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
-        var argType = new Struct(definitionKey, argumentFields, typeParameterCount);
+        var argType = new UStruct(definitionKey, argumentFields, typeParameterCount);
 
         Map<String, Object> resultDefinitionAsParsedJson;
         try {
@@ -277,7 +277,7 @@ class _JApiSchemaUtil {
             }
         }
 
-        var values = new HashMap<String, Struct>();
+        var values = new HashMap<String, UStruct>();
         for (var entry : resultDefinitionAsParsedJson.entrySet()) {
             Map<String, Object> enumValueData;
             try {
@@ -287,7 +287,7 @@ class _JApiSchemaUtil {
             }
             var enumValue = entry.getKey();
 
-            var fields = new HashMap<String, FieldDeclaration>();
+            var fields = new HashMap<String, UFieldDeclaration>();
             for (var structEntry : enumValueData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
@@ -298,29 +298,29 @@ class _JApiSchemaUtil {
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new Struct("->.%s".formatted(enumValue), fields, typeParameterCount);
+            var enumStruct = new UStruct("->.%s".formatted(enumValue), fields, typeParameterCount);
 
             values.put(enumValue, enumStruct);
         }
 
-        var resultType = new Enum("%s.->".formatted(definitionKey), values, typeParameterCount);
+        var resultType = new UEnum("%s.->".formatted(definitionKey), values, typeParameterCount);
 
-        var type = new Fn(definitionKey, argType, resultType);
+        var type = new UFn(definitionKey, argType, resultType);
 
         return type;
     }
 
-    private static Struct parseStructType(
+    private static UStruct parseStructType(
             Map<String, Object> structDefinitionAsParsedJson,
             String definitionKey,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes,
+            Map<String, UType> parsedTypes,
             Map<String, TypeExtension> typeExtensions) {
         var definition = (Map<String, Object>) structDefinitionAsParsedJson.get(definitionKey);
 
-        var fields = new HashMap<String, FieldDeclaration>();
+        var fields = new HashMap<String, UFieldDeclaration>();
         for (var entry : definition.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
@@ -330,22 +330,22 @@ class _JApiSchemaUtil {
             fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
         }
 
-        var type = new Struct(definitionKey, fields, typeParameterCount);
+        var type = new UStruct(definitionKey, fields, typeParameterCount);
 
         return type;
     }
 
-    private static Enum parseEnumType(
+    private static UEnum parseEnumType(
             Map<String, Object> enumDefinitionAsParsedJson,
             String definitionKey,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes,
+            Map<String, UType> parsedTypes,
             Map<String, TypeExtension> typeExtensions) {
         var definition = (Map<String, Object>) enumDefinitionAsParsedJson.get(definitionKey);
 
-        var values = new HashMap<String, Struct>();
+        var values = new HashMap<String, UStruct>();
         for (var entry : definition.entrySet()) {
             Map<String, Object> enumStructData;
             try {
@@ -355,7 +355,7 @@ class _JApiSchemaUtil {
             }
             var enumValue = entry.getKey();
 
-            var fields = new HashMap<String, FieldDeclaration>();
+            var fields = new HashMap<String, UFieldDeclaration>();
             for (var structEntry : enumStructData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
@@ -366,24 +366,24 @@ class _JApiSchemaUtil {
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new Struct("%s.%s".formatted(definitionKey, enumValue), fields, typeParameterCount);
+            var enumStruct = new UStruct("%s.%s".formatted(definitionKey, enumValue), fields, typeParameterCount);
 
             values.put(enumValue, enumStruct);
         }
 
-        var type = new Enum(definitionKey, values, typeParameterCount);
+        var type = new UEnum(definitionKey, values, typeParameterCount);
 
         return type;
     }
 
-    private static FieldNameAndFieldDeclaration parseField(
+    private static UFieldNameAndFieldDeclaration parseField(
             String fieldDeclaration,
             Object typeDeclarationValue,
             boolean isForEnum,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes,
+            Map<String, UType> parsedTypes,
             Map<String, TypeExtension> typeExtensions) {
         var regex = Pattern.compile("^([a-zA-Z_]+[a-zA-Z0-9_]*)(!)?$");
         var matcher = regex.matcher(fieldDeclaration);
@@ -412,14 +412,14 @@ class _JApiSchemaUtil {
                 parsedTypes,
                 typeExtensions);
 
-        return new FieldNameAndFieldDeclaration(fieldName, new FieldDeclaration(typeDeclaration, optional));
+        return new UFieldNameAndFieldDeclaration(fieldName, new UFieldDeclaration(typeDeclaration, optional));
     }
 
-    private static TypeDeclaration parseTypeDeclaration(List<Object> typeDeclarationArray,
+    private static UTypeDeclaration parseTypeDeclaration(List<Object> typeDeclarationArray,
             int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
+            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         if (typeDeclarationArray.size() == 0) {
             throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
@@ -445,7 +445,7 @@ class _JApiSchemaUtil {
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions);
 
-        if (type instanceof Generic && nullable) {
+        if (type instanceof UGeneric && nullable) {
             throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
 
@@ -454,7 +454,7 @@ class _JApiSchemaUtil {
             throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
         }
 
-        var typeParameters = new ArrayList<TypeDeclaration>();
+        var typeParameters = new ArrayList<UTypeDeclaration>();
         var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
         for (var e : givenTypeParameters) {
             List<Object> l;
@@ -468,13 +468,13 @@ class _JApiSchemaUtil {
             typeParameters.add(typeParameterTypeDeclaration);
         }
 
-        return new TypeDeclaration(type, nullable, typeParameters);
+        return new UTypeDeclaration(type, nullable, typeParameters);
     }
 
-    private static Type getOrParseType(String typeName, int thisTypeParameterCount, boolean allowTraitsAndInfo,
+    private static UType getOrParseType(String typeName, int thisTypeParameterCount, boolean allowTraitsAndInfo,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, Type> parsedTypes, Map<String, TypeExtension> typeExtensions) {
+            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         var existingType = parsedTypes.get(typeName);
         if (existingType != null) {
             return existingType;
@@ -490,13 +490,13 @@ class _JApiSchemaUtil {
         var standardTypeName = matcher.group(1);
         if (standardTypeName != null) {
             return switch (standardTypeName) {
-                case "boolean" -> new JsonBoolean();
-                case "integer" -> new JsonInteger();
-                case "number" -> new JsonNumber();
-                case "string" -> new JsonString();
-                case "array" -> new JsonArray();
-                case "object" -> new JsonObject();
-                case "any" -> new JsonAny();
+                case "boolean" -> new UBoolean();
+                case "integer" -> new UInteger();
+                case "number" -> new UNumber();
+                case "string" -> new UString();
+                case "array" -> new UArray();
+                case "object" -> new UObject();
+                case "any" -> new UAny();
                 default -> {
                     var genericParameterIndexString = matcher.group(2);
                     if (genericParameterIndexString != null) {
@@ -506,7 +506,7 @@ class _JApiSchemaUtil {
                                     "Generic index (%d) too high for this type: %s".formatted(genericParameterIndex,
                                             typeName));
                         }
-                        yield new Generic(genericParameterIndex);
+                        yield new UGeneric(genericParameterIndex);
                     } else {
                         throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
                     }
@@ -533,7 +533,7 @@ class _JApiSchemaUtil {
                 }
             }
 
-            Type type;
+            UType type;
             if (customTypeName.startsWith("struct")) {
                 type = parseStructType(definition, customTypeName, typeParameterCount, originalJApiSchema,
                         schemaKeysToIndex, parsedTypes,
@@ -549,14 +549,14 @@ class _JApiSchemaUtil {
                 type = parseTraitType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions);
             } else if (allowTraitsAndInfo && customTypeName.startsWith("info")) {
-                type = new Info(customTypeName);
+                type = new UInfo(customTypeName);
             } else if (customTypeName.startsWith("ext")) {
                 var typeExtension = typeExtensions.get(customTypeName);
                 if (typeExtension == null) {
                     throw new JApiSchemaParseError(
                             "Missing type extension implementation %s".formatted(customTypeName));
                 }
-                type = new Ext(customTypeName, typeExtension, typeParameterCount);
+                type = new UExt(customTypeName, typeExtension, typeParameterCount);
             } else {
                 throw new JApiSchemaParseError("Unrecognized type: %s".formatted(customTypeName));
             }

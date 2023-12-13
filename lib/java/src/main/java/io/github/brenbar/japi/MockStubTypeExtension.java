@@ -6,9 +6,9 @@ import java.util.Map;
 
 public class MockStubTypeExtension implements TypeExtension {
 
-    public final Map<String, Type> types;
+    public final Map<String, UType> types;
 
-    public MockStubTypeExtension(Map<String, Type> types) {
+    public MockStubTypeExtension(Map<String, UType> types) {
         this.types = types;
     }
 
@@ -26,7 +26,7 @@ public class MockStubTypeExtension implements TypeExtension {
 
             } else {
                 var functionName = optionalFunctionName.get();
-                var functionDef = (Fn) this.types.get(functionName);
+                var functionDef = (UFn) this.types.get(functionName);
 
                 var input = (Map<String, Object>) givenMap.get(functionName);
 
