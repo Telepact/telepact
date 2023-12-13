@@ -1,5 +1,8 @@
 package io.github.brenbar.japi;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
@@ -10,29 +13,33 @@ class _ClientUtil {
             boolean forceSendJsonDefault,
             long timeoutMsDefault) {
         boolean finalUseBinary;
-        if (request.useBinary.isPresent()) {
+        Optional<Boolean> useBinaryOptional = request.useBinary;
+        if (useBinaryOptional.isPresent()) {
             finalUseBinary = request.useBinary.get();
         } else {
             finalUseBinary = useBinaryDefault;
         }
 
         boolean finalForceSendJson;
-        if (request.forceSendJson.isPresent()) {
+        Optional<Boolean> forceSendJsonOptional = request.forceSendJson;
+        if (forceSendJsonOptional.isPresent()) {
             finalForceSendJson = request.forceSendJson.get();
         } else {
             finalForceSendJson = forceSendJsonDefault;
         }
 
         long finalTimeoutMs;
-        if (request.timeoutMs.isPresent()) {
+        Optional<Long> timeoutMsOptional = request.timeoutMs;
+        if (timeoutMsOptional.isPresent()) {
             finalTimeoutMs = request.timeoutMs.get();
         } else {
             finalTimeoutMs = timeoutMsDefault;
         }
 
-        var headers = request.headers;
+        Map<String, Object> headers = request.headers;
+        Map<String, List<String>> selectedStructFields = request.selectedStructFields;
 
-        if (!request.selectedStructFields.isEmpty()) {
+        if (!selectedStructFields.isEmpty()) {
             headers.put("_sel", request.selectedStructFields);
         }
 
