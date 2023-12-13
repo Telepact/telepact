@@ -31,7 +31,7 @@ public class MockServer {
     }
 
     public final Server server;
-    private final MockRandom random;
+    private final RandomGenerator random;
     private boolean enableGeneratedDefaultStub;
 
     private final List<MockStub> stubs = new ArrayList<>();
@@ -57,7 +57,7 @@ public class MockServer {
 
         parsedTypes.putAll(server.jApiSchema.parsed);
 
-        this.random = new MockRandom();
+        this.random = new RandomGenerator();
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
     }
 

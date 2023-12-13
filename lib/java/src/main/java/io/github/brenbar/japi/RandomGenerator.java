@@ -3,7 +3,7 @@ package io.github.brenbar.japi;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
-public class MockRandom {
+public class RandomGenerator {
     private int seed;
 
     public void setSeed(int seed) {

@@ -77,7 +77,7 @@ class TypeDeclaration {
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (this.nullable && !useStartingValue && random.nextBoolean()) {
             return null;
         } else {
@@ -108,7 +108,7 @@ interface Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random);
+            RandomGenerator random);
 }
 
 class JsonBoolean implements Type {
@@ -145,7 +145,7 @@ class JsonBoolean implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
         } else {
@@ -196,7 +196,7 @@ class JsonInteger implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
         } else {
@@ -241,7 +241,7 @@ class JsonNumber implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
         } else {
@@ -283,7 +283,7 @@ class JsonString implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
         } else {
@@ -338,7 +338,7 @@ class JsonArray implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         var nestedTypeDeclaration = typeParameters.get(0);
         if (useStartingValue) {
             var startingArray = (List<Object>) startingValue;
@@ -409,7 +409,7 @@ class JsonObject implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         var nestedTypeDeclaration = typeParameters.get(0);
         if (useStartingValue) {
             var startingObj = (Map<String, Object>) startingValue;
@@ -453,7 +453,7 @@ class JsonAny implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         var selectType = random.nextInt(3);
         if (selectType == 0) {
             return random.nextBoolean();
@@ -488,7 +488,7 @@ class Generic implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
                 includeRandomOptionalFields, List.of(), random);
@@ -582,7 +582,7 @@ class Struct implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             var startingStructValue = (Map<String, Object>) startingValue;
             return constructRandomStruct(this.fields, startingStructValue, includeRandomOptionalFields,
@@ -596,7 +596,7 @@ class Struct implements Type {
     public static Map<String, Object> constructRandomStruct(
             Map<String, FieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
-            MockRandom random) {
+            RandomGenerator random) {
 
         var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -735,7 +735,7 @@ class Enum implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             var startingEnumValue = (Map<String, Object>) startingValue;
             return constructRandomEnum(this.values, startingEnumValue, includeRandomOptionalFields,
@@ -750,7 +750,7 @@ class Enum implements Type {
             Map<String, Object> startingEnum,
             boolean includeRandomOptionalFields,
             List<TypeDeclaration> typeParameters,
-            MockRandom random) {
+            RandomGenerator random) {
         var existingEnumValue = startingEnum.keySet().stream().findAny();
         if (existingEnumValue.isPresent()) {
             var enumValue = existingEnumValue.get();
@@ -803,7 +803,7 @@ class Fn implements Type {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters,
             List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         if (useStartingValue) {
             var startingFnValue = (Map<String, Object>) startingValue;
             return Struct.constructRandomStruct(this.arg.fields, startingFnValue, includeRandomOptionalFields,
@@ -844,7 +844,7 @@ class Trait implements Type {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
@@ -873,7 +873,7 @@ class Info implements Type {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
@@ -904,7 +904,7 @@ class Ext implements Type {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<TypeDeclaration> typeParameters, List<TypeDeclaration> generics,
-            MockRandom random) {
+            RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
