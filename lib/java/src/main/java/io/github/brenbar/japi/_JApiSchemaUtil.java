@@ -15,32 +15,37 @@ import java.util.regex.Pattern;
 class _JApiSchemaUtil {
 
     static JApiSchemaTuple combineJApiSchemas(JApiSchema first, JApiSchema second) {
+        List<Object> firstOriginal = first.original;
+        List<Object> secondOriginal = second.original;
+        Map<String, Type> firstParsed = first.parsed;
+        Map<String, Type> secondParsed = second.parsed;
+
         // Any traits in the first schema need to be applied to the second
-        for (var e : first.parsed.entrySet()) {
+        for (var e : firstParsed.entrySet()) {
             if (e.getValue() instanceof Trait t) {
-                if (second.parsed.containsKey(t.name)) {
+                if (secondParsed.containsKey(t.name)) {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
                 }
-                _JApiSchemaUtil.applyTraitToParsedTypes(t, second.parsed);
+                _JApiSchemaUtil.applyTraitToParsedTypes(t, secondParsed);
             }
         }
 
         // And vice versa
-        for (var e : second.parsed.entrySet()) {
+        for (var e : secondParsed.entrySet()) {
             if (e.getValue() instanceof Trait t) {
-                if (first.parsed.containsKey(t.name)) {
+                if (firstParsed.containsKey(t.name)) {
                     throw new JApiSchemaParseError(
                             "Could not combine schemas due to duplicate trait %s".formatted(t.name));
                 }
-                _JApiSchemaUtil.applyTraitToParsedTypes(t, first.parsed);
+                _JApiSchemaUtil.applyTraitToParsedTypes(t, firstParsed);
             }
         }
 
         // Check for duplicates
         var duplicatedJsonSchemaKeys = new HashSet<String>();
-        for (var key : first.parsed.keySet()) {
-            if (second.parsed.containsKey(key)) {
+        for (var key : firstParsed.keySet()) {
+            if (secondParsed.containsKey(key)) {
                 duplicatedJsonSchemaKeys.add(key);
             }
         }
@@ -51,12 +56,12 @@ class _JApiSchemaUtil {
         }
 
         var original = new ArrayList<Object>();
-        original.addAll(first.original);
-        original.addAll(second.original);
+        original.addAll(firstOriginal);
+        original.addAll(secondOriginal);
 
         var parsed = new HashMap<String, Type>();
-        parsed.putAll(first.parsed);
-        parsed.putAll(second.parsed);
+        parsed.putAll(firstParsed);
+        parsed.putAll(secondParsed);
 
         return new JApiSchemaTuple(original, parsed);
     }
@@ -147,35 +152,49 @@ class _JApiSchemaUtil {
                 continue;
             }
 
-            var regex = Pattern.compile(trait.regex);
-            var matcher = regex.matcher(f.name);
+            String traitRegex = trait.regex;
+            String fnName = f.name;
+
+            var regex = Pattern.compile(traitRegex);
+            var matcher = regex.matcher(fnName);
             if (!matcher.find()) {
                 continue;
             }
 
-            if (f.name.startsWith("fn._")) {
+            String traitName = trait.name;
+            Struct fnArg = f.arg;
+            Map<String, FieldDeclaration> fnArgFields = fnArg.fields;
+            Enum fnResult = f.result;
+            Map<String, Struct> fnResultValues = fnResult.values;
+            Fn traitFn = trait.fn;
+            Struct traitFnArg = traitFn.arg;
+            Map<String, FieldDeclaration> traitFnArgFields = traitFnArg.fields;
+            Enum traitFnResult = traitFn.result;
+            Map<String, Struct> traitFnResultValues = traitFnResult.values;
+
+            if (fnName.startsWith("fn._")) {
                 // Only internal traits can change internal functions
-                if (!trait.name.startsWith("trait._")) {
+                if (!traitName.startsWith("trait._")) {
                     continue;
                 }
             }
 
-            for (var traitArgumentField : trait.fn.arg.fields.entrySet()) {
+            for (var traitArgumentField : traitFnArgFields.entrySet()) {
                 var newKey = traitArgumentField.getKey();
-                if (f.arg.fields.containsKey(newKey)) {
+                if (fnArgFields.containsKey(newKey)) {
                     throw new JApiSchemaParseError(
                             "Argument field already in use: %s".formatted(newKey));
                 }
-                f.arg.fields.put(newKey, traitArgumentField.getValue());
+                fnArgFields.put(newKey, traitArgumentField.getValue());
             }
 
-            for (var traitResultField : trait.fn.result.values.entrySet()) {
+            for (var traitResultField : traitFnResultValues.entrySet()) {
                 var newKey = traitResultField.getKey();
-                if (f.result.values.containsKey(newKey)) {
+                if (fnResultValues.containsKey(newKey)) {
                     throw new JApiSchemaParseError(
                             "Result value already in use: %s".formatted(newKey));
                 }
-                f.result.values.put(newKey, traitResultField.getValue());
+                fnResultValues.put(newKey, traitResultField.getValue());
             }
         }
     }
