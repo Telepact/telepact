@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-class _JApiSchemaUtil {
+class _UApiSchemaUtil {
 
-    static UApiSchemaTuple combineJApiSchemas(JApiSchema first, JApiSchema second) {
+    static UApiSchemaTuple combineUApiSchemas(JApiSchema first, JApiSchema second) {
         List<Object> firstOriginal = first.original;
         List<Object> secondOriginal = second.original;
         Map<String, UType> firstParsed = first.parsed;
@@ -23,34 +23,36 @@ class _JApiSchemaUtil {
         // Any traits in the first schema need to be applied to the second
         for (var e : firstParsed.entrySet()) {
             if (e.getValue() instanceof UTrait t) {
-                if (secondParsed.containsKey(t.name)) {
+                String traitName = t.name;
+                if (secondParsed.containsKey(traitName)) {
                     throw new JApiSchemaParseError(
-                            "Could not combine schemas due to duplicate trait %s".formatted(t.name));
+                            "Could not combine schemas due to duplicate trait %s".formatted(traitName));
                 }
-                _JApiSchemaUtil.applyTraitToParsedTypes(t, secondParsed);
+                _UApiSchemaUtil.applyTraitToParsedTypes(t, secondParsed);
             }
         }
 
         // And vice versa
         for (var e : secondParsed.entrySet()) {
             if (e.getValue() instanceof UTrait t) {
-                if (firstParsed.containsKey(t.name)) {
+                String traitName = t.name;
+                if (firstParsed.containsKey(traitName)) {
                     throw new JApiSchemaParseError(
-                            "Could not combine schemas due to duplicate trait %s".formatted(t.name));
+                            "Could not combine schemas due to duplicate trait %s".formatted(traitName));
                 }
-                _JApiSchemaUtil.applyTraitToParsedTypes(t, firstParsed);
+                _UApiSchemaUtil.applyTraitToParsedTypes(t, firstParsed);
             }
         }
 
         // Check for duplicates
-        var duplicatedJsonSchemaKeys = new HashSet<String>();
+        var duplicatedSchemaKeys = new HashSet<String>();
         for (var key : firstParsed.keySet()) {
             if (secondParsed.containsKey(key)) {
-                duplicatedJsonSchemaKeys.add(key);
+                duplicatedSchemaKeys.add(key);
             }
         }
-        if (!duplicatedJsonSchemaKeys.isEmpty()) {
-            var sortedKeys = new TreeSet<String>(duplicatedJsonSchemaKeys);
+        if (!duplicatedSchemaKeys.isEmpty()) {
+            var sortedKeys = new TreeSet<String>(duplicatedSchemaKeys);
             throw new JApiSchemaParseError(
                     "Final schema has duplicate keys: %s".formatted(sortedKeys));
         }
@@ -66,13 +68,13 @@ class _JApiSchemaUtil {
         return new UApiSchemaTuple(original, parsed);
     }
 
-    static UApiSchemaTuple parseJApiSchema(String jApiSchemaAsJson, Map<String, TypeExtension> typeExtensions) {
+    static UApiSchemaTuple parseUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var parsedTypes = new HashMap<String, UType>();
 
         var objectMapper = new ObjectMapper();
-        List<Object> originalJApiSchema;
+        List<Object> originalUApiSchema;
         try {
-            originalJApiSchema = objectMapper.readValue(jApiSchemaAsJson, new TypeReference<>() {
+            originalUApiSchema = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new JApiSchemaParseError("Document root must be an array of objects", e);
@@ -83,7 +85,7 @@ class _JApiSchemaUtil {
         var schemaKeys = new HashSet<String>();
         var duplicateKeys = new HashSet<String>();
         var index = 0;
-        for (var definition : originalJApiSchema) {
+        for (var definition : originalUApiSchema) {
             Map<String, Object> def;
             try {
                 def = (Map<String, Object>) definition;
@@ -108,7 +110,7 @@ class _JApiSchemaUtil {
         var rootTypeParameterCount = 0;
         boolean allowTraitsAndInfo = true;
         for (var schemaKey : schemaKeys) {
-            var typ = getOrParseType(schemaKey, rootTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
+            var typ = getOrParseType(schemaKey, rootTypeParameterCount, allowTraitsAndInfo, originalUApiSchema,
                     schemaKeysToIndex,
                     parsedTypes, typeExtensions);
             if (typ instanceof UTrait t) {
@@ -129,7 +131,7 @@ class _JApiSchemaUtil {
             }
         }
 
-        return new UApiSchemaTuple(originalJApiSchema, parsedTypes);
+        return new UApiSchemaTuple(originalUApiSchema, parsedTypes);
     }
 
     private static String findSchemaKey(Map<String, Object> definition) {

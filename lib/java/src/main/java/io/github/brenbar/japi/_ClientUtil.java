@@ -40,7 +40,7 @@ class _ClientUtil {
         Map<String, List<String>> selectedStructFields = request.selectedStructFields;
 
         if (!selectedStructFields.isEmpty()) {
-            headers.put("_sel", request.selectedStructFields);
+            headers.put("_sel", selectedStructFields);
         }
 
         if (finalForceSendJson) {
