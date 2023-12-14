@@ -70,6 +70,7 @@ class _UApiSchemaUtil {
 
     static UApiSchemaTuple parseUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var parsedTypes = new HashMap<String, UType>();
+        var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var objectMapper = new ObjectMapper();
         List<Object> originalUApiSchema;
@@ -77,7 +78,8 @@ class _UApiSchemaUtil {
             originalUApiSchema = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new JApiSchemaParseError("Document root must be an array of objects", e);
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure("", "MustBeArrayOfObjects", Map.of())),
+                    e);
         }
 
         var schemaKeysToIndex = new HashMap<String, Integer>();
@@ -85,14 +87,25 @@ class _UApiSchemaUtil {
         var schemaKeys = new HashSet<String>();
         var duplicateKeys = new HashSet<String>();
         var index = 0;
+        var definitionFailures = new ArrayList<SchemaParseFailure>();
         for (var definition : originalUApiSchema) {
             Map<String, Object> def;
             try {
                 def = (Map<String, Object>) definition;
             } catch (ClassCastException e) {
-                throw new JApiSchemaParseError("Document root must be an array of objects", e);
+                definitionFailures
+                        .add(new SchemaParseFailure("[%d]".formatted(index), "DefinitionMustBeAnObject", Map.of()));
+                continue;
             }
-            String schemaKey = findSchemaKey(def);
+
+            String schemaKey;
+            try {
+                schemaKey = findSchemaKey(def, index);
+            } catch (JApiSchemaParseError e) {
+                definitionFailures.addAll(e.schemaParseFailures);
+                continue;
+            }
+
             if (schemaKeys.contains(schemaKey)) {
                 duplicateKeys.add(schemaKey);
             }
@@ -102,7 +115,7 @@ class _UApiSchemaUtil {
         }
 
         if (!duplicateKeys.isEmpty()) {
-            throw new JApiSchemaParseError("Schema has duplicate keys %s".formatted(duplicateKeys));
+            parseFailures.add(new SchemaParseFailure("", "DuplicateSchemaKeys", Map.of("keys", duplicateKeys)));
         }
 
         var traits = new ArrayList<UTrait>();
@@ -119,33 +132,45 @@ class _UApiSchemaUtil {
         }
 
         for (var trait : traits) {
-            applyTraitToParsedTypes(trait, parsedTypes);
+            try {
+                applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
+            } catch (JApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
         }
 
         // Ensure all type extensions are defined
+        var undefinedTypeExtensions = new ArrayList<SchemaParseFailure>();
         for (var entry : typeExtensions.entrySet()) {
             var typeExtensionName = entry.getKey();
             var typeExtension = (UExt) parsedTypes.get(typeExtensionName);
             if (typeExtension == null) {
-                throw new JApiSchemaParseError("Undefined type extension %s".formatted(typeExtensionName));
+                parseFailures
+                        .add(new SchemaParseFailure("", "UndefinedTypeExtension", Map.of("name", typeExtensionName)));
             }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new JApiSchemaParseError(undefinedTypeExtensions);
         }
 
         return new UApiSchemaTuple(originalUApiSchema, parsedTypes);
     }
 
-    private static String findSchemaKey(Map<String, Object> definition) {
+    private static String findSchemaKey(Map<String, Object> definition, int index) {
+        var regex = "^((fn|trait|info)|((struct|enum|ext)(<[0-2]>)?))\\..*";
         for (var e : definition.keySet()) {
-            if (e.matches("^((fn|trait|info)|((struct|enum|ext)(<[0-2]>)?))\\..*")) {
+            if (e.matches(regex)) {
                 return e;
             }
         }
-        throw new JApiSchemaParseError(
-                "Invalid definition. Each definition should have one key matching the regex ^(struct|enum|fn|trait|info|ext)\\..* but was %s"
-                        .formatted(definition));
+        throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d]".formatted(index),
+                "DefinitionObjectMustHaveOneKeyMatchingRegex", Map.of("regex", regex))));
     }
 
-    static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes) {
+    static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes,
+            Map<String, Integer> schemaKeysToIndex) {
+        var parseFailures = new ArrayList<SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
             UFn f;
             try {
@@ -169,6 +194,7 @@ class _UApiSchemaUtil {
             UEnum fnResult = f.result;
             Map<String, UStruct> fnResultValues = fnResult.values;
             UFn traitFn = trait.fn;
+            String traitFnName = traitFn.name;
             UStruct traitFnArg = traitFn.arg;
             Map<String, UFieldDeclaration> traitFnArgFields = traitFnArg.fields;
             UEnum traitFnResult = traitFn.result;
@@ -184,8 +210,9 @@ class _UApiSchemaUtil {
             for (var traitArgumentField : traitFnArgFields.entrySet()) {
                 var newKey = traitArgumentField.getKey();
                 if (fnArgFields.containsKey(newKey)) {
-                    throw new JApiSchemaParseError(
-                            "Argument field already in use: %s".formatted(newKey));
+                    var index = schemaKeysToIndex.get(traitName);
+                    parseFailures.add(new SchemaParseFailure("[%d].%s.%s".formatted(index, traitFnName, newKey),
+                            "TraitArgumentFieldAlreadyInUseByFunction", Map.of("fn", fnName)));
                 }
                 fnArgFields.put(newKey, traitArgumentField.getValue());
             }
@@ -193,11 +220,16 @@ class _UApiSchemaUtil {
             for (var traitResultField : traitFnResultValues.entrySet()) {
                 var newKey = traitResultField.getKey();
                 if (fnResultValues.containsKey(newKey)) {
-                    throw new JApiSchemaParseError(
-                            "Result value already in use: %s".formatted(newKey));
+                    var index = schemaKeysToIndex.get(traitName);
+                    parseFailures.add(new SchemaParseFailure("[%d].->.%s".formatted(index, newKey),
+                            "TraitResultValueAlreadyInUseByFunction", Map.of("fn", fnName)));
                 }
                 fnResultValues.put(newKey, traitResultField.getValue());
             }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new JApiSchemaParseError(parseFailures);
         }
     }
 

@@ -928,6 +928,18 @@ class ValidationFailure {
     }
 }
 
+class SchemaParseFailure {
+    public final String path;
+    public final String reason;
+    public final Map<String, Object> data;
+
+    public SchemaParseFailure(String path, String reason, Map<String, Object> data) {
+        this.path = path;
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 class Invocation {
     final String functionName;
     final Map<String, Object> functionArgument;
