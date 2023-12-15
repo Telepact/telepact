@@ -2,6 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +26,7 @@ public class JApiSchemaParseError extends RuntimeException {
 
     private static String mapSchemaParseFailuresToJson(List<SchemaParseFailure> schemaParseFailures) {
         var pseudoJson = schemaParseFailures.stream()
-                .map(f -> Map.of("path", f.path, "reason", Map.of(f.reason, f.data))).toList();
+                .map(f -> new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data)))).toList();
         try {
             return new ObjectMapper().writeValueAsString(pseudoJson);
         } catch (JsonProcessingException e) {

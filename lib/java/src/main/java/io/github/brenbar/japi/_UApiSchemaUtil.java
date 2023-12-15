@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -79,7 +80,8 @@ class _UApiSchemaUtil {
             originalUApiSchema = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure("", "MustBeArrayOfObjects", Map.of())),
+            throw new JApiSchemaParseError(
+                    List.of(new SchemaParseFailure("(document-root)", "ArrayTypeRequired", Map.of())),
                     e);
         }
 
@@ -88,13 +90,12 @@ class _UApiSchemaUtil {
         var schemaKeys = new HashSet<String>();
         var duplicateKeys = new HashSet<String>();
         var index = 0;
-        var definitionFailures = new ArrayList<SchemaParseFailure>();
         for (var definition : originalUApiSchema) {
             Map<String, Object> def;
             try {
                 def = (Map<String, Object>) definition;
             } catch (ClassCastException e) {
-                definitionFailures
+                parseFailures
                         .add(new SchemaParseFailure("[%d]".formatted(index), "DefinitionMustBeAnObject", Map.of()));
                 continue;
             }
@@ -103,7 +104,7 @@ class _UApiSchemaUtil {
             try {
                 schemaKey = findSchemaKey(def, index);
             } catch (JApiSchemaParseError e) {
-                definitionFailures.addAll(e.schemaParseFailures);
+                parseFailures.addAll(e.schemaParseFailures);
                 continue;
             }
 
@@ -144,7 +145,6 @@ class _UApiSchemaUtil {
         }
 
         // Ensure all type extensions are defined
-        var undefinedTypeExtensions = new ArrayList<SchemaParseFailure>();
         for (var entry : typeExtensions.entrySet()) {
             var typeExtensionName = entry.getKey();
             var typeExtension = (UExt) parsedTypes.get(typeExtensionName);
@@ -155,7 +155,7 @@ class _UApiSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(undefinedTypeExtensions);
+            throw new JApiSchemaParseError(parseFailures);
         }
 
         return new UApiSchemaTuple(originalUApiSchema, parsedTypes);
@@ -168,8 +168,10 @@ class _UApiSchemaUtil {
                 return e;
             }
         }
+        var sortedKeys = new TreeSet<>(definition.keySet());
+        Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex, "keys", sortedKeys));
         throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d]".formatted(index),
-                "DefinitionObjectMustHaveOneKeyMatchingRegex", Map.of("regex", regex))));
+                "DefinitionObjectMustHaveOneKeyMatchingRegex", sortedMap)));
     }
 
     static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes,

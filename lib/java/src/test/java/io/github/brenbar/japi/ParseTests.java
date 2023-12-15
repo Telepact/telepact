@@ -23,7 +23,9 @@ public class ParseTests {
                 var json = Files.readString(
                                 FileSystems.getDefault().getPath("../../test/parse", "duplicate_keys.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class, () -> new JApiSchema(json));
-                Assertions.assertTrue(e.getMessage().contains("Schema has duplicate keys"));
+                Assertions.assertEquals(
+                                "[{\"path\":\"\",\"reason\":{\"DuplicateSchemaKeys\":{\"keys\":[\"struct.Example\"]}}}]",
+                                e.getMessage());
         }
 
         @Test
@@ -33,9 +35,9 @@ public class ParseTests {
                                                 "invalid_definition.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class,
                                 () -> new JApiSchema(json));
-                Assertions.assertTrue(
-                                e.getMessage().contains(
-                                                "Invalid definition. Each definition should have one key matching the regex"));
+                Assertions.assertEquals(
+                                "[{\"reason\":{\"DefinitionObjectMustHaveOneKeyMatchingRegex\":{\"keys\":[\"invalid.Example\"],\"regex\":\"^((fn|trait|info)|((struct|enum|ext)(<[0-2]>)?))\\\\..*\"}},\"path\":\"[0]\"}]",
+                                e.getMessage());
         }
 
         @Test
@@ -45,7 +47,9 @@ public class ParseTests {
                                                 "invalid_root_boolean.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class,
                                 () -> new JApiSchema(json));
-                Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
+                Assertions.assertEquals(
+                                "[{\"path\":\"(document-root)\",\"reason\":{\"ArrayTypeRequired\":{}}}]",
+                                e.getMessage());
         }
 
         @Test
@@ -55,7 +59,9 @@ public class ParseTests {
                                                 "invalid_root_number.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class,
                                 () -> new JApiSchema(json));
-                Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
+                Assertions.assertEquals(
+                                "[{\"path\":\"(document-root)\",\"reason\":{\"ArrayTypeRequired\":{}}}]",
+                                e.getMessage());
         }
 
         @Test
@@ -65,7 +71,9 @@ public class ParseTests {
                                                 "invalid_root_string.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class,
                                 () -> new JApiSchema(json));
-                Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
+                Assertions.assertEquals(
+                                "[{\"path\":\"(document-root)\",\"reason\":{\"ArrayTypeRequired\":{}}}]",
+                                e.getMessage());
         }
 
         @Test
@@ -75,7 +83,9 @@ public class ParseTests {
                                                 "invalid_root_object.japi.json"));
                 var e = assertThrows(JApiSchemaParseError.class,
                                 () -> new JApiSchema(json));
-                Assertions.assertEquals("Document root must be an array of objects", e.getMessage());
+                Assertions.assertEquals(
+                                "[{\"path\":\"(document-root)\",\"reason\":{\"ArrayTypeRequired\":{}}}]",
+                                e.getMessage());
         }
 
         @Test
