@@ -20,30 +20,6 @@ class _UApiSchemaUtil {
         Map<String, UType> firstParsed = first.parsed;
         Map<String, UType> secondParsed = second.parsed;
 
-        // Any traits in the first schema need to be applied to the second
-        for (var e : firstParsed.entrySet()) {
-            if (e.getValue() instanceof UTrait t) {
-                String traitName = t.name;
-                if (secondParsed.containsKey(traitName)) {
-                    throw new JApiSchemaParseError(
-                            "Could not combine schemas due to duplicate trait %s".formatted(traitName));
-                }
-                _UApiSchemaUtil.applyTraitToParsedTypes(t, secondParsed);
-            }
-        }
-
-        // And vice versa
-        for (var e : secondParsed.entrySet()) {
-            if (e.getValue() instanceof UTrait t) {
-                String traitName = t.name;
-                if (firstParsed.containsKey(traitName)) {
-                    throw new JApiSchemaParseError(
-                            "Could not combine schemas due to duplicate trait %s".formatted(traitName));
-                }
-                _UApiSchemaUtil.applyTraitToParsedTypes(t, firstParsed);
-            }
-        }
-
         // Check for duplicates
         var duplicatedSchemaKeys = new HashSet<String>();
         for (var key : firstParsed.keySet()) {
@@ -53,13 +29,38 @@ class _UApiSchemaUtil {
         }
         if (!duplicatedSchemaKeys.isEmpty()) {
             var sortedKeys = new TreeSet<String>(duplicatedSchemaKeys);
-            throw new JApiSchemaParseError(
-                    "Final schema has duplicate keys: %s".formatted(sortedKeys));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure("",
+                    "DuplicateSchemaKeys", Map.of("keys", sortedKeys))));
         }
 
         var original = new ArrayList<Object>();
         original.addAll(firstOriginal);
         original.addAll(secondOriginal);
+
+        var schemaKeysToIndex = new HashMap<String, Integer>();
+        var index = 0;
+        for (var definition : original) {
+            Map<String, Object> def = (Map<String, Object>) definition;
+
+            String schemaKey = findSchemaKey(def, index);
+
+            schemaKeysToIndex.put(schemaKey, index);
+            index += 1;
+        }
+
+        // Any traits in the first schema need to be applied to the second
+        for (var e : firstParsed.entrySet()) {
+            if (e.getValue() instanceof UTrait t) {
+                applyTraitToParsedTypes(t, secondParsed, schemaKeysToIndex);
+            }
+        }
+
+        // And vice versa
+        for (var e : secondParsed.entrySet()) {
+            if (e.getValue() instanceof UTrait t) {
+                applyTraitToParsedTypes(t, firstParsed, schemaKeysToIndex);
+            }
+        }
 
         var parsed = new HashMap<String, UType>();
         parsed.putAll(firstParsed);
@@ -123,7 +124,10 @@ class _UApiSchemaUtil {
         var rootTypeParameterCount = 0;
         boolean allowTraitsAndInfo = true;
         for (var schemaKey : schemaKeys) {
-            var typ = getOrParseType(schemaKey, rootTypeParameterCount, allowTraitsAndInfo, originalUApiSchema,
+            var thisIndex = schemaKeysToIndex.get(schemaKey);
+            var thisPath = "[%d]".formatted(index);
+            var typ = getOrParseType(thisPath, schemaKey, rootTypeParameterCount, allowTraitsAndInfo,
+                    originalUApiSchema,
                     schemaKeysToIndex,
                     parsedTypes, typeExtensions);
             if (typ instanceof UTrait t) {
@@ -494,7 +498,7 @@ class _UApiSchemaUtil {
                     "EnumKeysCannotBeMarkedAsOptional", Map.of())));
         }
 
-        var typeDeclaration = parseTypeDeclaration(typeDeclarationArray, typeParameterCount, originalJApiSchema,
+        var typeDeclaration = parseTypeDeclaration(path, typeDeclarationArray, typeParameterCount, originalJApiSchema,
                 schemaKeysToIndex,
                 parsedTypes,
                 typeExtensions);
@@ -502,63 +506,86 @@ class _UApiSchemaUtil {
         return new UFieldNameAndFieldDeclaration(fieldName, new UFieldDeclaration(typeDeclaration, optional));
     }
 
-    private static UTypeDeclaration parseTypeDeclaration(List<Object> typeDeclarationArray,
+    private static UTypeDeclaration parseTypeDeclaration(String path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions) {
         if (typeDeclarationArray.size() == 0) {
-            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                    "ArrayMustNotBeEmpty", Map.of())));
         }
+
+        var thisPath = "%s[%d]".formatted(path, 0);
 
         String rootTypeString;
         try {
             rootTypeString = (String) typeDeclarationArray.get(0);
         } catch (ClassCastException ex) {
-            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+                    "StringTypeRequired", Map.of())));
         }
 
         var regex = Pattern.compile("^(.*?)(\\?)?$");
         var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+                    "CouldNotParseType", Map.of())));
         }
 
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
 
         boolean allowTraitsAndInfo = false;
-        var type = getOrParseType(typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
+        var type = getOrParseType(thisPath, typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions);
 
         if (type instanceof UGeneric && nullable) {
-            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+                    "CannotMarkGenericAsNullable", Map.of())));
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                    "IncorrectNumberOfTypeParameters", Map.of())));
         }
 
+        var parseFailures = new ArrayList<SchemaParseFailure>();
         var typeParameters = new ArrayList<UTypeDeclaration>();
         var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
+        var index = 0;
         for (var e : givenTypeParameters) {
+            var loopPath = "%s[%d]".formatted(path, index);
+            index += 1;
             List<Object> l;
             try {
                 l = (List<Object>) e;
             } catch (ClassCastException ex) {
-                throw new JApiSchemaParseError("Invalid type declaration: %s".formatted(typeDeclarationArray));
+                parseFailures.add(new SchemaParseFailure("%s[%d]".formatted(path, index),
+                        "ArrayTypeRequired", Map.of()));
+                continue;
             }
-            var typeParameterTypeDeclaration = parseTypeDeclaration(l, thisTypeParameterCount, originalJApiSchema,
-                    schemaKeysToIndex, parsedTypes, typeExtensions);
+
+            UTypeDeclaration typeParameterTypeDeclaration;
+            try {
+                typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
+                        originalJApiSchema,
+                        schemaKeysToIndex, parsedTypes, typeExtensions);
+            } catch (JApiSchemaParseError e2) {
+                parseFailures.addAll(e2.schemaParseFailures);
+                continue;
+            }
+
             typeParameters.add(typeParameterTypeDeclaration);
         }
 
         return new UTypeDeclaration(type, nullable, typeParameters);
     }
 
-    private static UType getOrParseType(String typeName, int thisTypeParameterCount, boolean allowTraitsAndInfo,
+    private static UType getOrParseType(String path, String typeName, int thisTypeParameterCount,
+            boolean allowTraitsAndInfo,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions) {
@@ -571,7 +598,8 @@ class _UApiSchemaUtil {
                 "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(enum|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                    "InvalidType", Map.of("type", typeName))));
         }
 
         var standardTypeName = matcher.group(1);
@@ -589,13 +617,13 @@ class _UApiSchemaUtil {
                     if (genericParameterIndexString != null) {
                         var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
                         if (genericParameterIndex >= thisTypeParameterCount) {
-                            throw new JApiSchemaParseError(
-                                    "Generic index (%d) too high for this type: %s".formatted(genericParameterIndex,
-                                            typeName));
+                            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                                    "MaximumTypeParametersExceeded", Map.of())));
                         }
                         yield new UGeneric(genericParameterIndex);
                     } else {
-                        throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
+                        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                                "InvalidGenericType", Map.of("type", standardTypeName))));
                     }
                 }
             };
@@ -605,19 +633,15 @@ class _UApiSchemaUtil {
         if (customTypeName != null) {
             var index = schemaKeysToIndex.get(customTypeName);
             if (index == null) {
-                throw new JApiSchemaParseError("Unrecognized type: %s".formatted(typeName));
+                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                        "UndefinedType", Map.of("type", customTypeName))));
             }
             var definition = (Map<String, Object>) originalJApiSchema.get(index);
 
             var typeParameterCountString = matcher.group(7);
             int typeParameterCount = 0;
             if (typeParameterCountString != null) {
-                try {
-                    typeParameterCount = Integer.parseInt(typeParameterCountString);
-                } catch (NumberFormatException e) {
-                    throw new JApiSchemaParseError(
-                            "Type parameter count must match regex (<([1-3])>)?".formatted(standardTypeName));
-                }
+                typeParameterCount = Integer.parseInt(typeParameterCountString);
             }
 
             UType type;
@@ -640,12 +664,13 @@ class _UApiSchemaUtil {
             } else if (customTypeName.startsWith("ext")) {
                 var typeExtension = typeExtensions.get(customTypeName);
                 if (typeExtension == null) {
-                    throw new JApiSchemaParseError(
-                            "Missing type extension implementation %s".formatted(customTypeName));
+                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                            "TypeExtensionImplementationMissing", Map.of("type", customTypeName))));
                 }
                 type = new UExt(customTypeName, typeExtension, typeParameterCount);
             } else {
-                throw new JApiSchemaParseError("Unrecognized type: %s".formatted(customTypeName));
+                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                        "InvalidType", Map.of("type", customTypeName))));
             }
 
             parsedTypes.put(customTypeName, type);
@@ -653,6 +678,7 @@ class _UApiSchemaUtil {
             return type;
         }
 
-        throw new JApiSchemaParseError("Invalid type: %s".formatted(typeName));
+        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                "InvalidType", Map.of("type", typeName))));
     }
 }
