@@ -271,7 +271,7 @@ class _UApiSchemaUtil {
         } else {
             var index = schemaKeysToIndex.get(schemaKey);
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d].%s".formatted(index, schemaKey),
-                    "InvalidFunctionTarget", Map.of())));
+                    "InvalidTrait", Map.of())));
         }
 
         var traitFunction = parseFunctionType(def, traitFunctionKey, originalJApiSchema, schemaKeysToIndex, parsedTypes,
