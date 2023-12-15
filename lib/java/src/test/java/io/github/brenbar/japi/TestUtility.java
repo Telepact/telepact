@@ -54,7 +54,7 @@ public class TestUtility {
 
     public static void test(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test/example.japi.json"));
         var jApi = new JApiSchema(json);
         var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
