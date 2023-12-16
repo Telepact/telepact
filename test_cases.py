@@ -19,11 +19,15 @@ class TestCases(TestCase):
             modName = '{}.startTestServer'.format(lib.replace('/', '.'))
             mod = importlib.import_module(modName)
             os.chdir(lib)
-            process = mod.run('../../test/example.japi.json')
-            for k, v in cases.items():
-                with self.subTest(v):
-                    print('testing')
-                    request = v[0]
-                    expectedResponse = v[1]
-                    actualResponse = []
-                    self.assertEqual(expectedResponse, actualResponse)
+            try:
+                process = mod.run('../../test/example.japi.json')
+                for k, v in cases.items():
+                    with self.subTest(v):
+                        print('testing')
+                        request = v[0]
+                        expectedResponse = v[1]
+                        actualResponse = []
+                        self.assertEqual(expectedResponse, actualResponse)
+            finally:
+                process.kill()
+            os.chdir('../..')
