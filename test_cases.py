@@ -29,5 +29,5 @@ class TestCases(TestCase):
                         actualResponse = []
                         self.assertEqual(expectedResponse, actualResponse)
             finally:
-                process.kill()
+                process.terminate()
             os.chdir('../..')
