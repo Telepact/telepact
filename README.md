@@ -40,18 +40,22 @@ $ python japi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x":
 
 # Motivation
 
-| Capability                                                 | RESTful | gRPC | GraphQL | jAPI |
-| ---------------------------------------------------------- | ------- | ---- | ------- | ---- |
-| Transport agnosticism (can use something other than HTTP)  | ❌      | ❌   | ✅      | ✅   |
-| API design cleanly separated from transport                | ❌      | ✅   | ✅      | ✅   |
-| Maximally expressive API design options                    | ✅      | ❌   | ❌      | ✅   |
-| Low development burden for servers                         | ✅      | ✅   | ❌      | ✅   |
-| No required libraries for clients                          | ✅      | ❌   | ❌      | ✅   |
-| Type-safe generated code                                   | 🤔      | ✅   | ✅      | ✅   |
-| Developer-friendly data serialization protocol with JSON   | ✅      | ❌   | ✅      | ✅   |
-| Compact and efficient data serialization protocol          | ❌      | ✅   | ❌      | ✅   |
-| Built-in client-driven selection of serialization protocol | ❌      | ❌   | ❌      | ✅   |
-| Built-in client-driven dynamic response shaping            | ❌      | ❌   | ✅      | ✅   |
+| Capability                                                | OpenAPI | gRPC | GraphQL | jAPI |
+| --------------------------------------------------------- | ------- | ---- | ------- | ---- |
+| Transport agnosticism (can use something other than HTTP) | ❌      | ❌   | ✅      | ✅   |
+| No transport details leaked into API                      | ❌      | ✅   | ✅      | ✅   |
+| No ad-hoc serialization patterns                          | ❌      | ✅   | ✅      | ✅   |
+| Support for dictionary data structures                    | ✅      | ❌   | ❌      | ✅   |
+| Low development burden for servers                        | ✅      | ✅   | ❌      | ✅   |
+| No ad-hoc libraries for clients                           | ✅      | ❌   | ❌      | ✅   |
+| Type-safe generated code                                  | 🤔      | ✅   | ✅      | ✅   |
+| Developer-friendly data serialization protocol with JSON  | ✅      | ❌   | 🤔      | ✅   |
+| Compact and efficient data serialization protocol         | ❌      | ✅   | ❌      | ✅   |
+| Built-in dynamic response shaping                         | ❌      | ❌   | ✅      | ✅   |
+| No ABI                                                    | ✅      | ❌   | ✅      | ✅   |
+| Built-in API documentation distribution                   | ❌      | ❌   | ❌      | ✅   |
+| Generic Types                                             | ❌      | ❌   | ❌      | ✅   |
+| Built-in mocking for tests                                | ❌      | ❌   | ❌      | ✅   |
 
 ## Why not RESTful APIs?
 
