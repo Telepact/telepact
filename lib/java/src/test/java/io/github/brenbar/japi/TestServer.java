@@ -20,12 +20,10 @@ public class TestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var socketAddress = UnixDomainSocketAddress.of("./testServer.socket");
-        var serverSocketChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
-        serverSocketChannel.bind(socketAddress);
 
         try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
             serverChannel.bind(socketAddress);
-            try (var clientChannel = serverSocketChannel.accept()) {
+            try (var clientChannel = serverChannel.accept()) {
 
                 var path = args[0];
                 var json = Files.readString(FileSystems.getDefault().getPath(path));
