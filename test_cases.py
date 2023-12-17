@@ -7,6 +7,7 @@ import os
 import time
 import subprocess
 import json
+import pytest
 
 os.listdir
 
@@ -69,6 +70,9 @@ def run_case(runner, socket_path, e):
 
 
 class TestCases(TestCase):
+
+    # need to figure this out
+    @pytest.mark.parametrize()
     def test_case(self):
         for lib in libs:
             modName = '{}.startTestServer'.format(lib.replace('/', '.'))
