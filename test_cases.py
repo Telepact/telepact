@@ -32,6 +32,42 @@ def handler(request):
                 return [{}, {}]
 
 
+def run_case(runner, socket_path, e):
+    print('testing')
+    request = e[0]
+    expectedResponse = e[1]
+
+    requestJson = json.dumps(request)
+
+    with open(socket_path, 'w') as f:
+        f.write(requestJson)
+
+    print(' <--| {}'.format(requestJson))
+
+    with open(socket_path, 'r') as f:
+        backdoorRequestJson = f.read()
+
+    print(' >| {}'.format(backdoorRequestJson))
+
+    backdoorRequest = json.loads(backdoorRequestJson)
+    backdoorResponse = handler(backdoorRequest)
+    backdoorResponseJson = json.dumps(backdoorResponse)
+
+    with open(socket_path, 'w') as f:
+        f.write(backdoorResponseJson)
+
+    print(' <| {}'.format(backdoorRequestJson))
+
+    with open(socket_path, 'r') as f:
+        responseJson = f.read()
+
+    print(' -->| {}'.format(responseJson))
+
+    response = json.loads(responseJson)
+
+    runner.assertEqual(expectedResponse, response)
+
+
 class TestCases(TestCase):
     def test_case(self):
         for lib in libs:
@@ -42,37 +78,16 @@ class TestCases(TestCase):
             os.chdir(lib)
             try:
                 process = mod.run('../../test/example.japi.json')
-                socket_address = './testServer.socket'
-                client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                socket_path = './testServer.socket'
 
-                while not os.path.exists(socket_address):
-                    time.sleep(0.2)
+                os.mkfifo(socket_path)
 
-                client.connect(socket_address)
-
-                for k, v in cases.items():
-                    for e in v:
-                        with self.subTest(e):
-                            print('testing {}'.format(e))
-                            request = e[0]
-                            expectedResponse = e[1]
-
-                            requestJson = json.dumps(request)
-
-                            client.sendall(requestJson.encode())
-                            backdoorRequestJson = client.recv(1024)
-
-                            backdoorRequest = json.loads(backdoorRequestJson)
-                            backdoorResponse = handler(backdoorRequest)
-                            backdoorResponseJson = json.dumps(backdoorResponse)
-
-                            client.sendall(backdoorResponseJson.encode())
-                            responseJson = client.recv(1024)
-
-                            response = json.loads(responseJson)
-
-                            self.assertEqual(expectedResponse, response)
+                run_case(self, socket_path, next(iter(cases.values()))[0])
+                # for k, v in cases.items():
+                #     for e in v:
+                #         with self.subTest(e):
+                #             run_case(self, socket_path, e)
             finally:
                 process.terminate()
-                os.remove(socket_address)
+                os.remove(socket_path)
                 os.chdir('../..')

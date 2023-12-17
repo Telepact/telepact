@@ -1,15 +1,13 @@
 package io.github.brenbar.japi;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.StandardProtocolFamily;
-import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,69 +17,60 @@ import io.github.brenbar.japi.Server.Options;
 public class TestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var socketAddress = UnixDomainSocketAddress.of("./testServer.socket");
-        Files.deleteIfExists(socketAddress.getPath());
+        var socketPath = "./testServer.socket";
 
-        try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
-            serverChannel.bind(socketAddress);
-            try (var clientChannel = serverChannel.accept()) {
+        var path = args[0];
+        var json = Files.readString(FileSystems.getDefault().getPath(path));
+        var jApi = new JApiSchema(json);
+        var objectMapper = new ObjectMapper();
 
-                var path = args[0];
-                var json = Files.readString(FileSystems.getDefault().getPath(path));
-                var jApi = new JApiSchema(json);
-                var objectMapper = new ObjectMapper();
+        Function<Message, Message> handler = (requestMessage) -> {
+            try {
+                var requestHeaders = requestMessage.header;
+                var requestBody = requestMessage.body;
+                var requestPseudoJson = List.of(requestHeaders, requestBody);
+                var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                Function<Message, Message> handler = (requestMessage) -> {
-                    try {
-                        var requestHeaders = requestMessage.header;
-                        var requestBody = requestMessage.body;
-                        var requestPseudoJson = List.of(requestHeaders, requestBody);
-                        var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
+                Files.write(Path.of(socketPath), requestBytes);
 
-                        System.out.println("> %s".formatted(new String(requestBytes)));
-                        var requestBuf = ByteBuffer.allocate(requestBytes.length);
-                        requestBuf.put(requestBytes);
-                        clientChannel.write(requestBuf);
+                System.out.println("|> %s".formatted(new String(requestBytes)));
 
-                        var responseBuf = ByteBuffer.allocate(1024);
-                        while (clientChannel.read(responseBuf) == 0)
-                            ;
-
-                        var responseBytes = responseBuf.array();
-
-                        System.out.println("< %s".formatted(new String(responseBytes)));
-
-                        var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
-                        var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
-                        var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
-                        return new Message(responseHeaders, responseBody);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                };
-
-                var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
-
-                while (true) {
-                    var readBuf = ByteBuffer.allocate(1024);
-                    var bytesRead = clientChannel.read(readBuf);
-                    if (bytesRead == 0) {
-                        Thread.sleep(1);
-                    }
-                    readBuf.flip();
-                    var requestBytes = readBuf.array();
-
-                    System.out.println("<-- %s".formatted(new String(requestBytes)));
-                    var responseBytes = server.process(requestBytes);
-                    System.out.println("--> %s".formatted(new String(responseBytes)));
-
-                    var responseBuf = ByteBuffer.allocate(responseBytes.length);
-                    responseBuf.put(responseBytes);
-                    clientChannel.write(responseBuf);
+                var in = new FileInputStream(socketPath);
+                var buf = ByteBuffer.allocate(1024);
+                int b = 0;
+                while ((b = in.read()) != -1) {
+                    buf.put((byte) b);
                 }
+                var responseBytes = buf.array();
+
+                System.out.println("|< %s".formatted(new String(responseBytes)));
+
+                var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
+                var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
+                var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
+                return new Message(responseHeaders, responseBody);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        } finally {
-            Files.deleteIfExists(socketAddress.getPath());
+        };
+
+        var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
+
+        while (true) {
+
+            var in = new FileInputStream(socketPath);
+            var buf = ByteBuffer.allocate(1024);
+            int b = 0;
+            while ((b = in.read()) != -1) {
+                buf.put((byte) b);
+            }
+            var requestBytes = buf.array();
+
+            System.out.println("|<-- %s".formatted(new String(requestBytes)));
+            var responseBytes = server.process(requestBytes);
+            System.out.println("|--> %s".formatted(new String(responseBytes)));
+
+            Files.write(Path.of(socketPath), responseBytes);
         }
     }
 }
