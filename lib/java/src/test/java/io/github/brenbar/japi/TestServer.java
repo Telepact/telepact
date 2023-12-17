@@ -20,6 +20,7 @@ public class TestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var socketAddress = UnixDomainSocketAddress.of("./testServer.socket");
+        Files.deleteIfExists(socketAddress.getPath());
 
         try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
             serverChannel.bind(socketAddress);
@@ -37,6 +38,7 @@ public class TestServer {
                         var requestPseudoJson = List.of(requestHeaders, requestBody);
                         var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
+                        System.out.println("> %s".formatted(new String(requestBytes)));
                         var requestBuf = ByteBuffer.allocate(requestBytes.length);
                         requestBuf.put(requestBytes);
                         clientChannel.write(requestBuf);
@@ -46,6 +48,9 @@ public class TestServer {
                             ;
 
                         var responseBytes = responseBuf.array();
+
+                        System.out.println("< %s".formatted(new String(responseBytes)));
+
                         var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
                         var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
                         var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
@@ -66,7 +71,9 @@ public class TestServer {
                     readBuf.flip();
                     var requestBytes = readBuf.array();
 
+                    System.out.println("<-- %s".formatted(new String(requestBytes)));
                     var responseBytes = server.process(requestBytes);
+                    System.out.println("--> %s".formatted(new String(responseBytes)));
 
                     var responseBuf = ByteBuffer.allocate(responseBytes.length);
                     responseBuf.put(responseBytes);
