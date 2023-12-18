@@ -1,7 +1,9 @@
 package io.github.brenbar.japi;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -19,6 +21,8 @@ public class TestServer {
     public static void main(String[] args) throws IOException, InterruptedException {
         var fifoPath = "./frontdoor.fifo";
         var fifoBackdoorPath = "./backdoor.fifo";
+        var fifoRetPath = "./frontdoor_ret.fifo";
+        var fifoRetBackdoorPath = "./backdoor_ret.fifo";
 
         var path = args[0];
         var json = Files.readString(FileSystems.getDefault().getPath(path));
@@ -32,14 +36,14 @@ public class TestServer {
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                Files.write(Path.of(fifoBackdoorPath), requestBytes);
-
                 System.out.println("|>    %s".formatted(new String(requestBytes)));
 
-                var in = new FileInputStream(fifoBackdoorPath);
-                var buf = ByteBuffer.allocate(1024);
+                Files.write(Path.of(fifoRetBackdoorPath), requestBytes);
+
+                var in = new BufferedReader(new InputStreamReader(new FileInputStream(fifoBackdoorPath)));
+                var buf = ByteBuffer.allocate(2048);
                 int b = 0;
-                while ((b = in.read()) != -1) {
+                while ((b = in.read()) >= 0) {
                     buf.put((byte) b);
                 }
                 var responseBytes = buf.array();
@@ -59,10 +63,10 @@ public class TestServer {
 
         while (true) {
 
-            var in = new FileInputStream(fifoPath);
+            var in = new BufferedReader(new InputStreamReader(new FileInputStream(fifoPath)));
             var buf = ByteBuffer.allocate(1024);
             int b = 0;
-            while ((b = in.read()) != -1) {
+            while ((b = in.read()) >= 0) {
                 buf.put((byte) b);
             }
             var requestBytes = buf.array();
@@ -71,7 +75,7 @@ public class TestServer {
             var responseBytes = server.process(requestBytes);
             System.out.println("|-->  %s".formatted(new String(responseBytes)));
 
-            Files.write(Path.of(fifoPath), responseBytes);
+            Files.write(Path.of(fifoRetPath), responseBytes);
         }
     }
 }

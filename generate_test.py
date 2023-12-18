@@ -3,6 +3,7 @@ import os
 import json
 import pathlib
 import signal
+import traceback
 
 should_abort = False
 
@@ -23,31 +24,40 @@ def handler(request):
             else:
                 return [{}, {}]
             
-def backdoor_handler(fifo_backdoor_path):
+def backdoor_handler(fifo_backdoor_path, fifo_ret_backdoor_path):
     while True:
-        with open(fifo_backdoor_path, 'r') as f:
-            backdoor_request_json = f.read()    
+        try:
+            with open(fifo_ret_backdoor_path, 'r') as f:
+                backdoor_request_json = f.read()    
 
-        print(' >|   {}'.format(backdoor_request_json))
+            print(' >|   {}'.format(backdoor_request_json))
 
-        backdoor_request = json.loads(backdoor_request_json)
-        backdoor_response = handler(backdoor_request)
-        backdoor_response_json = json.dumps(backdoor_response)
+            try:
+                backdoor_request = json.loads(backdoor_request_json)
+                backdoor_response = handler(backdoor_request)
+            except Exception:
+                print(traceback.format_exc())
+                backdoor_response = "Boom!"
 
-        with open(fifo_backdoor_path, 'w') as f:
-            f.write(backdoor_response_json)
+            backdoor_response_json = json.dumps(backdoor_response)
 
-        print(' <|   {}'.format(backdoor_request_json))
+            print(' <|   {}'.format(backdoor_response_json))
+
+            with open(fifo_backdoor_path, 'w') as f:
+                f.write(backdoor_response_json)
+
+        except Exception:
+            print(traceback.format_exc())
 
 
 def signal_handler(signum, frame):
-    raise Exception("Broken")
+    raise Exception("Timeout")
 
 
 def verify_case(runner, request, expected_response, path):
     global should_abort
     if should_abort:
-        runner.skipTest('Broken')
+        runner.skipTest('Skipped')
     
     signal.signal(signal.SIGALRM, signal_handler)
     signal.alarm(5)
@@ -55,15 +65,16 @@ def verify_case(runner, request, expected_response, path):
     try:
 
         fifo_path = '{}/frontdoor.fifo'.format(path)
+        fifo_ret_path = '{}/frontdoor_ret.fifo'.format(path)
 
         request_json = json.dumps(request)
+
+        print(' <--| {}'.format(request_json))
 
         with open(fifo_path, 'w') as f:
             f.write(request_json)
         
-        print(' <--| {}'.format(request_json))
-
-        with open(fifo_path, 'r') as f:
+        with open(fifo_ret_path, 'r') as f:
             response_json = f.read()
 
         print(' -->| {}'.format(response_json))
@@ -72,9 +83,11 @@ def verify_case(runner, request, expected_response, path):
 
         runner.assertEqual(expected_response, response)
     except Exception:
-        print('problem')
+        traceback.print_exc()
         should_abort = True
-        raise Exception('Boom')
+        raise
+    finally:
+        signal.alarm(0)
 
 
 def generate():
@@ -100,6 +113,8 @@ import multiprocessing
 path = '{}'
 fifo_path = '{}/frontdoor.fifo'
 fifo_backdoor_path = '{}/backdoor.fifo'
+fifo_ret_path = '{}/frontdoor_ret.fifo'
+fifo_ret_backdoor_path = '{}/backdoor_ret.fifo'
 
 class TestCases(unittest.TestCase):
                               
@@ -109,8 +124,12 @@ class TestCases(unittest.TestCase):
             os.mkfifo(fifo_path)
         if not os.path.exists(fifo_backdoor_path):
             os.mkfifo(fifo_backdoor_path)
+        if not os.path.exists(fifo_ret_path):
+            os.mkfifo(fifo_ret_path)
+        if not os.path.exists(fifo_ret_backdoor_path):
+            os.mkfifo(fifo_ret_backdoor_path)
         
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(fifo_backdoor_path, ))
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(fifo_backdoor_path, fifo_ret_backdoor_path, ))
         cls.process.start()                                            
         
         cls.server = server.start('../../test/example.japi.json')
@@ -121,9 +140,11 @@ class TestCases(unittest.TestCase):
         cls.server.terminate()
         os.remove(fifo_path)                              
         os.remove(fifo_backdoor_path)
+        os.remove(fifo_ret_path)                              
+        os.remove(fifo_ret_backdoor_path)
                               
                         
-    '''.format(lib_path.replace('/', '.'), lib_path, lib_path, lib_path))
+    '''.format(lib_path.replace('/', '.'), lib_path, lib_path, lib_path, lib_path, lib_path))
 
         for name, cases in all_cases.items():
 
