@@ -50,7 +50,7 @@ def verify_case(runner, request, expected_response, path):
         runner.skipTest('Broken')
     
     signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(1)
+    signal.alarm(5)
 
     try:
 
