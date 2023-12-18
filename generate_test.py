@@ -2,6 +2,9 @@ from test.cases import cases as all_cases
 import os
 import json
 import pathlib
+import signal
+
+should_abort = False
 
 def handler(request):
     header = request[0]
@@ -37,24 +40,41 @@ def backdoor_handler(fifo_backdoor_path):
         print(' <|   {}'.format(backdoor_request_json))
 
 
+def signal_handler(signum, frame):
+    raise Exception("Broken")
+
+
 def verify_case(runner, request, expected_response, path):
-    fifo_path = '{}/frontdoor.fifo'.format(path)
-
-    request_json = json.dumps(request)
-
-    with open(fifo_path, 'w') as f:
-        f.write(request_json)
+    global should_abort
+    if should_abort:
+        runner.skipTest('Broken')
     
-    print(' <--| {}'.format(request_json))
+    signal.signal(signal.SIGALRM, signal_handler)
+    signal.alarm(1)
 
-    with open(fifo_path, 'r') as f:
-        response_json = f.read()
+    try:
 
-    print(' -->| {}'.format(response_json))
+        fifo_path = '{}/frontdoor.fifo'.format(path)
 
-    response = json.loads(response_json)
+        request_json = json.dumps(request)
 
-    runner.assertEqual(expected_response, response)
+        with open(fifo_path, 'w') as f:
+            f.write(request_json)
+        
+        print(' <--| {}'.format(request_json))
+
+        with open(fifo_path, 'r') as f:
+            response_json = f.read()
+
+        print(' -->| {}'.format(response_json))
+
+        response = json.loads(response_json)
+
+        runner.assertEqual(expected_response, response)
+    except Exception:
+        print('problem')
+        should_abort = True
+        raise Exception('Boom')
 
 
 def generate():
