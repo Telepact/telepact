@@ -17,7 +17,7 @@ import io.github.brenbar.japi.Server.Options;
 public class TestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var socketPath = "./testServer.socket";
+        var socketPath = "./server.fifo";
 
         var path = args[0];
         var json = Files.readString(FileSystems.getDefault().getPath(path));

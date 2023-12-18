@@ -11,8 +11,11 @@ import pytest
 
 os.listdir
 
-libs = ['lib/{}'.format(f) for f in os.listdir('lib')
-        if os.path.isdir('lib/{}'.format(f))]
+lib_paths = ['lib/{}'.format(f) for f in os.listdir('lib')
+             if os.path.isdir('lib/{}'.format(f))]
+
+libs = [(lib_path, '{}/server.fifo'.format(lib_path),
+         '{}.startTestServer'.format(lib_path.replace('/', '.'))) for lib_path in lib_paths]
 
 
 def handler(request):
@@ -33,19 +36,19 @@ def handler(request):
                 return [{}, {}]
 
 
-def run_case(runner, socket_path, e):
+def run_case(runner, fifo_path, data):
     print('testing')
-    request = e[0]
-    expectedResponse = e[1]
+    request = data[0]
+    expectedResponse = data[1]
 
     requestJson = json.dumps(request)
 
-    with open(socket_path, 'w') as f:
+    with open(fifo_path, 'w') as f:
         f.write(requestJson)
 
     print(' <--| {}'.format(requestJson))
 
-    with open(socket_path, 'r') as f:
+    with open(fifo_path, 'r') as f:
         backdoorRequestJson = f.read()
 
     print(' >| {}'.format(backdoorRequestJson))
@@ -54,12 +57,12 @@ def run_case(runner, socket_path, e):
     backdoorResponse = handler(backdoorRequest)
     backdoorResponseJson = json.dumps(backdoorResponse)
 
-    with open(socket_path, 'w') as f:
+    with open(fifo_path, 'w') as f:
         f.write(backdoorResponseJson)
 
     print(' <| {}'.format(backdoorRequestJson))
 
-    with open(socket_path, 'r') as f:
+    with open(fifo_path, 'r') as f:
         responseJson = f.read()
 
     print(' -->| {}'.format(responseJson))
@@ -69,29 +72,37 @@ def run_case(runner, socket_path, e):
     runner.assertEqual(expectedResponse, response)
 
 
+def get_cases():
+    new_cases = []
+    for lib_path, fifo_path, mod_name in libs:
+        for k, v in cases.items():
+            for data in v:
+                new_cases.append((fifo_path, data))
+    return new_cases
+
+
 class TestCases(TestCase):
 
+    test_servers = []
+
+    def setUp(self):
+        for lib_path, fifo_path, mod_name in libs:
+
+            mod = importlib.import_module(mod_name)
+
+            os.mkfifo(fifo_path)
+
+            print('Starting server in {}'.format(lib_path))
+            process = mod.run('../../test/example.japi.json')
+            self.test_servers.append((fifo_path, process))
+
+    def tearDown(self):
+        for fifo_path, process in self.test_servers:
+            os.remove(fifo_path)
+            process.terminate()
+
     # need to figure this out
-    @pytest.mark.parametrize()
-    def test_case(self):
-        for lib in libs:
-            modName = '{}.startTestServer'.format(lib.replace('/', '.'))
-            mod = importlib.import_module(modName)
-            print('______________________________ HELLO __________________________')
-            print(lib)
-            os.chdir(lib)
-            try:
-                process = mod.run('../../test/example.japi.json')
-                socket_path = './testServer.socket'
 
-                os.mkfifo(socket_path)
-
-                run_case(self, socket_path, next(iter(cases.values()))[0])
-                # for k, v in cases.items():
-                #     for e in v:
-                #         with self.subTest(e):
-                #             run_case(self, socket_path, e)
-            finally:
-                process.terminate()
-                os.remove(socket_path)
-                os.chdir('../..')
+    @pytest.mark.parametrize('fifo_path,data', get_cases())
+    def test_case(self, fifo_path, data):
+        run_case(self, fifo_path, data)
