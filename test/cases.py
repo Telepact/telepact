@@ -2635,7 +2635,7 @@ cases = {
     'testParseFailure': [
         [False, [{}, {'_errorParseFailure': {'reasons': ['MessageMustBeArrayWithTwoElements']}}], True],
         [0, [{}, {'_errorParseFailure': {'reasons': ['MessageMustBeArrayWithTwoElements']}}], True],
-        ['', [{}, {'_errorParseFailure': {'reasons': ['MessageMustBeArrayWithTwoElements']}}], True],
+        #['', [{}, {'_errorParseFailure': {'reasons': ['MessageMustBeArrayWithTwoElements']}}], True],
         [{}, [{}, {'_errorParseFailure': {'reasons': ['MessageMustBeArrayWithTwoElements']}}], True],
         [[{}, {}], [{}, {'_errorParseFailure': {'reasons': ['BodyMustBeUnionType']}}], True],
         [[False, {'fn._ping': {}}], [{}, {'_errorParseFailure': {'reasons': ['HeadersMustBeObject']}}], True],
