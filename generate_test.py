@@ -2,7 +2,6 @@ from test.cases import cases as all_cases
 import os
 import json
 import pathlib
-import multiprocessing
 
 def handler(request):
     header = request[0]
@@ -21,7 +20,7 @@ def handler(request):
             else:
                 return [{}, {}]
             
-def handle(fifo_backdoor_path):
+def backdoor_handler(fifo_backdoor_path):
     while True:
         with open(fifo_backdoor_path, 'r') as f:
             backdoor_request_json = f.read()    
@@ -35,35 +34,27 @@ def handle(fifo_backdoor_path):
         with open(fifo_backdoor_path, 'w') as f:
             f.write(backdoor_response_json)
 
-        print(' <|   {}'.format(backdoor_request_json))    
+        print(' <|   {}'.format(backdoor_request_json))
 
 
 def verify_case(runner, request, expected_response, path):
     fifo_path = '{}/frontdoor.fifo'.format(path)
-    fifo_backdoor_path = '{}/backdoor.fifo'.format(path)
 
-    process = multiprocessing.Process(target=handle, args=(fifo_backdoor_path, ))
-    process.start()
+    request_json = json.dumps(request)
 
-    try:
+    with open(fifo_path, 'w') as f:
+        f.write(request_json)
+    
+    print(' <--| {}'.format(request_json))
 
-        request_json = json.dumps(request)
+    with open(fifo_path, 'r') as f:
+        response_json = f.read()
 
-        with open(fifo_path, 'w') as f:
-            f.write(request_json)
-        
-        print(' <--| {}'.format(request_json))
+    print(' -->| {}'.format(response_json))
 
-        with open(fifo_path, 'r') as f:
-            response_json = f.read()
+    response = json.loads(response_json)
 
-        print(' -->| {}'.format(response_json))
-
-        response = json.loads(response_json)
-
-        runner.assertEqual(expected_response, response)
-    finally:
-        process.terminate()
+    runner.assertEqual(expected_response, response)
 
 
 def generate():
@@ -79,11 +70,12 @@ def generate():
         generated_tests = open('test/{}/test_generated.py'.format(lib_path), 'w')
 
         generated_tests.write('''
-from generate_test import verify_case
+from generate_test import verify_case, backdoor_handler
 import os
 from {} import server
 import json
 import unittest
+import multiprocessing
                             
 path = '{}'
 fifo_path = '{}/frontdoor.fifo'
@@ -96,15 +88,20 @@ class TestCases(unittest.TestCase):
         if not os.path.exists(fifo_path):
             os.mkfifo(fifo_path)
         if not os.path.exists(fifo_backdoor_path):
-            os.mkfifo(fifo_backdoor_path)                              
+            os.mkfifo(fifo_backdoor_path)
+        
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(fifo_backdoor_path, ))
+        cls.process.start()                                            
         
         cls.server = server.start('../../test/example.japi.json')
     
     @classmethod
     def tearDownClass(cls):
+        cls.process.terminate()
         cls.server.terminate()
         os.remove(fifo_path)                              
-        os.remove(fifo_backdoor_path)  
+        os.remove(fifo_backdoor_path)
+                              
                         
     '''.format(lib_path.replace('/', '.'), lib_path, lib_path, lib_path))
 
