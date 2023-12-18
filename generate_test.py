@@ -101,7 +101,7 @@ class TestCases(unittest.TestCase):
         cls.server = server.start('../../test/example.japi.json')
     
     @classmethod
-    def tearDown(cls):
+    def tearDownClass(cls):
         cls.server.terminate()
         os.remove(fifo_path)                              
         os.remove(fifo_backdoor_path)  
