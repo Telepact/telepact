@@ -17,7 +17,8 @@ import io.github.brenbar.japi.Server.Options;
 public class TestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var socketPath = "./transport.fifo";
+        var fifoPath = "./frontdoor.fifo";
+        var fifoBackdoorPath = "./backdoor.fifo";
 
         var path = args[0];
         var json = Files.readString(FileSystems.getDefault().getPath(path));
@@ -31,11 +32,11 @@ public class TestServer {
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                Files.write(Path.of(socketPath), requestBytes);
+                Files.write(Path.of(fifoBackdoorPath), requestBytes);
 
-                System.out.println("|> %s".formatted(new String(requestBytes)));
+                System.out.println("|>    %s".formatted(new String(requestBytes)));
 
-                var in = new FileInputStream(socketPath);
+                var in = new FileInputStream(fifoBackdoorPath);
                 var buf = ByteBuffer.allocate(1024);
                 int b = 0;
                 while ((b = in.read()) != -1) {
@@ -43,7 +44,7 @@ public class TestServer {
                 }
                 var responseBytes = buf.array();
 
-                System.out.println("|< %s".formatted(new String(responseBytes)));
+                System.out.println("|<    %s".formatted(new String(responseBytes)));
 
                 var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
                 var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
@@ -58,7 +59,7 @@ public class TestServer {
 
         while (true) {
 
-            var in = new FileInputStream(socketPath);
+            var in = new FileInputStream(fifoPath);
             var buf = ByteBuffer.allocate(1024);
             int b = 0;
             while ((b = in.read()) != -1) {
@@ -66,11 +67,11 @@ public class TestServer {
             }
             var requestBytes = buf.array();
 
-            System.out.println("|<-- %s".formatted(new String(requestBytes)));
+            System.out.println("|<--  %s".formatted(new String(requestBytes)));
             var responseBytes = server.process(requestBytes);
-            System.out.println("|--> %s".formatted(new String(responseBytes)));
+            System.out.println("|-->  %s".formatted(new String(responseBytes)));
 
-            Files.write(Path.of(socketPath), responseBytes);
+            Files.write(Path.of(fifoPath), responseBytes);
         }
     }
 }
