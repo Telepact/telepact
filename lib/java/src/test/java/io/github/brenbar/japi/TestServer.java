@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,6 +22,34 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.brenbar.japi.Server.Options;
 
 public class TestServer {
+
+    private static byte[] readSocket(SocketChannel socket) throws IOException {
+        var lengthBuf = ByteBuffer.allocate(4);
+        socket.read(lengthBuf);
+        System.out.println("|length buffer %s".formatted(HexFormat.of().formatHex(lengthBuf.array())));
+        lengthBuf.flip();
+        var length = lengthBuf.getInt();
+        System.out.println("|length %d".formatted(length));
+
+        var length_received = 0;
+
+        var finalBuf = ByteBuffer.allocate(8192);
+
+        while (length_received < length) {
+            var buf = ByteBuffer.allocate(4096);
+            var byteCount = socket.read(buf);
+            length_received += byteCount;
+            finalBuf.put(buf.flip());
+        }
+
+        finalBuf.flip();
+
+        var array = finalBuf.array();
+
+        System.out.println("|buf %s".formatted(new String(array)));
+
+        return array;
+    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var fifoPath = "./frontdoor.fifo";
@@ -65,10 +94,7 @@ public class TestServer {
                 // }
                 // var responseBytes = buf.array();
 
-                var responseBuf = ByteBuffer.allocate(1048576);
-                backdoorChannel.read(responseBuf);
-                responseBuf.flip();
-                var responseBytes = responseBuf.array();
+                var responseBytes = readSocket(backdoorChannel);
 
                 System.out.println("|<    %s".formatted(new String(responseBytes)));
 
@@ -107,10 +133,7 @@ public class TestServer {
             serverChannel.bind(socket);
             while (true) {
                 try (var clientChannel = serverChannel.accept()) {
-                    ByteBuffer buf = ByteBuffer.allocate(1048576);
-                    clientChannel.read(buf);
-                    buf.flip();
-                    var requestBytes = buf.array();
+                    var requestBytes = readSocket(clientChannel);
 
                     System.out.println("|<--  %s".formatted(new String(requestBytes)));
                     var responseBytes = server.process(requestBytes);

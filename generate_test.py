@@ -72,9 +72,15 @@ def backdoor_handler(path):
 
             backdoor_response_json = json.dumps(backdoor_response)
 
-            print(' <|   {}'.format(backdoor_response_json))
+            backdoor_response_bytes = backdoor_response_json.encode()
 
-            client_socket.send(backdoor_response_json.encode())
+            length = int(len(backdoor_response_bytes))
+
+            framed_request = length.to_bytes(4) + backdoor_response_bytes
+
+            print(' <|   {}'.format(framed_request))
+
+            client_socket.send(framed_request)
 
             # with open(fifo_backdoor_path, 'w') as f:
             #     f.write(backdoor_response_json)
@@ -106,12 +112,18 @@ def verify_case(runner, request, expected_response, path):
 
             request_json = json.dumps(request)
 
-            print(' <--| {}'.format(request_json))
-
             # with open(fifo_path, 'w') as f:
             #     f.write(request_json)
 
-            client.send(request_json.encode())
+            request_bytes = request_json.encode()
+
+            length = int(len(request_bytes))
+
+            framed_request = length.to_bytes(4) + request_bytes
+
+            print(' <--| {}'.format(framed_request))
+
+            client.send(framed_request)
 
             response_bytes = socket_recv(client)
 
