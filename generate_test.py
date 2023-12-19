@@ -33,7 +33,7 @@ def handler(request):
             if 'ok' in header:
                 return [{}, {'ok': header['ok']}]
             elif 'result' in header:
-                return header['result']
+                return [{}, header['result']]
             elif 'throw' in header:
                 return None
             else:
