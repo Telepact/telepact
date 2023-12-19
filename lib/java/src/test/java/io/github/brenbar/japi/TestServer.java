@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.StandardProtocolFamily;
+import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,14 +27,18 @@ public class TestServer {
         var fifoBackdoorPath = "./backdoor.fifo";
         var fifoRetPath = "./frontdoor_ret.fifo";
         var fifoRetBackdoorPath = "./backdoor_ret.fifo";
+        var socketPath = "./frontdoor.socket";
+        var socketBackdoorPath = "./backdoor.socket";
 
         var path = args[0];
         var json = Files.readString(FileSystems.getDefault().getPath(path));
         var jApi = new JApiSchema(json);
         var objectMapper = new ObjectMapper();
 
+        var backdoorSocket = UnixDomainSocketAddress.of(socketBackdoorPath);
+
         Function<Message, Message> handler = (requestMessage) -> {
-            try {
+            try (var backdoorChannel = SocketChannel.open(backdoorSocket)) {
                 var requestHeaders = requestMessage.header;
                 var requestBody = requestMessage.body;
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
@@ -38,15 +46,29 @@ public class TestServer {
 
                 System.out.println("|>    %s".formatted(new String(requestBytes)));
 
-                Files.write(Path.of(fifoRetBackdoorPath), requestBytes);
+                // var requestBuf = ByteBuffer.wrap(requestBytes);
+                var framedRequestBuf = ByteBuffer.allocate(requestBytes.length + 4);
+                framedRequestBuf.putInt(requestBytes.length);
+                framedRequestBuf.put(requestBytes);
+                framedRequestBuf.flip();
 
-                var in = new BufferedReader(new InputStreamReader(new FileInputStream(fifoBackdoorPath)));
-                var buf = ByteBuffer.allocate(2048);
-                int b = 0;
-                while ((b = in.read()) >= 0) {
-                    buf.put((byte) b);
-                }
-                var responseBytes = buf.array();
+                backdoorChannel.write(framedRequestBuf);
+
+                // Files.write(Path.of(fifoRetBackdoorPath), requestBytes);
+
+                // var in = new BufferedReader(new InputStreamReader(new
+                // FileInputStream(fifoBackdoorPath)));
+                // var buf = ByteBuffer.allocate(2048);
+                // int b = 0;
+                // while ((b = in.read()) >= 0) {
+                // buf.put((byte) b);
+                // }
+                // var responseBytes = buf.array();
+
+                var responseBuf = ByteBuffer.allocate(1048576);
+                backdoorChannel.read(responseBuf);
+                responseBuf.flip();
+                var responseBytes = responseBuf.array();
 
                 System.out.println("|<    %s".formatted(new String(responseBytes)));
 
@@ -61,21 +83,48 @@ public class TestServer {
 
         var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
 
-        while (true) {
+        // while (true) {
 
-            var in = new BufferedReader(new InputStreamReader(new FileInputStream(fifoPath)));
-            var buf = ByteBuffer.allocate(1024);
-            int b = 0;
-            while ((b = in.read()) >= 0) {
-                buf.put((byte) b);
+        // var in = new BufferedReader(new InputStreamReader(new
+        // FileInputStream(fifoPath)));
+        // var buf = ByteBuffer.allocate(1024);
+        // int b = 0;
+        // while ((b = in.read()) >= 0) {
+        // buf.put((byte) b);
+        // }
+        // var requestBytes = buf.array();
+
+        // System.out.println("|<-- %s".formatted(new String(requestBytes)));
+        // var responseBytes = server.process(requestBytes);
+        // System.out.println("|--> %s".formatted(new String(responseBytes)));
+
+        // Files.write(Path.of(fifoRetPath), responseBytes);
+        // }
+
+        var socket = UnixDomainSocketAddress.of(socketPath);
+        Files.deleteIfExists(socket.getPath());
+        try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
+            serverChannel.bind(socket);
+            while (true) {
+                try (var clientChannel = serverChannel.accept()) {
+                    ByteBuffer buf = ByteBuffer.allocate(1048576);
+                    clientChannel.read(buf);
+                    buf.flip();
+                    var requestBytes = buf.array();
+
+                    System.out.println("|<--  %s".formatted(new String(requestBytes)));
+                    var responseBytes = server.process(requestBytes);
+                    System.out.println("|-->  %s".formatted(new String(responseBytes)));
+
+                    // var responseBuf = ByteBuffer.wrap(responseBytes);
+                    var framedResponseBuf = ByteBuffer.allocate(responseBytes.length + 4);
+                    framedResponseBuf.putInt(responseBytes.length);
+                    framedResponseBuf.put(responseBytes);
+                    framedResponseBuf.flip();
+
+                    clientChannel.write(framedResponseBuf);
+                }
             }
-            var requestBytes = buf.array();
-
-            System.out.println("|<--  %s".formatted(new String(requestBytes)));
-            var responseBytes = server.process(requestBytes);
-            System.out.println("|-->  %s".formatted(new String(responseBytes)));
-
-            Files.write(Path.of(fifoRetPath), responseBytes);
         }
     }
 }
