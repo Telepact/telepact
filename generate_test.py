@@ -137,13 +137,14 @@ def verify_case(runner, request, expected_response, path):
             response = json.loads(response_json)
 
         print('verifying...')
-        runner.assertEqual(expected_response, response)
     except Exception:
         traceback.print_exc()
         should_abort = True
         raise
     finally:
         signal.alarm(0)
+
+    runner.assertEqual(expected_response, response)
 
 
 def generate():
