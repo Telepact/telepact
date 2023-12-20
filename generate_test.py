@@ -1,5 +1,6 @@
 from test.cases import cases as all_cases
 from test.binary.invalid_binary_cases import cases as binary_cases
+from test.mock_cases import cases as mock_cases
 import os
 import json
 import pathlib
@@ -164,13 +165,14 @@ def generate():
 from generate_test import verify_case, backdoor_handler
 import os
 from {} import server
+from {} import mock_server
 import json
 import unittest
 import multiprocessing
                             
 path = '{}'
 
-'''.format(lib_path.replace('/', '.'), lib_path))
+'''.format(lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path))
         
         generated_tests.write('''
 
@@ -204,7 +206,7 @@ class TestCases(unittest.TestCase):
         request = {}
         expected_response = {}
         verify_case(self, request, expected_response, path)
-    '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
                 
         generated_tests.write('''
 
@@ -225,7 +227,7 @@ class BinaryTestCases(unittest.TestCase):
         cls.server.wait()
                               
                         
-    ''')
+''')
 
         for name, cases in binary_cases.items():
             for i, case in enumerate(cases):
@@ -237,7 +239,40 @@ class BinaryTestCases(unittest.TestCase):
         request = {}
         expected_response = {}
         verify_case(self, request, expected_response, path)
-    '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+'''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+
+        generated_tests.write('''
+
+class MockTestCases(unittest.TestCase):
+                              
+    @classmethod
+    def setUpClass(cls):
+        cls.server = mock_server.start('../../test/example.japi.json')
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.terminate()
+        cls.server.wait()
+                              
+                        
+''')
+
+        for name, cases in mock_cases.items():
+            generated_tests.write('''
+    def test_{}(self):
+'''.format(name))
+            
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path)
+
+'''.format(request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+
 
 
 if __name__ == '__main__':

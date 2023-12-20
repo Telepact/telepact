@@ -1,9 +1,6 @@
 package io.github.brenbar.japi;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
@@ -11,9 +8,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,39 +18,7 @@ import io.github.brenbar.japi.Server.Options;
 
 public class TestServer {
 
-    private static byte[] readSocket(SocketChannel socket) throws IOException {
-        var lengthBuf = ByteBuffer.allocate(4);
-        socket.read(lengthBuf);
-        System.out.println("|length buffer %s".formatted(HexFormat.of().formatHex(lengthBuf.array())));
-        lengthBuf.flip();
-        var length = lengthBuf.getInt();
-        System.out.println("|length %d".formatted(length));
-
-        var length_received = 0;
-
-        var finalBuf = ByteBuffer.allocate(8192);
-
-        while (length_received < length) {
-            var buf = ByteBuffer.allocate(4096);
-            var byteCount = socket.read(buf);
-            length_received += byteCount;
-            finalBuf.put(buf.flip());
-        }
-
-        finalBuf.flip();
-
-        var array = Arrays.copyOfRange(finalBuf.array(), 0, length);
-
-        System.out.println("|buf %s hex: %s".formatted(new String(array), HexFormat.of().formatHex(array)));
-
-        return array;
-    }
-
     public static void main(String[] args) throws IOException, InterruptedException {
-        var fifoPath = "./frontdoor.fifo";
-        var fifoBackdoorPath = "./backdoor.fifo";
-        var fifoRetPath = "./frontdoor_ret.fifo";
-        var fifoRetBackdoorPath = "./backdoor_ret.fifo";
         var socketPath = "./frontdoor.socket";
         var socketBackdoorPath = "./backdoor.socket";
 
@@ -76,7 +38,6 @@ public class TestServer {
 
                 System.out.println("|>    %s".formatted(new String(requestBytes)));
 
-                // var requestBuf = ByteBuffer.wrap(requestBytes);
                 var framedRequestBuf = ByteBuffer.allocate(requestBytes.length + 4);
                 framedRequestBuf.putInt(requestBytes.length);
                 framedRequestBuf.put(requestBytes);
@@ -84,18 +45,7 @@ public class TestServer {
 
                 backdoorChannel.write(framedRequestBuf);
 
-                // Files.write(Path.of(fifoRetBackdoorPath), requestBytes);
-
-                // var in = new BufferedReader(new InputStreamReader(new
-                // FileInputStream(fifoBackdoorPath)));
-                // var buf = ByteBuffer.allocate(2048);
-                // int b = 0;
-                // while ((b = in.read()) >= 0) {
-                // buf.put((byte) b);
-                // }
-                // var responseBytes = buf.array();
-
-                var responseBytes = readSocket(backdoorChannel);
+                var responseBytes = TestUtility.readSocket(backdoorChannel);
 
                 System.out.println("|<    %s".formatted(new String(responseBytes)));
 
@@ -110,37 +60,18 @@ public class TestServer {
 
         var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
 
-        // while (true) {
-
-        // var in = new BufferedReader(new InputStreamReader(new
-        // FileInputStream(fifoPath)));
-        // var buf = ByteBuffer.allocate(1024);
-        // int b = 0;
-        // while ((b = in.read()) >= 0) {
-        // buf.put((byte) b);
-        // }
-        // var requestBytes = buf.array();
-
-        // System.out.println("|<-- %s".formatted(new String(requestBytes)));
-        // var responseBytes = server.process(requestBytes);
-        // System.out.println("|--> %s".formatted(new String(responseBytes)));
-
-        // Files.write(Path.of(fifoRetPath), responseBytes);
-        // }
-
         var socket = UnixDomainSocketAddress.of(socketPath);
         Files.deleteIfExists(socket.getPath());
         try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
             serverChannel.bind(socket);
             while (true) {
                 try (var clientChannel = serverChannel.accept()) {
-                    var requestBytes = readSocket(clientChannel);
+                    var requestBytes = TestUtility.readSocket(clientChannel);
 
                     System.out.println("|<--  %s".formatted(new String(requestBytes)));
                     var responseBytes = server.process(requestBytes);
                     System.out.println("|-->  %s".formatted(new String(responseBytes)));
 
-                    // var responseBuf = ByteBuffer.wrap(responseBytes);
                     var framedResponseBuf = ByteBuffer.allocate(responseBytes.length + 4);
                     framedResponseBuf.putInt(responseBytes.length);
                     framedResponseBuf.put(responseBytes);

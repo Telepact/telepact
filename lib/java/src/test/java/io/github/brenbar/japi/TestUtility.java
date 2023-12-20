@@ -4,11 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -159,6 +162,34 @@ public class TestUtility {
         var responseAsParsedJson = objectMapper.readValue(responseBytes, new TypeReference<List<Object>>() {
         });
         assertEquals(expectedResponseAsParsedJson, responseAsParsedJson);
+    }
+
+    public static byte[] readSocket(SocketChannel socket) throws IOException {
+        var lengthBuf = ByteBuffer.allocate(4);
+        socket.read(lengthBuf);
+        System.out.println("|length buffer %s".formatted(HexFormat.of().formatHex(lengthBuf.array())));
+        lengthBuf.flip();
+        var length = lengthBuf.getInt();
+        System.out.println("|length %d".formatted(length));
+
+        var length_received = 0;
+
+        var finalBuf = ByteBuffer.allocate(8192);
+
+        while (length_received < length) {
+            var buf = ByteBuffer.allocate(4096);
+            var byteCount = socket.read(buf);
+            length_received += byteCount;
+            finalBuf.put(buf.flip());
+        }
+
+        finalBuf.flip();
+
+        var array = Arrays.copyOfRange(finalBuf.array(), 0, length);
+
+        System.out.println("|buf %s hex: %s".formatted(new String(array), HexFormat.of().formatHex(array)));
+
+        return array;
     }
 
 }
