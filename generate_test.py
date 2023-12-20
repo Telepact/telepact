@@ -2,6 +2,7 @@ from test.cases import cases as all_cases
 from test.binary.invalid_binary_cases import cases as binary_cases
 from test.mock_cases import cases as mock_cases
 from test.mock_invalid_stub_cases import cases as mock_invalid_stub_cases
+from test.parse_cases import cases as parse_cases
 import os
 import json
 import pathlib
@@ -167,13 +168,14 @@ from generate_test import verify_case, backdoor_handler
 import os
 from {} import server
 from {} import mock_server
+from {} import schema_server
 import json
 import unittest
 import multiprocessing
                             
 path = '{}'
 
-'''.format(lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path))
+'''.format(lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path))
         
         generated_tests.write('''
 
@@ -284,6 +286,35 @@ class MockTestCases(unittest.TestCase):
         expected_response = {}
         verify_case(self, request, expected_response, path)
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+
+        generated_tests.write('''
+
+class SchemaTestCases(unittest.TestCase):
+                              
+    @classmethod
+    def setUpClass(cls):
+        cls.server = schema_server.start('../../test/schema.japi.json')
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.terminate()
+        cls.server.wait()
+                              
+                        
+''')
+
+        for name, cases in parse_cases.items():
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+    def test_{}_{}(self):
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path)
+'''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+
 
 
 if __name__ == '__main__':

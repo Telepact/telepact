@@ -3,7 +3,6 @@ package io.github.brenbar.japi;
 import java.io.IOException;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -32,12 +31,7 @@ public class MockTestServer {
                     var responseBytes = server.process(requestBytes);
                     System.out.println("|-->  %s".formatted(new String(responseBytes)));
 
-                    var framedResponseBuf = ByteBuffer.allocate(responseBytes.length + 4);
-                    framedResponseBuf.putInt(responseBytes.length);
-                    framedResponseBuf.put(responseBytes);
-                    framedResponseBuf.flip();
-
-                    clientChannel.write(framedResponseBuf);
+                    TestUtility.writeSocket(clientChannel, responseBytes);
                 }
             }
         }

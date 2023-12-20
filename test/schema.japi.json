@@ -1,0 +1,20 @@
+[
+  {
+    "struct.ValidationFailure": {
+      "path": ["string"],
+      "reason": ["string"],
+      "data": ["object", ["any"]]
+    }
+  },
+  {
+    "fn.validateSchema": {
+      "schema": ["array", ["object", ["any"]]]
+    },
+    "->": {
+      "ok": {},
+      "errorValidationFailure": {
+        "cases": ["array", ["struct.ValidationFailure"]]
+      }
+    }
+  }
+]

@@ -192,4 +192,13 @@ public class TestUtility {
         return array;
     }
 
+    public static void writeSocket(SocketChannel socket, byte[] bytes) throws IOException {
+        var framedResponseBuf = ByteBuffer.allocate(bytes.length + 4);
+        framedResponseBuf.putInt(bytes.length);
+        framedResponseBuf.put(bytes);
+        framedResponseBuf.flip();
+
+        socket.write(framedResponseBuf);
+    }
+
 }
