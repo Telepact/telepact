@@ -4,7 +4,7 @@ import os
 import itertools
 import json
 
-cases_filepath = "test/mockCases.txt"
+cases_filepath = "test/mockInvalidStubCases.txt"
 
 cases_file = open(cases_filepath, "r")
 

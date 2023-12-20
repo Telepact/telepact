@@ -1,6 +1,7 @@
 from test.cases import cases as all_cases
 from test.binary.invalid_binary_cases import cases as binary_cases
 from test.mock_cases import cases as mock_cases
+from test.mock_invalid_stub_cases import cases as mock_invalid_stub_cases
 import os
 import json
 import pathlib
@@ -270,9 +271,19 @@ class MockTestCases(unittest.TestCase):
         request = {}
         expected_response = {}
         verify_case(self, request, expected_response, path)
-
 '''.format(request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
+        for name, cases in mock_invalid_stub_cases.items():
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+    def test_{}_{}(self):
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path)
+'''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
 
 if __name__ == '__main__':
