@@ -1,4 +1,5 @@
 from test.cases import cases as all_cases
+from test.binary.invalid_binary_cases import cases as binary_cases
 import os
 import json
 import pathlib
@@ -110,12 +111,11 @@ def verify_case(runner, request, expected_response, path):
             while client.connect_ex(socket_path) != 0:
                 pass
 
-            request_json = json.dumps(request)
-
-            # with open(fifo_path, 'w') as f:
-            #     f.write(request_json)
-
-            request_bytes = request_json.encode()
+            if type(request) == bytes:
+                request_bytes = request
+            else:
+                request_json = json.dumps(request)
+                request_bytes = request_json.encode()
 
             length = int(len(request_bytes))
 
@@ -127,14 +127,11 @@ def verify_case(runner, request, expected_response, path):
 
             response_bytes = socket_recv(client)
 
-            response_json = response_bytes.decode()
+            print(' -->| {}'.format(response_bytes))
 
-            # with open(fifo_ret_path, 'r') as f:
-            #     response_json = f.read()
-
-            print(' -->| {}'.format(response_json))
-
-            response = json.loads(response_json)
+            if type(expected_response) != bytes:
+                response_json = response_bytes.decode()
+                response = json.loads(response_json)
 
         print('verifying...')
     except Exception:
@@ -144,7 +141,10 @@ def verify_case(runner, request, expected_response, path):
     finally:
         signal.alarm(0)
 
-    runner.assertEqual(expected_response, response)
+    if type(expected_response) == bytes:
+        runner.assertEqual(expected_response, response_bytes)
+    else:
+        runner.assertEqual(expected_response, response)
 
 
 def generate():
@@ -169,24 +169,15 @@ import unittest
 import multiprocessing
                             
 path = '{}'
-fifo_path = '{}/frontdoor.fifo'
-fifo_backdoor_path = '{}/backdoor.fifo'
-fifo_ret_path = '{}/frontdoor_ret.fifo'
-fifo_ret_backdoor_path = '{}/backdoor_ret.fifo'
+
+'''.format(lib_path.replace('/', '.'), lib_path))
+        
+        generated_tests.write('''
 
 class TestCases(unittest.TestCase):
                               
     @classmethod
     def setUpClass(cls):
-        #if not os.path.exists(fifo_path):
-        #    os.mkfifo(fifo_path)
-        #if not os.path.exists(fifo_backdoor_path):
-        #    os.mkfifo(fifo_backdoor_path)
-        #if not os.path.exists(fifo_ret_path):
-        #    os.mkfifo(fifo_ret_path)
-        #if not os.path.exists(fifo_ret_backdoor_path):
-        #    os.mkfifo(fifo_ret_backdoor_path)
-        
         cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
         cls.process.start()                                            
         
@@ -196,23 +187,53 @@ class TestCases(unittest.TestCase):
     def tearDownClass(cls):
         cls.process.terminate()
         cls.server.terminate()
-        #os.remove(fifo_path)                              
-        #os.remove(fifo_backdoor_path)
-        #os.remove(fifo_ret_path)                              
-        #os.remove(fifo_ret_backdoor_path)
                               
                         
-    '''.format(lib_path.replace('/', '.'), lib_path, lib_path, lib_path, lib_path, lib_path))
+    ''')
 
         for name, cases in all_cases.items():
 
             for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
                 generated_tests.write('''
     def test_{}_{}(self):
         request = {}
         expected_response = {}
         verify_case(self, request, expected_response, path)
-    '''.format(name, i, case[0], case[1]))
+    '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+                
+        generated_tests.write('''
+
+class BinaryTestCases(unittest.TestCase):
+                              
+    @classmethod
+    def setUpClass(cls):
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+        cls.process.start()                                            
+        
+        cls.server = server.start('../../test/binary/binary.japi.json')
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.process.terminate()
+        cls.server.terminate()
+                              
+                        
+    ''')
+
+        for name, cases in binary_cases.items():
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+    def test_{}_{}(self):
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path)
+    '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
 
 if __name__ == '__main__':

@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,9 @@ public class TestServer {
 
         finalBuf.flip();
 
-        var array = finalBuf.array();
+        var array = Arrays.copyOfRange(finalBuf.array(), 0, length);
 
-        System.out.println("|buf %s".formatted(new String(array)));
+        System.out.println("|buf %s hex: %s".formatted(new String(array), HexFormat.of().formatHex(array)));
 
         return array;
     }
