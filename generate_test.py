@@ -186,7 +186,9 @@ class TestCases(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.process.terminate()
+        cls.process.join()
         cls.server.terminate()
+        cls.server.wait()
                               
                         
     ''')
@@ -218,7 +220,9 @@ class BinaryTestCases(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.process.terminate()
+        cls.process.join()
         cls.server.terminate()
+        cls.server.wait()
                               
                         
     ''')
