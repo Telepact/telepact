@@ -17,7 +17,8 @@ public class MockTestServer {
         var json = Files.readString(FileSystems.getDefault().getPath(path));
         var jApi = new JApiSchema(json);
 
-        var server = new MockServer(jApi, new MockServer.Options().setOnError((e) -> e.printStackTrace()));
+        var server = new MockServer(jApi,
+                new MockServer.Options().setOnError((e) -> e.printStackTrace()).setEnableGeneratedDefaultStub(false));
 
         var socket = UnixDomainSocketAddress.of(socketPath);
         Files.deleteIfExists(socket.getPath());
