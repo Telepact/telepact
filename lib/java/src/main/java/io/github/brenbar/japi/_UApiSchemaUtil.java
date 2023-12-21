@@ -88,9 +88,9 @@ class _UApiSchemaUtil {
         var schemaKeysToIndex = new HashMap<String, Integer>();
 
         var schemaKeys = new HashSet<String>();
-        var duplicateKeys = new HashSet<String>();
-        var index = 0;
+        var index = -1;
         for (var definition : originalUApiSchema) {
+            index += 1;
             Map<String, Object> def;
             try {
                 def = (Map<String, Object>) definition;
@@ -109,15 +109,11 @@ class _UApiSchemaUtil {
             }
 
             if (schemaKeys.contains(schemaKey)) {
-                duplicateKeys.add(schemaKey);
+                parseFailures.add(new SchemaParseFailure("[%d]".formatted(index), "DuplicateSchemaKey",
+                        Map.of("schemaKey", schemaKey)));
             }
             schemaKeys.add(schemaKey);
             schemaKeysToIndex.put(schemaKey, index);
-            index += 1;
-        }
-
-        if (!duplicateKeys.isEmpty()) {
-            parseFailures.add(new SchemaParseFailure("", "DuplicateSchemaKeys", Map.of("keys", duplicateKeys)));
         }
 
         var traits = new ArrayList<UTrait>();
@@ -168,10 +164,9 @@ class _UApiSchemaUtil {
                 return e;
             }
         }
-        var sortedKeys = new TreeSet<>(definition.keySet());
-        Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex, "keys", sortedKeys));
+        Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex));
         throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d]".formatted(index),
-                "DefinitionObjectMustHaveOneKeyMatchingRegex", sortedMap)));
+                "DefinitionMustHaveOneKeyMatchingRegex", sortedMap)));
     }
 
     static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes,

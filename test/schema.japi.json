@@ -1,9 +1,23 @@
 [
   {
+    "enum.ValidationFailureReason": {
+      "DuplicateSchemaKey": {
+        "schemaKey": ["string"]
+      },
+      "ArrayTypeRequired": {},
+      "DefinitionMustBeObjectType": {},
+      "UndefinedTypeExtension": {
+        "name": ["string"]
+      },
+      "DefinitionMustHaveOneKeyMatchingRegex": {
+        "regex": ["string"]
+      }
+    }
+  },
+  {
     "struct.ValidationFailure": {
       "path": ["string"],
-      "reason": ["string"],
-      "data": ["object", ["any"]]
+      "reason": ["enum.ValidationFailureReason"]
     }
   },
   {

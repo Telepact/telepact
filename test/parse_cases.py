@@ -17,7 +17,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[1]', 'reason': 'Duplicate'}]}}]
+                'cases': [{'path': '[1]', 'reason': {'DuplicateSchemaKey': {'schemaKey': 'struct.Example'}}}]}}]
         ],
         [
             [
@@ -34,7 +34,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[0]', 'reason': 'InvalidDefinition'}]}}]
+                'cases': [{'path': '[0]', 'reason': {'DefinitionMustHaveOneKeyMatchingRegex': {'regex': '^((fn|trait|info)|((struct|enum|ext)(<[0-2]>)?))\\..*'}}}]}}]
         ],
         [
             [
@@ -46,7 +46,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidRoot'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
         ],
         [
             [
@@ -58,7 +58,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidRoot'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
         ],
         [
             [
@@ -70,7 +70,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidRoot'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
         ],
         [
             [
@@ -82,7 +82,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidRoot'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
         ],
         [
             [
@@ -112,7 +112,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidTrait'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
             [
@@ -144,7 +144,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidTrait'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
             [
@@ -160,7 +160,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidTrait'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
             [
@@ -179,7 +179,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidTrait'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
             [
@@ -199,7 +199,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': 'InvalidTrait'}]}}]
+                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
         ],
     ]
 }

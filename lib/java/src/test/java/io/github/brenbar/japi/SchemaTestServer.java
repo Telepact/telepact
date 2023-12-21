@@ -6,7 +6,6 @@ import java.net.UnixDomainSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -28,7 +27,8 @@ public class SchemaTestServer {
         Function<Message, Message> handler = (requestMessage) -> {
             var requestBody = requestMessage.body;
 
-            var schemaPseudoJson = requestBody.get("schema");
+            var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
+            var schemaPseudoJson = arg.get("schema");
 
             byte[] schemaJson;
             try {
@@ -41,9 +41,8 @@ public class SchemaTestServer {
                 var schema = new JApiSchema(new String(schemaJson));
                 return new Message(Map.of(), Map.of("ok", Map.of()));
             } catch (JApiSchemaParseError e) {
-                var parseFailures = e.schemaParseFailures.stream().map(f -> Map.ofEntries(Map.entry("path", f.path),
-                        Map.entry("reason", f.reason), Map.entry("data", f.data))).toList();
-                return new Message(Map.of(), Map.of("errorValidationFailure", Map.of("cases", parseFailures)));
+                return new Message(Map.of(),
+                        Map.of("errorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
             }
         };
 

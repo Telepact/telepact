@@ -4,33 +4,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Indicates a failure to parse a jAPI Schema.
  */
 public class JApiSchemaParseError extends RuntimeException {
 
     public final List<SchemaParseFailure> schemaParseFailures;
+    public final List<Object> schemaParseFailuresPseudoJson;
 
     public JApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures) {
-        super(mapSchemaParseFailuresToJson(schemaParseFailures));
+        super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)));
         this.schemaParseFailures = schemaParseFailures;
+        this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
     }
 
     public JApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures, Throwable cause) {
-        super(mapSchemaParseFailuresToJson(schemaParseFailures), cause);
+        super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)), cause);
         this.schemaParseFailures = schemaParseFailures;
+        this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
     }
 
-    private static String mapSchemaParseFailuresToJson(List<SchemaParseFailure> schemaParseFailures) {
-        var pseudoJson = schemaParseFailures.stream()
-                .map(f -> new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data)))).toList();
-        try {
-            return new ObjectMapper().writeValueAsString(pseudoJson);
-        } catch (JsonProcessingException e) {
-            return "UnknownSchemaParseFailure";
-        }
+    private static List<Object> mapSchemaParseFailuresToPseudoJson(
+            List<SchemaParseFailure> schemaParseFailures) {
+        return (List<Object>) schemaParseFailures.stream()
+                .map(f -> (Object) new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data))))
+                .toList();
     }
 }
