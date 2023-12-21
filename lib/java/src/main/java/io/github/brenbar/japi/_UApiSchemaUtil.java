@@ -212,8 +212,9 @@ class _UApiSchemaUtil {
                 var newKey = traitArgumentField.getKey();
                 if (fnArgFields.containsKey(newKey)) {
                     var index = schemaKeysToIndex.get(traitName);
-                    parseFailures.add(new SchemaParseFailure("[%d].%s.%s".formatted(index, traitFnName, newKey),
-                            "TraitArgumentFieldAlreadyInUseByFunction", Map.of("fn", fnName)));
+                    parseFailures.add(
+                            new SchemaParseFailure("[%d].%s.%s.%s".formatted(index, traitName, traitFnName, newKey),
+                                    "TraitArgumentFieldAlreadyInUseByFunction", Map.of("fn", fnName)));
                 }
                 fnArgFields.put(newKey, traitArgumentField.getValue());
             }
@@ -222,7 +223,7 @@ class _UApiSchemaUtil {
                 var newKey = traitResultField.getKey();
                 if (fnResultValues.containsKey(newKey)) {
                     var index = schemaKeysToIndex.get(traitName);
-                    parseFailures.add(new SchemaParseFailure("[%d].->.%s".formatted(index, newKey),
+                    parseFailures.add(new SchemaParseFailure("[%d].%s.->.%s".formatted(index, traitName, newKey),
                             "TraitResultValueAlreadyInUseByFunction", Map.of("fn", fnName)));
                 }
                 fnResultValues.put(newKey, traitResultField.getValue());

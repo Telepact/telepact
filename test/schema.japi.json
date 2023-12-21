@@ -11,7 +11,16 @@
       },
       "DefinitionMustHaveOneKeyMatchingRegex": {
         "regex": ["string"]
-      }
+      },
+      "TraitArgumentFieldAlreadyInUseByFunction": {
+        "fn": ["string"]
+      },
+      "TraitResultValueAlreadyInUseByFunction": {
+        "fn": ["string"]
+      },
+      "ObjectTypeRequired": {},
+      "InvalidTrait": {},
+      "TraitDefinitionCannotTargetInternalFunctions": {}
     }
   },
   {
@@ -22,7 +31,7 @@
   },
   {
     "fn.validateSchema": {
-      "schema": ["array", ["object", ["any"]]]
+      "schema": ["any"]
     },
     "->": {
       "ok": {},

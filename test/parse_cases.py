@@ -46,7 +46,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
+                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -58,7 +58,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
+                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -70,7 +70,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
+                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -82,7 +82,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidRoot': {}}}]}}]
+                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -112,7 +112,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
+                'cases': [{'path': '[1].trait.Collide.fn.*.arg1', 'reason': {'TraitArgumentFieldAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
         ],
         [
             [
@@ -123,18 +123,15 @@ cases = {
                             {
                                 'fn.example': {},
                                 '->': {
-                                    'ok': {
-                                        'result1': ['boolean']
-                                    }
+                                    'ok': {},
+                                    "err": {}
                                 }
                             },
                             {
                                 'trait.Collide': {
                                     'fn.*': {},
                                     '->': {
-                                        'ok': {
-                                            'result1': ['boolean']
-                                        }
+                                        'err': {}
                                     }
                                 }
                             }
@@ -144,7 +141,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
+                'cases': [{'path': '[1].trait.Collide.->.err', 'reason': {'TraitResultValueAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
         ],
         [
             [
@@ -160,7 +157,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
+                'cases': [{'path': '[0].trait.Example', 'reason': {'ObjectTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -179,7 +176,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
+                'cases': [{'path': '[0].trait.Example', 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
             [
@@ -199,7 +196,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(root)', 'reason': {'InvalidTrait': {}}}]}}]
+                'cases': [{'path': '[0].trait.Example', 'reason': {'TraitDefinitionCannotTargetInternalFunctions': {}}}]}}]
         ],
     ]
 }
