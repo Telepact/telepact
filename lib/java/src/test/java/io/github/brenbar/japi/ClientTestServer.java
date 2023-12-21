@@ -30,13 +30,13 @@ public class ClientTestServer {
                 try (var backdoorChannel = SocketChannel.open(backdoorSocket)) {
                     var requestBytes = s.serialize(m);
 
-                    System.out.println("|>    %s".formatted(new String(requestBytes)));
+                    System.out.println("  <-|   %s".formatted(new String(requestBytes)));
 
                     TestUtility.writeSocket(backdoorChannel, requestBytes);
 
                     var responseBytes = TestUtility.readSocket(backdoorChannel);
 
-                    System.out.println("|<    %s".formatted(new String(responseBytes)));
+                    System.out.println("  ->|   %s".formatted(new String(responseBytes)));
 
                     var responseMessage = s.deserialize(responseBytes);
                     return responseMessage;
@@ -56,7 +56,7 @@ public class ClientTestServer {
                 try (var clientChannel = serverChannel.accept()) {
                     var requestBytes = TestUtility.readSocket(clientChannel);
 
-                    System.out.println("|<--  %s".formatted(new String(requestBytes)));
+                    System.out.println("   ->|  %s".formatted(new String(requestBytes)));
 
                     var requestPseudoJson = objectMapper.readValue(requestBytes, List.class);
                     var requestHeaders = (Map<String, Object>) requestPseudoJson.get(0);
@@ -67,7 +67,7 @@ public class ClientTestServer {
                     var responsePseudoJson = List.of(response.header, response.header);
                     var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
-                    System.out.println("|-->  %s".formatted(new String(responseBytes)));
+                    System.out.println("   <-|  %s".formatted(new String(responseBytes)));
 
                     TestUtility.writeSocket(clientChannel, responseBytes);
                 }

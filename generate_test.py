@@ -62,17 +62,14 @@ def backdoor_handler(path):
     while True:
         (client_socket, address) = server_socket.accept()
         try:
-            # with open(fifo_ret_backdoor_path, 'r') as f:
-            #     backdoor_request_json = f.read()
-
             backdoor_request_bytes = socket_recv(client_socket)
 
             if backdoor_request_bytes == b'':
                 continue
 
-            backdoor_request_json = backdoor_request_bytes.decode()
+            print(' |<-    {}'.format(backdoor_request_bytes))
 
-            print(' |<-    {}'.format(backdoor_request_json))
+            backdoor_request_json = backdoor_request_bytes.decode()
 
             try:
                 backdoor_request = json.loads(backdoor_request_json)
@@ -85,10 +82,48 @@ def backdoor_handler(path):
 
             backdoor_response_bytes = backdoor_response_json.encode()
 
+            print(' |->    {}'.format(backdoor_request_json))
+
             socket_send(client_socket, backdoor_response_bytes)
 
-            # with open(fifo_backdoor_path, 'w') as f:
-            #     f.write(backdoor_response_json)
+        except Exception:
+            print(traceback.format_exc())
+
+
+def client_backdoor_handler(path):
+    client_backdoor_path = '{}/clientbackdoor.socket'.format(path)
+    server_frontdoor_path = '{}/frontdoor.socket'.format(path)
+    if os.path.exists(client_backdoor_path):
+        os.remove(client_backdoor_path)
+
+    client_backdoor_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client_backdoor_socket.bind(client_backdoor_path)
+    client_backdoor_socket.listen()
+    while True:
+        (client_backdoor_client, address) = client_backdoor_socket.accept()
+        try:
+            backdoor_request_bytes = socket_recv(client_backdoor_client)
+
+            if backdoor_request_bytes == b'':
+                continue
+
+            print('  |<-   {}'.format(backdoor_request_bytes))
+
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server_frontdoor_client:
+                while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
+                    pass
+
+                print('  |->   {}'.format(backdoor_request_bytes))
+
+                socket_send(server_frontdoor_client, backdoor_request_bytes)
+
+                backdoor_response_bytes = socket_recv(server_frontdoor_client)
+
+                print('  |<-   {}'.format(backdoor_response_bytes))
+
+            print('  |->   {}'.format(backdoor_response_bytes))
+
+            socket_send(client_backdoor_client, backdoor_response_bytes)
 
         except Exception:
             print(traceback.format_exc())
@@ -98,7 +133,7 @@ def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-def verify_case(runner, request, expected_response, path):
+def verify_case(runner, request, expected_response, path, use_client=False):
     global should_abort
     if should_abort:
         runner.skipTest('Skipped')
@@ -110,7 +145,11 @@ def verify_case(runner, request, expected_response, path):
 
         # fifo_path = '{}/frontdoor.fifo'.format(path)
         # fifo_ret_path = '{}/frontdoor_ret.fifo'.format(path)
-        socket_path = '{}/frontdoor.socket'.format(path)
+
+        if use_client:
+            socket_path = '{}/clientfrontdoor.socket'.format(path)
+        else:
+            socket_path = '{}/frontdoor.socket'.format(path)
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
             while client.connect_ex(socket_path) != 0:
                 pass
@@ -168,13 +207,14 @@ import os
 from {} import server
 from {} import mock_server
 from {} import schema_server
+from {} import client_server
 import json
 import unittest
 import multiprocessing
                             
 path = '{}'
 
-'''.format(lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path))
+'''.format(lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path))
         
         generated_tests.write('''
 
@@ -314,6 +354,47 @@ class SchemaTestCases(unittest.TestCase):
         verify_case(self, request, expected_response, path)
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
+
+        generated_tests.write('''
+
+class ClientTestCases(unittest.TestCase):
+                              
+    @classmethod
+    def setUpClass(cls):
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+        cls.process.start()
+        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, ))
+        cls.client_process.start()                                                                            
+        
+        cls.servers = client_server.start('../../test/example.japi.json')
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.process.terminate()
+        cls.process.join()
+        cls.client_process.terminate()
+        cls.client_process.join()
+        for server in cls.servers:
+            server.terminate()
+        for server in cls.servers:
+            server.wait()
+
+                        
+    ''')
+
+        for name, cases in all_cases.items():
+
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+    def test_{}_{}(self):
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path, use_client=True)
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+    
 
 
 if __name__ == '__main__':
