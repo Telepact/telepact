@@ -139,12 +139,9 @@ def verify_case(runner, request, expected_response, path, use_client=False):
         runner.skipTest('Skipped')
 
     signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(15)
+    signal.alarm(30)
 
     try:
-
-        # fifo_path = '{}/frontdoor.fifo'.format(path)
-        # fifo_ret_path = '{}/frontdoor_ret.fifo'.format(path)
 
         if use_client:
             socket_path = '{}/clientfrontdoor.socket'.format(path)

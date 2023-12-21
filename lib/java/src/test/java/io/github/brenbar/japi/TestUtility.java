@@ -172,10 +172,10 @@ public class TestUtility {
 
         var length_received = 0;
 
-        var finalBuf = ByteBuffer.allocate(8192);
+        var finalBuf = ByteBuffer.allocate(16384);
 
         while (length_received < length) {
-            var buf = ByteBuffer.allocate(4096);
+            var buf = ByteBuffer.allocate(8192);
             var byteCount = socket.read(buf);
             length_received += byteCount;
             finalBuf.put(buf.flip());
