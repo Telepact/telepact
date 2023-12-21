@@ -35,13 +35,13 @@ public class TestServer {
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                System.out.println("|>    %s".formatted(new String(requestBytes)));
+                System.out.println("   <-|  %s".formatted(new String(requestBytes)));
 
                 TestUtility.writeSocket(backdoorChannel, requestBytes);
 
                 var responseBytes = TestUtility.readSocket(backdoorChannel);
 
-                System.out.println("|<    %s".formatted(new String(responseBytes)));
+                System.out.println("   ->|  %s".formatted(new String(responseBytes)));
 
                 var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
                 var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
@@ -62,9 +62,9 @@ public class TestServer {
                 try (var clientChannel = serverChannel.accept()) {
                     var requestBytes = TestUtility.readSocket(clientChannel);
 
-                    System.out.println("|<--  %s".formatted(new String(requestBytes)));
+                    System.out.println("    ->| %s".formatted(new String(requestBytes)));
                     var responseBytes = server.process(requestBytes);
-                    System.out.println("|-->  %s".formatted(new String(responseBytes)));
+                    System.out.println("    <-| %s".formatted(new String(responseBytes)));
 
                     TestUtility.writeSocket(clientChannel, responseBytes);
                 }

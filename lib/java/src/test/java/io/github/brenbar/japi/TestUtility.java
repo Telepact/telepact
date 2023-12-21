@@ -167,10 +167,8 @@ public class TestUtility {
     public static byte[] readSocket(SocketChannel socket) throws IOException {
         var lengthBuf = ByteBuffer.allocate(4);
         socket.read(lengthBuf);
-        System.out.println("|length buffer %s".formatted(HexFormat.of().formatHex(lengthBuf.array())));
         lengthBuf.flip();
         var length = lengthBuf.getInt();
-        System.out.println("|length %d".formatted(length));
 
         var length_received = 0;
 
@@ -186,8 +184,6 @@ public class TestUtility {
         finalBuf.flip();
 
         var array = Arrays.copyOfRange(finalBuf.array(), 0, length);
-
-        System.out.println("|buf %s hex: %s".formatted(new String(array), HexFormat.of().formatHex(array)));
 
         return array;
     }

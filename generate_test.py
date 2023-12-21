@@ -25,6 +25,13 @@ def socket_recv(sock: socket.socket):
         pass
     return b''.join(chunks)
 
+def socket_send(sock: socket.socket, given_bytes):
+    length = int(len(given_bytes))
+
+    framed_bytes = length.to_bytes(4) + given_bytes
+
+    sock.send(framed_bytes)    
+
 
 def handler(request):
     header = request[0]
@@ -65,7 +72,7 @@ def backdoor_handler(path):
 
             backdoor_request_json = backdoor_request_bytes.decode()
 
-            print(' >|   {}'.format(backdoor_request_json))
+            print(' |<-    {}'.format(backdoor_request_json))
 
             try:
                 backdoor_request = json.loads(backdoor_request_json)
@@ -78,13 +85,7 @@ def backdoor_handler(path):
 
             backdoor_response_bytes = backdoor_response_json.encode()
 
-            length = int(len(backdoor_response_bytes))
-
-            framed_request = length.to_bytes(4) + backdoor_response_bytes
-
-            print(' <|   {}'.format(framed_request))
-
-            client_socket.send(framed_request)
+            socket_send(client_socket, backdoor_response_bytes)
 
             # with open(fifo_backdoor_path, 'w') as f:
             #     f.write(backdoor_response_json)
@@ -120,17 +121,13 @@ def verify_case(runner, request, expected_response, path):
                 request_json = json.dumps(request)
                 request_bytes = request_json.encode()
 
-            length = int(len(request_bytes))
+            print('|->     {}'.format(request_bytes))
 
-            framed_request = length.to_bytes(4) + request_bytes
-
-            print(' <--| {}'.format(framed_request))
-
-            client.send(framed_request)
+            socket_send(client, request_bytes)
 
             response_bytes = socket_recv(client)
 
-            print(' -->| {}'.format(response_bytes))
+            print('|<-     {}'.format(response_bytes))
 
             if type(expected_response) != bytes:
                 response_json = response_bytes.decode()
@@ -143,6 +140,8 @@ def verify_case(runner, request, expected_response, path):
         raise
     finally:
         signal.alarm(0)
+
+    #runner.assertEqual(True, False)
 
     if type(expected_response) == bytes:
         runner.assertEqual(expected_response, response_bytes)
