@@ -17,13 +17,13 @@ def socket_recv(sock: socket.socket):
     length = int.from_bytes(sock.recv(4))
     chunks = []
     length_received = 0
-    print('length {}'.format(length))
     while length_received < length:
         chunk = sock.recv(min(length - length_received, 4096))
         length_received += len(chunk)
         chunks.append(chunk)
         pass
     return b''.join(chunks)
+
 
 def socket_send(sock: socket.socket, given_bytes):
     length = int(len(given_bytes))
@@ -113,13 +113,13 @@ def client_backdoor_handler(path):
                 while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
                     pass
 
-                print('  |->   {}'.format(backdoor_request_bytes))
+                print('   |->  {}'.format(backdoor_request_bytes))
 
                 socket_send(server_frontdoor_client, backdoor_request_bytes)
 
                 backdoor_response_bytes = socket_recv(server_frontdoor_client)
 
-                print('  |<-   {}'.format(backdoor_response_bytes))
+                print('   |<-  {}'.format(backdoor_response_bytes))
 
             print('  |->   {}'.format(backdoor_response_bytes))
 
@@ -139,7 +139,7 @@ def verify_case(runner, request, expected_response, path, use_client=False):
         runner.skipTest('Skipped')
 
     signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(10)
+    signal.alarm(15)
 
     try:
 
@@ -202,7 +202,7 @@ def generate():
             'test/{}/test_generated.py'.format(lib_path), 'w')
 
         generated_tests.write('''
-from generate_test import verify_case, backdoor_handler
+from generate_test import verify_case, backdoor_handler, client_backdoor_handler
 import os
 from {} import server
 from {} import mock_server

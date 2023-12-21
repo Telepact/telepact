@@ -64,7 +64,8 @@ public class ClientTestServer {
                     var request = new Message(requestHeaders, requestBody);
 
                     var response = client.send(request);
-                    var responsePseudoJson = List.of(response.header, response.header);
+
+                    var responsePseudoJson = List.of(response.header, response.body);
                     var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
                     System.out.println("   <-|  %s".formatted(new String(responseBytes)));
