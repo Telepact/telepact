@@ -20,12 +20,12 @@ class _ClientUtil {
             finalUseBinary = useBinaryDefault;
         }
 
-        boolean finalForceSendJson;
+        boolean finalJsonRequest;
         Optional<Boolean> forceSendJsonOptional = request.forceSendJson;
         if (forceSendJsonOptional.isPresent()) {
-            finalForceSendJson = request.forceSendJson.get();
+            finalJsonRequest = request.forceSendJson.get();
         } else {
-            finalForceSendJson = forceSendJsonDefault;
+            finalJsonRequest = forceSendJsonDefault;
         }
 
         long finalTimeoutMs;
@@ -43,23 +43,45 @@ class _ClientUtil {
             headers.put("_sel", selectedStructFields);
         }
 
-        if (finalForceSendJson) {
-            headers.put("_serializeAsJson", finalForceSendJson);
-        }
-
         headers.put("_tim", finalTimeoutMs);
 
         if (finalUseBinary) {
-            headers.put("_serializeAsBinary", true);
+            headers.put("_binary", true);
         }
 
         return new Message(headers, request.functionName, request.functionArgument);
     }
 
     static Message processRequestObject(Message requestMessage,
-            BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMs) {
+            BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long defaultTimeoutMs,
+            boolean defaultBinary) {
         try {
-            var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
+            Long finalTimeoutMs;
+            if (requestMessage.header.containsKey("_tim")) {
+                finalTimeoutMs = (Long) requestMessage.header.get("_tim");
+            } else {
+                var timeoutMs = requestMessage.header.remove("_timeoutMs");
+                if (timeoutMs != null) {
+                    finalTimeoutMs = (Long) timeoutMs;
+                } else {
+                    finalTimeoutMs = defaultTimeoutMs;
+                }
+                requestMessage.header.put("_tim", finalTimeoutMs);
+            }
+
+            if (!requestMessage.header.containsKey("_sel")) {
+                var selectFields = requestMessage.header.remove("_select");
+                if (selectFields != null) {
+                    requestMessage.header.put("_sel", selectFields);
+                }
+            }
+
+            if (!requestMessage.header.containsKey("_binary")) {
+                requestMessage.header.put("_binary", defaultBinary);
+            }
+
+            var responseMessage = adapter.apply(requestMessage, serializer).get(finalTimeoutMs,
+                    TimeUnit.MILLISECONDS);
             return responseMessage;
         } catch (Exception e) {
             throw new ClientProcessError(e);

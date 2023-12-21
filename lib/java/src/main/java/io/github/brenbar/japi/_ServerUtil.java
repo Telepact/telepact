@@ -99,7 +99,7 @@ class _ServerUtil {
 
         if (requestHeaders.containsKey("_bin")) {
             List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
-            responseHeaders.put("_serializeAsBinary", true);
+            responseHeaders.put("_binary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 

@@ -156,7 +156,7 @@ public class Client {
 
     private Message processMessage(Message message) {
         return _ClientUtil.processRequestObject(message, this.adapter, this.serializer,
-                this.timeoutMsDefault);
+                this.timeoutMsDefault, this.useBinaryDefault);
     }
 
 }

@@ -52,15 +52,11 @@ class _SerializerUtil {
             SerializationImpl serializer) {
         var headers = message.header;
         boolean serializeAsBinary = false;
-        if (headers.containsKey("_serializeAsBinary")) {
-            serializeAsBinary = Objects.equals(true, headers.remove("_serializeAsBinary"));
-        }
-        boolean forceSendJson = false;
-        if (headers.containsKey("_serializeAsJson")) {
-            forceSendJson = Objects.equals(true, headers.remove("_serializeAsJson"));
+        if (headers.containsKey("_binary")) {
+            serializeAsBinary = Objects.equals(true, headers.remove("_binary"));
         }
         List<Object> messageAsPseudoJson = List.of(message.header, message.body);
-        if (serializeAsBinary && !forceSendJson) {
+        if (serializeAsBinary) {
             try {
                 var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
                 return serializer.toMsgPack(encodedMessage);
