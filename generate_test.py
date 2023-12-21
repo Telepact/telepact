@@ -177,8 +177,6 @@ def verify_case(runner, request, expected_response, path, use_client=False):
     finally:
         signal.alarm(0)
 
-    #runner.assertEqual(True, False)
-
     if type(expected_response) == bytes:
         runner.assertEqual(expected_response, response_bytes)
     else:
