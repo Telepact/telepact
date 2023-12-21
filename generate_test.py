@@ -9,6 +9,7 @@ import pathlib
 import signal
 import traceback
 import socket
+import msgpack
 
 should_abort = False
 
@@ -90,7 +91,22 @@ def backdoor_handler(path):
             print(traceback.format_exc())
 
 
-def client_backdoor_handler(path):
+def count_int_keys(m: dict):
+    int_keys = 0
+    str_keys = 0
+    for k,v in m.items():
+        if type(k) == int:
+            int_keys += 1
+        else:
+            str_keys += 1
+        if type(v) == dict:
+            (this_int_keys, this_str_keys) = count_int_keys(v)
+            int_keys += this_int_keys
+            str_keys += this_str_keys
+    return (int_keys, str_keys)
+
+
+def client_backdoor_handler(path, check_binary):
     client_backdoor_path = '{}/clientbackdoor.socket'.format(path)
     server_frontdoor_path = '{}/frontdoor.socket'.format(path)
     if os.path.exists(client_backdoor_path):
@@ -108,6 +124,17 @@ def client_backdoor_handler(path):
                 continue
 
             print('  |<-   {}'.format(backdoor_request_bytes))
+
+            if check_binary:
+                try:
+                    backdoor_request = msgpack.loads(backdoor_request_bytes)
+                    (int_keys, str_keys) = count_int_keys(backdoor_request[1])
+                    if int_keys < str_keys:
+                        raise Exception('not enough integer keys')
+                except Exception:
+                    msg = [{}, {'_errorBadBinary': {}}]
+                    msg_bytes = json.dumps(msg)
+                    socket_send(client_backdoor_client, msg_bytes)
 
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server_frontdoor_client:
                 while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
@@ -133,7 +160,7 @@ def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-def verify_case(runner, request, expected_response, path, use_client=False):
+def verify_case(runner, request, expected_response, path, use_client=False, use_binary=False):
     global should_abort
     if should_abort:
         runner.skipTest('Skipped')
@@ -154,6 +181,9 @@ def verify_case(runner, request, expected_response, path, use_client=False):
             if type(request) == bytes:
                 request_bytes = request
             else:
+                if use_binary:
+                    request[0]['_binary'] = True
+
                 request_json = json.dumps(request)
                 request_bytes = request_json.encode()
 
@@ -358,7 +388,7 @@ class ClientTestCases(unittest.TestCase):
     def setUpClass(cls):
         cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
         cls.process.start()
-        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, ))
+        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, False))
         cls.client_process.start()                                                                            
         
         cls.servers = client_server.start('../../test/example.japi.json')
@@ -390,6 +420,46 @@ class ClientTestCases(unittest.TestCase):
         verify_case(self, request, expected_response, path, use_client=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
+        generated_tests.write('''
+
+class BinaryClientTestCases(unittest.TestCase):
+                              
+    @classmethod
+    def setUpClass(cls):
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+        cls.process.start()
+        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, True))
+        cls.client_process.start()                                                                            
+        
+        cls.servers = client_server.start('../../test/example.japi.json')
+    
+    @classmethod
+    def tearDownClass(cls):
+        cls.process.terminate()
+        cls.process.join()
+        cls.client_process.terminate()
+        cls.client_process.join()
+        for server in cls.servers:
+            server.terminate()
+        for server in cls.servers:
+            server.wait()
+
+                        
+    ''')
+
+        for name, cases in all_cases.items():
+
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+    def test_{}_{}(self):
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path, use_client=True, use_binary=True)
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+   
 
 
 if __name__ == '__main__':
