@@ -133,13 +133,15 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
 
             # try to check binary, we may not need to, but store the result anyway
             try:
-                backdoor_request = msgpack.loads(backdoor_request_bytes)
+                backdoor_request = msgpack.loads(backdoor_request_bytes, strict_map_key=False)
                 (int_keys, str_keys) = count_int_keys(backdoor_request[1])
                 if int_keys < str_keys:
                     raise Exception('not enough integer keys')
             except Exception:
                 index = client_backdoor_results[0]
                 client_backdoor_results[index + 1] |= 2
+                print(traceback.format_exc())
+
 
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server_frontdoor_client:
                 while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
@@ -155,14 +157,14 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
 
                 # try to check binary, we may not need to, but store the result anyway
                 try:
-                    backdoor_request = msgpack.loads(backdoor_request_bytes)
+                    backdoor_request = msgpack.loads(backdoor_request_bytes, strict_map_key=False)
                     (int_keys, str_keys) = count_int_keys(backdoor_request[1])
                     if int_keys < str_keys:
                         raise Exception('not enough integer keys')
                 except Exception:
                     index = client_backdoor_results[0]
                     client_backdoor_results[index] |= 4
-
+                    print(traceback.format_exc())
 
 
             print('  |->   {}'.format(backdoor_response_bytes))
