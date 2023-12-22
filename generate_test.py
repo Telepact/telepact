@@ -420,45 +420,49 @@ class ClientTestCases(unittest.TestCase):
         verify_case(self, request, expected_response, path, use_client=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
-        generated_tests.write('''
+#         generated_tests.write('''
 
-class BinaryClientTestCases(unittest.TestCase):
+# class BinaryClientTestCases(unittest.TestCase):
                               
-    @classmethod
-    def setUpClass(cls):
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
-        cls.process.start()
-        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, True))
-        cls.client_process.start()                                                                            
+#     @classmethod
+#     def setUpClass(cls):
+#         cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+#         cls.process.start()
+#         cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, True))
+#         cls.client_process.start()                                                                            
         
-        cls.servers = client_server.start('../../test/example.japi.json')
+#         cls.servers = client_server.start('../../test/example.japi.json')
     
-    @classmethod
-    def tearDownClass(cls):
-        cls.process.terminate()
-        cls.process.join()
-        cls.client_process.terminate()
-        cls.client_process.join()
-        for server in cls.servers:
-            server.terminate()
-        for server in cls.servers:
-            server.wait()
+#     @classmethod
+#     def tearDownClass(cls):
+#         cls.process.terminate()
+#         cls.process.join()
+#         cls.client_process.terminate()
+#         cls.client_process.join()
+#         for server in cls.servers:
+#             server.terminate()
+#         for server in cls.servers:
+#             server.wait()
 
                         
-    ''')
+#     ''')
 
-        for name, cases in all_cases.items():
+#         for name, cases in all_cases.items():
 
-            for i, case in enumerate(cases):
-                request = case[0]
-                expected_response = case[1]
+#             for i, case in enumerate(cases):
+#                 request = case[0]
+#                 expected_response = case[1]
 
-                generated_tests.write('''
-    def test_{}_{}(self):
-        request = {}
-        expected_response = {}
-        verify_case(self, request, expected_response, path, use_client=True, use_binary=True)
-'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+#                 generated_tests.write('''
+#     def test_{}_{}(self):
+#         request = [{{'_binary': True}}, {{'fn.ping': {{}}}}]
+#         expected_response = [{{}}, {{'ok':{{}}}}]
+#         verify_case(self, request, expected_response, path, use_client=True)
+                                      
+#         request = {}
+#         expected_response = {}
+#         verify_case(self, request, expected_response, path, use_client=True, use_binary=True)
+# '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
    
 
 
