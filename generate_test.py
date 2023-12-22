@@ -221,7 +221,7 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
                 response = json.loads(response_json)
 
     except Exception:
-        traceback.print_exc()
+        print(traceback.format_exc())
         should_abort = True
         raise
     finally:
@@ -235,6 +235,9 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
             if use_binary:
                 runner.assertTrue('_bin' in response[0])
                 del response[0]['_bin']
+
+            if 'numberTooBig' in response[0]:
+                runner.skipTest('Cannot use big numbers with msgpack')
             
             runner.assertEqual(expected_response, response)
     
@@ -323,13 +326,17 @@ class BinaryTestCases(unittest.TestCase):
                               
     @classmethod
     def setUpClass(cls):
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+        initial_list = [0] * 10000
+        cls.backdoor_results = ShareableList(initial_list)
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
         cls.process.start()                                            
         
         cls.server = server.start('../../test/binary/binary.japi.json')
     
     @classmethod
     def tearDownClass(cls):
+        cls.backdoor_results.shm.close()
+        cls.backdoor_results.shm.unlink()
         cls.process.terminate()
         cls.process.join()
         cls.server.terminate()

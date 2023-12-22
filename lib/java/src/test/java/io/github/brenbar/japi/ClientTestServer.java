@@ -28,7 +28,12 @@ public class ClientTestServer {
         Adapter adapter = (m, s) -> {
             return CompletableFuture.supplyAsync(() -> {
                 try (var backdoorChannel = SocketChannel.open(backdoorSocket)) {
-                    var requestBytes = s.serialize(m);
+                    byte[] requestBytes;
+                    try {
+                        requestBytes = s.serialize(m);
+                    } catch (IllegalArgumentException e) {
+                        return new Message(Map.of("numberTooBig", true), Map.of("errorUnknown", Map.of()));
+                    }
 
                     System.out.println("  <-|   %s".formatted(new String(requestBytes)));
 
