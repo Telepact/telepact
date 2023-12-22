@@ -161,7 +161,7 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
                         raise Exception('not enough integer keys')
                 except Exception:
                     index = client_backdoor_results[0]
-                    client_backdoor_results[index + 1] |= 4
+                    client_backdoor_results[index] |= 4
 
 
 
@@ -171,7 +171,7 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
 
         except Exception:
             index = client_backdoor_results[0]
-            client_backdoor_results[index + 1] |= 1
+            client_backdoor_results[index] |= 1
             print(traceback.format_exc())
 
 
@@ -179,24 +179,13 @@ def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-def verify_case(runner, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False):
+def verify_case(runner, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False, skip_assertion=False):
     global should_abort
     if should_abort:
         runner.skipTest('Skipped')
 
     signal.signal(signal.SIGALRM, signal_handler)
     signal.alarm(30)
-
-    if backdoor_results:
-        test_index = backdoor_results[0]
-        test_index += 1
-        backdoor_results[0] = test_index
-
-    if client_backdoor_results:
-        client_test_index = client_backdoor_results[0]
-        client_test_index += 1
-        client_backdoor_results[0] = client_test_index
-
 
     try:
 
@@ -229,7 +218,6 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
                 response_json = response_bytes.decode()
                 response = json.loads(response_json)
 
-        print('verifying...')
     except Exception:
         traceback.print_exc()
         should_abort = True
@@ -237,16 +225,24 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
     finally:
         signal.alarm(0)
 
-    if type(expected_response) == bytes:
-        runner.assertEqual(expected_response, response_bytes)
-    else:
-        runner.assertEqual(expected_response, response)
+    if not skip_assertion:
+        print('verifying...')
+        if type(expected_response) == bytes:
+            runner.assertEqual(expected_response, response_bytes)
+        else:
+            if use_binary:
+                runner.assertTrue('_bin' in response[0])
+                del response[0]['_bin']
+            
+            runner.assertEqual(expected_response, response)
     
-    if backdoor_results:
-        runner.assertEqual(0, backdoor_results[test_index + 1])
+        if backdoor_results:
+            test_index = backdoor_results[0]
+            runner.assertEqual(0, backdoor_results[test_index])
 
-    if client_backdoor_results:
-        runner.assertEqual(0, client_backdoor_results[client_test_index + 1] & client_bitmask)
+        if client_backdoor_results:
+            test_index = client_backdoor_results[0]
+            runner.assertEqual(0, client_backdoor_results[test_index] & client_bitmask)
 
 
 def generate():
@@ -300,7 +296,9 @@ class TestCases(unittest.TestCase):
         cls.process.join()
         cls.server.terminate()
         cls.server.wait()
-                              
+
+    def setUp(self):
+        self.__class__.backdoor_results[0] += 1
                         
     ''')
 
@@ -453,6 +451,9 @@ class ClientTestCases(unittest.TestCase):
         for server in cls.servers:
             server.wait()
 
+    def setUp(self):
+        self.__class__.backdoor_results[0] += 1
+        self.__class__.client_backdoor_results[0] += 1
                         
     ''')
 
@@ -469,49 +470,59 @@ class ClientTestCases(unittest.TestCase):
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
-#         generated_tests.write('''
+        generated_tests.write('''
 
-# class BinaryClientTestCases(unittest.TestCase):
+class BinaryClientTestCases(unittest.TestCase):
                               
-#     @classmethod
-#     def setUpClass(cls):
-#         cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
-#         cls.process.start()
-#         cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, True))
-#         cls.client_process.start()                                                                            
+    @classmethod
+    def setUpClass(cls):
+        initial_list = [0] * 10000
+        cls.backdoor_results = ShareableList(initial_list)
+        cls.client_backdoor_results = ShareableList(initial_list)
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
+        cls.process.start()
+        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, cls.client_backdoor_results,))
+        cls.client_process.start()                                                                            
         
-#         cls.servers = client_server.start('../../test/example.japi.json')
+        cls.servers = client_server.start('../../test/example.japi.json')
+                              
+        request = [{'_binary': True}, {'fn.ping': {}}]
+        expected_response = [{}, {'ok':{}}]
+        verify_case(None, request, expected_response, path, use_client=True, skip_assertion=True)
     
-#     @classmethod
-#     def tearDownClass(cls):
-#         cls.process.terminate()
-#         cls.process.join()
-#         cls.client_process.terminate()
-#         cls.client_process.join()
-#         for server in cls.servers:
-#             server.terminate()
-#         for server in cls.servers:
-#             server.wait()
+    @classmethod
+    def tearDownClass(cls):
+        cls.backdoor_results.shm.close()
+        cls.backdoor_results.shm.unlink()
+        cls.client_backdoor_results.shm.close()
+        cls.client_backdoor_results.shm.unlink()
+        cls.process.terminate()
+        cls.process.join()
+        cls.client_process.terminate()
+        cls.client_process.join()
+        for server in cls.servers:
+            server.terminate()
+        for server in cls.servers:
+            server.wait()
 
+    def setUp(self):
+        self.__class__.backdoor_results[0] += 1
+        self.__class__.client_backdoor_results[0] += 1
                         
-#     ''')
+    ''')
 
-#         for name, cases in all_cases.items():
+        for name, cases in all_cases.items():
 
-#             for i, case in enumerate(cases):
-#                 request = case[0]
-#                 expected_response = case[1]
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
 
-#                 generated_tests.write('''
-#     def test_{}_{}(self):
-#         request = [{{'_binary': True}}, {{'fn.ping': {{}}}}]
-#         expected_response = [{{}}, {{'ok':{{}}}}]
-#         verify_case(self, request, expected_response, path, use_client=True)
-                                      
-#         request = {}
-#         expected_response = {}
-#         verify_case(self, request, expected_response, path, use_client=True, use_binary=True)
-# '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+                generated_tests.write('''
+    def test_binary_client_{}_{}(self):
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, use_client=True, use_binary=True)
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
    
 
 
