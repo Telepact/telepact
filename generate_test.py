@@ -3,6 +3,9 @@ from test.binary.invalid_binary_cases import cases as binary_cases
 from test.mock_cases import cases as mock_cases
 from test.mock_invalid_stub_cases import cases as mock_invalid_stub_cases
 from test.parse_cases import cases as parse_cases
+from multiprocessing.managers import SharedMemoryManager
+from multiprocessing.shared_memory import SharedMemory
+from multiprocessing.shared_memory import ShareableList
 import os
 import json
 import pathlib
@@ -52,7 +55,7 @@ def handler(request):
                 return [{}, {}]
 
 
-def backdoor_handler(path):
+def backdoor_handler(path, backdoor_results: ShareableList):
     server_socket_path = '{}/backdoor.socket'.format(path)
     if os.path.exists(server_socket_path):
         os.remove(server_socket_path)
@@ -60,6 +63,7 @@ def backdoor_handler(path):
     server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     server_socket.bind(server_socket_path)
     server_socket.listen()
+
     while True:
         (client_socket, address) = server_socket.accept()
         try:
@@ -88,6 +92,8 @@ def backdoor_handler(path):
             socket_send(client_socket, backdoor_response_bytes)
 
         except Exception:
+            index = backdoor_results[0]
+            backdoor_results[index + 1] = 1
             print(traceback.format_exc())
 
 
@@ -106,7 +112,7 @@ def count_int_keys(m: dict):
     return (int_keys, str_keys)
 
 
-def client_backdoor_handler(path, check_binary):
+def client_backdoor_handler(path, client_backdoor_results: ShareableList):
     client_backdoor_path = '{}/clientbackdoor.socket'.format(path)
     server_frontdoor_path = '{}/frontdoor.socket'.format(path)
     if os.path.exists(client_backdoor_path):
@@ -125,16 +131,15 @@ def client_backdoor_handler(path, check_binary):
 
             print('  |<-   {}'.format(backdoor_request_bytes))
 
-            if check_binary:
-                try:
-                    backdoor_request = msgpack.loads(backdoor_request_bytes)
-                    (int_keys, str_keys) = count_int_keys(backdoor_request[1])
-                    if int_keys < str_keys:
-                        raise Exception('not enough integer keys')
-                except Exception:
-                    msg = [{}, {'_errorBadBinary': {}}]
-                    msg_bytes = json.dumps(msg)
-                    socket_send(client_backdoor_client, msg_bytes)
+            # try to check binary, we may not need to, but store the result anyway
+            try:
+                backdoor_request = msgpack.loads(backdoor_request_bytes)
+                (int_keys, str_keys) = count_int_keys(backdoor_request[1])
+                if int_keys < str_keys:
+                    raise Exception('not enough integer keys')
+            except Exception:
+                index = client_backdoor_results[0]
+                client_backdoor_results[index + 1] |= 2
 
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server_frontdoor_client:
                 while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
@@ -148,11 +153,25 @@ def client_backdoor_handler(path, check_binary):
 
                 print('   |<-  {}'.format(backdoor_response_bytes))
 
+                # try to check binary, we may not need to, but store the result anyway
+                try:
+                    backdoor_request = msgpack.loads(backdoor_request_bytes)
+                    (int_keys, str_keys) = count_int_keys(backdoor_request[1])
+                    if int_keys < str_keys:
+                        raise Exception('not enough integer keys')
+                except Exception:
+                    index = client_backdoor_results[0]
+                    client_backdoor_results[index + 1] |= 4
+
+
+
             print('  |->   {}'.format(backdoor_response_bytes))
 
             socket_send(client_backdoor_client, backdoor_response_bytes)
 
         except Exception:
+            index = client_backdoor_results[0]
+            client_backdoor_results[index + 1] |= 1
             print(traceback.format_exc())
 
 
@@ -160,13 +179,24 @@ def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-def verify_case(runner, request, expected_response, path, use_client=False, use_binary=False):
+def verify_case(runner, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False):
     global should_abort
     if should_abort:
         runner.skipTest('Skipped')
 
     signal.signal(signal.SIGALRM, signal_handler)
     signal.alarm(30)
+
+    if backdoor_results:
+        test_index = backdoor_results[0]
+        test_index += 1
+        backdoor_results[0] = test_index
+
+    if client_backdoor_results:
+        client_test_index = client_backdoor_results[0]
+        client_test_index += 1
+        client_backdoor_results[0] = client_test_index
+
 
     try:
 
@@ -211,6 +241,12 @@ def verify_case(runner, request, expected_response, path, use_client=False, use_
         runner.assertEqual(expected_response, response_bytes)
     else:
         runner.assertEqual(expected_response, response)
+    
+    if backdoor_results:
+        runner.assertEqual(0, backdoor_results[test_index + 1])
+
+    if client_backdoor_results:
+        runner.assertEqual(0, client_backdoor_results[client_test_index + 1] & client_bitmask)
 
 
 def generate():
@@ -236,6 +272,8 @@ from {} import client_server
 import json
 import unittest
 import multiprocessing
+from multiprocessing.shared_memory import ShareableList
+
                             
 path = '{}'
 
@@ -247,13 +285,17 @@ class TestCases(unittest.TestCase):
                               
     @classmethod
     def setUpClass(cls):
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+        initial_list = [0] * 10000
+        cls.backdoor_results = ShareableList(initial_list)
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
         cls.process.start()                                            
         
         cls.server = server.start('../../test/example.japi.json')
     
     @classmethod
     def tearDownClass(cls):
+        cls.backdoor_results.shm.close()
+        cls.backdoor_results.shm.unlink()
         cls.process.terminate()
         cls.process.join()
         cls.server.terminate()
@@ -272,7 +314,7 @@ class TestCases(unittest.TestCase):
     def test_{}_{}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path)
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
                 
         generated_tests.write('''
@@ -386,15 +428,22 @@ class ClientTestCases(unittest.TestCase):
                               
     @classmethod
     def setUpClass(cls):
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, ))
+        initial_list = [0] * 10000
+        cls.backdoor_results = ShareableList(initial_list)
+        cls.client_backdoor_results = ShareableList(initial_list)
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results))
         cls.process.start()
-        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, False))
+        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, cls.client_backdoor_results))
         cls.client_process.start()                                                                            
         
         cls.servers = client_server.start('../../test/example.japi.json')
     
     @classmethod
     def tearDownClass(cls):
+        cls.backdoor_results.shm.close()
+        cls.backdoor_results.shm.unlink()
+        cls.client_backdoor_results.shm.close()
+        cls.client_backdoor_results.shm.unlink()
         cls.process.terminate()
         cls.process.join()
         cls.client_process.terminate()
@@ -414,10 +463,10 @@ class ClientTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_{}_{}(self):
+    def test_client_{}_{}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, use_client=True)
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
 #         generated_tests.write('''
