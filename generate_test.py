@@ -362,11 +362,11 @@ class BinaryTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_{}_{}(self):
+    def test_bin_{}(self):
         request = {}
         expected_response = {}
         verify_case(self, request, expected_response, path)
-'''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+'''.format(i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         generated_tests.write('''
 

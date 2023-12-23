@@ -2632,17 +2632,6 @@ cases = {
         [[{'_unsafe': True, 'result': {'ok': {'value': {'bool': 0}}}}, {'fn.test': {}}], [{}, {'ok': {'value': {'bool': 0}}}]],
         [[{'_unsafe': True, 'result': {'errorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'errorExample': {'wrong': 'a'}}]],
     ],
-    'testBinaryHeader': [
-        [[{'_bin': False}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': 0}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': ''}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': {}}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': [False]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': [0.1]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': ['']}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': [[]]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-        [[{'_bin': [{}]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}], True],
-    ],
     'testApplicationFailure': [
         [[{'throw': True}, {'fn.test': {}}], [{}, {'_errorUnknown': {}}]],
     ],

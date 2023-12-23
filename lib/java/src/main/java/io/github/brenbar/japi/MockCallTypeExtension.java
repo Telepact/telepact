@@ -34,7 +34,7 @@ public class MockCallTypeExtension implements TypeExtension {
                         .map(f -> new ValidationFailure(".%s%s".formatted(functionName, f.path), f.reason))
                         .toList();
                 var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
-                        .filter(f -> !f.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)).toList();
+                        .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
 
                 validationFailures.addAll(inputFailuresWithoutMissingRequired);
             }

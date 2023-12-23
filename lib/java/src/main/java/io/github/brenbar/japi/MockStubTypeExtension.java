@@ -36,7 +36,7 @@ public class MockStubTypeExtension implements TypeExtension {
                         .toList();
 
                 var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
-                        .filter(f -> !f.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING)).toList();
+                        .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
 
                 validationFailures.addAll(inputFailuresWithoutMissingRequired);
 
@@ -50,7 +50,7 @@ public class MockStubTypeExtension implements TypeExtension {
                     var outputFailuresWithPath = outputFailures.stream()
                             .map(f -> new ValidationFailure(".%s%s".formatted("->", f.path), f.reason)).toList();
                     var failuresWithoutMissingRequired = outputFailuresWithPath
-                            .stream().filter(f -> !f.reason.equals(_ValidateUtil.REQUIRED_STRUCT_FIELD_MISSING))
+                            .stream().filter(f -> !f.reason.equals("RequiredStructFieldMissing"))
                             .toList();
 
                     validationFailures.addAll(failuresWithoutMissingRequired);
