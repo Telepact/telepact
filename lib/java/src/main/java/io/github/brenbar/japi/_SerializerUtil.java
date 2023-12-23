@@ -29,6 +29,13 @@ class _SerializerUtil {
                     var struct = entry2.getValue();
                     allKeys.addAll(struct.fields.keySet());
                 }
+            } else if (entry.getValue() instanceof UFn f) {
+                allKeys.addAll(f.arg.fields.keySet());
+                for (var e2 : f.result.values.entrySet()) {
+                    allKeys.add(e2.getKey());
+                    var struct = e2.getValue();
+                    allKeys.addAll(struct.fields.keySet());
+                }
             }
         }
         var i = (long) 0;

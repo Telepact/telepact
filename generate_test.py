@@ -112,6 +112,10 @@ def count_int_keys(m: dict):
     return (int_keys, str_keys)
 
 
+class NotEnoughIntegerKeys(Exception):
+    pass
+
+
 def client_backdoor_handler(path, client_backdoor_results: ShareableList):
     client_backdoor_path = '{}/clientbackdoor.socket'.format(path)
     server_frontdoor_path = '{}/frontdoor.socket'.format(path)
@@ -136,7 +140,10 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
                 backdoor_request = msgpack.loads(backdoor_request_bytes, strict_map_key=False)
                 (int_keys, str_keys) = count_int_keys(backdoor_request[1])
                 if int_keys < str_keys:
-                    raise Exception('not enough integer keys')
+                    raise NotEnoughIntegerKeys()
+            except NotEnoughIntegerKeys:
+                index = client_backdoor_results[0]
+                client_backdoor_results[index + 1] |= 8
             except Exception:
                 index = client_backdoor_results[0]
                 client_backdoor_results[index + 1] |= 2
@@ -160,7 +167,10 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
                     backdoor_request = msgpack.loads(backdoor_request_bytes, strict_map_key=False)
                     (int_keys, str_keys) = count_int_keys(backdoor_request[1])
                     if int_keys < str_keys:
-                        raise Exception('not enough integer keys')
+                        raise NotEnoughIntegerKeys()
+                except NotEnoughIntegerKeys:
+                    index = client_backdoor_results[0]
+                    client_backdoor_results[index + 1] |= 16
                 except Exception:
                     index = client_backdoor_results[0]
                     client_backdoor_results[index] |= 4
@@ -233,8 +243,9 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
             runner.assertEqual(expected_response, response_bytes)
         else:
             if use_binary:
-                runner.assertTrue('_bin' in response[0])
-                del response[0]['_bin']
+                if 'error' not in next(iter(response[1])):
+                    runner.assertTrue('_bin' in response[0])
+                response[0].pop('_bin', None)
 
             if 'numberTooBig' in response[0]:
                 runner.skipTest('Cannot use big numbers with msgpack')
