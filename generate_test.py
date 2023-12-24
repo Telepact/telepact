@@ -192,12 +192,28 @@ def signal_handler(signum, frame):
 
 
 def verify_case(runner, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False, skip_assertion=False):
+    """
+    client_bitmask
+    bit 0 - client proxy failed outright
+    bit 1 - request could not be parsed as mspack
+    bit 2 - response could not be parsed as mspack
+    bit 3 - binary request didn't have enough integer keys
+    bit 4 - binary response didn't have enough integer keys
+    """
     global should_abort
     if should_abort:
         runner.skipTest('Skipped')
 
     signal.signal(signal.SIGALRM, signal_handler)
     signal.alarm(30)
+
+    if backdoor_results:
+        test_index = backdoor_results[0]
+        backdoor_results[test_index] = 0
+
+    if client_backdoor_results:
+        test_index = client_backdoor_results[0]
+        client_backdoor_results[test_index] = 0
 
     try:
 
@@ -537,12 +553,16 @@ class BinaryClientTestCases(unittest.TestCase):
                 request = case[0]
                 expected_response = case[1]
 
+                if len(case) == 2:
+                    case.append(True)
+                client_bitmask = 0xFF if case[2] else 0xE7
+
                 generated_tests.write('''
     def test_binary_client_{}_{}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, use_client=True, use_binary=True)
-'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
    
 
 
