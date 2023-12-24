@@ -97,12 +97,6 @@ class _ServerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        if (requestHeaders.containsKey("_bin")) {
-            List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
-            responseHeaders.put("_binary", true);
-            responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
-        }
-
         if (unknownTarget != null) {
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", List.of(Map.of("path", unknownTarget, "reason", "UnknownFunction"))));
@@ -187,6 +181,12 @@ class _ServerUtil {
                     selectStructFieldsHeader);
         } else {
             finalResultEnum = resultEnum;
+        }
+
+        if (requestHeaders.containsKey("_bin")) {
+            List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
+            responseHeaders.put("_binary", true);
+            responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
         return new Message(responseHeaders, finalResultEnum);
