@@ -25,6 +25,6 @@ cases = {
         [[{'_bin': [0.1]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
         [[{'_bin': ['']}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
         [[{'_bin': [[]]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': [{}]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
+        [[{'_bin': [{}]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]]
     ]
 }
