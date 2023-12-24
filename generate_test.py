@@ -13,6 +13,7 @@ import signal
 import traceback
 import socket
 import msgpack
+import unittest
 
 should_abort = False
 
@@ -189,15 +190,7 @@ def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-def verify_case(runner, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False, skip_assertion=False):
-    """
-    client_bitmask
-    bit 0 - client proxy failed outright
-    bit 1 - request could not be parsed as mspack
-    bit 2 - response could not be parsed as mspack
-    bit 3 - binary request didn't have enough integer keys
-    bit 4 - binary response didn't have enough integer keys
-    """
+def verify_case(runner: unittest.TestCase, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False, skip_assertion=False):
     global should_abort
     if should_abort:
         runner.skipTest('Skipped')
@@ -271,7 +264,14 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
 
         if client_backdoor_results:
             test_index = client_backdoor_results[0]
-            runner.assertEqual(0, client_backdoor_results[test_index] & client_bitmask)
+            runner.assertEqual(0, client_backdoor_results[test_index] & client_bitmask, """
+client_bitmask
+bit 0 - client proxy failed outright
+bit 1 - request could not be parsed as mspack
+bit 2 - response could not be parsed as mspack
+bit 3 - binary request didn't have enough integer keys
+bit 4 - binary response didn't have enough integer keys
+""")
 
 
 def generate():
