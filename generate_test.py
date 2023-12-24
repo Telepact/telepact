@@ -147,7 +147,6 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
             except Exception:
                 index = client_backdoor_results[0]
                 client_backdoor_results[index + 1] |= 2
-                print(traceback.format_exc())
 
 
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server_frontdoor_client:
@@ -174,7 +173,6 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
                 except Exception:
                     index = client_backdoor_results[0]
                     client_backdoor_results[index] |= 4
-                    print(traceback.format_exc())
 
 
             print('  |->   {}'.format(backdoor_response_bytes))
@@ -254,7 +252,6 @@ def verify_case(runner, request, expected_response, path, backdoor_results: Shar
         signal.alarm(0)
 
     if not skip_assertion:
-        print('verifying...')
         if type(expected_response) == bytes:
             runner.assertEqual(expected_response, response_bytes)
         else:
