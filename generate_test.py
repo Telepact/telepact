@@ -519,7 +519,7 @@ class BinaryClientTestCases(unittest.TestCase):
         
         cls.servers = client_server.start('../../test/example.japi.json')
                               
-        request = [{'_binary': True}, {'fn.ping': {}}]
+        request = [{'_binary': True}, {'fn._ping': {}}]
         expected_response = [{}, {'ok':{}}]
         verify_case(None, request, expected_response, path, use_client=True, skip_assertion=True)
     
