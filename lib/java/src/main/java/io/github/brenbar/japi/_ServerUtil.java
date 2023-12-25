@@ -75,11 +75,7 @@ class _ServerUtil {
             var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
                     Map.of("reasons", parseFailures));
-            var newErrorResultValidationFailures = resultEnumType.validate(
-                    newErrorResult, List.of(), List.of());
-            if (!newErrorResultValidationFailures.isEmpty()) {
-                throw new JApiProcessError("Failed internal jAPI validation");
-            }
+            validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
@@ -89,22 +85,14 @@ class _ServerUtil {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = resultEnumType.validate(
-                    newErrorResult, List.of(), List.of());
-            if (!newErrorResultValidationFailures.isEmpty()) {
-                throw new JApiProcessError("Failed internal jAPI validation");
-            }
+            validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
         if (unknownTarget != null) {
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", List.of(Map.of("path", unknownTarget, "reason", "UnknownFunction"))));
-            var newErrorResultValidationFailures = resultEnumType.validate(
-                    newErrorResult, List.of(), List.of());
-            if (!newErrorResultValidationFailures.isEmpty()) {
-                throw new JApiProcessError("Failed internal jAPI validation");
-            }
+            validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
@@ -116,12 +104,7 @@ class _ServerUtil {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
-            var newErrorResultValidationFailures = resultEnumType.validate(
-                    newErrorResult, List.of(), List.of());
-            if (!newErrorResultValidationFailures.isEmpty()) {
-                throw new JApiProcessError("Failed internal jAPI validation");
-            }
-
+            validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
@@ -158,11 +141,7 @@ class _ServerUtil {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailuresTrimmed);
                 Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
-                var newErrorResultValidationFailures = resultEnumType.validate(
-                        newErrorResult, List.of(), List.of());
-                if (!newErrorResultValidationFailures.isEmpty()) {
-                    throw new JApiProcessError("Failed internal jAPI validation");
-                }
+                validateResult(resultEnumType, newErrorResult);
                 return new Message(responseHeaders, newErrorResult);
             }
         }
@@ -175,7 +154,7 @@ class _ServerUtil {
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResultEnum = (Map<String, Object>) selectStructFields(
+            finalResultEnum = (Map<String, Object>) _SelectUtil.selectStructFields(
                     new UTypeDeclaration(resultEnumType, false, List.of()),
                     resultEnum,
                     selectStructFieldsHeader);
@@ -204,78 +183,11 @@ class _ServerUtil {
         return validationFailureCases;
     }
 
-    static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
-            Map<String, List<String>> selectedStructFields) {
-        if (typeDeclaration.type instanceof UStruct s) {
-            var selectedFields = selectedStructFields.get(s.name);
-            var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var fieldName = entry.getKey();
-                if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = s.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
-                            selectedStructFields);
-                    finalMap.put(entry.getKey(), valueWithSelectedFields);
-                }
-            }
-            return finalMap;
-        } else if (typeDeclaration.type instanceof UFn f) {
-            var selectedFields = selectedStructFields.get(f.name);
-            var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var fieldName = entry.getKey();
-                if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = f.arg.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
-                            selectedStructFields);
-                    finalMap.put(entry.getKey(), valueWithSelectedFields);
-                }
-            }
-            return finalMap;
-        } else if (typeDeclaration.type instanceof UEnum e) {
-            var valueAsMap = (Map<String, Object>) value;
-            var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-            var enumValue = enumEntry.getKey();
-            var enumData = (Map<String, Object>) enumEntry.getValue();
-
-            var enumStructReference = e.values.get(enumValue);
-
-            var selectedFields = selectedStructFields.get(enumStructReference.name);
-            var finalMap = new HashMap<>();
-            for (var entry : enumData.entrySet()) {
-                var fieldName = entry.getKey();
-                if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = enumStructReference.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
-                            selectedStructFields);
-                    finalMap.put(entry.getKey(), valueWithSelectedFields);
-                }
-            }
-
-            return Map.of(enumEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof UObject o) {
-            var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
-            var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(nestedTypeDeclaration, entry.getValue(),
-                        selectedStructFields);
-                finalMap.put(entry.getKey(), valueWithSelectedFields);
-            }
-            return finalMap;
-        } else if (typeDeclaration.type instanceof UArray a) {
-            var nestedType = typeDeclaration.typeParameters.get(0);
-            var valueAsList = (List<Object>) value;
-            var finalList = new ArrayList<>();
-            for (var entry : valueAsList) {
-                var valueWithSelectedFields = selectStructFields(nestedType, entry, selectedStructFields);
-                finalList.add(valueWithSelectedFields);
-            }
-            return finalList;
-        } else {
-            return value;
+    private static void validateResult(UEnum resultEnumType, Object errorResult) {
+        var newErrorResultValidationFailures = resultEnumType.validate(
+                errorResult, List.of(), List.of());
+        if (!newErrorResultValidationFailures.isEmpty()) {
+            throw new JApiProcessError("Failed internal jAPI validation");
         }
     }
 }
