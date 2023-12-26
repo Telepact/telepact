@@ -443,7 +443,7 @@ class UStruct implements UType {
 
         for (var missingField : missingFields) {
             var validationFailure = new ValidationFailure(".%s".formatted(missingField),
-                    "MissingRequiredStructField", Map.of());
+                    "RequiredStructFieldMissing", Map.of());
             validationFailures
                     .add(validationFailure);
         }
@@ -454,7 +454,7 @@ class UStruct implements UType {
             var referenceField = fields.get(fieldName);
             if (referenceField == null) {
                 var validationFailure = new ValidationFailure(".%s".formatted(fieldName),
-                        "UnknownStructField", Map.of());
+                        "StructFieldUnknown", Map.of());
                 validationFailures
                         .add(validationFailure);
                 continue;
@@ -580,7 +580,7 @@ class UEnum implements UType {
                     .toList();
             return nestedValidationFailuresWithPath;
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", enumPayload, "Object");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure(".%s".formatted(enumTarget), enumPayload, "Object");
         }
     }
 
