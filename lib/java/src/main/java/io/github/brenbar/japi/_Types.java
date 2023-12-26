@@ -66,7 +66,7 @@ class UTypeDeclaration {
                     : this.nullable;
             if (!isNullable) {
                 return Collections.singletonList(new ValidationFailure("",
-                        "UnexpectedNull", Map.of()));
+                        "NullDisallowed", Map.of()));
             } else {
                 return Collections.emptyList();
             }
