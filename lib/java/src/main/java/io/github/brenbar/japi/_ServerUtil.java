@@ -98,7 +98,7 @@ class _ServerUtil {
 
         var argumentValidationFailures = argStructType.validate(requestPayload, List.of(), List.of());
         var argumentValidationFailuresWithPath = argumentValidationFailures
-                .stream().map(f -> new ValidationFailure("%s%s".formatted(functionType.name, f.path), f.reason))
+                .stream().map(f -> new ValidationFailure("%s%s".formatted(functionType.name, f.path), f.reason, f.data))
                 .toList();
         if (!argumentValidationFailuresWithPath.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
@@ -135,7 +135,7 @@ class _ServerUtil {
                     resultMessage.body, List.of(), List.of());
             var resultValidationFailuresTrimmed = resultValidationFailures
                     .stream()
-                    .map(f -> f.path.startsWith(".") ? new ValidationFailure(f.path.substring(1), f.reason) : f)
+                    .map(f -> f.path.startsWith(".") ? new ValidationFailure(f.path.substring(1), f.reason, f.data) : f)
                     .toList();
             if (!resultValidationFailuresTrimmed.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailuresTrimmed);
@@ -171,13 +171,13 @@ class _ServerUtil {
         return new Message(responseHeaders, finalResultEnum);
     }
 
-    private static List<Map<String, String>> mapValidationFailuresToInvalidFieldCases(
+    private static List<Map<String, Object>> mapValidationFailuresToInvalidFieldCases(
             List<ValidationFailure> argumentValidationFailures) {
-        var validationFailureCases = new ArrayList<Map<String, String>>();
+        var validationFailureCases = new ArrayList<Map<String, Object>>();
         for (var validationFailure : argumentValidationFailures) {
-            var validationFailureCase = Map.of(
+            Map<String, Object> validationFailureCase = Map.of(
                     "path", validationFailure.path,
-                    "reason", validationFailure.reason);
+                    "reason", Map.of(validationFailure.reason, validationFailure.data));
             validationFailureCases.add(validationFailureCase);
         }
         return validationFailureCases;
@@ -187,7 +187,9 @@ class _ServerUtil {
         var newErrorResultValidationFailures = resultEnumType.validate(
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
-            throw new JApiProcessError("Failed internal jAPI validation");
+            throw new JApiProcessError(
+                    "Failed internal jAPI validation: "
+                            + mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures));
         }
     }
 }

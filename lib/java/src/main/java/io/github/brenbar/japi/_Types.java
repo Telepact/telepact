@@ -66,7 +66,7 @@ class UTypeDeclaration {
                     : this.nullable;
             if (!isNullable) {
                 return Collections.singletonList(new ValidationFailure("",
-                        "NullInvalidForNonNullType"));
+                        "UnexpectedNull", Map.of()));
             } else {
                 return Collections.emptyList();
             }
@@ -111,21 +111,8 @@ class UBoolean implements UType {
             List<UTypeDeclaration> generics) {
         if (value instanceof Boolean) {
             return Collections.emptyList();
-        } else if (value instanceof Number) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberInvalidForBooleanType"));
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForBooleanType"));
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForBooleanType"));
-        } else if (value instanceof Map) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ObjectInvalidForBooleanType"));
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForBooleanType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Boolean");
         }
     }
 
@@ -152,31 +139,13 @@ class UInteger implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForIntegerType"));
+        if (value instanceof Long || value instanceof Integer) {
+            return Collections.emptyList();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
-                    new ValidationFailure("", "NumberOutOfRange"));
-        } else if (value instanceof Number) {
-            if (value instanceof Long || value instanceof Integer) {
-                return Collections.emptyList();
-            } else {
-                return Collections.singletonList(new ValidationFailure("",
-                        "NumberInvalidForIntegerType"));
-            }
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForIntegerType"));
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForIntegerType"));
-        } else if (value instanceof Map) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ObjectInvalidForIntegerType"));
+                    new ValidationFailure("", "NumberOutOfRange", Map.of()));
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForIntegerType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Integer");
         }
     }
 
@@ -202,26 +171,13 @@ class UNumber implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
+        if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForNumberType"));
-        } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberOutOfRange"));
+                    new ValidationFailure("", "NumberOutOfRange", Map.of()));
         } else if (value instanceof Number) {
             return Collections.emptyList();
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForNumberType"));
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForNumberType"));
-        } else if (value instanceof Map) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ObjectInvalidForNumberType"));
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForNumberType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Number");
         }
     }
 
@@ -247,23 +203,10 @@ class UString implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForStringType"));
-        } else if (value instanceof Number) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberInvalidForStringType"));
-        } else if (value instanceof String) {
+        if (value instanceof String) {
             return Collections.emptyList();
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForStringType"));
-        } else if (value instanceof Map) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ObjectInvalidForStringType"));
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForStringType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "String");
         }
     }
 
@@ -290,16 +233,7 @@ class UArray implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForArrayType"));
-        } else if (value instanceof Number) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberInvalidForArrayType"));
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForArrayType"));
-        } else if (value instanceof List l) {
+        if (value instanceof List l) {
             var nestedTypeDeclaration = typeParameters.get(0);
             var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
@@ -308,17 +242,13 @@ class UArray implements UType {
                 final var index = i;
                 var nestedValidationFailuresWithPath = nestedValidationFailures
                         .stream()
-                        .map(f -> new ValidationFailure("[%d]%s".formatted(index, f.path), f.reason))
+                        .map(f -> new ValidationFailure("[%d]%s".formatted(index, f.path), f.reason, f.data))
                         .toList();
                 validationFailures.addAll(nestedValidationFailuresWithPath);
             }
             return validationFailures;
-        } else if (value instanceof Map) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ObjectInvalidForArrayType"));
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForArrayType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Array");
         }
     }
 
@@ -361,19 +291,7 @@ class UObject implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForObjectType"));
-        } else if (value instanceof Number) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberInvalidForObjectType"));
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForObjectType"));
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForObjectType"));
-        } else if (value instanceof Map<?, ?> m) {
+        if (value instanceof Map<?, ?> m) {
             var nestedTypeDeclaration = typeParameters.get(0);
             var validationFailures = new ArrayList<ValidationFailure>();
             for (Map.Entry<?, ?> entry : m.entrySet()) {
@@ -382,14 +300,13 @@ class UObject implements UType {
                 var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
                 var nestedValidationFailuresWithPath = nestedValidationFailures
                         .stream()
-                        .map(f -> new ValidationFailure("{%s}%s".formatted(k, f.path), f.reason))
+                        .map(f -> new ValidationFailure("{%s}%s".formatted(k, f.path), f.reason, f.data))
                         .toList();
                 validationFailures.addAll(nestedValidationFailuresWithPath);
             }
             return validationFailures;
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForObjectType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Object");
         }
     }
 
@@ -503,23 +420,10 @@ class UStruct implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForStructType"));
-        } else if (value instanceof Number) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberInvalidForStructType"));
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForStructType"));
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForStructType"));
-        } else if (value instanceof Map<?, ?> m) {
+        if (value instanceof Map<?, ?> m) {
             return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForStructType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Object");
         }
     }
 
@@ -539,7 +443,7 @@ class UStruct implements UType {
 
         for (var missingField : missingFields) {
             var validationFailure = new ValidationFailure(".%s".formatted(missingField),
-                    "RequiredStructFieldMissing");
+                    "MissingRequiredStructField", Map.of());
             validationFailures
                     .add(validationFailure);
         }
@@ -550,7 +454,7 @@ class UStruct implements UType {
             var referenceField = fields.get(fieldName);
             if (referenceField == null) {
                 var validationFailure = new ValidationFailure(".%s".formatted(fieldName),
-                        "UnknownStructField");
+                        "UnknownStructField", Map.of());
                 validationFailures
                         .add(validationFailure);
                 continue;
@@ -558,7 +462,7 @@ class UStruct implements UType {
             var nestedValidationFailures = referenceField.typeDeclaration.validate(fieldValue, typeParameters);
             var nestedValidationFailuresWithPath = nestedValidationFailures
                     .stream()
-                    .map(f -> new ValidationFailure(".%s%s".formatted(fieldName, f.path), f.reason))
+                    .map(f -> new ValidationFailure(".%s%s".formatted(fieldName, f.path), f.reason, f.data))
                     .toList();
             validationFailures.addAll(nestedValidationFailuresWithPath);
         }
@@ -641,23 +545,10 @@ class UEnum implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "BooleanInvalidForEnumType"));
-        } else if (value instanceof Number) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "NumberInvalidForEnumType"));
-        } else if (value instanceof String) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "StringInvalidForEnumType"));
-        } else if (value instanceof List) {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ArrayInvalidForEnumType"));
-        } else if (value instanceof Map<?, ?> m) {
+        if (value instanceof Map<?, ?> m) {
             return validateEnumValues(this.values, m, typeParameters);
         } else {
-            return Collections.singletonList(
-                    new ValidationFailure("", "ValueInvalidForEnumType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Object");
         }
     }
 
@@ -667,7 +558,7 @@ class UEnum implements UType {
         if (actual.size() != 1) {
             return Collections.singletonList(
                     new ValidationFailure("",
-                            "EnumDoesNotHaveExactlyOneField"));
+                            "ZeroOrManyEnumFieldsDisallowed", Map.of()));
         }
         var entry = actual.entrySet().stream().findFirst().get();
         var enumTarget = (String) entry.getKey();
@@ -677,32 +568,19 @@ class UEnum implements UType {
         if (referenceStruct == null) {
             return Collections
                     .singletonList(new ValidationFailure(".%s".formatted(enumTarget),
-                            "UnknownEnumField"));
+                            "EnumFieldUnknown", Map.of()));
         }
 
-        if (enumPayload instanceof Boolean) {
-            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
-                    "BooleanInvalidForEnumStructType"));
-        } else if (enumPayload instanceof Number) {
-            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
-                    "NumberInvalidForEnumStructType"));
-        } else if (enumPayload instanceof String) {
-            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
-                    "StringInvalidForEnumStructType"));
-        } else if (enumPayload instanceof List) {
-            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
-                    "ArrayInvalidForEnumStructType"));
-        } else if (enumPayload instanceof Map<?, ?> m2) {
+        if (enumPayload instanceof Map<?, ?> m2) {
             var nestedValidationFailures = validateEnumStruct(referenceStruct, enumTarget,
                     (Map<String, Object>) m2, typeParameters);
             var nestedValidationFailuresWithPath = nestedValidationFailures
                     .stream()
-                    .map(f -> new ValidationFailure(".%s%s".formatted(enumTarget, f.path), f.reason))
+                    .map(f -> new ValidationFailure(".%s%s".formatted(enumTarget, f.path), f.reason, f.data))
                     .toList();
             return nestedValidationFailuresWithPath;
         } else {
-            return Collections.singletonList(new ValidationFailure(".%s".formatted(enumTarget),
-                    "ValueInvalidForEnumStructType"));
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", enumPayload, "Object");
         }
     }
 
@@ -921,10 +799,12 @@ interface BinaryEncoder {
 class ValidationFailure {
     public final String path;
     public final String reason;
+    public final Map<String, Object> data;
 
-    public ValidationFailure(String path, String reason) {
+    public ValidationFailure(String path, String reason, Map<String, Object> data) {
         this.path = path;
         this.reason = reason;
+        this.data = data;
     }
 }
 

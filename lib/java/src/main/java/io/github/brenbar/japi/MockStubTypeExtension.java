@@ -22,7 +22,8 @@ public class MockStubTypeExtension implements TypeExtension {
 
             var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.startsWith("fn.")).findAny();
             if (optionalFunctionName.isEmpty()) {
-                validationFailures.add(new ValidationFailure("", "StubMissingCall"));
+                validationFailures.add(
+                        new ValidationFailure("", "ExtensionValidationFailure", Map.of("message", "StubMissingCall")));
 
             } else {
                 var functionName = optionalFunctionName.get();
@@ -32,7 +33,7 @@ public class MockStubTypeExtension implements TypeExtension {
 
                 var inputFailures = functionDef.arg.validate(input, List.of(), List.of());
                 var inputFailuresWithPath = inputFailures.stream()
-                        .map(f -> new ValidationFailure(".%s%s".formatted(functionName, f.path), f.reason))
+                        .map(f -> new ValidationFailure(".%s%s".formatted(functionName, f.path), f.reason, f.data))
                         .toList();
 
                 var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
@@ -41,14 +42,16 @@ public class MockStubTypeExtension implements TypeExtension {
                 validationFailures.addAll(inputFailuresWithoutMissingRequired);
 
                 if (!givenMap.containsKey("->")) {
-                    validationFailures.add(new ValidationFailure("", "StubMissingResult"));
+                    validationFailures.add(new ValidationFailure("", "ExtensionValidationFailure",
+                            Map.of("message", "StubMissingResult")));
                 } else {
 
                     var output = (Map<String, Object>) givenMap.get("->");
 
                     var outputFailures = functionDef.result.validate(output, List.of(), List.of());
                     var outputFailuresWithPath = outputFailures.stream()
-                            .map(f -> new ValidationFailure(".%s%s".formatted("->", f.path), f.reason)).toList();
+                            .map(f -> new ValidationFailure(".%s%s".formatted("->", f.path), f.reason, f.data))
+                            .toList();
                     var failuresWithoutMissingRequired = outputFailuresWithPath
                             .stream().filter(f -> !f.reason.equals("RequiredStructFieldMissing"))
                             .toList();
@@ -58,7 +61,8 @@ public class MockStubTypeExtension implements TypeExtension {
             }
 
         } catch (ClassCastException e) {
-            validationFailures.add(new ValidationFailure("", "StubTypeRequired"));
+            validationFailures.add(
+                    new ValidationFailure("", "ExtensionValidationFailure", Map.of("message", "StubTypeRequired")));
         }
 
         return validationFailures;

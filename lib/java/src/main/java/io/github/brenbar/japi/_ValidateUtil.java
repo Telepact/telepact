@@ -1,9 +1,11 @@
 package io.github.brenbar.japi;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class _ValidateUtil {
 
@@ -15,15 +17,25 @@ public class _ValidateUtil {
             List<Object> binaryChecksums;
             try {
                 binaryChecksums = (List<Object>) headers.get("_bin");
+                var i = 0;
                 for (var binaryChecksum : binaryChecksums) {
                     try {
                         var integerElement = (Integer) binaryChecksum;
                     } catch (ClassCastException e) {
-                        var longElement = (Long) binaryChecksum;
+                        try {
+                            var longElement = (Long) binaryChecksum;
+                        } catch (ClassCastException e2) {
+                            validationFailures
+                                    .addAll(getTypeUnxpectedValidationFailure("headers{_bin}[%d]".formatted(i),
+                                            binaryChecksum,
+                                            "Integer"));
+                        }
                     }
+                    i += 1;
                 }
             } catch (ClassCastException e) {
-                validationFailures.add(new ValidationFailure("headers{_bin}", "BinaryHeaderMustBeArrayOfIntegers"));
+                validationFailures
+                        .addAll(getTypeUnxpectedValidationFailure("headers{_bin}", headers.get("_bin"), "Array"));
             }
         }
 
@@ -34,15 +46,15 @@ public class _ValidateUtil {
                         .get("_sel");
 
             } catch (ClassCastException e) {
-                validationFailures.add(new ValidationFailure("headers{_sel}",
-                        "SelectHeaderMustBeObject"));
+                validationFailures.addAll(getTypeUnxpectedValidationFailure("headers{_sel}",
+                        headers.get("_sel"), "Object"));
             }
             for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
                 var structName = entry.getKey();
                 if (!structName.startsWith("struct.") && !structName.startsWith("->.")
                         && !structName.startsWith("fn.")) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
-                            "SelectHeaderKeyMustBeStructReference"));
+                            "SelectHeaderKeyMustBeStructReference", Map.of()));
                     continue;
                 }
 
@@ -59,7 +71,7 @@ public class _ValidateUtil {
 
                 if (structReference == null) {
                     validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
-                            "UnknownStruct"));
+                            "StructNameUnknown", Map.of()));
                     continue;
                 }
 
@@ -67,8 +79,10 @@ public class _ValidateUtil {
                 try {
                     fields = (List<Object>) entry.getValue();
                 } catch (ClassCastException e) {
-                    validationFailures.add(new ValidationFailure("headers{_sel}{%s}".formatted(structName),
-                            "SelectHeaderFieldsMustBeArray"));
+                    validationFailures
+                            .addAll(getTypeUnxpectedValidationFailure("headers{_sel}{%s}".formatted(structName),
+                                    entry.getValue(),
+                                    "Array"));
                 }
 
                 for (int i = 0; i < fields.size(); i += 1) {
@@ -77,15 +91,16 @@ public class _ValidateUtil {
                     try {
                         stringField = (String) field;
                     } catch (ClassCastException e) {
-                        validationFailures.add(new ValidationFailure(
+                        validationFailures.addAll(getTypeUnxpectedValidationFailure(
                                 "headers{_sel}{%s}[%d]".formatted(structName, i),
-                                "SelectHeaderFieldMustBeString"));
+                                field,
+                                "String"));
                         continue;
                     }
                     if (!structReference.fields.containsKey(stringField)) {
                         validationFailures.add(new ValidationFailure(
                                 "headers{_sel}{%s}[%d]".formatted(structName, i),
-                                "UnknownStructField"));
+                                "StructFieldUnknown", Map.of()));
                     }
                 }
             }
@@ -94,5 +109,31 @@ public class _ValidateUtil {
 
         return validationFailures;
 
+    }
+
+    static String getType(Object value) {
+        if (value instanceof Boolean) {
+            return "Boolean";
+        } else if (value instanceof Integer) {
+            return "Integer";
+        } else if (value instanceof Number) {
+            return "Number";
+        } else if (value instanceof String) {
+            return "String";
+        } else if (value instanceof List) {
+            return "Array";
+        } else if (value instanceof Map) {
+            return "Object";
+        } else {
+            return "Unknown";
+        }
+    }
+
+    static List<ValidationFailure> getTypeUnxpectedValidationFailure(String path, Object value, String expectedType) {
+        var actualType = _ValidateUtil.getType(value);
+        Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
+                Map.entry("expected", Map.of(expectedType, Map.of()))));
+        return Collections.singletonList(
+                new ValidationFailure(path, "TypeUnexpected", data));
     }
 }

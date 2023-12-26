@@ -26,10 +26,63 @@
   },
 
   {
+    "///": " A type. ",
+    "enum._Type": {
+      "Boolean": {},
+      "Integer": {},
+      "Number": {},
+      "String": {},
+      "Array": {},
+      "Object": {},
+      "Unknown": {}
+    }
+  },
+
+  {
+    "///": " A reason for the validation failure in the body. ",
+    "enum._BodyValidationFailureReason": {
+      "TypeUnexpected": {
+        "expected": ["enum._Type"],
+        "actual": ["enum._Type"]
+      },
+      "NullDisallowed": {},
+      "StructFieldUnknown": {},
+      "RequiredStructFieldMissing": {},
+      "NumberOutOfRange": {},
+      "ZeroOrManyEnumFieldsDisallowed": {},
+      "EnumFieldUnknown": {},
+      "ExtensionValidationFailure": {
+        "message": ["string"]
+      }
+    }
+  },
+
+  {
+    "///": " A reason for the validation failure in the header. ",
+    "enum._HeaderValidationFailureReason": {
+      "TypeUnexpected": {
+        "expected": ["enum._Type"],
+        "actual": ["enum._Type"]
+      },
+      "SelectHeaderKeyMustBeStructReference": {},
+      "StructNameUnknown": {},
+      "StructFieldUnknown": {}
+    }
+  },
+
+  {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
-    "struct._ValidationFailure": {
+    "struct._BodyValidationFailure": {
       "path": ["string"],
-      "reason": ["string"]
+      "reason": ["enum._BodyValidationFailureReason"]
+    }
+  },
+
+  {
+    "///": " A validation failure located at a `path` explained by a `reason`. ",
+    "struct._HeaderValidationFailure": {
+      "path": ["string"],
+      "reason": ["enum._BodyValidationFailureReason"]
     }
   },
 
@@ -47,13 +100,13 @@
       "->": {
         "_errorUnknown": {},
         "_errorInvalidRequestHeaders": {
-          "cases": ["array", ["struct._ValidationFailure"]]
+          "cases": ["array", ["struct._HeaderValidationFailure"]]
         },
         "_errorInvalidRequestBody": {
-          "cases": ["array", ["struct._ValidationFailure"]]
+          "cases": ["array", ["struct._BodyValidationFailure"]]
         },
         "_errorInvalidResponseBody": {
-          "cases": ["array", ["struct._ValidationFailure"]]
+          "cases": ["array", ["struct._BodyValidationFailure"]]
         },
         "_errorParseFailure": {
           "reasons": ["array", ["string"]]
