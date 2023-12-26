@@ -195,7 +195,8 @@ def verify_case(runner: unittest.TestCase, request, expected_response, path, bac
     if should_abort:
         runner.skipTest('Skipped')
 
-    runner.maxDiff = None
+    if runner:
+        runner.maxDiff = None
 
     signal.signal(signal.SIGALRM, signal_handler)
     signal.alarm(30)
