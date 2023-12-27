@@ -231,13 +231,13 @@ def verify_case(runner: unittest.TestCase, request, expected_response, path, bac
                 request_json = json.dumps(request)
                 request_bytes = request_json.encode()
 
-            print('|->     {}'.format(request_bytes))
+            print('|->     {}'.format(request_bytes), flush=True)
 
             socket_send(client, request_bytes)
 
             response_bytes = socket_recv(client)
 
-            print('|<-     {}'.format(response_bytes))
+            print('|<-     {}'.format(response_bytes), flush=True)
 
             if type(expected_response) != bytes:
                 response_json = response_bytes.decode()

@@ -76,6 +76,12 @@ class _ServerUtil {
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
                     Map.of("reasons", parseFailures));
             validateResult(resultEnumType, newErrorResult);
+
+            // TODO: Need to find a good way to do this:
+            // if (parseFailures.contains("IncompatibleBinaryEncoding") ||
+            // parseFailures.contains("BinaryDecodeFailure")) {
+            // responseHeaders.put("_binary", true);
+            // }
             return new Message(responseHeaders, newErrorResult);
         }
 

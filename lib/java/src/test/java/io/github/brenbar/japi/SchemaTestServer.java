@@ -57,8 +57,10 @@ public class SchemaTestServer {
                     var requestBytes = TestUtility.readSocket(clientChannel);
 
                     System.out.println("    ->| %s".formatted(new String(requestBytes)));
+                    System.out.flush();
                     var responseBytes = server.process(requestBytes);
                     System.out.println("    <-| %s".formatted(new String(responseBytes)));
+                    System.out.flush();
 
                     TestUtility.writeSocket(clientChannel, responseBytes);
                 }
