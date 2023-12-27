@@ -291,7 +291,7 @@ def generate():
             pathlib.Path('test/{}/__init__.py'.format(lib_path)).touch()
 
         generated_tests = open(
-            'test/{}/test_generated.py'.format(lib_path), 'w')
+            'test/{}/test_cases.py'.format(lib_path), 'w')
 
         generated_tests.write('''
 from generate_test import verify_case, backdoor_handler, client_backdoor_handler
