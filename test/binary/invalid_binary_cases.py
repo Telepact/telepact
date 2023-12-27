@@ -17,14 +17,14 @@ cases = {
         [[{}, 0], [{}, {'_errorParseFailure': {'reasons': ['BodyMustBeObject']}}]],
         [[{}, ''], [{}, {'_errorParseFailure': {'reasons': ['BodyMustBeObject']}}]],
         [[{}, []], [{}, {'_errorParseFailure': {'reasons': ['BodyMustBeObject']}}]],
-        [[{'_bin': False}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': 0}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': ''}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': {}}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': [False]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': [0.1]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': ['']}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': [[]]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]],
-        [[{'_bin': [{}]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': 'BinaryHeaderMustBeArrayOfIntegers'}]}}]]
+        [[{'_bin': False}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_bin': 0}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_bin': ''}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_bin': {}}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_bin': [False]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]],
+        [[{'_bin': [0.1]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]],
+        [[{'_bin': ['']}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]],
+        [[{'_bin': [[]]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]],
+        [[{'_bin': [{}]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]]
     ]
 }

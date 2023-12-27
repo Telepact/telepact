@@ -73,7 +73,7 @@ def backdoor_handler(path, backdoor_results: ShareableList):
             if backdoor_request_bytes == b'':
                 continue
 
-            print(' |<-    {}'.format(backdoor_request_bytes))
+            print(' |<-    {}'.format(backdoor_request_bytes), flush=True)
 
             backdoor_request_json = backdoor_request_bytes.decode()
 
@@ -88,7 +88,7 @@ def backdoor_handler(path, backdoor_results: ShareableList):
 
             backdoor_response_bytes = backdoor_response_json.encode()
 
-            print(' |->    {}'.format(backdoor_request_json))
+            print(' |->    {}'.format(backdoor_request_json), flush=True)
 
             socket_send(client_socket, backdoor_response_bytes)
 
@@ -134,7 +134,7 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
             if backdoor_request_bytes == b'':
                 continue
 
-            print('  |<-   {}'.format(backdoor_request_bytes))
+            print('  |<-   {}'.format(backdoor_request_bytes), flush=True)
 
             # try to check binary, we may not need to, but store the result anyway
             try:
@@ -154,13 +154,13 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
                 while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
                     pass
 
-                print('   |->  {}'.format(backdoor_request_bytes))
+                print('   |->  {}'.format(backdoor_request_bytes), flush=True)
 
                 socket_send(server_frontdoor_client, backdoor_request_bytes)
 
                 backdoor_response_bytes = socket_recv(server_frontdoor_client)
 
-                print('   |<-  {}'.format(backdoor_response_bytes))
+                print('   |<-  {}'.format(backdoor_response_bytes), flush=True)
 
                 # try to check binary, we may not need to, but store the result anyway
                 try:
@@ -176,7 +176,7 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
                     client_backdoor_results[index] |= 4
 
 
-            print('  |->   {}'.format(backdoor_response_bytes))
+            print('  |->   {}'.format(backdoor_response_bytes), flush=True)
 
             socket_send(client_backdoor_client, backdoor_response_bytes)
 
@@ -193,7 +193,10 @@ def signal_handler(signum, frame):
 def verify_case(runner: unittest.TestCase, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False, skip_assertion=False):
     global should_abort
     if should_abort:
-        runner.skipTest('Skipped')
+        if runner:
+            runner.skipTest('Skipped')
+        else:
+            return
 
     if runner:
         runner.maxDiff = None

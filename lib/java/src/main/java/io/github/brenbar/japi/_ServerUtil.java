@@ -91,7 +91,8 @@ class _ServerUtil {
 
         if (unknownTarget != null) {
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
-                    Map.of("cases", List.of(Map.of("path", unknownTarget, "reason", "UnknownFunction"))));
+                    Map.of("cases",
+                            List.of(Map.of("path", unknownTarget, "reason", Map.of("FunctionUnknown", Map.of())))));
             validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
