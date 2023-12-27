@@ -19,57 +19,57 @@ def get_type(the_type) -> str:
 
 
 def get_values(given_field: str, the_type, given_correct_values):
-    given_incorrect_values = filter(lambda n: type(n) != the_type, default_values)
+    given_incorrect_values = list(filter(lambda n: type(n) != the_type, default_values))
     abc = 'abcdefghijklmnopqrstuvwxyz'
 
     field = given_field
     correct_values = given_correct_values
-    incorrect_values = [None] + given_incorrect_values
+    incorrect_values = [(v, v) for v in [None] + given_incorrect_values]
     yield field, correct_values, incorrect_values, field
     
     field = 'null{}'.format(given_field.capitalize())
     correct_values = [None] + given_correct_values
-    incorrect_values = given_incorrect_values
+    incorrect_values = [(v, v) for v in given_incorrect_values]
     yield field, correct_values, incorrect_values, field
 
     field = 'arr{}'.format(given_field.capitalize())
-    correct_values = [[]] + [[i] for i in given_correct_values] + [given_correct_values]
-    incorrect_values = [[None]] + [[given_correct_values[0], i] for i in given_incorrect_values]
+    correct_values = [[]] + [[v] for v in given_correct_values] + [given_correct_values]
+    incorrect_values = [([given_correct_values[0], v], v) for v in [None] + given_incorrect_values]
     yield field, correct_values, incorrect_values, '{}[1]'.format(field)
 
     field = 'arrNull{}'.format(given_field.capitalize())
-    correct_values = [[]] + [[None]] + [[i] for i in given_correct_values] + [[None] + given_correct_values]
-    incorrect_values = [[given_correct_values[0], i] for i in given_incorrect_values]
+    correct_values = [[]] + [[v] for v in [None] + given_correct_values] + [[None] + given_correct_values]
+    incorrect_values = [([given_correct_values[0], v], v) for v in given_incorrect_values]
     yield field, correct_values, incorrect_values, '{}[1]'.format(field)
 
     field = 'obj{}'.format(given_field.capitalize())
     correct_values = [{}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate(given_correct_values)}]
-    incorrect_values = [{'a': None}] + [{'a': given_correct_values[0], 'b': v} for v in given_incorrect_values]
-    yield field, correct_values, incorrect_values, '{}{{\'b\'}}'.format(field)
+    incorrect_values = [({'a': given_correct_values[0], 'b': v}, v) for v in [None] + given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}{{b}}'.format(field)
 
     field = 'objNull{}'.format(given_field.capitalize())
-    correct_values = [{}] + [{'a': None}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate([None] + given_correct_values)}]
-    incorrect_values = [{'a': given_correct_values[0], 'b': v} for v in given_incorrect_values]
-    yield field, correct_values, incorrect_values, '{}{{\'b\'}}'.format(field)
+    correct_values = [{}] + [{'a': v} for v in [None] + given_correct_values] + [{abc[i]: v for i,v in enumerate([None] + given_correct_values)}]
+    incorrect_values = [({'a': given_correct_values[0], 'b': v}, v) for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}{{b}}'.format(field)
 
     field = 'pStr{}'.format(given_field.capitalize())
     correct_values = [{'wrap': v} for v in given_correct_values]
-    incorrect_values = [{'wrap': None}] + [{'wrap': v} for v in given_incorrect_values]
+    incorrect_values = [({'wrap': v}, v) for v in [None] + given_incorrect_values]
     yield field, correct_values, incorrect_values, '{}.wrap'.format(field)
 
     field = 'pStrNull{}'.format(given_field.capitalize())
-    correct_values = [{'wrap': None}] + [{'wrap': v} for v in given_correct_values]
-    incorrect_values = [{'wrap': v} for v in given_incorrect_values]
+    correct_values = [{'wrap': v} for v in [None] + given_correct_values]
+    incorrect_values = [({'wrap': v}, v) for v in given_incorrect_values]
     yield field, correct_values, incorrect_values, '{}.wrap'.format(field)
 
     field = 'pEnum{}'.format(given_field.capitalize())
     correct_values = [{'one': {}}] + [{'two': {'ewrap': v}} for v in given_correct_values]
-    incorrect_values = [{'two': {'ewrap': None}}] + [{'two': {'ewrap': v}} for v in given_incorrect_values]
+    incorrect_values = [({'two': {'ewrap': v}}, v) for v in [None] + given_incorrect_values]
     yield field, correct_values, incorrect_values, '{}.two.ewrap'.format(field)
 
     field = 'pEnumNull{}'.format(given_field.capitalize())
-    correct_values = [{'one': {}}] + [{'two': {'ewrap': None}}] + [{'two': {'ewrap': v}} for v in given_correct_values]
-    incorrect_values = [{'two': {'ewrap': v}} for v in given_incorrect_values]
+    correct_values = [{'one': {}}] + [{'two': {'ewrap': v}} for v in [None] + given_correct_values]
+    incorrect_values = [({'two': {'ewrap': v}}, v) for v in given_incorrect_values]
     yield field, correct_values, incorrect_values, '{}.two.ewrap'.format(field)
 
 
@@ -81,176 +81,15 @@ def generate_basic_cases(given_field: str, the_type, correct_values):
         for correct_value in correct_values:
             yield [[{'ok': {'value': {field: correct_value}}}, {'fn.test': {'value': {field: correct_value}}}], [{}, {'ok': {'value': {field: correct_value}}}]]
 
-        for incorrect_value in incorrect_values:
-            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.{}'.format(path), 'reason': {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}}]}}]],
+        for scaffold, incorrect_value in incorrect_values:
+            yield [[{}, {'fn.test': {'value': {field: scaffold}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.{}'.format(path), 'reason': {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}}]}}]]
 
-        for incorrect_value in incorrect_values:
-            yield [[{'ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.{}'.format(path), 'reason': {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}}]}}]],
-
-
+        for scaffold, incorrect_value in incorrect_values:
+            yield [[{'ok': {'value': {field: scaffold}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.{}'.format(path), 'reason': {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}}]}}]]
 
 
 cases = {
-    'testBoolean': [
-        [[{'ok': {'value': {'bool': False}}}, {'fn.test': {'value': {'bool': False}}}], [{}, {'ok': {'value': {'bool': False}}}]],
-        [[{'ok': {'value': {'bool': True}}}, {'fn.test': {'value': {'bool': True}}}], [{}, {'ok': {'value': {'bool': True}}}]],
-        [[{}, {'fn.test': {'value': {'bool': None}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.bool', 'reason': {'NullDisallowed': {}}}]}}]],
-        [[{}, {'fn.test': {'value': {'bool': 0}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'bool': 0.1}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'bool': ''}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.bool', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'bool': []}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'bool': {}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'bool': 0}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'bool': 0.1}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'bool': ''}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.bool', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'bool': []}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'bool': {}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.bool', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testNullableBoolean': [
-        [[{'ok': {'value': {'nullBool': None}}}, {'fn.test': {'value': {'nullBool': None}}}], [{}, {'ok': {'value': {'nullBool': None}}}]],
-        [[{'ok': {'value': {'nullBool': False}}}, {'fn.test': {'value': {'nullBool': False}}}], [{}, {'ok': {'value': {'nullBool': False}}}]],
-        [[{'ok': {'value': {'nullBool': True}}}, {'fn.test': {'value': {'nullBool': True}}}], [{}, {'ok': {'value': {'nullBool': True}}}]],
-        [[{}, {'fn.test': {'value': {'nullBool': 0}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'nullBool': 0.1}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'nullBool': ''}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'nullBool': []}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'nullBool': {}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'nullBool': 0}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'nullBool': 0.1}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'nullBool': ''}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'nullBool': []}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'nullBool': {}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullBool', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testArrayBoolean': [
-        [[{'ok': {'value': {'arrBool': []}}}, {'fn.test': {'value': {'arrBool': []}}}], [{}, {'ok': {'value': {'arrBool': []}}}]],
-        [[{'ok': {'value': {'arrBool': [False]}}}, {'fn.test': {'value': {'arrBool': [False]}}}], [{}, {'ok': {'value': {'arrBool': [False]}}}]],
-        [[{'ok': {'value': {'arrBool': [True]}}}, {'fn.test': {'value': {'arrBool': [True]}}}], [{}, {'ok': {'value': {'arrBool': [True]}}}]],
-        [[{'ok': {'value': {'arrBool': [False, True]}}}, {'fn.test': {'value': {'arrBool': [False, True]}}}], [{}, {'ok': {'value': {'arrBool': [False, True]}}}]],
-        [[{}, {'fn.test': {'value': {'arrBool': [False, None]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrBool[1]', 'reason': {'NullDisallowed': {}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrBool': [False, 0]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrBool': [False, 0.1]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrBool': [False, '']}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrBool': [False, []]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrBool': [False, {}]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrBool': [False, 0]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrBool': [False, 0.1]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrBool': [False, '']}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrBool': [False, []]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrBool': [False, {}]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testArrayNullBoolean': [
-        [[{'ok': {'value': {'arrNullBool': []}}}, {'fn.test': {'value': {'arrNullBool': []}}}], [{}, {'ok': {'value': {'arrNullBool': []}}}]],
-        [[{'ok': {'value': {'arrNullBool': [None]}}}, {'fn.test': {'value': {'arrNullBool': [None]}}}], [{}, {'ok': {'value': {'arrNullBool': [None]}}}]],
-        [[{'ok': {'value': {'arrNullBool': [False]}}}, {'fn.test': {'value': {'arrNullBool': [False]}}}], [{}, {'ok': {'value': {'arrNullBool': [False]}}}]],
-        [[{'ok': {'value': {'arrNullBool': [True]}}}, {'fn.test': {'value': {'arrNullBool': [True]}}}], [{}, {'ok': {'value': {'arrNullBool': [True]}}}]],
-        [[{'ok': {'value': {'arrNullBool': [None, False, True]}}}, {'fn.test': {'value': {'arrNullBool': [None, False, True]}}}], [{}, {'ok': {'value': {'arrNullBool': [None, False, True]}}}]],
-        [[{}, {'fn.test': {'value': {'arrNullBool': [False, 0]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrNullBool': [False, 0.1]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrNullBool': [False, '']}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrNullBool': [False, []]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'arrNullBool': [False, {}]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrNullBool': [False, 0]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrNullBool': [False, 0.1]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrNullBool': [False, '']}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrNullBool': [False, []]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'arrNullBool': [False, {}]}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullBool[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testObjectBoolean': [
-        [[{'ok': {'value': {'objBool': {}}}}, {'fn.test': {'value': {'objBool': {}}}}], [{}, {'ok': {'value': {'objBool': {}}}}]],
-        [[{'ok': {'value': {'objBool': {'a': False}}}}, {'fn.test': {'value': {'objBool': {'a': False}}}}], [{}, {'ok': {'value': {'objBool': {'a': False}}}}]],
-        [[{'ok': {'value': {'objBool': {'a': True}}}}, {'fn.test': {'value': {'objBool': {'a': True}}}}], [{}, {'ok': {'value': {'objBool': {'a': True}}}}]],
-        [[{'ok': {'value': {'objBool': {'a': False, 'b': True}}}}, {'fn.test': {'value': {'objBool': {'a': False, 'b': True}}}}], [{}, {'ok': {'value': {'objBool': {'a': False, 'b': True}}}}]],
-        [[{}, {'fn.test': {'value': {'objBool': {'a': False, 'b': None}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objBool{b}', 'reason': {'NullDisallowed': {}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objBool': {'a': False, 'b': 0}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objBool': {'a': False, 'b': 0.1}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objBool': {'a': False, 'b': ''}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objBool': {'a': False, 'b': []}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objBool': {'a': False, 'b': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objBool': {'a': False, 'b': 0}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objBool': {'a': False, 'b': 0.1}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objBool': {'a': False, 'b': ''}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objBool': {'a': False, 'b': []}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objBool': {'a': False, 'b': {}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testObjectNullBoolean': [
-        [[{'ok': {'value': {'objNullBool': {}}}}, {'fn.test': {'value': {'objNullBool': {}}}}], [{}, {'ok': {'value': {'objNullBool': {}}}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': None}}}}, {'fn.test': {'value': {'objNullBool': {'a': None}}}}], [{}, {'ok': {'value': {'objNullBool': {'a': None}}}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': False}}}}, {'fn.test': {'value': {'objNullBool': {'a': False}}}}], [{}, {'ok': {'value': {'objNullBool': {'a': False}}}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': True}}}}, {'fn.test': {'value': {'objNullBool': {'a': True}}}}], [{}, {'ok': {'value': {'objNullBool': {'a': True}}}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': None, 'b': False, 'c': True}}}}, {'fn.test': {'value': {'objNullBool': {'a': None, 'b': False, 'c': True}}}}], [{}, {'ok': {'value': {'objNullBool': {'a': None, 'b': False, 'c': True}}}}]],
-        [[{}, {'fn.test': {'value': {'objNullBool': {'a': False, 'b': 0}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objNullBool': {'a': False, 'b': 0.1}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objNullBool': {'a': False, 'b': ''}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objNullBool': {'a': False, 'b': []}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'objNullBool': {'a': False, 'b': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': False, 'b': 0}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': False, 'b': 0.1}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': False, 'b': ''}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': False, 'b': []}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'objNullBool': {'a': False, 'b': {}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullBool{b}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testPStructBoolean': [
-        [[{'ok': {'value': {'pStrBool': {'wrap': False}}}}, {'fn.test': {'value': {'pStrBool': {'wrap': False}}}}], [{}, {'ok': {'value': {'pStrBool': {'wrap': False}}}}]],
-        [[{'ok': {'value': {'pStrBool': {'wrap': True}}}}, {'fn.test': {'value': {'pStrBool': {'wrap': True}}}}], [{}, {'ok': {'value': {'pStrBool': {'wrap': True}}}}]],
-        [[{}, {'fn.test': {'value': {'pStrBool': {'wrap': None}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrBool.wrap', 'reason': {'NullDisallowed': {}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrBool': {'wrap': 0}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrBool': {'wrap': 0.1}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrBool': {'wrap': ''}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrBool': {'wrap': []}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrBool': {'wrap': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrBool': {'wrap': 0}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrBool': {'wrap': 0.1}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrBool': {'wrap': ''}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrBool': {'wrap': []}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrBool': {'wrap': {}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testPStructNullBoolean': [
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullBool': {'wrap': None}}}}], [{}, {'ok': {'value': {'pStrNullBool': {'wrap': None}}}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': False}}}}, {'fn.test': {'value': {'pStrNullBool': {'wrap': False}}}}], [{}, {'ok': {'value': {'pStrNullBool': {'wrap': False}}}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': True}}}}, {'fn.test': {'value': {'pStrNullBool': {'wrap': True}}}}], [{}, {'ok': {'value': {'pStrNullBool': {'wrap': True}}}}]],
-        [[{}, {'fn.test': {'value': {'pStrNullBool': {'wrap': 0}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrNullBool': {'wrap': 0.1}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrNullBool': {'wrap': ''}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrNullBool': {'wrap': []}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pStrNullBool': {'wrap': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': 0}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': 0.1}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': ''}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': []}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pStrNullBool': {'wrap': {}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullBool.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testPEnumBoolean': [
-        [[{'ok': {'value': {'pEnumBool': {'one': {}}}}}, {'fn.test': {'value': {'pEnumBool': {'one': {}}}}}], [{}, {'ok': {'value': {'pEnumBool': {'one': {}}}}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': False}}}}}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': False}}}}}], [{}, {'ok': {'value': {'pEnumBool': {'two': {'ewrap': False}}}}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': True}}}}}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': True}}}}}], [{}, {'ok': {'value': {'pEnumBool': {'two': {'ewrap': True}}}}}]],
-        [[{}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': None}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumBool.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': 0}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': 0.1}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': ''}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': []}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumBool': {'two': {'ewrap': {}}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': []}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumBool': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
-    'testPEnumNullBoolean': [
-        [[{'ok': {'value': {'pEnumBool': {'one': {}}}}}, {'fn.test': {'value': {'pEnumBool': {'one': {}}}}}], [{}, {'ok': {'value': {'pEnumBool': {'one': {}}}}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': None}}}}}], [{}, {'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': None}}}}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': False}}}}}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': False}}}}}], [{}, {'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': False}}}}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': True}}}}}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': True}}}}}], [{}, {'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': True}}}}}]],
-        [[{}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': 0}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': 0.1}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': ''}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': []}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{}, {'fn.test': {'value': {'pEnumNullBool': {'two': {'ewrap': {}}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': []}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-        [[{'ok': {'value': {'pEnumNullBool': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullBool.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
-    ],
+    'testBoolean': [v for v in generate_basic_cases('bool', bool, [False, True])],
     'testInteger': [
         [[{'ok': {'value': {'int': 0}}}, {'fn.test': {'value': {'int': 0}}}], [{}, {'ok': {'value': {'int': 0}}}]],
         [[{'ok': {'value': {'int': -1}}}, {'fn.test': {'value': {'int': -1}}}], [{}, {'ok': {'value': {'int': -1}}}]],
