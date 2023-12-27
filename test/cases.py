@@ -1,3 +1,5 @@
+from typing import Any
+
 default_values = [False, 0, 0.1, '', [], {}]
 
 def get_type(the_type) -> str:
@@ -15,6 +17,8 @@ def get_type(the_type) -> str:
         return 'Object'
     elif the_type == type(None):
         return 'Null'
+    elif the_type == Any:
+        return 'Any'
 
 
 def type_unexp(incorrect_value, the_type):
@@ -22,7 +26,7 @@ def type_unexp(incorrect_value, the_type):
 
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
-    default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else type(n) != the_type, default_values))
+    default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else False if the_type == Any else type(n) != the_type, default_values))
     given_incorrect_values = additional_incorrect_values + [(v, type_unexp(v, the_type), '') for v in default_incorrect_values]
     given_incorrect_values_w_null = additional_incorrect_values + [(v, type_unexp(v, the_type), '') for v in [None] + default_incorrect_values]
     abc = 'abcdefghijklmnopqrstuvwxyz'
@@ -114,102 +118,7 @@ cases = {
     'string': [v for v in generate_basic_cases('str', str, ['', 'abc'])],
     'array': [v for v in generate_basic_cases('arr', list, [[], [False, 0, 0.1, '']])],
     'object': [v for v in generate_basic_cases('obj', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
-    'testAny': [
-        [[{'ok': {'value': {'any': False}}}, {'fn.test': {'value': {'any': False}}}], [{}, {'ok': {'value': {'any': False}}}]],
-        [[{'ok': {'value': {'any': 0}}}, {'fn.test': {'value': {'any': 0}}}], [{}, {'ok': {'value': {'any': 0}}}]],
-        [[{'ok': {'value': {'any': 0.1}}}, {'fn.test': {'value': {'any': 0.1}}}], [{}, {'ok': {'value': {'any': 0.1}}}]],
-        [[{'ok': {'value': {'any': ''}}}, {'fn.test': {'value': {'any': ''}}}], [{}, {'ok': {'value': {'any': ''}}}]],
-        [[{'ok': {'value': {'any': [None, False, 0, 0.1, '', [], {}]}}}, {'fn.test': {'value': {'any': [None, False, 0, 0.1, '', [], {}]}}}], [{}, {'ok': {'value': {'any': [None, False, 0, 0.1, '', [], {}]}}}]],
-        [[{'ok': {'value': {'any': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}, {'fn.test': {'value': {'any': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}], [{}, {'ok': {'value': {'any': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}], False],
-        [[{}, {'fn.test': {'value': {'any': None}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.any', 'reason': {'NullDisallowed': {}}}]}}]],
-    ],
-    'testNullableAny': [
-        [[{'ok': {'value': {'nullAny': None}}}, {'fn.test': {'value': {'nullAny': None}}}], [{}, {'ok': {'value': {'nullAny': None}}}]],
-        [[{'ok': {'value': {'nullAny': False}}}, {'fn.test': {'value': {'nullAny': False}}}], [{}, {'ok': {'value': {'nullAny': False}}}]],
-        [[{'ok': {'value': {'nullAny': 0}}}, {'fn.test': {'value': {'nullAny': 0}}}], [{}, {'ok': {'value': {'nullAny': 0}}}]],
-        [[{'ok': {'value': {'nullAny': 0.1}}}, {'fn.test': {'value': {'nullAny': 0.1}}}], [{}, {'ok': {'value': {'nullAny': 0.1}}}]],
-        [[{'ok': {'value': {'nullAny': ''}}}, {'fn.test': {'value': {'nullAny': ''}}}], [{}, {'ok': {'value': {'nullAny': ''}}}]],
-        [[{'ok': {'value': {'nullAny': [None, False, 0, 0.1, '', [], {}]}}}, {'fn.test': {'value': {'nullAny': [None, False, 0, 0.1, '', [], {}]}}}], [{}, {'ok': {'value': {'nullAny': [None, False, 0, 0.1, '', [], {}]}}}]],
-        [[{'ok': {'value': {'nullAny': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}, {'fn.test': {'value': {'nullAny': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}], [{}, {'ok': {'value': {'nullAny': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}]],
-    ],
-    'testArrayAny': [
-        [[{'ok': {'value': {'arrAny': []}}}, {'fn.test': {'value': {'arrAny': []}}}], [{}, {'ok': {'value': {'arrAny': []}}}]],
-        [[{'ok': {'value': {'arrAny': [False]}}}, {'fn.test': {'value': {'arrAny': [False]}}}], [{}, {'ok': {'value': {'arrAny': [False]}}}]],
-        [[{'ok': {'value': {'arrAny': [0]}}}, {'fn.test': {'value': {'arrAny': [0]}}}], [{}, {'ok': {'value': {'arrAny': [0]}}}]],
-        [[{'ok': {'value': {'arrAny': [0.1]}}}, {'fn.test': {'value': {'arrAny': [0.1]}}}], [{}, {'ok': {'value': {'arrAny': [0.1]}}}]],
-        [[{'ok': {'value': {'arrAny': ['']}}}, {'fn.test': {'value': {'arrAny': ['']}}}], [{}, {'ok': {'value': {'arrAny': ['']}}}]],
-        [[{'ok': {'value': {'arrAny': [[None, False, 0, 0.1, '', [], {}]]}}}, {'fn.test': {'value': {'arrAny': [[None, False, 0, 0.1, '', [], {}]]}}}], [{}, {'ok': {'value': {'arrAny': [[None, False, 0, 0.1, '', [], {}]]}}}]],
-        [[{'ok': {'value': {'arrAny': [{'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}, {'fn.test': {'value': {'arrAny': [{'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}], [{}, {'ok': {'value': {'arrAny': [{'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}]],
-        [[{'ok': {'value': {'arrAny': [0, False, 1, [None, False, 0, 0.1, '', [], {}], {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}, {'fn.test': {'value': {'arrAny': [0, False, 1, [None, False, 0, 0.1, '', [], {}], {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}], [{}, {'ok': {'value': {'arrAny': [0, False, 1, [None, False, 0, 0.1, '', [], {}], {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}]],
-        [[{}, {'fn.test': {'value': {'arrAny': [None]}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrAny[0]', 'reason': {'NullDisallowed': {}}}]}}]],
-    ],
-    'testArrayNullAny': [
-        [[{'ok': {'value': {'arrNullAny': []}}}, {'fn.test': {'value': {'arrNullAny': []}}}], [{}, {'ok': {'value': {'arrNullAny': []}}}]],
-        [[{'ok': {'value': {'arrNullAny': [None]}}}, {'fn.test': {'value': {'arrNullAny': [None]}}}], [{}, {'ok': {'value': {'arrNullAny': [None]}}}]],
-        [[{'ok': {'value': {'arrNullAny': [False]}}}, {'fn.test': {'value': {'arrNullAny': [False]}}}], [{}, {'ok': {'value': {'arrNullAny': [False]}}}]],
-        [[{'ok': {'value': {'arrNullAny': [0]}}}, {'fn.test': {'value': {'arrNullAny': [0]}}}], [{}, {'ok': {'value': {'arrNullAny': [0]}}}]],
-        [[{'ok': {'value': {'arrNullAny': [0.1]}}}, {'fn.test': {'value': {'arrNullAny': [0.1]}}}], [{}, {'ok': {'value': {'arrNullAny': [0.1]}}}]],
-        [[{'ok': {'value': {'arrNullAny': ['']}}}, {'fn.test': {'value': {'arrNullAny': ['']}}}], [{}, {'ok': {'value': {'arrNullAny': ['']}}}]],
-        [[{'ok': {'value': {'arrNullAny': [[None, False, 0, 0.1, '', [], {}]]}}}, {'fn.test': {'value': {'arrNullAny': [[None, False, 0, 0.1, '', [], {}]]}}}], [{}, {'ok': {'value': {'arrNullAny': [[None, False, 0, 0.1, '', [], {}]]}}}]],
-        [[{'ok': {'value': {'arrNullAny': [{'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}, {'fn.test': {'value': {'arrNullAny': [{'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}], [{}, {'ok': {'value': {'arrNullAny': [{'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}]],
-        [[{'ok': {'value': {'arrNullAny': [None, 0, False, 1, [None, False, 0, 0.1, '', [], {}], {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}, {'fn.test': {'value': {'arrNullAny': [None, 0, False, 1, [None, False, 0, 0.1, '', [], {}], {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}], [{}, {'ok': {'value': {'arrNullAny': [None, 0, False, 1, [None, False, 0, 0.1, '', [], {}], {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}]}}}]],
-    ],
-    'testObjectAny': [
-        [[{'ok': {'value': {'objAny': {}}}}, {'fn.test': {'value': {'objAny': {}}}}], [{}, {'ok': {'value': {'objAny': {}}}}]],
-        [[{'ok': {'value': {'objAny': {'a': False}}}}, {'fn.test': {'value': {'objAny': {'a': False}}}}], [{}, {'ok': {'value': {'objAny': {'a': False}}}}]],
-        [[{'ok': {'value': {'objAny': {'a': 0}}}}, {'fn.test': {'value': {'objAny': {'a': 0}}}}], [{}, {'ok': {'value': {'objAny': {'a': 0}}}}]],
-        [[{'ok': {'value': {'objAny': {'a': 0.1}}}}, {'fn.test': {'value': {'objAny': {'a': 0.1}}}}], [{}, {'ok': {'value': {'objAny': {'a': 0.1}}}}]],
-        [[{'ok': {'value': {'objAny': {'a': ''}}}}, {'fn.test': {'value': {'objAny': {'a': ''}}}}], [{}, {'ok': {'value': {'objAny': {'a': ''}}}}]],
-        [[{'ok': {'value': {'objAny': {'a': [None, False, 0, 0.1, '', [], {}]}}}}, {'fn.test': {'value': {'objAny': {'a': [None, False, 0, 0.1, '', [], {}]}}}}], [{}, {'ok': {'value': {'objAny': {'a': [None, False, 0, 0.1, '', [], {}]}}}}]],
-        [[{'ok': {'value': {'objAny': {'a': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}, {'fn.test': {'value': {'objAny': {'a': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], [{}, {'ok': {'value': {'objAny': {'a': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], False],
-        [[{'ok': {'value': {'objAny': {'a': 0, 'b': False, 'c': 1, 'd': [None, False, 0, 0.1, '', [], {}], 'e': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}, {'fn.test': {'value': {'objAny': {'a': 0, 'b': False, 'c': 1, 'd': [None, False, 0, 0.1, '', [], {}], 'e': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], [{}, {'ok': {'value': {'objAny': {'a': 0, 'b': False, 'c': 1, 'd': [None, False, 0, 0.1, '', [], {}], 'e': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], False],
-        [[{}, {'fn.test': {'value': {'objAny': {'a': None}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objAny{a}', 'reason': {'NullDisallowed': {}}}]}}]],
-    ],
-    'testObjectNullAny': [
-        [[{'ok': {'value': {'objNullAny': {}}}}, {'fn.test': {'value': {'objNullAny': {}}}}], [{}, {'ok': {'value': {'objNullAny': {}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': None}}}}, {'fn.test': {'value': {'objNullAny': {'a': None}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': None}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': False}}}}, {'fn.test': {'value': {'objNullAny': {'a': False}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': False}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': 0}}}}, {'fn.test': {'value': {'objNullAny': {'a': 0}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': 0}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': 0.1}}}}, {'fn.test': {'value': {'objNullAny': {'a': 0.1}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': 0.1}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': ''}}}}, {'fn.test': {'value': {'objNullAny': {'a': ''}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': ''}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': [None, False, 0, 0.1, '', [], {}]}}}}, {'fn.test': {'value': {'objNullAny': {'a': [None, False, 0, 0.1, '', [], {}]}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': [None, False, 0, 0.1, '', [], {}]}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}, {'fn.test': {'value': {'objNullAny': {'a': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}]],
-        [[{'ok': {'value': {'objNullAny': {'a': None, 'b': 0, 'c': False, 'd': 1, 'e': [None, False, 0, 0.1, '', [], {}], 'f': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}, {'fn.test': {'value': {'objNullAny': {'a': None, 'b': 0, 'c': False, 'd': 1, 'e': [None, False, 0, 0.1, '', [], {}], 'f': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], [{}, {'ok': {'value': {'objNullAny': {'a': None, 'b': 0, 'c': False, 'd': 1, 'e': [None, False, 0, 0.1, '', [], {}], 'f': {'a': None, 'b': False, 'c': 0, 'd': 0.1, 'e': '', 'f': [], 'g': {}}}}}}], False],
-    ],
-    'testPStructAny': [
-        [[{'ok': {'value': {'pStrAny': {'wrap': False}}}}, {'fn.test': {'value': {'pStrAny': {'wrap': False}}}}], [{}, {'ok': {'value': {'pStrAny': {'wrap': False}}}}]],
-        [[{'ok': {'value': {'pStrAny': {'wrap': 0}}}}, {'fn.test': {'value': {'pStrAny': {'wrap': 0}}}}], [{}, {'ok': {'value': {'pStrAny': {'wrap': 0}}}}]],
-        [[{'ok': {'value': {'pStrAny': {'wrap': 0.1}}}}, {'fn.test': {'value': {'pStrAny': {'wrap': 0.1}}}}], [{}, {'ok': {'value': {'pStrAny': {'wrap': 0.1}}}}]],
-        [[{'ok': {'value': {'pStrAny': {'wrap': ''}}}}, {'fn.test': {'value': {'pStrAny': {'wrap': ''}}}}], [{}, {'ok': {'value': {'pStrAny': {'wrap': ''}}}}]],
-        [[{'ok': {'value': {'pStrAny': {'wrap': [None, False, 0, 0.1, '', [], {}]}}}}, {'fn.test': {'value': {'pStrAny': {'wrap': [None, False, 0, 0.1, '', [], {}]}}}}], [{}, {'ok': {'value': {'pStrAny': {'wrap': [None, False, 0, 0.1, '', [], {}]}}}}]],
-        [[{}, {'fn.test': {'value': {'pStrAny': {'wrap': None}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrAny.wrap', 'reason': {'NullDisallowed': {}}}]}}]],
-    ],
-    'testPStructNullAny': [
-        [[{'ok': {'value': {'pStrNullAny': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullAny': {'wrap': None}}}}], [{}, {'ok': {'value': {'pStrNullAny': {'wrap': None}}}}]],
-        [[{'ok': {'value': {'pStrNullAny': {'wrap': False}}}}, {'fn.test': {'value': {'pStrNullAny': {'wrap': False}}}}], [{}, {'ok': {'value': {'pStrNullAny': {'wrap': False}}}}]],
-        [[{'ok': {'value': {'pStrNullAny': {'wrap': 0}}}}, {'fn.test': {'value': {'pStrNullAny': {'wrap': 0}}}}], [{}, {'ok': {'value': {'pStrNullAny': {'wrap': 0}}}}]],
-        [[{'ok': {'value': {'pStrNullAny': {'wrap': 0.1}}}}, {'fn.test': {'value': {'pStrNullAny': {'wrap': 0.1}}}}], [{}, {'ok': {'value': {'pStrNullAny': {'wrap': 0.1}}}}]],
-        [[{'ok': {'value': {'pStrNullAny': {'wrap': ''}}}}, {'fn.test': {'value': {'pStrNullAny': {'wrap': ''}}}}], [{}, {'ok': {'value': {'pStrNullAny': {'wrap': ''}}}}]],
-        [[{'ok': {'value': {'pStrNullAny': {'wrap': [None, False, 0, 0.1, '', [], {}]}}}}, {'fn.test': {'value': {'pStrNullAny': {'wrap': [None, False, 0, 0.1, '', [], {}]}}}}], [{}, {'ok': {'value': {'pStrNullAny': {'wrap': [None, False, 0, 0.1, '', [], {}]}}}}]],
-    ],
-    'testPEnumAny': [
-        [[{'ok': {'value': {'pEnumAny': {'one': {}}}}}, {'fn.test': {'value': {'pEnumAny': {'one': {}}}}}], [{}, {'ok': {'value': {'pEnumAny': {'one': {}}}}}]],
-        [[{'ok': {'value': {'pEnumAny': {'two': {'ewrap': False}}}}}, {'fn.test': {'value': {'pEnumAny': {'two': {'ewrap': False}}}}}], [{}, {'ok': {'value': {'pEnumAny': {'two': {'ewrap': False}}}}}]],
-        [[{'ok': {'value': {'pEnumAny': {'two': {'ewrap': 0}}}}}, {'fn.test': {'value': {'pEnumAny': {'two': {'ewrap': 0}}}}}], [{}, {'ok': {'value': {'pEnumAny': {'two': {'ewrap': 0}}}}}]],
-        [[{'ok': {'value': {'pEnumAny': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {'value': {'pEnumAny': {'two': {'ewrap': 0.1}}}}}], [{}, {'ok': {'value': {'pEnumAny': {'two': {'ewrap': 0.1}}}}}]],
-        [[{'ok': {'value': {'pEnumAny': {'two': {'ewrap': ''}}}}}, {'fn.test': {'value': {'pEnumAny': {'two': {'ewrap': ''}}}}}], [{}, {'ok': {'value': {'pEnumAny': {'two': {'ewrap': ''}}}}}]],
-        [[{'ok': {'value': {'pEnumAny': {'two': {'ewrap': [None, False, 0, 0.1, '', [], {}]}}}}}, {'fn.test': {'value': {'pEnumAny': {'two': {'ewrap': [None, False, 0, 0.1, '', [], {}]}}}}}], [{}, {'ok': {'value': {'pEnumAny': {'two': {'ewrap': [None, False, 0, 0.1, '', [], {}]}}}}}]],
-        [[{}, {'fn.test': {'value': {'pEnumAny': {'two': {'ewrap': None}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumAny.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]],
-    ],
-    'testPEnumNullAny': [
-        [[{'ok': {'value': {'pEnumNullAny': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'one': {}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'one': {}}}}}]],
-        [[{'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'two': {'ewrap': None}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': None}}}}}]],
-        [[{'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': False}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'two': {'ewrap': False}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': False}}}}}]],
-        [[{'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': 0}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'two': {'ewrap': 0}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': 0}}}}}]],
-        [[{'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'two': {'ewrap': 0.1}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': 0.1}}}}}]],
-        [[{'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': ''}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'two': {'ewrap': ''}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': ''}}}}}]],
-        [[{'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': [None, False, 0, 0.1, '', [], {}]}}}}}, {'fn.test': {'value': {'pEnumNullAny': {'two': {'ewrap': [None, False, 0, 0.1, '', [], {}]}}}}}], [{}, {'ok': {'value': {'pEnumNullAny': {'two': {'ewrap': [None, False, 0, 0.1, '', [], {}]}}}}}]],
-    ],
+    'any': [v for v in generate_basic_cases('any', Any, [False, 0, 0.1, '', [], {}])],
     'testStruct': [
         [[{'ok': {'value': {'struct': {'required': False}}}}, {'fn.test': {'value': {'struct': {'required': False}}}}], [{}, {'ok': {'value': {'struct': {'required': False}}}}]],
         [[{'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'struct': {'optional': False, 'required': False}}}}], [{}, {'ok': {'value': {'struct': {'optional': False, 'required': False}}}}]],
