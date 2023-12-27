@@ -1,3 +1,95 @@
+default_values = [False, 0, 0.1, '', [], {}]
+
+def get_type(the_type) -> str:
+    if the_type == bool:
+        return 'Boolean'
+    elif the_type == int:
+        return 'Integer'
+    elif the_type == float:
+        return 'Number'
+    elif the_type == str:
+        return 'String'
+    elif the_type == list:
+        return 'Array'
+    elif the_type == dict:
+        return 'Object'
+    elif the_type == type(None):
+        return 'Null'
+
+
+
+def get_values(given_field: str, the_type, given_correct_values):
+    given_incorrect_values = filter(lambda n: type(n) != the_type, default_values)
+    abc = 'abcdefghijklmnopqrstuvwxyz'
+
+    field = given_field
+    correct_values = given_correct_values
+    incorrect_values = [None] + given_incorrect_values
+    yield field, correct_values, incorrect_values, field
+    
+    field = 'null{}'.format(given_field.capitalize())
+    correct_values = [None] + given_correct_values
+    incorrect_values = given_incorrect_values
+    yield field, correct_values, incorrect_values, field
+
+    field = 'arr{}'.format(given_field.capitalize())
+    correct_values = [[]] + [[i] for i in given_correct_values] + [given_correct_values]
+    incorrect_values = [[None]] + [[given_correct_values[0], i] for i in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}[1]'.format(field)
+
+    field = 'arrNull{}'.format(given_field.capitalize())
+    correct_values = [[]] + [[None]] + [[i] for i in given_correct_values] + [[None] + given_correct_values]
+    incorrect_values = [[given_correct_values[0], i] for i in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}[1]'.format(field)
+
+    field = 'obj{}'.format(given_field.capitalize())
+    correct_values = [{}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate(given_correct_values)}]
+    incorrect_values = [{'a': None}] + [{'a': given_correct_values[0], 'b': v} for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}{{\'b\'}}'.format(field)
+
+    field = 'objNull{}'.format(given_field.capitalize())
+    correct_values = [{}] + [{'a': None}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate([None] + given_correct_values)}]
+    incorrect_values = [{'a': given_correct_values[0], 'b': v} for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}{{\'b\'}}'.format(field)
+
+    field = 'pStr{}'.format(given_field.capitalize())
+    correct_values = [{'wrap': v} for v in given_correct_values]
+    incorrect_values = [{'wrap': None}] + [{'wrap': v} for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}.wrap'.format(field)
+
+    field = 'pStrNull{}'.format(given_field.capitalize())
+    correct_values = [{'wrap': None}] + [{'wrap': v} for v in given_correct_values]
+    incorrect_values = [{'wrap': v} for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}.wrap'.format(field)
+
+    field = 'pEnum{}'.format(given_field.capitalize())
+    correct_values = [{'one': {}}] + [{'two': {'ewrap': v}} for v in given_correct_values]
+    incorrect_values = [{'two': {'ewrap': None}}] + [{'two': {'ewrap': v}} for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}.two.ewrap'.format(field)
+
+    field = 'pEnumNull{}'.format(given_field.capitalize())
+    correct_values = [{'one': {}}] + [{'two': {'ewrap': None}}] + [{'two': {'ewrap': v}} for v in given_correct_values]
+    incorrect_values = [{'two': {'ewrap': v}} for v in given_incorrect_values]
+    yield field, correct_values, incorrect_values, '{}.two.ewrap'.format(field)
+
+
+
+
+
+def generate_basic_cases(given_field: str, the_type, correct_values):
+    for field, correct_values, incorrect_values, path in get_values(given_field, the_type, correct_values):
+        for correct_value in correct_values:
+            yield [[{'ok': {'value': {field: correct_value}}}, {'fn.test': {'value': {field: correct_value}}}], [{}, {'ok': {'value': {field: correct_value}}}]]
+
+        for incorrect_value in incorrect_values:
+            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.{}'.format(path), 'reason': {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}}]}}]],
+
+        for incorrect_value in incorrect_values:
+            yield [[{'ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.{}'.format(path), 'reason': {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}}]}}]],
+
+
+
+
 cases = {
     'testBoolean': [
         [[{'ok': {'value': {'bool': False}}}, {'fn.test': {'value': {'bool': False}}}], [{}, {'ok': {'value': {'bool': False}}}]],
