@@ -28,6 +28,7 @@
   {
     "///": " A type. ",
     "enum._Type": {
+      "Null": {},
       "Boolean": {},
       "Integer": {},
       "Number": {},

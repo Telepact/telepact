@@ -65,8 +65,7 @@ class UTypeDeclaration {
                     ? generics.get(g.index).nullable
                     : this.nullable;
             if (!isNullable) {
-                return Collections.singletonList(new ValidationFailure("",
-                        "NullDisallowed", Map.of()));
+                return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.type.getName(generics));
             } else {
                 return Collections.emptyList();
             }
@@ -97,6 +96,8 @@ interface UType {
             boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator random);
+
+    public String getName(List<UTypeDeclaration> generics);
 }
 
 class UBoolean implements UType {
@@ -112,7 +113,7 @@ class UBoolean implements UType {
         if (value instanceof Boolean) {
             return Collections.emptyList();
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Boolean");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -126,6 +127,11 @@ class UBoolean implements UType {
         } else {
             return random.nextBoolean();
         }
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Boolean";
     }
 
 }
@@ -145,7 +151,7 @@ class UInteger implements UType {
             return Collections.singletonList(
                     new ValidationFailure("", "NumberOutOfRange", Map.of()));
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Integer");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -159,6 +165,11 @@ class UInteger implements UType {
         } else {
             return random.nextInt();
         }
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Integer";
     }
 }
 
@@ -177,7 +188,7 @@ class UNumber implements UType {
         } else if (value instanceof Number) {
             return Collections.emptyList();
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Number");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -191,6 +202,11 @@ class UNumber implements UType {
         } else {
             return random.nextDouble();
         }
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Number";
     }
 }
 
@@ -206,7 +222,7 @@ class UString implements UType {
         if (value instanceof String) {
             return Collections.emptyList();
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "String");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -220,6 +236,11 @@ class UString implements UType {
         } else {
             return random.nextString();
         }
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "String";
     }
 }
 
@@ -248,7 +269,7 @@ class UArray implements UType {
             }
             return validationFailures;
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Array");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -279,6 +300,11 @@ class UArray implements UType {
             return array;
         }
     }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Array";
+    }
 }
 
 class UObject implements UType {
@@ -306,7 +332,7 @@ class UObject implements UType {
             }
             return validationFailures;
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Object");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -340,6 +366,11 @@ class UObject implements UType {
         }
     }
 
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Object";
+    }
+
 }
 
 class UAny implements UType {
@@ -367,6 +398,11 @@ class UAny implements UType {
         } else {
             return random.nextString();
         }
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Any";
     }
 }
 
@@ -398,6 +434,12 @@ class UGeneric implements UType {
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
                 includeRandomOptionalFields, List.of(), random);
     }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        var typeDeclaration = generics.get(this.index);
+        return typeDeclaration.type.getName(generics);
+    }
 }
 
 class UStruct implements UType {
@@ -423,7 +465,7 @@ class UStruct implements UType {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Object");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -523,6 +565,11 @@ class UStruct implements UType {
         }
         return obj;
     }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Object";
+    }
 }
 
 class UEnum implements UType {
@@ -548,7 +595,7 @@ class UEnum implements UType {
         if (value instanceof Map<?, ?> m) {
             return validateEnumValues(this.values, m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, "Object");
+            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
         }
     }
 
@@ -640,6 +687,11 @@ class UEnum implements UType {
                             typeParameters, random));
         }
     }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Object";
+    }
 }
 
 class UFn implements UType {
@@ -681,6 +733,11 @@ class UFn implements UType {
                     random);
         }
     }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Object";
+    }
 }
 
 // TODO: trait is not a type
@@ -714,6 +771,12 @@ class UTrait implements UType {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+    }
 }
 
 // TODO: info is not a type
@@ -742,6 +805,12 @@ class UInfo implements UType {
             RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getName'");
     }
 }
 
@@ -773,6 +842,11 @@ class UExt implements UType {
             RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "Any";
     }
 }
 

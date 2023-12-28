@@ -112,8 +112,12 @@ public class _ValidateUtil {
     }
 
     static String getType(Object value) {
-        if (value instanceof Boolean) {
+        if (value == null) {
+            return "Null";
+        } else if (value instanceof Boolean) {
             return "Boolean";
+        } else if (value instanceof Long || value instanceof Integer) {
+            return "Integer";
         } else if (value instanceof Number) {
             return "Number";
         } else if (value instanceof String) {
