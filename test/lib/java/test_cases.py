@@ -6339,1444 +6339,1679 @@ class TestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullStruct.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_0(self):
+    def test_enum_0(self):
         request = [{'ok': {'value': {'enum': {'one': {}}}}}, {'fn.test': {'value': {'enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_1(self):
-        request = [{'ok': {'value': {'enum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
+    def test_enum_1(self):
+        request = [{'ok': {'value': {'enum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'two': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_2(self):
+    def test_enum_2(self):
         request = [{'ok': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_3(self):
-        request = [{}, {'fn.test': {'value': {'enum': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_4(self):
+    def test_enum_3(self):
         request = [{}, {'fn.test': {'value': {'enum': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_5(self):
+    def test_enum_4(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_6(self):
+    def test_enum_5(self):
         request = [{}, {'fn.test': {'value': {'enum': {'a': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_7(self):
+    def test_enum_6(self):
         request = [{}, {'fn.test': {'value': {'enum': {'two': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'enum': False}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'enum': 0.1}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'enum': ''}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'enum': []}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_13(self):
+    def test_enum_7(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_14(self):
+    def test_enum_8(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_9(self):
+        request = [{}, {'fn.test': {'value': {'enum': {'one': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_15(self):
+    def test_enum_10(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_16(self):
+    def test_enum_11(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_17(self):
-        request = [{'ok': {'value': {'enum': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_enum_12(self):
+        request = [{}, {'fn.test': {'value': {'enum': None}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_18(self):
+    def test_enum_13(self):
+        request = [{}, {'fn.test': {'value': {'enum': False}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_14(self):
+        request = [{}, {'fn.test': {'value': {'enum': 0}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_15(self):
+        request = [{}, {'fn.test': {'value': {'enum': 0.1}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_16(self):
+        request = [{}, {'fn.test': {'value': {'enum': ''}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_17(self):
+        request = [{}, {'fn.test': {'value': {'enum': []}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_18(self):
         request = [{'ok': {'value': {'enum': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_19(self):
+    def test_enum_19(self):
         request = [{'ok': {'value': {'enum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_20(self):
+    def test_enum_20(self):
         request = [{'ok': {'value': {'enum': {'a': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_21(self):
+    def test_enum_21(self):
         request = [{'ok': {'value': {'enum': {'two': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_22(self):
-        request = [{'ok': {'value': {'enum': False}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_23(self):
-        request = [{'ok': {'value': {'enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_24(self):
-        request = [{'ok': {'value': {'enum': 0.1}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_25(self):
-        request = [{'ok': {'value': {'enum': ''}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_26(self):
-        request = [{'ok': {'value': {'enum': []}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testEnum_27(self):
+    def test_enum_22(self):
         request = [{'ok': {'value': {'enum': {'one': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_28(self):
+    def test_enum_23(self):
         request = [{'ok': {'value': {'enum': {'one': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_24(self):
+        request = [{'ok': {'value': {'enum': {'one': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_29(self):
+    def test_enum_25(self):
         request = [{'ok': {'value': {'enum': {'one': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testEnum_30(self):
+    def test_enum_26(self):
         request = [{'ok': {'value': {'enum': {'one': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_0(self):
+    def test_enum_27(self):
+        request = [{'ok': {'value': {'enum': None}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_28(self):
+        request = [{'ok': {'value': {'enum': False}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_29(self):
+        request = [{'ok': {'value': {'enum': 0}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_30(self):
+        request = [{'ok': {'value': {'enum': 0.1}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_31(self):
+        request = [{'ok': {'value': {'enum': ''}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_32(self):
+        request = [{'ok': {'value': {'enum': []}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_33(self):
         request = [{'ok': {'value': {'nullEnum': None}}}, {'fn.test': {'value': {'nullEnum': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_1(self):
+    def test_enum_34(self):
         request = [{'ok': {'value': {'nullEnum': {'one': {}}}}}, {'fn.test': {'value': {'nullEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_2(self):
+    def test_enum_35(self):
+        request = [{'ok': {'value': {'nullEnum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'nullEnum': {'two': {'required': False}}}}}]
+        expected_response = [{}, {'ok': {'value': {'nullEnum': {'two': {'required': False}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_36(self):
         request = [{'ok': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_3(self):
+    def test_enum_37(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_4(self):
+    def test_enum_38(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_5(self):
+    def test_enum_39(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'a': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': False}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_40(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': {'two': {}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': 0.1}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': ''}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': []}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_11(self):
+    def test_enum_41(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_12(self):
+    def test_enum_42(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_43(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': {'one': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_13(self):
+    def test_enum_44(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_14(self):
+    def test_enum_45(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_15(self):
+    def test_enum_46(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': False}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_47(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': 0}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_48(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': 0.1}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_49(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': ''}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_50(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': []}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_51(self):
         request = [{'ok': {'value': {'nullEnum': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_16(self):
+    def test_enum_52(self):
         request = [{'ok': {'value': {'nullEnum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_17(self):
+    def test_enum_53(self):
         request = [{'ok': {'value': {'nullEnum': {'a': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_18(self):
-        request = [{'ok': {'value': {'nullEnum': False}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_54(self):
+        request = [{'ok': {'value': {'nullEnum': {'two': {}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_19(self):
-        request = [{'ok': {'value': {'nullEnum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_20(self):
-        request = [{'ok': {'value': {'nullEnum': 0.1}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_21(self):
-        request = [{'ok': {'value': {'nullEnum': ''}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_22(self):
-        request = [{'ok': {'value': {'nullEnum': []}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testNullEnum_23(self):
+    def test_enum_55(self):
         request = [{'ok': {'value': {'nullEnum': {'one': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_24(self):
+    def test_enum_56(self):
         request = [{'ok': {'value': {'nullEnum': {'one': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_57(self):
+        request = [{'ok': {'value': {'nullEnum': {'one': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_25(self):
+    def test_enum_58(self):
         request = [{'ok': {'value': {'nullEnum': {'one': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullEnum_26(self):
+    def test_enum_59(self):
         request = [{'ok': {'value': {'nullEnum': {'one': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_0(self):
+    def test_enum_60(self):
+        request = [{'ok': {'value': {'nullEnum': False}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_61(self):
+        request = [{'ok': {'value': {'nullEnum': 0}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_62(self):
+        request = [{'ok': {'value': {'nullEnum': 0.1}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_63(self):
+        request = [{'ok': {'value': {'nullEnum': ''}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_64(self):
+        request = [{'ok': {'value': {'nullEnum': []}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_65(self):
         request = [{'ok': {'value': {'arrEnum': []}}}, {'fn.test': {'value': {'arrEnum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_1(self):
+    def test_enum_66(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_2(self):
+    def test_enum_67(self):
+        request = [{'ok': {'value': {'arrEnum': [{'two': {'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'two': {'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'two': {'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_68(self):
         request = [{'ok': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_3(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
+    def test_enum_69(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_4(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_5(self):
+    def test_enum_70(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_6(self):
+    def test_enum_71(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_7(self):
+    def test_enum_72(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'a': {}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, False]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_73(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, '']}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, []]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_13(self):
+    def test_enum_74(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_14(self):
+    def test_enum_75(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': 0}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_76(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': 0.1}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_15(self):
+    def test_enum_77(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': ''}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_16(self):
+    def test_enum_78(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': []}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_17(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_enum_79(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, None]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_18(self):
+    def test_enum_80(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, False]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_81(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_82(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_83(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, '']}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_84(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, []]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_85(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_19(self):
+    def test_enum_86(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_20(self):
+    def test_enum_87(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'a': {}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_21(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_88(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_22(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_23(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_24(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_25(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayEnum_26(self):
+    def test_enum_89(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_27(self):
+    def test_enum_90(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': 0}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_91(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': 0.1}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_28(self):
+    def test_enum_92(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': ''}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayEnum_29(self):
+    def test_enum_93(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': []}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_0(self):
-        request = [{'ok': {'value': {'arrNullEnum': [None]}}}, {'fn.test': {'value': {'arrNullEnum': [None]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None]}}}]
+    def test_enum_94(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, None]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_1(self):
+    def test_enum_95(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_96(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_97(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_98(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_99(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_100(self):
         request = [{'ok': {'value': {'arrNullEnum': []}}}, {'fn.test': {'value': {'arrNullEnum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_2(self):
+    def test_enum_101(self):
+        request = [{'ok': {'value': {'arrNullEnum': [None]}}}, {'fn.test': {'value': {'arrNullEnum': [None]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_102(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'one': {}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_3(self):
+    def test_enum_103(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_104(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_4(self):
-        request = [{'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
+    def test_enum_105(self):
+        request = [{'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_5(self):
+    def test_enum_106(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_6(self):
+    def test_enum_107(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_7(self):
+    def test_enum_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'a': {}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, False]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_109(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'two': {}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, '']}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, []]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_13(self):
+    def test_enum_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_14(self):
+    def test_enum_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_112(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0.1}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_15(self):
+    def test_enum_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': ''}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_16(self):
+    def test_enum_114(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': []}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_17(self):
+    def test_enum_115(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, False]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_116(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_117(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_118(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, '']}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_119(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, []]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_120(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_18(self):
+    def test_enum_121(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_19(self):
+    def test_enum_122(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'a': {}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_20(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_123(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'two': {}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_21(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_22(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_23(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_24(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullEnum_25(self):
+    def test_enum_124(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_26(self):
+    def test_enum_125(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_126(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0.1}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_27(self):
+    def test_enum_127(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': ''}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullEnum_28(self):
+    def test_enum_128(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': []}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_0(self):
+    def test_enum_129(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_130(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_131(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_132(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_133(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_134(self):
         request = [{'ok': {'value': {'objEnum': {}}}}, {'fn.test': {'value': {'objEnum': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_1(self):
+    def test_enum_135(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_2(self):
+    def test_enum_136(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_137(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_3(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}]
-        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}]
+    def test_enum_138(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_4(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_5(self):
+    def test_enum_139(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_6(self):
+    def test_enum_140(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_7(self):
+    def test_enum_141(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_142(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_13(self):
+    def test_enum_143(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_14(self):
+    def test_enum_144(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_145(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_15(self):
+    def test_enum_146(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_16(self):
+    def test_enum_147(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_17(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_enum_148(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_18(self):
+    def test_enum_149(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_150(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_151(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_152(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_153(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_154(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_19(self):
+    def test_enum_155(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_20(self):
+    def test_enum_156(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_21(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_157(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_22(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_23(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_24(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_25(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectEnum_26(self):
+    def test_enum_158(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_27(self):
+    def test_enum_159(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_160(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_28(self):
+    def test_enum_161(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectEnum_29(self):
+    def test_enum_162(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_0(self):
+    def test_enum_163(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_164(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_165(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_166(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_167(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_168(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_169(self):
         request = [{'ok': {'value': {'objNullEnum': {}}}}, {'fn.test': {'value': {'objNullEnum': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_1(self):
+    def test_enum_170(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': None}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_2(self):
+    def test_enum_171(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_3(self):
+    def test_enum_172(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_173(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_4(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
-        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
+    def test_enum_174(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_5(self):
+    def test_enum_175(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_6(self):
+    def test_enum_176(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_7(self):
+    def test_enum_177(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_178(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_13(self):
+    def test_enum_179(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_14(self):
+    def test_enum_180(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_181(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_15(self):
+    def test_enum_182(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_16(self):
+    def test_enum_183(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_17(self):
+    def test_enum_184(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_186(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_187(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_188(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_189(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_18(self):
+    def test_enum_190(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_19(self):
+    def test_enum_191(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_20(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_192(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_21(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_22(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_23(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_24(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectNullEnum_25(self):
+    def test_enum_193(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_26(self):
+    def test_enum_194(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_195(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_27(self):
+    def test_enum_196(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullEnum_28(self):
+    def test_enum_197(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_0(self):
+    def test_enum_198(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_199(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_200(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_201(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_202(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_203(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_1(self):
+    def test_enum_204(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_205(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_2(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_3(self):
+    def test_enum_206(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_4(self):
+    def test_enum_207(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_5(self):
+    def test_enum_208(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_209(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_11(self):
+    def test_enum_210(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_12(self):
+    def test_enum_211(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_212(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_13(self):
+    def test_enum_213(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_14(self):
+    def test_enum_214(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_15(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_enum_215(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_16(self):
+    def test_enum_216(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_217(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_219(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_220(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_221(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_17(self):
+    def test_enum_222(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_18(self):
+    def test_enum_223(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_19(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_224(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_20(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_21(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_22(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_23(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructEnum_24(self):
+    def test_enum_225(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_25(self):
+    def test_enum_226(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_227(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_26(self):
+    def test_enum_228(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructEnum_27(self):
+    def test_enum_229(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_0(self):
+    def test_enum_230(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_231(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_232(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_233(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_234(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_235(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_236(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_1(self):
+    def test_enum_237(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_2(self):
+    def test_enum_238(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_239(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_3(self):
+    def test_enum_240(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_4(self):
+    def test_enum_241(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_5(self):
+    def test_enum_242(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_243(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_11(self):
+    def test_enum_244(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_12(self):
+    def test_enum_245(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_246(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_13(self):
+    def test_enum_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_14(self):
+    def test_enum_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_15(self):
+    def test_enum_249(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_250(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_251(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_253(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_254(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_16(self):
+    def test_enum_255(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_17(self):
+    def test_enum_256(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_18(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_257(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_19(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_20(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_21(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_22(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructNullEnum_23(self):
+    def test_enum_258(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_24(self):
+    def test_enum_259(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_260(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_25(self):
+    def test_enum_261(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullEnum_26(self):
+    def test_enum_262(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_0(self):
+    def test_enum_263(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_264(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_265(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_266(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_267(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_268(self):
         request = [{'ok': {'value': {'pEnumEnum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_1(self):
+    def test_enum_269(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_2(self):
+    def test_enum_270(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_271(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_3(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_4(self):
+    def test_enum_272(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_5(self):
+    def test_enum_273(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_6(self):
+    def test_enum_274(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'a': {}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_275(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_12(self):
+    def test_enum_276(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_13(self):
+    def test_enum_277(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_278(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0.1}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_14(self):
+    def test_enum_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': ''}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_15(self):
+    def test_enum_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': []}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_16(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_enum_281(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_17(self):
+    def test_enum_282(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_283(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_284(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_285(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_287(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_18(self):
+    def test_enum_288(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_19(self):
+    def test_enum_289(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'a': {}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_20(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_290(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_21(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_22(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_23(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_24(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumEnum_25(self):
+    def test_enum_291(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_26(self):
+    def test_enum_292(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_293(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0.1}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_27(self):
+    def test_enum_294(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': ''}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumEnum_28(self):
+    def test_enum_295(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': []}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_0(self):
+    def test_enum_296(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_297(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_298(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_299(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_300(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_301(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_302(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_1(self):
+    def test_enum_303(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_2(self):
+    def test_enum_304(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_3(self):
+    def test_enum_305(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_306(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_4(self):
+    def test_enum_307(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_5(self):
+    def test_enum_308(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_6(self):
+    def test_enum_309(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'a': {}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_310(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_12(self):
+    def test_enum_311(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_13(self):
+    def test_enum_312(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_313(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0.1}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_14(self):
+    def test_enum_314(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': ''}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_15(self):
+    def test_enum_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': []}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_16(self):
+    def test_enum_316(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_317(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_318(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_319(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_320(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_321(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_17(self):
+    def test_enum_322(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_18(self):
+    def test_enum_323(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'a': {}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_19(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_enum_324(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_20(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_21(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_22(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_23(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumNullEnum_24(self):
+    def test_enum_325(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_25(self):
+    def test_enum_326(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_327(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0.1}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_26(self):
+    def test_enum_328(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': ''}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullEnum_27(self):
+    def test_enum_329(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': []}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_330(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_331(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_332(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_333(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_enum_334(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
     def test_testFn_0(self):
@@ -20147,1444 +20382,1679 @@ class ClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullStruct.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_0(self):
+    def test_client_enum_0(self):
         request = [{'ok': {'value': {'enum': {'one': {}}}}}, {'fn.test': {'value': {'enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_1(self):
-        request = [{'ok': {'value': {'enum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
+    def test_client_enum_1(self):
+        request = [{'ok': {'value': {'enum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'two': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_2(self):
+    def test_client_enum_2(self):
         request = [{'ok': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_3(self):
-        request = [{}, {'fn.test': {'value': {'enum': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_4(self):
+    def test_client_enum_3(self):
         request = [{}, {'fn.test': {'value': {'enum': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_5(self):
+    def test_client_enum_4(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_6(self):
+    def test_client_enum_5(self):
         request = [{}, {'fn.test': {'value': {'enum': {'a': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_7(self):
+    def test_client_enum_6(self):
         request = [{}, {'fn.test': {'value': {'enum': {'two': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'enum': False}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'enum': 0.1}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'enum': ''}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'enum': []}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_13(self):
+    def test_client_enum_7(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_14(self):
+    def test_client_enum_8(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_9(self):
+        request = [{}, {'fn.test': {'value': {'enum': {'one': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_15(self):
+    def test_client_enum_10(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_16(self):
+    def test_client_enum_11(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_17(self):
-        request = [{'ok': {'value': {'enum': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_client_enum_12(self):
+        request = [{}, {'fn.test': {'value': {'enum': None}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_18(self):
+    def test_client_enum_13(self):
+        request = [{}, {'fn.test': {'value': {'enum': False}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_14(self):
+        request = [{}, {'fn.test': {'value': {'enum': 0}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_15(self):
+        request = [{}, {'fn.test': {'value': {'enum': 0.1}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_16(self):
+        request = [{}, {'fn.test': {'value': {'enum': ''}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_17(self):
+        request = [{}, {'fn.test': {'value': {'enum': []}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_18(self):
         request = [{'ok': {'value': {'enum': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_19(self):
+    def test_client_enum_19(self):
         request = [{'ok': {'value': {'enum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_20(self):
+    def test_client_enum_20(self):
         request = [{'ok': {'value': {'enum': {'a': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_21(self):
+    def test_client_enum_21(self):
         request = [{'ok': {'value': {'enum': {'two': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_22(self):
-        request = [{'ok': {'value': {'enum': False}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_23(self):
-        request = [{'ok': {'value': {'enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_24(self):
-        request = [{'ok': {'value': {'enum': 0.1}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_25(self):
-        request = [{'ok': {'value': {'enum': ''}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_26(self):
-        request = [{'ok': {'value': {'enum': []}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testEnum_27(self):
+    def test_client_enum_22(self):
         request = [{'ok': {'value': {'enum': {'one': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_28(self):
+    def test_client_enum_23(self):
         request = [{'ok': {'value': {'enum': {'one': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_24(self):
+        request = [{'ok': {'value': {'enum': {'one': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_29(self):
+    def test_client_enum_25(self):
         request = [{'ok': {'value': {'enum': {'one': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testEnum_30(self):
+    def test_client_enum_26(self):
         request = [{'ok': {'value': {'enum': {'one': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_0(self):
+    def test_client_enum_27(self):
+        request = [{'ok': {'value': {'enum': None}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_28(self):
+        request = [{'ok': {'value': {'enum': False}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_29(self):
+        request = [{'ok': {'value': {'enum': 0}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_30(self):
+        request = [{'ok': {'value': {'enum': 0.1}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_31(self):
+        request = [{'ok': {'value': {'enum': ''}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_32(self):
+        request = [{'ok': {'value': {'enum': []}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_33(self):
         request = [{'ok': {'value': {'nullEnum': None}}}, {'fn.test': {'value': {'nullEnum': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_1(self):
+    def test_client_enum_34(self):
         request = [{'ok': {'value': {'nullEnum': {'one': {}}}}}, {'fn.test': {'value': {'nullEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_2(self):
+    def test_client_enum_35(self):
+        request = [{'ok': {'value': {'nullEnum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'nullEnum': {'two': {'required': False}}}}}]
+        expected_response = [{}, {'ok': {'value': {'nullEnum': {'two': {'required': False}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_36(self):
         request = [{'ok': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_3(self):
+    def test_client_enum_37(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_4(self):
+    def test_client_enum_38(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_5(self):
+    def test_client_enum_39(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'a': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': False}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_40(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': {'two': {}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': 0.1}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': ''}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': []}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_11(self):
+    def test_client_enum_41(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_12(self):
+    def test_client_enum_42(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_43(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': {'one': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_13(self):
+    def test_client_enum_44(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_14(self):
+    def test_client_enum_45(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_15(self):
+    def test_client_enum_46(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': False}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_47(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': 0}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_48(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': 0.1}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_49(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': ''}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_50(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': []}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_51(self):
         request = [{'ok': {'value': {'nullEnum': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_16(self):
+    def test_client_enum_52(self):
         request = [{'ok': {'value': {'nullEnum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_17(self):
+    def test_client_enum_53(self):
         request = [{'ok': {'value': {'nullEnum': {'a': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_18(self):
-        request = [{'ok': {'value': {'nullEnum': False}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_54(self):
+        request = [{'ok': {'value': {'nullEnum': {'two': {}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_19(self):
-        request = [{'ok': {'value': {'nullEnum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_20(self):
-        request = [{'ok': {'value': {'nullEnum': 0.1}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_21(self):
-        request = [{'ok': {'value': {'nullEnum': ''}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_22(self):
-        request = [{'ok': {'value': {'nullEnum': []}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testNullEnum_23(self):
+    def test_client_enum_55(self):
         request = [{'ok': {'value': {'nullEnum': {'one': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_24(self):
+    def test_client_enum_56(self):
         request = [{'ok': {'value': {'nullEnum': {'one': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_57(self):
+        request = [{'ok': {'value': {'nullEnum': {'one': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_25(self):
+    def test_client_enum_58(self):
         request = [{'ok': {'value': {'nullEnum': {'one': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullEnum_26(self):
+    def test_client_enum_59(self):
         request = [{'ok': {'value': {'nullEnum': {'one': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_0(self):
+    def test_client_enum_60(self):
+        request = [{'ok': {'value': {'nullEnum': False}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_61(self):
+        request = [{'ok': {'value': {'nullEnum': 0}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_62(self):
+        request = [{'ok': {'value': {'nullEnum': 0.1}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_63(self):
+        request = [{'ok': {'value': {'nullEnum': ''}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_64(self):
+        request = [{'ok': {'value': {'nullEnum': []}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_65(self):
         request = [{'ok': {'value': {'arrEnum': []}}}, {'fn.test': {'value': {'arrEnum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_1(self):
+    def test_client_enum_66(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_2(self):
+    def test_client_enum_67(self):
+        request = [{'ok': {'value': {'arrEnum': [{'two': {'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'two': {'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'two': {'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_68(self):
         request = [{'ok': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_3(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
+    def test_client_enum_69(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_4(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_5(self):
+    def test_client_enum_70(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_6(self):
+    def test_client_enum_71(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_7(self):
+    def test_client_enum_72(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'a': {}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, False]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_73(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, '']}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, []]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_13(self):
+    def test_client_enum_74(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_14(self):
+    def test_client_enum_75(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': 0}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_76(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': 0.1}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_15(self):
+    def test_client_enum_77(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': ''}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_16(self):
+    def test_client_enum_78(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': []}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_17(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_client_enum_79(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, None]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_18(self):
+    def test_client_enum_80(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, False]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_81(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_82(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_83(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, '']}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_84(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, []]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_85(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_19(self):
+    def test_client_enum_86(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_20(self):
+    def test_client_enum_87(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'a': {}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_21(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_88(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_22(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_23(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_24(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_25(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayEnum_26(self):
+    def test_client_enum_89(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_27(self):
+    def test_client_enum_90(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': 0}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_91(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': 0.1}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_28(self):
+    def test_client_enum_92(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': ''}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayEnum_29(self):
+    def test_client_enum_93(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': []}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_0(self):
-        request = [{'ok': {'value': {'arrNullEnum': [None]}}}, {'fn.test': {'value': {'arrNullEnum': [None]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None]}}}]
+    def test_client_enum_94(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, None]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_1(self):
+    def test_client_enum_95(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_96(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_97(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_98(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_99(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_100(self):
         request = [{'ok': {'value': {'arrNullEnum': []}}}, {'fn.test': {'value': {'arrNullEnum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_2(self):
+    def test_client_enum_101(self):
+        request = [{'ok': {'value': {'arrNullEnum': [None]}}}, {'fn.test': {'value': {'arrNullEnum': [None]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_102(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'one': {}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_3(self):
+    def test_client_enum_103(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_104(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_4(self):
-        request = [{'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
+    def test_client_enum_105(self):
+        request = [{'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_5(self):
+    def test_client_enum_106(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_6(self):
+    def test_client_enum_107(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_7(self):
+    def test_client_enum_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'a': {}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, False]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_109(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'two': {}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, '']}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, []]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_13(self):
+    def test_client_enum_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_14(self):
+    def test_client_enum_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_112(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0.1}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_15(self):
+    def test_client_enum_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': ''}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_16(self):
+    def test_client_enum_114(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': []}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_17(self):
+    def test_client_enum_115(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, False]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_116(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_117(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_118(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, '']}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_119(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, []]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_120(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_18(self):
+    def test_client_enum_121(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_19(self):
+    def test_client_enum_122(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'a': {}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_20(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_123(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'two': {}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_21(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_22(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_23(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_24(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullEnum_25(self):
+    def test_client_enum_124(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_26(self):
+    def test_client_enum_125(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_126(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0.1}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_27(self):
+    def test_client_enum_127(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': ''}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullEnum_28(self):
+    def test_client_enum_128(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': []}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_0(self):
+    def test_client_enum_129(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_130(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_131(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_132(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_133(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_134(self):
         request = [{'ok': {'value': {'objEnum': {}}}}, {'fn.test': {'value': {'objEnum': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_1(self):
+    def test_client_enum_135(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_2(self):
+    def test_client_enum_136(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_137(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_3(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}]
-        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}]
+    def test_client_enum_138(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_4(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_5(self):
+    def test_client_enum_139(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_6(self):
+    def test_client_enum_140(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_7(self):
+    def test_client_enum_141(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_142(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_13(self):
+    def test_client_enum_143(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_14(self):
+    def test_client_enum_144(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_145(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_15(self):
+    def test_client_enum_146(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_16(self):
+    def test_client_enum_147(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_17(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_client_enum_148(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_18(self):
+    def test_client_enum_149(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_150(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_151(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_152(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_153(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_154(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_19(self):
+    def test_client_enum_155(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_20(self):
+    def test_client_enum_156(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_21(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_157(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_22(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_23(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_24(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_25(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectEnum_26(self):
+    def test_client_enum_158(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_27(self):
+    def test_client_enum_159(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_160(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_28(self):
+    def test_client_enum_161(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectEnum_29(self):
+    def test_client_enum_162(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_0(self):
+    def test_client_enum_163(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_164(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_165(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_166(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_167(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_168(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_169(self):
         request = [{'ok': {'value': {'objNullEnum': {}}}}, {'fn.test': {'value': {'objNullEnum': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_1(self):
+    def test_client_enum_170(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': None}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_2(self):
+    def test_client_enum_171(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_3(self):
+    def test_client_enum_172(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_173(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_4(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
-        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
+    def test_client_enum_174(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_5(self):
+    def test_client_enum_175(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_6(self):
+    def test_client_enum_176(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_7(self):
+    def test_client_enum_177(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_178(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_13(self):
+    def test_client_enum_179(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_14(self):
+    def test_client_enum_180(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_181(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_15(self):
+    def test_client_enum_182(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_16(self):
+    def test_client_enum_183(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_17(self):
+    def test_client_enum_184(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_186(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_187(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_188(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_189(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_18(self):
+    def test_client_enum_190(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_19(self):
+    def test_client_enum_191(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_20(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_192(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_21(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_22(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_23(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_24(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectNullEnum_25(self):
+    def test_client_enum_193(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_26(self):
+    def test_client_enum_194(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_195(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_27(self):
+    def test_client_enum_196(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullEnum_28(self):
+    def test_client_enum_197(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_0(self):
+    def test_client_enum_198(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_199(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_200(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_201(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_202(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_203(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_1(self):
+    def test_client_enum_204(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_205(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_2(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_3(self):
+    def test_client_enum_206(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_4(self):
+    def test_client_enum_207(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_5(self):
+    def test_client_enum_208(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_209(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_11(self):
+    def test_client_enum_210(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_12(self):
+    def test_client_enum_211(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_212(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_13(self):
+    def test_client_enum_213(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_14(self):
+    def test_client_enum_214(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_15(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_client_enum_215(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_16(self):
+    def test_client_enum_216(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_217(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_219(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_220(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_221(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_17(self):
+    def test_client_enum_222(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_18(self):
+    def test_client_enum_223(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_19(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_224(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_20(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_21(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_22(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_23(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructEnum_24(self):
+    def test_client_enum_225(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_25(self):
+    def test_client_enum_226(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_227(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_26(self):
+    def test_client_enum_228(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructEnum_27(self):
+    def test_client_enum_229(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_0(self):
+    def test_client_enum_230(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_231(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_232(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_233(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_234(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_235(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_236(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_1(self):
+    def test_client_enum_237(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_2(self):
+    def test_client_enum_238(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_239(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_3(self):
+    def test_client_enum_240(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_4(self):
+    def test_client_enum_241(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_5(self):
+    def test_client_enum_242(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_243(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_11(self):
+    def test_client_enum_244(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_12(self):
+    def test_client_enum_245(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_246(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_13(self):
+    def test_client_enum_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_14(self):
+    def test_client_enum_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_15(self):
+    def test_client_enum_249(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_250(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_251(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_253(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_254(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_16(self):
+    def test_client_enum_255(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_17(self):
+    def test_client_enum_256(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_18(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_257(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_19(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_20(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_21(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_22(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructNullEnum_23(self):
+    def test_client_enum_258(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_24(self):
+    def test_client_enum_259(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_260(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_25(self):
+    def test_client_enum_261(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullEnum_26(self):
+    def test_client_enum_262(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_0(self):
+    def test_client_enum_263(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_264(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_265(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_266(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_267(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_268(self):
         request = [{'ok': {'value': {'pEnumEnum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_1(self):
+    def test_client_enum_269(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_2(self):
+    def test_client_enum_270(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_271(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_3(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_4(self):
+    def test_client_enum_272(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_5(self):
+    def test_client_enum_273(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_6(self):
+    def test_client_enum_274(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'a': {}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_275(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_12(self):
+    def test_client_enum_276(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_13(self):
+    def test_client_enum_277(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_278(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0.1}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_14(self):
+    def test_client_enum_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': ''}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_15(self):
+    def test_client_enum_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': []}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_16(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_client_enum_281(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_17(self):
+    def test_client_enum_282(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_283(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_284(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_285(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_287(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_18(self):
+    def test_client_enum_288(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_19(self):
+    def test_client_enum_289(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'a': {}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_20(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_290(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_21(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_22(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_23(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_24(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumEnum_25(self):
+    def test_client_enum_291(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_26(self):
+    def test_client_enum_292(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_293(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0.1}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_27(self):
+    def test_client_enum_294(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': ''}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumEnum_28(self):
+    def test_client_enum_295(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': []}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_0(self):
+    def test_client_enum_296(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_297(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_298(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_299(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_300(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_301(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_302(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_1(self):
+    def test_client_enum_303(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_2(self):
+    def test_client_enum_304(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_3(self):
+    def test_client_enum_305(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_306(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_4(self):
+    def test_client_enum_307(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_5(self):
+    def test_client_enum_308(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_6(self):
+    def test_client_enum_309(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'a': {}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_310(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_12(self):
+    def test_client_enum_311(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_13(self):
+    def test_client_enum_312(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_313(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0.1}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_14(self):
+    def test_client_enum_314(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': ''}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_15(self):
+    def test_client_enum_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': []}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_16(self):
+    def test_client_enum_316(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_317(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_318(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_319(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_320(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_321(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_17(self):
+    def test_client_enum_322(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_18(self):
+    def test_client_enum_323(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'a': {}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_19(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_client_enum_324(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_20(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_21(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_22(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_23(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumNullEnum_24(self):
+    def test_client_enum_325(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_25(self):
+    def test_client_enum_326(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_327(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0.1}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_26(self):
+    def test_client_enum_328(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': ''}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullEnum_27(self):
+    def test_client_enum_329(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': []}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_330(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_331(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_332(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_333(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_enum_334(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
     def test_client_testFn_0(self):
@@ -32276,1444 +32746,1679 @@ class BinaryClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullStruct.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_0(self):
+    def test_binary_client_enum_0(self):
         request = [{'ok': {'value': {'enum': {'one': {}}}}}, {'fn.test': {'value': {'enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_1(self):
-        request = [{'ok': {'value': {'enum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
+    def test_binary_client_enum_1(self):
+        request = [{'ok': {'value': {'enum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'two': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_2(self):
+    def test_binary_client_enum_2(self):
         request = [{'ok': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'enum': {'two': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_3(self):
-        request = [{}, {'fn.test': {'value': {'enum': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_4(self):
+    def test_binary_client_enum_3(self):
         request = [{}, {'fn.test': {'value': {'enum': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_5(self):
+    def test_binary_client_enum_4(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_6(self):
+    def test_binary_client_enum_5(self):
         request = [{}, {'fn.test': {'value': {'enum': {'a': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_7(self):
+    def test_binary_client_enum_6(self):
         request = [{}, {'fn.test': {'value': {'enum': {'two': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'enum': False}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'enum': 0.1}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'enum': ''}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'enum': []}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_13(self):
+    def test_binary_client_enum_7(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_14(self):
+    def test_binary_client_enum_8(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_9(self):
+        request = [{}, {'fn.test': {'value': {'enum': {'one': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_15(self):
+    def test_binary_client_enum_10(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_16(self):
+    def test_binary_client_enum_11(self):
         request = [{}, {'fn.test': {'value': {'enum': {'one': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_17(self):
-        request = [{'ok': {'value': {'enum': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_binary_client_enum_12(self):
+        request = [{}, {'fn.test': {'value': {'enum': None}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_18(self):
+    def test_binary_client_enum_13(self):
+        request = [{}, {'fn.test': {'value': {'enum': False}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_14(self):
+        request = [{}, {'fn.test': {'value': {'enum': 0}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_15(self):
+        request = [{}, {'fn.test': {'value': {'enum': 0.1}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_16(self):
+        request = [{}, {'fn.test': {'value': {'enum': ''}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_17(self):
+        request = [{}, {'fn.test': {'value': {'enum': []}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_18(self):
         request = [{'ok': {'value': {'enum': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_19(self):
+    def test_binary_client_enum_19(self):
         request = [{'ok': {'value': {'enum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_20(self):
+    def test_binary_client_enum_20(self):
         request = [{'ok': {'value': {'enum': {'a': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_21(self):
+    def test_binary_client_enum_21(self):
         request = [{'ok': {'value': {'enum': {'two': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_22(self):
-        request = [{'ok': {'value': {'enum': False}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_23(self):
-        request = [{'ok': {'value': {'enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_24(self):
-        request = [{'ok': {'value': {'enum': 0.1}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_25(self):
-        request = [{'ok': {'value': {'enum': ''}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_26(self):
-        request = [{'ok': {'value': {'enum': []}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testEnum_27(self):
+    def test_binary_client_enum_22(self):
         request = [{'ok': {'value': {'enum': {'one': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_28(self):
+    def test_binary_client_enum_23(self):
         request = [{'ok': {'value': {'enum': {'one': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_24(self):
+        request = [{'ok': {'value': {'enum': {'one': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_29(self):
+    def test_binary_client_enum_25(self):
         request = [{'ok': {'value': {'enum': {'one': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testEnum_30(self):
+    def test_binary_client_enum_26(self):
         request = [{'ok': {'value': {'enum': {'one': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_0(self):
+    def test_binary_client_enum_27(self):
+        request = [{'ok': {'value': {'enum': None}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_28(self):
+        request = [{'ok': {'value': {'enum': False}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_29(self):
+        request = [{'ok': {'value': {'enum': 0}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_30(self):
+        request = [{'ok': {'value': {'enum': 0.1}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_31(self):
+        request = [{'ok': {'value': {'enum': ''}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_32(self):
+        request = [{'ok': {'value': {'enum': []}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_33(self):
         request = [{'ok': {'value': {'nullEnum': None}}}, {'fn.test': {'value': {'nullEnum': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_1(self):
+    def test_binary_client_enum_34(self):
         request = [{'ok': {'value': {'nullEnum': {'one': {}}}}}, {'fn.test': {'value': {'nullEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_2(self):
+    def test_binary_client_enum_35(self):
+        request = [{'ok': {'value': {'nullEnum': {'two': {'required': False}}}}}, {'fn.test': {'value': {'nullEnum': {'two': {'required': False}}}}}]
+        expected_response = [{}, {'ok': {'value': {'nullEnum': {'two': {'required': False}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_36(self):
         request = [{'ok': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullEnum': {'two': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_3(self):
+    def test_binary_client_enum_37(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_4(self):
+    def test_binary_client_enum_38(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_5(self):
+    def test_binary_client_enum_39(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'a': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': False}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_40(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': {'two': {}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': 0.1}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': ''}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'nullEnum': []}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_11(self):
+    def test_binary_client_enum_41(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_12(self):
+    def test_binary_client_enum_42(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_43(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': {'one': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_13(self):
+    def test_binary_client_enum_44(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_14(self):
+    def test_binary_client_enum_45(self):
         request = [{}, {'fn.test': {'value': {'nullEnum': {'one': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_15(self):
+    def test_binary_client_enum_46(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': False}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_47(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': 0}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_48(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': 0.1}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_49(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': ''}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_50(self):
+        request = [{}, {'fn.test': {'value': {'nullEnum': []}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_51(self):
         request = [{'ok': {'value': {'nullEnum': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_16(self):
+    def test_binary_client_enum_52(self):
         request = [{'ok': {'value': {'nullEnum': {'one': {}, 'two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_17(self):
+    def test_binary_client_enum_53(self):
         request = [{'ok': {'value': {'nullEnum': {'a': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_18(self):
-        request = [{'ok': {'value': {'nullEnum': False}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_54(self):
+        request = [{'ok': {'value': {'nullEnum': {'two': {}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_19(self):
-        request = [{'ok': {'value': {'nullEnum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_20(self):
-        request = [{'ok': {'value': {'nullEnum': 0.1}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_21(self):
-        request = [{'ok': {'value': {'nullEnum': ''}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_22(self):
-        request = [{'ok': {'value': {'nullEnum': []}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testNullEnum_23(self):
+    def test_binary_client_enum_55(self):
         request = [{'ok': {'value': {'nullEnum': {'one': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_24(self):
+    def test_binary_client_enum_56(self):
         request = [{'ok': {'value': {'nullEnum': {'one': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_57(self):
+        request = [{'ok': {'value': {'nullEnum': {'one': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_25(self):
+    def test_binary_client_enum_58(self):
         request = [{'ok': {'value': {'nullEnum': {'one': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullEnum_26(self):
+    def test_binary_client_enum_59(self):
         request = [{'ok': {'value': {'nullEnum': {'one': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_0(self):
+    def test_binary_client_enum_60(self):
+        request = [{'ok': {'value': {'nullEnum': False}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_61(self):
+        request = [{'ok': {'value': {'nullEnum': 0}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_62(self):
+        request = [{'ok': {'value': {'nullEnum': 0.1}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_63(self):
+        request = [{'ok': {'value': {'nullEnum': ''}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_64(self):
+        request = [{'ok': {'value': {'nullEnum': []}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullEnum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_65(self):
         request = [{'ok': {'value': {'arrEnum': []}}}, {'fn.test': {'value': {'arrEnum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_1(self):
+    def test_binary_client_enum_66(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_2(self):
+    def test_binary_client_enum_67(self):
+        request = [{'ok': {'value': {'arrEnum': [{'two': {'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'two': {'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'two': {'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_68(self):
         request = [{'ok': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_3(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
+    def test_binary_client_enum_69(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_4(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_5(self):
+    def test_binary_client_enum_70(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_6(self):
+    def test_binary_client_enum_71(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_7(self):
+    def test_binary_client_enum_72(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'a': {}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, False]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_73(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'two': {}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, '']}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, []]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_13(self):
+    def test_binary_client_enum_74(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_14(self):
+    def test_binary_client_enum_75(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': 0}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_76(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': 0.1}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_15(self):
+    def test_binary_client_enum_77(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': ''}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_16(self):
+    def test_binary_client_enum_78(self):
         request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, {'one': []}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_17(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_binary_client_enum_79(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, None]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_18(self):
+    def test_binary_client_enum_80(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, False]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_81(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_82(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_83(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, '']}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_84(self):
+        request = [{}, {'fn.test': {'value': {'arrEnum': [{'one': {}}, []]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_85(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_19(self):
+    def test_binary_client_enum_86(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_20(self):
+    def test_binary_client_enum_87(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'a': {}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_21(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_88(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'two': {}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_22(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_23(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_24(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_25(self):
-        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayEnum_26(self):
+    def test_binary_client_enum_89(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_27(self):
+    def test_binary_client_enum_90(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': 0}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_91(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': 0.1}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_28(self):
+    def test_binary_client_enum_92(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': ''}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayEnum_29(self):
+    def test_binary_client_enum_93(self):
         request = [{'ok': {'value': {'arrEnum': [{'one': {}}, {'one': []}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_0(self):
-        request = [{'ok': {'value': {'arrNullEnum': [None]}}}, {'fn.test': {'value': {'arrNullEnum': [None]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None]}}}]
+    def test_binary_client_enum_94(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, None]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_1(self):
+    def test_binary_client_enum_95(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_96(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_97(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_98(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_99(self):
+        request = [{'ok': {'value': {'arrEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_100(self):
         request = [{'ok': {'value': {'arrNullEnum': []}}}, {'fn.test': {'value': {'arrNullEnum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_2(self):
+    def test_binary_client_enum_101(self):
+        request = [{'ok': {'value': {'arrNullEnum': [None]}}}, {'fn.test': {'value': {'arrNullEnum': [None]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_102(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'one': {}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_3(self):
+    def test_binary_client_enum_103(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'two': {'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_104(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullEnum': [{'two': {'optional': False, 'required': False}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_4(self):
-        request = [{'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'optional': False, 'required': False}}]}}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+    def test_binary_client_enum_105(self):
+        request = [{'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullEnum': [None, {'one': {}}, {'two': {'required': False}}, {'two': {'optional': False, 'required': False}}]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=231, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_5(self):
+    def test_binary_client_enum_106(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_6(self):
+    def test_binary_client_enum_107(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_7(self):
+    def test_binary_client_enum_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'a': {}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, False]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_109(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'two': {}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, '']}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, []]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_13(self):
+    def test_binary_client_enum_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_14(self):
+    def test_binary_client_enum_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_112(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0.1}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_15(self):
+    def test_binary_client_enum_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': ''}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_16(self):
+    def test_binary_client_enum_114(self):
         request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, {'one': []}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_17(self):
+    def test_binary_client_enum_115(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, False]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_116(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_117(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_118(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, '']}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_119(self):
+        request = [{}, {'fn.test': {'value': {'arrNullEnum': [{'one': {}}, []]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_120(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_18(self):
+    def test_binary_client_enum_121(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': {}, 'two': {'optional': False, 'required': False}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_19(self):
+    def test_binary_client_enum_122(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'a': {}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_20(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_123(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'two': {}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_21(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_22(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_23(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_24(self):
-        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullEnum_25(self):
+    def test_binary_client_enum_124(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_26(self):
+    def test_binary_client_enum_125(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_126(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': 0.1}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_27(self):
+    def test_binary_client_enum_127(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': ''}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullEnum_28(self):
+    def test_binary_client_enum_128(self):
         request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, {'one': []}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1].one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_0(self):
+    def test_binary_client_enum_129(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, False]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_130(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_131(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, 0.1]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_132(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, '']}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_133(self):
+        request = [{'ok': {'value': {'arrNullEnum': [{'one': {}}, []]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullEnum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_134(self):
         request = [{'ok': {'value': {'objEnum': {}}}}, {'fn.test': {'value': {'objEnum': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_1(self):
+    def test_binary_client_enum_135(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_2(self):
+    def test_binary_client_enum_136(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_137(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_3(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}]
-        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'optional': False, 'required': False}}}}}}]
+    def test_binary_client_enum_138(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {'required': False}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_4(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_5(self):
+    def test_binary_client_enum_139(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_6(self):
+    def test_binary_client_enum_140(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_7(self):
+    def test_binary_client_enum_141(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_142(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_13(self):
+    def test_binary_client_enum_143(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_14(self):
+    def test_binary_client_enum_144(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_145(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_15(self):
+    def test_binary_client_enum_146(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_16(self):
+    def test_binary_client_enum_147(self):
         request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_17(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_binary_client_enum_148(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_18(self):
+    def test_binary_client_enum_149(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_150(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_151(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_152(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_153(self):
+        request = [{}, {'fn.test': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_154(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_19(self):
+    def test_binary_client_enum_155(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_20(self):
+    def test_binary_client_enum_156(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_21(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_157(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_22(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_23(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_24(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_25(self):
-        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectEnum_26(self):
+    def test_binary_client_enum_158(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_27(self):
+    def test_binary_client_enum_159(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_160(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_28(self):
+    def test_binary_client_enum_161(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectEnum_29(self):
+    def test_binary_client_enum_162(self):
         request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_0(self):
+    def test_binary_client_enum_163(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_164(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_165(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_166(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_167(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_168(self):
+        request = [{'ok': {'value': {'objEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_169(self):
         request = [{'ok': {'value': {'objNullEnum': {}}}}, {'fn.test': {'value': {'objNullEnum': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_1(self):
+    def test_binary_client_enum_170(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': None}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_2(self):
+    def test_binary_client_enum_171(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_3(self):
+    def test_binary_client_enum_172(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_173(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_4(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
-        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'optional': False, 'required': False}}}}}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+    def test_binary_client_enum_174(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullEnum': {'a': None, 'b': {'one': {}}, 'c': {'two': {'required': False}}, 'd': {'two': {'optional': False, 'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=231, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_5(self):
+    def test_binary_client_enum_175(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_6(self):
+    def test_binary_client_enum_176(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_7(self):
+    def test_binary_client_enum_177(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_178(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_12(self):
-        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_13(self):
+    def test_binary_client_enum_179(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_14(self):
+    def test_binary_client_enum_180(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_181(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_15(self):
+    def test_binary_client_enum_182(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_16(self):
+    def test_binary_client_enum_183(self):
         request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_17(self):
+    def test_binary_client_enum_184(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_186(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_187(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_188(self):
+        request = [{}, {'fn.test': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_189(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_18(self):
+    def test_binary_client_enum_190(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_19(self):
+    def test_binary_client_enum_191(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_20(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_192(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_21(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_22(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_23(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_24(self):
-        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectNullEnum_25(self):
+    def test_binary_client_enum_193(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_26(self):
+    def test_binary_client_enum_194(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_195(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_27(self):
+    def test_binary_client_enum_196(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullEnum_28(self):
+    def test_binary_client_enum_197(self):
         request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_0(self):
+    def test_binary_client_enum_198(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_199(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_200(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_201(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_202(self):
+        request = [{'ok': {'value': {'objNullEnum': {'a': {'one': {}}, 'b': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullEnum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_203(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_1(self):
+    def test_binary_client_enum_204(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_205(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_2(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_3(self):
+    def test_binary_client_enum_206(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_4(self):
+    def test_binary_client_enum_207(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_5(self):
+    def test_binary_client_enum_208(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_209(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_11(self):
+    def test_binary_client_enum_210(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_12(self):
+    def test_binary_client_enum_211(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_212(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_13(self):
+    def test_binary_client_enum_213(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_14(self):
+    def test_binary_client_enum_214(self):
         request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_15(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_binary_client_enum_215(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_16(self):
+    def test_binary_client_enum_216(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_217(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_219(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_220(self):
+        request = [{}, {'fn.test': {'value': {'pStrEnum': {'wrap': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_221(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_17(self):
+    def test_binary_client_enum_222(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_18(self):
+    def test_binary_client_enum_223(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_19(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_224(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_20(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_21(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_22(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_23(self):
-        request = [{'ok': {'value': {'pStrEnum': {'wrap': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructEnum_24(self):
+    def test_binary_client_enum_225(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_25(self):
+    def test_binary_client_enum_226(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_227(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_26(self):
+    def test_binary_client_enum_228(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructEnum_27(self):
+    def test_binary_client_enum_229(self):
         request = [{'ok': {'value': {'pStrEnum': {'wrap': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_0(self):
+    def test_binary_client_enum_230(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_231(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_232(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_233(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_234(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_235(self):
+        request = [{'ok': {'value': {'pStrEnum': {'wrap': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_236(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_1(self):
+    def test_binary_client_enum_237(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_2(self):
+    def test_binary_client_enum_238(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'required': False}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_239(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_3(self):
+    def test_binary_client_enum_240(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_4(self):
+    def test_binary_client_enum_241(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_5(self):
+    def test_binary_client_enum_242(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'a': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_6(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': False}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_243(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'two': {}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': ''}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': []}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_11(self):
+    def test_binary_client_enum_244(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_12(self):
+    def test_binary_client_enum_245(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_246(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_13(self):
+    def test_binary_client_enum_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_14(self):
+    def test_binary_client_enum_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': {'one': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_15(self):
+    def test_binary_client_enum_249(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': False}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_250(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_251(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': ''}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_253(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullEnum': {'wrap': []}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_254(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_16(self):
+    def test_binary_client_enum_255(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_17(self):
+    def test_binary_client_enum_256(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'a': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_18(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': False}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_257(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'two': {}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_19(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_20(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_21(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': ''}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_22(self):
-        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': []}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructNullEnum_23(self):
+    def test_binary_client_enum_258(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_24(self):
+    def test_binary_client_enum_259(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_260(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_25(self):
+    def test_binary_client_enum_261(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullEnum_26(self):
+    def test_binary_client_enum_262(self):
         request = [{'ok': {'value': {'pStrNullEnum': {'wrap': {'one': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_0(self):
+    def test_binary_client_enum_263(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': False}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_264(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_265(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': 0.1}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_266(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': ''}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_267(self):
+        request = [{'ok': {'value': {'pStrNullEnum': {'wrap': []}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullEnum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_268(self):
         request = [{'ok': {'value': {'pEnumEnum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_1(self):
+    def test_binary_client_enum_269(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_2(self):
+    def test_binary_client_enum_270(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_271(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_3(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_4(self):
+    def test_binary_client_enum_272(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_5(self):
+    def test_binary_client_enum_273(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_6(self):
+    def test_binary_client_enum_274(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'a': {}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_275(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_12(self):
+    def test_binary_client_enum_276(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_13(self):
+    def test_binary_client_enum_277(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_278(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0.1}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_14(self):
+    def test_binary_client_enum_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': ''}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_15(self):
+    def test_binary_client_enum_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': []}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_16(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+    def test_binary_client_enum_281(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_17(self):
+    def test_binary_client_enum_282(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_283(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_284(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_285(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_287(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_18(self):
+    def test_binary_client_enum_288(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_19(self):
+    def test_binary_client_enum_289(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'a': {}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_20(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_290(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'two': {}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_21(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_22(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_23(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_24(self):
-        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumEnum_25(self):
+    def test_binary_client_enum_291(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_26(self):
+    def test_binary_client_enum_292(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_293(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': 0.1}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_27(self):
+    def test_binary_client_enum_294(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': ''}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumEnum_28(self):
+    def test_binary_client_enum_295(self):
         request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': {'one': []}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_0(self):
+    def test_binary_client_enum_296(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_297(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_298(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_299(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_300(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_301(self):
+        request = [{'ok': {'value': {'pEnumEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_302(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_1(self):
+    def test_binary_client_enum_303(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_2(self):
+    def test_binary_client_enum_304(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_3(self):
+    def test_binary_client_enum_305(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'required': False}}}}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_306(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {'optional': False, 'required': False}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_4(self):
+    def test_binary_client_enum_307(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_5(self):
+    def test_binary_client_enum_308(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_6(self):
+    def test_binary_client_enum_309(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'a': {}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_7(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_310(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_8(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_9(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_10(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_11(self):
-        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_12(self):
+    def test_binary_client_enum_311(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_13(self):
+    def test_binary_client_enum_312(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_313(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0.1}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_14(self):
+    def test_binary_client_enum_314(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': ''}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_15(self):
+    def test_binary_client_enum_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': []}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_16(self):
+    def test_binary_client_enum_316(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_317(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_318(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_319(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_320(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_321(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_17(self):
+    def test_binary_client_enum_322(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': {}, 'two': {'optional': False, 'required': False}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'ZeroOrManyEnumFieldsDisallowed': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_18(self):
+    def test_binary_client_enum_323(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'a': {}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.a', 'reason': {'EnumFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_19(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+    def test_binary_client_enum_324(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'two': {}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.two.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_20(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_21(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_22(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_23(self):
-        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumNullEnum_24(self):
+    def test_binary_client_enum_325(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_25(self):
+    def test_binary_client_enum_326(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_327(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': 0.1}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_26(self):
+    def test_binary_client_enum_328(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': ''}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullEnum_27(self):
+    def test_binary_client_enum_329(self):
         request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': {'one': []}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap.one', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_330(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_331(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_332(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_333(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_enum_334(self):
+        request = [{'ok': {'value': {'pEnumNullEnum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
     def test_binary_client_testFn_0(self):
