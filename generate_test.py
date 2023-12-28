@@ -405,7 +405,7 @@ class MockTestCases(unittest.TestCase):
 
         for name, cases in mock_cases.items():
             generated_tests.write('''
-    def test_{}(self):
+    def test_mock_{}(self):
 '''.format(name))
             
             for i, case in enumerate(cases):
@@ -424,7 +424,7 @@ class MockTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_{}_{}(self):
+    def test_invalid_mock_{}_{}(self):
         request = {}
         expected_response = {}
         verify_case(self, request, expected_response, path)
