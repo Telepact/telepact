@@ -8939,1617 +8939,1727 @@ class TestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_0(self):
+    def test_p2Str_0(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_1(self):
+    def test_p2Str_1(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}, {'fn.test': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_2(self):
+    def test_p2Str_2(self):
         request = [{}, {'fn.test': {'value': {'p2Str': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_3(self):
+    def test_p2Str_3(self):
         request = [{}, {'fn.test': {'value': {'p2Str': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_4(self):
+    def test_p2Str_4(self):
         request = [{}, {'fn.test': {'value': {'p2Str': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_5(self):
+    def test_p2Str_5(self):
         request = [{}, {'fn.test': {'value': {'p2Str': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_6(self):
+    def test_p2Str_6(self):
         request = [{}, {'fn.test': {'value': {'p2Str': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_7(self):
+    def test_p2Str_7(self):
         request = [{}, {'fn.test': {'value': {'p2Str': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_8(self):
+    def test_p2Str_8(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': 0, 'nest': [0]}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_9(self):
+        request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': 0.1, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_9(self):
+    def test_p2Str_10(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': '', 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_10(self):
+    def test_p2Str_11(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': [], 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_11(self):
+    def test_p2Str_12(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': {}, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_12(self):
+    def test_p2Str_13(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, False]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_13(self):
+    def test_p2Str_14(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, 0.1]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_14(self):
+    def test_p2Str_15(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, '']}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_15(self):
+    def test_p2Str_16(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, []]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_16(self):
+    def test_p2Str_17(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, {}]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_17(self):
+    def test_p2Str_18(self):
         request = [{'ok': {'value': {'p2Str': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_18(self):
+    def test_p2Str_19(self):
         request = [{'ok': {'value': {'p2Str': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_19(self):
+    def test_p2Str_20(self):
         request = [{'ok': {'value': {'p2Str': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_20(self):
+    def test_p2Str_21(self):
         request = [{'ok': {'value': {'p2Str': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_21(self):
+    def test_p2Str_22(self):
         request = [{'ok': {'value': {'p2Str': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_22(self):
+    def test_p2Str_23(self):
         request = [{'ok': {'value': {'p2Str': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_23(self):
+    def test_p2Str_24(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': 0, 'nest': [0]}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_25(self):
+        request = [{'ok': {'value': {'p2Str': {'wrap': 0.1, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_24(self):
+    def test_p2Str_26(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': '', 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_25(self):
+    def test_p2Str_27(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': [], 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_26(self):
+    def test_p2Str_28(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': {}, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_27(self):
+    def test_p2Str_29(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, False]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_28(self):
+    def test_p2Str_30(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, 0.1]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_29(self):
+    def test_p2Str_31(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, '']}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_30(self):
+    def test_p2Str_32(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, []]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Str_31(self):
+    def test_p2Str_33(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, {}]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_0(self):
+    def test_p2Str_34(self):
         request = [{'ok': {'value': {'nullP2Str': None}}}, {'fn.test': {'value': {'nullP2Str': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_1(self):
+    def test_p2Str_35(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_2(self):
+    def test_p2Str_36(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}, {'fn.test': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_3(self):
+    def test_p2Str_37(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_4(self):
+    def test_p2Str_38(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_5(self):
+    def test_p2Str_39(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_6(self):
+    def test_p2Str_40(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_7(self):
+    def test_p2Str_41(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_8(self):
+    def test_p2Str_42(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': 0, 'nest': [0]}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_43(self):
+        request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': 0.1, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_9(self):
+    def test_p2Str_44(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': '', 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_10(self):
+    def test_p2Str_45(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': [], 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_11(self):
+    def test_p2Str_46(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': {}, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_12(self):
+    def test_p2Str_47(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, False]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_13(self):
+    def test_p2Str_48(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, 0.1]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_14(self):
+    def test_p2Str_49(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, '']}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_15(self):
+    def test_p2Str_50(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, []]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_16(self):
+    def test_p2Str_51(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, {}]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_17(self):
+    def test_p2Str_52(self):
         request = [{'ok': {'value': {'nullP2Str': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_18(self):
+    def test_p2Str_53(self):
         request = [{'ok': {'value': {'nullP2Str': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_19(self):
+    def test_p2Str_54(self):
         request = [{'ok': {'value': {'nullP2Str': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_20(self):
+    def test_p2Str_55(self):
         request = [{'ok': {'value': {'nullP2Str': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_21(self):
+    def test_p2Str_56(self):
         request = [{'ok': {'value': {'nullP2Str': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_22(self):
+    def test_p2Str_57(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': 0, 'nest': [0]}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_58(self):
+        request = [{'ok': {'value': {'nullP2Str': {'wrap': 0.1, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_23(self):
+    def test_p2Str_59(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': '', 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_24(self):
+    def test_p2Str_60(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': [], 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_25(self):
+    def test_p2Str_61(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': {}, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_26(self):
+    def test_p2Str_62(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, False]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_27(self):
+    def test_p2Str_63(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, 0.1]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_28(self):
+    def test_p2Str_64(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, '']}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_29(self):
+    def test_p2Str_65(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, []]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Str_30(self):
+    def test_p2Str_66(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, {}]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_0(self):
+    def test_p2Str_67(self):
         request = [{'ok': {'value': {'arrP2Str': []}}}, {'fn.test': {'value': {'arrP2Str': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_1(self):
+    def test_p2Str_68(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_2(self):
+    def test_p2Str_69(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_3(self):
+    def test_p2Str_70(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_4(self):
+    def test_p2Str_71(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_5(self):
+    def test_p2Str_72(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_6(self):
+    def test_p2Str_73(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_7(self):
+    def test_p2Str_74(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_8(self):
+    def test_p2Str_75(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_9(self):
+    def test_p2Str_76(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_10(self):
+    def test_p2Str_77(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_78(self):
+        request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_11(self):
+    def test_p2Str_79(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_12(self):
+    def test_p2Str_80(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_13(self):
+    def test_p2Str_81(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_14(self):
+    def test_p2Str_82(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_15(self):
+    def test_p2Str_83(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_16(self):
+    def test_p2Str_84(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_17(self):
+    def test_p2Str_85(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_18(self):
+    def test_p2Str_86(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_19(self):
+    def test_p2Str_87(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_20(self):
+    def test_p2Str_88(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_21(self):
+    def test_p2Str_89(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_22(self):
+    def test_p2Str_90(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_23(self):
+    def test_p2Str_91(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_24(self):
+    def test_p2Str_92(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_25(self):
+    def test_p2Str_93(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_94(self):
+        request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_26(self):
+    def test_p2Str_95(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_27(self):
+    def test_p2Str_96(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_28(self):
+    def test_p2Str_97(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_29(self):
+    def test_p2Str_98(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_30(self):
+    def test_p2Str_99(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_31(self):
+    def test_p2Str_100(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_32(self):
+    def test_p2Str_101(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Str_33(self):
+    def test_p2Str_102(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_0(self):
+    def test_p2Str_103(self):
         request = [{'ok': {'value': {'arrNullP2Str': []}}}, {'fn.test': {'value': {'arrNullP2Str': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_1(self):
+    def test_p2Str_104(self):
         request = [{'ok': {'value': {'arrNullP2Str': [None]}}}, {'fn.test': {'value': {'arrNullP2Str': [None]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [None]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_2(self):
+    def test_p2Str_105(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_3(self):
+    def test_p2Str_106(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_4(self):
+    def test_p2Str_107(self):
         request = [{'ok': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_5(self):
+    def test_p2Str_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_6(self):
+    def test_p2Str_109(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_7(self):
+    def test_p2Str_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_8(self):
+    def test_p2Str_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_9(self):
+    def test_p2Str_112(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_10(self):
+    def test_p2Str_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_114(self):
+        request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_11(self):
+    def test_p2Str_115(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_12(self):
+    def test_p2Str_116(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_13(self):
+    def test_p2Str_117(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_14(self):
+    def test_p2Str_118(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_15(self):
+    def test_p2Str_119(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_16(self):
+    def test_p2Str_120(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_17(self):
+    def test_p2Str_121(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_18(self):
+    def test_p2Str_122(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_19(self):
+    def test_p2Str_123(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_20(self):
+    def test_p2Str_124(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_21(self):
+    def test_p2Str_125(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_22(self):
+    def test_p2Str_126(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_23(self):
+    def test_p2Str_127(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_24(self):
+    def test_p2Str_128(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_129(self):
+        request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_25(self):
+    def test_p2Str_130(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_26(self):
+    def test_p2Str_131(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_27(self):
+    def test_p2Str_132(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_28(self):
+    def test_p2Str_133(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_29(self):
+    def test_p2Str_134(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_30(self):
+    def test_p2Str_135(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_31(self):
+    def test_p2Str_136(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Str_32(self):
+    def test_p2Str_137(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_0(self):
+    def test_p2Str_138(self):
+        request = [{'ok': {'value': {'objP2Str': {}}}}, {'fn.test': {'value': {'objP2Str': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objP2Str': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_139(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_1(self):
+    def test_p2Str_140(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_2(self):
+    def test_p2Str_141(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_3(self):
+    def test_p2Str_142(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_4(self):
+    def test_p2Str_143(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_5(self):
+    def test_p2Str_144(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_6(self):
+    def test_p2Str_145(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_7(self):
+    def test_p2Str_146(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_8(self):
+    def test_p2Str_147(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_9(self):
+    def test_p2Str_148(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_149(self):
+        request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_10(self):
+    def test_p2Str_150(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_11(self):
+    def test_p2Str_151(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_12(self):
+    def test_p2Str_152(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_13(self):
+    def test_p2Str_153(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_14(self):
+    def test_p2Str_154(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_15(self):
+    def test_p2Str_155(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_16(self):
+    def test_p2Str_156(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_17(self):
+    def test_p2Str_157(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_18(self):
+    def test_p2Str_158(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_19(self):
+    def test_p2Str_159(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_20(self):
+    def test_p2Str_160(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_21(self):
+    def test_p2Str_161(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_22(self):
+    def test_p2Str_162(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_23(self):
+    def test_p2Str_163(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_24(self):
+    def test_p2Str_164(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_165(self):
+        request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_25(self):
+    def test_p2Str_166(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_26(self):
+    def test_p2Str_167(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_27(self):
+    def test_p2Str_168(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_28(self):
+    def test_p2Str_169(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_29(self):
+    def test_p2Str_170(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_30(self):
+    def test_p2Str_171(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_31(self):
+    def test_p2Str_172(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Str_32(self):
+    def test_p2Str_173(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_0(self):
+    def test_p2Str_174(self):
+        request = [{'ok': {'value': {'objNullP2Str': {}}}}, {'fn.test': {'value': {'objNullP2Str': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullP2Str': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_175(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': None}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_1(self):
+    def test_p2Str_176(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_2(self):
+    def test_p2Str_177(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_3(self):
+    def test_p2Str_178(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_4(self):
+    def test_p2Str_179(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_5(self):
+    def test_p2Str_180(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_6(self):
+    def test_p2Str_181(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_7(self):
+    def test_p2Str_182(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_8(self):
+    def test_p2Str_183(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_9(self):
+    def test_p2Str_184(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_10(self):
+    def test_p2Str_186(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_11(self):
+    def test_p2Str_187(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_12(self):
+    def test_p2Str_188(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_13(self):
+    def test_p2Str_189(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_14(self):
+    def test_p2Str_190(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_15(self):
+    def test_p2Str_191(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_16(self):
+    def test_p2Str_192(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_17(self):
+    def test_p2Str_193(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_18(self):
+    def test_p2Str_194(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_19(self):
+    def test_p2Str_195(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_20(self):
+    def test_p2Str_196(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_21(self):
+    def test_p2Str_197(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_22(self):
+    def test_p2Str_198(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_23(self):
+    def test_p2Str_199(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_200(self):
+        request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_24(self):
+    def test_p2Str_201(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_25(self):
+    def test_p2Str_202(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_26(self):
+    def test_p2Str_203(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_27(self):
+    def test_p2Str_204(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_28(self):
+    def test_p2Str_205(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_29(self):
+    def test_p2Str_206(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_30(self):
+    def test_p2Str_207(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Str_31(self):
+    def test_p2Str_208(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_0(self):
+    def test_p2Str_209(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_1(self):
+    def test_p2Str_210(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_2(self):
+    def test_p2Str_211(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_3(self):
+    def test_p2Str_212(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_4(self):
+    def test_p2Str_213(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_5(self):
+    def test_p2Str_214(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_6(self):
+    def test_p2Str_215(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_7(self):
+    def test_p2Str_216(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_8(self):
+    def test_p2Str_217(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_9(self):
+    def test_p2Str_219(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_10(self):
+    def test_p2Str_220(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_11(self):
+    def test_p2Str_221(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_12(self):
+    def test_p2Str_222(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_13(self):
+    def test_p2Str_223(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_14(self):
+    def test_p2Str_224(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_15(self):
+    def test_p2Str_225(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_16(self):
+    def test_p2Str_226(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_17(self):
+    def test_p2Str_227(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_18(self):
+    def test_p2Str_228(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_19(self):
+    def test_p2Str_229(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_20(self):
+    def test_p2Str_230(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_21(self):
+    def test_p2Str_231(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_22(self):
+    def test_p2Str_232(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_23(self):
+    def test_p2Str_233(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_234(self):
+        request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_24(self):
+    def test_p2Str_235(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_25(self):
+    def test_p2Str_236(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_26(self):
+    def test_p2Str_237(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_27(self):
+    def test_p2Str_238(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_28(self):
+    def test_p2Str_239(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_29(self):
+    def test_p2Str_240(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_30(self):
+    def test_p2Str_241(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Str_31(self):
+    def test_p2Str_242(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_0(self):
+    def test_p2Str_243(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_1(self):
+    def test_p2Str_244(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_2(self):
+    def test_p2Str_245(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_3(self):
+    def test_p2Str_246(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_4(self):
+    def test_p2Str_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_5(self):
+    def test_p2Str_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_6(self):
+    def test_p2Str_249(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_7(self):
+    def test_p2Str_250(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_8(self):
+    def test_p2Str_251(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_9(self):
+    def test_p2Str_253(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_10(self):
+    def test_p2Str_254(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_11(self):
+    def test_p2Str_255(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_12(self):
+    def test_p2Str_256(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_13(self):
+    def test_p2Str_257(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_14(self):
+    def test_p2Str_258(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_15(self):
+    def test_p2Str_259(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_16(self):
+    def test_p2Str_260(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_17(self):
+    def test_p2Str_261(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_18(self):
+    def test_p2Str_262(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_19(self):
+    def test_p2Str_263(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_20(self):
+    def test_p2Str_264(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_21(self):
+    def test_p2Str_265(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_22(self):
+    def test_p2Str_266(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_267(self):
+        request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_23(self):
+    def test_p2Str_268(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_24(self):
+    def test_p2Str_269(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_25(self):
+    def test_p2Str_270(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_26(self):
+    def test_p2Str_271(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_27(self):
+    def test_p2Str_272(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_28(self):
+    def test_p2Str_273(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_29(self):
+    def test_p2Str_274(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Str_30(self):
+    def test_p2Str_275(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_0(self):
+    def test_p2Str_276(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'one': {}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_1(self):
+    def test_p2Str_277(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_2(self):
+    def test_p2Str_278(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_3(self):
+    def test_p2Str_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_4(self):
+    def test_p2Str_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_5(self):
+    def test_p2Str_281(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_6(self):
+    def test_p2Str_282(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_7(self):
+    def test_p2Str_283(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_8(self):
+    def test_p2Str_284(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_9(self):
+    def test_p2Str_285(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_10(self):
+    def test_p2Str_287(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_11(self):
+    def test_p2Str_288(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_12(self):
+    def test_p2Str_289(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_13(self):
+    def test_p2Str_290(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_14(self):
+    def test_p2Str_291(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_15(self):
+    def test_p2Str_292(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_16(self):
+    def test_p2Str_293(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_17(self):
+    def test_p2Str_294(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_18(self):
+    def test_p2Str_295(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_19(self):
+    def test_p2Str_296(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_20(self):
+    def test_p2Str_297(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_21(self):
+    def test_p2Str_298(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_22(self):
+    def test_p2Str_299(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_23(self):
+    def test_p2Str_300(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_24(self):
+    def test_p2Str_301(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_302(self):
+        request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_25(self):
+    def test_p2Str_303(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_26(self):
+    def test_p2Str_304(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_27(self):
+    def test_p2Str_305(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_28(self):
+    def test_p2Str_306(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_29(self):
+    def test_p2Str_307(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_30(self):
+    def test_p2Str_308(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_31(self):
+    def test_p2Str_309(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Str_32(self):
+    def test_p2Str_310(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_0(self):
+    def test_p2Str_311(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_1(self):
+    def test_p2Str_312(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_2(self):
+    def test_p2Str_313(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_3(self):
+    def test_p2Str_314(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_4(self):
+    def test_p2Str_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_5(self):
+    def test_p2Str_316(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_6(self):
+    def test_p2Str_317(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_7(self):
+    def test_p2Str_318(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_8(self):
+    def test_p2Str_319(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_9(self):
+    def test_p2Str_320(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_321(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_10(self):
+    def test_p2Str_322(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_11(self):
+    def test_p2Str_323(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_12(self):
+    def test_p2Str_324(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_13(self):
+    def test_p2Str_325(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_14(self):
+    def test_p2Str_326(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_15(self):
+    def test_p2Str_327(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_16(self):
+    def test_p2Str_328(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_17(self):
+    def test_p2Str_329(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_18(self):
+    def test_p2Str_330(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_19(self):
+    def test_p2Str_331(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_20(self):
+    def test_p2Str_332(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_21(self):
+    def test_p2Str_333(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_22(self):
+    def test_p2Str_334(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_23(self):
+    def test_p2Str_335(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Str_336(self):
+        request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_24(self):
+    def test_p2Str_337(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_25(self):
+    def test_p2Str_338(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_26(self):
+    def test_p2Str_339(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_27(self):
+    def test_p2Str_340(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_28(self):
+    def test_p2Str_341(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_29(self):
+    def test_p2Str_342(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_30(self):
+    def test_p2Str_343(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Str_31(self):
+    def test_p2Str_344(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
@@ -22982,1617 +23092,1727 @@ class ClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_0(self):
+    def test_client_p2Str_0(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_1(self):
+    def test_client_p2Str_1(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}, {'fn.test': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_2(self):
+    def test_client_p2Str_2(self):
         request = [{}, {'fn.test': {'value': {'p2Str': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_3(self):
+    def test_client_p2Str_3(self):
         request = [{}, {'fn.test': {'value': {'p2Str': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_4(self):
+    def test_client_p2Str_4(self):
         request = [{}, {'fn.test': {'value': {'p2Str': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_5(self):
+    def test_client_p2Str_5(self):
         request = [{}, {'fn.test': {'value': {'p2Str': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_6(self):
+    def test_client_p2Str_6(self):
         request = [{}, {'fn.test': {'value': {'p2Str': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_7(self):
+    def test_client_p2Str_7(self):
         request = [{}, {'fn.test': {'value': {'p2Str': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_8(self):
+    def test_client_p2Str_8(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': 0, 'nest': [0]}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_9(self):
+        request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': 0.1, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_9(self):
+    def test_client_p2Str_10(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': '', 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_10(self):
+    def test_client_p2Str_11(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': [], 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_11(self):
+    def test_client_p2Str_12(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': {}, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_12(self):
+    def test_client_p2Str_13(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, False]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_13(self):
+    def test_client_p2Str_14(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, 0.1]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_14(self):
+    def test_client_p2Str_15(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, '']}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_15(self):
+    def test_client_p2Str_16(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, []]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_16(self):
+    def test_client_p2Str_17(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, {}]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_17(self):
+    def test_client_p2Str_18(self):
         request = [{'ok': {'value': {'p2Str': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_18(self):
+    def test_client_p2Str_19(self):
         request = [{'ok': {'value': {'p2Str': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_19(self):
+    def test_client_p2Str_20(self):
         request = [{'ok': {'value': {'p2Str': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_20(self):
+    def test_client_p2Str_21(self):
         request = [{'ok': {'value': {'p2Str': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_21(self):
+    def test_client_p2Str_22(self):
         request = [{'ok': {'value': {'p2Str': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_22(self):
+    def test_client_p2Str_23(self):
         request = [{'ok': {'value': {'p2Str': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_23(self):
+    def test_client_p2Str_24(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': 0, 'nest': [0]}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_25(self):
+        request = [{'ok': {'value': {'p2Str': {'wrap': 0.1, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_24(self):
+    def test_client_p2Str_26(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': '', 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_25(self):
+    def test_client_p2Str_27(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': [], 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_26(self):
+    def test_client_p2Str_28(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': {}, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_27(self):
+    def test_client_p2Str_29(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, False]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_28(self):
+    def test_client_p2Str_30(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, 0.1]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_29(self):
+    def test_client_p2Str_31(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, '']}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_30(self):
+    def test_client_p2Str_32(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, []]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Str_31(self):
+    def test_client_p2Str_33(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, {}]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_0(self):
+    def test_client_p2Str_34(self):
         request = [{'ok': {'value': {'nullP2Str': None}}}, {'fn.test': {'value': {'nullP2Str': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_1(self):
+    def test_client_p2Str_35(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_2(self):
+    def test_client_p2Str_36(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}, {'fn.test': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_3(self):
+    def test_client_p2Str_37(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_4(self):
+    def test_client_p2Str_38(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_5(self):
+    def test_client_p2Str_39(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_6(self):
+    def test_client_p2Str_40(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_7(self):
+    def test_client_p2Str_41(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_8(self):
+    def test_client_p2Str_42(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': 0, 'nest': [0]}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_43(self):
+        request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': 0.1, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_9(self):
+    def test_client_p2Str_44(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': '', 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_10(self):
+    def test_client_p2Str_45(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': [], 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_11(self):
+    def test_client_p2Str_46(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': {}, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_12(self):
+    def test_client_p2Str_47(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, False]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_13(self):
+    def test_client_p2Str_48(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, 0.1]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_14(self):
+    def test_client_p2Str_49(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, '']}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_15(self):
+    def test_client_p2Str_50(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, []]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_16(self):
+    def test_client_p2Str_51(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, {}]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_17(self):
+    def test_client_p2Str_52(self):
         request = [{'ok': {'value': {'nullP2Str': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_18(self):
+    def test_client_p2Str_53(self):
         request = [{'ok': {'value': {'nullP2Str': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_19(self):
+    def test_client_p2Str_54(self):
         request = [{'ok': {'value': {'nullP2Str': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_20(self):
+    def test_client_p2Str_55(self):
         request = [{'ok': {'value': {'nullP2Str': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_21(self):
+    def test_client_p2Str_56(self):
         request = [{'ok': {'value': {'nullP2Str': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_22(self):
+    def test_client_p2Str_57(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': 0, 'nest': [0]}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_58(self):
+        request = [{'ok': {'value': {'nullP2Str': {'wrap': 0.1, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_23(self):
+    def test_client_p2Str_59(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': '', 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_24(self):
+    def test_client_p2Str_60(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': [], 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_25(self):
+    def test_client_p2Str_61(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': {}, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_26(self):
+    def test_client_p2Str_62(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, False]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_27(self):
+    def test_client_p2Str_63(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, 0.1]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_28(self):
+    def test_client_p2Str_64(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, '']}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_29(self):
+    def test_client_p2Str_65(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, []]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Str_30(self):
+    def test_client_p2Str_66(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, {}]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_0(self):
+    def test_client_p2Str_67(self):
         request = [{'ok': {'value': {'arrP2Str': []}}}, {'fn.test': {'value': {'arrP2Str': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_1(self):
+    def test_client_p2Str_68(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_2(self):
+    def test_client_p2Str_69(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_3(self):
+    def test_client_p2Str_70(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_4(self):
+    def test_client_p2Str_71(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_5(self):
+    def test_client_p2Str_72(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_6(self):
+    def test_client_p2Str_73(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_7(self):
+    def test_client_p2Str_74(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_8(self):
+    def test_client_p2Str_75(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_9(self):
+    def test_client_p2Str_76(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_10(self):
+    def test_client_p2Str_77(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_78(self):
+        request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_11(self):
+    def test_client_p2Str_79(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_12(self):
+    def test_client_p2Str_80(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_13(self):
+    def test_client_p2Str_81(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_14(self):
+    def test_client_p2Str_82(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_15(self):
+    def test_client_p2Str_83(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_16(self):
+    def test_client_p2Str_84(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_17(self):
+    def test_client_p2Str_85(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_18(self):
+    def test_client_p2Str_86(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_19(self):
+    def test_client_p2Str_87(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_20(self):
+    def test_client_p2Str_88(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_21(self):
+    def test_client_p2Str_89(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_22(self):
+    def test_client_p2Str_90(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_23(self):
+    def test_client_p2Str_91(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_24(self):
+    def test_client_p2Str_92(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_25(self):
+    def test_client_p2Str_93(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_94(self):
+        request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_26(self):
+    def test_client_p2Str_95(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_27(self):
+    def test_client_p2Str_96(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_28(self):
+    def test_client_p2Str_97(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_29(self):
+    def test_client_p2Str_98(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_30(self):
+    def test_client_p2Str_99(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_31(self):
+    def test_client_p2Str_100(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_32(self):
+    def test_client_p2Str_101(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Str_33(self):
+    def test_client_p2Str_102(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_0(self):
+    def test_client_p2Str_103(self):
         request = [{'ok': {'value': {'arrNullP2Str': []}}}, {'fn.test': {'value': {'arrNullP2Str': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_1(self):
+    def test_client_p2Str_104(self):
         request = [{'ok': {'value': {'arrNullP2Str': [None]}}}, {'fn.test': {'value': {'arrNullP2Str': [None]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [None]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_2(self):
+    def test_client_p2Str_105(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_3(self):
+    def test_client_p2Str_106(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_4(self):
+    def test_client_p2Str_107(self):
         request = [{'ok': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_5(self):
+    def test_client_p2Str_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_6(self):
+    def test_client_p2Str_109(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_7(self):
+    def test_client_p2Str_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_8(self):
+    def test_client_p2Str_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_9(self):
+    def test_client_p2Str_112(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_10(self):
+    def test_client_p2Str_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_114(self):
+        request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_11(self):
+    def test_client_p2Str_115(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_12(self):
+    def test_client_p2Str_116(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_13(self):
+    def test_client_p2Str_117(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_14(self):
+    def test_client_p2Str_118(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_15(self):
+    def test_client_p2Str_119(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_16(self):
+    def test_client_p2Str_120(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_17(self):
+    def test_client_p2Str_121(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_18(self):
+    def test_client_p2Str_122(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_19(self):
+    def test_client_p2Str_123(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_20(self):
+    def test_client_p2Str_124(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_21(self):
+    def test_client_p2Str_125(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_22(self):
+    def test_client_p2Str_126(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_23(self):
+    def test_client_p2Str_127(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_24(self):
+    def test_client_p2Str_128(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_129(self):
+        request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_25(self):
+    def test_client_p2Str_130(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_26(self):
+    def test_client_p2Str_131(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_27(self):
+    def test_client_p2Str_132(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_28(self):
+    def test_client_p2Str_133(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_29(self):
+    def test_client_p2Str_134(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_30(self):
+    def test_client_p2Str_135(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_31(self):
+    def test_client_p2Str_136(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Str_32(self):
+    def test_client_p2Str_137(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_0(self):
+    def test_client_p2Str_138(self):
+        request = [{'ok': {'value': {'objP2Str': {}}}}, {'fn.test': {'value': {'objP2Str': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objP2Str': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_139(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_1(self):
+    def test_client_p2Str_140(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_2(self):
+    def test_client_p2Str_141(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_3(self):
+    def test_client_p2Str_142(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_4(self):
+    def test_client_p2Str_143(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_5(self):
+    def test_client_p2Str_144(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_6(self):
+    def test_client_p2Str_145(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_7(self):
+    def test_client_p2Str_146(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_8(self):
+    def test_client_p2Str_147(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_9(self):
+    def test_client_p2Str_148(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_149(self):
+        request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_10(self):
+    def test_client_p2Str_150(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_11(self):
+    def test_client_p2Str_151(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_12(self):
+    def test_client_p2Str_152(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_13(self):
+    def test_client_p2Str_153(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_14(self):
+    def test_client_p2Str_154(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_15(self):
+    def test_client_p2Str_155(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_16(self):
+    def test_client_p2Str_156(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_17(self):
+    def test_client_p2Str_157(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_18(self):
+    def test_client_p2Str_158(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_19(self):
+    def test_client_p2Str_159(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_20(self):
+    def test_client_p2Str_160(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_21(self):
+    def test_client_p2Str_161(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_22(self):
+    def test_client_p2Str_162(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_23(self):
+    def test_client_p2Str_163(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_24(self):
+    def test_client_p2Str_164(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_165(self):
+        request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_25(self):
+    def test_client_p2Str_166(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_26(self):
+    def test_client_p2Str_167(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_27(self):
+    def test_client_p2Str_168(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_28(self):
+    def test_client_p2Str_169(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_29(self):
+    def test_client_p2Str_170(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_30(self):
+    def test_client_p2Str_171(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_31(self):
+    def test_client_p2Str_172(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Str_32(self):
+    def test_client_p2Str_173(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_0(self):
+    def test_client_p2Str_174(self):
+        request = [{'ok': {'value': {'objNullP2Str': {}}}}, {'fn.test': {'value': {'objNullP2Str': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullP2Str': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_175(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': None}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_1(self):
+    def test_client_p2Str_176(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_2(self):
+    def test_client_p2Str_177(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_3(self):
+    def test_client_p2Str_178(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_4(self):
+    def test_client_p2Str_179(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_5(self):
+    def test_client_p2Str_180(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_6(self):
+    def test_client_p2Str_181(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_7(self):
+    def test_client_p2Str_182(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_8(self):
+    def test_client_p2Str_183(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_9(self):
+    def test_client_p2Str_184(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_10(self):
+    def test_client_p2Str_186(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_11(self):
+    def test_client_p2Str_187(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_12(self):
+    def test_client_p2Str_188(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_13(self):
+    def test_client_p2Str_189(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_14(self):
+    def test_client_p2Str_190(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_15(self):
+    def test_client_p2Str_191(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_16(self):
+    def test_client_p2Str_192(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_17(self):
+    def test_client_p2Str_193(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_18(self):
+    def test_client_p2Str_194(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_19(self):
+    def test_client_p2Str_195(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_20(self):
+    def test_client_p2Str_196(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_21(self):
+    def test_client_p2Str_197(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_22(self):
+    def test_client_p2Str_198(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_23(self):
+    def test_client_p2Str_199(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_200(self):
+        request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_24(self):
+    def test_client_p2Str_201(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_25(self):
+    def test_client_p2Str_202(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_26(self):
+    def test_client_p2Str_203(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_27(self):
+    def test_client_p2Str_204(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_28(self):
+    def test_client_p2Str_205(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_29(self):
+    def test_client_p2Str_206(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_30(self):
+    def test_client_p2Str_207(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Str_31(self):
+    def test_client_p2Str_208(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_0(self):
+    def test_client_p2Str_209(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_1(self):
+    def test_client_p2Str_210(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_2(self):
+    def test_client_p2Str_211(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_3(self):
+    def test_client_p2Str_212(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_4(self):
+    def test_client_p2Str_213(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_5(self):
+    def test_client_p2Str_214(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_6(self):
+    def test_client_p2Str_215(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_7(self):
+    def test_client_p2Str_216(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_8(self):
+    def test_client_p2Str_217(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_9(self):
+    def test_client_p2Str_219(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_10(self):
+    def test_client_p2Str_220(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_11(self):
+    def test_client_p2Str_221(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_12(self):
+    def test_client_p2Str_222(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_13(self):
+    def test_client_p2Str_223(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_14(self):
+    def test_client_p2Str_224(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_15(self):
+    def test_client_p2Str_225(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_16(self):
+    def test_client_p2Str_226(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_17(self):
+    def test_client_p2Str_227(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_18(self):
+    def test_client_p2Str_228(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_19(self):
+    def test_client_p2Str_229(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_20(self):
+    def test_client_p2Str_230(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_21(self):
+    def test_client_p2Str_231(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_22(self):
+    def test_client_p2Str_232(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_23(self):
+    def test_client_p2Str_233(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_234(self):
+        request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_24(self):
+    def test_client_p2Str_235(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_25(self):
+    def test_client_p2Str_236(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_26(self):
+    def test_client_p2Str_237(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_27(self):
+    def test_client_p2Str_238(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_28(self):
+    def test_client_p2Str_239(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_29(self):
+    def test_client_p2Str_240(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_30(self):
+    def test_client_p2Str_241(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Str_31(self):
+    def test_client_p2Str_242(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_0(self):
+    def test_client_p2Str_243(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_1(self):
+    def test_client_p2Str_244(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_2(self):
+    def test_client_p2Str_245(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_3(self):
+    def test_client_p2Str_246(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_4(self):
+    def test_client_p2Str_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_5(self):
+    def test_client_p2Str_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_6(self):
+    def test_client_p2Str_249(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_7(self):
+    def test_client_p2Str_250(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_8(self):
+    def test_client_p2Str_251(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_9(self):
+    def test_client_p2Str_253(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_10(self):
+    def test_client_p2Str_254(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_11(self):
+    def test_client_p2Str_255(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_12(self):
+    def test_client_p2Str_256(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_13(self):
+    def test_client_p2Str_257(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_14(self):
+    def test_client_p2Str_258(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_15(self):
+    def test_client_p2Str_259(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_16(self):
+    def test_client_p2Str_260(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_17(self):
+    def test_client_p2Str_261(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_18(self):
+    def test_client_p2Str_262(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_19(self):
+    def test_client_p2Str_263(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_20(self):
+    def test_client_p2Str_264(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_21(self):
+    def test_client_p2Str_265(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_22(self):
+    def test_client_p2Str_266(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_267(self):
+        request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_23(self):
+    def test_client_p2Str_268(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_24(self):
+    def test_client_p2Str_269(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_25(self):
+    def test_client_p2Str_270(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_26(self):
+    def test_client_p2Str_271(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_27(self):
+    def test_client_p2Str_272(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_28(self):
+    def test_client_p2Str_273(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_29(self):
+    def test_client_p2Str_274(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Str_30(self):
+    def test_client_p2Str_275(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_0(self):
+    def test_client_p2Str_276(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'one': {}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_1(self):
+    def test_client_p2Str_277(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_2(self):
+    def test_client_p2Str_278(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_3(self):
+    def test_client_p2Str_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_4(self):
+    def test_client_p2Str_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_5(self):
+    def test_client_p2Str_281(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_6(self):
+    def test_client_p2Str_282(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_7(self):
+    def test_client_p2Str_283(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_8(self):
+    def test_client_p2Str_284(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_9(self):
+    def test_client_p2Str_285(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_10(self):
+    def test_client_p2Str_287(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_11(self):
+    def test_client_p2Str_288(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_12(self):
+    def test_client_p2Str_289(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_13(self):
+    def test_client_p2Str_290(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_14(self):
+    def test_client_p2Str_291(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_15(self):
+    def test_client_p2Str_292(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_16(self):
+    def test_client_p2Str_293(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_17(self):
+    def test_client_p2Str_294(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_18(self):
+    def test_client_p2Str_295(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_19(self):
+    def test_client_p2Str_296(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_20(self):
+    def test_client_p2Str_297(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_21(self):
+    def test_client_p2Str_298(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_22(self):
+    def test_client_p2Str_299(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_23(self):
+    def test_client_p2Str_300(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_24(self):
+    def test_client_p2Str_301(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_302(self):
+        request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_25(self):
+    def test_client_p2Str_303(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_26(self):
+    def test_client_p2Str_304(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_27(self):
+    def test_client_p2Str_305(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_28(self):
+    def test_client_p2Str_306(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_29(self):
+    def test_client_p2Str_307(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_30(self):
+    def test_client_p2Str_308(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_31(self):
+    def test_client_p2Str_309(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Str_32(self):
+    def test_client_p2Str_310(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_0(self):
+    def test_client_p2Str_311(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_1(self):
+    def test_client_p2Str_312(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_2(self):
+    def test_client_p2Str_313(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_3(self):
+    def test_client_p2Str_314(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_4(self):
+    def test_client_p2Str_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_5(self):
+    def test_client_p2Str_316(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_6(self):
+    def test_client_p2Str_317(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_7(self):
+    def test_client_p2Str_318(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_8(self):
+    def test_client_p2Str_319(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_9(self):
+    def test_client_p2Str_320(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_321(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_10(self):
+    def test_client_p2Str_322(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_11(self):
+    def test_client_p2Str_323(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_12(self):
+    def test_client_p2Str_324(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_13(self):
+    def test_client_p2Str_325(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_14(self):
+    def test_client_p2Str_326(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_15(self):
+    def test_client_p2Str_327(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_16(self):
+    def test_client_p2Str_328(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_17(self):
+    def test_client_p2Str_329(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_18(self):
+    def test_client_p2Str_330(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_19(self):
+    def test_client_p2Str_331(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_20(self):
+    def test_client_p2Str_332(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_21(self):
+    def test_client_p2Str_333(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_22(self):
+    def test_client_p2Str_334(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_23(self):
+    def test_client_p2Str_335(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Str_336(self):
+        request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_24(self):
+    def test_client_p2Str_337(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_25(self):
+    def test_client_p2Str_338(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_26(self):
+    def test_client_p2Str_339(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_27(self):
+    def test_client_p2Str_340(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_28(self):
+    def test_client_p2Str_341(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_29(self):
+    def test_client_p2Str_342(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_30(self):
+    def test_client_p2Str_343(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Str_31(self):
+    def test_client_p2Str_344(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
@@ -35346,1617 +35566,1727 @@ class BinaryClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_0(self):
+    def test_binary_client_p2Str_0(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_1(self):
+    def test_binary_client_p2Str_1(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}, {'fn.test': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Str': {'wrap': True, 'nest': [1]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_2(self):
+    def test_binary_client_p2Str_2(self):
         request = [{}, {'fn.test': {'value': {'p2Str': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_3(self):
+    def test_binary_client_p2Str_3(self):
         request = [{}, {'fn.test': {'value': {'p2Str': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_4(self):
+    def test_binary_client_p2Str_4(self):
         request = [{}, {'fn.test': {'value': {'p2Str': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_5(self):
+    def test_binary_client_p2Str_5(self):
         request = [{}, {'fn.test': {'value': {'p2Str': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_6(self):
+    def test_binary_client_p2Str_6(self):
         request = [{}, {'fn.test': {'value': {'p2Str': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_7(self):
+    def test_binary_client_p2Str_7(self):
         request = [{}, {'fn.test': {'value': {'p2Str': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_8(self):
+    def test_binary_client_p2Str_8(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': 0, 'nest': [0]}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_9(self):
+        request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': 0.1, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_9(self):
+    def test_binary_client_p2Str_10(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': '', 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_10(self):
+    def test_binary_client_p2Str_11(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': [], 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_11(self):
+    def test_binary_client_p2Str_12(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': {}, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_12(self):
+    def test_binary_client_p2Str_13(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, False]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_13(self):
+    def test_binary_client_p2Str_14(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, 0.1]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_14(self):
+    def test_binary_client_p2Str_15(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, '']}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_15(self):
+    def test_binary_client_p2Str_16(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, []]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_16(self):
+    def test_binary_client_p2Str_17(self):
         request = [{}, {'fn.test': {'value': {'p2Str': {'wrap': False, 'nest': [0, {}]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_17(self):
+    def test_binary_client_p2Str_18(self):
         request = [{'ok': {'value': {'p2Str': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_18(self):
+    def test_binary_client_p2Str_19(self):
         request = [{'ok': {'value': {'p2Str': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_19(self):
+    def test_binary_client_p2Str_20(self):
         request = [{'ok': {'value': {'p2Str': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_20(self):
+    def test_binary_client_p2Str_21(self):
         request = [{'ok': {'value': {'p2Str': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_21(self):
+    def test_binary_client_p2Str_22(self):
         request = [{'ok': {'value': {'p2Str': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_22(self):
+    def test_binary_client_p2Str_23(self):
         request = [{'ok': {'value': {'p2Str': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_23(self):
+    def test_binary_client_p2Str_24(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': 0, 'nest': [0]}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_25(self):
+        request = [{'ok': {'value': {'p2Str': {'wrap': 0.1, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_24(self):
+    def test_binary_client_p2Str_26(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': '', 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_25(self):
+    def test_binary_client_p2Str_27(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': [], 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_26(self):
+    def test_binary_client_p2Str_28(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': {}, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_27(self):
+    def test_binary_client_p2Str_29(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, False]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_28(self):
+    def test_binary_client_p2Str_30(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, 0.1]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_29(self):
+    def test_binary_client_p2Str_31(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, '']}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_30(self):
+    def test_binary_client_p2Str_32(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, []]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Str_31(self):
+    def test_binary_client_p2Str_33(self):
         request = [{'ok': {'value': {'p2Str': {'wrap': False, 'nest': [0, {}]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_0(self):
+    def test_binary_client_p2Str_34(self):
         request = [{'ok': {'value': {'nullP2Str': None}}}, {'fn.test': {'value': {'nullP2Str': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_1(self):
+    def test_binary_client_p2Str_35(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_2(self):
+    def test_binary_client_p2Str_36(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}, {'fn.test': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Str': {'wrap': True, 'nest': [1]}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_3(self):
+    def test_binary_client_p2Str_37(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_4(self):
+    def test_binary_client_p2Str_38(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_5(self):
+    def test_binary_client_p2Str_39(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_6(self):
+    def test_binary_client_p2Str_40(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_7(self):
+    def test_binary_client_p2Str_41(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_8(self):
+    def test_binary_client_p2Str_42(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': 0, 'nest': [0]}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_43(self):
+        request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': 0.1, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_9(self):
+    def test_binary_client_p2Str_44(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': '', 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_10(self):
+    def test_binary_client_p2Str_45(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': [], 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_11(self):
+    def test_binary_client_p2Str_46(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': {}, 'nest': [0]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_12(self):
+    def test_binary_client_p2Str_47(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, False]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_13(self):
+    def test_binary_client_p2Str_48(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, 0.1]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_14(self):
+    def test_binary_client_p2Str_49(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, '']}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_15(self):
+    def test_binary_client_p2Str_50(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, []]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_16(self):
+    def test_binary_client_p2Str_51(self):
         request = [{}, {'fn.test': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, {}]}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_17(self):
+    def test_binary_client_p2Str_52(self):
         request = [{'ok': {'value': {'nullP2Str': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_18(self):
+    def test_binary_client_p2Str_53(self):
         request = [{'ok': {'value': {'nullP2Str': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_19(self):
+    def test_binary_client_p2Str_54(self):
         request = [{'ok': {'value': {'nullP2Str': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_20(self):
+    def test_binary_client_p2Str_55(self):
         request = [{'ok': {'value': {'nullP2Str': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_21(self):
+    def test_binary_client_p2Str_56(self):
         request = [{'ok': {'value': {'nullP2Str': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_22(self):
+    def test_binary_client_p2Str_57(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': 0, 'nest': [0]}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_58(self):
+        request = [{'ok': {'value': {'nullP2Str': {'wrap': 0.1, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_23(self):
+    def test_binary_client_p2Str_59(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': '', 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_24(self):
+    def test_binary_client_p2Str_60(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': [], 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_25(self):
+    def test_binary_client_p2Str_61(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': {}, 'nest': [0]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_26(self):
+    def test_binary_client_p2Str_62(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, False]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_27(self):
+    def test_binary_client_p2Str_63(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, 0.1]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_28(self):
+    def test_binary_client_p2Str_64(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, '']}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_29(self):
+    def test_binary_client_p2Str_65(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, []]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Str_30(self):
+    def test_binary_client_p2Str_66(self):
         request = [{'ok': {'value': {'nullP2Str': {'wrap': False, 'nest': [0, {}]}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Str.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_0(self):
+    def test_binary_client_p2Str_67(self):
         request = [{'ok': {'value': {'arrP2Str': []}}}, {'fn.test': {'value': {'arrP2Str': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_1(self):
+    def test_binary_client_p2Str_68(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_2(self):
+    def test_binary_client_p2Str_69(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_3(self):
+    def test_binary_client_p2Str_70(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_4(self):
+    def test_binary_client_p2Str_71(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_5(self):
+    def test_binary_client_p2Str_72(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_6(self):
+    def test_binary_client_p2Str_73(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_7(self):
+    def test_binary_client_p2Str_74(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_8(self):
+    def test_binary_client_p2Str_75(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_9(self):
+    def test_binary_client_p2Str_76(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_10(self):
+    def test_binary_client_p2Str_77(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_78(self):
+        request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_11(self):
+    def test_binary_client_p2Str_79(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_12(self):
+    def test_binary_client_p2Str_80(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_13(self):
+    def test_binary_client_p2Str_81(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_14(self):
+    def test_binary_client_p2Str_82(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_15(self):
+    def test_binary_client_p2Str_83(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_16(self):
+    def test_binary_client_p2Str_84(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_17(self):
+    def test_binary_client_p2Str_85(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_18(self):
+    def test_binary_client_p2Str_86(self):
         request = [{}, {'fn.test': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_19(self):
+    def test_binary_client_p2Str_87(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_20(self):
+    def test_binary_client_p2Str_88(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_21(self):
+    def test_binary_client_p2Str_89(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_22(self):
+    def test_binary_client_p2Str_90(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_23(self):
+    def test_binary_client_p2Str_91(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_24(self):
+    def test_binary_client_p2Str_92(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_25(self):
+    def test_binary_client_p2Str_93(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_94(self):
+        request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_26(self):
+    def test_binary_client_p2Str_95(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_27(self):
+    def test_binary_client_p2Str_96(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_28(self):
+    def test_binary_client_p2Str_97(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_29(self):
+    def test_binary_client_p2Str_98(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_30(self):
+    def test_binary_client_p2Str_99(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_31(self):
+    def test_binary_client_p2Str_100(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_32(self):
+    def test_binary_client_p2Str_101(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Str_33(self):
+    def test_binary_client_p2Str_102(self):
         request = [{'ok': {'value': {'arrP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_0(self):
+    def test_binary_client_p2Str_103(self):
         request = [{'ok': {'value': {'arrNullP2Str': []}}}, {'fn.test': {'value': {'arrNullP2Str': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_1(self):
+    def test_binary_client_p2Str_104(self):
         request = [{'ok': {'value': {'arrNullP2Str': [None]}}}, {'fn.test': {'value': {'arrNullP2Str': [None]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [None]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_2(self):
+    def test_binary_client_p2Str_105(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_3(self):
+    def test_binary_client_p2Str_106(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [{'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_4(self):
+    def test_binary_client_p2Str_107(self):
         request = [{'ok': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}, {'fn.test': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Str': [None, {'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_5(self):
+    def test_binary_client_p2Str_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_6(self):
+    def test_binary_client_p2Str_109(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_7(self):
+    def test_binary_client_p2Str_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_8(self):
+    def test_binary_client_p2Str_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_9(self):
+    def test_binary_client_p2Str_112(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_10(self):
+    def test_binary_client_p2Str_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_114(self):
+        request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_11(self):
+    def test_binary_client_p2Str_115(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_12(self):
+    def test_binary_client_p2Str_116(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_13(self):
+    def test_binary_client_p2Str_117(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_14(self):
+    def test_binary_client_p2Str_118(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_15(self):
+    def test_binary_client_p2Str_119(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_16(self):
+    def test_binary_client_p2Str_120(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_17(self):
+    def test_binary_client_p2Str_121(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_18(self):
+    def test_binary_client_p2Str_122(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_19(self):
+    def test_binary_client_p2Str_123(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_20(self):
+    def test_binary_client_p2Str_124(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_21(self):
+    def test_binary_client_p2Str_125(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_22(self):
+    def test_binary_client_p2Str_126(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_23(self):
+    def test_binary_client_p2Str_127(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_24(self):
+    def test_binary_client_p2Str_128(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0, 'nest': [0]}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_129(self):
+        request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': 0.1, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_25(self):
+    def test_binary_client_p2Str_130(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': '', 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_26(self):
+    def test_binary_client_p2Str_131(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': [], 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_27(self):
+    def test_binary_client_p2Str_132(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': {}, 'nest': [0]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_28(self):
+    def test_binary_client_p2Str_133(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, False]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_29(self):
+    def test_binary_client_p2Str_134(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, 0.1]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_30(self):
+    def test_binary_client_p2Str_135(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, '']}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_31(self):
+    def test_binary_client_p2Str_136(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, []]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Str_32(self):
+    def test_binary_client_p2Str_137(self):
         request = [{'ok': {'value': {'arrNullP2Str': [{'wrap': False, 'nest': [0]}, {'wrap': False, 'nest': [0, {}]}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Str[1].nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_0(self):
+    def test_binary_client_p2Str_138(self):
+        request = [{'ok': {'value': {'objP2Str': {}}}}, {'fn.test': {'value': {'objP2Str': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objP2Str': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_139(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_1(self):
+    def test_binary_client_p2Str_140(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_2(self):
+    def test_binary_client_p2Str_141(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_3(self):
+    def test_binary_client_p2Str_142(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_4(self):
+    def test_binary_client_p2Str_143(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_5(self):
+    def test_binary_client_p2Str_144(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_6(self):
+    def test_binary_client_p2Str_145(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_7(self):
+    def test_binary_client_p2Str_146(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_8(self):
+    def test_binary_client_p2Str_147(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_9(self):
+    def test_binary_client_p2Str_148(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_149(self):
+        request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_10(self):
+    def test_binary_client_p2Str_150(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_11(self):
+    def test_binary_client_p2Str_151(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_12(self):
+    def test_binary_client_p2Str_152(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_13(self):
+    def test_binary_client_p2Str_153(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_14(self):
+    def test_binary_client_p2Str_154(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_15(self):
+    def test_binary_client_p2Str_155(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_16(self):
+    def test_binary_client_p2Str_156(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_17(self):
+    def test_binary_client_p2Str_157(self):
         request = [{}, {'fn.test': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_18(self):
+    def test_binary_client_p2Str_158(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_19(self):
+    def test_binary_client_p2Str_159(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_20(self):
+    def test_binary_client_p2Str_160(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_21(self):
+    def test_binary_client_p2Str_161(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_22(self):
+    def test_binary_client_p2Str_162(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_23(self):
+    def test_binary_client_p2Str_163(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_24(self):
+    def test_binary_client_p2Str_164(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_165(self):
+        request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_25(self):
+    def test_binary_client_p2Str_166(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_26(self):
+    def test_binary_client_p2Str_167(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_27(self):
+    def test_binary_client_p2Str_168(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_28(self):
+    def test_binary_client_p2Str_169(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_29(self):
+    def test_binary_client_p2Str_170(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_30(self):
+    def test_binary_client_p2Str_171(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_31(self):
+    def test_binary_client_p2Str_172(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Str_32(self):
+    def test_binary_client_p2Str_173(self):
         request = [{'ok': {'value': {'objP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_0(self):
+    def test_binary_client_p2Str_174(self):
+        request = [{'ok': {'value': {'objNullP2Str': {}}}}, {'fn.test': {'value': {'objNullP2Str': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullP2Str': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_175(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': None}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_1(self):
+    def test_binary_client_p2Str_176(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_2(self):
+    def test_binary_client_p2Str_177(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_3(self):
+    def test_binary_client_p2Str_178(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Str': {'a': None, 'b': {'wrap': False, 'nest': [0]}, 'c': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_4(self):
+    def test_binary_client_p2Str_179(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_5(self):
+    def test_binary_client_p2Str_180(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_6(self):
+    def test_binary_client_p2Str_181(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_7(self):
+    def test_binary_client_p2Str_182(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_8(self):
+    def test_binary_client_p2Str_183(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_9(self):
+    def test_binary_client_p2Str_184(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_10(self):
+    def test_binary_client_p2Str_186(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_11(self):
+    def test_binary_client_p2Str_187(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_12(self):
+    def test_binary_client_p2Str_188(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_13(self):
+    def test_binary_client_p2Str_189(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_14(self):
+    def test_binary_client_p2Str_190(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_15(self):
+    def test_binary_client_p2Str_191(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_16(self):
+    def test_binary_client_p2Str_192(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_17(self):
+    def test_binary_client_p2Str_193(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_18(self):
+    def test_binary_client_p2Str_194(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_19(self):
+    def test_binary_client_p2Str_195(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_20(self):
+    def test_binary_client_p2Str_196(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_21(self):
+    def test_binary_client_p2Str_197(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_22(self):
+    def test_binary_client_p2Str_198(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_23(self):
+    def test_binary_client_p2Str_199(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_200(self):
+        request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_24(self):
+    def test_binary_client_p2Str_201(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_25(self):
+    def test_binary_client_p2Str_202(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_26(self):
+    def test_binary_client_p2Str_203(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_27(self):
+    def test_binary_client_p2Str_204(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_28(self):
+    def test_binary_client_p2Str_205(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_29(self):
+    def test_binary_client_p2Str_206(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_30(self):
+    def test_binary_client_p2Str_207(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Str_31(self):
+    def test_binary_client_p2Str_208(self):
         request = [{'ok': {'value': {'objNullP2Str': {'a': {'wrap': False, 'nest': [0]}, 'b': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Str{b}.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_0(self):
+    def test_binary_client_p2Str_209(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_1(self):
+    def test_binary_client_p2Str_210(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_2(self):
+    def test_binary_client_p2Str_211(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_3(self):
+    def test_binary_client_p2Str_212(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_4(self):
+    def test_binary_client_p2Str_213(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_5(self):
+    def test_binary_client_p2Str_214(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_6(self):
+    def test_binary_client_p2Str_215(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_7(self):
+    def test_binary_client_p2Str_216(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_8(self):
+    def test_binary_client_p2Str_217(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_9(self):
+    def test_binary_client_p2Str_219(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_10(self):
+    def test_binary_client_p2Str_220(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_11(self):
+    def test_binary_client_p2Str_221(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_12(self):
+    def test_binary_client_p2Str_222(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_13(self):
+    def test_binary_client_p2Str_223(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_14(self):
+    def test_binary_client_p2Str_224(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_15(self):
+    def test_binary_client_p2Str_225(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_16(self):
+    def test_binary_client_p2Str_226(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_17(self):
+    def test_binary_client_p2Str_227(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_18(self):
+    def test_binary_client_p2Str_228(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_19(self):
+    def test_binary_client_p2Str_229(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_20(self):
+    def test_binary_client_p2Str_230(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_21(self):
+    def test_binary_client_p2Str_231(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_22(self):
+    def test_binary_client_p2Str_232(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_23(self):
+    def test_binary_client_p2Str_233(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_234(self):
+        request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_24(self):
+    def test_binary_client_p2Str_235(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_25(self):
+    def test_binary_client_p2Str_236(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_26(self):
+    def test_binary_client_p2Str_237(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_27(self):
+    def test_binary_client_p2Str_238(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_28(self):
+    def test_binary_client_p2Str_239(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_29(self):
+    def test_binary_client_p2Str_240(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_30(self):
+    def test_binary_client_p2Str_241(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Str_31(self):
+    def test_binary_client_p2Str_242(self):
         request = [{'ok': {'value': {'pStrP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_0(self):
+    def test_binary_client_p2Str_243(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_1(self):
+    def test_binary_client_p2Str_244(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_2(self):
+    def test_binary_client_p2Str_245(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': True, 'nest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_3(self):
+    def test_binary_client_p2Str_246(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_4(self):
+    def test_binary_client_p2Str_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_5(self):
+    def test_binary_client_p2Str_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_6(self):
+    def test_binary_client_p2Str_249(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_7(self):
+    def test_binary_client_p2Str_250(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_8(self):
+    def test_binary_client_p2Str_251(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_9(self):
+    def test_binary_client_p2Str_253(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_10(self):
+    def test_binary_client_p2Str_254(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_11(self):
+    def test_binary_client_p2Str_255(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_12(self):
+    def test_binary_client_p2Str_256(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_13(self):
+    def test_binary_client_p2Str_257(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_14(self):
+    def test_binary_client_p2Str_258(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_15(self):
+    def test_binary_client_p2Str_259(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_16(self):
+    def test_binary_client_p2Str_260(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_17(self):
+    def test_binary_client_p2Str_261(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_18(self):
+    def test_binary_client_p2Str_262(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_19(self):
+    def test_binary_client_p2Str_263(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_20(self):
+    def test_binary_client_p2Str_264(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_21(self):
+    def test_binary_client_p2Str_265(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_22(self):
+    def test_binary_client_p2Str_266(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0, 'nest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_267(self):
+        request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': 0.1, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_23(self):
+    def test_binary_client_p2Str_268(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': '', 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_24(self):
+    def test_binary_client_p2Str_269(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': [], 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_25(self):
+    def test_binary_client_p2Str_270(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': {}, 'nest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_26(self):
+    def test_binary_client_p2Str_271(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_27(self):
+    def test_binary_client_p2Str_272(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_28(self):
+    def test_binary_client_p2Str_273(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_29(self):
+    def test_binary_client_p2Str_274(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Str_30(self):
+    def test_binary_client_p2Str_275(self):
         request = [{'ok': {'value': {'pStrNullP2Str': {'wrap': {'wrap': False, 'nest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Str.wrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_0(self):
+    def test_binary_client_p2Str_276(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'one': {}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_1(self):
+    def test_binary_client_p2Str_277(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_2(self):
+    def test_binary_client_p2Str_278(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_3(self):
+    def test_binary_client_p2Str_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_4(self):
+    def test_binary_client_p2Str_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_5(self):
+    def test_binary_client_p2Str_281(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_6(self):
+    def test_binary_client_p2Str_282(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_7(self):
+    def test_binary_client_p2Str_283(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_8(self):
+    def test_binary_client_p2Str_284(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_9(self):
+    def test_binary_client_p2Str_285(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_10(self):
+    def test_binary_client_p2Str_287(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_11(self):
+    def test_binary_client_p2Str_288(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_12(self):
+    def test_binary_client_p2Str_289(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_13(self):
+    def test_binary_client_p2Str_290(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_14(self):
+    def test_binary_client_p2Str_291(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_15(self):
+    def test_binary_client_p2Str_292(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_16(self):
+    def test_binary_client_p2Str_293(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_17(self):
+    def test_binary_client_p2Str_294(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_18(self):
+    def test_binary_client_p2Str_295(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_19(self):
+    def test_binary_client_p2Str_296(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_20(self):
+    def test_binary_client_p2Str_297(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_21(self):
+    def test_binary_client_p2Str_298(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_22(self):
+    def test_binary_client_p2Str_299(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_23(self):
+    def test_binary_client_p2Str_300(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_24(self):
+    def test_binary_client_p2Str_301(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_302(self):
+        request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_25(self):
+    def test_binary_client_p2Str_303(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_26(self):
+    def test_binary_client_p2Str_304(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_27(self):
+    def test_binary_client_p2Str_305(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_28(self):
+    def test_binary_client_p2Str_306(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_29(self):
+    def test_binary_client_p2Str_307(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_30(self):
+    def test_binary_client_p2Str_308(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_31(self):
+    def test_binary_client_p2Str_309(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Str_32(self):
+    def test_binary_client_p2Str_310(self):
         request = [{'ok': {'value': {'pEnumP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_0(self):
+    def test_binary_client_p2Str_311(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_1(self):
+    def test_binary_client_p2Str_312(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_2(self):
+    def test_binary_client_p2Str_313(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_3(self):
+    def test_binary_client_p2Str_314(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': True, 'nest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_4(self):
+    def test_binary_client_p2Str_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_5(self):
+    def test_binary_client_p2Str_316(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_6(self):
+    def test_binary_client_p2Str_317(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_7(self):
+    def test_binary_client_p2Str_318(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_8(self):
+    def test_binary_client_p2Str_319(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_9(self):
+    def test_binary_client_p2Str_320(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_321(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_10(self):
+    def test_binary_client_p2Str_322(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_11(self):
+    def test_binary_client_p2Str_323(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_12(self):
+    def test_binary_client_p2Str_324(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_13(self):
+    def test_binary_client_p2Str_325(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_14(self):
+    def test_binary_client_p2Str_326(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_15(self):
+    def test_binary_client_p2Str_327(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_16(self):
+    def test_binary_client_p2Str_328(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_17(self):
+    def test_binary_client_p2Str_329(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_18(self):
+    def test_binary_client_p2Str_330(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_19(self):
+    def test_binary_client_p2Str_331(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_20(self):
+    def test_binary_client_p2Str_332(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_21(self):
+    def test_binary_client_p2Str_333(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_22(self):
+    def test_binary_client_p2Str_334(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_23(self):
+    def test_binary_client_p2Str_335(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0, 'nest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Str_336(self):
+        request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': 0.1, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_24(self):
+    def test_binary_client_p2Str_337(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': '', 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_25(self):
+    def test_binary_client_p2Str_338(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': [], 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_26(self):
+    def test_binary_client_p2Str_339(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': {}, 'nest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.wrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_27(self):
+    def test_binary_client_p2Str_340(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_28(self):
+    def test_binary_client_p2Str_341(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_29(self):
+    def test_binary_client_p2Str_342(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_30(self):
+    def test_binary_client_p2Str_343(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Str_31(self):
+    def test_binary_client_p2Str_344(self):
         request = [{'ok': {'value': {'pEnumNullP2Str': {'two': {'ewrap': {'wrap': False, 'nest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
