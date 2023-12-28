@@ -27,8 +27,8 @@ def type_unexp(incorrect_value, the_type):
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
     default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else False if the_type == Any else type(n) != the_type, default_values))
-    given_incorrect_values = additional_incorrect_values + [(v, type_unexp(v, the_type), '') for v in default_incorrect_values]
-    given_incorrect_values_w_null = additional_incorrect_values + [(v, type_unexp(v, the_type), '') for v in [None] + default_incorrect_values]
+    given_incorrect_values = [(v, type_unexp(v, the_type), '') for v in default_incorrect_values] + additional_incorrect_values
+    given_incorrect_values_w_null = [(v, type_unexp(v, the_type), '') for v in [None] + default_incorrect_values] + additional_incorrect_values
     abc = 'abcdefghijklmnopqrstuvwxyz'
 
     field = given_field
