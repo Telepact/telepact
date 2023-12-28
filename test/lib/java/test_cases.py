@@ -8014,927 +8014,927 @@ class TestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_0(self):
+    def test_fn_0(self):
         request = [{'ok': {'value': {'fn': {'required': False}}}}, {'fn.test': {'value': {'fn': {'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'fn': {'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_1(self):
+    def test_fn_1(self):
         request = [{'ok': {'value': {'fn': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'fn': {'optional': False, 'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'fn': {'optional': False, 'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_2(self):
-        request = [{}, {'fn.test': {'value': {'fn': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testFn_3(self):
+    def test_fn_2(self):
         request = [{}, {'fn.test': {'value': {'fn': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_4(self):
+    def test_fn_3(self):
         request = [{}, {'fn.test': {'value': {'fn': {'required': False, 'a': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_5(self):
+    def test_fn_4(self):
+        request = [{}, {'fn.test': {'value': {'fn': None}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_5(self):
         request = [{}, {'fn.test': {'value': {'fn': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_6(self):
+    def test_fn_6(self):
         request = [{}, {'fn.test': {'value': {'fn': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_7(self):
+    def test_fn_7(self):
         request = [{}, {'fn.test': {'value': {'fn': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_8(self):
+    def test_fn_8(self):
         request = [{}, {'fn.test': {'value': {'fn': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_9(self):
+    def test_fn_9(self):
         request = [{}, {'fn.test': {'value': {'fn': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_10(self):
-        request = [{'ok': {'value': {'fn': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testFn_11(self):
+    def test_fn_10(self):
         request = [{'ok': {'value': {'fn': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_12(self):
+    def test_fn_11(self):
         request = [{'ok': {'value': {'fn': {'required': False, 'a': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_13(self):
+    def test_fn_12(self):
+        request = [{'ok': {'value': {'fn': None}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_13(self):
         request = [{'ok': {'value': {'fn': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_14(self):
+    def test_fn_14(self):
         request = [{'ok': {'value': {'fn': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_15(self):
+    def test_fn_15(self):
         request = [{'ok': {'value': {'fn': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_16(self):
+    def test_fn_16(self):
         request = [{'ok': {'value': {'fn': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testFn_17(self):
+    def test_fn_17(self):
         request = [{'ok': {'value': {'fn': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_0(self):
+    def test_fn_18(self):
         request = [{'ok': {'value': {'nullFn': None}}}, {'fn.test': {'value': {'nullFn': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_1(self):
+    def test_fn_19(self):
         request = [{'ok': {'value': {'nullFn': {'required': False}}}}, {'fn.test': {'value': {'nullFn': {'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': {'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_2(self):
+    def test_fn_20(self):
         request = [{'ok': {'value': {'nullFn': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'nullFn': {'optional': False, 'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': {'optional': False, 'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_3(self):
+    def test_fn_21(self):
         request = [{}, {'fn.test': {'value': {'nullFn': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_4(self):
+    def test_fn_22(self):
         request = [{}, {'fn.test': {'value': {'nullFn': {'required': False, 'a': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_5(self):
+    def test_fn_23(self):
         request = [{}, {'fn.test': {'value': {'nullFn': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_6(self):
+    def test_fn_24(self):
         request = [{}, {'fn.test': {'value': {'nullFn': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_7(self):
+    def test_fn_25(self):
         request = [{}, {'fn.test': {'value': {'nullFn': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_8(self):
+    def test_fn_26(self):
         request = [{}, {'fn.test': {'value': {'nullFn': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_9(self):
+    def test_fn_27(self):
         request = [{}, {'fn.test': {'value': {'nullFn': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_10(self):
+    def test_fn_28(self):
         request = [{'ok': {'value': {'nullFn': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_11(self):
+    def test_fn_29(self):
         request = [{'ok': {'value': {'nullFn': {'required': False, 'a': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_12(self):
+    def test_fn_30(self):
         request = [{'ok': {'value': {'nullFn': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_13(self):
+    def test_fn_31(self):
         request = [{'ok': {'value': {'nullFn': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_14(self):
+    def test_fn_32(self):
         request = [{'ok': {'value': {'nullFn': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_15(self):
+    def test_fn_33(self):
         request = [{'ok': {'value': {'nullFn': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullFn_16(self):
+    def test_fn_34(self):
         request = [{'ok': {'value': {'nullFn': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_0(self):
+    def test_fn_35(self):
         request = [{'ok': {'value': {'arrFn': []}}}, {'fn.test': {'value': {'arrFn': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_1(self):
+    def test_fn_36(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_2(self):
+    def test_fn_37(self):
         request = [{'ok': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_3(self):
+    def test_fn_38(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_4(self):
-        request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayFn_5(self):
+    def test_fn_39(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_6(self):
+    def test_fn_40(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, {'required': False, 'a': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_7(self):
+    def test_fn_41(self):
+        request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, None]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_42(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_8(self):
+    def test_fn_43(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_9(self):
+    def test_fn_44(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_10(self):
+    def test_fn_45(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_11(self):
+    def test_fn_46(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_12(self):
-        request = [{'ok': {'value': {'arrFn': [{'required': False}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayFn_13(self):
+    def test_fn_47(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_14(self):
+    def test_fn_48(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {'required': False, 'a': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_15(self):
+    def test_fn_49(self):
+        request = [{'ok': {'value': {'arrFn': [{'required': False}, None]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_50(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_16(self):
+    def test_fn_51(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_17(self):
+    def test_fn_52(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_18(self):
+    def test_fn_53(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayFn_19(self):
+    def test_fn_54(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_0(self):
-        request = [{'ok': {'value': {'arrNullFn': [None]}}}, {'fn.test': {'value': {'arrNullFn': [None]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullFn': [None]}}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testArrayNullFn_1(self):
+    def test_fn_55(self):
         request = [{'ok': {'value': {'arrNullFn': []}}}, {'fn.test': {'value': {'arrNullFn': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_2(self):
+    def test_fn_56(self):
+        request = [{'ok': {'value': {'arrNullFn': [None]}}}, {'fn.test': {'value': {'arrNullFn': [None]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullFn': [None]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_57(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [{'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [{'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_3(self):
+    def test_fn_58(self):
         request = [{'ok': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_4(self):
+    def test_fn_59(self):
         request = [{'ok': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_5(self):
+    def test_fn_60(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_6(self):
+    def test_fn_61(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, {'required': False, 'a': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_7(self):
+    def test_fn_62(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_8(self):
+    def test_fn_63(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_9(self):
+    def test_fn_64(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_10(self):
+    def test_fn_65(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_11(self):
+    def test_fn_66(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_12(self):
+    def test_fn_67(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_13(self):
+    def test_fn_68(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, {'required': False, 'a': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_14(self):
+    def test_fn_69(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_15(self):
+    def test_fn_70(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_16(self):
+    def test_fn_71(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_17(self):
+    def test_fn_72(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullFn_18(self):
+    def test_fn_73(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_0(self):
+    def test_fn_74(self):
         request = [{'ok': {'value': {'objFn': {}}}}, {'fn.test': {'value': {'objFn': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_1(self):
+    def test_fn_75(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_2(self):
+    def test_fn_76(self):
         request = [{'ok': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_3(self):
+    def test_fn_77(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_4(self):
-        request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectFn_5(self):
+    def test_fn_78(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_6(self):
+    def test_fn_79(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_7(self):
+    def test_fn_80(self):
+        request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_81(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_8(self):
+    def test_fn_82(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_9(self):
+    def test_fn_83(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_10(self):
+    def test_fn_84(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_11(self):
+    def test_fn_85(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_12(self):
-        request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testObjectFn_13(self):
+    def test_fn_86(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_14(self):
+    def test_fn_87(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_15(self):
+    def test_fn_88(self):
+        request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_89(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_16(self):
+    def test_fn_90(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_17(self):
+    def test_fn_91(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_18(self):
+    def test_fn_92(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectFn_19(self):
+    def test_fn_93(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_0(self):
+    def test_fn_94(self):
         request = [{'ok': {'value': {'objNullFn': {}}}}, {'fn.test': {'value': {'objNullFn': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_1(self):
+    def test_fn_95(self):
         request = [{'ok': {'value': {'objNullFn': {'a': None}}}}, {'fn.test': {'value': {'objNullFn': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_2(self):
+    def test_fn_96(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_3(self):
+    def test_fn_97(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_4(self):
+    def test_fn_98(self):
         request = [{'ok': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_5(self):
+    def test_fn_99(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_6(self):
+    def test_fn_100(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_7(self):
+    def test_fn_101(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_8(self):
+    def test_fn_102(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_9(self):
+    def test_fn_103(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_10(self):
+    def test_fn_104(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_11(self):
+    def test_fn_105(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_12(self):
+    def test_fn_106(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_13(self):
+    def test_fn_107(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_14(self):
+    def test_fn_108(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_15(self):
+    def test_fn_109(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_16(self):
+    def test_fn_110(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_17(self):
+    def test_fn_111(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullFn_18(self):
+    def test_fn_112(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_0(self):
+    def test_fn_113(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'required': False}}}}}, {'fn.test': {'value': {'pStrFn': {'wrap': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrFn': {'wrap': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_1(self):
+    def test_fn_114(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_2(self):
-        request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructFn_3(self):
+    def test_fn_115(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_4(self):
+    def test_fn_116(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_5(self):
+    def test_fn_117(self):
+        request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_118(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_6(self):
+    def test_fn_119(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_7(self):
+    def test_fn_120(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_8(self):
+    def test_fn_121(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_9(self):
+    def test_fn_122(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_10(self):
-        request = [{'ok': {'value': {'pStrFn': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPStructFn_11(self):
+    def test_fn_123(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_12(self):
+    def test_fn_124(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_13(self):
+    def test_fn_125(self):
+        request = [{'ok': {'value': {'pStrFn': {'wrap': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_126(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_14(self):
+    def test_fn_127(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_15(self):
+    def test_fn_128(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_16(self):
+    def test_fn_129(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructFn_17(self):
+    def test_fn_130(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_0(self):
+    def test_fn_131(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_1(self):
+    def test_fn_132(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_2(self):
+    def test_fn_133(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_3(self):
+    def test_fn_134(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_4(self):
+    def test_fn_135(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_5(self):
+    def test_fn_136(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_6(self):
+    def test_fn_137(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_7(self):
+    def test_fn_138(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_8(self):
+    def test_fn_139(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_9(self):
+    def test_fn_140(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_10(self):
+    def test_fn_141(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_11(self):
+    def test_fn_142(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_12(self):
+    def test_fn_143(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_13(self):
+    def test_fn_144(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_14(self):
+    def test_fn_145(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_15(self):
+    def test_fn_146(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullFn_16(self):
+    def test_fn_147(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_0(self):
+    def test_fn_148(self):
         request = [{'ok': {'value': {'pEnumFn': {'one': {}}}}}, {'fn.test': {'value': {'pEnumFn': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_1(self):
+    def test_fn_149(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_2(self):
+    def test_fn_150(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_3(self):
-        request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumFn_4(self):
+    def test_fn_151(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_5(self):
+    def test_fn_152(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_6(self):
+    def test_fn_153(self):
+        request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_154(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_7(self):
+    def test_fn_155(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_8(self):
+    def test_fn_156(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_9(self):
+    def test_fn_157(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_10(self):
+    def test_fn_158(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_11(self):
-        request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
-
-    def test_testPEnumFn_12(self):
+    def test_fn_159(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_13(self):
+    def test_fn_160(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_14(self):
+    def test_fn_161(self):
+        request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_fn_162(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_15(self):
+    def test_fn_163(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_16(self):
+    def test_fn_164(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_17(self):
+    def test_fn_165(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumFn_18(self):
+    def test_fn_166(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_0(self):
+    def test_fn_167(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_1(self):
+    def test_fn_168(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_2(self):
+    def test_fn_169(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_3(self):
+    def test_fn_170(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_4(self):
+    def test_fn_171(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_5(self):
+    def test_fn_172(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_6(self):
+    def test_fn_173(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_7(self):
+    def test_fn_174(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_8(self):
+    def test_fn_175(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_9(self):
+    def test_fn_176(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_10(self):
+    def test_fn_177(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_11(self):
+    def test_fn_178(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_12(self):
+    def test_fn_179(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_13(self):
+    def test_fn_180(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_14(self):
+    def test_fn_181(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_15(self):
+    def test_fn_182(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_16(self):
+    def test_fn_183(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullFn_17(self):
+    def test_fn_184(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
@@ -22057,927 +22057,927 @@ class ClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_0(self):
+    def test_client_fn_0(self):
         request = [{'ok': {'value': {'fn': {'required': False}}}}, {'fn.test': {'value': {'fn': {'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'fn': {'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_1(self):
+    def test_client_fn_1(self):
         request = [{'ok': {'value': {'fn': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'fn': {'optional': False, 'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'fn': {'optional': False, 'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_2(self):
-        request = [{}, {'fn.test': {'value': {'fn': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testFn_3(self):
+    def test_client_fn_2(self):
         request = [{}, {'fn.test': {'value': {'fn': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_4(self):
+    def test_client_fn_3(self):
         request = [{}, {'fn.test': {'value': {'fn': {'required': False, 'a': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_5(self):
+    def test_client_fn_4(self):
+        request = [{}, {'fn.test': {'value': {'fn': None}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_5(self):
         request = [{}, {'fn.test': {'value': {'fn': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_6(self):
+    def test_client_fn_6(self):
         request = [{}, {'fn.test': {'value': {'fn': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_7(self):
+    def test_client_fn_7(self):
         request = [{}, {'fn.test': {'value': {'fn': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_8(self):
+    def test_client_fn_8(self):
         request = [{}, {'fn.test': {'value': {'fn': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_9(self):
+    def test_client_fn_9(self):
         request = [{}, {'fn.test': {'value': {'fn': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_10(self):
-        request = [{'ok': {'value': {'fn': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testFn_11(self):
+    def test_client_fn_10(self):
         request = [{'ok': {'value': {'fn': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_12(self):
+    def test_client_fn_11(self):
         request = [{'ok': {'value': {'fn': {'required': False, 'a': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_13(self):
+    def test_client_fn_12(self):
+        request = [{'ok': {'value': {'fn': None}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_13(self):
         request = [{'ok': {'value': {'fn': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_14(self):
+    def test_client_fn_14(self):
         request = [{'ok': {'value': {'fn': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_15(self):
+    def test_client_fn_15(self):
         request = [{'ok': {'value': {'fn': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_16(self):
+    def test_client_fn_16(self):
         request = [{'ok': {'value': {'fn': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testFn_17(self):
+    def test_client_fn_17(self):
         request = [{'ok': {'value': {'fn': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_0(self):
+    def test_client_fn_18(self):
         request = [{'ok': {'value': {'nullFn': None}}}, {'fn.test': {'value': {'nullFn': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_1(self):
+    def test_client_fn_19(self):
         request = [{'ok': {'value': {'nullFn': {'required': False}}}}, {'fn.test': {'value': {'nullFn': {'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': {'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_2(self):
+    def test_client_fn_20(self):
         request = [{'ok': {'value': {'nullFn': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'nullFn': {'optional': False, 'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': {'optional': False, 'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_3(self):
+    def test_client_fn_21(self):
         request = [{}, {'fn.test': {'value': {'nullFn': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_4(self):
+    def test_client_fn_22(self):
         request = [{}, {'fn.test': {'value': {'nullFn': {'required': False, 'a': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_5(self):
+    def test_client_fn_23(self):
         request = [{}, {'fn.test': {'value': {'nullFn': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_6(self):
+    def test_client_fn_24(self):
         request = [{}, {'fn.test': {'value': {'nullFn': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_7(self):
+    def test_client_fn_25(self):
         request = [{}, {'fn.test': {'value': {'nullFn': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_8(self):
+    def test_client_fn_26(self):
         request = [{}, {'fn.test': {'value': {'nullFn': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_9(self):
+    def test_client_fn_27(self):
         request = [{}, {'fn.test': {'value': {'nullFn': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_10(self):
+    def test_client_fn_28(self):
         request = [{'ok': {'value': {'nullFn': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_11(self):
+    def test_client_fn_29(self):
         request = [{'ok': {'value': {'nullFn': {'required': False, 'a': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_12(self):
+    def test_client_fn_30(self):
         request = [{'ok': {'value': {'nullFn': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_13(self):
+    def test_client_fn_31(self):
         request = [{'ok': {'value': {'nullFn': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_14(self):
+    def test_client_fn_32(self):
         request = [{'ok': {'value': {'nullFn': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_15(self):
+    def test_client_fn_33(self):
         request = [{'ok': {'value': {'nullFn': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullFn_16(self):
+    def test_client_fn_34(self):
         request = [{'ok': {'value': {'nullFn': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_0(self):
+    def test_client_fn_35(self):
         request = [{'ok': {'value': {'arrFn': []}}}, {'fn.test': {'value': {'arrFn': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_1(self):
+    def test_client_fn_36(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_2(self):
+    def test_client_fn_37(self):
         request = [{'ok': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_3(self):
+    def test_client_fn_38(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_4(self):
-        request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayFn_5(self):
+    def test_client_fn_39(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_6(self):
+    def test_client_fn_40(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, {'required': False, 'a': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_7(self):
+    def test_client_fn_41(self):
+        request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, None]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_42(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_8(self):
+    def test_client_fn_43(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_9(self):
+    def test_client_fn_44(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_10(self):
+    def test_client_fn_45(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_11(self):
+    def test_client_fn_46(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_12(self):
-        request = [{'ok': {'value': {'arrFn': [{'required': False}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayFn_13(self):
+    def test_client_fn_47(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_14(self):
+    def test_client_fn_48(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {'required': False, 'a': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_15(self):
+    def test_client_fn_49(self):
+        request = [{'ok': {'value': {'arrFn': [{'required': False}, None]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_50(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_16(self):
+    def test_client_fn_51(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_17(self):
+    def test_client_fn_52(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_18(self):
+    def test_client_fn_53(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayFn_19(self):
+    def test_client_fn_54(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_0(self):
-        request = [{'ok': {'value': {'arrNullFn': [None]}}}, {'fn.test': {'value': {'arrNullFn': [None]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullFn': [None]}}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testArrayNullFn_1(self):
+    def test_client_fn_55(self):
         request = [{'ok': {'value': {'arrNullFn': []}}}, {'fn.test': {'value': {'arrNullFn': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_2(self):
+    def test_client_fn_56(self):
+        request = [{'ok': {'value': {'arrNullFn': [None]}}}, {'fn.test': {'value': {'arrNullFn': [None]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullFn': [None]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_57(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [{'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [{'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_3(self):
+    def test_client_fn_58(self):
         request = [{'ok': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_4(self):
+    def test_client_fn_59(self):
         request = [{'ok': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_5(self):
+    def test_client_fn_60(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_6(self):
+    def test_client_fn_61(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, {'required': False, 'a': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_7(self):
+    def test_client_fn_62(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_8(self):
+    def test_client_fn_63(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_9(self):
+    def test_client_fn_64(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_10(self):
+    def test_client_fn_65(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_11(self):
+    def test_client_fn_66(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_12(self):
+    def test_client_fn_67(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_13(self):
+    def test_client_fn_68(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, {'required': False, 'a': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_14(self):
+    def test_client_fn_69(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_15(self):
+    def test_client_fn_70(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_16(self):
+    def test_client_fn_71(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_17(self):
+    def test_client_fn_72(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullFn_18(self):
+    def test_client_fn_73(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_0(self):
+    def test_client_fn_74(self):
         request = [{'ok': {'value': {'objFn': {}}}}, {'fn.test': {'value': {'objFn': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_1(self):
+    def test_client_fn_75(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_2(self):
+    def test_client_fn_76(self):
         request = [{'ok': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_3(self):
+    def test_client_fn_77(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_4(self):
-        request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectFn_5(self):
+    def test_client_fn_78(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_6(self):
+    def test_client_fn_79(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_7(self):
+    def test_client_fn_80(self):
+        request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_81(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_8(self):
+    def test_client_fn_82(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_9(self):
+    def test_client_fn_83(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_10(self):
+    def test_client_fn_84(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_11(self):
+    def test_client_fn_85(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_12(self):
-        request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testObjectFn_13(self):
+    def test_client_fn_86(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_14(self):
+    def test_client_fn_87(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_15(self):
+    def test_client_fn_88(self):
+        request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_89(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_16(self):
+    def test_client_fn_90(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_17(self):
+    def test_client_fn_91(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_18(self):
+    def test_client_fn_92(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectFn_19(self):
+    def test_client_fn_93(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_0(self):
+    def test_client_fn_94(self):
         request = [{'ok': {'value': {'objNullFn': {}}}}, {'fn.test': {'value': {'objNullFn': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_1(self):
+    def test_client_fn_95(self):
         request = [{'ok': {'value': {'objNullFn': {'a': None}}}}, {'fn.test': {'value': {'objNullFn': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_2(self):
+    def test_client_fn_96(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_3(self):
+    def test_client_fn_97(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_4(self):
+    def test_client_fn_98(self):
         request = [{'ok': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_5(self):
+    def test_client_fn_99(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_6(self):
+    def test_client_fn_100(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_7(self):
+    def test_client_fn_101(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_8(self):
+    def test_client_fn_102(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_9(self):
+    def test_client_fn_103(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_10(self):
+    def test_client_fn_104(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_11(self):
+    def test_client_fn_105(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_12(self):
+    def test_client_fn_106(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_13(self):
+    def test_client_fn_107(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_14(self):
+    def test_client_fn_108(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_15(self):
+    def test_client_fn_109(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_16(self):
+    def test_client_fn_110(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_17(self):
+    def test_client_fn_111(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullFn_18(self):
+    def test_client_fn_112(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_0(self):
+    def test_client_fn_113(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'required': False}}}}}, {'fn.test': {'value': {'pStrFn': {'wrap': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrFn': {'wrap': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_1(self):
+    def test_client_fn_114(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_2(self):
-        request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructFn_3(self):
+    def test_client_fn_115(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_4(self):
+    def test_client_fn_116(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_5(self):
+    def test_client_fn_117(self):
+        request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_118(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_6(self):
+    def test_client_fn_119(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_7(self):
+    def test_client_fn_120(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_8(self):
+    def test_client_fn_121(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_9(self):
+    def test_client_fn_122(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_10(self):
-        request = [{'ok': {'value': {'pStrFn': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPStructFn_11(self):
+    def test_client_fn_123(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_12(self):
+    def test_client_fn_124(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_13(self):
+    def test_client_fn_125(self):
+        request = [{'ok': {'value': {'pStrFn': {'wrap': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_126(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_14(self):
+    def test_client_fn_127(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_15(self):
+    def test_client_fn_128(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_16(self):
+    def test_client_fn_129(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructFn_17(self):
+    def test_client_fn_130(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_0(self):
+    def test_client_fn_131(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_1(self):
+    def test_client_fn_132(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_2(self):
+    def test_client_fn_133(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_3(self):
+    def test_client_fn_134(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_4(self):
+    def test_client_fn_135(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_5(self):
+    def test_client_fn_136(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_6(self):
+    def test_client_fn_137(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_7(self):
+    def test_client_fn_138(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_8(self):
+    def test_client_fn_139(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_9(self):
+    def test_client_fn_140(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_10(self):
+    def test_client_fn_141(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_11(self):
+    def test_client_fn_142(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_12(self):
+    def test_client_fn_143(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_13(self):
+    def test_client_fn_144(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_14(self):
+    def test_client_fn_145(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_15(self):
+    def test_client_fn_146(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullFn_16(self):
+    def test_client_fn_147(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_0(self):
+    def test_client_fn_148(self):
         request = [{'ok': {'value': {'pEnumFn': {'one': {}}}}}, {'fn.test': {'value': {'pEnumFn': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_1(self):
+    def test_client_fn_149(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_2(self):
+    def test_client_fn_150(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_3(self):
-        request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumFn_4(self):
+    def test_client_fn_151(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_5(self):
+    def test_client_fn_152(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_6(self):
+    def test_client_fn_153(self):
+        request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_154(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_7(self):
+    def test_client_fn_155(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_8(self):
+    def test_client_fn_156(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_9(self):
+    def test_client_fn_157(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_10(self):
+    def test_client_fn_158(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_11(self):
-        request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
-
-    def test_client_testPEnumFn_12(self):
+    def test_client_fn_159(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_13(self):
+    def test_client_fn_160(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_14(self):
+    def test_client_fn_161(self):
+        request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_fn_162(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_15(self):
+    def test_client_fn_163(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_16(self):
+    def test_client_fn_164(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_17(self):
+    def test_client_fn_165(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumFn_18(self):
+    def test_client_fn_166(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_0(self):
+    def test_client_fn_167(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_1(self):
+    def test_client_fn_168(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_2(self):
+    def test_client_fn_169(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_3(self):
+    def test_client_fn_170(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_4(self):
+    def test_client_fn_171(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_5(self):
+    def test_client_fn_172(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_6(self):
+    def test_client_fn_173(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_7(self):
+    def test_client_fn_174(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_8(self):
+    def test_client_fn_175(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_9(self):
+    def test_client_fn_176(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_10(self):
+    def test_client_fn_177(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_11(self):
+    def test_client_fn_178(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_12(self):
+    def test_client_fn_179(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_13(self):
+    def test_client_fn_180(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_14(self):
+    def test_client_fn_181(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_15(self):
+    def test_client_fn_182(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_16(self):
+    def test_client_fn_183(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullFn_17(self):
+    def test_client_fn_184(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
@@ -34421,927 +34421,927 @@ class BinaryClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullEnum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_0(self):
+    def test_binary_client_fn_0(self):
         request = [{'ok': {'value': {'fn': {'required': False}}}}, {'fn.test': {'value': {'fn': {'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'fn': {'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_1(self):
+    def test_binary_client_fn_1(self):
         request = [{'ok': {'value': {'fn': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'fn': {'optional': False, 'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'fn': {'optional': False, 'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_2(self):
-        request = [{}, {'fn.test': {'value': {'fn': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testFn_3(self):
+    def test_binary_client_fn_2(self):
         request = [{}, {'fn.test': {'value': {'fn': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_4(self):
+    def test_binary_client_fn_3(self):
         request = [{}, {'fn.test': {'value': {'fn': {'required': False, 'a': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_5(self):
+    def test_binary_client_fn_4(self):
+        request = [{}, {'fn.test': {'value': {'fn': None}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_5(self):
         request = [{}, {'fn.test': {'value': {'fn': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_6(self):
+    def test_binary_client_fn_6(self):
         request = [{}, {'fn.test': {'value': {'fn': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_7(self):
+    def test_binary_client_fn_7(self):
         request = [{}, {'fn.test': {'value': {'fn': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_8(self):
+    def test_binary_client_fn_8(self):
         request = [{}, {'fn.test': {'value': {'fn': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_9(self):
+    def test_binary_client_fn_9(self):
         request = [{}, {'fn.test': {'value': {'fn': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_10(self):
-        request = [{'ok': {'value': {'fn': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testFn_11(self):
+    def test_binary_client_fn_10(self):
         request = [{'ok': {'value': {'fn': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_12(self):
+    def test_binary_client_fn_11(self):
         request = [{'ok': {'value': {'fn': {'required': False, 'a': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_13(self):
+    def test_binary_client_fn_12(self):
+        request = [{'ok': {'value': {'fn': None}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_13(self):
         request = [{'ok': {'value': {'fn': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_14(self):
+    def test_binary_client_fn_14(self):
         request = [{'ok': {'value': {'fn': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_15(self):
+    def test_binary_client_fn_15(self):
         request = [{'ok': {'value': {'fn': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_16(self):
+    def test_binary_client_fn_16(self):
         request = [{'ok': {'value': {'fn': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testFn_17(self):
+    def test_binary_client_fn_17(self):
         request = [{'ok': {'value': {'fn': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.fn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_0(self):
+    def test_binary_client_fn_18(self):
         request = [{'ok': {'value': {'nullFn': None}}}, {'fn.test': {'value': {'nullFn': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_1(self):
+    def test_binary_client_fn_19(self):
         request = [{'ok': {'value': {'nullFn': {'required': False}}}}, {'fn.test': {'value': {'nullFn': {'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': {'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_2(self):
+    def test_binary_client_fn_20(self):
         request = [{'ok': {'value': {'nullFn': {'optional': False, 'required': False}}}}, {'fn.test': {'value': {'nullFn': {'optional': False, 'required': False}}}}]
         expected_response = [{}, {'ok': {'value': {'nullFn': {'optional': False, 'required': False}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_3(self):
+    def test_binary_client_fn_21(self):
         request = [{}, {'fn.test': {'value': {'nullFn': {}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_4(self):
+    def test_binary_client_fn_22(self):
         request = [{}, {'fn.test': {'value': {'nullFn': {'required': False, 'a': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_5(self):
+    def test_binary_client_fn_23(self):
         request = [{}, {'fn.test': {'value': {'nullFn': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_6(self):
+    def test_binary_client_fn_24(self):
         request = [{}, {'fn.test': {'value': {'nullFn': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_7(self):
+    def test_binary_client_fn_25(self):
         request = [{}, {'fn.test': {'value': {'nullFn': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_8(self):
+    def test_binary_client_fn_26(self):
         request = [{}, {'fn.test': {'value': {'nullFn': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_9(self):
+    def test_binary_client_fn_27(self):
         request = [{}, {'fn.test': {'value': {'nullFn': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_10(self):
+    def test_binary_client_fn_28(self):
         request = [{'ok': {'value': {'nullFn': {}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_11(self):
+    def test_binary_client_fn_29(self):
         request = [{'ok': {'value': {'nullFn': {'required': False, 'a': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_12(self):
+    def test_binary_client_fn_30(self):
         request = [{'ok': {'value': {'nullFn': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_13(self):
+    def test_binary_client_fn_31(self):
         request = [{'ok': {'value': {'nullFn': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_14(self):
+    def test_binary_client_fn_32(self):
         request = [{'ok': {'value': {'nullFn': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_15(self):
+    def test_binary_client_fn_33(self):
         request = [{'ok': {'value': {'nullFn': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullFn_16(self):
+    def test_binary_client_fn_34(self):
         request = [{'ok': {'value': {'nullFn': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullFn', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_0(self):
+    def test_binary_client_fn_35(self):
         request = [{'ok': {'value': {'arrFn': []}}}, {'fn.test': {'value': {'arrFn': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_1(self):
+    def test_binary_client_fn_36(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_2(self):
+    def test_binary_client_fn_37(self):
         request = [{'ok': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_3(self):
+    def test_binary_client_fn_38(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrFn': [{'required': False}, {'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_4(self):
-        request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayFn_5(self):
+    def test_binary_client_fn_39(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_6(self):
+    def test_binary_client_fn_40(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, {'required': False, 'a': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_7(self):
+    def test_binary_client_fn_41(self):
+        request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, None]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_42(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_8(self):
+    def test_binary_client_fn_43(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_9(self):
+    def test_binary_client_fn_44(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_10(self):
+    def test_binary_client_fn_45(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_11(self):
+    def test_binary_client_fn_46(self):
         request = [{}, {'fn.test': {'value': {'arrFn': [{'required': False}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_12(self):
-        request = [{'ok': {'value': {'arrFn': [{'required': False}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayFn_13(self):
+    def test_binary_client_fn_47(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_14(self):
+    def test_binary_client_fn_48(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, {'required': False, 'a': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_15(self):
+    def test_binary_client_fn_49(self):
+        request = [{'ok': {'value': {'arrFn': [{'required': False}, None]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_50(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_16(self):
+    def test_binary_client_fn_51(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_17(self):
+    def test_binary_client_fn_52(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_18(self):
+    def test_binary_client_fn_53(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayFn_19(self):
+    def test_binary_client_fn_54(self):
         request = [{'ok': {'value': {'arrFn': [{'required': False}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_0(self):
-        request = [{'ok': {'value': {'arrNullFn': [None]}}}, {'fn.test': {'value': {'arrNullFn': [None]}}}]
-        expected_response = [{}, {'ok': {'value': {'arrNullFn': [None]}}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testArrayNullFn_1(self):
+    def test_binary_client_fn_55(self):
         request = [{'ok': {'value': {'arrNullFn': []}}}, {'fn.test': {'value': {'arrNullFn': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_2(self):
+    def test_binary_client_fn_56(self):
+        request = [{'ok': {'value': {'arrNullFn': [None]}}}, {'fn.test': {'value': {'arrNullFn': [None]}}}]
+        expected_response = [{}, {'ok': {'value': {'arrNullFn': [None]}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_57(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [{'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [{'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_3(self):
+    def test_binary_client_fn_58(self):
         request = [{'ok': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [{'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_4(self):
+    def test_binary_client_fn_59(self):
         request = [{'ok': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullFn': [None, {'required': False}, {'optional': False, 'required': False}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_5(self):
+    def test_binary_client_fn_60(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, {}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_6(self):
+    def test_binary_client_fn_61(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, {'required': False, 'a': False}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_7(self):
+    def test_binary_client_fn_62(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_8(self):
+    def test_binary_client_fn_63(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_9(self):
+    def test_binary_client_fn_64(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_10(self):
+    def test_binary_client_fn_65(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_11(self):
+    def test_binary_client_fn_66(self):
         request = [{}, {'fn.test': {'value': {'arrNullFn': [{'required': False}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_12(self):
+    def test_binary_client_fn_67(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, {}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1].required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_13(self):
+    def test_binary_client_fn_68(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, {'required': False, 'a': False}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1].a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_14(self):
+    def test_binary_client_fn_69(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_15(self):
+    def test_binary_client_fn_70(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_16(self):
+    def test_binary_client_fn_71(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_17(self):
+    def test_binary_client_fn_72(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullFn_18(self):
+    def test_binary_client_fn_73(self):
         request = [{'ok': {'value': {'arrNullFn': [{'required': False}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullFn[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_0(self):
+    def test_binary_client_fn_74(self):
         request = [{'ok': {'value': {'objFn': {}}}}, {'fn.test': {'value': {'objFn': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_1(self):
+    def test_binary_client_fn_75(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_2(self):
+    def test_binary_client_fn_76(self):
         request = [{'ok': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_3(self):
+    def test_binary_client_fn_77(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_4(self):
-        request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectFn_5(self):
+    def test_binary_client_fn_78(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_6(self):
+    def test_binary_client_fn_79(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_7(self):
+    def test_binary_client_fn_80(self):
+        request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_81(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_8(self):
+    def test_binary_client_fn_82(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_9(self):
+    def test_binary_client_fn_83(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_10(self):
+    def test_binary_client_fn_84(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_11(self):
+    def test_binary_client_fn_85(self):
         request = [{}, {'fn.test': {'value': {'objFn': {'a': {'required': False}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_12(self):
-        request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testObjectFn_13(self):
+    def test_binary_client_fn_86(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_14(self):
+    def test_binary_client_fn_87(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_15(self):
+    def test_binary_client_fn_88(self):
+        request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_89(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_16(self):
+    def test_binary_client_fn_90(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_17(self):
+    def test_binary_client_fn_91(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_18(self):
+    def test_binary_client_fn_92(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectFn_19(self):
+    def test_binary_client_fn_93(self):
         request = [{'ok': {'value': {'objFn': {'a': {'required': False}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_0(self):
+    def test_binary_client_fn_94(self):
         request = [{'ok': {'value': {'objNullFn': {}}}}, {'fn.test': {'value': {'objNullFn': {}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_1(self):
+    def test_binary_client_fn_95(self):
         request = [{'ok': {'value': {'objNullFn': {'a': None}}}}, {'fn.test': {'value': {'objNullFn': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_2(self):
+    def test_binary_client_fn_96(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_3(self):
+    def test_binary_client_fn_97(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_4(self):
+    def test_binary_client_fn_98(self):
         request = [{'ok': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullFn': {'a': None, 'b': {'required': False}, 'c': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_5(self):
+    def test_binary_client_fn_99(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_6(self):
+    def test_binary_client_fn_100(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_7(self):
+    def test_binary_client_fn_101(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_8(self):
+    def test_binary_client_fn_102(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_9(self):
+    def test_binary_client_fn_103(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_10(self):
+    def test_binary_client_fn_104(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_11(self):
+    def test_binary_client_fn_105(self):
         request = [{}, {'fn.test': {'value': {'objNullFn': {'a': {'required': False}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_12(self):
+    def test_binary_client_fn_106(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_13(self):
+    def test_binary_client_fn_107(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_14(self):
+    def test_binary_client_fn_108(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_15(self):
+    def test_binary_client_fn_109(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_16(self):
+    def test_binary_client_fn_110(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_17(self):
+    def test_binary_client_fn_111(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullFn_18(self):
+    def test_binary_client_fn_112(self):
         request = [{'ok': {'value': {'objNullFn': {'a': {'required': False}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullFn{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_0(self):
+    def test_binary_client_fn_113(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'required': False}}}}}, {'fn.test': {'value': {'pStrFn': {'wrap': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrFn': {'wrap': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_1(self):
+    def test_binary_client_fn_114(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrFn': {'wrap': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_2(self):
-        request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructFn_3(self):
+    def test_binary_client_fn_115(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_4(self):
+    def test_binary_client_fn_116(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_5(self):
+    def test_binary_client_fn_117(self):
+        request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': None}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_118(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_6(self):
+    def test_binary_client_fn_119(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_7(self):
+    def test_binary_client_fn_120(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_8(self):
+    def test_binary_client_fn_121(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_9(self):
+    def test_binary_client_fn_122(self):
         request = [{}, {'fn.test': {'value': {'pStrFn': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_10(self):
-        request = [{'ok': {'value': {'pStrFn': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPStructFn_11(self):
+    def test_binary_client_fn_123(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_12(self):
+    def test_binary_client_fn_124(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_13(self):
+    def test_binary_client_fn_125(self):
+        request = [{'ok': {'value': {'pStrFn': {'wrap': None}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_126(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_14(self):
+    def test_binary_client_fn_127(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_15(self):
+    def test_binary_client_fn_128(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_16(self):
+    def test_binary_client_fn_129(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructFn_17(self):
+    def test_binary_client_fn_130(self):
         request = [{'ok': {'value': {'pStrFn': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_0(self):
+    def test_binary_client_fn_131(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_1(self):
+    def test_binary_client_fn_132(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': {'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_2(self):
+    def test_binary_client_fn_133(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullFn': {'wrap': {'optional': False, 'required': False}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_3(self):
+    def test_binary_client_fn_134(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_4(self):
+    def test_binary_client_fn_135(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': {'required': False, 'a': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_5(self):
+    def test_binary_client_fn_136(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_6(self):
+    def test_binary_client_fn_137(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_7(self):
+    def test_binary_client_fn_138(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_8(self):
+    def test_binary_client_fn_139(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_9(self):
+    def test_binary_client_fn_140(self):
         request = [{}, {'fn.test': {'value': {'pStrNullFn': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_10(self):
+    def test_binary_client_fn_141(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_11(self):
+    def test_binary_client_fn_142(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': {'required': False, 'a': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_12(self):
+    def test_binary_client_fn_143(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_13(self):
+    def test_binary_client_fn_144(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_14(self):
+    def test_binary_client_fn_145(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_15(self):
+    def test_binary_client_fn_146(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullFn_16(self):
+    def test_binary_client_fn_147(self):
         request = [{'ok': {'value': {'pStrNullFn': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullFn.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_0(self):
+    def test_binary_client_fn_148(self):
         request = [{'ok': {'value': {'pEnumFn': {'one': {}}}}}, {'fn.test': {'value': {'pEnumFn': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_1(self):
+    def test_binary_client_fn_149(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_2(self):
+    def test_binary_client_fn_150(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_3(self):
-        request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumFn_4(self):
+    def test_binary_client_fn_151(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_5(self):
+    def test_binary_client_fn_152(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_6(self):
+    def test_binary_client_fn_153(self):
+        request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_154(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_7(self):
+    def test_binary_client_fn_155(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_8(self):
+    def test_binary_client_fn_156(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_9(self):
+    def test_binary_client_fn_157(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_10(self):
+    def test_binary_client_fn_158(self):
         request = [{}, {'fn.test': {'value': {'pEnumFn': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_11(self):
-        request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
-
-    def test_binary_client_testPEnumFn_12(self):
+    def test_binary_client_fn_159(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_13(self):
+    def test_binary_client_fn_160(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_14(self):
+    def test_binary_client_fn_161(self):
+        request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_fn_162(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_15(self):
+    def test_binary_client_fn_163(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_16(self):
+    def test_binary_client_fn_164(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_17(self):
+    def test_binary_client_fn_165(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumFn_18(self):
+    def test_binary_client_fn_166(self):
         request = [{'ok': {'value': {'pEnumFn': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_0(self):
+    def test_binary_client_fn_167(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_1(self):
+    def test_binary_client_fn_168(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_2(self):
+    def test_binary_client_fn_169(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_3(self):
+    def test_binary_client_fn_170(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'optional': False, 'required': False}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_4(self):
+    def test_binary_client_fn_171(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_5(self):
+    def test_binary_client_fn_172(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_6(self):
+    def test_binary_client_fn_173(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_7(self):
+    def test_binary_client_fn_174(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_8(self):
+    def test_binary_client_fn_175(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_9(self):
+    def test_binary_client_fn_176(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_10(self):
+    def test_binary_client_fn_177(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullFn': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_11(self):
+    def test_binary_client_fn_178(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.required', 'reason': {'RequiredStructFieldMissing': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_12(self):
+    def test_binary_client_fn_179(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': {'required': False, 'a': False}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap.a', 'reason': {'StructFieldUnknown': {}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_13(self):
+    def test_binary_client_fn_180(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_14(self):
+    def test_binary_client_fn_181(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_15(self):
+    def test_binary_client_fn_182(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_16(self):
+    def test_binary_client_fn_183(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullFn_17(self):
+    def test_binary_client_fn_184(self):
         request = [{'ok': {'value': {'pEnumNullFn': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullFn.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
