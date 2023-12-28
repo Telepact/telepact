@@ -10664,1617 +10664,1727 @@ class TestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_0(self):
+    def test_p2Enum_0(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_1(self):
+    def test_p2Enum_1(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_2(self):
+    def test_p2Enum_2(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_3(self):
+    def test_p2Enum_3(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_4(self):
+    def test_p2Enum_4(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_5(self):
+    def test_p2Enum_5(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_6(self):
+    def test_p2Enum_6(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_7(self):
+    def test_p2Enum_7(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_8(self):
+    def test_p2Enum_8(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_9(self):
+        request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_9(self):
+    def test_p2Enum_10(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_10(self):
+    def test_p2Enum_11(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_11(self):
+    def test_p2Enum_12(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_12(self):
+    def test_p2Enum_13(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_13(self):
+    def test_p2Enum_14(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_14(self):
+    def test_p2Enum_15(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_15(self):
+    def test_p2Enum_16(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_16(self):
+    def test_p2Enum_17(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_17(self):
+    def test_p2Enum_18(self):
         request = [{'ok': {'value': {'p2Enum': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_18(self):
+    def test_p2Enum_19(self):
         request = [{'ok': {'value': {'p2Enum': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_19(self):
+    def test_p2Enum_20(self):
         request = [{'ok': {'value': {'p2Enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_20(self):
+    def test_p2Enum_21(self):
         request = [{'ok': {'value': {'p2Enum': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_21(self):
+    def test_p2Enum_22(self):
         request = [{'ok': {'value': {'p2Enum': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_22(self):
+    def test_p2Enum_23(self):
         request = [{'ok': {'value': {'p2Enum': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_23(self):
+    def test_p2Enum_24(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_25(self):
+        request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_24(self):
+    def test_p2Enum_26(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_25(self):
+    def test_p2Enum_27(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_26(self):
+    def test_p2Enum_28(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_27(self):
+    def test_p2Enum_29(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_28(self):
+    def test_p2Enum_30(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_29(self):
+    def test_p2Enum_31(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_30(self):
+    def test_p2Enum_32(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testP2Enum_31(self):
+    def test_p2Enum_33(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_0(self):
+    def test_p2Enum_34(self):
         request = [{'ok': {'value': {'nullP2Enum': None}}}, {'fn.test': {'value': {'nullP2Enum': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_1(self):
+    def test_p2Enum_35(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_2(self):
+    def test_p2Enum_36(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_3(self):
+    def test_p2Enum_37(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_4(self):
+    def test_p2Enum_38(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_5(self):
+    def test_p2Enum_39(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_6(self):
+    def test_p2Enum_40(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_7(self):
+    def test_p2Enum_41(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_8(self):
+    def test_p2Enum_42(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_43(self):
+        request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_9(self):
+    def test_p2Enum_44(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_10(self):
+    def test_p2Enum_45(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_11(self):
+    def test_p2Enum_46(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_12(self):
+    def test_p2Enum_47(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_13(self):
+    def test_p2Enum_48(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_14(self):
+    def test_p2Enum_49(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_15(self):
+    def test_p2Enum_50(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_16(self):
+    def test_p2Enum_51(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_17(self):
+    def test_p2Enum_52(self):
         request = [{'ok': {'value': {'nullP2Enum': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_18(self):
+    def test_p2Enum_53(self):
         request = [{'ok': {'value': {'nullP2Enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_19(self):
+    def test_p2Enum_54(self):
         request = [{'ok': {'value': {'nullP2Enum': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_20(self):
+    def test_p2Enum_55(self):
         request = [{'ok': {'value': {'nullP2Enum': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_21(self):
+    def test_p2Enum_56(self):
         request = [{'ok': {'value': {'nullP2Enum': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_22(self):
+    def test_p2Enum_57(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_58(self):
+        request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_23(self):
+    def test_p2Enum_59(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_24(self):
+    def test_p2Enum_60(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_25(self):
+    def test_p2Enum_61(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_26(self):
+    def test_p2Enum_62(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_27(self):
+    def test_p2Enum_63(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_28(self):
+    def test_p2Enum_64(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_29(self):
+    def test_p2Enum_65(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testNullableP2Enum_30(self):
+    def test_p2Enum_66(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_0(self):
+    def test_p2Enum_67(self):
         request = [{'ok': {'value': {'arrP2Enum': []}}}, {'fn.test': {'value': {'arrP2Enum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_1(self):
+    def test_p2Enum_68(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_2(self):
+    def test_p2Enum_69(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_3(self):
+    def test_p2Enum_70(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_4(self):
+    def test_p2Enum_71(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_5(self):
+    def test_p2Enum_72(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_6(self):
+    def test_p2Enum_73(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_7(self):
+    def test_p2Enum_74(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_8(self):
+    def test_p2Enum_75(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_9(self):
+    def test_p2Enum_76(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_10(self):
+    def test_p2Enum_77(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_78(self):
+        request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_11(self):
+    def test_p2Enum_79(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_12(self):
+    def test_p2Enum_80(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_13(self):
+    def test_p2Enum_81(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_14(self):
+    def test_p2Enum_82(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_15(self):
+    def test_p2Enum_83(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_16(self):
+    def test_p2Enum_84(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_17(self):
+    def test_p2Enum_85(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_18(self):
+    def test_p2Enum_86(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_19(self):
+    def test_p2Enum_87(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_20(self):
+    def test_p2Enum_88(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_21(self):
+    def test_p2Enum_89(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_22(self):
+    def test_p2Enum_90(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_23(self):
+    def test_p2Enum_91(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_24(self):
+    def test_p2Enum_92(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_25(self):
+    def test_p2Enum_93(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_94(self):
+        request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_26(self):
+    def test_p2Enum_95(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_27(self):
+    def test_p2Enum_96(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_28(self):
+    def test_p2Enum_97(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_29(self):
+    def test_p2Enum_98(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_30(self):
+    def test_p2Enum_99(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_31(self):
+    def test_p2Enum_100(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_32(self):
+    def test_p2Enum_101(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayP2Enum_33(self):
+    def test_p2Enum_102(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_0(self):
+    def test_p2Enum_103(self):
         request = [{'ok': {'value': {'arrNullP2Enum': []}}}, {'fn.test': {'value': {'arrNullP2Enum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_1(self):
+    def test_p2Enum_104(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [None]}}}, {'fn.test': {'value': {'arrNullP2Enum': [None]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [None]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_2(self):
+    def test_p2Enum_105(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_3(self):
+    def test_p2Enum_106(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_4(self):
+    def test_p2Enum_107(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_5(self):
+    def test_p2Enum_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_6(self):
+    def test_p2Enum_109(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_7(self):
+    def test_p2Enum_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_8(self):
+    def test_p2Enum_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_9(self):
+    def test_p2Enum_112(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_10(self):
+    def test_p2Enum_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_114(self):
+        request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_11(self):
+    def test_p2Enum_115(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_12(self):
+    def test_p2Enum_116(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_13(self):
+    def test_p2Enum_117(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_14(self):
+    def test_p2Enum_118(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_15(self):
+    def test_p2Enum_119(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_16(self):
+    def test_p2Enum_120(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_17(self):
+    def test_p2Enum_121(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_18(self):
+    def test_p2Enum_122(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_19(self):
+    def test_p2Enum_123(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_20(self):
+    def test_p2Enum_124(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_21(self):
+    def test_p2Enum_125(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_22(self):
+    def test_p2Enum_126(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_23(self):
+    def test_p2Enum_127(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_24(self):
+    def test_p2Enum_128(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_129(self):
+        request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_25(self):
+    def test_p2Enum_130(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_26(self):
+    def test_p2Enum_131(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_27(self):
+    def test_p2Enum_132(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_28(self):
+    def test_p2Enum_133(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_29(self):
+    def test_p2Enum_134(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_30(self):
+    def test_p2Enum_135(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_31(self):
+    def test_p2Enum_136(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testArrayNullP2Enum_32(self):
+    def test_p2Enum_137(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_0(self):
+    def test_p2Enum_138(self):
+        request = [{'ok': {'value': {'objP2Enum': {}}}}, {'fn.test': {'value': {'objP2Enum': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objP2Enum': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_139(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_1(self):
+    def test_p2Enum_140(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_2(self):
+    def test_p2Enum_141(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_3(self):
+    def test_p2Enum_142(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_4(self):
+    def test_p2Enum_143(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_5(self):
+    def test_p2Enum_144(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_6(self):
+    def test_p2Enum_145(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_7(self):
+    def test_p2Enum_146(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_8(self):
+    def test_p2Enum_147(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_9(self):
+    def test_p2Enum_148(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_149(self):
+        request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_10(self):
+    def test_p2Enum_150(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_11(self):
+    def test_p2Enum_151(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_12(self):
+    def test_p2Enum_152(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_13(self):
+    def test_p2Enum_153(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_14(self):
+    def test_p2Enum_154(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_15(self):
+    def test_p2Enum_155(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_16(self):
+    def test_p2Enum_156(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_17(self):
+    def test_p2Enum_157(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_18(self):
+    def test_p2Enum_158(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_19(self):
+    def test_p2Enum_159(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_20(self):
+    def test_p2Enum_160(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_21(self):
+    def test_p2Enum_161(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_22(self):
+    def test_p2Enum_162(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_23(self):
+    def test_p2Enum_163(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_24(self):
+    def test_p2Enum_164(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_165(self):
+        request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_25(self):
+    def test_p2Enum_166(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_26(self):
+    def test_p2Enum_167(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_27(self):
+    def test_p2Enum_168(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_28(self):
+    def test_p2Enum_169(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_29(self):
+    def test_p2Enum_170(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_30(self):
+    def test_p2Enum_171(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_31(self):
+    def test_p2Enum_172(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectP2Enum_32(self):
+    def test_p2Enum_173(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_0(self):
+    def test_p2Enum_174(self):
+        request = [{'ok': {'value': {'objNullP2Enum': {}}}}, {'fn.test': {'value': {'objNullP2Enum': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_175(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': None}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_1(self):
+    def test_p2Enum_176(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_2(self):
+    def test_p2Enum_177(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_3(self):
+    def test_p2Enum_178(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_4(self):
+    def test_p2Enum_179(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_5(self):
+    def test_p2Enum_180(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_6(self):
+    def test_p2Enum_181(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_7(self):
+    def test_p2Enum_182(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_8(self):
+    def test_p2Enum_183(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_9(self):
+    def test_p2Enum_184(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_10(self):
+    def test_p2Enum_186(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_11(self):
+    def test_p2Enum_187(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_12(self):
+    def test_p2Enum_188(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_13(self):
+    def test_p2Enum_189(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_14(self):
+    def test_p2Enum_190(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_15(self):
+    def test_p2Enum_191(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_16(self):
+    def test_p2Enum_192(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_17(self):
+    def test_p2Enum_193(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_18(self):
+    def test_p2Enum_194(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_19(self):
+    def test_p2Enum_195(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_20(self):
+    def test_p2Enum_196(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_21(self):
+    def test_p2Enum_197(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_22(self):
+    def test_p2Enum_198(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_23(self):
+    def test_p2Enum_199(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_200(self):
+        request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_24(self):
+    def test_p2Enum_201(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_25(self):
+    def test_p2Enum_202(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_26(self):
+    def test_p2Enum_203(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_27(self):
+    def test_p2Enum_204(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_28(self):
+    def test_p2Enum_205(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_29(self):
+    def test_p2Enum_206(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_30(self):
+    def test_p2Enum_207(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testObjectNullP2Enum_31(self):
+    def test_p2Enum_208(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_0(self):
+    def test_p2Enum_209(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_1(self):
+    def test_p2Enum_210(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_2(self):
+    def test_p2Enum_211(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_3(self):
+    def test_p2Enum_212(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_4(self):
+    def test_p2Enum_213(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_5(self):
+    def test_p2Enum_214(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_6(self):
+    def test_p2Enum_215(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_7(self):
+    def test_p2Enum_216(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_8(self):
+    def test_p2Enum_217(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_9(self):
+    def test_p2Enum_219(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_10(self):
+    def test_p2Enum_220(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_11(self):
+    def test_p2Enum_221(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_12(self):
+    def test_p2Enum_222(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_13(self):
+    def test_p2Enum_223(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_14(self):
+    def test_p2Enum_224(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_15(self):
+    def test_p2Enum_225(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_16(self):
+    def test_p2Enum_226(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_17(self):
+    def test_p2Enum_227(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_18(self):
+    def test_p2Enum_228(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_19(self):
+    def test_p2Enum_229(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_20(self):
+    def test_p2Enum_230(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_21(self):
+    def test_p2Enum_231(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_22(self):
+    def test_p2Enum_232(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_23(self):
+    def test_p2Enum_233(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_234(self):
+        request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_24(self):
+    def test_p2Enum_235(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_25(self):
+    def test_p2Enum_236(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_26(self):
+    def test_p2Enum_237(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_27(self):
+    def test_p2Enum_238(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_28(self):
+    def test_p2Enum_239(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_29(self):
+    def test_p2Enum_240(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_30(self):
+    def test_p2Enum_241(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructP2Enum_31(self):
+    def test_p2Enum_242(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_0(self):
+    def test_p2Enum_243(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_1(self):
+    def test_p2Enum_244(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_2(self):
+    def test_p2Enum_245(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_3(self):
+    def test_p2Enum_246(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_4(self):
+    def test_p2Enum_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_5(self):
+    def test_p2Enum_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_6(self):
+    def test_p2Enum_249(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_7(self):
+    def test_p2Enum_250(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_8(self):
+    def test_p2Enum_251(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_9(self):
+    def test_p2Enum_253(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_10(self):
+    def test_p2Enum_254(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_11(self):
+    def test_p2Enum_255(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_12(self):
+    def test_p2Enum_256(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_13(self):
+    def test_p2Enum_257(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_14(self):
+    def test_p2Enum_258(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_15(self):
+    def test_p2Enum_259(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_16(self):
+    def test_p2Enum_260(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_17(self):
+    def test_p2Enum_261(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_18(self):
+    def test_p2Enum_262(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_19(self):
+    def test_p2Enum_263(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_20(self):
+    def test_p2Enum_264(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_21(self):
+    def test_p2Enum_265(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_22(self):
+    def test_p2Enum_266(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_267(self):
+        request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_23(self):
+    def test_p2Enum_268(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_24(self):
+    def test_p2Enum_269(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_25(self):
+    def test_p2Enum_270(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_26(self):
+    def test_p2Enum_271(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_27(self):
+    def test_p2Enum_272(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_28(self):
+    def test_p2Enum_273(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_29(self):
+    def test_p2Enum_274(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPStructNullP2Enum_30(self):
+    def test_p2Enum_275(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_0(self):
+    def test_p2Enum_276(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_1(self):
+    def test_p2Enum_277(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_2(self):
+    def test_p2Enum_278(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_3(self):
+    def test_p2Enum_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_4(self):
+    def test_p2Enum_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_5(self):
+    def test_p2Enum_281(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_6(self):
+    def test_p2Enum_282(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_7(self):
+    def test_p2Enum_283(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_8(self):
+    def test_p2Enum_284(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_9(self):
+    def test_p2Enum_285(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_10(self):
+    def test_p2Enum_287(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_11(self):
+    def test_p2Enum_288(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_12(self):
+    def test_p2Enum_289(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_13(self):
+    def test_p2Enum_290(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_14(self):
+    def test_p2Enum_291(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_15(self):
+    def test_p2Enum_292(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_16(self):
+    def test_p2Enum_293(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_17(self):
+    def test_p2Enum_294(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_18(self):
+    def test_p2Enum_295(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_19(self):
+    def test_p2Enum_296(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_20(self):
+    def test_p2Enum_297(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_21(self):
+    def test_p2Enum_298(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_22(self):
+    def test_p2Enum_299(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_23(self):
+    def test_p2Enum_300(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_24(self):
+    def test_p2Enum_301(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_302(self):
+        request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_25(self):
+    def test_p2Enum_303(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_26(self):
+    def test_p2Enum_304(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_27(self):
+    def test_p2Enum_305(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_28(self):
+    def test_p2Enum_306(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_29(self):
+    def test_p2Enum_307(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_30(self):
+    def test_p2Enum_308(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_31(self):
+    def test_p2Enum_309(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumP2Enum_32(self):
+    def test_p2Enum_310(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_0(self):
+    def test_p2Enum_311(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_1(self):
+    def test_p2Enum_312(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_2(self):
+    def test_p2Enum_313(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_3(self):
+    def test_p2Enum_314(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_4(self):
+    def test_p2Enum_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_5(self):
+    def test_p2Enum_316(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_6(self):
+    def test_p2Enum_317(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_7(self):
+    def test_p2Enum_318(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_8(self):
+    def test_p2Enum_319(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_9(self):
+    def test_p2Enum_320(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_321(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_10(self):
+    def test_p2Enum_322(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_11(self):
+    def test_p2Enum_323(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_12(self):
+    def test_p2Enum_324(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_13(self):
+    def test_p2Enum_325(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_14(self):
+    def test_p2Enum_326(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_15(self):
+    def test_p2Enum_327(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_16(self):
+    def test_p2Enum_328(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_17(self):
+    def test_p2Enum_329(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_18(self):
+    def test_p2Enum_330(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_19(self):
+    def test_p2Enum_331(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_20(self):
+    def test_p2Enum_332(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_21(self):
+    def test_p2Enum_333(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_22(self):
+    def test_p2Enum_334(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_23(self):
+    def test_p2Enum_335(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+
+    def test_p2Enum_336(self):
+        request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_24(self):
+    def test_p2Enum_337(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_25(self):
+    def test_p2Enum_338(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_26(self):
+    def test_p2Enum_339(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_27(self):
+    def test_p2Enum_340(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_28(self):
+    def test_p2Enum_341(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_29(self):
+    def test_p2Enum_342(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_30(self):
+    def test_p2Enum_343(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
 
-    def test_testPEnumNullP2Enum_31(self):
+    def test_p2Enum_344(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
@@ -24817,1617 +24927,1727 @@ class ClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_0(self):
+    def test_client_p2Enum_0(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_1(self):
+    def test_client_p2Enum_1(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_2(self):
+    def test_client_p2Enum_2(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_3(self):
+    def test_client_p2Enum_3(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_4(self):
+    def test_client_p2Enum_4(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_5(self):
+    def test_client_p2Enum_5(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_6(self):
+    def test_client_p2Enum_6(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_7(self):
+    def test_client_p2Enum_7(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_8(self):
+    def test_client_p2Enum_8(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_9(self):
+        request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_9(self):
+    def test_client_p2Enum_10(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_10(self):
+    def test_client_p2Enum_11(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_11(self):
+    def test_client_p2Enum_12(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_12(self):
+    def test_client_p2Enum_13(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_13(self):
+    def test_client_p2Enum_14(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_14(self):
+    def test_client_p2Enum_15(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_15(self):
+    def test_client_p2Enum_16(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_16(self):
+    def test_client_p2Enum_17(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_17(self):
+    def test_client_p2Enum_18(self):
         request = [{'ok': {'value': {'p2Enum': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_18(self):
+    def test_client_p2Enum_19(self):
         request = [{'ok': {'value': {'p2Enum': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_19(self):
+    def test_client_p2Enum_20(self):
         request = [{'ok': {'value': {'p2Enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_20(self):
+    def test_client_p2Enum_21(self):
         request = [{'ok': {'value': {'p2Enum': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_21(self):
+    def test_client_p2Enum_22(self):
         request = [{'ok': {'value': {'p2Enum': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_22(self):
+    def test_client_p2Enum_23(self):
         request = [{'ok': {'value': {'p2Enum': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_23(self):
+    def test_client_p2Enum_24(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_25(self):
+        request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_24(self):
+    def test_client_p2Enum_26(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_25(self):
+    def test_client_p2Enum_27(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_26(self):
+    def test_client_p2Enum_28(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_27(self):
+    def test_client_p2Enum_29(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_28(self):
+    def test_client_p2Enum_30(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_29(self):
+    def test_client_p2Enum_31(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_30(self):
+    def test_client_p2Enum_32(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testP2Enum_31(self):
+    def test_client_p2Enum_33(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_0(self):
+    def test_client_p2Enum_34(self):
         request = [{'ok': {'value': {'nullP2Enum': None}}}, {'fn.test': {'value': {'nullP2Enum': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_1(self):
+    def test_client_p2Enum_35(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_2(self):
+    def test_client_p2Enum_36(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_3(self):
+    def test_client_p2Enum_37(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_4(self):
+    def test_client_p2Enum_38(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_5(self):
+    def test_client_p2Enum_39(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_6(self):
+    def test_client_p2Enum_40(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_7(self):
+    def test_client_p2Enum_41(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_8(self):
+    def test_client_p2Enum_42(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_43(self):
+        request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_9(self):
+    def test_client_p2Enum_44(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_10(self):
+    def test_client_p2Enum_45(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_11(self):
+    def test_client_p2Enum_46(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_12(self):
+    def test_client_p2Enum_47(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_13(self):
+    def test_client_p2Enum_48(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_14(self):
+    def test_client_p2Enum_49(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_15(self):
+    def test_client_p2Enum_50(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_16(self):
+    def test_client_p2Enum_51(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_17(self):
+    def test_client_p2Enum_52(self):
         request = [{'ok': {'value': {'nullP2Enum': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_18(self):
+    def test_client_p2Enum_53(self):
         request = [{'ok': {'value': {'nullP2Enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_19(self):
+    def test_client_p2Enum_54(self):
         request = [{'ok': {'value': {'nullP2Enum': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_20(self):
+    def test_client_p2Enum_55(self):
         request = [{'ok': {'value': {'nullP2Enum': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_21(self):
+    def test_client_p2Enum_56(self):
         request = [{'ok': {'value': {'nullP2Enum': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_22(self):
+    def test_client_p2Enum_57(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_58(self):
+        request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_23(self):
+    def test_client_p2Enum_59(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_24(self):
+    def test_client_p2Enum_60(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_25(self):
+    def test_client_p2Enum_61(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_26(self):
+    def test_client_p2Enum_62(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_27(self):
+    def test_client_p2Enum_63(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_28(self):
+    def test_client_p2Enum_64(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_29(self):
+    def test_client_p2Enum_65(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testNullableP2Enum_30(self):
+    def test_client_p2Enum_66(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_0(self):
+    def test_client_p2Enum_67(self):
         request = [{'ok': {'value': {'arrP2Enum': []}}}, {'fn.test': {'value': {'arrP2Enum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_1(self):
+    def test_client_p2Enum_68(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_2(self):
+    def test_client_p2Enum_69(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_3(self):
+    def test_client_p2Enum_70(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_4(self):
+    def test_client_p2Enum_71(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_5(self):
+    def test_client_p2Enum_72(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_6(self):
+    def test_client_p2Enum_73(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_7(self):
+    def test_client_p2Enum_74(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_8(self):
+    def test_client_p2Enum_75(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_9(self):
+    def test_client_p2Enum_76(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_10(self):
+    def test_client_p2Enum_77(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_78(self):
+        request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_11(self):
+    def test_client_p2Enum_79(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_12(self):
+    def test_client_p2Enum_80(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_13(self):
+    def test_client_p2Enum_81(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_14(self):
+    def test_client_p2Enum_82(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_15(self):
+    def test_client_p2Enum_83(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_16(self):
+    def test_client_p2Enum_84(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_17(self):
+    def test_client_p2Enum_85(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_18(self):
+    def test_client_p2Enum_86(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_19(self):
+    def test_client_p2Enum_87(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_20(self):
+    def test_client_p2Enum_88(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_21(self):
+    def test_client_p2Enum_89(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_22(self):
+    def test_client_p2Enum_90(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_23(self):
+    def test_client_p2Enum_91(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_24(self):
+    def test_client_p2Enum_92(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_25(self):
+    def test_client_p2Enum_93(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_94(self):
+        request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_26(self):
+    def test_client_p2Enum_95(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_27(self):
+    def test_client_p2Enum_96(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_28(self):
+    def test_client_p2Enum_97(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_29(self):
+    def test_client_p2Enum_98(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_30(self):
+    def test_client_p2Enum_99(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_31(self):
+    def test_client_p2Enum_100(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_32(self):
+    def test_client_p2Enum_101(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayP2Enum_33(self):
+    def test_client_p2Enum_102(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_0(self):
+    def test_client_p2Enum_103(self):
         request = [{'ok': {'value': {'arrNullP2Enum': []}}}, {'fn.test': {'value': {'arrNullP2Enum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_1(self):
+    def test_client_p2Enum_104(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [None]}}}, {'fn.test': {'value': {'arrNullP2Enum': [None]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [None]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_2(self):
+    def test_client_p2Enum_105(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_3(self):
+    def test_client_p2Enum_106(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_4(self):
+    def test_client_p2Enum_107(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_5(self):
+    def test_client_p2Enum_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_6(self):
+    def test_client_p2Enum_109(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_7(self):
+    def test_client_p2Enum_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_8(self):
+    def test_client_p2Enum_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_9(self):
+    def test_client_p2Enum_112(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_10(self):
+    def test_client_p2Enum_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_114(self):
+        request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_11(self):
+    def test_client_p2Enum_115(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_12(self):
+    def test_client_p2Enum_116(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_13(self):
+    def test_client_p2Enum_117(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_14(self):
+    def test_client_p2Enum_118(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_15(self):
+    def test_client_p2Enum_119(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_16(self):
+    def test_client_p2Enum_120(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_17(self):
+    def test_client_p2Enum_121(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_18(self):
+    def test_client_p2Enum_122(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_19(self):
+    def test_client_p2Enum_123(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_20(self):
+    def test_client_p2Enum_124(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_21(self):
+    def test_client_p2Enum_125(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_22(self):
+    def test_client_p2Enum_126(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_23(self):
+    def test_client_p2Enum_127(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_24(self):
+    def test_client_p2Enum_128(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_129(self):
+        request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_25(self):
+    def test_client_p2Enum_130(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_26(self):
+    def test_client_p2Enum_131(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_27(self):
+    def test_client_p2Enum_132(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_28(self):
+    def test_client_p2Enum_133(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_29(self):
+    def test_client_p2Enum_134(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_30(self):
+    def test_client_p2Enum_135(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_31(self):
+    def test_client_p2Enum_136(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testArrayNullP2Enum_32(self):
+    def test_client_p2Enum_137(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_0(self):
+    def test_client_p2Enum_138(self):
+        request = [{'ok': {'value': {'objP2Enum': {}}}}, {'fn.test': {'value': {'objP2Enum': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objP2Enum': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_139(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_1(self):
+    def test_client_p2Enum_140(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_2(self):
+    def test_client_p2Enum_141(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_3(self):
+    def test_client_p2Enum_142(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_4(self):
+    def test_client_p2Enum_143(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_5(self):
+    def test_client_p2Enum_144(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_6(self):
+    def test_client_p2Enum_145(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_7(self):
+    def test_client_p2Enum_146(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_8(self):
+    def test_client_p2Enum_147(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_9(self):
+    def test_client_p2Enum_148(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_149(self):
+        request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_10(self):
+    def test_client_p2Enum_150(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_11(self):
+    def test_client_p2Enum_151(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_12(self):
+    def test_client_p2Enum_152(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_13(self):
+    def test_client_p2Enum_153(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_14(self):
+    def test_client_p2Enum_154(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_15(self):
+    def test_client_p2Enum_155(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_16(self):
+    def test_client_p2Enum_156(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_17(self):
+    def test_client_p2Enum_157(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_18(self):
+    def test_client_p2Enum_158(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_19(self):
+    def test_client_p2Enum_159(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_20(self):
+    def test_client_p2Enum_160(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_21(self):
+    def test_client_p2Enum_161(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_22(self):
+    def test_client_p2Enum_162(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_23(self):
+    def test_client_p2Enum_163(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_24(self):
+    def test_client_p2Enum_164(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_165(self):
+        request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_25(self):
+    def test_client_p2Enum_166(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_26(self):
+    def test_client_p2Enum_167(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_27(self):
+    def test_client_p2Enum_168(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_28(self):
+    def test_client_p2Enum_169(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_29(self):
+    def test_client_p2Enum_170(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_30(self):
+    def test_client_p2Enum_171(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_31(self):
+    def test_client_p2Enum_172(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectP2Enum_32(self):
+    def test_client_p2Enum_173(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_0(self):
+    def test_client_p2Enum_174(self):
+        request = [{'ok': {'value': {'objNullP2Enum': {}}}}, {'fn.test': {'value': {'objNullP2Enum': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_175(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': None}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_1(self):
+    def test_client_p2Enum_176(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_2(self):
+    def test_client_p2Enum_177(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_3(self):
+    def test_client_p2Enum_178(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_4(self):
+    def test_client_p2Enum_179(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_5(self):
+    def test_client_p2Enum_180(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_6(self):
+    def test_client_p2Enum_181(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_7(self):
+    def test_client_p2Enum_182(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_8(self):
+    def test_client_p2Enum_183(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_9(self):
+    def test_client_p2Enum_184(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_10(self):
+    def test_client_p2Enum_186(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_11(self):
+    def test_client_p2Enum_187(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_12(self):
+    def test_client_p2Enum_188(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_13(self):
+    def test_client_p2Enum_189(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_14(self):
+    def test_client_p2Enum_190(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_15(self):
+    def test_client_p2Enum_191(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_16(self):
+    def test_client_p2Enum_192(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_17(self):
+    def test_client_p2Enum_193(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_18(self):
+    def test_client_p2Enum_194(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_19(self):
+    def test_client_p2Enum_195(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_20(self):
+    def test_client_p2Enum_196(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_21(self):
+    def test_client_p2Enum_197(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_22(self):
+    def test_client_p2Enum_198(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_23(self):
+    def test_client_p2Enum_199(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_200(self):
+        request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_24(self):
+    def test_client_p2Enum_201(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_25(self):
+    def test_client_p2Enum_202(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_26(self):
+    def test_client_p2Enum_203(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_27(self):
+    def test_client_p2Enum_204(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_28(self):
+    def test_client_p2Enum_205(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_29(self):
+    def test_client_p2Enum_206(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_30(self):
+    def test_client_p2Enum_207(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testObjectNullP2Enum_31(self):
+    def test_client_p2Enum_208(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_0(self):
+    def test_client_p2Enum_209(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_1(self):
+    def test_client_p2Enum_210(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_2(self):
+    def test_client_p2Enum_211(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_3(self):
+    def test_client_p2Enum_212(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_4(self):
+    def test_client_p2Enum_213(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_5(self):
+    def test_client_p2Enum_214(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_6(self):
+    def test_client_p2Enum_215(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_7(self):
+    def test_client_p2Enum_216(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_8(self):
+    def test_client_p2Enum_217(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_9(self):
+    def test_client_p2Enum_219(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_10(self):
+    def test_client_p2Enum_220(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_11(self):
+    def test_client_p2Enum_221(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_12(self):
+    def test_client_p2Enum_222(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_13(self):
+    def test_client_p2Enum_223(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_14(self):
+    def test_client_p2Enum_224(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_15(self):
+    def test_client_p2Enum_225(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_16(self):
+    def test_client_p2Enum_226(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_17(self):
+    def test_client_p2Enum_227(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_18(self):
+    def test_client_p2Enum_228(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_19(self):
+    def test_client_p2Enum_229(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_20(self):
+    def test_client_p2Enum_230(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_21(self):
+    def test_client_p2Enum_231(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_22(self):
+    def test_client_p2Enum_232(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_23(self):
+    def test_client_p2Enum_233(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_234(self):
+        request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_24(self):
+    def test_client_p2Enum_235(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_25(self):
+    def test_client_p2Enum_236(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_26(self):
+    def test_client_p2Enum_237(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_27(self):
+    def test_client_p2Enum_238(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_28(self):
+    def test_client_p2Enum_239(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_29(self):
+    def test_client_p2Enum_240(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_30(self):
+    def test_client_p2Enum_241(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructP2Enum_31(self):
+    def test_client_p2Enum_242(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_0(self):
+    def test_client_p2Enum_243(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_1(self):
+    def test_client_p2Enum_244(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_2(self):
+    def test_client_p2Enum_245(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_3(self):
+    def test_client_p2Enum_246(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_4(self):
+    def test_client_p2Enum_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_5(self):
+    def test_client_p2Enum_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_6(self):
+    def test_client_p2Enum_249(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_7(self):
+    def test_client_p2Enum_250(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_8(self):
+    def test_client_p2Enum_251(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_9(self):
+    def test_client_p2Enum_253(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_10(self):
+    def test_client_p2Enum_254(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_11(self):
+    def test_client_p2Enum_255(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_12(self):
+    def test_client_p2Enum_256(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_13(self):
+    def test_client_p2Enum_257(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_14(self):
+    def test_client_p2Enum_258(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_15(self):
+    def test_client_p2Enum_259(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_16(self):
+    def test_client_p2Enum_260(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_17(self):
+    def test_client_p2Enum_261(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_18(self):
+    def test_client_p2Enum_262(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_19(self):
+    def test_client_p2Enum_263(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_20(self):
+    def test_client_p2Enum_264(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_21(self):
+    def test_client_p2Enum_265(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_22(self):
+    def test_client_p2Enum_266(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_267(self):
+        request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_23(self):
+    def test_client_p2Enum_268(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_24(self):
+    def test_client_p2Enum_269(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_25(self):
+    def test_client_p2Enum_270(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_26(self):
+    def test_client_p2Enum_271(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_27(self):
+    def test_client_p2Enum_272(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_28(self):
+    def test_client_p2Enum_273(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_29(self):
+    def test_client_p2Enum_274(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPStructNullP2Enum_30(self):
+    def test_client_p2Enum_275(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_0(self):
+    def test_client_p2Enum_276(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_1(self):
+    def test_client_p2Enum_277(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_2(self):
+    def test_client_p2Enum_278(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_3(self):
+    def test_client_p2Enum_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_4(self):
+    def test_client_p2Enum_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_5(self):
+    def test_client_p2Enum_281(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_6(self):
+    def test_client_p2Enum_282(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_7(self):
+    def test_client_p2Enum_283(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_8(self):
+    def test_client_p2Enum_284(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_9(self):
+    def test_client_p2Enum_285(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_10(self):
+    def test_client_p2Enum_287(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_11(self):
+    def test_client_p2Enum_288(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_12(self):
+    def test_client_p2Enum_289(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_13(self):
+    def test_client_p2Enum_290(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_14(self):
+    def test_client_p2Enum_291(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_15(self):
+    def test_client_p2Enum_292(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_16(self):
+    def test_client_p2Enum_293(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_17(self):
+    def test_client_p2Enum_294(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_18(self):
+    def test_client_p2Enum_295(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_19(self):
+    def test_client_p2Enum_296(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_20(self):
+    def test_client_p2Enum_297(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_21(self):
+    def test_client_p2Enum_298(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_22(self):
+    def test_client_p2Enum_299(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_23(self):
+    def test_client_p2Enum_300(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_24(self):
+    def test_client_p2Enum_301(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_302(self):
+        request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_25(self):
+    def test_client_p2Enum_303(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_26(self):
+    def test_client_p2Enum_304(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_27(self):
+    def test_client_p2Enum_305(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_28(self):
+    def test_client_p2Enum_306(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_29(self):
+    def test_client_p2Enum_307(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_30(self):
+    def test_client_p2Enum_308(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_31(self):
+    def test_client_p2Enum_309(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumP2Enum_32(self):
+    def test_client_p2Enum_310(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_0(self):
+    def test_client_p2Enum_311(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_1(self):
+    def test_client_p2Enum_312(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_2(self):
+    def test_client_p2Enum_313(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_3(self):
+    def test_client_p2Enum_314(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_4(self):
+    def test_client_p2Enum_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_5(self):
+    def test_client_p2Enum_316(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_6(self):
+    def test_client_p2Enum_317(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_7(self):
+    def test_client_p2Enum_318(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_8(self):
+    def test_client_p2Enum_319(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_9(self):
+    def test_client_p2Enum_320(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_321(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_10(self):
+    def test_client_p2Enum_322(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_11(self):
+    def test_client_p2Enum_323(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_12(self):
+    def test_client_p2Enum_324(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_13(self):
+    def test_client_p2Enum_325(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_14(self):
+    def test_client_p2Enum_326(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_15(self):
+    def test_client_p2Enum_327(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_16(self):
+    def test_client_p2Enum_328(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_17(self):
+    def test_client_p2Enum_329(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_18(self):
+    def test_client_p2Enum_330(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_19(self):
+    def test_client_p2Enum_331(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_20(self):
+    def test_client_p2Enum_332(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_21(self):
+    def test_client_p2Enum_333(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_22(self):
+    def test_client_p2Enum_334(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_23(self):
+    def test_client_p2Enum_335(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+
+    def test_client_p2Enum_336(self):
+        request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_24(self):
+    def test_client_p2Enum_337(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_25(self):
+    def test_client_p2Enum_338(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_26(self):
+    def test_client_p2Enum_339(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_27(self):
+    def test_client_p2Enum_340(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_28(self):
+    def test_client_p2Enum_341(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_29(self):
+    def test_client_p2Enum_342(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_30(self):
+    def test_client_p2Enum_343(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 
-    def test_client_testPEnumNullP2Enum_31(self):
+    def test_client_p2Enum_344(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
@@ -37291,1617 +37511,1727 @@ class BinaryClientTestCases(unittest.TestCase):
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Str.two.ewrap.nest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_0(self):
+    def test_binary_client_p2Enum_0(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_1(self):
+    def test_binary_client_p2Enum_1(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'p2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_2(self):
+    def test_binary_client_p2Enum_2(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': None}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_3(self):
+    def test_binary_client_p2Enum_3(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_4(self):
+    def test_binary_client_p2Enum_4(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_5(self):
+    def test_binary_client_p2Enum_5(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_6(self):
+    def test_binary_client_p2Enum_6(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_7(self):
+    def test_binary_client_p2Enum_7(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_8(self):
+    def test_binary_client_p2Enum_8(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_9(self):
+        request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_9(self):
+    def test_binary_client_p2Enum_10(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_10(self):
+    def test_binary_client_p2Enum_11(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_11(self):
+    def test_binary_client_p2Enum_12(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_12(self):
+    def test_binary_client_p2Enum_13(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_13(self):
+    def test_binary_client_p2Enum_14(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_14(self):
+    def test_binary_client_p2Enum_15(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_15(self):
+    def test_binary_client_p2Enum_16(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_16(self):
+    def test_binary_client_p2Enum_17(self):
         request = [{}, {'fn.test': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_17(self):
+    def test_binary_client_p2Enum_18(self):
         request = [{'ok': {'value': {'p2Enum': None}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_18(self):
+    def test_binary_client_p2Enum_19(self):
         request = [{'ok': {'value': {'p2Enum': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_19(self):
+    def test_binary_client_p2Enum_20(self):
         request = [{'ok': {'value': {'p2Enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_20(self):
+    def test_binary_client_p2Enum_21(self):
         request = [{'ok': {'value': {'p2Enum': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_21(self):
+    def test_binary_client_p2Enum_22(self):
         request = [{'ok': {'value': {'p2Enum': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_22(self):
+    def test_binary_client_p2Enum_23(self):
         request = [{'ok': {'value': {'p2Enum': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_23(self):
+    def test_binary_client_p2Enum_24(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_25(self):
+        request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_24(self):
+    def test_binary_client_p2Enum_26(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_25(self):
+    def test_binary_client_p2Enum_27(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_26(self):
+    def test_binary_client_p2Enum_28(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_27(self):
+    def test_binary_client_p2Enum_29(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_28(self):
+    def test_binary_client_p2Enum_30(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_29(self):
+    def test_binary_client_p2Enum_31(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_30(self):
+    def test_binary_client_p2Enum_32(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testP2Enum_31(self):
+    def test_binary_client_p2Enum_33(self):
         request = [{'ok': {'value': {'p2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.p2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_0(self):
+    def test_binary_client_p2Enum_34(self):
         request = [{'ok': {'value': {'nullP2Enum': None}}}, {'fn.test': {'value': {'nullP2Enum': None}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': None}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_1(self):
+    def test_binary_client_p2Enum_35(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_2(self):
+    def test_binary_client_p2Enum_36(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         expected_response = [{}, {'ok': {'value': {'nullP2Enum': {'two': {'ewrap': True, 'enest': [1]}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_3(self):
+    def test_binary_client_p2Enum_37(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': False}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_4(self):
+    def test_binary_client_p2Enum_38(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': 0}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_5(self):
+    def test_binary_client_p2Enum_39(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': 0.1}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_6(self):
+    def test_binary_client_p2Enum_40(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': ''}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_7(self):
+    def test_binary_client_p2Enum_41(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': []}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_8(self):
+    def test_binary_client_p2Enum_42(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_43(self):
+        request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_9(self):
+    def test_binary_client_p2Enum_44(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_10(self):
+    def test_binary_client_p2Enum_45(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_11(self):
+    def test_binary_client_p2Enum_46(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_12(self):
+    def test_binary_client_p2Enum_47(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_13(self):
+    def test_binary_client_p2Enum_48(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_14(self):
+    def test_binary_client_p2Enum_49(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_15(self):
+    def test_binary_client_p2Enum_50(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_16(self):
+    def test_binary_client_p2Enum_51(self):
         request = [{}, {'fn.test': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_17(self):
+    def test_binary_client_p2Enum_52(self):
         request = [{'ok': {'value': {'nullP2Enum': False}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_18(self):
+    def test_binary_client_p2Enum_53(self):
         request = [{'ok': {'value': {'nullP2Enum': 0}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_19(self):
+    def test_binary_client_p2Enum_54(self):
         request = [{'ok': {'value': {'nullP2Enum': 0.1}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_20(self):
+    def test_binary_client_p2Enum_55(self):
         request = [{'ok': {'value': {'nullP2Enum': ''}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_21(self):
+    def test_binary_client_p2Enum_56(self):
         request = [{'ok': {'value': {'nullP2Enum': []}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_22(self):
+    def test_binary_client_p2Enum_57(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': 0, 'enest': [0]}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_58(self):
+        request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_23(self):
+    def test_binary_client_p2Enum_59(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': '', 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_24(self):
+    def test_binary_client_p2Enum_60(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': [], 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_25(self):
+    def test_binary_client_p2Enum_61(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': {}, 'enest': [0]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_26(self):
+    def test_binary_client_p2Enum_62(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, False]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_27(self):
+    def test_binary_client_p2Enum_63(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_28(self):
+    def test_binary_client_p2Enum_64(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, '']}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_29(self):
+    def test_binary_client_p2Enum_65(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, []]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testNullableP2Enum_30(self):
+    def test_binary_client_p2Enum_66(self):
         request = [{'ok': {'value': {'nullP2Enum': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.nullP2Enum.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_0(self):
+    def test_binary_client_p2Enum_67(self):
         request = [{'ok': {'value': {'arrP2Enum': []}}}, {'fn.test': {'value': {'arrP2Enum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_1(self):
+    def test_binary_client_p2Enum_68(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_2(self):
+    def test_binary_client_p2Enum_69(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_3(self):
+    def test_binary_client_p2Enum_70(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_4(self):
+    def test_binary_client_p2Enum_71(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, None]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_5(self):
+    def test_binary_client_p2Enum_72(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_6(self):
+    def test_binary_client_p2Enum_73(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_7(self):
+    def test_binary_client_p2Enum_74(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_8(self):
+    def test_binary_client_p2Enum_75(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_9(self):
+    def test_binary_client_p2Enum_76(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_10(self):
+    def test_binary_client_p2Enum_77(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_78(self):
+        request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_11(self):
+    def test_binary_client_p2Enum_79(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_12(self):
+    def test_binary_client_p2Enum_80(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_13(self):
+    def test_binary_client_p2Enum_81(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_14(self):
+    def test_binary_client_p2Enum_82(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_15(self):
+    def test_binary_client_p2Enum_83(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_16(self):
+    def test_binary_client_p2Enum_84(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_17(self):
+    def test_binary_client_p2Enum_85(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_18(self):
+    def test_binary_client_p2Enum_86(self):
         request = [{}, {'fn.test': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_19(self):
+    def test_binary_client_p2Enum_87(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, None]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_20(self):
+    def test_binary_client_p2Enum_88(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_21(self):
+    def test_binary_client_p2Enum_89(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_22(self):
+    def test_binary_client_p2Enum_90(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_23(self):
+    def test_binary_client_p2Enum_91(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_24(self):
+    def test_binary_client_p2Enum_92(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_25(self):
+    def test_binary_client_p2Enum_93(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_94(self):
+        request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_26(self):
+    def test_binary_client_p2Enum_95(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_27(self):
+    def test_binary_client_p2Enum_96(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_28(self):
+    def test_binary_client_p2Enum_97(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_29(self):
+    def test_binary_client_p2Enum_98(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_30(self):
+    def test_binary_client_p2Enum_99(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_31(self):
+    def test_binary_client_p2Enum_100(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_32(self):
+    def test_binary_client_p2Enum_101(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayP2Enum_33(self):
+    def test_binary_client_p2Enum_102(self):
         request = [{'ok': {'value': {'arrP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_0(self):
+    def test_binary_client_p2Enum_103(self):
         request = [{'ok': {'value': {'arrNullP2Enum': []}}}, {'fn.test': {'value': {'arrNullP2Enum': []}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': []}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_1(self):
+    def test_binary_client_p2Enum_104(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [None]}}}, {'fn.test': {'value': {'arrNullP2Enum': [None]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [None]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_2(self):
+    def test_binary_client_p2Enum_105(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_3(self):
+    def test_binary_client_p2Enum_106(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_4(self):
+    def test_binary_client_p2Enum_107(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}, {'fn.test': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         expected_response = [{}, {'ok': {'value': {'arrNullP2Enum': [None, {'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}]}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_5(self):
+    def test_binary_client_p2Enum_108(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_6(self):
+    def test_binary_client_p2Enum_109(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_7(self):
+    def test_binary_client_p2Enum_110(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_8(self):
+    def test_binary_client_p2Enum_111(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_9(self):
+    def test_binary_client_p2Enum_112(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_10(self):
+    def test_binary_client_p2Enum_113(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_114(self):
+        request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_11(self):
+    def test_binary_client_p2Enum_115(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_12(self):
+    def test_binary_client_p2Enum_116(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_13(self):
+    def test_binary_client_p2Enum_117(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_14(self):
+    def test_binary_client_p2Enum_118(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_15(self):
+    def test_binary_client_p2Enum_119(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_16(self):
+    def test_binary_client_p2Enum_120(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_17(self):
+    def test_binary_client_p2Enum_121(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_18(self):
+    def test_binary_client_p2Enum_122(self):
         request = [{}, {'fn.test': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_19(self):
+    def test_binary_client_p2Enum_123(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, False]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_20(self):
+    def test_binary_client_p2Enum_124(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0]}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_21(self):
+    def test_binary_client_p2Enum_125(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, 0.1]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_22(self):
+    def test_binary_client_p2Enum_126(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, '']}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_23(self):
+    def test_binary_client_p2Enum_127(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, []]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_24(self):
+    def test_binary_client_p2Enum_128(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0, 'enest': [0]}}]}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_129(self):
+        request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': 0.1, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_25(self):
+    def test_binary_client_p2Enum_130(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': '', 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_26(self):
+    def test_binary_client_p2Enum_131(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': [], 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_27(self):
+    def test_binary_client_p2Enum_132(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': {}, 'enest': [0]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_28(self):
+    def test_binary_client_p2Enum_133(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, False]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_29(self):
+    def test_binary_client_p2Enum_134(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, 0.1]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_30(self):
+    def test_binary_client_p2Enum_135(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, '']}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_31(self):
+    def test_binary_client_p2Enum_136(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, []]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testArrayNullP2Enum_32(self):
+    def test_binary_client_p2Enum_137(self):
         request = [{'ok': {'value': {'arrNullP2Enum': [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': False, 'enest': [0, {}]}}]}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.arrNullP2Enum[1].two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_0(self):
+    def test_binary_client_p2Enum_138(self):
+        request = [{'ok': {'value': {'objP2Enum': {}}}}, {'fn.test': {'value': {'objP2Enum': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objP2Enum': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_139(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_1(self):
+    def test_binary_client_p2Enum_140(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_2(self):
+    def test_binary_client_p2Enum_141(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_3(self):
+    def test_binary_client_p2Enum_142(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_4(self):
+    def test_binary_client_p2Enum_143(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_5(self):
+    def test_binary_client_p2Enum_144(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_6(self):
+    def test_binary_client_p2Enum_145(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_7(self):
+    def test_binary_client_p2Enum_146(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_8(self):
+    def test_binary_client_p2Enum_147(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_9(self):
+    def test_binary_client_p2Enum_148(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_149(self):
+        request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_10(self):
+    def test_binary_client_p2Enum_150(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_11(self):
+    def test_binary_client_p2Enum_151(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_12(self):
+    def test_binary_client_p2Enum_152(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_13(self):
+    def test_binary_client_p2Enum_153(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_14(self):
+    def test_binary_client_p2Enum_154(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_15(self):
+    def test_binary_client_p2Enum_155(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_16(self):
+    def test_binary_client_p2Enum_156(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_17(self):
+    def test_binary_client_p2Enum_157(self):
         request = [{}, {'fn.test': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_18(self):
+    def test_binary_client_p2Enum_158(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_19(self):
+    def test_binary_client_p2Enum_159(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_20(self):
+    def test_binary_client_p2Enum_160(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_21(self):
+    def test_binary_client_p2Enum_161(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_22(self):
+    def test_binary_client_p2Enum_162(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_23(self):
+    def test_binary_client_p2Enum_163(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_24(self):
+    def test_binary_client_p2Enum_164(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_165(self):
+        request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_25(self):
+    def test_binary_client_p2Enum_166(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_26(self):
+    def test_binary_client_p2Enum_167(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_27(self):
+    def test_binary_client_p2Enum_168(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_28(self):
+    def test_binary_client_p2Enum_169(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_29(self):
+    def test_binary_client_p2Enum_170(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_30(self):
+    def test_binary_client_p2Enum_171(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_31(self):
+    def test_binary_client_p2Enum_172(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectP2Enum_32(self):
+    def test_binary_client_p2Enum_173(self):
         request = [{'ok': {'value': {'objP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_0(self):
+    def test_binary_client_p2Enum_174(self):
+        request = [{'ok': {'value': {'objNullP2Enum': {}}}}, {'fn.test': {'value': {'objNullP2Enum': {}}}}]
+        expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {}}}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_175(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': None}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': None}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_1(self):
+    def test_binary_client_p2Enum_176(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_2(self):
+    def test_binary_client_p2Enum_177(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_3(self):
+    def test_binary_client_p2Enum_178(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'objNullP2Enum': {'a': None, 'b': {'two': {'ewrap': False, 'enest': [0]}}, 'c': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_4(self):
+    def test_binary_client_p2Enum_179(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_5(self):
+    def test_binary_client_p2Enum_180(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_6(self):
+    def test_binary_client_p2Enum_181(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_7(self):
+    def test_binary_client_p2Enum_182(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_8(self):
+    def test_binary_client_p2Enum_183(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_9(self):
+    def test_binary_client_p2Enum_184(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_185(self):
+        request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_10(self):
+    def test_binary_client_p2Enum_186(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_11(self):
+    def test_binary_client_p2Enum_187(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_12(self):
+    def test_binary_client_p2Enum_188(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_13(self):
+    def test_binary_client_p2Enum_189(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_14(self):
+    def test_binary_client_p2Enum_190(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_15(self):
+    def test_binary_client_p2Enum_191(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_16(self):
+    def test_binary_client_p2Enum_192(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_17(self):
+    def test_binary_client_p2Enum_193(self):
         request = [{}, {'fn.test': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_18(self):
+    def test_binary_client_p2Enum_194(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_19(self):
+    def test_binary_client_p2Enum_195(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_20(self):
+    def test_binary_client_p2Enum_196(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_21(self):
+    def test_binary_client_p2Enum_197(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_22(self):
+    def test_binary_client_p2Enum_198(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_23(self):
+    def test_binary_client_p2Enum_199(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_200(self):
+        request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_24(self):
+    def test_binary_client_p2Enum_201(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_25(self):
+    def test_binary_client_p2Enum_202(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_26(self):
+    def test_binary_client_p2Enum_203(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_27(self):
+    def test_binary_client_p2Enum_204(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_28(self):
+    def test_binary_client_p2Enum_205(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_29(self):
+    def test_binary_client_p2Enum_206(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_30(self):
+    def test_binary_client_p2Enum_207(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testObjectNullP2Enum_31(self):
+    def test_binary_client_p2Enum_208(self):
         request = [{'ok': {'value': {'objNullP2Enum': {'a': {'two': {'ewrap': False, 'enest': [0]}}, 'b': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.objNullP2Enum{b}.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_0(self):
+    def test_binary_client_p2Enum_209(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_1(self):
+    def test_binary_client_p2Enum_210(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_2(self):
+    def test_binary_client_p2Enum_211(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': None}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_3(self):
+    def test_binary_client_p2Enum_212(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_4(self):
+    def test_binary_client_p2Enum_213(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_5(self):
+    def test_binary_client_p2Enum_214(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_6(self):
+    def test_binary_client_p2Enum_215(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_7(self):
+    def test_binary_client_p2Enum_216(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_8(self):
+    def test_binary_client_p2Enum_217(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_218(self):
+        request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_9(self):
+    def test_binary_client_p2Enum_219(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_10(self):
+    def test_binary_client_p2Enum_220(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_11(self):
+    def test_binary_client_p2Enum_221(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_12(self):
+    def test_binary_client_p2Enum_222(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_13(self):
+    def test_binary_client_p2Enum_223(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_14(self):
+    def test_binary_client_p2Enum_224(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_15(self):
+    def test_binary_client_p2Enum_225(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_16(self):
+    def test_binary_client_p2Enum_226(self):
         request = [{}, {'fn.test': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_17(self):
+    def test_binary_client_p2Enum_227(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': None}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_18(self):
+    def test_binary_client_p2Enum_228(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_19(self):
+    def test_binary_client_p2Enum_229(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_20(self):
+    def test_binary_client_p2Enum_230(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_21(self):
+    def test_binary_client_p2Enum_231(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_22(self):
+    def test_binary_client_p2Enum_232(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_23(self):
+    def test_binary_client_p2Enum_233(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_234(self):
+        request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_24(self):
+    def test_binary_client_p2Enum_235(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_25(self):
+    def test_binary_client_p2Enum_236(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_26(self):
+    def test_binary_client_p2Enum_237(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_27(self):
+    def test_binary_client_p2Enum_238(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_28(self):
+    def test_binary_client_p2Enum_239(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_29(self):
+    def test_binary_client_p2Enum_240(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_30(self):
+    def test_binary_client_p2Enum_241(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructP2Enum_31(self):
+    def test_binary_client_p2Enum_242(self):
         request = [{'ok': {'value': {'pStrP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_0(self):
+    def test_binary_client_p2Enum_243(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': None}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': None}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': None}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_1(self):
+    def test_binary_client_p2Enum_244(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_2(self):
+    def test_binary_client_p2Enum_245(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_3(self):
+    def test_binary_client_p2Enum_246(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': False}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_4(self):
+    def test_binary_client_p2Enum_247(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': 0}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_5(self):
+    def test_binary_client_p2Enum_248(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': 0.1}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_6(self):
+    def test_binary_client_p2Enum_249(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': ''}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_7(self):
+    def test_binary_client_p2Enum_250(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': []}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_8(self):
+    def test_binary_client_p2Enum_251(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_252(self):
+        request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_9(self):
+    def test_binary_client_p2Enum_253(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_10(self):
+    def test_binary_client_p2Enum_254(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_11(self):
+    def test_binary_client_p2Enum_255(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_12(self):
+    def test_binary_client_p2Enum_256(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_13(self):
+    def test_binary_client_p2Enum_257(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_14(self):
+    def test_binary_client_p2Enum_258(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_15(self):
+    def test_binary_client_p2Enum_259(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_16(self):
+    def test_binary_client_p2Enum_260(self):
         request = [{}, {'fn.test': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_17(self):
+    def test_binary_client_p2Enum_261(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': False}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_18(self):
+    def test_binary_client_p2Enum_262(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': 0}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_19(self):
+    def test_binary_client_p2Enum_263(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': 0.1}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_20(self):
+    def test_binary_client_p2Enum_264(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': ''}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_21(self):
+    def test_binary_client_p2Enum_265(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': []}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_22(self):
+    def test_binary_client_p2Enum_266(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_267(self):
+        request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_23(self):
+    def test_binary_client_p2Enum_268(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_24(self):
+    def test_binary_client_p2Enum_269(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_25(self):
+    def test_binary_client_p2Enum_270(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_26(self):
+    def test_binary_client_p2Enum_271(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_27(self):
+    def test_binary_client_p2Enum_272(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_28(self):
+    def test_binary_client_p2Enum_273(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_29(self):
+    def test_binary_client_p2Enum_274(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPStructNullP2Enum_30(self):
+    def test_binary_client_p2Enum_275(self):
         request = [{'ok': {'value': {'pStrNullP2Enum': {'wrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pStrNullP2Enum.wrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_0(self):
+    def test_binary_client_p2Enum_276(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_1(self):
+    def test_binary_client_p2Enum_277(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_2(self):
+    def test_binary_client_p2Enum_278(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_3(self):
+    def test_binary_client_p2Enum_279(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': None}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_4(self):
+    def test_binary_client_p2Enum_280(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_5(self):
+    def test_binary_client_p2Enum_281(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_6(self):
+    def test_binary_client_p2Enum_282(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_7(self):
+    def test_binary_client_p2Enum_283(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_8(self):
+    def test_binary_client_p2Enum_284(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_9(self):
+    def test_binary_client_p2Enum_285(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_286(self):
+        request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_10(self):
+    def test_binary_client_p2Enum_287(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_11(self):
+    def test_binary_client_p2Enum_288(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_12(self):
+    def test_binary_client_p2Enum_289(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_13(self):
+    def test_binary_client_p2Enum_290(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_14(self):
+    def test_binary_client_p2Enum_291(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_15(self):
+    def test_binary_client_p2Enum_292(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_16(self):
+    def test_binary_client_p2Enum_293(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_17(self):
+    def test_binary_client_p2Enum_294(self):
         request = [{}, {'fn.test': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_18(self):
+    def test_binary_client_p2Enum_295(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': None}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'NullDisallowed': {}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_19(self):
+    def test_binary_client_p2Enum_296(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_20(self):
+    def test_binary_client_p2Enum_297(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_21(self):
+    def test_binary_client_p2Enum_298(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_22(self):
+    def test_binary_client_p2Enum_299(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_23(self):
+    def test_binary_client_p2Enum_300(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_24(self):
+    def test_binary_client_p2Enum_301(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_302(self):
+        request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_25(self):
+    def test_binary_client_p2Enum_303(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_26(self):
+    def test_binary_client_p2Enum_304(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_27(self):
+    def test_binary_client_p2Enum_305(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_28(self):
+    def test_binary_client_p2Enum_306(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_29(self):
+    def test_binary_client_p2Enum_307(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_30(self):
+    def test_binary_client_p2Enum_308(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_31(self):
+    def test_binary_client_p2Enum_309(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumP2Enum_32(self):
+    def test_binary_client_p2Enum_310(self):
         request = [{'ok': {'value': {'pEnumP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_0(self):
+    def test_binary_client_p2Enum_311(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'one': {}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'one': {}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'one': {}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_1(self):
+    def test_binary_client_p2Enum_312(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': None}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_2(self):
+    def test_binary_client_p2Enum_313(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_3(self):
+    def test_binary_client_p2Enum_314(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         expected_response = [{}, {'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': True, 'enest': [1]}}}}}}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_4(self):
+    def test_binary_client_p2Enum_315(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': False}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_5(self):
+    def test_binary_client_p2Enum_316(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0}}}}}]
-        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_6(self):
+    def test_binary_client_p2Enum_317(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0.1}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_7(self):
+    def test_binary_client_p2Enum_318(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': ''}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_8(self):
+    def test_binary_client_p2Enum_319(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': []}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_9(self):
+    def test_binary_client_p2Enum_320(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}]
+        expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_321(self):
+        request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_10(self):
+    def test_binary_client_p2Enum_322(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_11(self):
+    def test_binary_client_p2Enum_323(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_12(self):
+    def test_binary_client_p2Enum_324(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_13(self):
+    def test_binary_client_p2Enum_325(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_14(self):
+    def test_binary_client_p2Enum_326(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_15(self):
+    def test_binary_client_p2Enum_327(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_16(self):
+    def test_binary_client_p2Enum_328(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_17(self):
+    def test_binary_client_p2Enum_329(self):
         request = [{}, {'fn.test': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}]
         expected_response = [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_18(self):
+    def test_binary_client_p2Enum_330(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': False}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_19(self):
+    def test_binary_client_p2Enum_331(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0}}}}}, {'fn.test': {}}]
-        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_20(self):
+    def test_binary_client_p2Enum_332(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': 0.1}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_21(self):
+    def test_binary_client_p2Enum_333(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': ''}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_22(self):
+    def test_binary_client_p2Enum_334(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': []}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_23(self):
+    def test_binary_client_p2Enum_335(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0, 'enest': [0]}}}}}}}, {'fn.test': {}}]
+        expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}}]}}]
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
+
+    def test_binary_client_p2Enum_336(self):
+        request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': 0.1, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_24(self):
+    def test_binary_client_p2Enum_337(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': '', 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_25(self):
+    def test_binary_client_p2Enum_338(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': [], 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_26(self):
+    def test_binary_client_p2Enum_339(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': {}, 'enest': [0]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.ewrap', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_27(self):
+    def test_binary_client_p2Enum_340(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, False]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_28(self):
+    def test_binary_client_p2Enum_341(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, 0.1]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_29(self):
+    def test_binary_client_p2Enum_342(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, '']}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_30(self):
+    def test_binary_client_p2Enum_343(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, []]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
 
-    def test_binary_client_testPEnumNullP2Enum_31(self):
+    def test_binary_client_p2Enum_344(self):
         request = [{'ok': {'value': {'pEnumNullP2Enum': {'two': {'ewrap': {'two': {'ewrap': False, 'enest': [0, {}]}}}}}}}, {'fn.test': {}}]
         expected_response = [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.pEnumNullP2Enum.two.ewrap.two.enest[1]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=255, use_client=True, use_binary=True)
