@@ -2,12 +2,12 @@ from typing import Any
 
 default_values = [False, 0, 0.1, '', [], {}]
 
-def get_type(the_type) -> str:
+def get_type(the_type, use_int=True) -> str:
     if the_type == bool:
         return 'Boolean'
-    elif the_type == int:
+    elif use_int and the_type == int:
         return 'Integer'
-    elif the_type == float:
+    elif the_type in (int, float):
         return 'Number'
     elif the_type == str:
         return 'String'
@@ -22,7 +22,7 @@ def get_type(the_type) -> str:
 
 
 def type_unexp(incorrect_value, the_type):
-    return {'TypeUnexpected': {'actual': {get_type(type(incorrect_value)): {}}, 'expected': {get_type(the_type): {}}}}
+    return {'TypeUnexpected': {'actual': {get_type(type(incorrect_value), use_int=False): {}}, 'expected': {get_type(the_type): {}}}}
 
 def cap(s: str):
     return s[:1].upper() + s[1:]
@@ -123,7 +123,7 @@ additional_enum_cases = [
     ({'a': {}}, {'EnumFieldUnknown': {}}, '.a'),
     ({'two': {}}, {'RequiredStructFieldMissing': {}}, '.two.required'),
     ({'one': False}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, '.one'),
-    ({'one': 0}, {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Object': {}}}}, '.one'),
+    ({'one': 0}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, '.one'),
     ({'one': 0.1}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, '.one'),
     ({'one': ''}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, '.one'),
     ({'one': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, '.one'),
@@ -133,7 +133,7 @@ additional_fn_cases = [
     ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, '.a')
 ]
 additional_p2Str_cases = [
-    ({'wrap': 0, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
+    ({'wrap': 0, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
     ({'wrap': 0.1, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
     ({'wrap': '', 'nest': [0]}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
     ({'wrap': [], 'nest': [0]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
@@ -145,7 +145,7 @@ additional_p2Str_cases = [
     ({'wrap': False, 'nest': [0, {}]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, '.nest[1]'),
 ]
 additional_p2Enum_cases = [
-    ({'two': {'ewrap': 0, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Integer': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
+    ({'two': {'ewrap': 0, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
     ({'two': {'ewrap': 0.1, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
     ({'two': {'ewrap': '', 'enest': [0]}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
     ({'two': {'ewrap': [], 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
