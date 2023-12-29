@@ -616,12 +616,16 @@ class RotateBinaryClientTestCases(unittest.TestCase):
                 request = case[0]
                 expected_response = case[1]
 
+                if len(case) == 2:
+                    case.append(True)
+                client_bitmask = 0xFF if case[2] else 0x01
+
                 generated_tests.write('''
 
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True, use_binary=True)
-'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
+'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
    
 
 

@@ -31,15 +31,13 @@ cases = {
 
 binary_client_rotation_cases = {
     'rotation': [
-        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
-        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}], False],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}], False],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}], False],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}], False],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}], False],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}], False],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}], False],
         [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
     ]
 }
