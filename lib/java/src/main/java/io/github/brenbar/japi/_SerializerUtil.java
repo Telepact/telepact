@@ -24,7 +24,7 @@ class _SerializerUtil {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof UStruct s) {
                 allKeys.addAll(s.fields.keySet());
-            } else if (entry.getValue() instanceof UEnum e) {
+            } else if (entry.getValue() instanceof UUnion e) {
                 for (var entry2 : e.values.entrySet()) {
                     allKeys.add(entry2.getKey());
                     var struct = entry2.getValue();

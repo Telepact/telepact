@@ -37,27 +37,27 @@ public class _SelectUtil {
                 }
             }
             return finalMap;
-        } else if (typeDeclaration.type instanceof UEnum e) {
+        } else if (typeDeclaration.type instanceof UUnion e) {
             var valueAsMap = (Map<String, Object>) value;
-            var enumEntry = valueAsMap.entrySet().stream().findFirst().get();
-            var enumValue = enumEntry.getKey();
-            var enumData = (Map<String, Object>) enumEntry.getValue();
+            var unionEntry = valueAsMap.entrySet().stream().findFirst().get();
+            var unionValue = unionEntry.getKey();
+            var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var enumStructReference = e.values.get(enumValue);
+            var unionStructReference = e.values.get(unionValue);
 
-            var selectedFields = selectedStructFields.get(enumStructReference.name);
+            var selectedFields = selectedStructFields.get(unionStructReference.name);
             var finalMap = new HashMap<>();
-            for (var entry : enumData.entrySet()) {
+            for (var entry : unionData.entrySet()) {
                 var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = enumStructReference.fields.get(fieldName);
+                    var field = unionStructReference.fields.get(fieldName);
                     var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
 
-            return Map.of(enumEntry.getKey(), finalMap);
+            return Map.of(unionEntry.getKey(), finalMap);
         } else if (typeDeclaration.type instanceof UObject o) {
             var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
             var valueAsMap = (Map<String, Object>) value;

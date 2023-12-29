@@ -9,7 +9,7 @@
   },
   {
     "///": " The number of times a function is allowed to be called. ",
-    "enum._CallCountCriteria": {
+    "union._CallCountCriteria": {
       "Exact": {
         "times": ["integer"]
       },
@@ -22,15 +22,15 @@
     }
   },
   {
-    "///": " An enumeration of possible causes for a mock verification to fail. ",
-    "enum._VerificationFailure": {
+    "///": " An unioneration of possible causes for a mock verification to fail. ",
+    "union._VerificationFailure": {
       "TooFewMatchingCalls": {
-        "wanted": ["enum._CallCountCriteria"],
+        "wanted": ["union._CallCountCriteria"],
         "found": ["integer"],
         "allCalls": ["array", ["ext._Call"]]
       },
       "TooManyMatchingCalls": {
-        "wanted": ["enum._CallCountCriteria"],
+        "wanted": ["union._CallCountCriteria"],
         "found": ["integer"],
         "allCalls": ["array", ["ext._Call"]]
       }
@@ -66,12 +66,12 @@
     "fn._verify": {
       "call": ["ext._Call"],
       "strictMatch!": ["boolean"],
-      "count!": ["enum._CallCountCriteria"]
+      "count!": ["union._CallCountCriteria"]
     },
     "->": {
       "Ok": {},
       "ErrorVerificationFailure": {
-        "reason": ["enum._VerificationFailure"]
+        "reason": ["union._VerificationFailure"]
       }
     }
   },

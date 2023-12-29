@@ -153,16 +153,16 @@ languages. By making the design entry point a struct, API designers are
 predisposed for backwards-compatible changes like appending optional struct
 fields.
 
-### Why are enums in jAPI not like traditional enums seen in C or Java?
+### Why are unions in jAPI not like traditional unions seen in C or Java?
 
-jAPI enums take the form of the tagged unions paradigm as featured in modern
+jAPI unions take the form of the tagged unions paradigm as featured in modern
 programming languages like rust. In the particular case of jAPI, it is very
-similar to the traditional enum, except that a struct is automatically attached
-to each enum value.
+similar to the traditional union, except that a struct is automatically attached
+to each union value.
 
 This design maximizes backwards compatible change points in the API design, as
 adding an optional field to a struct is a legal backwards compatible change. The
-traditional enum can be approximated by simply leaving all enum structs blank.
+traditional union can be approximated by simply leaving all union structs blank.
 
 ### Why force servers to perform result validation?
 
@@ -209,35 +209,36 @@ simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
 
-### Why can't I have a other non-error result enum values?
+### Why can't I have a other non-error result union values?
 
-The only required value for the function result enum is `ok`. All other values
-in the result enum that are not `ok` are, by definition, "not okay", and will be
-interpreted as an error in all circumstances. API designers are encouraged to
-prefix additional result enum values with `error` or equivalent to improve
+The only required value for the function result union is `ok`. All other values
+in the result union that are not `ok` are, by definition, "not okay", and will
+be interpreted as an error in all circumstances. API designers are encouraged to
+prefix additional result union values with `error` or equivalent to improve
 readability and recognition of errors.
 
-### Is adding a new enum value a backwards compatible change?
+### Is adding a new union value a backwards compatible change?
 
-Many API technologies will classify adding a new enum value to an existing enum
-as a backwards incompatible change. This is due to the potential risk of a
-client driving critical code paths off an enum value, and the emergence of a new
-enum value begets undefined behavior in that critical path, which invites bugs.
-And some technologies may suffer build-time failures due to the fact that many
-API technologies integrate directly with programming languages through generated
-code incorporating native enums, and many of these languages will simply not
-compile when a new enum value appears in the context of a `switch` or `match`
-statement until that new value has a handling procedure implemented.
+Many API technologies will classify adding a new union value to an existing
+union as a backwards incompatible change. This is due to the potential risk of a
+client driving critical code paths off an union value, and the emergence of a
+new union value begets undefined behavior in that critical path, which invites
+bugs. And some technologies may suffer build-time failures due to the fact that
+many API technologies integrate directly with programming languages through
+generated code incorporating native unions, and many of these languages will
+simply not compile when a new union value appears in the context of a `switch`
+or `match` statement until that new value has a handling procedure implemented.
 
-jAPI takes the stance that adding a new enum value to an existing enum _is_ a
+jAPI takes the stance that adding a new union value to an existing union _is_ a
 backwards compatible change, on the basis of the following:
 
-- Enums are powerful typing constructs that replace otherwise type unsafe
-  patterns, and classifying evolution of an enum as backwards incompatible
+- Unions are powerful typing constructs that replace otherwise type unsafe
+  patterns, and classifying evolution of an union as backwards incompatible
   discourages use in favor of far more flimsy data types like strings, violating
   jAPI's core principles of encouraging the strongest of type patterns.
-- jAPI does not run the risk of build-time failures with enums since jAPI enums
-  are represented as special objects in generated code rather than native enums.
+- jAPI does not run the risk of build-time failures with unions since jAPI
+  unions are represented as special objects in generated code rather than native
+  unions.
 - Clients are capable of implementing error-prone code regardless of how a
   server evolves it's API, and jAPI cannot uphold its core principle of enabling
   API evolution if it holds servers accountable for client-side design failures.
@@ -251,7 +252,7 @@ backwards compatible change, on the basis of the following:
   failed to highlight such invalid assumptions. And in the same way that a
   client should not make assumptions about patterns in strings or neglect `else`
   cases on its critical paths, a client should not make assumptions about
-  patterns in enums or neglect default branch logic in `switch` or `match`
+  patterns in unions or neglect default branch logic in `switch` or `match`
   statements.
 
 ## Glossary

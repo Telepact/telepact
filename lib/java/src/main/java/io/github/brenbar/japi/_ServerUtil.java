@@ -63,7 +63,7 @@ class _ServerUtil {
             requestTarget = "fn._unknown";
         }
         var functionType = (UFn) jApiSchema.parsed.get(requestTarget);
-        var resultEnumType = functionType.result;
+        var resultUnionType = functionType.result;
         var argStructType = (UStruct) functionType.arg;
 
         // Reflect call id
@@ -76,7 +76,7 @@ class _ServerUtil {
             var parseFailures = (List<Object>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_ErrorParseFailure",
                     Map.of("reasons", parseFailures));
-            validateResult(resultEnumType, newErrorResult);
+            validateResult(resultUnionType, newErrorResult);
 
             // TODO: Need to find a good way to do this:
             // if (parseFailures.contains("IncompatibleBinaryEncoding") ||
@@ -92,7 +92,7 @@ class _ServerUtil {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
-            validateResult(resultEnumType, newErrorResult);
+            validateResult(resultUnionType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
@@ -101,7 +101,7 @@ class _ServerUtil {
                     Map.of("cases",
                             List.of(Map.of("path", List.of(unknownTarget), "reason",
                                     Map.of("FunctionUnknown", Map.of())))));
-            validateResult(resultEnumType, newErrorResult);
+            validateResult(resultUnionType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
@@ -114,7 +114,7 @@ class _ServerUtil {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
             Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
-            validateResult(resultEnumType, newErrorResult);
+            validateResult(resultUnionType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
@@ -141,31 +141,31 @@ class _ServerUtil {
         }
         var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
-            var resultValidationFailures = resultEnumType.validate(
+            var resultValidationFailures = resultUnionType.validate(
                     resultMessage.body, List.of(), List.of());
             if (!resultValidationFailures.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
                 Map<String, Object> newErrorResult = Map.of("_ErrorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
-                validateResult(resultEnumType, newErrorResult);
+                validateResult(resultUnionType, newErrorResult);
                 return new Message(responseHeaders, newErrorResult);
             }
         }
 
-        Map<String, Object> resultEnum = resultMessage.body;
+        Map<String, Object> resultUnion = resultMessage.body;
         resultMessage.header.putAll(responseHeaders);
         responseHeaders = resultMessage.header;
 
-        Map<String, Object> finalResultEnum;
+        Map<String, Object> finalResultUnion;
         if (requestHeaders.containsKey("_sel")) {
             Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
                     .get("_sel");
-            finalResultEnum = (Map<String, Object>) _SelectUtil.selectStructFields(
-                    new UTypeDeclaration(resultEnumType, false, List.of()),
-                    resultEnum,
+            finalResultUnion = (Map<String, Object>) _SelectUtil.selectStructFields(
+                    new UTypeDeclaration(resultUnionType, false, List.of()),
+                    resultUnion,
                     selectStructFieldsHeader);
         } else {
-            finalResultEnum = resultEnum;
+            finalResultUnion = resultUnion;
         }
 
         if (requestHeaders.containsKey("_bin")) {
@@ -174,7 +174,7 @@ class _ServerUtil {
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
-        return new Message(responseHeaders, finalResultEnum);
+        return new Message(responseHeaders, finalResultUnion);
     }
 
     private static List<Map<String, Object>> mapValidationFailuresToInvalidFieldCases(
@@ -189,8 +189,8 @@ class _ServerUtil {
         return validationFailureCases;
     }
 
-    private static void validateResult(UEnum resultEnumType, Object errorResult) {
-        var newErrorResultValidationFailures = resultEnumType.validate(
+    private static void validateResult(UUnion resultUnionType, Object errorResult) {
+        var newErrorResultValidationFailures = resultUnionType.validate(
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
             throw new JApiProcessError(

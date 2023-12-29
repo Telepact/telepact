@@ -6,7 +6,7 @@
 
   {
     "///": "A value for computation that can take either a constant or variable form.",
-    "enum.Value": {
+    "union.Value": {
       "Constant": {
         "value": ["number"]
       },
@@ -18,7 +18,7 @@
 
   {
     "///": "A basic mathematical operation.",
-    "enum.Operation": {
+    "union.Operation": {
       "Add": {},
       "Sub": {},
       "Mul": {},
@@ -47,9 +47,9 @@
   {
     "///": "Compute the `result` of the given `x` and `y` values.",
     "fn.compute": {
-      "x": ["enum.Value"],
-      "y": ["enum.Value"],
-      "op": ["enum.Operation"]
+      "x": ["union.Value"],
+      "y": ["union.Value"],
+      "op": ["union.Operation"]
     },
     "->": {
       "Ok": {
@@ -84,9 +84,9 @@
   {
     "///": " A computation. ",
     "struct.Computation": {
-      "firstOperand": ["enum.Value"],
-      "secondOperand": ["enum.Value"],
-      "operation": ["enum.Operation"],
+      "firstOperand": ["union.Value"],
+      "secondOperand": ["union.Value"],
+      "operation": ["union.Operation"],
       "timestamp": ["integer"],
       "successful": ["boolean"]
     }

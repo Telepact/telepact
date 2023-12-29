@@ -585,13 +585,13 @@ class UStruct implements UType {
     }
 }
 
-class UEnum implements UType {
+class UUnion implements UType {
 
     public final String name;
     public final Map<String, UStruct> values;
     public final int typeParameterCount;
 
-    public UEnum(String name, Map<String, UStruct> values, int typeParameterCount) {
+    public UUnion(String name, Map<String, UStruct> values, int typeParameterCount) {
         this.name = name;
         this.values = values;
         this.typeParameterCount = typeParameterCount;
@@ -606,54 +606,54 @@ class UEnum implements UType {
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
-            return validateEnumValues(this.values, m, typeParameters);
+            return validateUnionValues(this.values, m, typeParameters);
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));
         }
     }
 
-    private List<ValidationFailure> validateEnumValues(
+    private List<ValidationFailure> validateUnionValues(
             Map<String, UStruct> referenceValues,
             Map<?, ?> actual, List<UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
                     new ValidationFailure(new ArrayList<Object>(),
-                            "ZeroOrManyEnumFieldsDisallowed", Map.of()));
+                            "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
         var entry = actual.entrySet().stream().findFirst().get();
-        var enumTarget = (String) entry.getKey();
-        var enumPayload = entry.getValue();
+        var unionTarget = (String) entry.getKey();
+        var unionPayload = entry.getValue();
 
-        var referenceStruct = referenceValues.get(enumTarget);
+        var referenceStruct = referenceValues.get(unionTarget);
         if (referenceStruct == null) {
             return Collections
-                    .singletonList(new ValidationFailure(List.of(enumTarget),
-                            "EnumFieldUnknown", Map.of()));
+                    .singletonList(new ValidationFailure(List.of(unionTarget),
+                            "UnionFieldUnknown", Map.of()));
         }
 
-        if (enumPayload instanceof Map<?, ?> m2) {
-            var nestedValidationFailures = validateEnumStruct(referenceStruct, enumTarget,
+        if (unionPayload instanceof Map<?, ?> m2) {
+            var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
                     (Map<String, Object>) m2, typeParameters);
             var nestedValidationFailuresWithPath = nestedValidationFailures
                     .stream()
-                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(enumTarget, f.path), f.reason,
+                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(unionTarget, f.path), f.reason,
                             f.data))
                     .toList();
             return nestedValidationFailuresWithPath;
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(enumTarget),
-                    enumPayload, "Object");
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(unionTarget),
+                    unionPayload, "Object");
         }
     }
 
-    private static List<ValidationFailure> validateEnumStruct(
-            UStruct enumStruct,
-            String enumCase,
+    private static List<ValidationFailure> validateUnionStruct(
+            UStruct unionStruct,
+            String unionCase,
             Map<String, Object> actual, List<UTypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var nestedValidationFailures = UStruct.validateStructFields(enumStruct.fields,
+        var nestedValidationFailures = UStruct.validateStructFields(unionStruct.fields,
                 actual, typeParameters);
         validationFailures.addAll(nestedValidationFailures);
 
@@ -666,40 +666,40 @@ class UEnum implements UType {
             List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
-            var startingEnumValue = (Map<String, Object>) startingValue;
-            return constructRandomEnum(this.values, startingEnumValue, includeRandomOptionalFields,
+            var startingUnionValue = (Map<String, Object>) startingValue;
+            return constructRandomUnion(this.values, startingUnionValue, includeRandomOptionalFields,
                     typeParameters, random);
         } else {
-            return constructRandomEnum(this.values, new HashMap<>(), includeRandomOptionalFields,
+            return constructRandomUnion(this.values, new HashMap<>(), includeRandomOptionalFields,
                     typeParameters, random);
         }
     }
 
-    private static Map<String, Object> constructRandomEnum(Map<String, UStruct> enumValuesReference,
-            Map<String, Object> startingEnum,
+    private static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionValuesReference,
+            Map<String, Object> startingUnion,
             boolean includeRandomOptionalFields,
             List<UTypeDeclaration> typeParameters,
             RandomGenerator random) {
-        var existingEnumValue = startingEnum.keySet().stream().findAny();
-        if (existingEnumValue.isPresent()) {
-            var enumValue = existingEnumValue.get();
-            var enumStructType = enumValuesReference.get(enumValue);
-            var enumStartingStruct = (Map<String, Object>) startingEnum.get(enumValue);
+        var existingUnionValue = startingUnion.keySet().stream().findAny();
+        if (existingUnionValue.isPresent()) {
+            var unionValue = existingUnionValue.get();
+            var unionStructType = unionValuesReference.get(unionValue);
+            var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionValue);
 
-            return Map.of(enumValue, UStruct.constructRandomStruct(enumStructType.fields, enumStartingStruct,
+            return Map.of(unionValue, UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
                     includeRandomOptionalFields, typeParameters, random));
         } else {
-            var sortedEnumValuesReference = new ArrayList<>(enumValuesReference.entrySet());
-            Collections.sort(sortedEnumValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+            var sortedUnionValuesReference = new ArrayList<>(unionValuesReference.entrySet());
+            Collections.sort(sortedUnionValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            var randomIndex = random.nextInt(sortedEnumValuesReference.size());
-            var enumEntry = sortedEnumValuesReference.get(randomIndex);
+            var randomIndex = random.nextInt(sortedUnionValuesReference.size());
+            var unionEntry = sortedUnionValuesReference.get(randomIndex);
 
-            var enumValue = enumEntry.getKey();
-            var enumData = enumEntry.getValue();
+            var unionValue = unionEntry.getKey();
+            var unionData = unionEntry.getValue();
 
-            return Map.of(enumValue,
-                    UStruct.constructRandomStruct(enumData.fields, new HashMap<>(), includeRandomOptionalFields,
+            return Map.of(unionValue,
+                    UStruct.constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,
                             typeParameters, random));
         }
     }
@@ -714,9 +714,9 @@ class UFn implements UType {
 
     public final String name;
     public final UStruct arg;
-    public final UEnum result;
+    public final UUnion result;
 
-    public UFn(String name, UStruct input, UEnum output) {
+    public UFn(String name, UStruct input, UUnion output) {
         this.name = name;
         this.arg = input;
         this.result = output;

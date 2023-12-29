@@ -153,7 +153,7 @@ class _UApiSchemaUtil {
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {
-        var regex = "^((fn|trait|info)|((struct|enum|ext)(<[0-2]>)?))\\..*";
+        var regex = "^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*";
         for (var e : definition.keySet()) {
             if (e.matches(regex)) {
                 return e;
@@ -187,13 +187,13 @@ class _UApiSchemaUtil {
             String traitName = trait.name;
             UStruct fnArg = f.arg;
             Map<String, UFieldDeclaration> fnArgFields = fnArg.fields;
-            UEnum fnResult = f.result;
+            UUnion fnResult = f.result;
             Map<String, UStruct> fnResultValues = fnResult.values;
             UFn traitFn = trait.fn;
             String traitFnName = traitFn.name;
             UStruct traitFnArg = traitFn.arg;
             Map<String, UFieldDeclaration> traitFnArgFields = traitFnArg.fields;
-            UEnum traitFnResult = traitFn.result;
+            UUnion traitFnResult = traitFn.result;
             Map<String, UStruct> traitFnResultValues = traitFnResult.values;
 
             if (fnName.startsWith("fn._")) {
@@ -289,13 +289,13 @@ class _UApiSchemaUtil {
                     "ObjectTypeRequired", Map.of())));
         }
         var argumentFields = new HashMap<String, UFieldDeclaration>();
-        var isForEnum = false;
+        var isForUnion = false;
         var typeParameterCount = 0;
         for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
             var fieldDeclaration = entry.getKey();
             var typeDeclarationValue = entry.getValue();
             var parsedField = parseField(schemaKey, fieldDeclaration,
-                    typeDeclarationValue, isForEnum, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                    typeDeclarationValue, isForUnion, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                     parsedTypes,
                     typeExtensions);
             argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
@@ -324,39 +324,39 @@ class _UApiSchemaUtil {
 
         var values = new HashMap<String, UStruct>();
         for (var entry : resultDefinitionAsParsedJson.entrySet()) {
-            Map<String, Object> enumValueData;
+            Map<String, Object> unionValueData;
             try {
-                enumValueData = (Map<String, Object>) entry.getValue();
+                unionValueData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
-                var enumValue = entry.getKey();
+                var unionValue = entry.getKey();
                 var index = schemaKeysToIndex.get(schemaKey);
-                parseFailures.add(new SchemaParseFailure("[%d].->.%s".formatted(index, enumValue),
+                parseFailures.add(new SchemaParseFailure("[%d].->.%s".formatted(index, unionValue),
                         "ObjectTypeRequired", Map.of()));
                 continue;
             }
-            var enumValue = entry.getKey();
+            var unionValue = entry.getKey();
 
             var fields = new HashMap<String, UFieldDeclaration>();
-            for (var structEntry : enumValueData.entrySet()) {
+            for (var structEntry : unionValueData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
                 var parsedField = parseField(schemaKey, fieldDeclaration,
-                        typeDeclarationValue, isForEnum, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                        typeDeclarationValue, isForUnion, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                         parsedTypes,
                         typeExtensions);
                 fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
             }
 
-            var enumStruct = new UStruct("->.%s".formatted(enumValue), fields, typeParameterCount);
+            var unionStruct = new UStruct("->.%s".formatted(unionValue), fields, typeParameterCount);
 
-            values.put(enumValue, enumStruct);
+            values.put(unionValue, unionStruct);
         }
 
         if (!parseFailures.isEmpty()) {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        var resultType = new UEnum("%s.->".formatted(schemaKey), values, typeParameterCount);
+        var resultType = new UUnion("%s.->".formatted(schemaKey), values, typeParameterCount);
 
         var type = new UFn(schemaKey, argType, resultType);
 
@@ -388,8 +388,8 @@ class _UApiSchemaUtil {
         return type;
     }
 
-    private static UEnum parseEnumType(
-            Map<String, Object> enumDefinitionAsParsedJson,
+    private static UUnion parseUnionType(
+            Map<String, Object> unionDefinitionAsParsedJson,
             String schemaKey,
             int typeParameterCount,
             List<Object> originalJApiSchema,
@@ -398,39 +398,39 @@ class _UApiSchemaUtil {
             Map<String, TypeExtension> typeExtensions) {
         var index = schemaKeysToIndex.get(schemaKey);
 
-        var definition = (Map<String, Object>) enumDefinitionAsParsedJson.get(schemaKey);
+        var definition = (Map<String, Object>) unionDefinitionAsParsedJson.get(schemaKey);
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var values = new HashMap<String, UStruct>();
         for (var entry : definition.entrySet()) {
-            Map<String, Object> enumStructData;
+            Map<String, Object> unionStructData;
             try {
-                enumStructData = (Map<String, Object>) entry.getValue();
+                unionStructData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
-                var enumValue = entry.getKey();
+                var unionValue = entry.getKey();
                 parseFailures.add(
-                        new SchemaParseFailure("[%d].->.%s".formatted(index, enumValue),
+                        new SchemaParseFailure("[%d].->.%s".formatted(index, unionValue),
                                 "ObjectTypeRequired", Map.of()));
                 continue;
             }
-            var enumValue = entry.getKey();
+            var unionValue = entry.getKey();
 
             var regex = Pattern.compile("^([a-zA-Z_]+[a-zA-Z0-9_]*)$");
-            var matcher = regex.matcher(enumValue);
+            var matcher = regex.matcher(unionValue);
             if (!matcher.find()) {
                 parseFailures.add(new SchemaParseFailure("[%d].->".formatted(index),
-                        "InvalidEnumValue", Map.of("value", enumValue)));
+                        "InvalidUnionValue", Map.of("value", unionValue)));
                 continue;
             }
 
             var fields = new HashMap<String, UFieldDeclaration>();
-            for (var structEntry : enumStructData.entrySet()) {
+            for (var structEntry : unionStructData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
                 UFieldNameAndFieldDeclaration parsedField;
                 try {
-                    parsedField = parseField("[%d].->.%s".formatted(index, enumValue), fieldDeclaration,
+                    parsedField = parseField("[%d].->.%s".formatted(index, unionValue), fieldDeclaration,
                             typeDeclarationValue, false, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                             parsedTypes,
                             typeExtensions);
@@ -443,16 +443,16 @@ class _UApiSchemaUtil {
                 fields.put(fieldName, fieldDeclarationInst);
             }
 
-            var enumStruct = new UStruct("%s.%s".formatted(schemaKey, enumValue), fields, typeParameterCount);
+            var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionValue), fields, typeParameterCount);
 
-            values.put(enumValue, enumStruct);
+            values.put(unionValue, unionStruct);
         }
 
         if (!parseFailures.isEmpty()) {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        var type = new UEnum(schemaKey, values, typeParameterCount);
+        var type = new UUnion(schemaKey, values, typeParameterCount);
 
         return type;
     }
@@ -461,7 +461,7 @@ class _UApiSchemaUtil {
             String path,
             String fieldDeclaration,
             Object typeDeclarationValue,
-            boolean isForEnum,
+            boolean isForUnion,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
@@ -486,9 +486,9 @@ class _UApiSchemaUtil {
                     "ArrayTypeRequired", Map.of())));
         }
 
-        if (optional && isForEnum) {
+        if (optional && isForUnion) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "EnumKeysCannotBeMarkedAsOptional", Map.of())));
+                    "UnionKeysCannotBeMarkedAsOptional", Map.of())));
         }
 
         var typeDeclaration = parseTypeDeclaration(path, typeDeclarationArray, typeParameterCount, originalJApiSchema,
@@ -588,7 +588,7 @@ class _UApiSchemaUtil {
         }
 
         var regex = Pattern.compile(
-                "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(enum|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
+                "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
@@ -642,8 +642,8 @@ class _UApiSchemaUtil {
                 type = parseStructType(definition, customTypeName, typeParameterCount, originalJApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions);
-            } else if (customTypeName.startsWith("enum")) {
-                type = parseEnumType(definition, customTypeName, typeParameterCount, originalJApiSchema,
+            } else if (customTypeName.startsWith("union")) {
+                type = parseUnionType(definition, customTypeName, typeParameterCount, originalJApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions);
             } else if (customTypeName.startsWith("fn")) {

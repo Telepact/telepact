@@ -105,8 +105,8 @@ class _MockServerUtil {
                 }
 
                 if (definition != null) {
-                    var resultEnum = (UEnum) definition.result;
-                    var OkStructRef = resultEnum.values.get("Ok");
+                    var resultUnion = (UUnion) definition.result;
+                    var OkStructRef = resultUnion.values.get("Ok");
                     var useStartingValue = true;
                     var includeRandomOptionalFields = true;
                     var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
