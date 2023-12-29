@@ -46,7 +46,8 @@ class _ClientUtil {
                     TimeUnit.MILLISECONDS);
 
             if (Objects.equals(responseMessage.body,
-                    Map.of("_errorParseFailure", Map.of("reasons", List.of("IncompatibleBinaryEncoding"))))) {
+                    Map.of("_errorParseFailure",
+                            Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
                 // Try again, but as json
                 requestMessage.header.put("_forceSendJson", true);
                 responseMessage = adapter.apply(requestMessage, serializer).get(finalTimeoutMs,

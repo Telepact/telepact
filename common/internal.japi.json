@@ -74,6 +74,19 @@
   },
 
   {
+    "///": " A parse failure. ",
+    "enum._ParseFailure": {
+      "HeadersMustBeObject": {},
+      "BodyMustBeObject": {},
+      "BodyMustBeUnionType": {},
+      "IncompatibleBinaryEncoding": {},
+      "BinaryDecodeFailure": {},
+      "InvalidJson": {},
+      "MessageMustBeArrayWithTwoElements": {}
+    }
+  },
+
+  {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
     "struct._BodyValidationFailure": {
       "path": ["array", ["any"]],
@@ -112,7 +125,7 @@
           "cases": ["array", ["struct._BodyValidationFailure"]]
         },
         "_errorParseFailure": {
-          "reasons": ["array", ["string"]]
+          "reasons": ["array", ["enum._ParseFailure"]]
         }
       }
     }

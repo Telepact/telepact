@@ -23,18 +23,19 @@ class _ServerUtil {
             }
             var cause = e.getCause();
 
-            List<String> parseFailures;
+            List<Map<String, Object>> parseFailures;
             if (cause instanceof BinaryEncoderUnavailableError e2) {
-                parseFailures = List.of("IncompatibleBinaryEncoding");
+                parseFailures = List.of(Map.of("IncompatibleBinaryEncoding", Map.of()));
             } else if (cause instanceof BinaryEncodingMissing e2) {
-                parseFailures = List.of("BinaryDecodeFailure");
+                parseFailures = List.of(Map.of("BinaryDecodeFailure", Map.of()));
             } else if (cause instanceof InvalidJsonError e2) {
-                parseFailures = List.of("InvalidJson");
+                parseFailures = List.of(Map.of("InvalidJson", Map.of()));
             } else if (cause instanceof MessageParseError e2) {
-                parseFailures = e2.failures;
+                parseFailures = e2.failures.stream().map(f -> (Map<String, Object>) (Object) Map.of(f, Map.of()))
+                        .toList();
             } else {
                 // TODO: Change this to something like "CouldNotParse"
-                parseFailures = List.of("MessageMustBeArrayWithTwoElements");
+                parseFailures = List.of(Map.of("MessageMustBeArrayWithTwoElements", Map.of()));
             }
 
             var requestHeaders = new HashMap<String, Object>();
@@ -72,7 +73,7 @@ class _ServerUtil {
         }
 
         if (requestHeaders.containsKey("_parseFailures")) {
-            var parseFailures = (List<String>) requestHeaders.get("_parseFailures");
+            var parseFailures = (List<Object>) requestHeaders.get("_parseFailures");
             Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
                     Map.of("reasons", parseFailures));
             validateResult(resultEnumType, newErrorResult);
