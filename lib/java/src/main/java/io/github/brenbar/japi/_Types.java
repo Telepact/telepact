@@ -68,7 +68,8 @@ class UTypeDeclaration {
                     ? generics.get(g.index).nullable
                     : this.nullable;
             if (!isNullable) {
-                return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.type.getName(generics));
+                return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                        this.type.getName(generics));
             } else {
                 return Collections.emptyList();
             }
@@ -116,7 +117,8 @@ class UBoolean implements UType {
         if (value instanceof Boolean) {
             return Collections.emptyList();
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -152,9 +154,10 @@ class UInteger implements UType {
             return Collections.emptyList();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
-                    new ValidationFailure("", "NumberOutOfRange", Map.of()));
+                    new ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -187,11 +190,12 @@ class UNumber implements UType {
             List<UTypeDeclaration> generics) {
         if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
-                    new ValidationFailure("", "NumberOutOfRange", Map.of()));
+                    new ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
         } else if (value instanceof Number) {
             return Collections.emptyList();
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -225,7 +229,8 @@ class UString implements UType {
         if (value instanceof String) {
             return Collections.emptyList();
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -266,13 +271,15 @@ class UArray implements UType {
                 final var index = i;
                 var nestedValidationFailuresWithPath = nestedValidationFailures
                         .stream()
-                        .map(f -> new ValidationFailure("[%d]%s".formatted(index, f.path), f.reason, f.data))
+                        .map(f -> new ValidationFailure(_ValidateUtil.prepend(index, f.path), f.reason,
+                                f.data))
                         .toList();
                 validationFailures.addAll(nestedValidationFailuresWithPath);
             }
             return validationFailures;
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -329,13 +336,14 @@ class UObject implements UType {
                 var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
                 var nestedValidationFailuresWithPath = nestedValidationFailures
                         .stream()
-                        .map(f -> new ValidationFailure("{%s}%s".formatted(k, f.path), f.reason, f.data))
+                        .map(f -> new ValidationFailure(_ValidateUtil.prepend(k, f.path), f.reason, f.data))
                         .toList();
                 validationFailures.addAll(nestedValidationFailuresWithPath);
             }
             return validationFailures;
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -468,7 +476,8 @@ class UStruct implements UType {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -487,7 +496,7 @@ class UStruct implements UType {
         }
 
         for (var missingField : missingFields) {
-            var validationFailure = new ValidationFailure(".%s".formatted(missingField),
+            var validationFailure = new ValidationFailure(List.of(missingField),
                     "RequiredStructFieldMissing", Map.of());
             validationFailures
                     .add(validationFailure);
@@ -498,7 +507,7 @@ class UStruct implements UType {
             var fieldValue = entry.getValue();
             var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new ValidationFailure(".%s".formatted(fieldName),
+                var validationFailure = new ValidationFailure(List.of(fieldName),
                         "StructFieldUnknown", Map.of());
                 validationFailures
                         .add(validationFailure);
@@ -507,7 +516,8 @@ class UStruct implements UType {
             var nestedValidationFailures = referenceField.typeDeclaration.validate(fieldValue, typeParameters);
             var nestedValidationFailuresWithPath = nestedValidationFailures
                     .stream()
-                    .map(f -> new ValidationFailure(".%s%s".formatted(fieldName, f.path), f.reason, f.data))
+                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(fieldName, f.path), f.reason,
+                            f.data))
                     .toList();
             validationFailures.addAll(nestedValidationFailuresWithPath);
         }
@@ -598,7 +608,8 @@ class UEnum implements UType {
         if (value instanceof Map<?, ?> m) {
             return validateEnumValues(this.values, m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure("", value, this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                    this.getName(generics));
         }
     }
 
@@ -607,7 +618,7 @@ class UEnum implements UType {
             Map<?, ?> actual, List<UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
-                    new ValidationFailure("",
+                    new ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyEnumFieldsDisallowed", Map.of()));
         }
         var entry = actual.entrySet().stream().findFirst().get();
@@ -617,7 +628,7 @@ class UEnum implements UType {
         var referenceStruct = referenceValues.get(enumTarget);
         if (referenceStruct == null) {
             return Collections
-                    .singletonList(new ValidationFailure(".%s".formatted(enumTarget),
+                    .singletonList(new ValidationFailure(List.of(enumTarget),
                             "EnumFieldUnknown", Map.of()));
         }
 
@@ -626,11 +637,13 @@ class UEnum implements UType {
                     (Map<String, Object>) m2, typeParameters);
             var nestedValidationFailuresWithPath = nestedValidationFailures
                     .stream()
-                    .map(f -> new ValidationFailure(".%s%s".formatted(enumTarget, f.path), f.reason, f.data))
+                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(enumTarget, f.path), f.reason,
+                            f.data))
                     .toList();
             return nestedValidationFailuresWithPath;
         } else {
-            return _ValidateUtil.getTypeUnxpectedValidationFailure(".%s".formatted(enumTarget), enumPayload, "Object");
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(enumTarget),
+                    enumPayload, "Object");
         }
     }
 
@@ -743,7 +756,6 @@ class UFn implements UType {
     }
 }
 
-// TODO: trait is not a type
 class UTrait {
     public final String name;
     public final UFn fn;
@@ -756,7 +768,6 @@ class UTrait {
     }
 }
 
-// TODO: info is not a type
 class UInfo {
     public final String name;
 
@@ -822,11 +833,11 @@ interface BinaryEncoder {
 }
 
 class ValidationFailure {
-    public final String path;
+    public final List<Object> path;
     public final String reason;
     public final Map<String, Object> data;
 
-    public ValidationFailure(String path, String reason, Map<String, Object> data) {
+    public ValidationFailure(List<Object> path, String reason, Map<String, Object> data) {
         this.path = path;
         this.reason = reason;
         this.data = data;

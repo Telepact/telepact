@@ -76,7 +76,7 @@
   {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
     "struct._BodyValidationFailure": {
-      "path": ["string"],
+      "path": ["array", ["any"]],
       "reason": ["enum._BodyValidationFailureReason"]
     }
   },
@@ -84,7 +84,7 @@
   {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
     "struct._HeaderValidationFailure": {
-      "path": ["string"],
+      "path": ["array", ["any"]],
       "reason": ["enum._HeaderValidationFailureReason"]
     }
   },

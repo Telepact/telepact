@@ -10,8 +10,8 @@ def generate_mock_cases(given_field: str, the_type, correct_values, additional_i
             if 'RequiredStructFieldMissing' in reason:
                 continue
 
-            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value': {field: incorrect_value}}, '->': {'ok': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn._createStub.stub.fn.test.value.{}{}'.format(base_path, path), 'reason': reason}]}}]]
-            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'ok': {'value': {field: incorrect_value}}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn._createStub.stub.->.ok.value.{}{}'.format(base_path, path), 'reason': reason}]}}]]
+            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value': {field: incorrect_value}}, '->': {'ok': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', 'fn.test', 'value'] + base_path + path, 'reason': reason}]}}]]
+            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'ok': {'value': {field: incorrect_value}}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->', 'ok', 'value'] + base_path + path, 'reason': reason}]}}]]
 
 
 cases = {

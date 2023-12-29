@@ -30,59 +30,59 @@ def cap(s: str):
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
     default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else False if the_type == Any else type(n) != the_type, default_values))
-    given_incorrect_values = [(v, type_unexp(v, the_type), '') for v in default_incorrect_values] + additional_incorrect_values
-    given_incorrect_values_w_null = [(v, type_unexp(v, the_type), '') for v in [None] + default_incorrect_values] + additional_incorrect_values
+    given_incorrect_values = [(v, type_unexp(v, the_type), []) for v in default_incorrect_values] + additional_incorrect_values
+    given_incorrect_values_w_null = [(v, type_unexp(v, the_type), []) for v in [None] + default_incorrect_values] + additional_incorrect_values
     abc = 'abcdefghijklmnopqrstuvwxyz'
 
     field = given_field
     correct_values = given_correct_values
     incorrect_values = [(v, r, p) for v, r, p in given_incorrect_values_w_null]
-    yield field, correct_values, incorrect_values, field
+    yield field, correct_values, incorrect_values, [field]
     
     field = 'null{}'.format(cap(given_field))
     correct_values = [None] + given_correct_values
     incorrect_values = [(v, r, p) for v, r, p in given_incorrect_values]
-    yield field, correct_values, incorrect_values, field
+    yield field, correct_values, incorrect_values, [field]
 
     field = 'arr{}'.format(cap(given_field))
     correct_values = [[]] + [[v] for v in given_correct_values] + [given_correct_values]
     incorrect_values = [([given_correct_values[0], v], r, p) for v, r, p in given_incorrect_values_w_null]
-    yield field, correct_values, incorrect_values, '{}[1]'.format(field)
+    yield field, correct_values, incorrect_values, [field, 1]
 
     field = 'arrNull{}'.format(cap(given_field))
     correct_values = [[]] + [[v] for v in [None] + given_correct_values] + [[None] + given_correct_values]
     incorrect_values = [([given_correct_values[0], v], r, p) for v, r, p in given_incorrect_values]
-    yield field, correct_values, incorrect_values, '{}[1]'.format(field)
+    yield field, correct_values, incorrect_values, [field, 1]
 
     field = 'obj{}'.format(cap(given_field))
     correct_values = [{}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate(given_correct_values)}]
     incorrect_values = [({'a': given_correct_values[0], 'b': v}, r, p) for v, r, p in given_incorrect_values_w_null]
-    yield field, correct_values, incorrect_values, '{}{{b}}'.format(field)
+    yield field, correct_values, incorrect_values, [field, 'b']
 
     field = 'objNull{}'.format(cap(given_field))
     correct_values = [{}] + [{'a': v} for v in [None] + given_correct_values] + [{abc[i]: v for i,v in enumerate([None] + given_correct_values)}]
     incorrect_values = [({'a': given_correct_values[0], 'b': v}, r, p) for v, r, p in given_incorrect_values]
-    yield field, correct_values, incorrect_values, '{}{{b}}'.format(field)
+    yield field, correct_values, incorrect_values, [field, 'b']
 
     field = 'pStr{}'.format(cap(given_field))
     correct_values = [{'wrap': v} for v in given_correct_values]
     incorrect_values = [({'wrap': v}, r, p) for v, r, p in given_incorrect_values_w_null]
-    yield field, correct_values, incorrect_values, '{}.wrap'.format(field)
+    yield field, correct_values, incorrect_values, [field, 'wrap']
 
     field = 'pStrNull{}'.format(cap(given_field))
     correct_values = [{'wrap': v} for v in [None] + given_correct_values]
     incorrect_values = [({'wrap': v}, r, p) for v, r, p in given_incorrect_values]
-    yield field, correct_values, incorrect_values, '{}.wrap'.format(field)
+    yield field, correct_values, incorrect_values, [field, 'wrap']
 
     field = 'pEnum{}'.format(cap(given_field))
     correct_values = [{'one': {}}] + [{'two': {'ewrap': v}} for v in given_correct_values]
     incorrect_values = [({'two': {'ewrap': v}}, r, p) for v, r, p in given_incorrect_values_w_null]
-    yield field, correct_values, incorrect_values, '{}.two.ewrap'.format(field)
+    yield field, correct_values, incorrect_values, [field, 'two', 'ewrap']
 
     field = 'pEnumNull{}'.format(cap(given_field))
     correct_values = [{'one': {}}] + [{'two': {'ewrap': v}} for v in [None] + given_correct_values]
     incorrect_values = [({'two': {'ewrap': v}}, r, p) for v, r, p in given_incorrect_values]
-    yield field, correct_values, incorrect_values, '{}.two.ewrap'.format(field)
+    yield field, correct_values, incorrect_values, [field, 'two', 'ewrap']
 
 
 def is_iter(v):
@@ -103,58 +103,58 @@ def generate_basic_cases(given_field: str, the_type, correct_values, additional_
             yield case
 
         for incorrect_value, reason, path in incorrect_values:
-            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.test.value.{}{}'.format(base_path, path), 'reason': reason}]}}]]
+            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': ['fn.test', 'value'] + base_path + path, 'reason': reason}]}}]]
 
         for incorrect_value, reason, path in incorrect_values:
-            yield [[{'ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'ok.value.{}{}'.format(base_path, path), 'reason': reason}]}}]]
+            yield [[{'ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': ['ok', 'value'] + base_path + path, 'reason': reason}]}}]]
 
 
 additional_integer_cases = [
-    (9223372036854775808, {'NumberOutOfRange': {}}, ''), 
-    (-9223372036854775809, {'NumberOutOfRange': {}}, '')
+    (9223372036854775808, {'NumberOutOfRange': {}}, []), 
+    (-9223372036854775809, {'NumberOutOfRange': {}}, [])
 ]
 additional_struct_cases = [
-    ({}, {'RequiredStructFieldMissing': {}}, '.required'),
-    ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, '.a')
+    ({}, {'RequiredStructFieldMissing': {}}, ['required']),
+    ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, ['a'])
 ]
 additional_enum_cases = [
-    ({}, {'ZeroOrManyEnumFieldsDisallowed': {}}, ''),
-    ({'one': {}, 'two': {'optional': False, 'required': False}}, {'ZeroOrManyEnumFieldsDisallowed': {}}, ''),
-    ({'a': {}}, {'EnumFieldUnknown': {}}, '.a'),
-    ({'two': {}}, {'RequiredStructFieldMissing': {}}, '.two.required'),
-    ({'one': False}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, '.one'),
-    ({'one': 0}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, '.one'),
-    ({'one': 0.1}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, '.one'),
-    ({'one': ''}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, '.one'),
-    ({'one': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, '.one'),
+    ({}, {'ZeroOrManyEnumFieldsDisallowed': {}}, []),
+    ({'one': {}, 'two': {'optional': False, 'required': False}}, {'ZeroOrManyEnumFieldsDisallowed': {}}, []),
+    ({'a': {}}, {'EnumFieldUnknown': {}}, ['a']),
+    ({'two': {}}, {'RequiredStructFieldMissing': {}}, ['two', 'required']),
+    ({'one': False}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['one']),
+    ({'one': 0}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['one']),
+    ({'one': 0.1}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['one']),
+    ({'one': ''}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['one']),
+    ({'one': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['one']),
 ]
 additional_fn_cases = [
-    ({}, {'RequiredStructFieldMissing': {}}, '.required'),
-    ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, '.a')
+    ({}, {'RequiredStructFieldMissing': {}}, ['required']),
+    ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, ['a'])
 ]
 additional_p2Str_cases = [
-    ({'wrap': 0, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
-    ({'wrap': 0.1, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
-    ({'wrap': '', 'nest': [0]}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
-    ({'wrap': [], 'nest': [0]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
-    ({'wrap': {}, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, '.wrap'),
-    ({'wrap': False, 'nest': [0, False]}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, '.nest[1]'),
-    ({'wrap': False, 'nest': [0, 0.1]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, '.nest[1]'),
-    ({'wrap': False, 'nest': [0, '']}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, '.nest[1]'),
-    ({'wrap': False, 'nest': [0, []]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, '.nest[1]'),
-    ({'wrap': False, 'nest': [0, {}]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, '.nest[1]'),
+    ({'wrap': 0, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
+    ({'wrap': 0.1, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
+    ({'wrap': '', 'nest': [0]}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
+    ({'wrap': [], 'nest': [0]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
+    ({'wrap': {}, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
+    ({'wrap': False, 'nest': [0, False]}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
+    ({'wrap': False, 'nest': [0, 0.1]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
+    ({'wrap': False, 'nest': [0, '']}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
+    ({'wrap': False, 'nest': [0, []]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
+    ({'wrap': False, 'nest': [0, {}]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
 ]
 additional_p2Enum_cases = [
-    ({'two': {'ewrap': 0, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
-    ({'two': {'ewrap': 0.1, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
-    ({'two': {'ewrap': '', 'enest': [0]}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
-    ({'two': {'ewrap': [], 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
-    ({'two': {'ewrap': {}, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, '.two.ewrap'),
-    ({'two': {'ewrap': False, 'enest': [0, False]}}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, '.two.enest[1]'),
-    ({'two': {'ewrap': False, 'enest': [0, 0.1]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, '.two.enest[1]'),
-    ({'two': {'ewrap': False, 'enest': [0, '']}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, '.two.enest[1]'),
-    ({'two': {'ewrap': False, 'enest': [0, []]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, '.two.enest[1]'),
-    ({'two': {'ewrap': False, 'enest': [0, {}]}}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, '.two.enest[1]'),
+    ({'two': {'ewrap': 0, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['two', 'ewrap']),
+    ({'two': {'ewrap': 0.1, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['two', 'ewrap']),
+    ({'two': {'ewrap': '', 'enest': [0]}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['two', 'ewrap']),
+    ({'two': {'ewrap': [], 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['two', 'ewrap']),
+    ({'two': {'ewrap': {}, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['two', 'ewrap']),
+    ({'two': {'ewrap': False, 'enest': [0, False]}}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['two', 'enest', 1]),
+    ({'two': {'ewrap': False, 'enest': [0, 0.1]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['two', 'enest', 1]),
+    ({'two': {'ewrap': False, 'enest': [0, '']}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['two', 'enest', 1]),
+    ({'two': {'ewrap': False, 'enest': [0, []]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['two', 'enest', 1]),
+    ({'two': {'ewrap': False, 'enest': [0, {}]}}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['two', 'enest', 1]),
 ]
 
 cases = {
@@ -181,12 +181,12 @@ cases = {
         [[{'_id': 1234}, {'fn._ping': {}}], [{'_id': 1234}, {'ok': {}}]],
     ],
     'testUnknownFunction': [
-        [[{}, {'fn.notFound': {}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': 'fn.notFound', 'reason': {'FunctionUnknown': {}}}]}}], True],
+        [[{}, {'fn.notFound': {}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': ['fn.notFound'], 'reason': {'FunctionUnknown': {}}}]}}], True],
     ],
     'testErrors': [
         [[{'result': {'errorExample': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'errorExample': {'property': 'a'}}]],
-        [[{'result': {'errorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'errorExample.property', 'reason': {'RequiredStructFieldMissing': {}}}, {'path': 'errorExample.wrong', 'reason': {'StructFieldUnknown': {}}}]}}]],
-        [[{'result': {'errorUnknown': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': 'errorUnknown', 'reason': {'EnumFieldUnknown': {}}}]}}]],
+        [[{'result': {'errorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': ['errorExample', 'property'], 'reason': {'RequiredStructFieldMissing': {}}}, {'path': ['errorExample', 'wrong'], 'reason': {'StructFieldUnknown': {}}}]}}]],
+        [[{'result': {'errorUnknown': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'_errorInvalidResponseBody': {'cases': [{'path': ['errorUnknown'], 'reason': {'EnumFieldUnknown': {}}}]}}]],
     ],
     'testSelectFields': [
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'ok': {'value': {'struct': {'optional': False}}}}]],
@@ -199,23 +199,23 @@ cases = {
         [[{'_sel': {'fn.example': ['optional']}, 'ok': {'value': {'fn': {'required': True, 'optional': True}}}}, {'fn.test': {}}], [{}, {'ok': {'value': {'fn': {'optional': True}}}}]],
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'ok': {'value': {'arrStruct': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {}}], [{}, {'ok': {'value': {'arrStruct': [{}, {'optional': False}]}}}]],
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'ok': {'value': {'objStruct': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'ok': {'value': {'objStruct': {'a': {}, 'b': {'optional': False}}}}}]],
-        [[{'_sel': False, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{'_sel': 0, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{'_sel': '', 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{'_sel': [], 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{'_sel': {'': []}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{}', 'reason': {'SelectHeaderKeyMustBeStructReference': {}}}]}}]],
-        [[{'_sel': {'notStruct': []}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{notStruct}', 'reason': {'SelectHeaderKeyMustBeStructReference': {}}}]}}]],
-        [[{'_sel': {'struct.Unknown': []}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.Unknown}', 'reason': {'StructNameUnknown': {}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': False}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': 0}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': ''}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}', 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': {}}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Array': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': [False]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}[0]', 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': [0]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}[0]', 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'String': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': [[]]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}[0]', 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'String': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': [{}]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}[0]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'String': {}}}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': ['unknownField']}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}[0]', 'reason': {'StructFieldUnknown': {}}}]}}]],
-        [[{'_sel': {'struct.ExStruct': ['']}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_sel}{struct.ExStruct}[0]', 'reason': {'StructFieldUnknown': {}}}]}}]],
+        [[{'_sel': False, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{'_sel': 0, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{'_sel': '', 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{'_sel': [], 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{'_sel': {'': []}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', ''], 'reason': {'SelectHeaderKeyMustBeStructReference': {}}}]}}]],
+        [[{'_sel': {'notStruct': []}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'notStruct'], 'reason': {'SelectHeaderKeyMustBeStructReference': {}}}]}}]],
+        [[{'_sel': {'struct.Unknown': []}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.Unknown'], 'reason': {'StructNameUnknown': {}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': False}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': 0}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': ''}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': {}}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Array': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': [False]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': [0]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'String': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': [[]]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'String': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': [{}]}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'String': {}}}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': ['unknownField']}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'StructFieldUnknown': {}}}]}}]],
+        [[{'_sel': {'struct.ExStruct': ['']}, 'ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'StructFieldUnknown': {}}}]}}]],
     ],
     'testUnsafe': [
         [[{'_unsafe': True, 'result': {'ok': {'value': {'bool': 0}}}}, {'fn.test': {}}], [{}, {'ok': {'value': {'bool': 0}}}]],

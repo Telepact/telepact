@@ -98,14 +98,16 @@ class _ServerUtil {
         if (unknownTarget != null) {
             Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
                     Map.of("cases",
-                            List.of(Map.of("path", unknownTarget, "reason", Map.of("FunctionUnknown", Map.of())))));
+                            List.of(Map.of("path", List.of(unknownTarget), "reason",
+                                    Map.of("FunctionUnknown", Map.of())))));
             validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
         var argumentValidationFailures = argStructType.validate(requestPayload, List.of(), List.of());
         var argumentValidationFailuresWithPath = argumentValidationFailures
-                .stream().map(f -> new ValidationFailure("%s%s".formatted(functionType.name, f.path), f.reason, f.data))
+                .stream()
+                .map(f -> new ValidationFailure(_ValidateUtil.prepend(functionType.name, f.path), f.reason, f.data))
                 .toList();
         if (!argumentValidationFailuresWithPath.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
@@ -140,12 +142,8 @@ class _ServerUtil {
         if (!skipResultValidation) {
             var resultValidationFailures = resultEnumType.validate(
                     resultMessage.body, List.of(), List.of());
-            var resultValidationFailuresTrimmed = resultValidationFailures
-                    .stream()
-                    .map(f -> f.path.startsWith(".") ? new ValidationFailure(f.path.substring(1), f.reason, f.data) : f)
-                    .toList();
-            if (!resultValidationFailuresTrimmed.isEmpty()) {
-                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailuresTrimmed);
+            if (!resultValidationFailures.isEmpty()) {
+                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
                 Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
                 validateResult(resultEnumType, newErrorResult);

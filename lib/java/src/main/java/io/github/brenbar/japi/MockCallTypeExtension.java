@@ -23,7 +23,7 @@ public class MockCallTypeExtension implements TypeExtension {
             var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.startsWith("fn.")).findAny();
             if (optionalFunctionName.isEmpty()) {
                 validationFailures
-                        .add(new ValidationFailure("", "ExtensionValidationFailure",
+                        .add(new ValidationFailure(new ArrayList<Object>(), "ExtensionValidationFailure",
                                 Map.of("message", "StubMissingCall")));
             } else {
                 var functionName = optionalFunctionName.get();
@@ -33,7 +33,8 @@ public class MockCallTypeExtension implements TypeExtension {
 
                 var inputFailures = functionDef.arg.validate(input, List.of(), List.of());
                 var inputFailuresWithPath = inputFailures.stream()
-                        .map(f -> new ValidationFailure(".%s%s".formatted(functionName, f.path), f.reason, f.data))
+                        .map(f -> new ValidationFailure(_ValidateUtil.prepend(functionName, f.path), f.reason,
+                                f.data))
                         .toList();
                 var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
                         .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
@@ -43,7 +44,8 @@ public class MockCallTypeExtension implements TypeExtension {
 
         } catch (ClassCastException e) {
             validationFailures.add(
-                    new ValidationFailure("", "ExtensionValidationFailure", Map.of("message", "CallTypeRequired")));
+                    new ValidationFailure(new ArrayList<Object>(), "ExtensionValidationFailure",
+                            Map.of("message", "CallTypeRequired")));
         }
 
         return validationFailures;
