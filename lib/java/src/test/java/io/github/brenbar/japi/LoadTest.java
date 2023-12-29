@@ -78,15 +78,14 @@ public class LoadTest {
                             .setTimeoutMsDefault(600000));
 
             // warmup
-            var requestMessage = client.createRequestMessage(new Request("fn.getPaperTape", Map.of()));
+            var requestMessage = new Message("fn.getPaperTape", Map.of());
             client.send(requestMessage);
 
             var jsonTimers = metrics.timer("roundtrip-json");
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = jsonTimers.time()) {
-                    var requestMessage2 = client
-                            .createRequestMessage(new Request("fn.getPaperTape", Map.of()).setUseBinary(false));
+                    var requestMessage2 = new Message("fn.getPaperTape", Map.of());
                     client.send(requestMessage2);
                 }
             }
@@ -95,8 +94,7 @@ public class LoadTest {
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = binaryTimers.time()) {
-                    var requestMessage3 = client
-                            .createRequestMessage(new Request("fn.getPaperTape", Map.of()).addHeader("b", true));
+                    var requestMessage3 = new Message(Map.of("_binary", true), Map.of("fn.getPaperTape", Map.of()));
                     client.send(requestMessage3);
                 }
             }

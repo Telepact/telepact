@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -100,7 +98,7 @@ public class TestUtility {
             var client = new Client(adapter,
                     new Client.Options().setForceSendJsonDefault(false).setUseBinaryDefault(true)
                             .setTimeoutMsDefault(600000));
-            client.send(client.createRequestMessage(new Request("fn._ping", Map.of()))); // warmup
+            client.send(new Message("fn._ping", Map.of())); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
@@ -110,9 +108,8 @@ public class TestUtility {
             var requestPayloadPseudoJson = (Map<String, Object>) requestBodyPseudoJson.values().stream().findAny()
                     .get();
 
-            var responseMessage = client.send(client.createRequestMessage(new Request(requestTargetPseudoJson,
-                    requestPayloadPseudoJson).addHeaders(
-                            requestHeadersPseudoJson)));
+            var responseMessage = client.send(new Message(requestHeadersPseudoJson, Map.of(requestTargetPseudoJson,
+                    requestPayloadPseudoJson)));
             var resultAsPseudoJson = responseMessage.body;
             assertEquals(expectedResponseAsParsedJson.get(1), resultAsPseudoJson);
         }

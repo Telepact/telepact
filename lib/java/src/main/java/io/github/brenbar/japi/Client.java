@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -131,8 +130,6 @@ public class Client {
     private Serializer serializer;
     private Middleware middleware;
     private boolean useBinaryDefault;
-    private boolean forceSendJsonDefault;
-    private boolean throwOnError;
     private long timeoutMsDefault;
 
     /**
@@ -145,18 +142,10 @@ public class Client {
 
         this.middleware = options.middleware;
         this.useBinaryDefault = options.useBinaryDefault;
-        this.forceSendJsonDefault = options.forceSendJsonDefault;
-        this.throwOnError = options.throwOnError;
         this.timeoutMsDefault = options.timeoutMsDefault;
 
         this.serializer = new Serializer(options.serializationImpl,
                 new _ClientBinaryEncoder(options.binaryChecksumStrategy));
-    }
-
-    // TODO: Remove this in favor of headers
-    public Message createRequestMessage(Request request) {
-        return _ClientUtil.constructRequestMessage(request, this.useBinaryDefault,
-                this.forceSendJsonDefault, this.timeoutMsDefault);
     }
 
     /**

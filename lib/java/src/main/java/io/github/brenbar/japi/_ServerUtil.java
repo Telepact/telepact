@@ -117,7 +117,7 @@ class _ServerUtil {
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
-        var callMessage = new Message(requestHeaders, requestTarget, requestPayload);
+        var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 
         Message resultMessage;
         if (requestTarget.equals("fn._ping")) {
