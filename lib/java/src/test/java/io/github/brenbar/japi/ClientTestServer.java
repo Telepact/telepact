@@ -6,64 +6,70 @@ import java.net.UnixDomainSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.japi.Client.Adapter;
 import io.github.brenbar.japi.Client.Options;
+import io.nats.client.Nats;
 
 public class ClientTestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var socketPath = "./clientfrontdoor.socket";
-        var socketBackdoorPath = "./clientbackdoor.socket";
+        var natsUrl = args[0];
+        var clientFrontdoorTopic = args[1];
+        var clientBackdoorTopic = args[2];
 
         var objectMapper = new ObjectMapper();
 
-        var backdoorSocket = UnixDomainSocketAddress.of(socketBackdoorPath);
+        try (var connection = Nats.connect(natsUrl)) {
 
-        Adapter adapter = (m, s) -> {
-            return CompletableFuture.supplyAsync(() -> {
-                try (var backdoorChannel = SocketChannel.open(backdoorSocket)) {
-                    byte[] requestBytes;
+            Adapter adapter = (m, s) -> {
+                return CompletableFuture.supplyAsync(() -> {
                     try {
-                        requestBytes = s.serialize(m);
-                    } catch (IllegalArgumentException e) {
-                        return new Message(Map.of("numberTooBig", true), Map.of("_ErrorUnknown", Map.of()));
+                        byte[] requestBytes;
+                        try {
+                            requestBytes = s.serialize(m);
+                        } catch (IllegalArgumentException e) {
+                            return new Message(Map.of("numberTooBig", true), Map.of("_ErrorUnknown", Map.of()));
+                        }
+
+                        System.out.println("  <-|   %s".formatted(new String(requestBytes)));
+                        System.out.flush();
+
+                        io.nats.client.Message natsResponseMessage;
+                        try {
+                            natsResponseMessage = connection.request(clientBackdoorTopic, requestBytes,
+                                    Duration.ofSeconds(5));
+                        } catch (InterruptedException e1) {
+                            throw new RuntimeException("Interruption");
+                        }
+                        var responseBytes = natsResponseMessage.getData();
+
+                        System.out.println("  ->|   %s".formatted(new String(responseBytes)));
+                        System.out.flush();
+
+                        var responseMessage = s.deserialize(responseBytes);
+                        return responseMessage;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
+                });
+            };
 
-                    System.out.println("  <-|   %s".formatted(new String(requestBytes)));
-                    System.out.flush();
+            var client = new Client(adapter, new Options());
 
-                    TestUtility.writeSocket(backdoorChannel, requestBytes);
+            var dispatcher = connection.createDispatcher((msg) -> {
+                try {
+                    var requestBytes = msg.getData();
 
-                    var responseBytes = TestUtility.readSocket(backdoorChannel);
-
-                    System.out.println("  ->|   %s".formatted(new String(responseBytes)));
-                    System.out.flush();
-
-                    var responseMessage = s.deserialize(responseBytes);
-                    return responseMessage;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        };
-
-        var client = new Client(adapter, new Options());
-
-        var socket = UnixDomainSocketAddress.of(socketPath);
-        Files.deleteIfExists(socket.getPath());
-        try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
-            serverChannel.bind(socket);
-            while (true) {
-                try (var clientChannel = serverChannel.accept()) {
-                    var requestBytes = TestUtility.readSocket(clientChannel);
-
-                    System.out.println("   ->|  %s".formatted(new String(requestBytes)));
+                    System.out.println("    ->| %s".formatted(new String(requestBytes)));
                     System.out.flush();
 
                     var requestPseudoJson = objectMapper.readValue(requestBytes, List.class);
@@ -76,12 +82,15 @@ public class ClientTestServer {
                     var responsePseudoJson = List.of(response.header, response.body);
                     var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
-                    System.out.println("   <-|  %s".formatted(new String(responseBytes)));
+                    System.out.println("    <-| %s".formatted(new String(responseBytes)));
                     System.out.flush();
 
-                    TestUtility.writeSocket(clientChannel, responseBytes);
+                    connection.publish(msg.getReplyTo(), responseBytes);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            }
+            });
+            dispatcher.subscribe(clientFrontdoorTopic);
         }
     }
 }

@@ -6,21 +6,26 @@ import java.net.UnixDomainSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.japi.Server.Options;
+import io.nats.client.Nats;
 
 public class SchemaTestServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var socketPath = "./frontdoor.socket";
+        var apiSchemaPath = args[0];
+        var natsUrl = args[1];
+        var frontdoorTopic = args[2];
 
-        var path = args[0];
-        var json = Files.readString(FileSystems.getDefault().getPath(path));
+        var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var jApi = new JApiSchema(json);
         var objectMapper = new ObjectMapper();
 
@@ -48,23 +53,19 @@ public class SchemaTestServer {
 
         var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
 
-        var socket = UnixDomainSocketAddress.of(socketPath);
-        Files.deleteIfExists(socket.getPath());
-        try (var serverChannel = ServerSocketChannel.open(StandardProtocolFamily.UNIX)) {
-            serverChannel.bind(socket);
-            while (true) {
-                try (var clientChannel = serverChannel.accept()) {
-                    var requestBytes = TestUtility.readSocket(clientChannel);
+        try (var connection = Nats.connect(natsUrl)) {
+            var dispatcher = connection.createDispatcher((msg) -> {
+                var requestBytes = msg.getData();
 
-                    System.out.println("    ->| %s".formatted(new String(requestBytes)));
-                    System.out.flush();
-                    var responseBytes = server.process(requestBytes);
-                    System.out.println("    <-| %s".formatted(new String(responseBytes)));
-                    System.out.flush();
+                System.out.println("    ->| %s".formatted(new String(requestBytes)));
+                System.out.flush();
+                var responseBytes = server.process(requestBytes);
+                System.out.println("    <-| %s".formatted(new String(responseBytes)));
+                System.out.flush();
 
-                    TestUtility.writeSocket(clientChannel, responseBytes);
-                }
-            }
+                connection.publish(msg.getReplyTo(), responseBytes);
+            });
+            dispatcher.subscribe(frontdoorTopic);
         }
     }
 }
