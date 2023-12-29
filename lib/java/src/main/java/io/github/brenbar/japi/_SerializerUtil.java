@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class _SerializerUtil {
@@ -58,7 +59,7 @@ class _SerializerUtil {
     static byte[] serialize(Message message, BinaryEncoder binaryEncoder,
             SerializationImpl serializer) {
         var headers = message.header;
-        boolean serializeAsBinary = false;
+        boolean serializeAsBinary = headers.containsKey("_bin");
         if (headers.containsKey("_binary")) {
             serializeAsBinary = Objects.equals(true, headers.remove("_binary"));
         }
@@ -178,17 +179,30 @@ class _SerializerUtil {
         return List.of(headers, messageBody);
     }
 
-    static List<Object> clientBinaryEncode(List<Object> message, Deque<BinaryEncoding> recentBinaryEncoders)
+    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
+            BinaryChecksumStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
-        var checksums = recentBinaryEncoders.stream().map(be -> be.checksum).toList();
-        headers.put("_bin", checksums);
+        headers.put("_bin", binaryChecksumStrategy.get());
+
+        var forceSendJson = headers.remove("_forceSendJson");
+
+        if (Objects.equals(forceSendJson, true)) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        if (recentBinaryEncoders.size() > 1) {
+            // Can't know which encoder to use.
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        var checksums = recentBinaryEncoders.keySet().stream().toList();
 
         BinaryEncoding binaryEncoder;
         try {
-            binaryEncoder = recentBinaryEncoders.getFirst();
-        } catch (NoSuchElementException e) {
+            binaryEncoder = recentBinaryEncoders.get(checksums.get(0));
+        } catch (ArrayIndexOutOfBoundsException e) {
             throw new BinaryEncoderUnavailableError();
         }
 
@@ -199,7 +213,8 @@ class _SerializerUtil {
         return List.of(headers, encodedMessageBody);
     }
 
-    static List<Object> clientBinaryDecode(List<Object> message, Deque<BinaryEncoding> recentBinaryEncoders)
+    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
+            BinaryChecksumStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
 
@@ -222,23 +237,21 @@ class _SerializerUtil {
                         }
                     }));
             var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
-            recentBinaryEncoders.add(newBinaryEncoder);
-
-            // We need to maintain 2 binary encodings in case a server is undergoing an API
-            // change during a new jAPI deployment
-            if (recentBinaryEncoders.size() >= 3) {
-                recentBinaryEncoders.removeLast();
-            }
+            recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
         }
 
-        var binaryEncoder = findBinaryEncoder(binaryChecksum, recentBinaryEncoders);
-        if (!binaryEncoder.isPresent()) {
+        binaryChecksumStrategy.update(binaryChecksum);
+        List<Integer> newCurrentChecksumStrategy = binaryChecksumStrategy.get();
+        recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
+
+        var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);
+        if (binaryEncoder == null) {
             throw new BinaryEncoderUnavailableError();
         }
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
-        var messageBody = decode(encodedMessageBody, binaryEncoder.get());
+        var messageBody = decode(encodedMessageBody, binaryEncoder);
 
         return List.of(headers, messageBody);
     }

@@ -13,10 +13,13 @@ import java.util.stream.Collectors;
 class UApiSchemaTuple {
     public final List<Object> original;
     public final Map<String, UType> parsed;
+    public final Map<String, TypeExtension> typeExtensions;
 
-    public UApiSchemaTuple(List<Object> original, Map<String, UType> parsed) {
+    public UApiSchemaTuple(List<Object> original, Map<String, UType> parsed,
+            Map<String, TypeExtension> typeExtensions) {
         this.original = original;
         this.parsed = parsed;
+        this.typeExtensions = typeExtensions;
     }
 }
 

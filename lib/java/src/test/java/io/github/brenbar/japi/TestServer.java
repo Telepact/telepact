@@ -9,6 +9,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,9 +26,20 @@ public class TestServer {
         var path = args[0];
         var json = Files.readString(FileSystems.getDefault().getPath(path));
         var jApi = new JApiSchema(json);
+        var alternateJApi = new JApiSchema(jApi, new JApiSchema("""
+                [
+                    {
+                        "struct.BackwardsCompatibleChange": {}
+                    }
+                ]
+                """));
         var objectMapper = new ObjectMapper();
 
+        System.out.println(alternateJApi.original);
+
         var backdoorSocket = UnixDomainSocketAddress.of(socketBackdoorPath);
+
+        var serveAlternateServer = new AtomicBoolean();
 
         Function<Message, Message> handler = (requestMessage) -> {
             try (var backdoorChannel = SocketChannel.open(backdoorSocket)) {
@@ -48,6 +61,12 @@ public class TestServer {
                 var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
                 var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
                 var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
+
+                var toggleAlternateServer = requestHeaders.get("_toggleAlternateServer");
+                if (Objects.equals(true, toggleAlternateServer)) {
+                    serveAlternateServer.set(!serveAlternateServer.get());
+                }
+
                 return new Message(responseHeaders, responseBody);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -55,6 +74,7 @@ public class TestServer {
         };
 
         var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
+        var alternateServer = new Server(alternateJApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
 
         var socket = UnixDomainSocketAddress.of(socketPath);
         Files.deleteIfExists(socket.getPath());
@@ -66,7 +86,12 @@ public class TestServer {
 
                     System.out.println("    ->| %s".formatted(new String(requestBytes)));
                     System.out.flush();
-                    var responseBytes = server.process(requestBytes);
+                    byte[] responseBytes;
+                    if (serveAlternateServer.get()) {
+                        responseBytes = alternateServer.process(requestBytes);
+                    } else {
+                        responseBytes = server.process(requestBytes);
+                    }
                     System.out.println("    <-| %s".formatted(new String(responseBytes)));
                     System.out.flush();
 

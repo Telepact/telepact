@@ -1,5 +1,6 @@
 package io.github.brenbar.japi;
 
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -49,7 +50,8 @@ public class Client {
         boolean forceSendJsonDefault = true;
         boolean throwOnError = false;
         long timeoutMsDefault = 5000;
-        SerializationImpl serializationImpl;
+        SerializationImpl serializationImpl = new _DefaultSerializer();
+        BinaryChecksumStrategy binaryChecksumStrategy = new _DefaultBinaryChecksumStrategy();
 
         /**
          * Set a new middleware for this client.
@@ -111,6 +113,18 @@ public class Client {
             this.serializationImpl = serializationImpl;
             return this;
         }
+
+        /**
+         * Set the function that determines the binary checksum strategy for upcoming
+         * outgoing requests.
+         * 
+         * @param binaryChecksumStrategy
+         * @return
+         */
+        public Options setBinaryChecksumStrategy(BinaryChecksumStrategy binaryChecksumStrategy) {
+            this.binaryChecksumStrategy = binaryChecksumStrategy;
+            return this;
+        }
     }
 
     private Adapter adapter;
@@ -135,10 +149,11 @@ public class Client {
         this.throwOnError = options.throwOnError;
         this.timeoutMsDefault = options.timeoutMsDefault;
 
-        this.serializer = new Serializer(new _DefaultSerializer(),
-                new _ClientBinaryEncoder());
+        this.serializer = new Serializer(options.serializationImpl,
+                new _ClientBinaryEncoder(options.binaryChecksumStrategy));
     }
 
+    // TODO: Remove this in favor of headers
     public Message createRequestMessage(Request request) {
         return _ClientUtil.constructRequestMessage(request, this.useBinaryDefault,
                 this.forceSendJsonDefault, this.timeoutMsDefault);

@@ -28,3 +28,18 @@ cases = {
         [[{'_bin': [{}]}, {'fn._ping': {}}], [{}, {'_errorInvalidRequestHeaders': {'cases': [{'path': 'headers{_bin}[0]', 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}}]}}]]
     ]
 }
+
+binary_client_rotation_cases = {
+    'rotation': [
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+        [[{'ok': {}}, {'fn.test': {}}], [{}, {'ok': {}}]],
+    ]
+}

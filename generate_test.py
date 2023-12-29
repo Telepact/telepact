@@ -1,5 +1,6 @@
 from test.cases import cases as all_cases
-from test.binary.invalid_binary_cases import cases as binary_cases
+from test.invalid_binary_cases import cases as binary_cases
+from test.invalid_binary_cases import binary_client_rotation_cases
 from test.mock_cases import cases as mock_cases
 from test.mock_invalid_stub_cases import cases as mock_invalid_stub_cases
 from test.parse_cases import cases as parse_cases
@@ -258,6 +259,7 @@ def verify_case(runner: unittest.TestCase, request, expected_response, path, bac
                 if 'error' not in next(iter(response[1])):
                     runner.assertTrue('_bin' in response[0])
                 response[0].pop('_bin', None)
+                response[0].pop('_enc', None)
 
             if 'numberTooBig' in response[0]:
                 runner.skipTest('Cannot use big numbers with msgpack')
@@ -567,6 +569,61 @@ class BinaryClientTestCases(unittest.TestCase):
         verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
    
+
+        generated_tests.write('''
+
+class RotateBinaryClientTestCases(unittest.TestCase):
+                              
+    @classmethod
+    def setUpClass(cls):
+        initial_list = [0] * 10000
+        cls.backdoor_results = ShareableList(initial_list)
+        cls.client_backdoor_results = ShareableList(initial_list)
+        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
+        cls.process.start()
+        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, cls.client_backdoor_results,))
+        cls.client_process.start()                                                                            
+        
+        cls.servers = client_server.start('../../test/example.japi.json')
+                              
+    @classmethod
+    def tearDownClass(cls):
+        cls.backdoor_results.shm.close()
+        cls.backdoor_results.shm.unlink()
+        cls.client_backdoor_results.shm.close()
+        cls.client_backdoor_results.shm.unlink()
+        cls.process.terminate()
+        cls.process.join()
+        cls.client_process.terminate()
+        cls.client_process.join()
+        for server in cls.servers:
+            server.terminate()
+        for server in cls.servers:
+            server.wait()
+
+    def setUp(self):
+        self.__class__.backdoor_results[0] += 1
+        self.__class__.client_backdoor_results[0] += 1
+                        
+    ''')
+        
+        for name, cases in binary_client_rotation_cases.items():
+            generated_tests.write('''
+    def test_rotate_binary_client_{}(self):
+'''.format(name))
+
+            for i, case in enumerate(cases):
+                request = case[0]
+                expected_response = case[1]
+
+                generated_tests.write('''
+
+        request = {}
+        expected_response = {}
+        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True, use_binary=True)
+'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
+   
+
 
 
 if __name__ == '__main__':

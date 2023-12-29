@@ -20,6 +20,8 @@ class _UApiSchemaUtil {
         List<Object> secondOriginal = second.original;
         Map<String, UType> firstParsed = first.parsed;
         Map<String, UType> secondParsed = second.parsed;
+        Map<String, TypeExtension> firstTypeExtensions = first.typeExtensions;
+        Map<String, TypeExtension> secondTypeExtensions = second.typeExtensions;
 
         // Check for duplicates
         var duplicatedSchemaKeys = new HashSet<String>();
@@ -38,42 +40,14 @@ class _UApiSchemaUtil {
         original.addAll(firstOriginal);
         original.addAll(secondOriginal);
 
-        var schemaKeysToIndex = new HashMap<String, Integer>();
-        var index = 0;
-        for (var definition : original) {
-            Map<String, Object> def = (Map<String, Object>) definition;
+        var typeExtensions = new HashMap<String, TypeExtension>();
+        typeExtensions.putAll(firstTypeExtensions);
+        typeExtensions.putAll(secondTypeExtensions);
 
-            String schemaKey = findSchemaKey(def, index);
-
-            schemaKeysToIndex.put(schemaKey, index);
-            index += 1;
-        }
-
-        // Any traits in the first schema need to be applied to the second
-        for (var e : firstParsed.entrySet()) {
-            if (e.getValue() instanceof UTrait t) {
-                applyTraitToParsedTypes(t, secondParsed, schemaKeysToIndex);
-            }
-        }
-
-        // And vice versa
-        for (var e : secondParsed.entrySet()) {
-            if (e.getValue() instanceof UTrait t) {
-                applyTraitToParsedTypes(t, firstParsed, schemaKeysToIndex);
-            }
-        }
-
-        var parsed = new HashMap<String, UType>();
-        parsed.putAll(firstParsed);
-        parsed.putAll(secondParsed);
-
-        return new UApiSchemaTuple(original, parsed);
+        return parseUApiSchema(original, typeExtensions);
     }
 
     static UApiSchemaTuple parseUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
-        var parsedTypes = new HashMap<String, UType>();
-        var parseFailures = new ArrayList<SchemaParseFailure>();
-
         var objectMapper = new ObjectMapper();
         List<Object> originalUApiSchema;
         try {
@@ -84,6 +58,14 @@ class _UApiSchemaUtil {
                     List.of(new SchemaParseFailure("(document-root)", "ArrayTypeRequired", Map.of())),
                     e);
         }
+
+        return parseUApiSchema(originalUApiSchema, typeExtensions);
+    }
+
+    private static UApiSchemaTuple parseUApiSchema(List<Object> originalUApiSchema,
+            Map<String, TypeExtension> typeExtensions) {
+        var parsedTypes = new HashMap<String, UType>();
+        var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var schemaKeysToIndex = new HashMap<String, Integer>();
 
@@ -122,7 +104,7 @@ class _UApiSchemaUtil {
         boolean allowTraitsAndInfo = true;
         for (var schemaKey : schemaKeys) {
             var thisIndex = schemaKeysToIndex.get(schemaKey);
-            var thisPath = "[%d]".formatted(index);
+            var thisPath = "[%d]".formatted(thisIndex);
             var typ = getOrParseType(thisPath, schemaKey, rootTypeParameterCount, allowTraitsAndInfo,
                     originalUApiSchema,
                     schemaKeysToIndex,
@@ -154,7 +136,7 @@ class _UApiSchemaUtil {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        return new UApiSchemaTuple(originalUApiSchema, parsedTypes);
+        return new UApiSchemaTuple(originalUApiSchema, parsedTypes, typeExtensions);
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {

@@ -2,6 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -76,12 +77,26 @@ class _ClientUtil {
                 }
             }
 
+            if (requestMessage.header.containsKey("_bin")) {
+                throw new RuntimeException(
+                        "The client manages the _bin header. Use _binary = true to enable binary encoding.");
+            }
+
             if (!requestMessage.header.containsKey("_binary")) {
                 requestMessage.header.put("_binary", defaultBinary);
             }
 
             var responseMessage = adapter.apply(requestMessage, serializer).get(finalTimeoutMs,
                     TimeUnit.MILLISECONDS);
+
+            if (Objects.equals(responseMessage.body,
+                    Map.of("_errorParseFailure", Map.of("reasons", List.of("IncompatibleBinaryEncoding"))))) {
+                // Try again, but as json
+                requestMessage.header.put("_forceSendJson", true);
+                responseMessage = adapter.apply(requestMessage, serializer).get(finalTimeoutMs,
+                        TimeUnit.MILLISECONDS);
+            }
+
             return responseMessage;
         } catch (Exception e) {
             throw new ClientProcessError(e);
