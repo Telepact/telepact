@@ -98,11 +98,19 @@ class _UApiSchemaUtil {
             schemaKeysToIndex.put(schemaKey, index);
         }
 
+        var traitKeys = new HashSet<String>();
         var traits = new ArrayList<UTrait>();
 
         var rootTypeParameterCount = 0;
         boolean allowTraitsAndInfo = true;
         for (var schemaKey : schemaKeys) {
+            if (schemaKey.startsWith("info.")) {
+                continue;
+            }
+            if (schemaKey.startsWith("trait.")) {
+                traitKeys.add(schemaKey);
+                continue;
+            }
             var thisIndex = schemaKeysToIndex.get(schemaKey);
             var thisPath = "[%d]".formatted(thisIndex);
             var typ = getOrParseType(thisPath, schemaKey, rootTypeParameterCount, allowTraitsAndInfo,
@@ -114,7 +122,12 @@ class _UApiSchemaUtil {
             }
         }
 
-        for (var trait : traits) {
+        for (var traitKey : traitKeys) {
+            var thisIndex = schemaKeysToIndex.get(traitKey);
+            var def = (Map<String, Object>) originalUApiSchema.get(thisIndex);
+
+            var trait = parseTraitType(def, traitKey, originalUApiSchema, schemaKeysToIndex, parsedTypes,
+                    typeExtensions);
             try {
                 applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
             } catch (JApiSchemaParseError e) {
@@ -636,11 +649,6 @@ class _UApiSchemaUtil {
             } else if (customTypeName.startsWith("fn")) {
                 type = parseFunctionType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions, false);
-            } else if (allowTraitsAndInfo && customTypeName.startsWith("trait")) {
-                type = parseTraitType(definition, customTypeName, originalJApiSchema, schemaKeysToIndex, parsedTypes,
-                        typeExtensions);
-            } else if (allowTraitsAndInfo && customTypeName.startsWith("info")) {
-                type = new UInfo(customTypeName);
             } else if (customTypeName.startsWith("ext")) {
                 var typeExtension = typeExtensions.get(customTypeName);
                 if (typeExtension == null) {

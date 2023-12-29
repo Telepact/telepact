@@ -744,7 +744,7 @@ class UFn implements UType {
 }
 
 // TODO: trait is not a type
-class UTrait implements UType {
+class UTrait {
     public final String name;
     public final UFn fn;
     public final String regex;
@@ -754,66 +754,14 @@ class UTrait implements UType {
         this.fn = fn;
         this.regex = regex;
     }
-
-    @Override
-    public int getTypeParameterCount() {
-        return 0;
-    }
-
-    @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validate'");
-    }
-
-    @Override
-    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
-            RandomGenerator random) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
-    }
-
-    @Override
-    public String getName(List<UTypeDeclaration> generics) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getName'");
-    }
 }
 
 // TODO: info is not a type
-class UInfo implements UType {
+class UInfo {
     public final String name;
 
     public UInfo(String name) {
         this.name = name;
-    }
-
-    @Override
-    public int getTypeParameterCount() {
-        return 0;
-    }
-
-    @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'validate'");
-    }
-
-    @Override
-    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
-            RandomGenerator random) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
-    }
-
-    @Override
-    public String getName(List<UTypeDeclaration> generics) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getName'");
     }
 }
 
