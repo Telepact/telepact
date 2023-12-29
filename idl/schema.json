@@ -167,7 +167,7 @@
         "minProperties": 2,
         "patternProperties": {
           "^fn\\.[a-zA-Z_]\\w*": {
-            "description": "A function that accepts an argument argument and returns a result enum that is either an ok struct or an error enum.",
+            "description": "A function that accepts an argument argument and returns a result enum that is either an Ok struct or an error enum.",
             "type": "object",
             "additionalProperties": false,
             "patternProperties": {
@@ -181,7 +181,7 @@
         "properties": {
           "->": {
             "type": "object",
-            "required": ["ok"],
+            "required": ["Ok"],
             "patternProperties": {
               "^[a-zA-Z_]\\w*?$": {
                 "type": "object",
@@ -210,7 +210,7 @@
           "^trait\\.[a-zA-Z_]\\w*": {
             "type": "object",
             "additionalProperties": {
-              "description": "A function that accepts an argument argument and returns a result enum that is either an ok struct or an error enum.",
+              "description": "A function that accepts an argument argument and returns a result enum that is either an Ok struct or an error enum.",
               "type": "object",
               "additionalProperties": false,
               "patternProperties": {

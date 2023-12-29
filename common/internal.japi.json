@@ -3,7 +3,7 @@
     "///": " Ping the server. ",
     "fn._ping": {},
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
 
@@ -11,7 +11,7 @@
     "///": " Get the jAPI `schema` of this server. ",
     "fn._api": {},
     "->": {
-      "ok": {
+      "Ok": {
         "api": ["array", ["object", ["any"]]]
       }
     }
@@ -21,7 +21,7 @@
     "///": " A placeholder function when the requested function is unknown. ",
     "fn._unknown": {},
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
 
@@ -105,26 +105,26 @@
   {
     "///": [
       " All functions may return a validation error:                                                             ",
-      " - `_errorInvalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
-      " - `_errorInvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
-      " - `_errorInvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
+      " - `_ErrorInvalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
+      " - `_ErrorInvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
+      " - `_ErrorInvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
       "     outlined by a list of `cases.                                                                        ",
-      " - `_errorParseFailure`: The Request could not be parsed as a jAPI Message.                               "
+      " - `_ErrorParseFailure`: The Request could not be parsed as a jAPI Message.                               "
     ],
     "trait._Validated": {
       "fn._?*": {},
       "->": {
-        "_errorUnknown": {},
-        "_errorInvalidRequestHeaders": {
+        "_ErrorUnknown": {},
+        "_ErrorInvalidRequestHeaders": {
           "cases": ["array", ["struct._HeaderValidationFailure"]]
         },
-        "_errorInvalidRequestBody": {
+        "_ErrorInvalidRequestBody": {
           "cases": ["array", ["struct._BodyValidationFailure"]]
         },
-        "_errorInvalidResponseBody": {
+        "_ErrorInvalidResponseBody": {
           "cases": ["array", ["struct._BodyValidationFailure"]]
         },
-        "_errorParseFailure": {
+        "_ErrorParseFailure": {
           "reasons": ["array", ["enum._ParseFailure"]]
         }
       }

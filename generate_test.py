@@ -47,8 +47,8 @@ def handler(request):
 
     match target:
         case 'fn.test':
-            if 'ok' in header:
-                return [{}, {'ok': header['ok']}]
+            if 'Ok' in header:
+                return [{}, {'Ok': header['Ok']}]
             elif 'result' in header:
                 return [{}, header['result']]
             elif 'throw' in header:
@@ -256,7 +256,7 @@ def verify_case(runner: unittest.TestCase, request, expected_response, path, bac
             runner.assertEqual(expected_response, response_bytes)
         else:
             if use_binary:
-                if 'error' not in next(iter(response[1])):
+                if 'Error' not in next(iter(response[1])):
                     runner.assertTrue('_bin' in response[0])
                 response[0].pop('_bin', None)
                 response[0].pop('_enc', None)
@@ -528,7 +528,7 @@ class BinaryClientTestCases(unittest.TestCase):
         cls.servers = client_server.start('../../test/example.japi.json')
                               
         request = [{'_binary': True}, {'fn._ping': {}}]
-        expected_response = [{}, {'ok':{}}]
+        expected_response = [{}, {'Ok':{}}]
         verify_case(None, request, expected_response, path, use_client=True, skip_assertion=True)
     
     @classmethod

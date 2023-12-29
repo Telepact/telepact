@@ -313,9 +313,9 @@ class _UApiSchemaUtil {
         }
 
         if (!isForTrait) {
-            if (!resultDefinitionAsParsedJson.containsKey("ok")) {
+            if (!resultDefinitionAsParsedJson.containsKey("Ok")) {
                 var index = schemaKeysToIndex.get(schemaKey);
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d].->.ok".formatted(index),
+                throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d].->.Ok".formatted(index),
                         "RequiredKeyMissing", Map.of())));
             }
         }

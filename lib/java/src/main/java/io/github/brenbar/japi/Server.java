@@ -72,7 +72,7 @@ public class Server {
             } catch (Exception ignored) {
             }
             return this.serializer
-                    .serialize(new Message(new HashMap<>(), Map.of("_errorUnknown", Map.of())));
+                    .serialize(new Message(new HashMap<>(), Map.of("_ErrorUnknown", Map.of())));
         }
     }
 

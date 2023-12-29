@@ -7,10 +7,10 @@
   {
     "///": "A value for computation that can take either a constant or variable form.",
     "enum.Value": {
-      "constant": {
+      "Constant": {
         "value": ["number"]
       },
-      "variable": {
+      "Variable": {
         "name": ["string"]
       }
     }
@@ -19,10 +19,10 @@
   {
     "///": "A basic mathematical operation.",
     "enum.Operation": {
-      "add": {},
-      "sub": {},
-      "mul": {},
-      "div": {}
+      "Add": {},
+      "Sub": {},
+      "Mul": {},
+      "Div": {}
     }
   },
 
@@ -40,7 +40,7 @@
       "variables": ["object", ["number"]]
     },
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
 
@@ -52,7 +52,7 @@
       "op": ["enum.Operation"]
     },
     "->": {
-      "ok": {
+      "Ok": {
         "result": ["number"]
       },
       "errorCannotDivideByZero": {}
@@ -65,7 +65,7 @@
       "limit!": ["integer"]
     },
     "->": {
-      "ok": {
+      "Ok": {
         "variables": ["array", ["struct.Variable"]]
       }
     }
@@ -75,7 +75,7 @@
     "///": "A function template.",
     "fn.getPaperTape": {},
     "->": {
-      "ok": {
+      "Ok": {
         "tape": ["array", ["struct.Computation"]]
       }
     }

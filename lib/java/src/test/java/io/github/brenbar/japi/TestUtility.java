@@ -28,10 +28,10 @@ public class TestUtility {
         var functionName = requestMessage.body.keySet().stream().findAny().get();
         return switch (functionName) {
             case "fn.test" -> {
-                if (requestHeaders.containsKey("ok")) {
+                if (requestHeaders.containsKey("Ok")) {
                     try {
-                        var o = (Map<String, Object>) requestHeaders.get("ok");
-                        yield new Message(Map.of("ok", o));
+                        var o = (Map<String, Object>) requestHeaders.get("Ok");
+                        yield new Message(Map.of("Ok", o));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

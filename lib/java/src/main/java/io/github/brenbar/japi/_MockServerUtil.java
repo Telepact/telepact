@@ -39,7 +39,7 @@ class _MockServerUtil {
                 }
 
                 stubs.add(0, stub);
-                return new Message(Map.of("ok", Map.of()));
+                return new Message(Map.of("Ok", Map.of()));
             }
             case "fn._verify" -> {
                 var givenCall = (Map<String, Object>) argument.get("call");
@@ -49,7 +49,7 @@ class _MockServerUtil {
                 var callFunctionName = call.getKey();
                 var callArg = (Map<String, Object>) call.getValue();
                 var verifyTimes = (Map<String, Object>) argument.getOrDefault("count",
-                        Map.of("atLeast", Map.of("times", 1)));
+                        Map.of("AtLeast", Map.of("times", 1)));
                 var strictMatch = (Boolean) argument.getOrDefault("strictMatch", false);
 
                 var verificationTimes = parseFromPseudoJson(verifyTimes);
@@ -65,11 +65,11 @@ class _MockServerUtil {
             }
             case "fn._clearCalls" -> {
                 invocations.clear();
-                return new Message(Map.of("ok", Map.of()));
+                return new Message(Map.of("Ok", Map.of()));
             }
             case "fn._clearStubs" -> {
                 stubs.clear();
-                return new Message(Map.of("ok", Map.of()));
+                return new Message(Map.of("Ok", Map.of()));
             }
             default -> {
                 invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
@@ -101,17 +101,17 @@ class _MockServerUtil {
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return new Message(Map.of("_errorNoMatchingStub", Map.of()));
+                    return new Message(Map.of("_ErrorNoMatchingStub", Map.of()));
                 }
 
                 if (definition != null) {
                     var resultEnum = (UEnum) definition.result;
-                    var okStructRef = resultEnum.values.get("ok");
+                    var OkStructRef = resultEnum.values.get("Ok");
                     var useStartingValue = true;
                     var includeRandomOptionalFields = true;
-                    var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
+                    var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
                             includeRandomOptionalFields, List.of(), List.of(), random);
-                    return new Message(Map.of("ok", randomOkStruct));
+                    return new Message(Map.of("Ok", randomOkStruct));
                 } else {
                     throw new JApiProcessError("Unexpected unknown function: %s".formatted(functionName));
                 }
@@ -124,15 +124,15 @@ class _MockServerUtil {
         var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
         return switch (verifyTimesEntry.getKey()) {
             case "unlimited" -> new MockVerification.UnlimitedNumberOfTimes();
-            case "exact" -> {
+            case "Exact" -> {
                 var times = (Integer) verifyTimesStruct.get("times");
                 yield new MockVerification.ExactNumberOfTimes(times);
             }
-            case "atMost" -> {
+            case "AtMost" -> {
                 var times = (Integer) verifyTimesStruct.get("times");
                 yield new MockVerification.AtMostNumberOfTimes(times);
             }
-            case "atLeast" -> {
+            case "AtLeast" -> {
                 var times = (Integer) verifyTimesStruct.get("times");
                 yield new MockVerification.AtLeastNumberOfTimes(times);
             }
@@ -202,31 +202,31 @@ class _MockServerUtil {
         Map<String, Object> verificationFailurePseudoJson = null;
         if (verificationTimes instanceof ExactNumberOfTimes e) {
             if (matchesFound > e.times) {
-                verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
+                verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
+                                Map.entry("wanted", Map.of("Exact", Map.of("times", e.times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
             } else if (matchesFound < e.times) {
-                verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
+                verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("exact", Map.of("times", e.times))),
+                                Map.entry("wanted", Map.of("Exact", Map.of("times", e.times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
             }
         } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
             if (matchesFound > a.times) {
-                verificationFailurePseudoJson = Map.of("tooManyMatchingCalls",
+                verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("atMost", Map.of("times", a.times))),
+                                Map.entry("wanted", Map.of("AtMost", Map.of("times", a.times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
             }
         } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
             if (matchesFound < a.times) {
-                verificationFailurePseudoJson = Map.of("tooFewMatchingCalls",
+                verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("atLeast", Map.of("times", a.times))),
+                                Map.entry("wanted", Map.of("AtLeast", Map.of("times", a.times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
 
@@ -236,10 +236,10 @@ class _MockServerUtil {
         }
 
         if (verificationFailurePseudoJson == null) {
-            return Map.of("ok", Map.of());
+            return Map.of("Ok", Map.of());
         }
 
-        return Map.of("errorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
+        return Map.of("ErrorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
     }
 
     static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
@@ -250,10 +250,10 @@ class _MockServerUtil {
             for (var invocation : invocationsNotVerified) {
                 unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
             }
-            return Map.of("errorVerificationFailure",
+            return Map.of("ErrorVerificationFailure",
                     Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
         }
 
-        return Map.of("ok", Map.of());
+        return Map.of("Ok", Map.of());
     }
 }

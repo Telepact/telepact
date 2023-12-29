@@ -34,7 +34,7 @@
       "schema": ["any"]
     },
     "->": {
-      "ok": {},
+      "Ok": {},
       "errorValidationFailure": {
         "cases": ["array", ["struct.ValidationFailure"]]
       }

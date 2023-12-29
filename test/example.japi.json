@@ -199,8 +199,8 @@
 
   {
     "enum.ExEnum": {
-      "one": {},
-      "two": {
+      "One": {},
+      "Two": {
         "required": ["boolean"],
         "optional!": ["boolean"]
       }
@@ -228,8 +228,8 @@
 
   {
     "enum<1>.PEnum": {
-      "one": {},
-      "two": {
+      "One": {},
+      "Two": {
         "ewrap": ["T.0"]
       }
     }
@@ -237,8 +237,8 @@
 
   {
     "enum<2>.P2Enum": {
-      "one": {},
-      "two": {
+      "One": {},
+      "Two": {
         "ewrap": ["T.0"],
         "enest": ["array", ["T.1"]]
       }
@@ -252,7 +252,7 @@
       "optional!": ["boolean"]
     },
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
 
@@ -261,7 +261,7 @@
       "value!": ["struct.Value"]
     },
     "->": {
-      "ok": {
+      "Ok": {
         "value!": ["struct.Value"]
       },
       "errorExample": {

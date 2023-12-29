@@ -10,13 +10,13 @@
   {
     "///": " The number of times a function is allowed to be called. ",
     "enum._CallCountCriteria": {
-      "exact": {
+      "Exact": {
         "times": ["integer"]
       },
-      "atMost": {
+      "AtMost": {
         "times": ["integer"]
       },
-      "atLeast": {
+      "AtLeast": {
         "times": ["integer"]
       }
     }
@@ -24,12 +24,12 @@
   {
     "///": " An enumeration of possible causes for a mock verification to fail. ",
     "enum._VerificationFailure": {
-      "tooFewMatchingCalls": {
+      "TooFewMatchingCalls": {
         "wanted": ["enum._CallCountCriteria"],
         "found": ["integer"],
         "allCalls": ["array", ["ext._Call"]]
       },
-      "tooManyMatchingCalls": {
+      "TooManyMatchingCalls": {
         "wanted": ["enum._CallCountCriteria"],
         "found": ["integer"],
         "allCalls": ["array", ["ext._Call"]]
@@ -42,7 +42,7 @@
       " matches the function argument on a request.                                                              ",
       "                                                                                                          ",
       " If `ignoreMissingArgFields` is `true`, then the server will skip field omission validation on the `stub` ",
-      " argument, and the stub will match calls where the given `stub` argument is exactly a json sub-structure  ",
+      " argument, and the stub will match calls where the given `stub` argument is Exactly a json sub-structure  ",
       " of the request function argument.                                                                        ",
       "                                                                                                          ",
       " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the   ",
@@ -54,14 +54,14 @@
       "strictMatch!": ["boolean"]
     },
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
   {
     "///": [
       " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
       " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
-      " match calls where the given `call` argument is exactly a json sub-structure of the actual argument.    "
+      " match calls where the given `call` argument is Exactly a json sub-structure of the actual argument.    "
     ],
     "fn._verify": {
       "call": ["ext._Call"],
@@ -69,8 +69,8 @@
       "count!": ["enum._CallCountCriteria"]
     },
     "->": {
-      "ok": {},
-      "errorVerificationFailure": {
+      "Ok": {},
+      "ErrorVerificationFailure": {
         "reason": ["enum._VerificationFailure"]
       }
     }
@@ -82,8 +82,8 @@
     ],
     "fn._verifyNoMoreInteractions": {},
     "->": {
-      "ok": {},
-      "errorVerificationFailure": {
+      "Ok": {},
+      "ErrorVerificationFailure": {
         "additionalUnverifiedCalls": ["array", ["ext._Call"]]
       }
     }
@@ -92,26 +92,26 @@
     "///": " Clear all stub conditions. ",
     "fn._clearStubs": {},
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
   {
     "///": " Clear all call data. ",
     "fn._clearCalls": {},
     "->": {
-      "ok": {}
+      "Ok": {}
     }
   },
   {
     "///": [
-      " If random generation is disabled, functions may return a `_errorNoMatchingStub`  ",
+      " If random generation is disabled, functions may return a `_ErrorNoMatchingStub`  ",
       " error, indicating that the mock could not return a result for that function call ",
       " due to no matching stub being available.                                         "
     ],
     "trait._Mockable": {
       "fn.*": {},
       "->": {
-        "_errorNoMatchingStub": {}
+        "_ErrorNoMatchingStub": {}
       }
     }
   }

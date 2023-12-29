@@ -10,8 +10,8 @@ def generate_mock_cases(given_field: str, the_type, correct_values, additional_i
             if 'RequiredStructFieldMissing' in reason:
                 continue
 
-            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value': {field: incorrect_value}}, '->': {'ok': {}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', 'fn.test', 'value'] + base_path + path, 'reason': reason}]}}]]
-            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'ok': {'value': {field: incorrect_value}}}}}}], [{}, {'_errorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->', 'ok', 'value'] + base_path + path, 'reason': reason}]}}]]
+            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value': {field: incorrect_value}}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', 'fn.test', 'value'] + base_path + path, 'reason': reason}]}}]]
+            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'Ok': {'value': {field: incorrect_value}}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->', 'Ok', 'value'] + base_path + path, 'reason': reason}]}}]]
 
 
 cases = {
@@ -23,8 +23,8 @@ cases = {
     'object': [v for v in generate_mock_cases('obj', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
     'any': [v for v in generate_mock_cases('any', Any, [False, 0, 0.1, '', [], {}])],
     'struct': [v for v in generate_mock_cases('struct', dict, [{'required': False}, {'optional': False, 'required': False}], additional_struct_cases)],
-    'enum': [v for v in generate_mock_cases('enum', dict, [{'one': {}}, {'two':{'required': False}}, {'two':{'optional': False, 'required': False}}], additional_enum_cases)],
+    'enum': [v for v in generate_mock_cases('enum', dict, [{'One': {}}, {'Two':{'required': False}}, {'Two':{'optional': False, 'required': False}}], additional_enum_cases)],
     'fn': [v for v in generate_mock_cases('fn', dict, [{'required': False}, {'optional': False, 'required': False}], additional_fn_cases)],
     'p2Str': [v for v in generate_mock_cases('p2Str', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
-    'p2Enum': [v for v in generate_mock_cases('p2Enum', dict, [{'two': {'ewrap': False, 'enest': [0]}}, {'two': {'ewrap': True, 'enest': [1]}}], additional_p2Enum_cases)]
+    'p2Enum': [v for v in generate_mock_cases('p2Enum', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Enum_cases)]
 }

@@ -74,7 +74,7 @@ class _ServerUtil {
 
         if (requestHeaders.containsKey("_parseFailures")) {
             var parseFailures = (List<Object>) requestHeaders.get("_parseFailures");
-            Map<String, Object> newErrorResult = Map.of("_errorParseFailure",
+            Map<String, Object> newErrorResult = Map.of("_ErrorParseFailure",
                     Map.of("reasons", parseFailures));
             validateResult(resultEnumType, newErrorResult);
 
@@ -90,14 +90,14 @@ class _ServerUtil {
 
         if (!headerValidationFailures.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestHeaders",
+            Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestHeaders",
                     Map.of("cases", validationFailureCases));
             validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
 
         if (unknownTarget != null) {
-            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
+            Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
                     Map.of("cases",
                             List.of(Map.of("path", List.of(unknownTarget), "reason",
                                     Map.of("FunctionUnknown", Map.of())))));
@@ -112,7 +112,7 @@ class _ServerUtil {
                 .toList();
         if (!argumentValidationFailuresWithPath.isEmpty()) {
             var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
-            Map<String, Object> newErrorResult = Map.of("_errorInvalidRequestBody",
+            Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
             validateResult(resultEnumType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
@@ -124,9 +124,9 @@ class _ServerUtil {
 
         Message resultMessage;
         if (requestTarget.equals("fn._ping")) {
-            resultMessage = new Message("ok", Map.of());
+            resultMessage = new Message("Ok", Map.of());
         } else if (requestTarget.equals("fn._api")) {
-            resultMessage = new Message("ok", Map.of("api", jApiSchema.original));
+            resultMessage = new Message("Ok", Map.of("api", jApiSchema.original));
         } else {
             try {
                 resultMessage = handler.apply(callMessage);
@@ -136,7 +136,7 @@ class _ServerUtil {
                 } catch (Throwable ignored) {
 
                 }
-                resultMessage = new Message("_errorUnknown", Map.of());
+                resultMessage = new Message("_ErrorUnknown", Map.of());
             }
         }
         var skipResultValidation = unsafeResponseEnabled;
@@ -145,7 +145,7 @@ class _ServerUtil {
                     resultMessage.body, List.of(), List.of());
             if (!resultValidationFailures.isEmpty()) {
                 var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-                Map<String, Object> newErrorResult = Map.of("_errorInvalidResponseBody",
+                Map<String, Object> newErrorResult = Map.of("_ErrorInvalidResponseBody",
                         Map.of("cases", validationFailureCases));
                 validateResult(resultEnumType, newErrorResult);
                 return new Message(responseHeaders, newErrorResult);
