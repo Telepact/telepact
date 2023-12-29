@@ -79,8 +79,9 @@ class _ServerUtil {
             validateResult(resultUnionType, newErrorResult);
 
             // TODO: Need to find a good way to do this:
-            // if (parseFailures.contains("IncompatibleBinaryEncoding") ||
-            // parseFailures.contains("BinaryDecodeFailure")) {
+            // if (parseFailures.contains(Map.of("IncompatibleBinaryEncoding", Map.of())) ||
+            // parseFailures.contains(Map.of("BinaryDecodeFailure", Map.of()))) {
+            // System.out.println("still sending binary");
             // responseHeaders.put("_binary", true);
             // }
             return new Message(responseHeaders, newErrorResult);

@@ -244,6 +244,8 @@ def verify_case(runner: unittest.TestCase, request, expected_response, path, bac
                 response_json = response_bytes.decode()
                 response = json.loads(response_json)
 
+                print('|       {}'.format(response, flush=True))
+
     except Exception:
         print(traceback.format_exc())
         should_abort = True

@@ -71,6 +71,12 @@ class _MockServerUtil {
                 stubs.clear();
                 return new Message(Map.of("Ok", Map.of()));
             }
+            case "fn._setRandomSeed" -> {
+                var givenSeed = (Integer) argument.get("seed");
+
+                random.setSeed(givenSeed);
+                return new Message(Map.of("Ok", Map.of()));
+            }
             default -> {
                 invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
 

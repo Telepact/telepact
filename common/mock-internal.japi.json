@@ -103,6 +103,15 @@
     }
   },
   {
+    "///": " Set the seed of the random generator. ",
+    "fn._setRandomSeed": {
+      "seed": ["integer"]
+    },
+    "->": {
+      "Ok": {}
+    }
+  },
+  {
     "///": [
       " If random generation is disabled, functions may return a `_ErrorNoMatchingStub`  ",
       " error, indicating that the mock could not return a result for that function call ",
