@@ -3,11 +3,16 @@ package io.github.brenbar.japi;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +22,8 @@ import io.nats.client.Nats;
 
 public class TestServer {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] givenArgs) throws IOException, InterruptedException {
+        var args = givenArgs[0].split(",");
         var apiSchemaPath = args[0];
         var natsUrl = args[1];
         var frontdoorTopic = args[2];
@@ -96,7 +102,11 @@ public class TestServer {
 
                 connection.publish(msg.getReplyTo(), responseBytes);
             });
+
             dispatcher.subscribe(frontdoorTopic);
+
+            Files.write(Path.of("SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
+            Thread.sleep(10000000);
         }
     }
 }

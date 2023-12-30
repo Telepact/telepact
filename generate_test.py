@@ -15,8 +15,20 @@ import traceback
 import socket
 import msgpack
 import unittest
+import nats
+import asyncio
+import subprocess
 
 should_abort = False
+
+class Constants:
+    example_api_path = '../../test/example.japi.json'
+    binary_api_path = '../../test/binary/binary.japi.json'
+    schema_api_path = '../../test/schema.japi.json'
+    nats_url = 'nats://127.0.0.1:4222'
+    frontdoor_topic = 'frontdoor'
+    intermediate_topic = 'intermediate'
+    backdoor_topic = 'backdoor'
 
 
 def socket_recv(sock: socket.socket):
@@ -57,7 +69,7 @@ def handler(request):
                 return [{}, {}]
 
 
-def backdoor_handler(path, backdoor_results: ShareableList):
+async def old_backdoor_handler(path, backdoor_results: ShareableList):
     server_socket_path = '{}/backdoor.socket'.format(path)
     if os.path.exists(server_socket_path):
         os.remove(server_socket_path)
@@ -99,6 +111,29 @@ def backdoor_handler(path, backdoor_results: ShareableList):
             print(traceback.format_exc())
 
 
+async def backdoor_handler(backdoor_topic):
+    nats_client = await get_nats_client()
+
+    async def nats_handler(msg):
+        backdoor_request_bytes = msg.data
+        backdoor_request_json = backdoor_request_bytes.decode()
+        backdoor_request = json.loads(backdoor_request_json)
+
+        print(' |<-    {}'.format(backdoor_request), flush=True)
+
+        backdoor_response = handler(backdoor_request)
+
+        print(' |->    {}'.format(backdoor_response), flush=True)
+
+        backdoor_response_json = json.dumps(backdoor_response)
+        backdoor_response_bytes = backdoor_response_json.encode()        
+        await nats_client.publish(msg.reply, backdoor_response_bytes)
+
+    sub = await nats_client.subscribe(backdoor_topic, cb=nats_handler)
+
+    await sub.unsubscribe(limit=1)
+
+
 def count_int_keys(m: dict):
     int_keys = 0
     str_keys = 0
@@ -118,7 +153,7 @@ class NotEnoughIntegerKeys(Exception):
     pass
 
 
-def client_backdoor_handler(path, client_backdoor_results: ShareableList):
+def old_client_backdoor_handler(path, client_backdoor_results: ShareableList):
     client_backdoor_path = '{}/clientbackdoor.socket'.format(path)
     server_frontdoor_path = '{}/frontdoor.socket'.format(path)
     if os.path.exists(client_backdoor_path):
@@ -187,101 +222,147 @@ def client_backdoor_handler(path, client_backdoor_results: ShareableList):
             print(traceback.format_exc())
 
 
+async def client_backdoor_handler(path, client_frontdoor_topic, server_frontdoor_topic):
+    nats_client = await get_nats_client()
+
+    async def nats_handler(msg):
+        frontdoor_request_bytes = msg.data
+        try:
+            frontdoor_request_json = frontdoor_request_bytes.decode()
+            frontdoor_request = json.loads(frontdoor_request_json)
+        except Exception:
+            frontdoor_request = msgpack.loads(frontdoor_request_bytes, strict_map_key=False)
+            # TODO: Verify binary is done when it's supposed to be done
+
+        print('  |<-   {}'.format(frontdoor_request), flush=True)
+        print('   |->  {}'.format(frontdoor_request), flush=True)
+
+        frontdoor_response_bytes = await nats_client.request(server_frontdoor_topic, frontdoor_request_bytes, timeout=10)
+
+        try:
+            frontdoor_response_json = frontdoor_response_bytes.decode()
+            frontdoor_response = json.loads(frontdoor_response_json)
+        except Exception:
+            frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
+            # TODO: verify binary is done when it's supposed to be done
+
+        print('   |<-  {}'.format(frontdoor_response), flush=True)
+        print('  |->   {}'.format(frontdoor_response), flush=True)
+
+        await nats_client.publish(msg.reply, frontdoor_response_bytes)
+
+    sub = await nats_client.subscribe(client_frontdoor_topic, cb=nats_handler)
+
+    await sub.unsubscribe(limit=1)
+
+
 def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-def verify_case(runner: unittest.TestCase, request, expected_response, path, backdoor_results: ShareableList | None = None, client_backdoor_results: ShareableList | None = None, client_bitmask = 0xFF, use_client=False, use_binary=False, skip_assertion=False):
+nc = None
+
+async def get_nats_client():
+    global nc
+    if not nc:
+        nc = await nats.connect(Constants.nats_url) 
+    return nc
+
+
+def start_nats_server():
+    return subprocess.Popen(['nats-server', '-DV'])
+
+
+async def verify_basic_case(runner: unittest.TestCase, request, expected_response):
+
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(Constants.backdoor_topic))
+
+    response = await send_case(runner, request, expected_response, Constants.frontdoor_topic)
+
+    backdoor_handling_task.cancel()
+
+    runner.assertEqual(expected_response, response)
+
+
+async def verify_flat_case(runner: unittest.TestCase, request, expected_response):
+
+    response = await send_case(runner, request, expected_response, Constants.frontdoor_topic)
+
+    runner.assertEqual(expected_response, response)
+
+
+async def verify_client_case(runner: unittest.TestCase, request, expected_response, use_binary=False, enforce_binary=False, enforce_integer_keys=False):
+
+    client_handling_task = asyncio.create_task(client_backdoor_handler(Constants.intermediate_topic))    
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(Constants.backdoor_topic))
+
+    if use_binary:
+        request[0]['_binary'] = True
+
+    response = await send_case(runner, request, expected_response, Constants.frontdoor_topic)
+
+    backdoor_handling_task.cancel()
+    client_handling_task.cancel()
+
+    if use_binary:
+        if 'Error' not in next(iter(response[1])):
+            runner.assertTrue('_bin' in response[0])
+        response[0].pop('_bin', None)
+        response[0].pop('_enc', None)
+    
+    runner.assertEqual(expected_response, response)
+
+    # TODO: verify that binary was being done    
+            
+
+async def binary_client_warmup(request, expected_response):
+
+    client_handling_task = asyncio.create_task(client_backdoor_handler(Constants.intermediate_topic))
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(Constants.backdoor_topic))
+
+    response = await send_case(None, request, expected_response, Constants.frontdoor_topic)
+
+    backdoor_handling_task.cancel()
+    client_handling_task.cancel()
+
+
+async def send_case(runner: unittest.TestCase, request, expected_response, request_topic):
     global should_abort
     if should_abort:
         if runner:
             runner.skipTest('Skipped')
         else:
             return
+        
+    nats_client = await get_nats_client()
 
     if runner:
         runner.maxDiff = None
 
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(30)
+    print('|->     {}'.format(request), flush=True)
 
-    if backdoor_results:
-        test_index = backdoor_results[0]
-        backdoor_results[test_index] = 0
+    if type(request) == bytes:
+        request_bytes = request
+    else:
+        request_json = json.dumps(request)
+        request_bytes = request_json.encode()    
 
-    if client_backdoor_results:
-        test_index = client_backdoor_results[0]
-        client_backdoor_results[test_index] = 0
+    nats_response = await nats_client.request(request_topic, request_bytes, timeout=1)
 
-    try:
+    response_bytes = nats_response.data
 
-        if use_client:
-            socket_path = '{}/clientfrontdoor.socket'.format(path)
-        else:
-            socket_path = '{}/frontdoor.socket'.format(path)
-        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
-            while client.connect_ex(socket_path) != 0:
-                pass
+    if type(expected_response) == bytes:
+        response = response_bytes
+    else:
+        response_json = response_bytes.decode()
+        response = json.loads(response_json)    
 
-            if type(request) == bytes:
-                request_bytes = request
-            else:
-                if use_binary:
-                    request[0]['_binary'] = True
+    print('|<-     {}'.format(response), flush=True)
 
-                request_json = json.dumps(request)
-                request_bytes = request_json.encode()
+    if 'numberTooBig' in response[0]:
+        runner.skipTest('Cannot use big numbers with msgpack')    
 
-            print('|->     {}'.format(request_bytes), flush=True)
-
-            socket_send(client, request_bytes)
-
-            response_bytes = socket_recv(client)
-
-            print('|<-     {}'.format(response_bytes), flush=True)
-
-            if type(expected_response) != bytes:
-                response_json = response_bytes.decode()
-                response = json.loads(response_json)
-
-                print('|       {}'.format(response, flush=True))
-
-    except Exception:
-        print(traceback.format_exc())
-        should_abort = True
-        raise
-    finally:
-        signal.alarm(0)
-
-    if not skip_assertion:
-        if type(expected_response) == bytes:
-            runner.assertEqual(expected_response, response_bytes)
-        else:
-            if use_binary:
-                if 'Error' not in next(iter(response[1])):
-                    runner.assertTrue('_bin' in response[0])
-                response[0].pop('_bin', None)
-                response[0].pop('_enc', None)
-
-            if 'numberTooBig' in response[0]:
-                runner.skipTest('Cannot use big numbers with msgpack')
-            
-            runner.assertEqual(expected_response, response)
-    
-        if backdoor_results:
-            test_index = backdoor_results[0]
-            runner.assertEqual(0, backdoor_results[test_index])
-
-        if client_backdoor_results:
-            test_index = client_backdoor_results[0]
-            runner.assertEqual(0, client_backdoor_results[test_index] & client_bitmask, """
-client_bitmask
-bit 0 - client proxy failed outright
-bit 1 - request could not be parsed as mspack
-bit 2 - response could not be parsed as mspack
-bit 3 - binary request didn't have enough integer keys
-bit 4 - binary response didn't have enough integer keys
-""")
+    return response
 
 
 def generate():
@@ -298,7 +379,7 @@ def generate():
             'test/{}/test_generated.py'.format(lib_path), 'w')
 
         generated_tests.write('''
-from generate_test import verify_case, backdoor_handler, client_backdoor_handler
+from generate_test import verify_basic_case, verify_flat_case, verify_client_case, binary_client_warmup, start_nats_server, backdoor_handler, client_backdoor_handler, Constants as c
 import os
 from {} import server
 from {} import mock_server
@@ -308,6 +389,7 @@ import json
 import unittest
 import multiprocessing
 from multiprocessing.shared_memory import ShareableList
+import asyncio
 
                             
 path = '{}'
@@ -316,29 +398,25 @@ path = '{}'
         
         generated_tests.write('''
 
-class TestCases(unittest.TestCase):
+class TestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        initial_list = [0] * 10000
-        cls.backdoor_results = ShareableList(initial_list)
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
-        cls.process.start()                                            
-        
-        cls.server = server.start('../../test/example.japi.json')
+        cls.nats = start_nats_server()
+        try:
+            cls.server = server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.backdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
     
     @classmethod
     def tearDownClass(cls):
-        cls.backdoor_results.shm.close()
-        cls.backdoor_results.shm.unlink()
-        cls.process.terminate()
-        cls.process.join()
         cls.server.terminate()
         cls.server.wait()
+        cls.nats.terminate()
+        cls.nats.wait()
 
-    def setUp(self):
-        self.__class__.backdoor_results[0] += 1
-                        
     ''')
 
         for name, cases in all_cases.items():
@@ -348,33 +426,32 @@ class TestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_{}_{}(self):
+    async def test_{}_{:04d}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results)
+        await verify_basic_case(self, request, expected_response)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
                 
         generated_tests.write('''
 
-class BinaryTestCases(unittest.TestCase):
+class BinaryTestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        initial_list = [0] * 10000
-        cls.backdoor_results = ShareableList(initial_list)
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
-        cls.process.start()                                            
-        
-        cls.server = server.start('../../test/binary/binary.japi.json')
+        cls.nats = start_nats_server()
+        try:
+            cls.server = server.start(c.binary_api_path, c.nats_url, c.frontdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
     
     @classmethod
     def tearDownClass(cls):
-        cls.backdoor_results.shm.close()
-        cls.backdoor_results.shm.unlink()
-        cls.process.terminate()
-        cls.process.join()
         cls.server.terminate()
         cls.server.wait()
+        cls.nats.terminate()
+        cls.nats.wait()
                               
                         
 ''')
@@ -385,31 +462,39 @@ class BinaryTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_bin_{}(self):
+    async def test_bin_{:04d}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path)
+        await verify_basic_case(self, request, expected_response)
 '''.format(i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         generated_tests.write('''
 
-class MockTestCases(unittest.TestCase):
+class MockTestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        cls.server = mock_server.start('../../test/example.japi.json')
+        cls.nats = start_nats_server()
+        try:
+            cls.server = mock_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
     
     @classmethod
     def tearDownClass(cls):
         cls.server.terminate()
         cls.server.wait()
+        cls.nats.terminate()
+        cls.nats.wait()
                               
                         
 ''')
 
         for name, cases in mock_cases.items():
             generated_tests.write('''
-    def test_mock_{}(self):
+    async def test_mock_{}(self):
 '''.format(name))
             
             for i, case in enumerate(cases):
@@ -419,7 +504,7 @@ class MockTestCases(unittest.TestCase):
                 generated_tests.write('''
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path)
+        await verify_flat_case(self, request, expected_response)
 '''.format(request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         for name, cases in mock_invalid_stub_cases.items():
@@ -428,24 +513,32 @@ class MockTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_invalid_mock_{}_{}(self):
+    async def test_invalid_mock_{}_{:04d}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path)
+        await verify_flat_case(self, request, expected_response)
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         generated_tests.write('''
 
-class SchemaTestCases(unittest.TestCase):
+class SchemaTestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        cls.server = schema_server.start('../../test/schema.japi.json')
+        cls.nats = start_nats_server()
+        try:
+            cls.server = schema_server.start(c.schema_api_path, c.nats_url, c.frontdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
     
     @classmethod
     def tearDownClass(cls):
         cls.server.terminate()
         cls.server.wait()
+        cls.nats.terminate()
+        cls.nats.wait()
                               
                         
 ''')
@@ -456,47 +549,35 @@ class SchemaTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_{}_{}(self):
+    async def test_{}_{:04d}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path)
+        await verify_flat_case(self, request, expected_response)
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
 
         generated_tests.write('''
 
-class ClientTestCases(unittest.TestCase):
+class ClientTestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        initial_list = [0] * 10000
-        cls.backdoor_results = ShareableList(initial_list)
-        cls.client_backdoor_results = ShareableList(initial_list)
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results))
-        cls.process.start()
-        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, cls.client_backdoor_results))
-        cls.client_process.start()                                                                            
-        
-        cls.servers = client_server.start('../../test/example.japi.json')
-    
+        cls.nats = start_nats_server()
+        try:
+            cls.servers = client_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.intermediate_topic, c.backdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
+
     @classmethod
     def tearDownClass(cls):
-        cls.backdoor_results.shm.close()
-        cls.backdoor_results.shm.unlink()
-        cls.client_backdoor_results.shm.close()
-        cls.client_backdoor_results.shm.unlink()
-        cls.process.terminate()
-        cls.process.join()
-        cls.client_process.terminate()
-        cls.client_process.join()
         for server in cls.servers:
             server.terminate()
         for server in cls.servers:
             server.wait()
-
-    def setUp(self):
-        self.__class__.backdoor_results[0] += 1
-        self.__class__.client_backdoor_results[0] += 1
+        cls.nats.terminate()
+        cls.nats.wait()
                         
     ''')
 
@@ -507,50 +588,38 @@ class ClientTestCases(unittest.TestCase):
                 expected_response = case[1]
 
                 generated_tests.write('''
-    def test_client_{}_{}(self):
+    async def test_client_{}_{:04d}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+        await verify_client_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
         generated_tests.write('''
 
-class BinaryClientTestCases(unittest.TestCase):
+class BinaryClientTestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        initial_list = [0] * 10000
-        cls.backdoor_results = ShareableList(initial_list)
-        cls.client_backdoor_results = ShareableList(initial_list)
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
-        cls.process.start()
-        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, cls.client_backdoor_results,))
-        cls.client_process.start()                                                                            
-        
-        cls.servers = client_server.start('../../test/example.japi.json')
+        cls.nats = start_nats_server()
+        try:
+            cls.servers = client_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.intermediate_topic, c.backdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
                               
         request = [{'_binary': True}, {'fn._ping': {}}]
         expected_response = [{}, {'Ok':{}}]
-        verify_case(None, request, expected_response, path, use_client=True, skip_assertion=True)
+        binary_client_warmup(request, expected_response)
     
     @classmethod
     def tearDownClass(cls):
-        cls.backdoor_results.shm.close()
-        cls.backdoor_results.shm.unlink()
-        cls.client_backdoor_results.shm.close()
-        cls.client_backdoor_results.shm.unlink()
-        cls.process.terminate()
-        cls.process.join()
-        cls.client_process.terminate()
-        cls.client_process.join()
         for server in cls.servers:
             server.terminate()
         for server in cls.servers:
             server.wait()
-
-    def setUp(self):
-        self.__class__.backdoor_results[0] += 1
-        self.__class__.client_backdoor_results[0] += 1
+        cls.nats.terminate()
+        cls.nats.wait()
                         
     ''')
 
@@ -565,53 +634,42 @@ class BinaryClientTestCases(unittest.TestCase):
                 client_bitmask = 0xFF if case[2] else 0xE7
 
                 generated_tests.write('''
-    def test_binary_client_{}_{}(self):
+    async def test_binary_client_{}_{:04d}(self):
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
+        await verify_client_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
    
 
         generated_tests.write('''
 
-class RotateBinaryClientTestCases(unittest.TestCase):
+class RotateBinaryClientTestCases(unittest.IsolatedAsyncioTestCase):
                               
     @classmethod
     def setUpClass(cls):
-        initial_list = [0] * 10000
-        cls.backdoor_results = ShareableList(initial_list)
-        cls.client_backdoor_results = ShareableList(initial_list)
-        cls.process = multiprocessing.Process(target=backdoor_handler, args=(path, cls.backdoor_results,))
-        cls.process.start()
-        cls.client_process = multiprocessing.Process(target=client_backdoor_handler, args=(path, cls.client_backdoor_results,))
-        cls.client_process.start()                                                                            
-        
-        cls.servers = client_server.start('../../test/example.japi.json')
+        cls.nats = start_nats_server()
+        try:
+            cls.servers = client_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.intermediate_topic, c.backdoor_topic)
+        except Exception:
+            cls.nats.terminate()
+            cls.nats.wait()
+            raise
+            
                               
     @classmethod
     def tearDownClass(cls):
-        cls.backdoor_results.shm.close()
-        cls.backdoor_results.shm.unlink()
-        cls.client_backdoor_results.shm.close()
-        cls.client_backdoor_results.shm.unlink()
-        cls.process.terminate()
-        cls.process.join()
-        cls.client_process.terminate()
-        cls.client_process.join()
         for server in cls.servers:
             server.terminate()
         for server in cls.servers:
             server.wait()
-
-    def setUp(self):
-        self.__class__.backdoor_results[0] += 1
-        self.__class__.client_backdoor_results[0] += 1
+        cls.nats.terminate()
+        cls.nats.wait()
                         
     ''')
         
         for name, cases in binary_client_rotation_cases.items():
             generated_tests.write('''
-    def test_rotate_binary_client_{}(self):
+    async def test_rotate_binary_client_{}(self):
 '''.format(name))
 
             for i, case in enumerate(cases):
@@ -626,7 +684,7 @@ class RotateBinaryClientTestCases(unittest.TestCase):
 
         request = {}
         expected_response = {}
-        verify_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
+        await verify_client_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
 '''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
    
 
