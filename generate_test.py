@@ -18,6 +18,8 @@ import unittest
 import nats
 import asyncio
 import subprocess
+import pytest
+import nats.aio.client
 
 should_abort = False
 
@@ -29,27 +31,6 @@ class Constants:
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'
     backdoor_topic = 'backdoor'
-
-
-def socket_recv(sock: socket.socket):
-    length = int.from_bytes(sock.recv(4))
-    chunks = []
-    length_received = 0
-    while length_received < length:
-        chunk = sock.recv(min(length - length_received, 4096))
-        length_received += len(chunk)
-        chunks.append(chunk)
-        pass
-    return b''.join(chunks)
-
-
-def socket_send(sock: socket.socket, given_bytes):
-    length = int(len(given_bytes))
-
-    framed_bytes = length.to_bytes(4) + given_bytes
-
-    sock.send(framed_bytes)    
-
 
 def handler(request):
     header = request[0]
@@ -67,48 +48,6 @@ def handler(request):
                 return None
             else:
                 return [{}, {}]
-
-
-async def old_backdoor_handler(path, backdoor_results: ShareableList):
-    server_socket_path = '{}/backdoor.socket'.format(path)
-    if os.path.exists(server_socket_path):
-        os.remove(server_socket_path)
-
-    server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    server_socket.bind(server_socket_path)
-    server_socket.listen()
-
-    while True:
-        (client_socket, address) = server_socket.accept()
-        try:
-            backdoor_request_bytes = socket_recv(client_socket)
-
-            if backdoor_request_bytes == b'':
-                continue
-
-            print(' |<-    {}'.format(backdoor_request_bytes), flush=True)
-
-            backdoor_request_json = backdoor_request_bytes.decode()
-
-            try:
-                backdoor_request = json.loads(backdoor_request_json)
-                backdoor_response = handler(backdoor_request)
-            except Exception:
-                print(traceback.format_exc())
-                backdoor_response = "Boom!"
-
-            backdoor_response_json = json.dumps(backdoor_response)
-
-            backdoor_response_bytes = backdoor_response_json.encode()
-
-            print(' |->    {}'.format(backdoor_request_json), flush=True)
-
-            socket_send(client_socket, backdoor_response_bytes)
-
-        except Exception:
-            index = backdoor_results[0]
-            backdoor_results[index + 1] = 1
-            print(traceback.format_exc())
 
 
 async def backdoor_handler(backdoor_topic):
@@ -152,74 +91,6 @@ def count_int_keys(m: dict):
 class NotEnoughIntegerKeys(Exception):
     pass
 
-
-def old_client_backdoor_handler(path, client_backdoor_results: ShareableList):
-    client_backdoor_path = '{}/clientbackdoor.socket'.format(path)
-    server_frontdoor_path = '{}/frontdoor.socket'.format(path)
-    if os.path.exists(client_backdoor_path):
-        os.remove(client_backdoor_path)
-
-    client_backdoor_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    client_backdoor_socket.bind(client_backdoor_path)
-    client_backdoor_socket.listen()
-    while True:
-        (client_backdoor_client, address) = client_backdoor_socket.accept()
-        try:
-            backdoor_request_bytes = socket_recv(client_backdoor_client)
-
-            if backdoor_request_bytes == b'':
-                continue
-
-            print('  |<-   {}'.format(backdoor_request_bytes), flush=True)
-
-            # try to check binary, we may not need to, but store the result anyway
-            try:
-                backdoor_request = msgpack.loads(backdoor_request_bytes, strict_map_key=False)
-                (int_keys, str_keys) = count_int_keys(backdoor_request[1])
-                if int_keys < str_keys:
-                    raise NotEnoughIntegerKeys()
-            except NotEnoughIntegerKeys:
-                index = client_backdoor_results[0]
-                client_backdoor_results[index + 1] |= 8
-            except Exception:
-                index = client_backdoor_results[0]
-                client_backdoor_results[index + 1] |= 2
-
-
-            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as server_frontdoor_client:
-                while server_frontdoor_client.connect_ex(server_frontdoor_path) != 0:
-                    pass
-
-                print('   |->  {}'.format(backdoor_request_bytes), flush=True)
-
-                socket_send(server_frontdoor_client, backdoor_request_bytes)
-
-                backdoor_response_bytes = socket_recv(server_frontdoor_client)
-
-                print('   |<-  {}'.format(backdoor_response_bytes), flush=True)
-
-                # try to check binary, we may not need to, but store the result anyway
-                try:
-                    backdoor_request = msgpack.loads(backdoor_request_bytes, strict_map_key=False)
-                    (int_keys, str_keys) = count_int_keys(backdoor_request[1])
-                    if int_keys < str_keys:
-                        raise NotEnoughIntegerKeys()
-                except NotEnoughIntegerKeys:
-                    index = client_backdoor_results[0]
-                    client_backdoor_results[index + 1] |= 16
-                except Exception:
-                    index = client_backdoor_results[0]
-                    client_backdoor_results[index] |= 4
-
-
-            print('  |->   {}'.format(backdoor_response_bytes), flush=True)
-
-            socket_send(client_backdoor_client, backdoor_response_bytes)
-
-        except Exception:
-            index = client_backdoor_results[0]
-            client_backdoor_results[index] |= 1
-            print(traceback.format_exc())
 
 
 async def client_backdoor_handler(path, client_frontdoor_topic, server_frontdoor_topic):
@@ -273,71 +144,61 @@ def start_nats_server():
     return subprocess.Popen(['nats-server', '-DV'])
 
 
-async def verify_basic_case(runner: unittest.TestCase, request, expected_response):
+async def verify_basic_case(request, expected_response, frontdoor_topic, backdoor_topic):
 
-    backdoor_handling_task = asyncio.create_task(backdoor_handler(Constants.backdoor_topic))
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
-    response = await send_case(runner, request, expected_response, Constants.frontdoor_topic)
+    response = await send_case(request, expected_response, frontdoor_topic)
 
     backdoor_handling_task.cancel()
 
-    runner.assertEqual(expected_response, response)
+    assert expected_response == response
 
 
-async def verify_flat_case(runner: unittest.TestCase, request, expected_response):
+async def verify_flat_case(request, expected_response, frontdoor_topic):
 
-    response = await send_case(runner, request, expected_response, Constants.frontdoor_topic)
+    response = await send_case(request, expected_response, frontdoor_topic)
 
-    runner.assertEqual(expected_response, response)
+    assert expected_response == response
 
 
-async def verify_client_case(runner: unittest.TestCase, request, expected_response, use_binary=False, enforce_binary=False, enforce_integer_keys=False):
+async def verify_client_case(request, expected_response, frontdoor_topic, intermediate_topic, backdoor_topic, use_binary=False, enforce_binary=False, enforce_integer_keys=False):
 
-    client_handling_task = asyncio.create_task(client_backdoor_handler(Constants.intermediate_topic))    
-    backdoor_handling_task = asyncio.create_task(backdoor_handler(Constants.backdoor_topic))
+    client_handling_task = asyncio.create_task(client_backdoor_handler(intermediate_topic))    
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
     if use_binary:
         request[0]['_binary'] = True
 
-    response = await send_case(runner, request, expected_response, Constants.frontdoor_topic)
+    response = await send_case(request, expected_response, frontdoor_topic)
 
     backdoor_handling_task.cancel()
     client_handling_task.cancel()
 
     if use_binary:
         if 'Error' not in next(iter(response[1])):
-            runner.assertTrue('_bin' in response[0])
+            assert '_bin' in response[0]
         response[0].pop('_bin', None)
         response[0].pop('_enc', None)
     
-    runner.assertEqual(expected_response, response)
+    assert expected_response == response
 
     # TODO: verify that binary was being done    
             
 
-async def binary_client_warmup(request, expected_response):
+async def binary_client_warmup(request, expected_response, frontdoor_topic, intermediate_topic, backdoor_topic):
 
-    client_handling_task = asyncio.create_task(client_backdoor_handler(Constants.intermediate_topic))
-    backdoor_handling_task = asyncio.create_task(backdoor_handler(Constants.backdoor_topic))
+    client_handling_task = asyncio.create_task(client_backdoor_handler(intermediate_topic))
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
-    response = await send_case(None, request, expected_response, Constants.frontdoor_topic)
+    response = await send_case(request, expected_response, frontdoor_topic)
 
     backdoor_handling_task.cancel()
     client_handling_task.cancel()
 
 
-async def send_case(runner: unittest.TestCase, request, expected_response, request_topic):
-    global should_abort
-    if should_abort:
-        if runner:
-            runner.skipTest('Skipped')
-        else:
-            return
-        
+async def send_case(request, expected_response, request_topic):
     nats_client = await get_nats_client()
-
-    if runner:
-        runner.maxDiff = None
 
     print('|->     {}'.format(request), flush=True)
 
@@ -360,7 +221,7 @@ async def send_case(runner: unittest.TestCase, request, expected_response, reque
     print('|<-     {}'.format(response), flush=True)
 
     if 'numberTooBig' in response[0]:
-        runner.skipTest('Cannot use big numbers with msgpack')    
+        pytest.skip('Cannot use big numbers with msgpack')
 
     return response
 
@@ -372,52 +233,35 @@ def generate():
     for lib_path in lib_paths:
         os.makedirs('test/{}'.format(lib_path), exist_ok=True)
 
-        if not os.path.exists('test/{}/__init__.py'.format(lib_path)):
-            pathlib.Path('test/{}/__init__.py'.format(lib_path)).touch()
+        init = open('test/{}/__init__.py'.format(lib_path), 'w')
+        init.write('''
+import pytest
 
-        generated_tests = open(
-            'test/{}/test_generated.py'.format(lib_path), 'w')
+pytestmark = pytest.mark.asyncio(scope="package")
+''')
 
-        generated_tests.write('''
-from generate_test import verify_basic_case, verify_flat_case, verify_client_case, binary_client_warmup, start_nats_server, backdoor_handler, client_backdoor_handler, Constants as c
-import os
-from {} import server
-from {} import mock_server
-from {} import schema_server
-from {} import client_server
-import json
-import unittest
-import multiprocessing
-from multiprocessing.shared_memory import ShareableList
+        generated_tests_basic = open(
+            'test/{}/test_basic_generated.py'.format(lib_path), 'w')
+
+        imports = '''
+from generate_test import verify_basic_case, verify_flat_case, verify_client_case, binary_client_warmup, get_nats_client, backdoor_handler, client_backdoor_handler, Constants as c
+from {} import server, mock_server, schema_server, client_server
 import asyncio
+import pytest
 
-                            
-path = '{}'
-
-'''.format(lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path.replace('/', '.'), lib_path))
+'''.format(lib_path.replace('/', '.'))
         
-        generated_tests.write('''
+        generated_tests_basic.write(imports)
+        
+        generated_tests_basic.write('''
+@pytest.fixture(scope="module")
+def basic_server_proc(nats_server):
+    s = server.start(c.example_api_path, c.nats_url, 'front-basic', 'back-basic')
+    yield s
+    s.terminate()
+    s.wait()
 
-class TestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.server = server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.backdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-    
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.terminate()
-        cls.server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-
-    ''')
+''')
 
         for name, cases in all_cases.items():
 
@@ -425,35 +269,26 @@ class TestCases(unittest.IsolatedAsyncioTestCase):
                 request = case[0]
                 expected_response = case[1]
 
-                generated_tests.write('''
-    async def test_{}_{:04d}(self):
-        request = {}
-        expected_response = {}
-        await verify_basic_case(self, request, expected_response)
+                generated_tests_basic.write('''
+@pytest.mark.asyncio
+async def test_{}_{:04d}(basic_server_proc):
+    request = {}
+    expected_response = {}
+    await verify_basic_case(request, expected_response, 'front-basic', 'back-basic')
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
-                
-        generated_tests.write('''
 
-class BinaryTestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.server = server.start(c.binary_api_path, c.nats_url, c.frontdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-    
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.terminate()
-        cls.server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-                              
-                        
+        generated_tests_binary = open(
+            'test/{}/test_binary_generated.py'.format(lib_path), 'w') 
+        
+        generated_tests_binary.write(imports)
+
+        generated_tests_binary.write('''
+@pytest.fixture(scope="module")
+def binary_server_proc(nats_server):
+    s = server.start(c.binary_api_path, c.nats_url, 'front-binary', 'back-binary')
+    yield s
+    s.terminate()
+    s.wait()
 ''')
 
         for name, cases in binary_cases.items():
@@ -461,50 +296,42 @@ class BinaryTestCases(unittest.IsolatedAsyncioTestCase):
                 request = case[0]
                 expected_response = case[1]
 
-                generated_tests.write('''
-    async def test_bin_{:04d}(self):
-        request = {}
-        expected_response = {}
-        await verify_basic_case(self, request, expected_response)
+                generated_tests_binary.write('''
+@pytest.mark.asyncio
+async def test_bin_{:04d}(nats_client, binary_server_proc):
+    request = {}
+    expected_response = {}
+    await verify_basic_case(request, expected_response, 'front-binary', 'back-binary')
+
 '''.format(i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
-        generated_tests.write('''
+        generated_tests_mock = open(
+            'test/{}/test_mock_generated.py'.format(lib_path), 'w')    
 
-class MockTestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.server = mock_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-    
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.terminate()
-        cls.server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-                              
-                        
+        generated_tests_mock.write(imports)
+
+        generated_tests_mock.write('''
+@pytest.fixture(scope="module")
+def mock_server_proc(nats_server):
+    s = mock_server.start(c.example_api_path, c.nats_url, 'front-mock')
+    yield s
+    s.terminate()
+    s.wait()
 ''')
 
         for name, cases in mock_cases.items():
-            generated_tests.write('''
-    async def test_mock_{}(self):
+            generated_tests_mock.write('''
+async def test_mock_{}(nats_client, mock_server_proc):
 '''.format(name))
             
             for i, case in enumerate(cases):
                 request = case[0]
                 expected_response = case[1]
 
-                generated_tests.write('''
-        request = {}
-        expected_response = {}
-        await verify_flat_case(self, request, expected_response)
+                generated_tests_mock.write('''
+    request = {}
+    expected_response = {}
+    await verify_flat_case(request, expected_response, 'front-mock')
 '''.format(request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         for name, cases in mock_invalid_stub_cases.items():
@@ -512,35 +339,25 @@ class MockTestCases(unittest.IsolatedAsyncioTestCase):
                 request = case[0]
                 expected_response = case[1]
 
-                generated_tests.write('''
-    async def test_invalid_mock_{}_{:04d}(self):
-        request = {}
-        expected_response = {}
-        await verify_flat_case(self, request, expected_response)
+                generated_tests_mock.write('''
+async def test_invalid_mock_{}_{:04d}(nats_client, mock_server_proc):
+    request = {}
+    expected_response = {}
+    await verify_flat_case(request, expected_response, 'front-mock')
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
-        generated_tests.write('''
+        generated_tests_schema = open(
+            'test/{}/test_schema_generated.py'.format(lib_path), 'w')
 
-class SchemaTestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.server = schema_server.start(c.schema_api_path, c.nats_url, c.frontdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-    
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.terminate()
-        cls.server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-                              
-                        
+        generated_tests_schema.write(imports)
+
+        generated_tests_schema.write('''
+@pytest.fixture(scope="module")
+def schema_server_proc(nats_server):
+    s = schema_server.start(c.example_api_path, c.nats_url, 'front-schema')
+    yield s
+    s.terminate()
+    s.wait()
 ''')
 
         for name, cases in parse_cases.items():
@@ -548,38 +365,28 @@ class SchemaTestCases(unittest.IsolatedAsyncioTestCase):
                 request = case[0]
                 expected_response = case[1]
 
-                generated_tests.write('''
-    async def test_{}_{:04d}(self):
-        request = {}
-        expected_response = {}
-        await verify_flat_case(self, request, expected_response)
+                generated_tests_schema.write('''
+async def test_schema_{}_{:04d}(nats_client, schema_server_proc):
+    request = {}
+    expected_response = {}
+    await verify_flat_case(request, expected_response, 'front-schema')
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
+        generated_tests_client = open(
+            'test/{}/test_client_generated.py'.format(lib_path), 'w')  
 
-        generated_tests.write('''
+        generated_tests_client.write(imports)  
 
-class ClientTestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.servers = client_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.intermediate_topic, c.backdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-
-    @classmethod
-    def tearDownClass(cls):
-        for server in cls.servers:
-            server.terminate()
-        for server in cls.servers:
-            server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-                        
-    ''')
+        generated_tests_client.write('''
+@pytest.fixture(scope="module")
+def client_server_proc(nats_server):
+    ss = client_server.start(c.example_api_path, c.nats_url, 'front-client', 'inter-client', 'back-client')
+    yield ss
+    for s in ss:
+        s.terminate()
+    for s in ss:
+        s.wait()
+''')
 
         for name, cases in all_cases.items():
 
@@ -587,40 +394,32 @@ class ClientTestCases(unittest.IsolatedAsyncioTestCase):
                 request = case[0]
                 expected_response = case[1]
 
-                generated_tests.write('''
-    async def test_client_{}_{:04d}(self):
-        request = {}
-        expected_response = {}
-        await verify_client_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask=0x01, use_client=True)
+                generated_tests_client.write('''
+async def test_client_{}_{:04d}(nats_client, client_server_proc):
+    request = {}
+    expected_response = {}
+    await verify_client_case(request, expected_response, 'front-client', 'inter-client', 'back-client')
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
-        generated_tests.write('''
+        generated_tests_bin_client = open(
+            'test/{}/test_bin_client_generated.py'.format(lib_path), 'w')   
 
-class BinaryClientTestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.servers = client_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.intermediate_topic, c.backdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-                              
-        request = [{'_binary': True}, {'fn._ping': {}}]
-        expected_response = [{}, {'Ok':{}}]
-        binary_client_warmup(request, expected_response)
-    
-    @classmethod
-    def tearDownClass(cls):
-        for server in cls.servers:
-            server.terminate()
-        for server in cls.servers:
-            server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-                        
+        generated_tests_bin_client.write(imports)   
+
+        generated_tests_bin_client.write('''
+@pytest.fixture(scope="module")
+async def bin_client_server_proc(nats_server, nats_client):
+    ss = client_server.start(c.example_api_path, c.nats_url, 'front-bin-client', 'inter-bin-client', 'back-bin-client')
+                                         
+    request = [{'_binary': True}, {'fn._ping': {}}]
+    expected_response = [{}, {'Ok':{}}]
+    await binary_client_warmup(request, expected_response)
+
+    yield ss
+    for s in ss:
+        s.terminate()
+    for s in ss:
+        s.wait()                        
     ''')
 
         for name, cases in all_cases.items():
@@ -631,45 +430,38 @@ class BinaryClientTestCases(unittest.IsolatedAsyncioTestCase):
 
                 if len(case) == 2:
                     case.append(True)
-                client_bitmask = 0xFF if case[2] else 0xE7
 
-                generated_tests.write('''
-    async def test_binary_client_{}_{:04d}(self):
-        request = {}
-        expected_response = {}
-        await verify_client_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
-'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
+                generated_tests_bin_client.write('''
+async def test_binary_client_{}_{:04d}(nats_client, bin_client_server_proc):
+    request = {}
+    expected_response = {}
+    await verify_client_case(request, expected_response, 'front-bin-client', 'inter-bin-client', 'back-bin-client', use_binary=True, enforce_binary=True, enforce_integer_keys={})
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
    
+        generated_tests_rot_bin_client = open(
+            'test/{}/test_rot_bin_client_generated.py'.format(lib_path), 'w')   
+        
+        generated_tests_rot_bin_client.write(imports)
 
-        generated_tests.write('''
+        generated_tests_rot_bin_client.write('''
+@pytest.fixture(scope="module")
+async def rot_bin_client_server_proc(nats_server, nats_client):
+    ss = client_server.start(c.example_api_path, c.nats_url, 'front-rot-bin-client', 'inter-rot-bin-client', 'back-rot-bin-client')
+                                         
+    request = [{'_binary': True}, {'fn._ping': {}}]
+    expected_response = [{}, {'Ok':{}}]
+    await binary_client_warmup(request, expected_response)
 
-class RotateBinaryClientTestCases(unittest.IsolatedAsyncioTestCase):
-                              
-    @classmethod
-    def setUpClass(cls):
-        cls.nats = start_nats_server()
-        try:
-            cls.servers = client_server.start(c.example_api_path, c.nats_url, c.frontdoor_topic, c.intermediate_topic, c.backdoor_topic)
-        except Exception:
-            cls.nats.terminate()
-            cls.nats.wait()
-            raise
-            
-                              
-    @classmethod
-    def tearDownClass(cls):
-        for server in cls.servers:
-            server.terminate()
-        for server in cls.servers:
-            server.wait()
-        cls.nats.terminate()
-        cls.nats.wait()
-                        
+    yield ss
+    for s in ss:
+        s.terminate()
+    for s in ss:
+        s.wait()    
     ''')
         
         for name, cases in binary_client_rotation_cases.items():
-            generated_tests.write('''
-    async def test_rotate_binary_client_{}(self):
+            generated_tests_rot_bin_client.write('''
+async def test_rotate_binary_client_{}(nats_client, rot_bin_client_server_proc):
 '''.format(name))
 
             for i, case in enumerate(cases):
@@ -678,14 +470,12 @@ class RotateBinaryClientTestCases(unittest.IsolatedAsyncioTestCase):
 
                 if len(case) == 2:
                     case.append(True)
-                client_bitmask = 0xFF if case[2] else 0x01
 
-                generated_tests.write('''
-
-        request = {}
-        expected_response = {}
-        await verify_client_case(self, request, expected_response, path, self.__class__.backdoor_results, self.__class__.client_backdoor_results, client_bitmask={}, use_client=True, use_binary=True)
-'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, client_bitmask))
+                generated_tests_rot_bin_client.write('''
+    request = {}
+    expected_response = {}
+    await verify_client_case(request, expected_response, use_binary=True, enforce_binary={})
+'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
    
 
 
