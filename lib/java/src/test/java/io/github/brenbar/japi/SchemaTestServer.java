@@ -6,6 +6,8 @@ import java.net.UnixDomainSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,8 @@ import io.nats.client.Nats;
 
 public class SchemaTestServer {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] givenArgs) throws IOException, InterruptedException {
+        var args = givenArgs[0].split(",");
         var apiSchemaPath = args[0];
         var natsUrl = args[1];
         var frontdoorTopic = args[2];
@@ -66,6 +69,9 @@ public class SchemaTestServer {
                 connection.publish(msg.getReplyTo(), responseBytes);
             });
             dispatcher.subscribe(frontdoorTopic);
+
+            Files.write(Path.of("SCHEMA_SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
+            Thread.sleep(10000000);
         }
     }
 }

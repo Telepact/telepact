@@ -3,12 +3,16 @@ package io.github.brenbar.japi;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import io.nats.client.Nats;
 
 public class MockTestServer {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] givenArgs) throws IOException, InterruptedException {
+        var args = givenArgs[0].split(",");
+
         var apiSchemaPath = args[0];
         var natsUrl = args[1];
         var frontdoorTopic = args[2];
@@ -32,6 +36,9 @@ public class MockTestServer {
                 connection.publish(msg.getReplyTo(), responseBytes);
             });
             dispatcher.subscribe(frontdoorTopic);
+
+            Files.write(Path.of("MOCK_SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
+            Thread.sleep(10000000);
         }
     }
 }

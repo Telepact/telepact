@@ -6,6 +6,8 @@ import java.net.UnixDomainSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,8 @@ import io.nats.client.Nats;
 
 public class ClientTestServer {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] givenArgs) throws IOException, InterruptedException {
+        var args = givenArgs[0].split(",");
         var natsUrl = args[0];
         var clientFrontdoorTopic = args[1];
         var clientBackdoorTopic = args[2];
@@ -91,6 +94,9 @@ public class ClientTestServer {
                 }
             });
             dispatcher.subscribe(clientFrontdoorTopic);
+
+            Files.write(Path.of("CLIENT_SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
+            Thread.sleep(10000000);
         }
     }
 }

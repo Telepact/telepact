@@ -10,14 +10,13 @@ def nats_server():
     p.terminate()
     p.wait()
 
-@pytest.fixture
+
+@pytest.fixture(scope='session', autouse=True)
 def event_loop():
-    loop = asyncio.get_event_loop()
-
+    print('Overriding event loop')
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
     yield loop
-
-    pending = asyncio.tasks.all_tasks(loop)
-    loop.run_until_complete(asyncio.gather(*pending))
-    loop.run_until_complete(asyncio.sleep(1))
-
     loop.close()
