@@ -235,9 +235,6 @@ def generate():
 
         init = open('test/{}/__init__.py'.format(lib_path), 'w')
         init.write('''
-import pytest
-
-pytestmark = pytest.mark.asyncio(scope="package")
 ''')
 
         generated_tests_basic = open(
@@ -298,7 +295,7 @@ def binary_server_proc(nats_server):
 
                 generated_tests_binary.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_bin_{:04d}(nats_client, binary_server_proc):
+async def test_bin_{:04d}(binary_server_proc):
     request = {}
     expected_response = {}
     await verify_basic_case(request, expected_response, 'front-binary', 'back-binary')
@@ -322,7 +319,7 @@ def mock_server_proc(nats_server):
         for name, cases in mock_cases.items():
             generated_tests_mock.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_mock_{}(nats_client, mock_server_proc):
+async def test_mock_{}(mock_server_proc):
 '''.format(name))
             
             for i, case in enumerate(cases):
@@ -342,7 +339,7 @@ async def test_mock_{}(nats_client, mock_server_proc):
 
                 generated_tests_mock.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_invalid_mock_{}_{:04d}(nats_client, mock_server_proc):
+async def test_invalid_mock_{}_{:04d}(mock_server_proc):
     request = {}
     expected_response = {}
     await verify_flat_case(request, expected_response, 'front-mock')
@@ -369,7 +366,7 @@ def schema_server_proc(nats_server):
 
                 generated_tests_schema.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_schema_{}_{:04d}(nats_client, schema_server_proc):
+async def test_schema_{}_{:04d}(schema_server_proc):
     request = {}
     expected_response = {}
     await verify_flat_case(request, expected_response, 'front-schema')
@@ -399,7 +396,7 @@ def client_server_proc(nats_server):
 
                 generated_tests_client.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_client_{}_{:04d}(nats_client, client_server_proc):
+async def test_client_{}_{:04d}(client_server_proc):
     request = {}
     expected_response = {}
     await verify_client_case(request, expected_response, 'front-client', 'inter-client', 'back-client')
@@ -412,7 +409,7 @@ async def test_client_{}_{:04d}(nats_client, client_server_proc):
 
         generated_tests_bin_client.write('''
 @pytest.fixture(scope="module")
-async def bin_client_server_proc(nats_server, nats_client):
+async def bin_client_server_proc(nats_server):
     ss = client_server.start(c.example_api_path, c.nats_url, 'front-bin-client', 'inter-bin-client', 'back-bin-client')
                                          
     request = [{'_binary': True}, {'fn._ping': {}}]
@@ -437,7 +434,7 @@ async def bin_client_server_proc(nats_server, nats_client):
 
                 generated_tests_bin_client.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_binary_client_{}_{:04d}(nats_client, bin_client_server_proc):
+async def test_binary_client_{}_{:04d}(bin_client_server_proc):
     request = {}
     expected_response = {}
     await verify_client_case(request, expected_response, 'front-bin-client', 'inter-bin-client', 'back-bin-client', use_binary=True, enforce_binary=True, enforce_integer_keys={})
@@ -450,7 +447,7 @@ async def test_binary_client_{}_{:04d}(nats_client, bin_client_server_proc):
 
         generated_tests_rot_bin_client.write('''
 @pytest.fixture(scope="module")
-async def rot_bin_client_server_proc(nats_server, nats_client):
+async def rot_bin_client_server_proc(nats_server):
     ss = client_server.start(c.example_api_path, c.nats_url, 'front-rot-bin-client', 'inter-rot-bin-client', 'back-rot-bin-client')
                                          
     request = [{'_binary': True}, {'fn._ping': {}}]
@@ -467,7 +464,7 @@ async def rot_bin_client_server_proc(nats_server, nats_client):
         for name, cases in binary_client_rotation_cases.items():
             generated_tests_rot_bin_client.write('''
 @pytest.mark.asyncio(scope="module")
-async def test_rotate_binary_client_{}(nats_client, rot_bin_client_server_proc):
+async def test_rotate_binary_client_{}(rot_bin_client_server_proc):
 '''.format(name))
 
             for i, case in enumerate(cases):
