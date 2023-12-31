@@ -150,7 +150,7 @@ async def verify_basic_case(request, expected_response, frontdoor_topic, backdoo
 
     response = await send_case(request, expected_response, frontdoor_topic)
 
-    backdoor_handling_task.cancel()
+    await backdoor_handling_task
 
     assert expected_response == response
 
@@ -172,8 +172,8 @@ async def verify_client_case(request, expected_response, frontdoor_topic, interm
 
     response = await send_case(request, expected_response, frontdoor_topic)
 
-    backdoor_handling_task.cancel()
-    client_handling_task.cancel()
+    await backdoor_handling_task
+    await client_handling_task
 
     if use_binary:
         if 'Error' not in next(iter(response[1])):
@@ -193,8 +193,8 @@ async def binary_client_warmup(request, expected_response, frontdoor_topic, inte
 
     response = await send_case(request, expected_response, frontdoor_topic)
 
-    backdoor_handling_task.cancel()
-    client_handling_task.cancel()
+    await backdoor_handling_task
+    await client_handling_task
 
 
 async def send_case(request, expected_response, request_topic):
@@ -270,7 +270,7 @@ def basic_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_basic.write('''
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_{}_{:04d}(basic_server_proc):
     request = {}
     expected_response = {}
@@ -297,7 +297,7 @@ def binary_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_binary.write('''
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_bin_{:04d}(nats_client, binary_server_proc):
     request = {}
     expected_response = {}
@@ -321,6 +321,7 @@ def mock_server_proc(nats_server):
 
         for name, cases in mock_cases.items():
             generated_tests_mock.write('''
+@pytest.mark.asyncio(scope="module")
 async def test_mock_{}(nats_client, mock_server_proc):
 '''.format(name))
             
@@ -340,6 +341,7 @@ async def test_mock_{}(nats_client, mock_server_proc):
                 expected_response = case[1]
 
                 generated_tests_mock.write('''
+@pytest.mark.asyncio(scope="module")
 async def test_invalid_mock_{}_{:04d}(nats_client, mock_server_proc):
     request = {}
     expected_response = {}
@@ -366,6 +368,7 @@ def schema_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_schema.write('''
+@pytest.mark.asyncio(scope="module")
 async def test_schema_{}_{:04d}(nats_client, schema_server_proc):
     request = {}
     expected_response = {}
@@ -395,6 +398,7 @@ def client_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_client.write('''
+@pytest.mark.asyncio(scope="module")
 async def test_client_{}_{:04d}(nats_client, client_server_proc):
     request = {}
     expected_response = {}
@@ -432,6 +436,7 @@ async def bin_client_server_proc(nats_server, nats_client):
                     case.append(True)
 
                 generated_tests_bin_client.write('''
+@pytest.mark.asyncio(scope="module")
 async def test_binary_client_{}_{:04d}(nats_client, bin_client_server_proc):
     request = {}
     expected_response = {}
@@ -461,6 +466,7 @@ async def rot_bin_client_server_proc(nats_server, nats_client):
         
         for name, cases in binary_client_rotation_cases.items():
             generated_tests_rot_bin_client.write('''
+@pytest.mark.asyncio(scope="module")
 async def test_rotate_binary_client_{}(nats_client, rot_bin_client_server_proc):
 '''.format(name))
 
