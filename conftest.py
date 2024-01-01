@@ -20,3 +20,9 @@ def nats_server():
 #         loop = asyncio.new_event_loop()
 #     yield loop
 #     loop.close()
+    
+@pytest.fixture(scope='session')
+def loop():
+    l = asyncio.new_event_loop()
+    asyncio.set_event_loop(l)
+    return l
