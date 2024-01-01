@@ -23,7 +23,7 @@ def generate():
 
         imports = '''
 from test.util import verify_server_case, verify_flat_case, verify_client_case, get_nats_client, ping_req, startup_check, backdoor_handler, client_backdoor_handler, Constants as c
-from {} import server, mock_server, schema_server, client_server
+from {}.test_server import start_basic_server, start_mock_server, start_schema_server, start_client_server
 import asyncio
 import pytest
 import time
@@ -35,7 +35,7 @@ import time
         generated_tests_basic.write('''
 @pytest.fixture(scope="module")
 def basic_server_proc(loop, nats_server):
-    s = server.start(c.example_api_path, c.nats_url, 'front-basic', 'back-basic')
+    s = start_basic_server(c.example_api_path, c.nats_url, 'front-basic', 'back-basic')
     
     try:                                
         startup_check(loop, lambda: verify_server_case(ping_req, None, 'front-basic', 'back-basic'))
@@ -75,7 +75,7 @@ def test_{}_{:04d}(loop, basic_server_proc):
         generated_tests_binary.write('''
 @pytest.fixture(scope="module")
 def binary_server_proc(loop, nats_server):
-    s = server.start(c.binary_api_path, c.nats_url, 'front-binary', 'back-binary')
+    s = start_basic_server(c.binary_api_path, c.nats_url, 'front-binary', 'back-binary')
 
     try:
         startup_check(loop, lambda: verify_server_case(ping_req, None, 'front-binary', 'back-binary'))
@@ -113,7 +113,7 @@ def test_bin_{:04d}(loop, binary_server_proc):
         generated_tests_mock.write('''
 @pytest.fixture(scope="module")
 def mock_server_proc(loop, nats_server):
-    s = mock_server.start(c.example_api_path, c.nats_url, 'front-mock')
+    s = start_mock_server(c.example_api_path, c.nats_url, 'front-mock')
 
     try:
         startup_check(loop, lambda: verify_flat_case(ping_req, None, 'front-mock'))
@@ -172,7 +172,7 @@ def test_invalid_mock_{}_{:04d}(loop, mock_server_proc):
         generated_tests_schema.write('''
 @pytest.fixture(scope="module")
 def schema_server_proc(loop, nats_server):
-    s = schema_server.start(c.schema_api_path, c.nats_url, 'front-schema')
+    s = start_schema_server(c.schema_api_path, c.nats_url, 'front-schema')
 
     try:
         startup_check(loop, lambda: verify_flat_case(ping_req, None, 'front-schema'))
@@ -210,7 +210,7 @@ def test_schema_{}_{:04d}(loop, schema_server_proc):
         generated_tests_client.write('''
 @pytest.fixture(scope="module")
 def client_server_proc(loop, nats_server):
-    ss = client_server.start(c.example_api_path, c.nats_url, 'cfront-client', 'cback-client', 'front-client', 'back-client')
+    ss = start_client_server(c.example_api_path, c.nats_url, 'cfront-client', 'cback-client', 'front-client', 'back-client')
 
     try:
         startup_check(loop, lambda: verify_client_case(ping_req, None, 'cfront-client', 'cback-client', 'front-client', 'back-client'))
@@ -253,7 +253,7 @@ def test_client_{}_{:04d}(loop, client_server_proc):
         generated_tests_bin_client.write('''
 @pytest.fixture(scope="module")
 def bin_client_server_proc(loop, nats_server):
-    ss = client_server.start(c.example_api_path, c.nats_url, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
+    ss = start_client_server(c.example_api_path, c.nats_url, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
                
     try:                          
         startup_check(loop, lambda: verify_client_case(ping_req, None, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client'))
@@ -305,7 +305,7 @@ def test_binary_client_{}_{:04d}(loop, bin_client_server_proc):
         generated_tests_rot_bin_client.write('''
 @pytest.fixture(scope="module")
 def rot_bin_client_server_proc(loop, nats_server):
-    ss = client_server.start(c.example_api_path, c.nats_url, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client')
+    ss = start_client_server(c.example_api_path, c.nats_url, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client')
 
     try:
         startup_check(loop, lambda: verify_client_case(ping_req, None,  'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client'))
