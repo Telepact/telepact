@@ -93,7 +93,7 @@ class NotEnoughIntegerKeys(Exception):
 
 
 
-async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic):
+async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=1):
     nats_client = await get_nats_client()
 
     async def nats_handler(msg):
@@ -126,7 +126,7 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic):
 
     sub = await nats_client.subscribe(client_backdoor_topic, cb=nats_handler)
 
-    await sub.unsubscribe(limit=1)
+    await sub.unsubscribe(limit=times)
 
 
 def signal_handler(signum, frame):
@@ -165,9 +165,9 @@ async def verify_flat_case(request, expected_response, frontdoor_topic):
     assert expected_response == response
 
 
-async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False, enforce_binary=False, enforce_integer_keys=False):
+async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False, enforce_binary=False, enforce_integer_keys=False, times=1):
 
-    client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic))    
+    client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=times))    
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
     if use_binary:
@@ -484,13 +484,6 @@ def test_binary_client_{}_{:04d}(loop, bin_client_server_proc):
 def rot_bin_client_server_proc(loop, nats_server):
     ss = client_server.start(c.example_api_path, c.nats_url, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client')
 
-    async def warmup():
-        request = [{'_binary': True}, {'fn._ping': {}}]
-        expected_response = [{}, {'Ok':{}}]
-        await binary_client_warmup(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client')
-    
-    loop.run_until_complete(warmup())
-
     yield ss
     for s in ss:
         s.terminate()
@@ -515,7 +508,7 @@ def test_rotate_binary_client_{}(loop, rot_bin_client_server_proc):
                 generated_tests_rot_bin_client.write('''
         request = {}
         expected_response = {}
-        await verify_client_case(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client', use_binary=True, enforce_binary={})
+        await verify_client_case(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client', use_binary=True, enforce_binary={}, times=2)
 '''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
    
             generated_tests_rot_bin_client.write('''
