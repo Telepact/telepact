@@ -379,7 +379,7 @@ def test_invalid_mock_{}_{:04d}(mock_server_proc):
         generated_tests_schema.write('''
 @pytest.fixture(scope="module")
 def schema_server_proc(nats_server):
-    s = schema_server.start(c.example_api_path, c.nats_url, 'front-schema')
+    s = schema_server.start(c.schema_api_path, c.nats_url, 'front-schema')
     yield s
     s.terminate()
     s.wait()
