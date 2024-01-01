@@ -11,7 +11,7 @@ should_abort = False
 
 class Constants:
     example_api_path = '../../test/example.japi.json'
-    binary_api_path = '../../test/binary/binary.japi.json'
+    binary_api_path = '../../test/binary.japi.json'
     schema_api_path = '../../test/schema.japi.json'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'
