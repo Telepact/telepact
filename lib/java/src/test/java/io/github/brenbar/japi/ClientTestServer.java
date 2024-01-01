@@ -43,7 +43,7 @@ public class ClientTestServer {
                             return new Message(Map.of("numberTooBig", true), Map.of("_ErrorUnknown", Map.of()));
                         }
 
-                        System.out.println("  <-|   %s".formatted(new String(requestBytes)));
+                        System.out.println("   <-c  %s".formatted(new String(requestBytes)));
                         System.out.flush();
 
                         io.nats.client.Message natsResponseMessage;
@@ -55,7 +55,7 @@ public class ClientTestServer {
                         }
                         var responseBytes = natsResponseMessage.getData();
 
-                        System.out.println("  ->|   %s".formatted(new String(responseBytes)));
+                        System.out.println("   ->c  %s".formatted(new String(responseBytes)));
                         System.out.flush();
 
                         var responseMessage = s.deserialize(responseBytes);
@@ -72,7 +72,7 @@ public class ClientTestServer {
                 try {
                     var requestBytes = msg.getData();
 
-                    System.out.println("    ->| %s".formatted(new String(requestBytes)));
+                    System.out.println("   ->C  %s".formatted(new String(requestBytes)));
                     System.out.flush();
 
                     var requestPseudoJson = objectMapper.readValue(requestBytes, List.class);
@@ -85,7 +85,7 @@ public class ClientTestServer {
                     var responsePseudoJson = List.of(response.header, response.body);
                     var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
-                    System.out.println("    <-| %s".formatted(new String(responseBytes)));
+                    System.out.println("   <-C  %s".formatted(new String(responseBytes)));
                     System.out.flush();
 
                     connection.publish(msg.getReplyTo(), responseBytes);

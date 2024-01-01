@@ -58,11 +58,11 @@ async def backdoor_handler(backdoor_topic):
         backdoor_request_json = backdoor_request_bytes.decode()
         backdoor_request = json.loads(backdoor_request_json)
 
-        print(' |<-    {}'.format(backdoor_request), flush=True)
+        print(' B<-    {}'.format(backdoor_request), flush=True)
 
         backdoor_response = handler(backdoor_request)
 
-        print(' |->    {}'.format(backdoor_response), flush=True)
+        print(' B->    {}'.format(backdoor_response), flush=True)
 
         backdoor_response_json = json.dumps(backdoor_response)
         backdoor_response_bytes = backdoor_response_json.encode()        
@@ -105,8 +105,8 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic):
             client_backdoor_request = msgpack.loads(client_backdoor_request_bytes, strict_map_key=False)
             # TODO: Verify binary is done when it's supposed to be done
 
-        print('  |<-   {}'.format(client_backdoor_request), flush=True)
-        print('   |->  {}'.format(client_backdoor_request), flush=True)
+        print('  I<-   {}'.format(client_backdoor_request), flush=True)
+        print('  i->   {}'.format(client_backdoor_request), flush=True)
 
         nats_response = await nats_client.request(frontdoor_topic, client_backdoor_request_bytes, timeout=10)
 
@@ -119,8 +119,8 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic):
             frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
             # TODO: verify binary is done when it's supposed to be done
 
-        print('   |<-  {}'.format(frontdoor_response), flush=True)
-        print('  |->   {}'.format(frontdoor_response), flush=True)
+        print('  i<-   {}'.format(frontdoor_response), flush=True)
+        print('  I->   {}'.format(frontdoor_response), flush=True)
 
         await nats_client.publish(msg.reply, frontdoor_response_bytes)
 
@@ -209,7 +209,7 @@ async def binary_client_warmup(request, expected_response, client_frontdoor_topi
 async def send_case(request, expected_response, request_topic):
     nats_client = await get_nats_client()
 
-    print('|->     {}'.format(request), flush=True)
+    print('T->     {}'.format(request), flush=True)
 
     if type(request) == bytes:
         request_bytes = request
@@ -227,7 +227,7 @@ async def send_case(request, expected_response, request_topic):
         response_json = response_bytes.decode()
         response = json.loads(response_json)    
 
-    print('|<-     {}'.format(response), flush=True)
+    print('T<-     {}'.format(response), flush=True)
 
     if 'numberTooBig' in response[0]:
         pytest.skip('Cannot use big numbers with msgpack')

@@ -27,10 +27,10 @@ public class MockTestServer {
             var dispatcher = connection.createDispatcher((msg) -> {
                 var requestBytes = msg.getData();
 
-                System.out.println("    ->| %s".formatted(new String(requestBytes)));
+                System.out.println("    ->S %s".formatted(new String(requestBytes)));
                 System.out.flush();
                 var responseBytes = server.process(requestBytes);
-                System.out.println("    <-| %s".formatted(new String(responseBytes)));
+                System.out.println("    <-S %s".formatted(new String(responseBytes)));
                 System.out.flush();
 
                 connection.publish(msg.getReplyTo(), responseBytes);

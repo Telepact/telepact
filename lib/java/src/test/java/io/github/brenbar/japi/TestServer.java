@@ -53,7 +53,7 @@ public class TestServer {
                     var requestPseudoJson = List.of(requestHeaders, requestBody);
                     var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                    System.out.println("   <-|  %s".formatted(new String(requestBytes)));
+                    System.out.println("    <-s %s".formatted(new String(requestBytes)));
                     System.out.flush();
 
                     io.nats.client.Message natsResponseMessage;
@@ -64,7 +64,7 @@ public class TestServer {
                     }
                     var responseBytes = natsResponseMessage.getData();
 
-                    System.out.println("   ->|  %s".formatted(new String(responseBytes)));
+                    System.out.println("    ->s %s".formatted(new String(responseBytes)));
                     System.out.flush();
 
                     var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
@@ -89,7 +89,7 @@ public class TestServer {
             var dispatcher = connection.createDispatcher((msg) -> {
                 var requestBytes = msg.getData();
 
-                System.out.println("    ->| %s".formatted(new String(requestBytes)));
+                System.out.println("    ->S %s".formatted(new String(requestBytes)));
                 System.out.flush();
                 byte[] responseBytes;
                 if (serveAlternateServer.get()) {
@@ -97,7 +97,7 @@ public class TestServer {
                 } else {
                     responseBytes = server.process(requestBytes);
                 }
-                System.out.println("    <-| %s".formatted(new String(responseBytes)));
+                System.out.println("    <-S %s".formatted(new String(responseBytes)));
                 System.out.flush();
 
                 connection.publish(msg.getReplyTo(), responseBytes);
