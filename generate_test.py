@@ -152,6 +152,7 @@ async def verify_basic_case(request, expected_response, frontdoor_topic, backdoo
 
     response = await send_case(request, expected_response, frontdoor_topic)
 
+    backdoor_handling_task.cancel()
     await backdoor_handling_task
 
     assert expected_response == response
@@ -174,6 +175,9 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
 
     response = await send_case(request, expected_response, client_frontdoor_topic)
 
+    backdoor_handling_task.cancel()
+    client_handling_task.cancel()
+
     await backdoor_handling_task
     await client_handling_task
 
@@ -188,12 +192,15 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
     # TODO: verify that binary was being done    
             
 
-async def binary_client_warmup(request, expected_response, frontdoor_topic, intermediate_topic, backdoor_topic):
+async def binary_client_warmup(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic):
 
-    client_handling_task = asyncio.create_task(client_backdoor_handler(intermediate_topic))
+    client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic))
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
-    response = await send_case(request, expected_response, frontdoor_topic)
+    response = await send_case(request, expected_response, client_frontdoor_topic)
+
+    backdoor_handling_task.cancel()
+    client_handling_task.cancel()
 
     await backdoor_handling_task
     await client_handling_task
@@ -259,6 +266,7 @@ def basic_server_proc(nats_server):
     yield s
     s.terminate()
     s.wait()
+    print('basic_server_proc stopped')
 
 ''')
 
@@ -269,11 +277,14 @@ def basic_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_basic.write('''
-@pytest.mark.asyncio
-async def test_{}_{:04d}(basic_server_proc):
-    request = {}
-    expected_response = {}
-    await verify_basic_case(request, expected_response, 'front-basic', 'back-basic')
+def test_{}_{:04d}(basic_server_proc):
+    async def t():
+        request = {}
+        expected_response = {}
+        await verify_basic_case(request, expected_response, 'front-basic', 'back-basic')
+    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
 
         generated_tests_binary = open(
@@ -288,6 +299,7 @@ def binary_server_proc(nats_server):
     yield s
     s.terminate()
     s.wait()
+    print('binary_server_proc stopped')
 ''')
 
         for name, cases in binary_cases.items():
@@ -296,12 +308,14 @@ def binary_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_binary.write('''
-@pytest.mark.asyncio
-async def test_bin_{:04d}(binary_server_proc):
-    request = {}
-    expected_response = {}
-    await verify_basic_case(request, expected_response, 'front-binary', 'back-binary')
-
+def test_bin_{:04d}(binary_server_proc):
+    async def t():
+        request = {}
+        expected_response = {}
+        await verify_basic_case(request, expected_response, 'front-binary', 'back-binary')
+    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
 '''.format(i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         generated_tests_mock = open(
@@ -316,12 +330,13 @@ def mock_server_proc(nats_server):
     yield s
     s.terminate()
     s.wait()
+    print('mock_server_proc stopped')
 ''')
 
         for name, cases in mock_cases.items():
             generated_tests_mock.write('''
-@pytest.mark.asyncio
-async def test_mock_{}(mock_server_proc):
+def test_mock_{}(mock_server_proc):
+    async def t():
 '''.format(name))
             
             for i, case in enumerate(cases):
@@ -329,10 +344,16 @@ async def test_mock_{}(mock_server_proc):
                 expected_response = case[1]
 
                 generated_tests_mock.write('''
-    request = {}
-    expected_response = {}
-    await verify_flat_case(request, expected_response, 'front-mock')
+        request = {}
+        expected_response = {}
+        await verify_flat_case(request, expected_response, 'front-mock')
 '''.format(request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
+                
+            generated_tests_mock.write('''
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
+''')
 
         for name, cases in mock_invalid_stub_cases.items():
             for i, case in enumerate(cases):
@@ -340,11 +361,14 @@ async def test_mock_{}(mock_server_proc):
                 expected_response = case[1]
 
                 generated_tests_mock.write('''
-@pytest.mark.asyncio
-async def test_invalid_mock_{}_{:04d}(mock_server_proc):
-    request = {}
-    expected_response = {}
-    await verify_flat_case(request, expected_response, 'front-mock')
+def test_invalid_mock_{}_{:04d}(mock_server_proc):
+    async def t():
+        request = {}
+        expected_response = {}
+        await verify_flat_case(request, expected_response, 'front-mock')
+    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         generated_tests_schema = open(
@@ -359,6 +383,7 @@ def schema_server_proc(nats_server):
     yield s
     s.terminate()
     s.wait()
+    print('schema_server_proc stopped')
 ''')
 
         for name, cases in parse_cases.items():
@@ -367,11 +392,14 @@ def schema_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_schema.write('''
-@pytest.mark.asyncio
-async def test_schema_{}_{:04d}(schema_server_proc):
-    request = {}
-    expected_response = {}
-    await verify_flat_case(request, expected_response, 'front-schema')
+def test_schema_{}_{:04d}(schema_server_proc):
+    async def t():
+        request = {}
+        expected_response = {}
+        await verify_flat_case(request, expected_response, 'front-schema')
+                                             
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
 '''.format(name, i, request.encode('raw_unicode_escape') if type(request) == str else request, expected_response.encode('raw_unicode_escape') if type(expected_response) == str else expected_response))
 
         generated_tests_client = open(
@@ -388,6 +416,7 @@ def client_server_proc(nats_server):
         s.terminate()
     for s in ss:
         s.wait()
+    print('client_server_proc stopped')
 ''')
 
         for name, cases in all_cases.items():
@@ -397,11 +426,14 @@ def client_server_proc(nats_server):
                 expected_response = case[1]
 
                 generated_tests_client.write('''
-@pytest.mark.asyncio
-async def test_client_{}_{:04d}(client_server_proc):
-    request = {}
-    expected_response = {}
-    await verify_client_case(request, expected_response, 'cfront-client', 'cback-client', 'front-client', 'back-client')
+def test_client_{}_{:04d}(client_server_proc):
+    async def t():
+        request = {}
+        expected_response = {}
+        await verify_client_case(request, expected_response, 'cfront-client', 'cback-client', 'front-client', 'back-client')
+                                             
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response))
     
         generated_tests_bin_client = open(
@@ -411,18 +443,23 @@ async def test_client_{}_{:04d}(client_server_proc):
 
         generated_tests_bin_client.write('''
 @pytest.fixture(scope="module")
-async def bin_client_server_proc(nats_server):
+def bin_client_server_proc(nats_server):
     ss = client_server.start(c.example_api_path, c.nats_url, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
                                          
-    request = [{'_binary': True}, {'fn._ping': {}}]
-    expected_response = [{}, {'Ok':{}}]
-    await binary_client_warmup(request, expected_response)
+    async def warmup():
+        request = [{'_binary': True}, {'fn._ping': {}}]
+        expected_response = [{}, {'Ok':{}}]
+        await binary_client_warmup(request, expected_response, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
 
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(warmup())
+    
     yield ss
     for s in ss:
         s.terminate()
     for s in ss:
         s.wait()                        
+    print('bin_client_server_proc stopped')
     ''')
 
         for name, cases in all_cases.items():
@@ -435,11 +472,14 @@ async def bin_client_server_proc(nats_server):
                     case.append(True)
 
                 generated_tests_bin_client.write('''
-@pytest.mark.asyncio
-async def test_binary_client_{}_{:04d}(bin_client_server_proc):
-    request = {}
-    expected_response = {}
-    await verify_client_case(request, expected_response, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client', use_binary=True, enforce_binary=True, enforce_integer_keys={})
+def test_binary_client_{}_{:04d}(bin_client_server_proc):
+    async def t():
+        request = {}
+        expected_response = {}
+        await verify_client_case(request, expected_response, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client', use_binary=True, enforce_binary=True, enforce_integer_keys={})
+                                                 
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
 '''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
    
         generated_tests_rot_bin_client = open(
@@ -449,24 +489,29 @@ async def test_binary_client_{}_{:04d}(bin_client_server_proc):
 
         generated_tests_rot_bin_client.write('''
 @pytest.fixture(scope="module")
-async def rot_bin_client_server_proc(nats_server):
+def rot_bin_client_server_proc(nats_server):
     ss = client_server.start(c.example_api_path, c.nats_url, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client')
-                                         
-    request = [{'_binary': True}, {'fn._ping': {}}]
-    expected_response = [{}, {'Ok':{}}]
-    await binary_client_warmup(request, expected_response)
+
+    async def warmup():
+        request = [{'_binary': True}, {'fn._ping': {}}]
+        expected_response = [{}, {'Ok':{}}]
+        await binary_client_warmup(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client')
+    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(warmup())
 
     yield ss
     for s in ss:
         s.terminate()
     for s in ss:
         s.wait()    
+    print('rot_bin_client_server_proc stopped')
     ''')
         
         for name, cases in binary_client_rotation_cases.items():
             generated_tests_rot_bin_client.write('''
-@pytest.mark.asyncio
-async def test_rotate_binary_client_{}(rot_bin_client_server_proc):
+def test_rotate_binary_client_{}(rot_bin_client_server_proc):
+    async def t():
 '''.format(name))
 
             for i, case in enumerate(cases):
@@ -477,12 +522,15 @@ async def test_rotate_binary_client_{}(rot_bin_client_server_proc):
                     case.append(True)
 
                 generated_tests_rot_bin_client.write('''
-    request = {}
-    expected_response = {}
-    await verify_client_case(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client', use_binary=True, enforce_binary={})
+        request = {}
+        expected_response = {}
+        await verify_client_case(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client', use_binary=True, enforce_binary={})
 '''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
    
-
+            generated_tests_rot_bin_client.write('''
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(t())
+''')
 
 
 if __name__ == '__main__':
