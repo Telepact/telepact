@@ -95,7 +95,6 @@ public class ClientTestServer {
             });
             dispatcher.subscribe(clientFrontdoorTopic);
 
-            Files.write(Path.of("CLIENT_SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
             Thread.sleep(10000000);
         }
     }

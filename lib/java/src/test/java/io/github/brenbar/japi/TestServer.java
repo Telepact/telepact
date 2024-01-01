@@ -105,7 +105,7 @@ public class TestServer {
 
             dispatcher.subscribe(frontdoorTopic);
 
-            Files.write(Path.of("SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
+            System.out.println("Test server ready");
             Thread.sleep(10000000);
         }
     }

@@ -70,7 +70,6 @@ public class SchemaTestServer {
             });
             dispatcher.subscribe(frontdoorTopic);
 
-            Files.write(Path.of("SCHEMA_SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
             Thread.sleep(10000000);
         }
     }

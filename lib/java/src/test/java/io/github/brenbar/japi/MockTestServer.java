@@ -37,7 +37,6 @@ public class MockTestServer {
             });
             dispatcher.subscribe(frontdoorTopic);
 
-            Files.write(Path.of("MOCK_SERVER_READY"), "".getBytes(), StandardOpenOption.CREATE);
             Thread.sleep(10000000);
         }
     }
