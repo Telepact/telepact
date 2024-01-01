@@ -150,10 +150,11 @@ async def verify_basic_case(request, expected_response, frontdoor_topic, backdoo
 
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
-    response = await send_case(request, expected_response, frontdoor_topic)
-
-    backdoor_handling_task.cancel()
-    await backdoor_handling_task
+    try:
+        response = await send_case(request, expected_response, frontdoor_topic)
+    finally:
+        backdoor_handling_task.cancel()
+        await backdoor_handling_task
 
     assert expected_response == response
 
@@ -173,13 +174,13 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
     if use_binary:
         request[0]['_binary'] = True
 
-    response = await send_case(request, expected_response, client_frontdoor_topic)
-
-    backdoor_handling_task.cancel()
-    client_handling_task.cancel()
-
-    await backdoor_handling_task
-    await client_handling_task
+    try:
+        response = await send_case(request, expected_response, client_frontdoor_topic)
+    finally:
+        backdoor_handling_task.cancel()
+        client_handling_task.cancel()
+        await backdoor_handling_task
+        await client_handling_task
 
     if use_binary:
         if 'Error' not in next(iter(response[1])):
@@ -197,13 +198,13 @@ async def binary_client_warmup(request, expected_response, client_frontdoor_topi
     client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic))
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
-    response = await send_case(request, expected_response, client_frontdoor_topic)
-
-    backdoor_handling_task.cancel()
-    client_handling_task.cancel()
-
-    await backdoor_handling_task
-    await client_handling_task
+    try:
+        response = await send_case(request, expected_response, client_frontdoor_topic)
+    finally:
+        backdoor_handling_task.cancel()
+        client_handling_task.cancel()
+        await backdoor_handling_task
+        await client_handling_task
 
 
 async def send_case(request, expected_response, request_topic):
