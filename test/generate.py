@@ -264,11 +264,18 @@ def bin_client_server_proc(loop, nats_server):
             s.wait()
         raise                                         
 
-    async def warmup():
-        request = [{'_binary': True}, {'fn._ping': {}}]
-        await verify_client_case(request, None, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
+    try:
+        async def warmup():
+            request = [{'_binary': True}, {'fn._ping': {}}]
+            await verify_client_case(request, None, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
 
-    loop.run_until_complete(warmup())
+        loop.run_until_complete(warmup())
+    except Exception:
+        for s in ss:
+            s.terminate()
+        for s in ss:
+            s.wait()
+        raise                                         
     
     yield ss
     for s in ss:
