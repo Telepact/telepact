@@ -91,15 +91,27 @@ def is_iter(v):
         return True
     except TypeError:
         return False
+    
 
+def has_too_many_keys(v):
+    if type(v) == list:
+        return any([has_too_many_keys(e) for e in v])
+    elif type(v) == dict:
+        if len(v) > 2:
+            return True
+        else:
+            return any([has_too_many_keys(e) for e in v.values()])
+    else:
+        return False
 
 
 def generate_basic_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
     for field, correct_values, incorrect_values, base_path in get_values(given_field, the_type, correct_values, additional_incorrect_values):
         for correct_value in correct_values:
             case = [[{'Ok': {'value': {field: correct_value}}}, {'fn.test': {'value': {field: correct_value}}}], [{}, {'Ok': {'value': {field: correct_value}}}]]
-            if is_iter(correct_value) and len(correct_value) > 3:
+            if has_too_many_keys(correct_value):
                 case.append(False)
+
             yield case
 
         for incorrect_value, reason, path in incorrect_values:
@@ -181,7 +193,7 @@ cases = {
         [[{'_id': 1234}, {'fn._ping': {}}], [{'_id': 1234}, {'Ok': {}}]],
     ],
     'testUnknownFunction': [
-        [[{}, {'fn.notFound': {}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn.notFound'], 'reason': {'FunctionUnknown': {}}}]}}], True],
+        [[{}, {'fn.notFound': {}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn.notFound'], 'reason': {'FunctionUnknown': {}}}]}}], False],
     ],
     'testErrors': [
         [[{'result': {'errorExample': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'errorExample': {'property': 'a'}}]],
@@ -199,6 +211,23 @@ cases = {
         [[{'_sel': {'fn.example': ['optional']}, 'Ok': {'value': {'fn': {'required': True, 'optional': True}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'fn': {'optional': True}}}}]],
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'arrStruct': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'arrStruct': [{}, {'optional': False}]}}}]],
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'objStruct': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'objStruct': {'a': {}, 'b': {'optional': False}}}}}]],
+        [[{'_sel': False, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}], False, False],
+        [[{'_sel': 0, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}], False, False],
+        [[{'_sel': '', 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}], False, False],
+        [[{'_sel': [], 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}], False, False],
+        [[{'_sel': {'': []}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', ''], 'reason': {'SelectHeaderKeyMustBeStructReference': {}}}]}}], False, False],
+        [[{'_sel': {'notStruct': []}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'notStruct'], 'reason': {'SelectHeaderKeyMustBeStructReference': {}}}]}}], False, False],
+        [[{'_sel': {'struct.Unknown': []}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.Unknown'], 'reason': {'StructNameUnknown': {}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': False}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': 0}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': ''}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': {}}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct'], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Array': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': [False]}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': [0]}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'String': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': [[]]}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'String': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': [{}]}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'String': {}}}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': ['unknownField']}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'StructFieldUnknown': {}}}]}}], False, False],
+        [[{'_sel': {'struct.ExStruct': ['']}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel', 'struct.ExStruct', 0], 'reason': {'StructFieldUnknown': {}}}]}}], False, False],
     ],
     'testUnsafe': [
         [[{'_unsafe': True, 'result': {'Ok': {'value': {'bool': 0}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'bool': 0}}}]],

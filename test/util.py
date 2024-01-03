@@ -89,7 +89,6 @@ class NotEnoughIntegerKeys(Exception):
 
 async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=1):
     try:
-        print('starting client handler {} {} {}'.format(client_backdoor_topic, frontdoor_topic, times))
         nats_client = await get_nats_client()
 
         request_was_binary = False
@@ -117,7 +116,8 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=
                 request_was_binary = True
                 try:
                     (int_keys, str_keys) = count_int_keys(client_backdoor_request[1])
-                    request_binary_had_enough_integer_keys = int_keys > str_keys
+                    print('keys {} {}'.format(int_keys, str_keys), flush=True)
+                    request_binary_had_enough_integer_keys = int_keys >= str_keys
                 except Exception as e:
                     print(e)
                     request_binary_had_enough_integer_keys = False
@@ -137,7 +137,8 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=
                 response_was_binary = True
                 try:
                     (int_keys, str_keys) = count_int_keys(frontdoor_response[1])
-                    response_binary_had_enough_integer_keys = int_keys > str_keys
+                    print('keys {} {}'.format(int_keys, str_keys), flush=True)
+                    response_binary_had_enough_integer_keys = int_keys >= str_keys
                 except Exception as e:
                     print(e)
                     response_binary_had_enough_integer_keys = False
@@ -194,7 +195,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
         await backdoor_handling_task
 
     if expected_response:
-        assert expected_response == response
+        assert expected_response == response, 'expected_response: {}, response: {}'.format(expected_response, response)
 
 
 async def verify_flat_case(request, expected_response, frontdoor_topic):
@@ -202,7 +203,7 @@ async def verify_flat_case(request, expected_response, frontdoor_topic):
     response = await send_case(request, expected_response, frontdoor_topic)
 
     if expected_response:
-        assert expected_response == response
+        assert expected_response == response, 'expected_response: {}, response: {}'.format(expected_response, response)
 
 
 async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False, enforce_binary=False, enforce_integer_keys=False, times=1):

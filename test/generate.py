@@ -291,18 +291,19 @@ def bin_client_server_proc(loop, nats_server):
                 request = case[0]
                 expected_response = case[1]
 
-                if len(case) == 2:
-                    case.append(True)
+                # Defaults
+                case.append(True)
+                case.append(True)
 
                 generated_tests_bin_client.write('''
 def test_binary_client_{}_{:04d}(loop, bin_client_server_proc):
     async def t():
         request = {}
         expected_response = {}
-        await verify_client_case(request, expected_response, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client', use_binary=True, enforce_binary=True, enforce_integer_keys={})
+        await verify_client_case(request, expected_response, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client', use_binary=True, enforce_binary={}, enforce_integer_keys={})
                                                  
     loop.run_until_complete(t())
-'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
+'''.format(name, i, request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[3], case[2]))
    
         generated_tests_rot_bin_client = open(
             'test/{}/test_rot_bin_client_generated.py'.format(lib_path), 'w')   
@@ -347,8 +348,8 @@ def test_rotate_binary_client_{}(loop, rot_bin_client_server_proc):
                 generated_tests_rot_bin_client.write('''
         request = {}
         expected_response = {}
-        await verify_client_case(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client', use_binary=True, enforce_binary={}, times=2)
-'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2]))
+        await verify_client_case(request, expected_response, 'cfront-rot-bin-client', 'cback-rot-bin-client', 'front-rot-bin-client', 'back-rot-bin-client', use_binary=True, enforce_binary={}, times={})
+'''.format(request.encode() if type(request) == str else request, expected_response.encode() if type(expected_response) == str else expected_response, case[2], 1 if case[2] else 2))
    
             generated_tests_rot_bin_client.write('''
     loop.run_until_complete(t())
