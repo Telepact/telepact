@@ -97,6 +97,12 @@ class _ServerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
+        if (requestHeaders.containsKey("_bin")) {
+            List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
+            responseHeaders.put("_binary", true);
+            responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+        }
+
         if (unknownTarget != null) {
             Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
                     Map.of("cases",
@@ -167,12 +173,6 @@ class _ServerUtil {
                     selectStructFieldsHeader);
         } else {
             finalResultUnion = resultUnion;
-        }
-
-        if (requestHeaders.containsKey("_bin")) {
-            List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
-            responseHeaders.put("_binary", true);
-            responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
         }
 
         return new Message(responseHeaders, finalResultUnion);

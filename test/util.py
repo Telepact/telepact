@@ -37,26 +37,34 @@ def handler(request):
 
 
 async def backdoor_handler(backdoor_topic):
-    nats_client = await get_nats_client()
+    done = asyncio.get_running_loop().create_future()
+    try:
+        nats_client = await get_nats_client()
 
-    async def nats_handler(msg):
-        backdoor_request_bytes = msg.data
-        backdoor_request_json = backdoor_request_bytes.decode()
-        backdoor_request = json.loads(backdoor_request_json)
+        async def nats_handler(msg):
+            backdoor_request_bytes = msg.data
+            backdoor_request_json = backdoor_request_bytes.decode()
+            backdoor_request = json.loads(backdoor_request_json)
 
-        print(' B<-    {}'.format(backdoor_request), flush=True)
+            print(' B<-    {}'.format(backdoor_request), flush=True)
 
-        backdoor_response = handler(backdoor_request)
+            backdoor_response = handler(backdoor_request)
 
-        print(' B->    {}'.format(backdoor_response), flush=True)
+            print(' B->    {}'.format(backdoor_response), flush=True)
 
-        backdoor_response_json = json.dumps(backdoor_response)
-        backdoor_response_bytes = backdoor_response_json.encode()        
-        await nats_client.publish(msg.reply, backdoor_response_bytes)
+            backdoor_response_json = json.dumps(backdoor_response)
+            backdoor_response_bytes = backdoor_response_json.encode()        
+            await nats_client.publish(msg.reply, backdoor_response_bytes)
 
-    sub = await nats_client.subscribe(backdoor_topic, cb=nats_handler)
+            done.set_result(True)
 
-    await sub.unsubscribe(limit=1)
+        sub = await nats_client.subscribe(backdoor_topic, cb=nats_handler)
+
+        await sub.unsubscribe(limit=1)
+        await done
+    except asyncio.exceptions.CancelledError:
+        if sub:
+            await sub.unsubscribe()        
 
 
 def count_int_keys(m: dict):
@@ -80,70 +88,83 @@ class NotEnoughIntegerKeys(Exception):
 
 
 async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=1):
-    print('starting client handler {} {} {}'.format(client_backdoor_topic, frontdoor_topic, times))
-    nats_client = await get_nats_client()
+    try:
+        print('starting client handler {} {} {}'.format(client_backdoor_topic, frontdoor_topic, times))
+        nats_client = await get_nats_client()
 
-    request_was_binary = False
-    request_binary_had_enough_integer_keys = False
-    response_was_binary = False
-    response_binary_had_enough_integer_keys = False
+        request_was_binary = False
+        request_binary_had_enough_integer_keys = False
+        response_was_binary = False
+        response_binary_had_enough_integer_keys = False
 
-    async def nats_handler(msg):
-        nonlocal request_was_binary
-        nonlocal request_binary_had_enough_integer_keys
-        nonlocal response_was_binary
-        nonlocal response_binary_had_enough_integer_keys
+        received = 0
+        done = asyncio.get_running_loop().create_future()
 
-        client_backdoor_request_bytes = msg.data
-        try:
-            client_backdoor_request_json = client_backdoor_request_bytes.decode()
-            client_backdoor_request = json.loads(client_backdoor_request_json)
-        except Exception:
-            client_backdoor_request = msgpack.loads(client_backdoor_request_bytes, strict_map_key=False)
-            request_was_binary = True
+        async def nats_handler(msg):
+            nonlocal request_was_binary
+            nonlocal request_binary_had_enough_integer_keys
+            nonlocal response_was_binary
+            nonlocal response_binary_had_enough_integer_keys
+            nonlocal received
+            nonlocal done
+
+            client_backdoor_request_bytes = msg.data
             try:
-                (int_keys, str_keys) = count_int_keys(client_backdoor_request[1])
-                print('request int keys, str keys : {} {}'.format(int_keys, str_keys))
-                request_binary_had_enough_integer_keys = int_keys > str_keys
-            except Exception as e:
-                print(e)
-                request_binary_had_enough_integer_keys = False
+                client_backdoor_request_json = client_backdoor_request_bytes.decode()
+                client_backdoor_request = json.loads(client_backdoor_request_json)
+            except Exception:
+                client_backdoor_request = msgpack.loads(client_backdoor_request_bytes, strict_map_key=False)
+                request_was_binary = True
+                try:
+                    (int_keys, str_keys) = count_int_keys(client_backdoor_request[1])
+                    request_binary_had_enough_integer_keys = int_keys > str_keys
+                except Exception as e:
+                    print(e)
+                    request_binary_had_enough_integer_keys = False
 
-        print('  I<-   {}'.format(client_backdoor_request), flush=True)
-        print('  i->   {}'.format(client_backdoor_request), flush=True)
+            print('  I<-   {}'.format(client_backdoor_request), flush=True)
+            print('  i->   {}'.format(client_backdoor_request), flush=True)
 
-        nats_response = await nats_client.request(frontdoor_topic, client_backdoor_request_bytes, timeout=10)
+            nats_response = await nats_client.request(frontdoor_topic, client_backdoor_request_bytes, timeout=10)
 
-        frontdoor_response_bytes = nats_response.data
+            frontdoor_response_bytes = nats_response.data
 
-        try:
-            frontdoor_response_json = frontdoor_response_bytes.decode()
-            frontdoor_response = json.loads(frontdoor_response_json)
-        except Exception:
-            frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
-            response_was_binary = True
             try:
-                (int_keys, str_keys) = count_int_keys(frontdoor_response[1])
-                print('response int keys, str keys : {} {}'.format(int_keys, str_keys))
-                response_binary_had_enough_integer_keys = int_keys > str_keys
-            except Exception as e:
-                print(e)
-                response_binary_had_enough_integer_keys = False
+                frontdoor_response_json = frontdoor_response_bytes.decode()
+                frontdoor_response = json.loads(frontdoor_response_json)
+            except Exception:
+                frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
+                response_was_binary = True
+                try:
+                    (int_keys, str_keys) = count_int_keys(frontdoor_response[1])
+                    response_binary_had_enough_integer_keys = int_keys > str_keys
+                except Exception as e:
+                    print(e)
+                    response_binary_had_enough_integer_keys = False
 
-        print('  i<-   {}'.format(frontdoor_response), flush=True)
-        print('  I->   {}'.format(frontdoor_response), flush=True)
+            print('  i<-   {}'.format(frontdoor_response), flush=True)
+            print('  I->   {}'.format(frontdoor_response), flush=True)
 
-        await nats_client.publish(msg.reply, frontdoor_response_bytes)
+            await nats_client.publish(msg.reply, frontdoor_response_bytes)
 
-    sub = await nats_client.subscribe(client_backdoor_topic, cb=nats_handler)
+            received += 1
 
-    # TODO: This does not block until the subscription ends. Need to find another way to get the binary assertion results
-    await sub.unsubscribe(limit=times)
+            if (received >= times):
+                done.set_result(True)
 
-    print(request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys)
 
-    return request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys
+        sub = await nats_client.subscribe(client_backdoor_topic, cb=nats_handler)
 
+        # TODO: This does not block until the subscription ends. Need to find another way to get the binary assertion results
+        await sub.unsubscribe(limit=times)
+        await done
+
+        print(request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys)
+
+        return request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys
+    except asyncio.exceptions.CancelledError:
+        if sub:
+            await sub.unsubscribe()
 
 def signal_handler(signum, frame):
     raise Exception("Timeout")
@@ -199,7 +220,7 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
         client_handling_task.cancel()
         await backdoor_handling_task
         await client_handling_task
-        (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys) = client_handling_task.result()
+        (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys) = client_handling_task.result() or (False, False, False, False)
 
     if use_binary:
         if 'Error' not in next(iter(response[1])):
@@ -207,13 +228,16 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
         response[0].pop('_bin', None)
         response[0].pop('_enc', None)
 
-        assert request_was_binary == True
-        assert response_was_binary == True
-        assert request_binary_had_enough_integer_keys == True
-        assert response_binary_had_enough_integer_keys == True
+        if enforce_binary:
+            assert request_was_binary == True, 'Request was not binary'
+            assert response_was_binary == True, 'Response was not binary'
+
+        if enforce_integer_keys:
+            assert request_binary_had_enough_integer_keys == True, 'Binary request did not have enough integer keys'
+            assert response_binary_had_enough_integer_keys == True, 'Binary response did not have enough integer keys'
 
     if expected_response:
-        assert expected_response == response
+        assert expected_response == response, 'expected_response: {}, response: {}'.format(expected_response, response)
 
     # TODO: verify that binary was being done    
 
