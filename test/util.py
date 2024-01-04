@@ -195,7 +195,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
         await backdoor_handling_task
 
     if expected_response:
-        assert expected_response == response, 'expected_response: {}, response: {}'.format(expected_response, response)
+        assert expected_response == response
 
 
 async def verify_flat_case(request, expected_response, frontdoor_topic):
@@ -203,7 +203,7 @@ async def verify_flat_case(request, expected_response, frontdoor_topic):
     response = await send_case(request, expected_response, frontdoor_topic)
 
     if expected_response:
-        assert expected_response == response, 'expected_response: {}, response: {}'.format(expected_response, response)
+        assert expected_response == response
 
 
 async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False, enforce_binary=False, enforce_integer_keys=False, times=1):
@@ -230,15 +230,15 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
         response[0].pop('_enc', None)
 
         if enforce_binary:
-            assert request_was_binary == True, 'Request was not binary'
-            assert response_was_binary == True, 'Response was not binary'
+            assert request_was_binary == True
+            assert response_was_binary == True
 
         if enforce_integer_keys:
-            assert request_binary_had_enough_integer_keys == True, 'Binary request did not have enough integer keys'
-            assert response_binary_had_enough_integer_keys == True, 'Binary response did not have enough integer keys'
+            assert request_binary_had_enough_integer_keys == True
+            assert response_binary_had_enough_integer_keys == True
 
     if expected_response:
-        assert expected_response == response, 'expected_response: {}, response: {}'.format(expected_response, response)
+        assert expected_response == response
 
     # TODO: verify that binary was being done    
 
