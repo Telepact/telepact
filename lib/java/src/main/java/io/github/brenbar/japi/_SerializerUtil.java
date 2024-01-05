@@ -31,7 +31,11 @@ class _SerializerUtil {
                     allKeys.addAll(struct.fields.keySet());
                 }
             } else if (entry.getValue() instanceof UFn f) {
-                allKeys.addAll(f.arg.fields.keySet());
+                for (var e2 : f.call.values.entrySet()) {
+                    allKeys.add(e2.getKey());
+                    var struct = e2.getValue();
+                    allKeys.addAll(struct.fields.keySet());
+                }
                 for (var e2 : f.result.values.entrySet()) {
                     allKeys.add(e2.getKey());
                     var struct = e2.getValue();

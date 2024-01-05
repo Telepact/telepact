@@ -25,7 +25,8 @@ public class TestUtility {
 
     private static Message handle(Message requestMessage) {
         var requestHeaders = requestMessage.header;
-        var functionName = requestMessage.body.keySet().stream().findAny().get();
+        var requestEntry = UUnion.entry(requestMessage.body);
+        var functionName = requestEntry.getKey();
         return switch (functionName) {
             case "fn.test" -> {
                 if (requestHeaders.containsKey("Ok")) {
@@ -104,9 +105,9 @@ public class TestUtility {
 
             var requestHeadersPseudoJson = (Map<String, Object>) requestAsParsedJson.get(0);
             var requestBodyPseudoJson = (Map<String, Object>) requestAsParsedJson.get(1);
-            var requestTargetPseudoJson = requestBodyPseudoJson.keySet().stream().findAny().get();
-            var requestPayloadPseudoJson = (Map<String, Object>) requestBodyPseudoJson.values().stream().findAny()
-                    .get();
+            var requestEntryPsuedoJson = UUnion.entry(requestBodyPseudoJson);
+            var requestTargetPseudoJson = requestEntryPsuedoJson.getKey();
+            var requestPayloadPseudoJson = (Map<String, Object>) requestEntryPsuedoJson.getValue();
 
             var responseMessage = client.send(new Message(requestHeadersPseudoJson, Map.of(requestTargetPseudoJson,
                     requestPayloadPseudoJson)));

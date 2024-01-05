@@ -143,8 +143,15 @@ additional_union_cases = [
     ({'One': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['One']),
 ]
 additional_fn_cases = [
-    ({}, {'RequiredStructFieldMissing': {}}, ['required']),
-    ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, ['a'])
+    ({}, {'ZeroOrManyUnionFieldsDisallowed': {}}, []),
+    ({'a': {}}, {'UnionFieldUnknown': {}}, ['a']),
+    ({'fn.example': {}}, {'RequiredStructFieldMissing': {}}, ['fn.example', 'required']),
+    ({'fn.example': {'required': False, 'a': False}}, {'StructFieldUnknown': {}}, ['fn.example', 'a']),
+    ({'fn.example': False}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
+    ({'fn.example': 0}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
+    ({'fn.example': 0.1}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
+    ({'fn.example': ''}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
+    ({'fn.example': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
 ]
 additional_p2Str_cases = [
     ({'wrap': 0, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
@@ -181,7 +188,7 @@ cases = {
     'any': [v for v in generate_basic_cases('any', Any, [False, 0, 0.1, '', [], {}])],
     'struct': [v for v in generate_basic_cases('struct', dict, [{'required': False}, {'optional': False, 'required': False}], additional_struct_cases)],
     'union': [v for v in generate_basic_cases('union', dict, [{'One': {}}, {'Two':{'required': False}}, {'Two':{'optional': False, 'required': False}}], additional_union_cases)],
-    'fn': [v for v in generate_basic_cases('fn', dict, [{'required': False}, {'optional': False, 'required': False}], additional_fn_cases)],
+    'fn': [v for v in generate_basic_cases('fn', dict, [{'fn.example':{'required': False}}, {'fn.example':{'optional': False, 'required': False}}], additional_fn_cases)],
     'p2Str': [v for v in generate_basic_cases('p2Str', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
     'p2Union': [v for v in generate_basic_cases('p2Union', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)],
     'testPdStr': [
@@ -210,7 +217,7 @@ cases = {
         [[{'_sel': {'struct.ExStruct': []}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {}}}}]],
         [[{'_sel': {'struct.ExStruct': []}, 'Ok': {'value': {'struct': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {}}}}]],
         [[{'_sel': {'->.Ok': []}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {}}]],
-        [[{'_sel': {'fn.example': ['optional']}, 'Ok': {'value': {'fn': {'required': True, 'optional': True}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'fn': {'optional': True}}}}]],
+        [[{'_sel': {'fn.example': ['optional']}, 'Ok': {'value': {'fn': {'fn.example': {'required': True, 'optional': True}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'fn': {'fn.example': {'optional': True}}}}}]],
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'arrStruct': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'arrStruct': [{}, {'optional': False}]}}}]],
         [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'objStruct': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'objStruct': {'a': {}, 'b': {'optional': False}}}}}]],
         [[{'_sel': False, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{'_assert': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['headers', '_sel'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],

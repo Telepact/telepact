@@ -55,8 +55,16 @@ class _ServerUtil {
         var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         var requestHeaders = requestMessage.header;
         var requestBody = requestMessage.body;
-        var requestPayload = (Map<String, Object>) requestBody.values().stream().findAny().orElse(Map.of());
-        var requestTarget = (String) requestBody.keySet().stream().findAny().orElse("fn._unknown");
+        var requestEntry = UUnion.entry(requestBody);
+        String requestTarget;
+        Map<String, Object> requestPayload;
+        if (requestEntry != null) {
+            requestTarget = requestEntry.getKey();
+            requestPayload = (Map<String, Object>) requestEntry.getValue();
+        } else {
+            requestTarget = "fn._unknown";
+            requestPayload = Map.of();
+        }
         var unknownTarget = (String) null;
         if (!jApiSchema.parsed.containsKey(requestTarget)) {
             unknownTarget = requestTarget;
@@ -64,7 +72,6 @@ class _ServerUtil {
         }
         var functionType = (UFn) jApiSchema.parsed.get(requestTarget);
         var resultUnionType = functionType.result;
-        var argStructType = (UStruct) functionType.arg;
 
         // Reflect call id
         var callId = requestHeaders.get("_id");
@@ -112,13 +119,9 @@ class _ServerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var argumentValidationFailures = argStructType.validate(requestPayload, List.of(), List.of());
-        var argumentValidationFailuresWithPath = argumentValidationFailures
-                .stream()
-                .map(f -> new ValidationFailure(_ValidateUtil.prepend(functionType.name, f.path), f.reason, f.data))
-                .toList();
-        if (!argumentValidationFailuresWithPath.isEmpty()) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(argumentValidationFailuresWithPath);
+        var callValidationFailures = functionType.call.validate(requestBody, List.of(), List.of());
+        if (!callValidationFailures.isEmpty()) {
+            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(callValidationFailures);
             Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
                     Map.of("cases", validationFailureCases));
             validateResult(resultUnionType, newErrorResult);

@@ -621,7 +621,7 @@ class UUnion implements UType {
                     new ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
-        var entry = actual.entrySet().stream().findFirst().get();
+        var entry = UUnion.entry((Map<String, Object>) actual);
         var unionTarget = (String) entry.getKey();
         var unionPayload = entry.getValue();
 
@@ -675,14 +675,14 @@ class UUnion implements UType {
         }
     }
 
-    private static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionValuesReference,
+    static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionValuesReference,
             Map<String, Object> startingUnion,
             boolean includeRandomOptionalFields,
             List<UTypeDeclaration> typeParameters,
             RandomGenerator random) {
-        var existingUnionValue = startingUnion.keySet().stream().findAny();
-        if (existingUnionValue.isPresent()) {
-            var unionValue = existingUnionValue.get();
+        if (!startingUnion.isEmpty()) {
+            var unionEntry = UUnion.entry(startingUnion);
+            var unionValue = unionEntry.getKey();
             var unionStructType = unionValuesReference.get(unionValue);
             var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionValue);
 
@@ -704,6 +704,10 @@ class UUnion implements UType {
         }
     }
 
+    static Map.Entry<String, Object> entry(Map<String, Object> union) {
+        return union.entrySet().stream().findAny().orElse(null);
+    }
+
     @Override
     public String getName(List<UTypeDeclaration> generics) {
         return "Object";
@@ -713,12 +717,12 @@ class UUnion implements UType {
 class UFn implements UType {
 
     public final String name;
-    public final UStruct arg;
+    public final UUnion call;
     public final UUnion result;
 
-    public UFn(String name, UStruct input, UUnion output) {
+    public UFn(String name, UUnion call, UUnion output) {
         this.name = name;
-        this.arg = input;
+        this.call = call;
         this.result = output;
     }
 
@@ -730,7 +734,7 @@ class UFn implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        return this.arg.validate(value, typeParameters, generics);
+        return this.call.validate(value, typeParameters, generics);
     }
 
     @Override
@@ -740,11 +744,11 @@ class UFn implements UType {
             RandomGenerator random) {
         if (useStartingValue) {
             var startingFnValue = (Map<String, Object>) startingValue;
-            return UStruct.constructRandomStruct(this.arg.fields, startingFnValue, includeRandomOptionalFields,
+            return UUnion.constructRandomUnion(this.call.values, startingFnValue, includeRandomOptionalFields,
                     List.of(),
                     random);
         } else {
-            return UStruct.constructRandomStruct(this.arg.fields, new HashMap<>(), includeRandomOptionalFields,
+            return UUnion.constructRandomUnion(this.call.values, new HashMap<>(), includeRandomOptionalFields,
                     List.of(),
                     random);
         }

@@ -65,7 +65,7 @@ public class _ValidateUtil {
                     structReference = functionType.result.values.get(resultUnionValue);
                 } else if (structName.startsWith("fn.")) {
                     var functionRef = (UFn) jApiSchema.parsed.get(structName);
-                    structReference = functionRef.arg;
+                    structReference = functionRef.call.values.get(functionRef.name);
                 } else {
                     structReference = (UStruct) jApiSchema.parsed.get(structName);
                 }

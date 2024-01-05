@@ -24,22 +24,29 @@ public class _SelectUtil {
             }
             return finalMap;
         } else if (typeDeclaration.type instanceof UFn f) {
-            var selectedFields = selectedStructFields.get(f.name);
             var valueAsMap = (Map<String, Object>) value;
+            var unionEntry = UUnion.entry(valueAsMap);
+            var unionValue = unionEntry.getKey();
+            var unionData = (Map<String, Object>) unionEntry.getValue();
+
+            var unionStructReference = f.call.values.get(unionValue);
+
+            var selectedFields = selectedStructFields.get(unionStructReference.name);
             var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
+            for (var entry : unionData.entrySet()) {
                 var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = f.arg.fields.get(fieldName);
+                    var field = unionStructReference.fields.get(fieldName);
                     var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
-            return finalMap;
+
+            return Map.of(unionEntry.getKey(), finalMap);
         } else if (typeDeclaration.type instanceof UUnion e) {
             var valueAsMap = (Map<String, Object>) value;
-            var unionEntry = valueAsMap.entrySet().stream().findFirst().get();
+            var unionEntry = UUnion.entry(valueAsMap);
             var unionValue = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 

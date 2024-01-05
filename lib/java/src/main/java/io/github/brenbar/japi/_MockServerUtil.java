@@ -126,7 +126,7 @@ class _MockServerUtil {
     }
 
     static VerificationTimes parseFromPseudoJson(Map<String, Object> verifyTimes) {
-        var verifyTimesEntry = verifyTimes.entrySet().stream().findAny().get();
+        var verifyTimesEntry = UUnion.entry(verifyTimes);
         var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
         return switch (verifyTimesEntry.getKey()) {
             case "unlimited" -> new MockVerification.UnlimitedNumberOfTimes();

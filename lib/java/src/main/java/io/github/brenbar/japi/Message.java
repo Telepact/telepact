@@ -23,10 +23,12 @@ public class Message {
     }
 
     public String getBodyTarget() {
-        return body.keySet().stream().findAny().get();
+        var entry = UUnion.entry(body);
+        return entry.getKey();
     }
 
     public Map<String, Object> getBodyPayload() {
-        return (Map<String, Object>) body.values().stream().findAny().get();
+        var entry = UUnion.entry(body);
+        return (Map<String, Object>) entry.getValue();
     }
 }

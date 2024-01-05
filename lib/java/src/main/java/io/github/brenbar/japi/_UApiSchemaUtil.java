@@ -185,13 +185,13 @@ class _UApiSchemaUtil {
             }
 
             String traitName = trait.name;
-            UStruct fnArg = f.arg;
+            UStruct fnArg = f.call.values.get(f.name);
             Map<String, UFieldDeclaration> fnArgFields = fnArg.fields;
             UUnion fnResult = f.result;
             Map<String, UStruct> fnResultValues = fnResult.values;
             UFn traitFn = trait.fn;
             String traitFnName = traitFn.name;
-            UStruct traitFnArg = traitFn.arg;
+            UStruct traitFnArg = traitFn.call.values.get(traitFn.name);
             Map<String, UFieldDeclaration> traitFnArgFields = traitFnArg.fields;
             UUnion traitFnResult = traitFn.result;
             Map<String, UStruct> traitFnResultValues = traitFnResult.values;
@@ -302,6 +302,7 @@ class _UApiSchemaUtil {
         }
 
         var argType = new UStruct(schemaKey, argumentFields, typeParameterCount);
+        var callType = new UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
 
         Map<String, Object> resultDefinitionAsParsedJson;
         try {
@@ -358,7 +359,7 @@ class _UApiSchemaUtil {
 
         var resultType = new UUnion("%s.->".formatted(schemaKey), values, typeParameterCount);
 
-        var type = new UFn(schemaKey, argType, resultType);
+        var type = new UFn(schemaKey, callType, resultType);
 
         return type;
     }
