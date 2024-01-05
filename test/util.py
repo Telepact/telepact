@@ -1,4 +1,5 @@
 import json
+from typing import Any
 import msgpack
 import nats
 import asyncio
@@ -184,6 +185,26 @@ def start_nats_server():
     return subprocess.Popen(['nats-server', '-DV'])
 
 
+class hashabledict(dict):
+  def __key(self):
+    return tuple(sorted(self.items()))
+  def __hash__(self):
+    return hash(self.__key())
+  def __eq__(self, other):
+    return self.__key() == other.__key()
+  
+
+def convert_lists_to_sets(a):
+    if type(a) == dict:
+        for k,v in a.items():
+            a[k] = convert_lists_to_sets(v)
+        return hashabledict(a)
+    elif type(a) == list:
+        return frozenset(convert_lists_to_sets(v) for v in a)
+    else:
+        return a
+
+
 async def verify_server_case(request, expected_response, frontdoor_topic, backdoor_topic):
 
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
@@ -195,6 +216,10 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
         await backdoor_handling_task
 
     if expected_response:
+        if expected_response[0].pop('_setCompare', False):
+            expected_response = convert_lists_to_sets(expected_response)
+            response = convert_lists_to_sets(response)
+            
         assert expected_response == response
 
 
@@ -238,6 +263,10 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
             assert response_binary_had_enough_integer_keys == True
 
     if expected_response:
+        if expected_response[0].pop('_setCompare', False):
+            expected_response = convert_lists_to_sets(expected_response)
+            response = convert_lists_to_sets(response)
+
         assert expected_response == response
 
     # TODO: verify that binary was being done    
@@ -262,7 +291,7 @@ async def send_case(request, expected_response, request_topic):
         response = response_bytes
     else:
         response_json = response_bytes.decode()
-        response = json.loads(response_json)    
+        response = json.loads(response_json)
 
     print('T<-     {}'.format(response), flush=True)
 
