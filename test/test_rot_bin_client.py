@@ -7,7 +7,7 @@ import importlib
 
 @pytest.fixture(scope="module", params=get_lib_modules())
 def rot_bin_client_server_proc(loop, nats_server, request):
-    test_module_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(request.param)
     print(test_module_name)
     l = importlib.import_module(test_module_name)
 

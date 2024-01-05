@@ -22,7 +22,7 @@ class Constants:
 
 
 def get_lib_modules():
-    result = ['lib.{}.test_server'.format(f) for f in os.listdir('lib')
+    result = [f for f in os.listdir('lib')
                  if os.path.isdir('lib/{}'.format(f))]    
     print(result)
     return result

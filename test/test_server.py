@@ -8,7 +8,7 @@ import importlib
 
 @pytest.fixture(scope="module", params=get_lib_modules())
 def basic_server_proc(loop, nats_server, request):
-    test_module_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(request.param)
     print(test_module_name)
     l = importlib.import_module(test_module_name)
     
@@ -26,8 +26,8 @@ def basic_server_proc(loop, nats_server, request):
     s.wait()
     print('basic_server_proc stopped')
 
-def test_basic_server_case(loop, basic_server_proc, name, req, expected_response):
+def test_basic_server_case(loop, basic_server_proc, name, req, res):
     async def t():
-        await verify_server_case(req, expected_response, 'front-basic', 'back-basic')
+        await verify_server_case(req, res, 'front-basic', 'back-basic')
     
     loop.run_until_complete(t())

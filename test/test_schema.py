@@ -7,7 +7,7 @@ import importlib
 
 @pytest.fixture(scope="module", params=get_lib_modules())
 def schema_server_proc(loop, nats_server, request):
-    test_module_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(request.param)
     print(test_module_name)
     l = importlib.import_module(test_module_name)
 
@@ -25,8 +25,8 @@ def schema_server_proc(loop, nats_server, request):
     s.wait()
     print('schema_server_proc stopped')
 
-def test_schema_case(loop, schema_server_proc, name, req, expected_response):
+def test_schema_case(loop, schema_server_proc, name, req, res):
     async def t():
-        await verify_flat_case(req, expected_response, 'front-schema')
+        await verify_flat_case(req, res, 'front-schema')
                                              
     loop.run_until_complete(t())

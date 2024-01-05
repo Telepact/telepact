@@ -7,7 +7,7 @@ import importlib
 
 @pytest.fixture(scope="module", params=get_lib_modules())
 def mock_server_proc(loop, nats_server, request):
-    test_module_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(request.param)
     print(test_module_name)
     l = importlib.import_module(test_module_name)
 
@@ -33,8 +33,8 @@ def test_mock_case(loop, mock_server_proc, name, statements):
     loop.run_until_complete(t())
 
 
-def test_mock_invalid_case(loop, mock_server_proc, name, req, expected_response):
+def test_mock_invalid_case(loop, mock_server_proc, name, req, res):
     async def t():
-        await verify_flat_case(req, expected_response, 'front-mock')
+        await verify_flat_case(req, res, 'front-mock')
     
     loop.run_until_complete(t())

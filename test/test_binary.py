@@ -7,7 +7,7 @@ import importlib
 
 @pytest.fixture(scope="module", params=get_lib_modules())
 def binary_server_proc(loop, nats_server, request):
-    test_module_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(request.param)
     print(test_module_name)
     l = importlib.import_module(test_module_name)
 
@@ -25,8 +25,8 @@ def binary_server_proc(loop, nats_server, request):
     s.wait()
     print('binary_server_proc stopped')
 
-def test_binary_case(loop, binary_server_proc, name, req, expected_response):
+def test_binary_case(loop, binary_server_proc, name, req, res):
     async def t():
-        await verify_server_case(req, expected_response, 'front-binary', 'back-binary')
+        await verify_server_case(req, res, 'front-binary', 'back-binary')
     
     loop.run_until_complete(t())

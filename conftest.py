@@ -36,19 +36,19 @@ def loop():
 
 def pytest_generate_tests(metafunc: pytest.Metafunc):
     if 'test_basic_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,expected_response', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
     elif 'test_binary_client_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,expected_response', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
     elif 'test_client_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,expected_response', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
     elif 'test_binary_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,expected_response', [(k, rq, rs) for k in binary_cases for rq, rs in binary_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in binary_cases for rq, rs in binary_cases[k]])
     elif 'test_mock_case' == metafunc.function.__name__:
         metafunc.parametrize('name,statements', [(k, s) for k,s in mock_cases.items()])
     elif 'test_mock_invalid_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,expected_response', [(k, rq, rs) for k in mock_invalid_stub_cases for rq, rs in mock_invalid_stub_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in mock_invalid_stub_cases for rq, rs in mock_invalid_stub_cases[k]])
     elif 'test_schema_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,expected_response', [(k, rq, rs) for k in parse_cases for rq, rs in parse_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in parse_cases for rq, rs in parse_cases[k]])
     elif 'test_rotate_binary_client_case' == metafunc.function.__name__:
         metafunc.parametrize('name,statements', [(k, s) for k,s in binary_client_rotation_cases.items()])
 
