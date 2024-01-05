@@ -21,6 +21,11 @@ class Constants:
     intermediate_topic = 'intermediate'
     backdoor_topic = 'backdoor'
 
+def increment():
+    count = 0
+    while True:
+        yield count
+        count += 1
 
 def get_lib_modules():
     result = [f for f in os.listdir('lib')
