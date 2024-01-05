@@ -8,6 +8,7 @@ import pytest
 import nats.aio.client
 import time
 import os
+import copy
 
 should_abort = False
 
