@@ -206,6 +206,7 @@ def convert_lists_to_sets(a):
 
 
 async def verify_server_case(request, expected_response, frontdoor_topic, backdoor_topic):
+    assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
@@ -224,6 +225,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
 
 
 async def verify_flat_case(request, expected_response, frontdoor_topic):
+    assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
     response = await send_case(request, expected_response, frontdoor_topic)
 
@@ -231,9 +233,14 @@ async def verify_flat_case(request, expected_response, frontdoor_topic):
         assert expected_response == response
 
 
-async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False, enforce_binary=False, enforce_integer_keys=False, times=1):
+async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False):
+    assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
-    client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=times))    
+    client_times = 1
+    if assert_rules.get('expectTwoRequests', False):
+        client_times = 2
+
+    client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=client_times))    
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
     if use_binary:
@@ -254,11 +261,11 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
         response[0].pop('_bin', None)
         response[0].pop('_enc', None)
 
-        if enforce_binary:
+        if not assert_rules.get('skipBinaryCheck', False):
             assert request_was_binary == True
             assert response_was_binary == True
 
-        if enforce_integer_keys:
+        if not assert_rules.get('skipFieldIdCheck', False):
             assert request_binary_had_enough_integer_keys == True
             assert response_binary_had_enough_integer_keys == True
 

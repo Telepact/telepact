@@ -31,13 +31,13 @@ cases = {
 
 binary_client_rotation_cases = {
     'rotation': [
-        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
-        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
-        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
-        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
-        [[{'Ok': {}}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
-        [[{'Ok': {}}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
-        [[{'Ok': {}}, {'fn.test': {}}], [{}, {'Ok': {}}], False, False],
+        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
+        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
+        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
+        [[{'Ok': {}, '_toggleAlternateServer': True}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
+        [[{'Ok': {}}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
+        [[{'Ok': {}}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
+        [[{'Ok': {}}, {'fn.test': {}}], [{'_assert': {'expectTwoRequests': True, 'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'Ok': {}}]],
         [[{'Ok': {}}, {'fn.test': {}}], [{}, {'Ok': {}}]],
     ]
 }
