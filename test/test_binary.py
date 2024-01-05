@@ -7,26 +7,32 @@ import importlib
 
 @pytest.fixture(scope="module", params=get_lib_modules())
 def binary_server_proc(loop, nats_server, request):
-    test_module_name = 'lib.{}.test_server'.format(request.param)
-    print(test_module_name)
+    lib_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(lib_name)
     l = importlib.import_module(test_module_name)
 
-    s = l.start_basic_server(c.binary_api_path, c.nats_url, 'front-binary', 'back-binary')
+    init_topics = ['frontdoor', 'backdoor']
+    topics = tuple('{}.{}.{}'.format(lib_name, 'binary-server', t) for t in init_topics)
+
+    s = l.start_basic_server(c.binary_api_path, c.nats_url, *topics)
 
     try:
-        startup_check(loop, lambda: verify_server_case(ping_req, None, 'front-binary', 'back-binary'))
+        startup_check(loop, lambda: verify_server_case(ping_req, None, *topics))
     except Exception:
         s.terminate()
         s.wait()
         raise    
 
-    yield s
+    yield s, topics
+    
     s.terminate()
     s.wait()
     print('binary_server_proc stopped')
 
 def test_binary_case(loop, binary_server_proc, name, req, res):
+    _, topics = binary_server_proc
+    
     async def t():
-        await verify_server_case(req, res, 'front-binary', 'back-binary')
+        await verify_server_case(req, res, *topics)
     
     loop.run_until_complete(t())

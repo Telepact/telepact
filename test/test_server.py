@@ -7,27 +7,33 @@ import importlib
 
 
 @pytest.fixture(scope="module", params=get_lib_modules())
-def basic_server_proc(loop, nats_server, request):
-    test_module_name = 'lib.{}.test_server'.format(request.param)
-    print(test_module_name)
+def server_proc(loop, nats_server, request):
+    lib_name = request.param
+    test_module_name = 'lib.{}.test_server'.format(lib_name)
     l = importlib.import_module(test_module_name)
+
+    init_topics = ['frontdoor', 'backdoor']
+    topics = tuple('{}.{}.{}'.format(lib_name, 'server', t) for t in init_topics)     
     
-    s = l.start_basic_server(c.example_api_path, c.nats_url, 'front-basic', 'back-basic')
+    s = l.start_basic_server(c.example_api_path, c.nats_url, *topics)
     
     try:                                
-        startup_check(loop, lambda: verify_server_case(ping_req, None, 'front-basic', 'back-basic'))
+        startup_check(loop, lambda: verify_server_case(ping_req, None, *topics))
     except Exception:
         s.terminate()
         s.wait()
         raise   
     
-    yield s
+    yield s, topics
+    
     s.terminate()
     s.wait()
     print('basic_server_proc stopped')
 
-def test_basic_server_case(loop, basic_server_proc, name, req, res):
+def test_server_case(loop, server_proc, name, req, res):
+    _, topics = server_proc
+    
     async def t():
-        await verify_server_case(req, res, 'front-basic', 'back-basic')
+        await verify_server_case(req, res, *topics)
     
     loop.run_until_complete(t())
