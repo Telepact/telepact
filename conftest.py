@@ -8,6 +8,8 @@ from test.mock_cases import cases as mock_cases
 from test.mock_cases import invalid_cases as mock_invalid_cases
 from test.parse_cases import cases as parse_cases
 from copy import deepcopy as dc
+import functools
+import operator
 
 @pytest.fixture(scope='session')
 def nats_server():
@@ -47,6 +49,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     elif 'test_mock_multi_case' == metafunc.function.__name__:
         metafunc.parametrize('name,statements', [(k, [[dc(rq), dc(rs)] for rq, rs in mock_cases[k]]) for k in mock_cases])
     elif 'test_mock_case' == metafunc.function.__name__:
+        print('mock_invalid_cases {}'.format(functools.reduce(operator.add, [len(v) for v in mock_invalid_cases.values()])))
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in mock_invalid_cases for rq, rs in mock_invalid_cases[k]])
     elif 'test_schema_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in parse_cases for rq, rs in parse_cases[k]])

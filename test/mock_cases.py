@@ -14,7 +14,7 @@ def generate_mock_cases(given_field: str, the_type, correct_values, additional_i
             yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'Ok': {'value': {field: incorrect_value}}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->', 'Ok', 'value'] + base_path + path, 'reason': reason}]}}]]
 
 
-cases = {
+invalid_cases = {
     'boolean': [v for v in generate_mock_cases('bool', bool, [False, True])],
     'integer': [v for v in generate_mock_cases('int', int, [0, -1, 1, 9223372036854775807, -9223372036854775808], additional_integer_cases)],
     'number': [v for v in generate_mock_cases('num', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1])],
@@ -29,7 +29,7 @@ cases = {
     'p2Union': [v for v in generate_mock_cases('p2Union', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)]
 }
 
-invalid_cases = {
+cases = {
     'emptyPartialMatchStub': [
         [[{}, {'fn._clearStubs': {}}], [{}, {'Ok': {}}]],
         [[{}, {'fn._clearCalls': {}}], [{}, {'Ok': {}}]],
