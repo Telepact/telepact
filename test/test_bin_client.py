@@ -24,8 +24,8 @@ def bin_client_server_proc(loop, nats_server, request):
 
     try:
         async def warmup():
-            request = [{}, {'fn._ping': {}}]
-            await verify_client_case(request, None, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client', use_binary=True)
+            request = [{'_binary': True}, {'fn._ping': {}}]
+            await verify_client_case(request, None, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client')
 
         loop.run_until_complete(warmup())
     except Exception:
@@ -42,7 +42,7 @@ def bin_client_server_proc(loop, nats_server, request):
         s.wait()                        
     print('bin_client_server_proc stopped')
     
-def test_binary_client_case(loop, bin_client_server_proc, name ,req, expected_response):
+def test_binary_client_case(loop, bin_client_server_proc, name, req, expected_response):
     async def t():
         await verify_client_case(req, expected_response, 'cfront-bin-client', 'cback-bin-client', 'front-bin-client', 'back-bin-client', use_binary=True)
                                                  
