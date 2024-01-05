@@ -6,8 +6,10 @@
     }
   ],
   "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test_*.py"],
-  "python.testing.pytestEnabled": false,
-  "python.testing.unittestEnabled": true,
-  "python.testing.pytestArgs": ["."],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "."
+  ],
   "autopep8.args": ["--exclude test/cases.py"]
 }
