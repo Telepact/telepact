@@ -1,7 +1,7 @@
 from typing import Any
 
-from cases import get_values
-from cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_p2Union_cases, additional_p2Str_cases, additional_struct_cases
+from test.cases import get_values
+from test.cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_p2Union_cases, additional_p2Str_cases, additional_struct_cases
 
 
 def generate_mock_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):

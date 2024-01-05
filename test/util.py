@@ -7,6 +7,7 @@ import subprocess
 import pytest
 import nats.aio.client
 import time
+import os
 
 should_abort = False
 
@@ -18,6 +19,13 @@ class Constants:
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'
     backdoor_topic = 'backdoor'
+
+
+def get_lib_modules():
+    result = ['lib.{}.test_server'.format(f) for f in os.listdir('lib')
+                 if os.path.isdir('lib/{}'.format(f))]    
+    print(result)
+    return result
 
 def handler(request):
     header = request[0]
