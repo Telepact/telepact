@@ -231,7 +231,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
         await backdoor_handling_task
 
     if expected_response:
-        if expected_response[0].pop('_setCompare', False):
+        if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
             response = convert_lists_to_sets(response)
             
@@ -284,7 +284,7 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
             assert response_binary_had_enough_integer_keys == True
 
     if expected_response:
-        if expected_response[0].pop('_setCompare', False):
+        if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
             response = convert_lists_to_sets(response)
 

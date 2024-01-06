@@ -15,7 +15,7 @@ import operator
 @pytest.fixture(scope='session')
 def nats_server():
     print('Creating NATS fixture')
-    p = subprocess.Popen(['nats-server', '-DV'])
+    p = subprocess.Popen(['nats-server', '-D'])
     yield p
     p.terminate()
     p.wait()
@@ -40,7 +40,7 @@ def loop():
 
 def pytest_generate_tests(metafunc: pytest.Metafunc):
     if 'test_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]])
     elif 'test_binary_client_server_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
     elif 'test_client_server_case' == metafunc.function.__name__:
