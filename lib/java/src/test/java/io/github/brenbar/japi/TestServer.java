@@ -30,8 +30,8 @@ public class TestServer {
         var backdoorTopic = args[3];
 
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = new JApiSchema(json);
-        var alternateJApi = new JApiSchema(jApi, new JApiSchema("""
+        var jApi = JApiSchema.fromJson(json);
+        var alternateJApi = JApiSchema.combine(jApi, JApiSchema.fromJson("""
                 [
                     {
                         "struct.BackwardsCompatibleChange": {}

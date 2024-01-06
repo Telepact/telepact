@@ -49,8 +49,8 @@ public class MockServer {
         typeExtensions.put("ext._Call", new MockCallTypeExtension(parsedTypes));
         typeExtensions.put("ext._Stub", new MockStubTypeExtension(parsedTypes));
 
-        var mockJApiSchema = new JApiSchema(_InternalMockJApiUtil.getJson(), typeExtensions);
-        var combinedJApiSchema = new JApiSchema(jApiSchema, mockJApiSchema);
+        var mockJApiSchema = JApiSchema.fromJsonWithExtensions(_InternalMockJApiUtil.getJson(), typeExtensions);
+        var combinedJApiSchema = JApiSchema.combine(jApiSchema, mockJApiSchema);
 
         this.server = new Server(combinedJApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));

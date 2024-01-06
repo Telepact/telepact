@@ -26,7 +26,7 @@ public class LoadTest {
     public void test() throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
 
-        var jApiSchema = new JApiSchema(json);
+        var jApiSchema = JApiSchema.fromJson(json);
 
         var server = new MockServer(jApiSchema, new Options())
                 .setOnError((e) -> e.printStackTrace())

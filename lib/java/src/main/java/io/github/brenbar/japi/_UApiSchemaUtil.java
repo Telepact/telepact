@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 class _UApiSchemaUtil {
 
-    static UApiSchemaTuple combineUApiSchemas(JApiSchema first, JApiSchema second) {
+    static JApiSchema combineUApiSchemas(JApiSchema first, JApiSchema second) {
         List<Object> firstOriginal = first.original;
         List<Object> secondOriginal = second.original;
         Map<String, UType> firstParsed = first.parsed;
@@ -47,7 +47,7 @@ class _UApiSchemaUtil {
         return parseUApiSchema(original, typeExtensions);
     }
 
-    static UApiSchemaTuple parseUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
+    static JApiSchema parseUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var objectMapper = new ObjectMapper();
         List<Object> originalUApiSchema;
         try {
@@ -62,7 +62,7 @@ class _UApiSchemaUtil {
         return parseUApiSchema(originalUApiSchema, typeExtensions);
     }
 
-    private static UApiSchemaTuple parseUApiSchema(List<Object> originalUApiSchema,
+    private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,
             Map<String, TypeExtension> typeExtensions) {
         var parsedTypes = new HashMap<String, UType>();
         var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -149,7 +149,7 @@ class _UApiSchemaUtil {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        return new UApiSchemaTuple(originalUApiSchema, parsedTypes, typeExtensions);
+        return new JApiSchema(originalUApiSchema, parsedTypes, typeExtensions);
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {

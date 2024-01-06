@@ -10,24 +10,23 @@ public class JApiSchema {
     final Map<String, UType> parsed;
     final Map<String, TypeExtension> typeExtensions;
 
-    public JApiSchema(String jApiSchemaJson) {
-        var tuple = _UApiSchemaUtil.parseUApiSchema(jApiSchemaJson, new HashMap<>());
-        this.original = tuple.original;
-        this.parsed = tuple.parsed;
-        this.typeExtensions = tuple.typeExtensions;
+    public JApiSchema(List<Object> original,
+            Map<String, UType> parsed,
+            Map<String, TypeExtension> typeExtensions) {
+        this.original = original;
+        this.parsed = parsed;
+        this.typeExtensions = typeExtensions;
     }
 
-    public JApiSchema(String jApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
-        var tuple = _UApiSchemaUtil.parseUApiSchema(jApiSchemaJson, typeExtensions);
-        this.original = tuple.original;
-        this.parsed = tuple.parsed;
-        this.typeExtensions = tuple.typeExtensions;
+    public static JApiSchema fromJson(String json) {
+        return _UApiSchemaUtil.parseUApiSchema(json, new HashMap<>());
     }
 
-    public JApiSchema(JApiSchema first, JApiSchema second) {
-        var tuple = _UApiSchemaUtil.combineUApiSchemas(first, second);
-        this.original = tuple.original;
-        this.parsed = tuple.parsed;
-        this.typeExtensions = tuple.typeExtensions;
+    public static JApiSchema fromJsonWithExtensions(String json, Map<String, TypeExtension> typeExtensions) {
+        return _UApiSchemaUtil.parseUApiSchema(json, typeExtensions);
+    }
+
+    public static JApiSchema combine(JApiSchema first, JApiSchema second) {
+        return _UApiSchemaUtil.combineUApiSchemas(first, second);
     }
 }

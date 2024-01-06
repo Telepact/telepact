@@ -29,7 +29,7 @@ public class SchemaTestServer {
         var frontdoorTopic = args[2];
 
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = new JApiSchema(json);
+        var jApi = JApiSchema.fromJson(json);
         var objectMapper = new ObjectMapper();
 
         Function<Message, Message> handler = (requestMessage) -> {
@@ -46,7 +46,7 @@ public class SchemaTestServer {
             }
 
             try {
-                var schema = new JApiSchema(new String(schemaJson));
+                var schema = JApiSchema.fromJson(new String(schemaJson));
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             } catch (JApiSchemaParseError e) {
                 return new Message(Map.of(),

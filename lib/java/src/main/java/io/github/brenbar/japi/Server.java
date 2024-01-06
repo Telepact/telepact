@@ -37,8 +37,8 @@ public class Server {
      * @param handler
      */
     public Server(JApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
-        var internalJApiSchema = new JApiSchema(_InternalJApiUtil.getJson());
-        this.jApiSchema = new JApiSchema(jApiSchema, internalJApiSchema);
+        var internalJApiSchema = JApiSchema.fromJson(_InternalJApiUtil.getJson());
+        this.jApiSchema = JApiSchema.combine(jApiSchema, internalJApiSchema);
         this.handler = handler;
 
         this.onError = options.onError;

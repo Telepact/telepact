@@ -57,7 +57,7 @@ public class TestUtility {
     public static void test(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test/example.japi.json"));
-        var jApi = new JApiSchema(json);
+        var jApi = JApiSchema.fromJson(json);
         var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
@@ -78,7 +78,7 @@ public class TestUtility {
     public static void testBinary(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var jApi = new JApiSchema(json);
+        var jApi = JApiSchema.fromJson(json);
         var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
@@ -118,7 +118,7 @@ public class TestUtility {
 
     public static void testBinaryExact(byte[] requestBytes, byte[] expectedResponseBytes) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test/binary", "binary.japi.json"));
-        var jApi = new JApiSchema(json);
+        var jApi = JApiSchema.fromJson(json);
         var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
 
         // test json
@@ -140,7 +140,7 @@ public class TestUtility {
 
     public static MockServer generatedMockTestSetup() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var jApi = new JApiSchema(json);
+        var jApi = JApiSchema.fromJson(json);
         var server = new MockServer(jApi,
                 new io.github.brenbar.japi.MockServer.Options().setOnError((e) -> e.printStackTrace())
                         .setEnableGeneratedDefaultStub(false));

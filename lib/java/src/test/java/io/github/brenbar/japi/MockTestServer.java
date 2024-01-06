@@ -18,7 +18,7 @@ public class MockTestServer {
         var frontdoorTopic = args[2];
 
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = new JApiSchema(json);
+        var jApi = JApiSchema.fromJson(json);
 
         var server = new MockServer(jApi,
                 new MockServer.Options().setOnError((e) -> e.printStackTrace()).setEnableGeneratedDefaultStub(false));
