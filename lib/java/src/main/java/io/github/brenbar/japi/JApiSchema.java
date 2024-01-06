@@ -19,14 +19,14 @@ public class JApiSchema {
     }
 
     public static JApiSchema fromJson(String json) {
-        return _UApiSchemaUtil.parseUApiSchema(json, new HashMap<>());
+        return _ParseSchemaUtil.parseUApiSchema(json, new HashMap<>());
     }
 
     public static JApiSchema fromJsonWithExtensions(String json, Map<String, TypeExtension> typeExtensions) {
-        return _UApiSchemaUtil.parseUApiSchema(json, typeExtensions);
+        return _ParseSchemaUtil.parseUApiSchema(json, typeExtensions);
     }
 
     public static JApiSchema combine(JApiSchema first, JApiSchema second) {
-        return _UApiSchemaUtil.combineUApiSchemas(first, second);
+        return _ParseSchemaUtil.combineUApiSchemas(first, second);
     }
 }
