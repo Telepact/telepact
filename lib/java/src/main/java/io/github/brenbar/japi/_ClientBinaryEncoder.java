@@ -16,13 +16,13 @@ class _ClientBinaryEncoder implements BinaryEncoder {
 
     @Override
     public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return _SerializerUtil.clientBinaryEncode(message, recentBinaryEncoders,
+        return _BinaryEncodeUtil.clientBinaryEncode(message, recentBinaryEncoders,
                 binaryChecksumStrategy);
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return _SerializerUtil.clientBinaryDecode(message, recentBinaryEncoders, binaryChecksumStrategy);
+        return _BinaryEncodeUtil.clientBinaryDecode(message, recentBinaryEncoders, binaryChecksumStrategy);
     }
 
 }

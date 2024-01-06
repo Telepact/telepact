@@ -43,7 +43,7 @@ public class Server {
 
         this.onError = options.onError;
 
-        var binaryEncoding = _SerializerUtil.constructBinaryEncoding(this.jApiSchema);
+        var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.jApiSchema);
         var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }

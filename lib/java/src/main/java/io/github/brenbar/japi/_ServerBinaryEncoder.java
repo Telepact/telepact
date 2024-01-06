@@ -12,12 +12,12 @@ class _ServerBinaryEncoder implements BinaryEncoder {
 
     @Override
     public List<Object> encode(List<Object> message) {
-        return _SerializerUtil.serverBinaryEncode(message, binaryEncoder);
+        return _BinaryEncodeUtil.serverBinaryEncode(message, binaryEncoder);
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return _SerializerUtil.serverBinaryDecode(message, binaryEncoder);
+        return _BinaryEncodeUtil.serverBinaryDecode(message, binaryEncoder);
     }
 
 }

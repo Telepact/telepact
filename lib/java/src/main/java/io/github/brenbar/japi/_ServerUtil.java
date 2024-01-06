@@ -73,7 +73,6 @@ class _ServerUtil {
         var functionType = (UFn) jApiSchema.parsed.get(requestTarget);
         var resultUnionType = functionType.result;
 
-        // Reflect call id
         var callId = requestHeaders.get("_id");
         if (callId != null) {
             responseHeaders.put("_id", callId);
@@ -85,23 +84,14 @@ class _ServerUtil {
                     Map.of("reasons", parseFailures));
             validateResult(resultUnionType, newErrorResult);
 
-            // TODO: Need to find a good way to do this:
-            // if (parseFailures.contains(Map.of("IncompatibleBinaryEncoding", Map.of())) ||
-            // parseFailures.contains(Map.of("BinaryDecodeFailure", Map.of()))) {
-            // System.out.println("still sending binary");
-            // responseHeaders.put("_binary", true);
-            // }
             return new Message(responseHeaders, newErrorResult);
         }
 
         var headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders, jApiSchema, functionType);
 
         if (!headerValidationFailures.isEmpty()) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(headerValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestHeaders",
-                    Map.of("cases", validationFailureCases));
-            validateResult(resultUnionType, newErrorResult);
-            return new Message(responseHeaders, newErrorResult);
+            return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,
+                    responseHeaders);
         }
 
         if (requestHeaders.containsKey("_bin")) {
@@ -121,11 +111,8 @@ class _ServerUtil {
 
         var callValidationFailures = functionType.call.validate(requestBody, List.of(), List.of());
         if (!callValidationFailures.isEmpty()) {
-            var validationFailureCases = mapValidationFailuresToInvalidFieldCases(callValidationFailures);
-            Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
-                    Map.of("cases", validationFailureCases));
-            validateResult(resultUnionType, newErrorResult);
-            return new Message(responseHeaders, newErrorResult);
+            return getInvalidErrorMessage("_ErrorInvalidRequestBody", callValidationFailures, resultUnionType,
+                    responseHeaders);
         }
 
         unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
@@ -154,11 +141,8 @@ class _ServerUtil {
             var resultValidationFailures = resultUnionType.validate(
                     resultMessage.body, List.of(), List.of());
             if (!resultValidationFailures.isEmpty()) {
-                var validationFailureCases = mapValidationFailuresToInvalidFieldCases(resultValidationFailures);
-                Map<String, Object> newErrorResult = Map.of("_ErrorInvalidResponseBody",
-                        Map.of("cases", validationFailureCases));
-                validateResult(resultUnionType, newErrorResult);
-                return new Message(responseHeaders, newErrorResult);
+                return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType,
+                        responseHeaders);
             }
         }
 
@@ -179,6 +163,15 @@ class _ServerUtil {
         }
 
         return new Message(responseHeaders, finalResultUnion);
+    }
+
+    private static Message getInvalidErrorMessage(String error, List<ValidationFailure> validationFailures,
+            UUnion resultUnionType, Map<String, Object> responseHeaders) {
+        var validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
+        Map<String, Object> newErrorResult = Map.of(error,
+                Map.of("cases", validationFailureCases));
+        validateResult(resultUnionType, newErrorResult);
+        return new Message(responseHeaders, newErrorResult);
     }
 
     private static List<Map<String, Object>> mapValidationFailuresToInvalidFieldCases(

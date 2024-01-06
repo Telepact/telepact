@@ -14,10 +14,10 @@ public class Serializer {
     }
 
     public byte[] serialize(Message message) {
-        return _SerializerUtil.serialize(message, this.binaryEncoder, this.serializationImpl);
+        return _SerializeUtil.serialize(message, this.binaryEncoder, this.serializationImpl);
     }
 
     public Message deserialize(byte[] messageBytes) {
-        return _SerializerUtil.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
+        return _SerializeUtil.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
     }
 }
