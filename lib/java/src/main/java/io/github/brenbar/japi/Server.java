@@ -1,6 +1,5 @@
 package io.github.brenbar.japi;
 
-import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -12,10 +11,24 @@ public class Server {
     public static class Options {
         public Consumer<Throwable> onError = (e) -> {
         };
+        public Consumer<Message> onRequest = (m) -> {
+        };
+        public Consumer<Message> onResponse = (m) -> {
+        };
         public SerializationImpl serializer = new _DefaultSerializer();
 
         public Options setOnError(Consumer<Throwable> onError) {
             this.onError = onError;
+            return this;
+        }
+
+        public Options setOnRequest(Consumer<Message> onRequest) {
+            this.onRequest = onRequest;
+            return this;
+        }
+
+        public Options setOnResponse(Consumer<Message> onResponse) {
+            this.onResponse = onResponse;
             return this;
         }
 
@@ -28,6 +41,8 @@ public class Server {
     JApiSchema jApiSchema;
     Function<Message, Message> handler;
     Consumer<Throwable> onError;
+    Consumer<Message> onRequest;
+    Consumer<Message> onResponse;
     Serializer serializer;
 
     /**
@@ -42,6 +57,8 @@ public class Server {
         this.handler = handler;
 
         this.onError = options.onError;
+        this.onRequest = options.onRequest;
+        this.onResponse = options.onResponse;
 
         var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.jApiSchema);
         var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
@@ -55,29 +72,7 @@ public class Server {
      * @return
      */
     public byte[] process(byte[] requestMessageBytes) {
-        return deserializeAndProcess(requestMessageBytes);
-    }
-
-    private byte[] deserializeAndProcess(byte[] requestMessageBytes) {
-        try {
-            var requestMessage = _ServerUtil.parseRequestMessage(requestMessageBytes, this.serializer,
-                    this.jApiSchema, this.onError);
-
-            var responseMessage = processMessage(requestMessage);
-
-            return this.serializer.serialize(responseMessage);
-        } catch (Exception e) {
-            try {
-                this.onError.accept(e);
-            } catch (Exception ignored) {
-            }
-            return this.serializer
-                    .serialize(new Message(new HashMap<>(), Map.of("_ErrorUnknown", Map.of())));
-        }
-    }
-
-    private Message processMessage(Message requestMessage) {
-        return _ServerUtil.processMessage(requestMessage, this.jApiSchema, this.handler,
-                this.onError);
+        return _ServerUtil.processBytes(requestMessageBytes, this.serializer, this.jApiSchema, this.onError,
+                this.onRequest, this.onResponse, this.handler);
     }
 }

@@ -9,6 +9,36 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 class _ServerUtil {
+    static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
+            Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
+            Function<Message, Message> handler) {
+        try {
+            var requestMessage = parseRequestMessage(requestMessageBytes, serializer,
+                    jApiSchema, onError);
+
+            try {
+                onRequest.accept(requestMessage);
+            } catch (Throwable ignored) {
+            }
+
+            var responseMessage = processMessage(requestMessage, jApiSchema, handler, onError);
+
+            try {
+                onResponse.accept(responseMessage);
+            } catch (Throwable ignored) {
+            }
+
+            return serializer.serialize(responseMessage);
+        } catch (Throwable e) {
+            try {
+                onError.accept(e);
+            } catch (Throwable ignored) {
+            }
+
+            return serializer
+                    .serialize(new Message(new HashMap<>(), Map.of("_ErrorUnknown", Map.of())));
+        }
+    }
 
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
             Consumer<Throwable> onError) {
@@ -127,9 +157,9 @@ class _ServerUtil {
         } else {
             try {
                 resultMessage = handler.apply(callMessage);
-            } catch (Throwable t) {
+            } catch (Throwable e) {
                 try {
-                    onError.accept(t);
+                    onError.accept(e);
                 } catch (Throwable ignored) {
 
                 }
