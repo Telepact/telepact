@@ -3,34 +3,36 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class _ParseSchemaTypeUtil {
 
-    static UTypeDeclaration parseTypeDeclaration(String path, List<Object> typeDeclarationArray,
+    static UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions) {
+            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(),
                     "ArrayMustNotBeEmpty", Map.of())));
         }
 
-        var thisPath = "%s[%d]".formatted(path, 0);
+        var basePath = _ValidateUtil.append(path, 0);
 
         String rootTypeString;
         try {
             rootTypeString = (String) typeDeclarationArray.get(0);
         } catch (ClassCastException ex) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringTypeRequired", Map.of())));
         }
 
         var regex = Pattern.compile("^(.*?)(\\?)?$");
         var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "CouldNotParseType", Map.of())));
         }
 
@@ -38,18 +40,18 @@ public class _ParseSchemaTypeUtil {
         var nullable = matcher.group(2) != null;
 
         boolean allowTraitsAndInfo = false;
-        var type = getOrParseType(thisPath, typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
+        UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
                 schemaKeysToIndex, parsedTypes,
-                typeExtensions);
+                typeExtensions, allParseFailures, failedTypes);
 
         if (type instanceof UGeneric && nullable) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "CannotMarkGenericAsNullable", Map.of())));
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "IncorrectNumberOfTypeParameters", Map.of())));
         }
 
@@ -58,13 +60,13 @@ public class _ParseSchemaTypeUtil {
         var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
         var index = 0;
         for (var e : givenTypeParameters) {
-            var loopPath = "%s[%d]".formatted(path, index);
             index += 1;
+            var loopPath = _ValidateUtil.append(path, index);
             List<Object> l;
             try {
                 l = (List<Object>) e;
             } catch (ClassCastException ex) {
-                parseFailures.add(new SchemaParseFailure("%s[%d]".formatted(path, index),
+                parseFailures.add(new SchemaParseFailure(loopPath,
                         "ArrayTypeRequired", Map.of()));
                 continue;
             }
@@ -73,23 +75,30 @@ public class _ParseSchemaTypeUtil {
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
                         originalJApiSchema,
-                        schemaKeysToIndex, parsedTypes, typeExtensions);
+                        schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
+                typeParameters.add(typeParameterTypeDeclaration);
             } catch (JApiSchemaParseError e2) {
                 parseFailures.addAll(e2.schemaParseFailures);
-                continue;
             }
+        }
 
-            typeParameters.add(typeParameterTypeDeclaration);
+        if (!parseFailures.isEmpty()) {
+            throw new JApiSchemaParseError(parseFailures);
         }
 
         return new UTypeDeclaration(type, nullable, typeParameters);
     }
 
-    static UType getOrParseType(String path, String typeName, int thisTypeParameterCount,
+    static UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
             boolean allowTraitsAndInfo,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions) {
+            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        if (failedTypes.contains(typeName)) {
+            throw new JApiSchemaParseError(List.of());
+        }
+
         var existingType = parsedTypes.get(typeName);
         if (existingType != null) {
             return existingType;
@@ -145,36 +154,45 @@ public class _ParseSchemaTypeUtil {
                 typeParameterCount = Integer.parseInt(typeParameterCountString);
             }
 
-            UType type;
-            if (customTypeName.startsWith("struct")) {
-                type = _ParseSchemaCustomTypeUtil.parseStructType(definition, customTypeName, typeParameterCount,
-                        originalJApiSchema,
-                        schemaKeysToIndex, parsedTypes,
-                        typeExtensions);
-            } else if (customTypeName.startsWith("union")) {
-                type = _ParseSchemaCustomTypeUtil.parseUnionType(definition, customTypeName, typeParameterCount,
-                        originalJApiSchema,
-                        schemaKeysToIndex, parsedTypes,
-                        typeExtensions);
-            } else if (customTypeName.startsWith("fn")) {
-                type = _ParseSchemaFnTypeUtil.parseFunctionType(definition, customTypeName, originalJApiSchema,
-                        schemaKeysToIndex, parsedTypes,
-                        typeExtensions, false);
-            } else if (customTypeName.startsWith("ext")) {
-                var typeExtension = typeExtensions.get(customTypeName);
-                if (typeExtension == null) {
-                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                            "TypeExtensionImplementationMissing", Map.of("type", customTypeName))));
+            try {
+                UType type;
+                if (customTypeName.startsWith("struct")) {
+                    type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
+                            typeParameterCount,
+                            originalJApiSchema,
+                            schemaKeysToIndex, parsedTypes,
+                            typeExtensions, allParseFailures, failedTypes);
+                } else if (customTypeName.startsWith("union")) {
+                    type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
+                            typeParameterCount,
+                            originalJApiSchema,
+                            schemaKeysToIndex, parsedTypes,
+                            typeExtensions, allParseFailures, failedTypes);
+                } else if (customTypeName.startsWith("fn")) {
+                    type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
+                            originalJApiSchema,
+                            schemaKeysToIndex, parsedTypes,
+                            typeExtensions, false, allParseFailures, failedTypes);
+                } else if (customTypeName.startsWith("ext")) {
+                    var typeExtension = typeExtensions.get(customTypeName);
+                    if (typeExtension == null) {
+                        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                                "TypeExtensionImplementationMissing", Map.of("type", customTypeName))));
+                    }
+                    type = new UExt(customTypeName, typeExtension, typeParameterCount);
+                } else {
+                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                            "InvalidType", Map.of("type", customTypeName))));
                 }
-                type = new UExt(customTypeName, typeExtension, typeParameterCount);
-            } else {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                        "InvalidType", Map.of("type", customTypeName))));
+
+                parsedTypes.put(customTypeName, type);
+
+                return type;
+            } catch (JApiSchemaParseError e) {
+                allParseFailures.addAll(e.schemaParseFailures);
+                failedTypes.add(customTypeName);
+                throw new JApiSchemaParseError(List.of());
             }
-
-            parsedTypes.put(customTypeName, type);
-
-            return type;
         }
 
         throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,

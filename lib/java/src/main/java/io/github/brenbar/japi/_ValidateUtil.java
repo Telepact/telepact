@@ -144,4 +144,10 @@ public class _ValidateUtil {
         newList.add(0, value);
         return newList;
     }
+
+    static List<Object> append(List<Object> original, Object value) {
+        var newList = new ArrayList<>(original);
+        newList.add(value);
+        return newList;
+    }
 }

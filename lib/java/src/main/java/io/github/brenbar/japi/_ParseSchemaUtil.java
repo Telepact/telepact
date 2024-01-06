@@ -22,18 +22,6 @@ class _ParseSchemaUtil {
         Map<String, TypeExtension> firstTypeExtensions = first.typeExtensions;
         Map<String, TypeExtension> secondTypeExtensions = second.typeExtensions;
 
-        var duplicatedSchemaKeys = new HashSet<String>();
-        for (var key : firstParsed.keySet()) {
-            if (secondParsed.containsKey(key)) {
-                duplicatedSchemaKeys.add(key);
-            }
-        }
-        if (!duplicatedSchemaKeys.isEmpty()) {
-            var sortedKeys = new TreeSet<String>(duplicatedSchemaKeys);
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure("",
-                    "DuplicateSchemaKeys", Map.of("keys", sortedKeys))));
-        }
-
         var original = new ArrayList<Object>();
         original.addAll(firstOriginal);
         original.addAll(secondOriginal);
@@ -53,7 +41,7 @@ class _ParseSchemaUtil {
             });
         } catch (IOException e) {
             throw new JApiSchemaParseError(
-                    List.of(new SchemaParseFailure("(document-root)", "ArrayTypeRequired", Map.of())),
+                    List.of(new SchemaParseFailure(List.of(), "ArrayTypeRequired", Map.of())),
                     e);
         }
 
@@ -64,6 +52,7 @@ class _ParseSchemaUtil {
             Map<String, TypeExtension> typeExtensions) {
         var parsedTypes = new HashMap<String, UType>();
         var parseFailures = new ArrayList<SchemaParseFailure>();
+        var failedTypes = new HashSet<String>();
 
         var schemaKeysToIndex = new HashMap<String, Integer>();
 
@@ -76,7 +65,7 @@ class _ParseSchemaUtil {
                 def = (Map<String, Object>) definition;
             } catch (ClassCastException e) {
                 parseFailures
-                        .add(new SchemaParseFailure("[%d]".formatted(index), "DefinitionMustBeAnObject", Map.of()));
+                        .add(new SchemaParseFailure(List.of(index), "DefinitionMustBeAnObject", Map.of()));
                 continue;
             }
 
@@ -89,11 +78,15 @@ class _ParseSchemaUtil {
             }
 
             if (schemaKeys.contains(schemaKey)) {
-                parseFailures.add(new SchemaParseFailure("[%d]".formatted(index), "DuplicateSchemaKey",
+                parseFailures.add(new SchemaParseFailure(List.of(index), "DuplicateSchemaKey",
                         Map.of("schemaKey", schemaKey)));
             }
             schemaKeys.add(schemaKey);
             schemaKeysToIndex.put(schemaKey, index);
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new JApiSchemaParseError(parseFailures);
         }
 
         var traitKeys = new HashSet<String>();
@@ -110,12 +103,11 @@ class _ParseSchemaUtil {
                 continue;
             }
             var thisIndex = schemaKeysToIndex.get(schemaKey);
-            var thisPath = "[%d]".formatted(thisIndex);
-            var typ = _ParseSchemaTypeUtil.getOrParseType(thisPath, schemaKey, rootTypeParameterCount,
+            var typ = _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
                     allowTraitsAndInfo,
                     originalUApiSchema,
                     schemaKeysToIndex,
-                    parsedTypes, typeExtensions);
+                    parsedTypes, typeExtensions, parseFailures, failedTypes);
             if (typ instanceof UTrait t) {
                 traits.add(t);
             }
@@ -125,10 +117,11 @@ class _ParseSchemaUtil {
             var thisIndex = schemaKeysToIndex.get(traitKey);
             var def = (Map<String, Object>) originalUApiSchema.get(thisIndex);
 
-            var trait = _ParseSchemaTraitTypeUtil.parseTraitType(def, traitKey, originalUApiSchema, schemaKeysToIndex,
-                    parsedTypes,
-                    typeExtensions);
             try {
+                var trait = _ParseSchemaTraitTypeUtil.parseTraitType(def, traitKey, originalUApiSchema,
+                        schemaKeysToIndex,
+                        parsedTypes,
+                        typeExtensions, parseFailures, failedTypes);
                 _ParseSchemaTraitTypeUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
             } catch (JApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -141,7 +134,8 @@ class _ParseSchemaUtil {
             var typeExtension = (UExt) parsedTypes.get(typeExtensionName);
             if (typeExtension == null) {
                 parseFailures
-                        .add(new SchemaParseFailure("", "UndefinedTypeExtension", Map.of("name", typeExtensionName)));
+                        .add(new SchemaParseFailure(List.of(), "UndefinedTypeExtension",
+                                Map.of("name", typeExtensionName)));
             }
         }
 
@@ -160,7 +154,7 @@ class _ParseSchemaUtil {
             }
         }
         Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex));
-        throw new JApiSchemaParseError(List.of(new SchemaParseFailure("[%d]".formatted(index),
+        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
                 "DefinitionMustHaveOneKeyMatchingRegex", sortedMap)));
     }
 

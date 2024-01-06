@@ -196,7 +196,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[0].trait.Example', 'reason': {'TraitDefinitionCannotTargetInternalFunctions': {}}}]}}]
+                'cases': [{'path': [0, 'trait.Example', 'fn._?*'], 'reason': {'TraitDefinitionCannotTargetInternalFunctions': {}}}]}}]
         ],
     ]
 }

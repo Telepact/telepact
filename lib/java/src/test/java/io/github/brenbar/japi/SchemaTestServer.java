@@ -49,6 +49,7 @@ public class SchemaTestServer {
                 var schema = JApiSchema.fromJson(new String(schemaJson));
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             } catch (JApiSchemaParseError e) {
+                e.printStackTrace();
                 return new Message(Map.of(),
                         Map.of("errorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
             }

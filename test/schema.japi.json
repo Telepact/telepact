@@ -25,7 +25,7 @@
   },
   {
     "struct.ValidationFailure": {
-      "path": ["string"],
+      "path": ["array", ["any"]],
       "reason": ["union.ValidationFailureReason"]
     }
   },
