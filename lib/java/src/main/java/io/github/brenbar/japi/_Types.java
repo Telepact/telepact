@@ -10,27 +10,17 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-class UFieldNameAndFieldDeclaration {
-
-    public final String fieldName;
-    public final UFieldDeclaration fieldDeclaration;
-
-    public UFieldNameAndFieldDeclaration(
-            String fieldName,
-            UFieldDeclaration fieldDeclaration) {
-        this.fieldName = fieldName;
-        this.fieldDeclaration = fieldDeclaration;
-    }
-}
-
 class UFieldDeclaration {
 
+    public final String fieldName;
     public final UTypeDeclaration typeDeclaration;
     public final boolean optional;
 
     public UFieldDeclaration(
+            String fieldName,
             UTypeDeclaration typeDeclaration,
             boolean optional) {
+        this.fieldName = fieldName;
         this.typeDeclaration = typeDeclaration;
         this.optional = optional;
     }

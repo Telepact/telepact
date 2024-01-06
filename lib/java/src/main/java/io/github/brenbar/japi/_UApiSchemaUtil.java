@@ -298,7 +298,8 @@ class _UApiSchemaUtil {
                     typeDeclarationValue, isForUnion, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                     parsedTypes,
                     typeExtensions);
-            argumentFields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+            String fieldName = parsedField.fieldName;
+            argumentFields.put(fieldName, parsedField);
         }
 
         var argType = new UStruct(schemaKey, argumentFields, typeParameterCount);
@@ -345,7 +346,8 @@ class _UApiSchemaUtil {
                         typeDeclarationValue, isForUnion, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                         parsedTypes,
                         typeExtensions);
-                fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+                String fieldName = parsedField.fieldName;
+                fields.put(fieldName, parsedField);
             }
 
             var unionStruct = new UStruct("->.%s".formatted(unionValue), fields, typeParameterCount);
@@ -381,7 +383,8 @@ class _UApiSchemaUtil {
             var parsedField = parseField(schemaKey, fieldDeclaration,
                     typeDeclarationValue, false, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                     typeExtensions);
-            fields.put(parsedField.fieldName, parsedField.fieldDeclaration);
+            String fieldName = parsedField.fieldName;
+            fields.put(fieldName, parsedField);
         }
 
         var type = new UStruct(schemaKey, fields, typeParameterCount);
@@ -429,7 +432,7 @@ class _UApiSchemaUtil {
             for (var structEntry : unionStructData.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
-                UFieldNameAndFieldDeclaration parsedField;
+                UFieldDeclaration parsedField;
                 try {
                     parsedField = parseField("[%d].->.%s".formatted(index, unionValue), fieldDeclaration,
                             typeDeclarationValue, false, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
@@ -440,8 +443,7 @@ class _UApiSchemaUtil {
                     continue;
                 }
                 String fieldName = parsedField.fieldName;
-                UFieldDeclaration fieldDeclarationInst = parsedField.fieldDeclaration;
-                fields.put(fieldName, fieldDeclarationInst);
+                fields.put(fieldName, parsedField);
             }
 
             var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionValue), fields, typeParameterCount);
@@ -458,7 +460,7 @@ class _UApiSchemaUtil {
         return type;
     }
 
-    private static UFieldNameAndFieldDeclaration parseField(
+    private static UFieldDeclaration parseField(
             String path,
             String fieldDeclaration,
             Object typeDeclarationValue,
@@ -497,7 +499,7 @@ class _UApiSchemaUtil {
                 parsedTypes,
                 typeExtensions);
 
-        return new UFieldNameAndFieldDeclaration(fieldName, new UFieldDeclaration(typeDeclaration, optional));
+        return new UFieldDeclaration(fieldName, typeDeclaration, optional);
     }
 
     private static UTypeDeclaration parseTypeDeclaration(String path, List<Object> typeDeclarationArray,
