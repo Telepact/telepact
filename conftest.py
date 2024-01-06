@@ -48,7 +48,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     elif 'test_binary_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in binary_cases for rq, rs in binary_cases[k]], ids=increment())
     elif 'test_mock_multi_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,statements', [(k, [[dc(rq), dc(rs)] for rq, rs in mock_cases[k]]) for k in mock_cases], ids=increment())
+        metafunc.parametrize('name,statements', [(k, [[dc(rq), dc(rs)] for rq, rs in mock_cases[k]]) for k in mock_cases])
     elif 'test_mock_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in mock_invalid_cases for rq, rs in mock_invalid_cases[k]], ids=increment())
     elif 'test_schema_case' == metafunc.function.__name__:

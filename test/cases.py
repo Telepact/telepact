@@ -30,58 +30,58 @@ def cap(s: str):
 
 def get_values(given_field: str, the_type, given_correct_values, additional_incorrect_values):
     default_incorrect_values = list(filter(lambda n: type(n) not in (int, float) if the_type == float else False if the_type == Any else type(n) != the_type, default_values))
-    given_incorrect_values = [(v, type_unexp(v, the_type), []) for v in default_incorrect_values] + additional_incorrect_values
-    given_incorrect_values_w_null = [(v, type_unexp(v, the_type), []) for v in [None] + default_incorrect_values] + additional_incorrect_values
+    given_incorrect_values = [(v, [(type_unexp(v, the_type), [])]) for v in default_incorrect_values] + additional_incorrect_values
+    given_incorrect_values_w_null = [(v, [(type_unexp(v, the_type), [])]) for v in [None] + default_incorrect_values] + additional_incorrect_values
     abc = 'abcdefghijklmnopqrstuvwxyz'
 
     field = given_field
     correct_values = given_correct_values
-    incorrect_values = [(v, r, p) for v, r, p in given_incorrect_values_w_null]
+    incorrect_values = [(v, e) for v, e in given_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field]
     
     field = 'null{}'.format(cap(given_field))
     correct_values = [None] + given_correct_values
-    incorrect_values = [(v, r, p) for v, r, p in given_incorrect_values]
+    incorrect_values = [(v, e) for v, e in given_incorrect_values]
     yield field, correct_values, incorrect_values, [field]
 
     field = 'arr{}'.format(cap(given_field))
     correct_values = [[]] + [[v] for v in given_correct_values] + [given_correct_values]
-    incorrect_values = [([given_correct_values[0], v], r, p) for v, r, p in given_incorrect_values_w_null]
+    incorrect_values = [([given_correct_values[0], v], e) for v, e in given_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field, 1]
 
     field = 'arrNull{}'.format(cap(given_field))
     correct_values = [[]] + [[v] for v in [None] + given_correct_values] + [[None] + given_correct_values]
-    incorrect_values = [([given_correct_values[0], v], r, p) for v, r, p in given_incorrect_values]
+    incorrect_values = [([given_correct_values[0], v], e) for v, e in given_incorrect_values]
     yield field, correct_values, incorrect_values, [field, 1]
 
     field = 'obj{}'.format(cap(given_field))
     correct_values = [{}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate(given_correct_values)}]
-    incorrect_values = [({'a': given_correct_values[0], 'b': v}, r, p) for v, r, p in given_incorrect_values_w_null]
+    incorrect_values = [({'a': given_correct_values[0], 'b': v}, e) for v, e in given_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field, 'b']
 
     field = 'objNull{}'.format(cap(given_field))
     correct_values = [{}] + [{'a': v} for v in [None] + given_correct_values] + [{abc[i]: v for i,v in enumerate([None] + given_correct_values)}]
-    incorrect_values = [({'a': given_correct_values[0], 'b': v}, r, p) for v, r, p in given_incorrect_values]
+    incorrect_values = [({'a': given_correct_values[0], 'b': v}, e) for v, e in given_incorrect_values]
     yield field, correct_values, incorrect_values, [field, 'b']
 
     field = 'pStr{}'.format(cap(given_field))
     correct_values = [{'wrap': v} for v in given_correct_values]
-    incorrect_values = [({'wrap': v}, r, p) for v, r, p in given_incorrect_values_w_null]
+    incorrect_values = [({'wrap': v}, e) for v, e in given_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field, 'wrap']
 
     field = 'pStrNull{}'.format(cap(given_field))
     correct_values = [{'wrap': v} for v in [None] + given_correct_values]
-    incorrect_values = [({'wrap': v}, r, p) for v, r, p in given_incorrect_values]
+    incorrect_values = [({'wrap': v}, e) for v, e in given_incorrect_values]
     yield field, correct_values, incorrect_values, [field, 'wrap']
 
     field = 'pUnion{}'.format(cap(given_field))
     correct_values = [{'One': {}}] + [{'Two': {'ewrap': v}} for v in given_correct_values]
-    incorrect_values = [({'Two': {'ewrap': v}}, r, p) for v, r, p in given_incorrect_values_w_null]
+    incorrect_values = [({'Two': {'ewrap': v}}, e) for v, e in given_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field, 'Two', 'ewrap']
 
     field = 'pUnionNull{}'.format(cap(given_field))
     correct_values = [{'One': {}}] + [{'Two': {'ewrap': v}} for v in [None] + given_correct_values]
-    incorrect_values = [({'Two': {'ewrap': v}}, r, p) for v, r, p in given_incorrect_values]
+    incorrect_values = [({'Two': {'ewrap': v}}, e) for v, e in given_incorrect_values]
     yield field, correct_values, incorrect_values, [field, 'Two', 'ewrap']
 
 
@@ -116,66 +116,68 @@ def generate_basic_cases(given_field: str, the_type, correct_values, additional_
 
             yield case
 
-        for incorrect_value, reason, path in incorrect_values:
-            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn.test', 'value'] + base_path + path, 'reason': reason}]}}]]
+        for incorrect_value, errors in incorrect_values:
+            cases = [{'path': ['fn.test', 'value'] + base_path + path, 'reason': reason} for reason, path in errors]
+            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
 
-        for incorrect_value, reason, path in incorrect_values:
-            yield [[{'Ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseBody': {'cases': [{'path': ['Ok', 'value'] + base_path + path, 'reason': reason}]}}]]
+        for incorrect_value, errors in incorrect_values:
+            cases = [{'path': ['Ok', 'value'] + base_path + path, 'reason': reason} for reason, path in errors]
+            yield [[{'Ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseBody': {'cases': cases}}]]
 
 
 additional_integer_cases = [
-    (9223372036854775808, {'NumberOutOfRange': {}}, []), 
-    (-9223372036854775809, {'NumberOutOfRange': {}}, [])
+    (9223372036854775808, [({'NumberOutOfRange': {}}, [])]), 
+    (-9223372036854775809, [({'NumberOutOfRange': {}}, [])])
 ]
 additional_struct_cases = [
-    ({}, {'RequiredStructFieldMissing': {}}, ['required']),
-    ({'required': False, 'a': False}, {'StructFieldUnknown': {}}, ['a'])
+    ({}, [({'RequiredStructFieldMissing': {}}, ['required'])]),
+    ({'required': False, 'a': False}, [({'StructFieldUnknown': {}}, ['a'])])
 ]
 additional_union_cases = [
-    ({}, {'ZeroOrManyUnionFieldsDisallowed': {}}, []),
-    ({'One': {}, 'Two': {'optional': False, 'required': False}}, {'ZeroOrManyUnionFieldsDisallowed': {}}, []),
-    ({'a': {}}, {'UnionFieldUnknown': {}}, ['a']),
-    ({'Two': {}}, {'RequiredStructFieldMissing': {}}, ['Two', 'required']),
-    ({'One': False}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['One']),
-    ({'One': 0}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['One']),
-    ({'One': 0.1}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['One']),
-    ({'One': ''}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['One']),
-    ({'One': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['One']),
+    ({}, [({'ZeroOrManyUnionFieldsDisallowed': {}}, [])]),
+    ({'One': {}, 'Two': {'optional': False, 'required': False}}, [({'ZeroOrManyUnionFieldsDisallowed': {}}, [])]),
+    ({'a': {}}, [({'UnionFieldUnknown': {}}, ['a'])]),
+    ({'Two': {}}, [({'RequiredStructFieldMissing': {}}, ['Two', 'required'])]),
+    ({'One': False}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['One'])]),
+    ({'One': 0}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['One'])]),
+    ({'One': 0.1}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['One'])]),
+    ({'One': ''}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['One'])]),
+    ({'One': []}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['One'])]),
 ]
 additional_fn_cases = [
-    ({}, {'ZeroOrManyUnionFieldsDisallowed': {}}, []),
-    ({'a': {}}, {'UnionFieldUnknown': {}}, ['a']),
-    ({'fn.example': {}}, {'RequiredStructFieldMissing': {}}, ['fn.example', 'required']),
-    ({'fn.example': {'required': False, 'a': False}}, {'StructFieldUnknown': {}}, ['fn.example', 'a']),
-    ({'fn.example': False}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
-    ({'fn.example': 0}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
-    ({'fn.example': 0.1}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
-    ({'fn.example': ''}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
-    ({'fn.example': []}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['fn.example']),
+    ({}, [({'ZeroOrManyUnionFieldsDisallowed': {}}, [])]),
+    ({'a': {}}, [({'UnionFieldUnknown': {}}, ['a'])]),
+    ({'fn.example': {}}, [({'RequiredStructFieldMissing': {}}, ['fn.example', 'required'])]),
+    ({'fn.example': {'required': False, 'a': False}}, [({'StructFieldUnknown': {}}, ['fn.example', 'a'])]),
+    ({'fn.example': False}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
+    ({'fn.example': 0}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
+    ({'fn.example': 0.1}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
+    ({'fn.example': ''}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
+    ({'fn.example': []}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
 ]
 additional_p2Str_cases = [
-    ({'wrap': 0, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
-    ({'wrap': 0.1, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
-    ({'wrap': '', 'nest': [0]}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
-    ({'wrap': [], 'nest': [0]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
-    ({'wrap': {}, 'nest': [0]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['wrap']),
-    ({'wrap': False, 'nest': [0, False]}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
-    ({'wrap': False, 'nest': [0, 0.1]}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
-    ({'wrap': False, 'nest': [0, '']}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
-    ({'wrap': False, 'nest': [0, []]}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
-    ({'wrap': False, 'nest': [0, {}]}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['nest', 1]),
+    ({'wrap': 0, 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
+    ({'wrap': 0.1, 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
+    ({'wrap': '', 'nest': [0]}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
+    ({'wrap': [], 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
+    ({'wrap': {}, 'nest': [0]}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['wrap'])]),
+    ({'wrap': False, 'nest': [0, False]}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
+    ({'wrap': False, 'nest': [0, 0.1]}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
+    ({'wrap': False, 'nest': [0, '']}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
+    ({'wrap': False, 'nest': [0, []]}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
+    ({'wrap': False, 'nest': [0, {}]}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['nest', 1])]),
 ]
 additional_p2Union_cases = [
-    ({'Two': {'ewrap': 0, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap']),
-    ({'Two': {'ewrap': 0.1, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap']),
-    ({'Two': {'ewrap': '', 'enest': [0]}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap']),
-    ({'Two': {'ewrap': [], 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap']),
-    ({'Two': {'ewrap': {}, 'enest': [0]}}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap']),
-    ({'Two': {'ewrap': False, 'enest': [0, False]}}, {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1]),
-    ({'Two': {'ewrap': False, 'enest': [0, 0.1]}}, {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1]),
-    ({'Two': {'ewrap': False, 'enest': [0, '']}}, {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1]),
-    ({'Two': {'ewrap': False, 'enest': [0, []]}}, {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1]),
-    ({'Two': {'ewrap': False, 'enest': [0, {}]}}, {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1]),
+    ({'Two': {'ewrap': 0, 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
+    ({'Two': {'ewrap': 0.1, 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
+    ({'Two': {'ewrap': '', 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
+    ({'Two': {'ewrap': [], 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
+    ({'Two': {'ewrap': {}, 'enest': [0]}}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}, ['Two', 'ewrap'])]),
+    ({'Two': {'ewrap': False, 'enest': [0, False]}}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
+    ({'Two': {'ewrap': False, 'enest': [0, 0.1]}}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
+    ({'Two': {'ewrap': False, 'enest': [0, '']}}, [({'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
+    ({'Two': {'ewrap': False, 'enest': [0, []]}}, [({'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
+    ({'Two': {'ewrap': False, 'enest': [0, {}]}}, [({'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Integer': {}}}}, ['Two', 'enest', 1])]),
 ]
 
 cases = {
