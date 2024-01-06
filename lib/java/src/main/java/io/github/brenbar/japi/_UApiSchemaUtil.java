@@ -23,7 +23,6 @@ class _UApiSchemaUtil {
         Map<String, TypeExtension> firstTypeExtensions = first.typeExtensions;
         Map<String, TypeExtension> secondTypeExtensions = second.typeExtensions;
 
-        // Check for duplicates
         var duplicatedSchemaKeys = new HashSet<String>();
         for (var key : firstParsed.keySet()) {
             if (secondParsed.containsKey(key)) {
