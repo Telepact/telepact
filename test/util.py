@@ -214,7 +214,10 @@ def convert_lists_to_sets(a):
             a[k] = convert_lists_to_sets(v)
         return hashabledict(a)
     elif type(a) == list:
-        return frozenset(convert_lists_to_sets(v) for v in a)
+        if type(next(iter(a))) == dict:
+            return frozenset(convert_lists_to_sets(v) for v in a)
+        else:
+            return tuple(convert_lists_to_sets(v) for v in a)
     else:
         return a
 

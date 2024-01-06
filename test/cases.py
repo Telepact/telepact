@@ -60,13 +60,17 @@ def get_values(given_field: str, the_type, given_correct_values, additional_inco
 
     field = 'obj{}'.format(cap(given_field))
     correct_values = [{}] + [{'a': v} for v in given_correct_values] + [{abc[i]: v for i,v in enumerate(given_correct_values)}]
-    incorrect_values = [({'a': given_correct_values[0], 'b': v}, e) for v, e in given_incorrect_values_w_null]
-    yield field, correct_values, incorrect_values, [field, 'b']
+    incorrect_values = [({'a': given_correct_values[0], 'b': v}, [(r, ['b'] + p)]) for v, [(r, p)] in given_incorrect_values_w_null]
+    if incorrect_values:
+        incorrect_values += [({abc[i]: v for i, (v, e) in enumerate(given_incorrect_values_w_null)}, [(r, [abc[i]] + p) for i, (v, [(r, p)]) in enumerate(given_incorrect_values_w_null)])]
+    yield field, correct_values, incorrect_values, [field]
 
     field = 'objNull{}'.format(cap(given_field))
     correct_values = [{}] + [{'a': v} for v in [None] + given_correct_values] + [{abc[i]: v for i,v in enumerate([None] + given_correct_values)}]
-    incorrect_values = [({'a': given_correct_values[0], 'b': v}, e) for v, e in given_incorrect_values]
-    yield field, correct_values, incorrect_values, [field, 'b']
+    incorrect_values = [({'a': given_correct_values[0], 'b': v}, [(r, ['b'] + p)]) for v, [(r, p)] in given_incorrect_values]
+    if incorrect_values:
+        incorrect_values += [({abc[i]: v for i, (v, e) in enumerate(given_incorrect_values)}, [(r, [abc[i]] + p) for i, (v, [(r, p)]) in enumerate(given_incorrect_values)])]
+    yield field, correct_values, incorrect_values, [field]
 
     field = 'pStr{}'.format(cap(given_field))
     correct_values = [{'wrap': v} for v in given_correct_values]
@@ -121,13 +125,23 @@ def generate_basic_cases(given_field: str, the_type, correct_values, additional_
             yield case
 
         for incorrect_value, errors in incorrect_values:
+            expected_response_header = {}
             cases = [{'path': ['fn.test', 'value'] + base_path + path, 'reason': reason} for reason, path in errors]
-            expected_response_header = {'_assert': {'setCompare': True}} if len(cases) > 1 else {}
+            if len(cases) > 1:
+                expected_response_header.setdefault('_assert', {})['setCompare'] = True
+            if has_too_many_keys(incorrect_value):
+                expected_response_header.setdefault('_assert', {})['skipFieldIdCheck'] = True
+
             yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [expected_response_header, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
 
         for incorrect_value, errors in incorrect_values:
+            expected_response_header = {}
             cases = [{'path': ['Ok', 'value'] + base_path + path, 'reason': reason} for reason, path in errors]
-            expected_response_header = {'_assert': {'setCompare': True}} if len(cases) > 1 else {}
+            if len(cases) > 1:
+                expected_response_header.setdefault('_assert', {})['setCompare'] = True
+            if has_too_many_keys(incorrect_value):
+                expected_response_header.setdefault('_assert', {})['skipFieldIdCheck'] = True
+
             yield [[{'Ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [expected_response_header, {'_ErrorInvalidResponseBody': {'cases': cases}}]]
 
 
