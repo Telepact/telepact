@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class _ParseSchemaTraitTypeUtil {
+public class _ParseSchemaTraitUtil {
     static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
         String traitName = trait.name;
@@ -100,7 +100,7 @@ public class _ParseSchemaTraitTypeUtil {
             traitFunctionRegex = "^fn\\.[a-zA-Z]";
         } else if (def.containsKey("fn._?*")) {
             if (!schemaKey.startsWith("trait._")) {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
+                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "fn._?*"),
                         "TraitDefinitionCannotTargetInternalFunctions", Map.of())));
             }
             traitFunctionKey = "fn._?*";

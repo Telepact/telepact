@@ -118,11 +118,11 @@ class _ParseSchemaUtil {
             var def = (Map<String, Object>) originalUApiSchema.get(thisIndex);
 
             try {
-                var trait = _ParseSchemaTraitTypeUtil.parseTraitType(def, traitKey, originalUApiSchema,
+                var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, originalUApiSchema,
                         schemaKeysToIndex,
                         parsedTypes,
                         typeExtensions, parseFailures, failedTypes);
-                _ParseSchemaTraitTypeUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
+                _ParseSchemaTraitUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
             } catch (JApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }

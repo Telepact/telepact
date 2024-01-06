@@ -17,7 +17,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[1]', 'reason': {'DuplicateSchemaKey': {'schemaKey': 'struct.Example'}}}]}}]
+                'cases': [{'path': [1], 'reason': {'DuplicateSchemaKey': {'schemaKey': 'struct.Example'}}}]}}]
         ],
         [
             [
@@ -34,7 +34,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[0]', 'reason': {'DefinitionMustHaveOneKeyMatchingRegex': {'regex': '^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*'}}}]}}]
+                'cases': [{'path': [0], 'reason': {'DefinitionMustHaveOneKeyMatchingRegex': {'regex': '^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*'}}}]}}]
         ],
         [
             [
@@ -46,7 +46,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -58,7 +58,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -70,7 +70,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -82,7 +82,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '(document-root)', 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -112,7 +112,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[1].trait.Collide.fn.*.arg1', 'reason': {'TraitArgumentFieldAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
+                'cases': [{'path': [1, 'trait.Collide', 'fn.*', 'arg1'], 'reason': {'TraitArgumentFieldAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
         ],
         [
             [
@@ -141,7 +141,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[1].trait.Collide.->.err', 'reason': {'TraitResultValueAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
+                'cases': [{'path': [1, 'trait.Collide', '->', 'err'], 'reason': {'TraitResultValueAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
         ],
         [
             [
@@ -157,7 +157,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[0].trait.Example', 'reason': {'ObjectTypeRequired': {}}}]}}]
+                'cases': [{'path': [0, 'trait.Example'], 'reason': {'ObjectTypeRequired': {}}}]}}]
         ],
         [
             [
@@ -176,7 +176,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': '[0].trait.Example', 'reason': {'InvalidTrait': {}}}]}}]
+                'cases': [{'path': [0, 'trait.Example'], 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
             [
