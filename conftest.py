@@ -17,7 +17,7 @@ import importlib
 @pytest.fixture(scope='session')
 def nats_server():
     print('Creating NATS fixture')
-    p = subprocess.Popen(['nats-server', '-DV'])
+    p = subprocess.Popen(['nats-server', '-D'])
     yield p
     p.terminate()
     p.wait()
@@ -45,7 +45,7 @@ def dispatcher_server(loop, nats_server, request):
     loop.run_until_complete(t2())        
 
     try:    
-        s.wait(timeout=5)
+        s.wait(timeout=10)
     except subprocess.TimeoutExpired:
         s.terminate()
         s.wait()

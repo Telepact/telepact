@@ -48,7 +48,8 @@ public class TestDispatch {
                         }
                         case "End" -> {
                             lock.lock();
-                            done.signal();
+                            done.signalAll();
+                            lock.unlock();
                         }
                         case "Stop" -> {
                             var id = (String) payload.get("id");
@@ -117,6 +118,8 @@ public class TestDispatch {
 
             lock.lock();
             done.await();
+
+            System.out.println("Dispatcher exiting");
         }
     }
 }
