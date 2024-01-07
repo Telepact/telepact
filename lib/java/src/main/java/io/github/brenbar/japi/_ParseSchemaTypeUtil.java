@@ -31,11 +31,12 @@ public class _ParseSchemaTypeUtil {
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
         }
 
-        var regex = Pattern.compile("^(.*?)(\\?)?$");
+        var regexString = "^(.+)(\\?)?$";
+        var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "CouldNotParseType", Map.of())));
+                    "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         var typeName = matcher.group(1);

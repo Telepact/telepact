@@ -25,7 +25,10 @@
       "ObjectTypeRequired": {},
       "InvalidTrait": {},
       "TraitDefinitionCannotTargetInternalFunctions": {},
-      "ArrayMustNotBeEmpty": {}
+      "ArrayMustNotBeEmpty": {},
+      "StringRegexMatchFailed": {
+        "regex": ["string"]
+      }
     }
   },
   {
