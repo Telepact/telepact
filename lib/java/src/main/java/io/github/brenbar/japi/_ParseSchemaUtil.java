@@ -103,14 +103,22 @@ class _ParseSchemaUtil {
                 continue;
             }
             var thisIndex = schemaKeysToIndex.get(schemaKey);
-            var typ = _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
-                    allowTraitsAndInfo,
-                    originalUApiSchema,
-                    schemaKeysToIndex,
-                    parsedTypes, typeExtensions, parseFailures, failedTypes);
-            if (typ instanceof UTrait t) {
-                traits.add(t);
+            try {
+                var typ = _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
+                        allowTraitsAndInfo,
+                        originalUApiSchema,
+                        schemaKeysToIndex,
+                        parsedTypes, typeExtensions, parseFailures, failedTypes);
+                if (typ instanceof UTrait t) {
+                    traits.add(t);
+                }
+            } catch (JApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
             }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new JApiSchemaParseError(parseFailures);
         }
 
         for (var traitKey : traitKeys) {

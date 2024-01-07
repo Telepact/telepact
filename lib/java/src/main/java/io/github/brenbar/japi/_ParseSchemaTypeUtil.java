@@ -15,7 +15,7 @@ public class _ParseSchemaTypeUtil {
             Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(),
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "ArrayMustNotBeEmpty", Map.of())));
         }
 

@@ -198,5 +198,23 @@ cases = {
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, 'trait.Example', 'fn._?*'], 'reason': {'TraitDefinitionCannotTargetInternalFunctions': {}}}]}}]
         ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct.Example': {
+                                    'wrong': []
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'struct.Example', 'wrong'], 'reason': {'ArrayMustNotBeEmpty': {}}}]}}]
+        ],
     ]
 }
