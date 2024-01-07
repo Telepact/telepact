@@ -6,38 +6,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import io.nats.client.Connection;
+import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 
 public class MockTestServer {
 
-    public static void main(String[] givenArgs) throws IOException, InterruptedException {
-        var args = givenArgs[0].split(",");
-
-        var apiSchemaPath = args[0];
-        var natsUrl = args[1];
-        var frontdoorTopic = args[2];
-
+    public static Dispatcher start(Connection connection, String apiSchemaPath, String frontdoorTopic)
+            throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var jApi = JApiSchema.fromJson(json);
 
         var server = new MockServer(jApi,
                 new MockServer.Options().setOnError((e) -> e.printStackTrace()).setEnableGeneratedDefaultStub(false));
 
-        try (var connection = Nats.connect(natsUrl)) {
-            var dispatcher = connection.createDispatcher((msg) -> {
-                var requestBytes = msg.getData();
+        var dispatcher = connection.createDispatcher((msg) -> {
+            var requestBytes = msg.getData();
 
-                System.out.println("    ->S %s".formatted(new String(requestBytes)));
-                System.out.flush();
-                var responseBytes = server.process(requestBytes);
-                System.out.println("    <-S %s".formatted(new String(responseBytes)));
-                System.out.flush();
+            System.out.println("    ->S %s".formatted(new String(requestBytes)));
+            System.out.flush();
+            var responseBytes = server.process(requestBytes);
+            System.out.println("    <-S %s".formatted(new String(responseBytes)));
+            System.out.flush();
 
-                connection.publish(msg.getReplyTo(), responseBytes);
-            });
-            dispatcher.subscribe(frontdoorTopic);
+            connection.publish(msg.getReplyTo(), responseBytes);
+        });
+        dispatcher.subscribe(frontdoorTopic);
 
-            Thread.sleep(10000000);
-        }
+        return dispatcher;
     }
 }

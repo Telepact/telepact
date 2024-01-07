@@ -18,17 +18,15 @@ import java.util.function.Function;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.japi.Server.Options;
+import io.nats.client.Connection;
+import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 
 public class TestServer {
 
-    public static void main(String[] givenArgs) throws IOException, InterruptedException {
-        var args = givenArgs[0].split(",");
-        var apiSchemaPath = args[0];
-        var natsUrl = args[1];
-        var frontdoorTopic = args[2];
-        var backdoorTopic = args[3];
-
+    public static Dispatcher start(Connection connection, String apiSchemaPath, String frontdoorTopic,
+            String backdoorTopic)
+            throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var jApi = JApiSchema.fromJson(json);
         var alternateJApi = JApiSchema.combine(jApi, JApiSchema.fromJson("""
@@ -40,73 +38,69 @@ public class TestServer {
                 """));
         var objectMapper = new ObjectMapper();
 
-        System.out.println(alternateJApi.original);
-
         var serveAlternateServer = new AtomicBoolean();
 
-        try (var connection = Nats.connect(natsUrl)) {
+        Function<Message, Message> handler = (requestMessage) -> {
+            try {
+                var requestHeaders = requestMessage.header;
+                var requestBody = requestMessage.body;
+                var requestPseudoJson = List.of(requestHeaders, requestBody);
+                var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-            Function<Message, Message> handler = (requestMessage) -> {
+                System.out.println("    <-s %s".formatted(new String(requestBytes)));
+                System.out.flush();
+
+                io.nats.client.Message natsResponseMessage;
                 try {
-                    var requestHeaders = requestMessage.header;
-                    var requestBody = requestMessage.body;
-                    var requestPseudoJson = List.of(requestHeaders, requestBody);
-                    var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
-
-                    System.out.println("    <-s %s".formatted(new String(requestBytes)));
-                    System.out.flush();
-
-                    io.nats.client.Message natsResponseMessage;
-                    try {
-                        natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
-                    } catch (InterruptedException e1) {
-                        throw new RuntimeException("Interruption");
-                    }
-                    var responseBytes = natsResponseMessage.getData();
-
-                    System.out.println("    ->s %s".formatted(new String(responseBytes)));
-                    System.out.flush();
-
-                    var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
-                    var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
-                    var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
-
-                    var toggleAlternateServer = requestHeaders.get("_toggleAlternateServer");
-                    if (Objects.equals(true, toggleAlternateServer)) {
-                        serveAlternateServer.set(!serveAlternateServer.get());
-                    }
-
-                    return new Message(responseHeaders, responseBody);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
+                } catch (InterruptedException e1) {
+                    throw new RuntimeException("Interruption");
                 }
-            };
+                var responseBytes = natsResponseMessage.getData();
 
-            var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
-            var alternateServer = new Server(alternateJApi, handler,
-                    new Options().setOnError((e) -> e.printStackTrace()));
-
-            var dispatcher = connection.createDispatcher((msg) -> {
-                var requestBytes = msg.getData();
-
-                System.out.println("    ->S %s".formatted(new String(requestBytes)));
-                System.out.flush();
-                byte[] responseBytes;
-                if (serveAlternateServer.get()) {
-                    responseBytes = alternateServer.process(requestBytes);
-                } else {
-                    responseBytes = server.process(requestBytes);
-                }
-                System.out.println("    <-S %s".formatted(new String(responseBytes)));
+                System.out.println("    ->s %s".formatted(new String(responseBytes)));
                 System.out.flush();
 
-                connection.publish(msg.getReplyTo(), responseBytes);
-            });
+                var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
+                var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
+                var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
 
-            dispatcher.subscribe(frontdoorTopic);
+                var toggleAlternateServer = requestHeaders.get("_toggleAlternateServer");
+                if (Objects.equals(true, toggleAlternateServer)) {
+                    serveAlternateServer.set(!serveAlternateServer.get());
+                }
 
-            System.out.println("Test server ready");
-            Thread.sleep(10000000);
-        }
+                return new Message(responseHeaders, responseBody);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
+        var alternateServer = new Server(alternateJApi, handler,
+                new Options().setOnError((e) -> e.printStackTrace()));
+
+        var dispatcher = connection.createDispatcher((msg) -> {
+            var requestBytes = msg.getData();
+
+            System.out.println("    ->S %s".formatted(new String(requestBytes)));
+            System.out.flush();
+            byte[] responseBytes;
+            if (serveAlternateServer.get()) {
+                responseBytes = alternateServer.process(requestBytes);
+            } else {
+                responseBytes = server.process(requestBytes);
+            }
+            System.out.println("    <-S %s".formatted(new String(responseBytes)));
+            System.out.flush();
+
+            connection.publish(msg.getReplyTo(), responseBytes);
+        });
+
+        dispatcher.subscribe(frontdoorTopic);
+
+        System.out.println("Test server listening on " + frontdoorTopic);
+
+        return dispatcher;
     }
 }

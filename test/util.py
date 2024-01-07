@@ -30,7 +30,6 @@ def increment():
 def get_lib_modules():
     result = [f for f in os.listdir('lib')
                  if os.path.isdir('lib/{}'.format(f))]    
-    print(result)
     return result
 
 def handler(request):
@@ -326,10 +325,16 @@ async def send_case(request, expected_response, request_topic):
 
 ping_req = [{},{'fn._ping': {}}]
 
-def startup_check(loop: asyncio.AbstractEventLoop, verify):
+async def ping(topic):
+    nats_client = await get_nats_client()
+    req = json.dumps([{}, {'Ping': {}}])
+    await nats_client.request(topic, req.encode(), timeout=1)
+
+
+def startup_check(loop: asyncio.AbstractEventLoop, verify, times=10):
     async def check():
         ex: Exception = None
-        for _ in range(10):
+        for _ in range(times):
             try:
                 await verify()
                 print('Server successfully started.')

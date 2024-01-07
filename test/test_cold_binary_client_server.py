@@ -3,37 +3,48 @@ import asyncio
 import pytest
 import time
 import importlib
+import json
 
 
 @pytest.fixture(scope="module", params=get_lib_modules())
-def cold_binary_client_server_proc(loop, nats_server, request):
+def cold_binary_client_server_proc(loop, nats_server, dispatcher_server, request):
     lib_name = request.param
-    test_module_name = 'lib.{}.test_server'.format(lib_name)
-    l = importlib.import_module(test_module_name)
 
     init_topics = ['client-frontdoor', 'client-backdoor', 'frontdoor', 'backdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'cold-binary-client-server', t) for t in init_topics)
 
-    ss = l.start_client_server(c.example_api_path, c.nats_url, *topics)
+    cserver_id = '{}.{}'.format(lib_name, 'binary-client-server-client')
+    server_id = '{}.{}'.format(lib_name, 'binary-client-server-server')
+
+    async def t():
+        nats_client = await get_nats_client()
+        req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[2], 'backdoorTopic': topics[3]}}])
+        await nats_client.request(lib_name, req.encode(), timeout=1)
+        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1]}}])
+        await nats_client.request(lib_name, req2.encode(), timeout=1)
+
+    loop.run_until_complete(t())    
 
     try:
         startup_check(loop, lambda: verify_client_case(ping_req, None, *topics))
     except Exception:
-        for s in ss:
-            s.terminate()
-        for s in ss:
-            s.wait()
         raise
                                              
-    yield ss, topics
+    yield topics
+    
+    async def t2():
+        nats_client = await get_nats_client()
+        req = json.dumps([{}, {'Stop': {'id': server_id}}])
+        await nats_client.request(lib_name, req.encode(), timeout=1)
+        req2 = json.dumps([{}, {'Stop': {'id': cserver_id}}])
+        await nats_client.request(lib_name, req2.encode(), timeout=1)
 
-    for s in ss:
-        s.terminate()
-    for s in ss:
-        s.wait()    
+    loop.run_until_complete(t2()) 
+
+    print('cold_binary_client_server_proc stopped')
     
 def test_cold_binary_client_server_multi_case(loop, cold_binary_client_server_proc, name, statements):
-    _, topics = cold_binary_client_server_proc
+    topics = cold_binary_client_server_proc
 
     async def t():
         for request, expected_response in statements:

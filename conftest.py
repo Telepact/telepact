@@ -8,18 +8,47 @@ from test.mock_cases import cases as mock_cases
 from test.mock_cases import invalid_cases as mock_invalid_cases
 from test.parse_cases import cases as parse_cases
 from copy import deepcopy as dc
-from test.util import increment
+from test.util import increment, get_lib_modules, get_nats_client, ping, startup_check
 import functools
 import operator
+import json
+import importlib
 
 @pytest.fixture(scope='session')
 def nats_server():
     print('Creating NATS fixture')
-    p = subprocess.Popen(['nats-server', '-D'])
+    p = subprocess.Popen(['nats-server', '-DV'])
     yield p
     p.terminate()
     p.wait()
 
+@pytest.fixture(scope='session', params=get_lib_modules())
+def dispatcher_server(loop, nats_server, request):
+    lib_name = request.param
+    test_module_name = 'lib.{}.dispatch'.format(lib_name)
+    l = importlib.import_module(test_module_name)
+
+    s: subprocess.Popen = l.start()
+
+    try:                                
+        startup_check(loop, lambda: ping(lib_name), times=20)
+    except Exception:
+        raise       
+
+    yield s
+
+    async def t2():
+        nats_client = await get_nats_client()
+        req = json.dumps([{}, {'End': {}}])
+        await nats_client.request(lib_name, req.encode(), timeout=1)
+
+    loop.run_until_complete(t2())        
+
+    try:    
+        s.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        s.terminate()
+        s.wait()
 
 # @pytest.fixture(scope='session', autouse=True)
 # def event_loop():

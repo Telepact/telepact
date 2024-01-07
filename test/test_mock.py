@@ -3,34 +3,43 @@ import asyncio
 import pytest
 import time
 import importlib
+import json
 
 
 @pytest.fixture(scope="module", params=get_lib_modules())
-def mock_server_proc(loop, nats_server, request):
+def mock_server_proc(loop, nats_server, dispatcher_server, request):
     lib_name = request.param
-    test_module_name = 'lib.{}.test_server'.format(lib_name)
-    l = importlib.import_module(test_module_name)
 
     init_topics = ['frontdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'mock', t) for t in init_topics)     
 
-    s = l.start_mock_server(c.example_api_path, c.nats_url, *topics)
+    server_id = '{}.{}'.format(lib_name, 'mock')
+
+    async def t():
+        nats_client = await get_nats_client()
+        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[0]}}])
+        await nats_client.request(lib_name, req.encode(), timeout=1)    
+
+    loop.run_until_complete(t())    
 
     try:
         startup_check(loop, lambda: verify_flat_case(ping_req, None, *topics))
     except Exception:
-        s.terminate()
-        s.wait()
         raise      
 
-    yield s, topics
+    yield topics
+
+    async def t2():
+        nats_client = await get_nats_client()
+        req = json.dumps([{}, {'Stop': {'id': server_id}}])
+        await nats_client.request(lib_name, req.encode(), timeout=1)    
     
-    s.terminate()
-    s.wait()
+    loop.run_until_complete(t2())         
+    
     print('mock_server_proc stopped')
 
 def test_mock_multi_case(loop, mock_server_proc, name, statements):
-    _, topics = mock_server_proc
+    topics = mock_server_proc
 
     async def t():
         for request, expected_response in statements:
@@ -40,7 +49,7 @@ def test_mock_multi_case(loop, mock_server_proc, name, statements):
 
 
 def test_mock_case(loop, mock_server_proc, name, req, res):
-    _, topics = mock_server_proc
+    topics = mock_server_proc
 
     async def t():
         await verify_flat_case(req, res, *topics)
