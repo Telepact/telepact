@@ -104,12 +104,6 @@ class _DefaultSerializer implements SerializationImpl {
             });
         } catch (JsonParseException e) {
             throw new DeserializationError(new InvalidJsonError(e));
-        } catch (JsonMappingException e) {
-            if (e.getMessage().contains("out of range")) {
-                throw new DeserializationError(new NumberOutOfRangeError());
-            } else {
-                throw new DeserializationError(e);
-            }
         } catch (IOException e) {
             throw new DeserializationError(e);
         }
