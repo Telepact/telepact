@@ -29,13 +29,13 @@ public class TestServer {
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var jApi = JApiSchema.fromJson(json);
-        var alternateJApi = JApiSchema.combine(jApi, JApiSchema.fromJson("""
+        var alternateJApi = JApiSchema.extend(jApi, """
                 [
                     {
                         "struct.BackwardsCompatibleChange": {}
                     }
                 ]
-                """));
+                """);
         var objectMapper = new ObjectMapper();
 
         var serveAlternateServer = new AtomicBoolean();

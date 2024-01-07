@@ -216,5 +216,23 @@ cases = {
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Example', 'wrong'], 'reason': {'ArrayMustNotBeEmpty': {}}}]}}]
         ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct.Example': {
+                                    'wrong': [False]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'struct.Example', 'wrong', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
+        ],        
     ]
 }

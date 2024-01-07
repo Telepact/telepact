@@ -1,6 +1,10 @@
 [
   {
     "union.ValidationFailureReason": {
+      "TypeUnexpected": {
+        "expected": ["union._Type"],
+        "actual": ["union._Type"]
+      },
       "DuplicateSchemaKey": {
         "schemaKey": ["string"]
       },
@@ -20,7 +24,8 @@
       },
       "ObjectTypeRequired": {},
       "InvalidTrait": {},
-      "TraitDefinitionCannotTargetInternalFunctions": {}
+      "TraitDefinitionCannotTargetInternalFunctions": {},
+      "ArrayMustNotBeEmpty": {}
     }
   },
   {

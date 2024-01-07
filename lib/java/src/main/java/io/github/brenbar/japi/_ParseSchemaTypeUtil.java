@@ -21,12 +21,14 @@ public class _ParseSchemaTypeUtil {
 
         var basePath = _ValidateUtil.append(path, 0);
 
+        var baseType = typeDeclarationArray.get(0);
+
         String rootTypeString;
         try {
-            rootTypeString = (String) typeDeclarationArray.get(0);
+            rootTypeString = (String) baseType;
         } catch (ClassCastException ex) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "StringTypeRequired", Map.of())));
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
         }
 
         var regex = Pattern.compile("^(.*?)(\\?)?$");

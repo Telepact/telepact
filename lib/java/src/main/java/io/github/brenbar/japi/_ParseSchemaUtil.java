@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,13 +15,21 @@ import java.util.TreeSet;
 
 class _ParseSchemaUtil {
 
-    static JApiSchema combineUApiSchemas(JApiSchema first, JApiSchema second) {
+    static JApiSchema extendUApiSchema(JApiSchema first, String secondUApiSchemaJson,
+            Map<String, TypeExtension> secondTypeExtensions) {
+        var objectMapper = new ObjectMapper();
+        List<Object> secondOriginal;
+        try {
+            secondOriginal = objectMapper.readValue(secondUApiSchemaJson, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new JApiSchemaParseError(
+                    List.of(new SchemaParseFailure(List.of(), "ArrayTypeRequired", Map.of())),
+                    e);
+        }
+
         List<Object> firstOriginal = first.original;
-        List<Object> secondOriginal = second.original;
-        Map<String, UType> firstParsed = first.parsed;
-        Map<String, UType> secondParsed = second.parsed;
         Map<String, TypeExtension> firstTypeExtensions = first.typeExtensions;
-        Map<String, TypeExtension> secondTypeExtensions = second.typeExtensions;
 
         var original = new ArrayList<Object>();
         original.addAll(firstOriginal);
@@ -33,11 +42,11 @@ class _ParseSchemaUtil {
         return parseUApiSchema(original, typeExtensions);
     }
 
-    static JApiSchema parseUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
+    static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var objectMapper = new ObjectMapper();
-        List<Object> originalUApiSchema;
+        List<Object> internalJApiSchemaOriginal;
         try {
-            originalUApiSchema = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
+            internalJApiSchemaOriginal = objectMapper.readValue(_InternalJApiUtil.getJson(), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new JApiSchemaParseError(
@@ -45,7 +54,9 @@ class _ParseSchemaUtil {
                     e);
         }
 
-        return parseUApiSchema(originalUApiSchema, typeExtensions);
+        var internalApi = parseUApiSchema(internalJApiSchemaOriginal, Map.of());
+
+        return extendUApiSchema(internalApi, uApiSchemaJson, typeExtensions);
     }
 
     private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,
@@ -164,6 +175,15 @@ class _ParseSchemaUtil {
         Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex));
         throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
                 "DefinitionMustHaveOneKeyMatchingRegex", sortedMap)));
+    }
+
+    static List<SchemaParseFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
+            String expectedType) {
+        var actualType = _ValidateUtil.getType(value);
+        Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
+                Map.entry("expected", Map.of(expectedType, Map.of()))));
+        return Collections.singletonList(
+                new SchemaParseFailure(path, "TypeUnexpected", data));
     }
 
 }
