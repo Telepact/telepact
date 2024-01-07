@@ -233,7 +233,7 @@ cases = {
             ],
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Example', 'wrong', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
-        ],   
+        ],
         [
             [
                 {},
@@ -250,7 +250,25 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [0, 'struct.Example', 'wrong', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(.+)(\\?)?$'}}}]}}]
-        ],              
+                'cases': [{'path': [0, 'struct.Example', 'wrong', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(.+?)(\\?)?$'}}}]}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct<1>.Example': {
+                                    'wrong': ['T.0?']
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'struct<1>.Example', 'wrong', 0], 'reason': {'NullableGenericDisallowed': {}}}]}}]
+        ],
     ]
 }

@@ -28,7 +28,8 @@
       "ArrayMustNotBeEmpty": {},
       "StringRegexMatchFailed": {
         "regex": ["string"]
-      }
+      },
+      "NullableGenericDisallowed": {}
     }
   },
   {

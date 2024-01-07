@@ -31,7 +31,7 @@ public class _ParseSchemaTypeUtil {
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
         }
 
-        var regexString = "^(.+)(\\?)?$";
+        var regexString = "^(.+?)(\\?)?$";
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
@@ -41,6 +41,9 @@ public class _ParseSchemaTypeUtil {
 
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
+        if (nullable) {
+            System.out.println("IS NULLABLE");
+        }
 
         boolean allowTraitsAndInfo = false;
         UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
@@ -49,7 +52,7 @@ public class _ParseSchemaTypeUtil {
 
         if (type instanceof UGeneric && nullable) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "CannotMarkGenericAsNullable", Map.of())));
+                    "NullableGenericDisallowed", Map.of())));
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
