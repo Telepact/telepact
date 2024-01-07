@@ -39,7 +39,7 @@ class _ParseSchemaUtil {
         typeExtensions.putAll(firstTypeExtensions);
         typeExtensions.putAll(secondTypeExtensions);
 
-        return parseUApiSchema(original, typeExtensions);
+        return parseUApiSchema(original, typeExtensions, firstOriginal.size());
     }
 
     static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
@@ -54,13 +54,13 @@ class _ParseSchemaUtil {
                     e);
         }
 
-        var internalApi = parseUApiSchema(internalJApiSchemaOriginal, Map.of());
+        var internalApi = parseUApiSchema(internalJApiSchemaOriginal, Map.of(), 0);
 
         return extendUApiSchema(internalApi, uApiSchemaJson, typeExtensions);
     }
 
     private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,
-            Map<String, TypeExtension> typeExtensions) {
+            Map<String, TypeExtension> typeExtensions, int offset) {
         var parsedTypes = new HashMap<String, UType>();
         var parseFailures = new ArrayList<SchemaParseFailure>();
         var failedTypes = new HashSet<String>();
@@ -97,7 +97,8 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
+            throw new JApiSchemaParseError(offsetParseFailures);
         }
 
         var traitKeys = new HashSet<String>();
@@ -129,7 +130,8 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
+            throw new JApiSchemaParseError(offsetParseFailures);
         }
 
         for (var traitKey : traitKeys) {
@@ -159,10 +161,25 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
+            throw new JApiSchemaParseError(offsetParseFailures);
         }
 
         return new JApiSchema(originalUApiSchema, parsedTypes, typeExtensions);
+    }
+
+    private static List<SchemaParseFailure> offsetSchemaIndex(List<SchemaParseFailure> initialFailures, int offset) {
+        return initialFailures.stream().map(f -> {
+            List<Object> newPath;
+            if (f.path.size() == 0) {
+                newPath = f.path;
+            } else {
+                newPath = new ArrayList<>(f.path);
+                newPath.set(0, (Integer) newPath.get(0) - offset);
+            }
+            return new SchemaParseFailure(newPath, f.reason, f.data);
+        })
+                .toList();
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {
