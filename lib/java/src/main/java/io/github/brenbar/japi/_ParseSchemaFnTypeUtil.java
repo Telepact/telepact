@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class _ParseSchemaFnTypeUtil {
+class _ParseSchemaFnTypeUtil {
+
+    private static final _ParseSchemaFnTypeUtil INST = new _ParseSchemaFnTypeUtil();
 
     static UFn parseFunctionType(
             List<Object> path,

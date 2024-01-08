@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class _BinaryEncodeUtil {
+class _BinaryEncodeUtil {
 
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         var headers = (Map<String, Object>) message.get(0);

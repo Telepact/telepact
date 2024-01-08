@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class _DefaultBinaryChecksumStrategy implements BinaryChecksumStrategy {
+class _DefaultBinaryChecksumStrategy implements BinaryChecksumStrategy {
 
     private static class Checksum {
         public final int value;

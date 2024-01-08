@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class _SelectUtil {
+class _SelectUtil {
 
     static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
             Map<String, List<String>> selectedStructFields) {

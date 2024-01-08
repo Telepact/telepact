@@ -11,7 +11,7 @@ import io.github.brenbar.japi.MockVerification.AtMostNumberOfTimes;
 import io.github.brenbar.japi.MockVerification.ExactNumberOfTimes;
 import io.github.brenbar.japi.MockVerification.VerificationTimes;
 
-public class _MockVerifyUtil {
+class _MockVerifyUtil {
 
     static VerificationTimes parseFromPseudoJson(Map<String, Object> verifyTimes) {
         var verifyTimesEntry = UUnion.entry(verifyTimes);

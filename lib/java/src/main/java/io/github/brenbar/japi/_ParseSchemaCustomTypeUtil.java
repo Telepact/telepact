@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class _ParseSchemaCustomTypeUtil {
+class _ParseSchemaCustomTypeUtil {
 
     static UStruct parseStructType(
             List<Object> path,

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class _ParseSchemaTypeUtil {
+class _ParseSchemaTypeUtil {
 
     static UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount,

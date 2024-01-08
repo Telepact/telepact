@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class _ParseSchemaTraitUtil {
+class _ParseSchemaTraitUtil {
     static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
         String traitName = trait.name;

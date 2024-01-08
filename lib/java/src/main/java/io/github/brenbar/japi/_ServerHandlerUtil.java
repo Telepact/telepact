@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class _ServerHandlerUtil {
+class _ServerHandlerUtil {
 
     static Message handleMessage(Message requestMessage,
             JApiSchema jApiSchema,

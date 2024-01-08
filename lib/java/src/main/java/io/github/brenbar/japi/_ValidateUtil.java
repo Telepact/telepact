@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class _ValidateUtil {
+class _ValidateUtil {
 
     static List<ValidationFailure> validateHeaders(
             Map<String, Object> headers, JApiSchema jApiSchema, UFn functionType) {
