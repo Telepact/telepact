@@ -36,7 +36,7 @@ class _DefaultSerializer implements SerializationImpl {
                 JsonParser parser = deserializationContext.getParser();
                 if (parser instanceof MessagePackParser p) {
                     if (p.isCurrentFieldId()) {
-                        return Long.valueOf(s);
+                        return Integer.valueOf(s);
                     }
                 }
                 return s;

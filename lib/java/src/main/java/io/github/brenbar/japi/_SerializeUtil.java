@@ -38,8 +38,8 @@ class _SerializeUtil {
                 }
             }
         }
-        var i = (long) 0;
-        var binaryEncoding = new HashMap<String, Long>();
+        var i = 0;
+        var binaryEncoding = new HashMap<String, Integer>();
         for (var key : allKeys) {
             binaryEncoding.put(key, i++);
         }

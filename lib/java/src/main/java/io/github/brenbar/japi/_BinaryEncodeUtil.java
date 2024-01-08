@@ -91,19 +91,7 @@ class _BinaryEncodeUtil {
 
         // If there is a binary encoding included on this message, cache it
         if (headers.containsKey("_enc")) {
-            var initialBinaryEncoding = (Map<String, Object>) headers.get("_enc");
-            // Ensure everything is a long
-            var binaryEncoding = initialBinaryEncoding.entrySet().stream()
-                    .collect(Collectors.toMap(e -> e.getKey(), e -> {
-                        var value = e.getValue();
-                        if (value instanceof Integer i) {
-                            return Long.valueOf(i);
-                        } else if (value instanceof Long l) {
-                            return l;
-                        } else {
-                            throw new RuntimeException("Unexpected type");
-                        }
-                    }));
+            var binaryEncoding = (Map<String, Integer>) headers.get("_enc");
             var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
             recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
         }
@@ -113,25 +101,12 @@ class _BinaryEncodeUtil {
         recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
 
         var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);
-        if (binaryEncoder == null) {
-            throw new BinaryEncoderUnavailableError();
-        }
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
         var messageBody = decode(encodedMessageBody, binaryEncoder);
 
         return List.of(headers, messageBody);
-    }
-
-    private static Optional<BinaryEncoding> findBinaryEncoder(Integer checksum,
-            Deque<BinaryEncoding> binaryEncoderStore) {
-        for (var binaryEncoder : binaryEncoderStore) {
-            if (Objects.equals(binaryEncoder.checksum, checksum)) {
-                return Optional.of(binaryEncoder);
-            }
-        }
-        return Optional.empty();
     }
 
     private static Map<Object, Object> encode(Map<String, Object> messageBody, BinaryEncoding binaryEncoder) {
