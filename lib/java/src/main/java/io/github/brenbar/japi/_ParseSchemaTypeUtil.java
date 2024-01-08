@@ -42,8 +42,7 @@ public class _ParseSchemaTypeUtil {
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
 
-        boolean allowTraitsAndInfo = false;
-        UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
+        UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, originalJApiSchema,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions, allParseFailures, failedTypes);
 
@@ -93,7 +92,6 @@ public class _ParseSchemaTypeUtil {
     }
 
     static UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
-            boolean allowTraitsAndInfo,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions,
@@ -115,15 +113,8 @@ public class _ParseSchemaTypeUtil {
             genericRegex = "";
         }
 
-        String traitAndInfoRegex;
-        if (allowTraitsAndInfo) {
-            traitAndInfoRegex = "trait|info|";
-        } else {
-            traitAndInfoRegex = "";
-        }
-
-        var regexString = "^(boolean|integer|number|string|any|array|object)|((%sfn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
-                .formatted(traitAndInfoRegex, genericRegex);
+        var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
+                .formatted(genericRegex);
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
@@ -183,16 +174,13 @@ public class _ParseSchemaTypeUtil {
                         originalJApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, false, allParseFailures, failedTypes);
-            } else if (customTypeName.startsWith("ext")) {
+            } else {
                 var typeExtension = typeExtensions.get(customTypeName);
                 if (typeExtension == null) {
                     throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                            "TypeExtensionImplementationMissing", Map.of("type", customTypeName))));
+                            "TypeExtensionImplementationMissing", Map.of("name", customTypeName))));
                 }
                 type = new UExt(customTypeName, typeExtension, typeParameterCount);
-            } else {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                        "InvalidType", Map.of("type", customTypeName))));
             }
 
             parsedTypes.put(customTypeName, type);

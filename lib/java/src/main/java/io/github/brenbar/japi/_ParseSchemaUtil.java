@@ -105,7 +105,6 @@ class _ParseSchemaUtil {
         var traits = new ArrayList<UTrait>();
 
         var rootTypeParameterCount = 0;
-        boolean allowTraitsAndInfo = true;
         for (var schemaKey : schemaKeys) {
             if (schemaKey.startsWith("info.")) {
                 continue;
@@ -117,7 +116,6 @@ class _ParseSchemaUtil {
             var thisIndex = schemaKeysToIndex.get(schemaKey);
             try {
                 var typ = _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
-                        allowTraitsAndInfo,
                         originalUApiSchema,
                         schemaKeysToIndex,
                         parsedTypes, typeExtensions, parseFailures, failedTypes);

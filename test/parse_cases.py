@@ -476,6 +476,24 @@ cases = {
             ],
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Broken', 'field', 0], 'reason': {'TypeUnknown': {'name': 'struct.Unknown'}}}]}}]
-        ],        
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'ext.Broken': {
+                                },
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0], 'reason': {'TypeExtensionImplementationMissing': {'name': 'ext.Broken'}}}]}}]
+        ],
+        
     ]
 }

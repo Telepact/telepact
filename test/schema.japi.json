@@ -36,6 +36,9 @@
       },
       "TypeUnknown": {
         "name": ["string"]
+      },
+      "TypeExtensionImplementationMissing": {
+        "name": ["string"]
       }
     }
   },
