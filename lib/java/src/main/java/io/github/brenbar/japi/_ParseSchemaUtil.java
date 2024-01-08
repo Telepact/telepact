@@ -111,7 +111,6 @@ class _ParseSchemaUtil {
         }
 
         var traitKeys = new HashSet<String>();
-        var traits = new ArrayList<UTrait>();
 
         var rootTypeParameterCount = 0;
         for (var schemaKey : schemaKeys) {
@@ -153,17 +152,6 @@ class _ParseSchemaUtil {
             }
         }
 
-        // Ensure all type extensions are defined
-        for (var entry : typeExtensions.entrySet()) {
-            var typeExtensionName = entry.getKey();
-            var typeExtension = (UExt) parsedTypes.get(typeExtensionName);
-            if (typeExtension == null) {
-                parseFailures
-                        .add(new SchemaParseFailure(List.of(), "UndefinedTypeExtension",
-                                Map.of("name", typeExtensionName)));
-            }
-        }
-
         if (!parseFailures.isEmpty()) {
             var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
             throw new JApiSchemaParseError(offsetParseFailures);
@@ -174,13 +162,8 @@ class _ParseSchemaUtil {
 
     private static List<SchemaParseFailure> offsetSchemaIndex(List<SchemaParseFailure> initialFailures, int offset) {
         return initialFailures.stream().map(f -> {
-            List<Object> newPath;
-            if (f.path.size() == 0) {
-                newPath = f.path;
-            } else {
-                newPath = new ArrayList<>(f.path);
-                newPath.set(0, (Integer) newPath.get(0) - offset);
-            }
+            List<Object> newPath = new ArrayList<>(f.path);
+            newPath.set(0, (Integer) newPath.get(0) - offset);
             return new SchemaParseFailure(newPath, f.reason, f.data);
         })
                 .toList();
