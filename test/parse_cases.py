@@ -344,13 +344,18 @@ cases = {
                     'fn.validateSchema': {
                         'schema': [
                             {
-                                'struct<1>.Param': {
-                                    'field': ['T.0']
+                                'struct.Example': {
+                                    'field': ['struct.Broken']
                                 },
                             },
                             {
-                                'struct.Example': {
-                                    'field': ['struct<1>.Param', ['']]
+                                'struct.Example2': {
+                                    'field': ['struct.Broken']
+                                },
+                            },
+                            {
+                                'struct.Broken': {
+                                    'field': [False]
                                 }
                             }
                         ]
@@ -358,7 +363,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [1, 'struct.Example', 'field', 1, 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(.+?)(\\?)?$'}}}]}}]
+                'cases': [{'path': [2, 'struct.Broken', 'field', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
         ],
     ]
 }
