@@ -46,7 +46,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
             [
@@ -58,7 +58,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
             [
@@ -70,7 +70,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
             [
@@ -82,7 +82,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [], 'reason': {'ArrayTypeRequired': {}}}]}}]
+                'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
             [
@@ -513,6 +513,26 @@ cases = {
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, 'fn.broken'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],        
-        
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'fn.broken': {
+                                    "field": False
+                                },
+                                "->": {
+                                    "Ok": {}
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'fn.broken', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
+        ],          
     ]
 }

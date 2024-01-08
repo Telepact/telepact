@@ -11,20 +11,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 class _ParseSchemaUtil {
 
     static JApiSchema extendUApiSchema(JApiSchema first, String secondUApiSchemaJson,
             Map<String, TypeExtension> secondTypeExtensions) {
         var objectMapper = new ObjectMapper();
-        List<Object> secondOriginal;
+        Object secondOriginalInit;
         try {
-            secondOriginal = objectMapper.readValue(secondUApiSchemaJson, new TypeReference<>() {
+            secondOriginalInit = objectMapper.readValue(secondUApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new JApiSchemaParseError(
-                    List.of(new SchemaParseFailure(List.of(), "ArrayTypeRequired", Map.of())),
+                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
+                    e);
+        }
+
+        List<Object> secondOriginal;
+        try {
+            secondOriginal = (List<Object>) secondOriginalInit;
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), secondOriginalInit, "Array"),
                     e);
         }
 
@@ -44,13 +52,23 @@ class _ParseSchemaUtil {
 
     static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var objectMapper = new ObjectMapper();
-        List<Object> internalJApiSchemaOriginal;
+        Object internalJApiSchemaOriginalInit;
         try {
-            internalJApiSchemaOriginal = objectMapper.readValue(_InternalJApiUtil.getJson(), new TypeReference<>() {
+            internalJApiSchemaOriginalInit = objectMapper.readValue(_InternalJApiUtil.getJson(), new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new JApiSchemaParseError(
-                    List.of(new SchemaParseFailure(List.of(), "ArrayTypeRequired", Map.of())),
+                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
+                    e);
+        }
+
+        List<Object> internalJApiSchemaOriginal;
+        try {
+            internalJApiSchemaOriginal = (List<Object>) internalJApiSchemaOriginalInit;
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), internalJApiSchemaOriginalInit,
+                            "Array"),
                     e);
         }
 

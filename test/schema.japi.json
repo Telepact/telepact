@@ -8,7 +8,6 @@
       "DuplicateSchemaKey": {
         "schemaKey": ["string"]
       },
-      "ArrayTypeRequired": {},
       "DefinitionMustBeObjectType": {},
       "UndefinedTypeExtension": {
         "name": ["string"]

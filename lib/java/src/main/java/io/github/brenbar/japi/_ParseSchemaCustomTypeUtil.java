@@ -148,8 +148,8 @@ public class _ParseSchemaCustomTypeUtil {
         try {
             typeDeclarationArray = (List<Object>) typeDeclarationValue;
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
-                    "ArrayTypeRequired", Map.of())));
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));
         }
 
         if (optional && isForUnion) {
