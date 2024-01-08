@@ -206,7 +206,7 @@ cases = {
                         'schema': [
                             {
                                 'struct.Example': {
-                                    'wrong': []
+                                    'field': []
                                 }
                             }
                         ]
@@ -214,7 +214,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [0, 'struct.Example', 'wrong'], 'reason': {'ArrayMustNotBeEmpty': {}}}]}}]
+                'cases': [{'path': [0, 'struct.Example', 'field'], 'reason': {'ArrayMustNotBeEmpty': {}}}]}}]
         ],
         [
             [
@@ -224,7 +224,7 @@ cases = {
                         'schema': [
                             {
                                 'struct.Example': {
-                                    'wrong': [False]
+                                    'field': [False]
                                 }
                             }
                         ]
@@ -232,7 +232,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [0, 'struct.Example', 'wrong', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
+                'cases': [{'path': [0, 'struct.Example', 'field', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
         ],
         [
             [
@@ -242,7 +242,7 @@ cases = {
                         'schema': [
                             {
                                 'struct.Example': {
-                                    'wrong': ['']
+                                    'field': ['']
                                 }
                             }
                         ]
@@ -250,7 +250,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [0, 'struct.Example', 'wrong', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(.+?)(\\?)?$'}}}]}}]
+                'cases': [{'path': [0, 'struct.Example', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(.+?)(\\?)?$'}}}]}}]
         ],
         [
             [
@@ -260,7 +260,7 @@ cases = {
                         'schema': [
                             {
                                 'struct<1>.Example': {
-                                    'wrong': ['T.0?']
+                                    'field': ['T.0?']
                                 }
                             }
                         ]
@@ -268,7 +268,7 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [0, 'struct<1>.Example', 'wrong', 0], 'reason': {'NullableGenericDisallowed': {}}}]}}]
+                'cases': [{'path': [0, 'struct<1>.Example', 'field', 0], 'reason': {'NullableGenericDisallowed': {}}}]}}]
         ],
         [
             [
@@ -281,7 +281,7 @@ cases = {
                                     'field': ['T.0']
                                 },
                                 'struct.Example': {
-                                    'wrong': ['struct<1>.Param']
+                                    'field': ['struct<1>.Param']
                                 }
                             }
                         ]
@@ -304,7 +304,7 @@ cases = {
                             },
                             {
                                 'struct.Example': {
-                                    'wrong': ['struct<1>.Param']
+                                    'field': ['struct<1>.Param']
                                 }
                             }
                         ]
@@ -312,7 +312,30 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [1, 'struct.Example', 'wrong'], 'reason': {'ArrayLengthUnexpected': {'actual': 1, 'expected': 2}}}]}}]
-        ],        
+                'cases': [{'path': [1, 'struct.Example', 'field'], 'reason': {'ArrayLengthUnexpected': {'actual': 1, 'expected': 2}}}]}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct<1>.Param': {
+                                    'field': ['T.0']
+                                },
+                            },
+                            {
+                                'struct.Example': {
+                                    'field': ['struct<1>.Param', False]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [1, 'struct.Example', 'field', 1], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
+        ],
     ]
 }

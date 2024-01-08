@@ -71,8 +71,7 @@ public class _ParseSchemaTypeUtil {
             try {
                 l = (List<Object>) e;
             } catch (ClassCastException ex) {
-                parseFailures.add(new SchemaParseFailure(loopPath,
-                        "ArrayTypeRequired", Map.of()));
+                parseFailures.addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, e, "Array"));
                 continue;
             }
 
