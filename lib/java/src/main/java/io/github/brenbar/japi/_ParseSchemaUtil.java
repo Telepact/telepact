@@ -52,24 +52,12 @@ class _ParseSchemaUtil {
 
     static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var objectMapper = new ObjectMapper();
-        Object internalJApiSchemaOriginalInit;
-        try {
-            internalJApiSchemaOriginalInit = objectMapper.readValue(_InternalJApiUtil.getJson(), new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            throw new JApiSchemaParseError(
-                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
-                    e);
-        }
-
         List<Object> internalJApiSchemaOriginal;
         try {
-            internalJApiSchemaOriginal = (List<Object>) internalJApiSchemaOriginalInit;
-        } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), internalJApiSchemaOriginalInit,
-                            "Array"),
-                    e);
+            internalJApiSchemaOriginal = objectMapper.readValue(_InternalJApiUtil.getJson(), new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         var internalApi = parseUApiSchema(internalJApiSchemaOriginal, Map.of(), 0);
@@ -89,12 +77,15 @@ class _ParseSchemaUtil {
         var index = -1;
         for (var definition : originalUApiSchema) {
             index += 1;
+
+            List<Object> loopPath = List.of(index);
+
             Map<String, Object> def;
             try {
                 def = (Map<String, Object>) definition;
             } catch (ClassCastException e) {
                 parseFailures
-                        .add(new SchemaParseFailure(List.of(index), "DefinitionMustBeAnObject", Map.of()));
+                        .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, definition, "Object"));
                 continue;
             }
 
@@ -107,7 +98,7 @@ class _ParseSchemaUtil {
             }
 
             if (schemaKeys.contains(schemaKey)) {
-                parseFailures.add(new SchemaParseFailure(List.of(index), "DuplicateSchemaKey",
+                parseFailures.add(new SchemaParseFailure(loopPath, "DuplicateSchemaKey",
                         Map.of("schemaKey", schemaKey)));
             }
             schemaKeys.add(schemaKey);
@@ -133,13 +124,10 @@ class _ParseSchemaUtil {
             }
             var thisIndex = schemaKeysToIndex.get(schemaKey);
             try {
-                var typ = _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
+                _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
                         originalUApiSchema,
                         schemaKeysToIndex,
                         parsedTypes, typeExtensions, parseFailures, failedTypes);
-                if (typ instanceof UTrait t) {
-                    traits.add(t);
-                }
             } catch (JApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }

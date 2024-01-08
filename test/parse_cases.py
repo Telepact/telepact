@@ -650,7 +650,7 @@ cases = {
             [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'union.Broken', 'Case!'], 'reason': {'StringRegexMatchFailed': {'regex': '^(_?[A-Z][a-zA-Z0-9_]*)$'}}}]}}]
         ],
-       [
+        [
             [
                 {},
                 {
@@ -669,6 +669,20 @@ cases = {
             ],
             [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'union.Broken', 'Case', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            False
+                        ]
+                    }
+                }
+            ],
+            [{}, {'ErrorValidationFailure': {
+                'cases': [{'path': [0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],
     ]
 }

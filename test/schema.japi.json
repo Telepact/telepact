@@ -1,5 +1,8 @@
 [
   {
+    "info.SchemaExample": {}
+  },
+  {
     "union.ValidationFailureReason": {
       "TypeUnexpected": {
         "expected": ["union._Type"],
