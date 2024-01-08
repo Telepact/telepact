@@ -42,7 +42,8 @@
       "TypeExtensionImplementationMissing": {
         "name": ["string"]
       },
-      "RequiredObjectKeyMissing": {}
+      "RequiredObjectKeyMissing": {},
+      "JsonInvalid": {}
     }
   },
   {

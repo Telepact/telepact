@@ -684,5 +684,17 @@ cases = {
             [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],
+        [
+            [
+                {'_serializeSchema': False},
+                {
+                    'fn.validateSchema': {
+                        'schema': 'badjson'
+                    }
+                }
+            ],
+            [{}, {'ErrorValidationFailure': {
+                'cases': [{'path': [], 'reason': {'JsonInvalid': {}}}]}}]
+        ],
     ]
 }

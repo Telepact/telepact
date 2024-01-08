@@ -36,15 +36,22 @@ public class SchemaTestServer {
             var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
             var schemaPseudoJson = arg.get("schema");
 
-            byte[] schemaJson;
-            try {
-                schemaJson = objectMapper.writeValueAsBytes(schemaPseudoJson);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+            var serializeSchema = (Boolean) requestMessage.header.getOrDefault("_serializeSchema", true);
+
+            String schemaJson;
+            if (serializeSchema) {
+                try {
+                    var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
+                    schemaJson = new String(schemaJsonBytes);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                schemaJson = (String) schemaPseudoJson;
             }
 
             try {
-                var schema = JApiSchema.fromJson(new String(schemaJson));
+                var schema = JApiSchema.fromJson(schemaJson);
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             } catch (JApiSchemaParseError e) {
                 e.printStackTrace();
