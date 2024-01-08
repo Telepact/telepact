@@ -53,8 +53,12 @@
       "NumberOutOfRange": {},
       "ZeroOrManyUnionFieldsDisallowed": {},
       "UnionFieldUnknown": {},
-      "ExtensionValidationFailure": {
-        "message": ["string"]
+      "ExtensionValidationFailed": {
+        "reason": ["string"],
+        "data": ["object", ["any"]]
+      },
+      "RequiredObjectKeyRegexMatchFailed": {
+        "regex": ["string"]
       },
       "FunctionUnknown": {}
     }
