@@ -23,7 +23,7 @@ public class MockCallTypeExtension implements TypeExtension {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }
 
-        var regexString = "^fn\\..*";
+        var regexString = "^fn\\..*$";
         var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.matches(regexString)).findAny();
         if (optionalFunctionName.isEmpty()) {
             return List.of(new ValidationFailure(new ArrayList<Object>(), "RequiredObjectKeyRegexMatchFailed",
@@ -32,13 +32,7 @@ public class MockCallTypeExtension implements TypeExtension {
         var functionName = optionalFunctionName.get();
         var functionDef = (UFn) this.types.get(functionName);
 
-        var inputInit = givenMap.get(functionName);
-        Map<String, Object> input;
-        try {
-            input = (Map<String, Object>) inputInit;
-        } catch (ClassCastException e) {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(new ArrayList<Object>(), inputInit, "Object");
-        }
+        var input = givenMap.get(functionName);
 
         var inputFailures = functionDef.call.values.get(functionDef.name).validate(input, List.of(), List.of());
         var inputFailuresWithPath = inputFailures.stream()

@@ -60,6 +60,7 @@
       "RequiredObjectKeyRegexMatchFailed": {
         "regex": ["string"]
       },
+      "RequiredObjectKeyMissing": {},
       "FunctionUnknown": {}
     }
   },

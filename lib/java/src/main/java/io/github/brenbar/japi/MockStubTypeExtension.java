@@ -23,7 +23,7 @@ public class MockStubTypeExtension implements TypeExtension {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
 
-        var regexString = "^fn\\..*";
+        var regexString = "^fn\\..*$";
         var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.matches(regexString))
                 .findAny();
         if (optionalFunctionName.isEmpty()) {
@@ -37,13 +37,7 @@ public class MockStubTypeExtension implements TypeExtension {
         var functionName = optionalFunctionName.get();
         var functionDef = (UFn) this.types.get(functionName);
 
-        var inputInit = givenMap.get(functionName);
-        Map<String, Object> input;
-        try {
-            input = (Map<String, Object>) inputInit;
-        } catch (ClassCastException e) {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), inputInit, "Object");
-        }
+        var input = givenMap.get(functionName);
 
         var inputFailures = functionDef.call.values.get(functionDef.name).validate(input, List.of(),
                 List.of());
@@ -65,13 +59,7 @@ public class MockStubTypeExtension implements TypeExtension {
                     Map.of()));
         }
 
-        var outputInit = givenMap.get("->");
-        Map<String, Object> output;
-        try {
-            output = (Map<String, Object>) outputInit;
-        } catch (ClassCastException e) {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), outputInit, "Object");
-        }
+        var output = givenMap.get("->");
 
         var outputFailures = functionDef.result.validate(output, List.of(), List.of());
         var outputFailuresWithPath = outputFailures.stream()
