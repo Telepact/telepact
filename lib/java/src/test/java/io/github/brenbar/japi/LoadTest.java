@@ -74,7 +74,6 @@ public class LoadTest {
             };
 
             var options = new Client.Options();
-            options.forceSendJsonDefault = false;
             options.useBinaryDefault = false;
             options.timeoutMsDefault = 600000;
 

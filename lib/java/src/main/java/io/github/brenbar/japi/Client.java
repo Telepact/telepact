@@ -2,7 +2,6 @@ package io.github.brenbar.japi;
 
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * A jAPI client.
@@ -27,27 +26,8 @@ public class Client {
     interface Adapter extends BiFunction<Message, Serializer, Future<Message>> {
     }
 
-    /**
-     * A Middleware layer that allows for customized Request/Response processing on
-     * all requests.
-     * 
-     * Example:
-     * 
-     * <pre>
-     * var middleware = (message, next) -> {
-     *     // Custom logic here
-     *     next.apply(message);
-     * };
-     * </pre>
-     */
-    interface Middleware extends BiFunction<Message, Function<Message, Message>, Message> {
-    }
-
     public static class Options {
-        public Middleware middleware = (m, n) -> n.apply(m);
         public boolean useBinaryDefault = false;
-        public boolean forceSendJsonDefault = true;
-        public boolean throwOnError = false;
         public long timeoutMsDefault = 5000;
         public SerializationImpl serializationImpl = new _DefaultSerializer();
         public BinaryChecksumStrategy binaryChecksumStrategy = new _DefaultBinaryChecksumStrategy();
@@ -55,7 +35,6 @@ public class Client {
 
     private Adapter adapter;
     private Serializer serializer;
-    private Middleware middleware;
     private boolean useBinaryDefault;
     private long timeoutMsDefault;
 
@@ -67,7 +46,6 @@ public class Client {
     public Client(Adapter adapter, Options options) {
         this.adapter = adapter;
 
-        this.middleware = options.middleware;
         this.useBinaryDefault = options.useBinaryDefault;
         this.timeoutMsDefault = options.timeoutMsDefault;
 
@@ -82,11 +60,7 @@ public class Client {
      * @return
      */
     public Message send(Message requestMessage) {
-        return this.middleware.apply(requestMessage, this::processMessage);
-    }
-
-    private Message processMessage(Message message) {
-        return _ClientUtil.processRequestObject(message, this.adapter, this.serializer,
+        return _ClientUtil.processRequestObject(requestMessage, this.adapter, this.serializer,
                 this.timeoutMsDefault, this.useBinaryDefault);
     }
 

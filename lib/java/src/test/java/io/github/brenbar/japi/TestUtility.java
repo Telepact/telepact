@@ -97,7 +97,6 @@ public class TestUtility {
                 });
             };
             var options = new Client.Options();
-            options.forceSendJsonDefault = false;
             options.useBinaryDefault = true;
             options.timeoutMsDefault = 600000;
             var client = new Client(adapter, options);
