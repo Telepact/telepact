@@ -107,7 +107,23 @@ public class _ParseSchemaTypeUtil {
             return existingType;
         }
 
-        var regexString = "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$";
+        String genericRegex;
+        if (thisTypeParameterCount > 0) {
+            genericRegex = "|(T.([%s]))"
+                    .formatted(thisTypeParameterCount > 1 ? "0-%d".formatted(thisTypeParameterCount - 1) : "0");
+        } else {
+            genericRegex = "";
+        }
+
+        String traitAndInfoRegex;
+        if (allowTraitsAndInfo) {
+            traitAndInfoRegex = "trait|info|";
+        } else {
+            traitAndInfoRegex = "";
+        }
+
+        var regexString = "^(boolean|integer|number|string|any|array|object)|((%sfn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
+                .formatted(traitAndInfoRegex, genericRegex);
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
@@ -124,25 +140,29 @@ public class _ParseSchemaTypeUtil {
                 case "string" -> new UString();
                 case "array" -> new UArray();
                 case "object" -> new UObject();
-                case "any" -> new UAny();
-                default -> {
-                    var genericParameterIndexString = matcher.group(2);
-                    if (genericParameterIndexString != null) {
-                        var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
-                        if (genericParameterIndex >= thisTypeParameterCount) {
-                            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                                    "MaximumTypeParametersExceeded", Map.of())));
-                        }
-                        yield new UGeneric(genericParameterIndex);
-                    } else {
-                        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                                "InvalidGenericType", Map.of("type", standardTypeName))));
-                    }
-                }
+                default -> new UAny();
             };
         }
 
-        var customTypeName = matcher.group(3);
+        if (thisTypeParameterCount > 0) {
+            var genericType = matcher.group(8);
+            if (genericType != null) {
+                var genericParameterIndexString = matcher.group(9);
+                if (genericParameterIndexString != null) {
+                    var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
+                    if (genericParameterIndex >= thisTypeParameterCount) {
+                        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                                "MaximumTypeParametersExceeded", Map.of())));
+                    }
+                    return new UGeneric(genericParameterIndex);
+                } else {
+                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                            "InvalidGenericType", Map.of("type", standardTypeName))));
+                }
+            }
+        }
+
+        var customTypeName = matcher.group(2);
         if (customTypeName != null) {
             var index = schemaKeysToIndex.get(customTypeName);
             if (index == null) {
@@ -151,7 +171,7 @@ public class _ParseSchemaTypeUtil {
             }
             var definition = (Map<String, Object>) originalJApiSchema.get(index);
 
-            var typeParameterCountString = matcher.group(7);
+            var typeParameterCountString = matcher.group(6);
             int typeParameterCount = 0;
             if (typeParameterCountString != null) {
                 typeParameterCount = Integer.parseInt(typeParameterCountString);

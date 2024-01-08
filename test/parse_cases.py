@@ -344,6 +344,29 @@ cases = {
                     'fn.validateSchema': {
                         'schema': [
                             {
+                                'struct<1>.Param': {
+                                    'field': ['T.0']
+                                },
+                            },
+                            {
+                                'struct.Example': {
+                                    'field': ['struct<1>.Param', [False]]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [1, 'struct.Example', 'field', 1, 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
                                 'struct.Example': {
                                     'field': ['struct.Broken']
                                 },
@@ -381,7 +404,42 @@ cases = {
                 }
             ],
             [{}, {'errorValidationFailure': {
-                'cases': [{'path': [0, 'struct.Broken', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$'}}}]}}]
-        ],        
+                'cases': [{'path': [0, 'struct.Broken', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$'}}}]}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct.Fine': {
+                                    'field': ['number']
+                                },
+                            },
+                        ]
+                    }
+                }
+            ],
+            [{}, {'Ok': {}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct<1>.Broken': {
+                                    'field': ['T.1']
+                                },
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'struct<1>.Broken', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)|(T.([0])))$'}}}]}}]
+        ],
     ]
 }
