@@ -52,12 +52,14 @@ public class _ParseSchemaFnTypeUtil {
 
         var resPath = _ValidateUtil.append(path, "->");
 
+        Object resDefInit = functionDefinitionAsParsedJson.get("->");
+
         Map<String, Object> resultDefinitionAsParsedJson;
         try {
-            resultDefinitionAsParsedJson = (Map<String, Object>) functionDefinitionAsParsedJson.get("->");
+            resultDefinitionAsParsedJson = (Map<String, Object>) resDefInit;
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(resPath,
-                    "ObjectTypeRequired", Map.of())));
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(resPath, resDefInit, "Object"));
         }
 
         if (!isForTrait) {
