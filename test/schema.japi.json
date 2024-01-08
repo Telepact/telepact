@@ -33,6 +33,9 @@
       "ArrayLengthUnexpected": {
         "actual": ["integer"],
         "expected": ["integer"]
+      },
+      "TypeUnknown": {
+        "name": ["string"]
       }
     }
   },

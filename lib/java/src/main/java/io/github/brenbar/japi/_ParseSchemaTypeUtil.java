@@ -145,21 +145,9 @@ public class _ParseSchemaTypeUtil {
         }
 
         if (thisTypeParameterCount > 0) {
-            var genericType = matcher.group(8);
-            if (genericType != null) {
-                var genericParameterIndexString = matcher.group(9);
-                if (genericParameterIndexString != null) {
-                    var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
-                    if (genericParameterIndex >= thisTypeParameterCount) {
-                        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                                "MaximumTypeParametersExceeded", Map.of())));
-                    }
-                    return new UGeneric(genericParameterIndex);
-                } else {
-                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                            "InvalidGenericType", Map.of("type", standardTypeName))));
-                }
-            }
+            var genericParameterIndexString = matcher.group(9);
+            var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
+            return new UGeneric(genericParameterIndex);
         }
 
         var customTypeName = matcher.group(2);
@@ -167,7 +155,7 @@ public class _ParseSchemaTypeUtil {
             var index = schemaKeysToIndex.get(customTypeName);
             if (index == null) {
                 throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                        "UndefinedType", Map.of("type", customTypeName))));
+                        "TypeUnknown", Map.of("name", customTypeName))));
             }
             var definition = (Map<String, Object>) originalJApiSchema.get(index);
 
