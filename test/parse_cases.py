@@ -552,5 +552,24 @@ cases = {
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, '->'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'fn.broken': {
+                                },
+                                "->": {
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, '->', 'Ok'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]
+        ],        
     ]
 }

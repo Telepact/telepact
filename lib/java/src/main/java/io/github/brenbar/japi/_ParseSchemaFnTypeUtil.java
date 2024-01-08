@@ -65,7 +65,7 @@ public class _ParseSchemaFnTypeUtil {
         if (!isForTrait) {
             if (!resultDefinitionAsParsedJson.containsKey("Ok")) {
                 throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(resPath, "Ok"),
-                        "RequiredKeyMissing", Map.of())));
+                        "RequiredObjectKeyMissing", Map.of())));
             }
         }
 
