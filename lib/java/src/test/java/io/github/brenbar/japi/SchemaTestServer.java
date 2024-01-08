@@ -48,12 +48,16 @@ public class SchemaTestServer {
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             } catch (JApiSchemaParseError e) {
                 e.printStackTrace();
+                System.err.flush();
                 return new Message(Map.of(),
-                        Map.of("errorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
+                        Map.of("ErrorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
             }
         };
 
-        var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
+        var server = new Server(jApi, handler, new Options().setOnError((e) -> {
+            e.printStackTrace();
+            System.err.flush();
+        }));
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();

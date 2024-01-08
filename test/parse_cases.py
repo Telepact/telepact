@@ -16,7 +16,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [1], 'reason': {'DuplicateSchemaKey': {'schemaKey': 'struct.Example'}}}]}}]
         ],
         [
@@ -33,7 +33,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0], 'reason': {'DefinitionMustHaveOneKeyMatchingRegex': {'regex': '^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*'}}}]}}]
         ],
         [
@@ -45,7 +45,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -57,7 +57,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -69,7 +69,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -81,7 +81,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -111,7 +111,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [1, 'trait.Collide', 'fn.*', 'arg1'], 'reason': {'TraitArgumentFieldAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
         ],
         [
@@ -124,14 +124,14 @@ cases = {
                                 'fn.example': {},
                                 '->': {
                                     'Ok': {},
-                                    "err": {}
+                                    "Err": {}
                                 }
                             },
                             {
                                 'trait.Collide': {
                                     'fn.*': {},
                                     '->': {
-                                        'err': {}
+                                        'Err': {}
                                     }
                                 }
                             }
@@ -140,8 +140,8 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
-                'cases': [{'path': [1, 'trait.Collide', '->', 'err'], 'reason': {'TraitResultValueAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
+            [{}, {'ErrorValidationFailure': {
+                'cases': [{'path': [1, 'trait.Collide', '->', 'Err'], 'reason': {'TraitResultValueAlreadyInUseByFunction': {"fn": "fn.example"}}}]}}]
         ],
         [
             [
@@ -156,7 +156,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'trait.Example'], 'reason': {'ObjectTypeRequired': {}}}]}}]
         ],
         [
@@ -175,7 +175,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'trait.Example'], 'reason': {'InvalidTrait': {}}}]}}]
         ],
         [
@@ -195,7 +195,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'trait.Example', 'fn._?*'], 'reason': {'TraitDefinitionCannotTargetInternalFunctions': {}}}]}}]
         ],
         [
@@ -213,7 +213,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Example', 'field'], 'reason': {'ArrayMustNotBeEmpty': {}}}]}}]
         ],
         [
@@ -231,7 +231,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Example', 'field', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
         ],
         [
@@ -249,7 +249,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Example', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(.+?)(\\?)?$'}}}]}}]
         ],
         [
@@ -267,7 +267,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct<1>.Example', 'field', 0], 'reason': {'NullableGenericDisallowed': {}}}]}}]
         ],
         [
@@ -288,7 +288,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0], 'reason': {'DefinitionMustHaveOneKeyMatchingRegex': {'regex': '^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*'}}}]}}]
         ],        
         [
@@ -311,7 +311,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [1, 'struct.Example', 'field'], 'reason': {'ArrayLengthUnexpected': {'actual': 1, 'expected': 2}}}]}}]
         ],
         [
@@ -334,7 +334,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [1, 'struct.Example', 'field', 1], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -357,7 +357,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [1, 'struct.Example', 'field', 1, 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
         ],
         [
@@ -385,7 +385,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [2, 'struct.Broken', 'field', 0], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'String': {}}}}}]}}]
         ],
         [
@@ -403,7 +403,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Broken', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$'}}}]}}]
         ],
         [
@@ -438,7 +438,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct<1>.Broken', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)|(T.([0])))$'}}}]}}]
         ],
         [
@@ -456,7 +456,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct<2>.Broken', 'field', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)|(T.([0-1])))$'}}}]}}]
         ],
         [
@@ -474,7 +474,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'struct.Broken', 'field', 0], 'reason': {'TypeUnknown': {'name': 'struct.Unknown'}}}]}}]
         ],
         [
@@ -491,7 +491,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0], 'reason': {'TypeExtensionImplementationMissing': {'name': 'ext.Broken'}}}]}}]
         ],
         [
@@ -510,7 +510,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'fn.broken'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],        
         [
@@ -531,7 +531,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'fn.broken', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -549,7 +549,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, '->'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],
         [
@@ -568,7 +568,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, '->', 'Ok'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]
         ],
         [
@@ -589,7 +589,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, '->', 'Wrong'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],
         [
@@ -611,7 +611,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, '->', 'Ok', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
         [
@@ -629,7 +629,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'union.Broken', 'Case'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
         ],
         [
@@ -647,7 +647,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'union.Broken', 'Case!'], 'reason': {'StringRegexMatchFailed': {'regex': '^(_?[A-Z][a-zA-Z0-9_]*)$'}}}]}}]
         ],
        [
@@ -667,7 +667,7 @@ cases = {
                     }
                 }
             ],
-            [{}, {'errorValidationFailure': {
+            [{}, {'ErrorValidationFailure': {
                 'cases': [{'path': [0, 'union.Broken', 'Case', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
         ],
     ]

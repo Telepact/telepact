@@ -76,7 +76,10 @@ public class TestServer {
             }
         };
 
-        var server = new Server(jApi, handler, new Options().setOnError((e) -> e.printStackTrace()));
+        var server = new Server(jApi, handler, new Options().setOnError((e) -> {
+            e.printStackTrace();
+            System.err.flush();
+        }));
         var alternateServer = new Server(alternateJApi, handler,
                 new Options().setOnError((e) -> e.printStackTrace()));
 

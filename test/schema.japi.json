@@ -54,7 +54,7 @@
     },
     "->": {
       "Ok": {},
-      "errorValidationFailure": {
+      "ErrorValidationFailure": {
         "cases": ["array", ["struct.ValidationFailure"]]
       }
     }

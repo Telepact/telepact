@@ -164,8 +164,9 @@ class _ParseSchemaTypeUtil {
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
+                boolean okValueRequired = false;
                 type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
-                        typeParameterCount,
+                        okValueRequired, typeParameterCount,
                         originalJApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);

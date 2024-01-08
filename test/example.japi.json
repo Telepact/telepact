@@ -264,7 +264,7 @@
       "Ok": {
         "value!": ["struct.Value"]
       },
-      "errorExample": {
+      "ErrorExample": {
         "property": ["string"]
       }
     }

@@ -55,7 +55,7 @@
       "Ok": {
         "result": ["number"]
       },
-      "errorCannotDivideByZero": {}
+      "ErrorCannotDivideByZero": {}
     }
   },
 
@@ -98,7 +98,7 @@
         "token": ["string"]
       },
       "->": {
-        "errorInvalidToken": {}
+        "ErrorInvalidToken": {}
       }
     }
   }

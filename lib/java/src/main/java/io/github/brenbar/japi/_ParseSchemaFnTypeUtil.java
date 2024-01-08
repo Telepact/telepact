@@ -21,96 +21,25 @@ class _ParseSchemaFnTypeUtil {
             boolean isForTrait, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
-        var fnPath = _ValidateUtil.append(path, schemaKey);
-
-        var def = functionDefinitionAsParsedJson.get(schemaKey);
-
-        Map<String, Object> argumentDefinitionAsParsedJson;
-        try {
-            argumentDefinitionAsParsedJson = (Map<String, Object>) def;
-        } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(fnPath, def, "Object"));
-        }
-        var argumentFields = new HashMap<String, UFieldDeclaration>();
-        var isForUnion = false;
         var typeParameterCount = 0;
-        for (var entry : argumentDefinitionAsParsedJson.entrySet()) {
-            var fieldDeclaration = entry.getKey();
-            var typeDeclarationValue = entry.getValue();
-            try {
-                var parsedField = _ParseSchemaCustomTypeUtil.parseField(fnPath, fieldDeclaration,
-                        typeDeclarationValue, isForUnion, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
-                        parsedTypes,
-                        typeExtensions, allParseFailures, failedTypes);
-                String fieldName = parsedField.fieldName;
-                argumentFields.put(fieldName, parsedField);
-            } catch (JApiSchemaParseError e) {
-                parseFailures.addAll(e.schemaParseFailures);
-            }
-        }
-
-        var argType = new UStruct(schemaKey, argumentFields, typeParameterCount);
+        var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson, schemaKey, 0,
+                originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
         var callType = new UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
 
         var resPath = _ValidateUtil.append(path, "->");
 
-        Object resDefInit = functionDefinitionAsParsedJson.get("->");
-
-        Map<String, Object> resultDefinitionAsParsedJson;
-        try {
-            resultDefinitionAsParsedJson = (Map<String, Object>) resDefInit;
-        } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(resPath, resDefInit, "Object"));
+        if (!functionDefinitionAsParsedJson.containsKey("->")) {
+            parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
+            throw new JApiSchemaParseError(parseFailures);
         }
 
-        if (!isForTrait) {
-            if (!resultDefinitionAsParsedJson.containsKey("Ok")) {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(resPath, "Ok"),
-                        "RequiredObjectKeyMissing", Map.of())));
-            }
-        }
-
-        var values = new HashMap<String, UStruct>();
-        for (var entry : resultDefinitionAsParsedJson.entrySet()) {
-            var unionValue = entry.getKey();
-            var loopPath = _ValidateUtil.append(resPath, unionValue);
-
-            Map<String, Object> unionValueData;
-            try {
-                unionValueData = (Map<String, Object>) entry.getValue();
-            } catch (ClassCastException e) {
-                parseFailures.addAll(
-                        _ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, entry.getValue(), "Object"));
-                continue;
-            }
-
-            var fields = new HashMap<String, UFieldDeclaration>();
-            for (var structEntry : unionValueData.entrySet()) {
-                var fieldDeclaration = structEntry.getKey();
-                var typeDeclarationValue = structEntry.getValue();
-                try {
-                    var parsedField = _ParseSchemaCustomTypeUtil.parseField(loopPath, fieldDeclaration,
-                            typeDeclarationValue, isForUnion, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
-                            parsedTypes,
-                            typeExtensions, allParseFailures, failedTypes);
-                    String fieldName = parsedField.fieldName;
-                    fields.put(fieldName, parsedField);
-                } catch (JApiSchemaParseError e) {
-                    parseFailures.addAll(e.schemaParseFailures);
-                }
-            }
-
-            var unionStruct = new UStruct("->.%s".formatted(unionValue), fields, typeParameterCount);
-
-            values.put(unionValue, unionStruct);
-        }
+        var resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson, "->",
+                !isForTrait, 0, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
+                allParseFailures, failedTypes);
 
         if (!parseFailures.isEmpty()) {
             throw new JApiSchemaParseError(parseFailures);
         }
-
-        var resultType = new UUnion("%s.->".formatted(schemaKey), values, typeParameterCount);
 
         var type = new UFn(schemaKey, callType, resultType);
 
