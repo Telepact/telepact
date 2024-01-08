@@ -270,5 +270,49 @@ cases = {
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, 'struct<1>.Example', 'wrong', 0], 'reason': {'NullableGenericDisallowed': {}}}]}}]
         ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct<1>.Param': {
+                                    'field': ['T.0']
+                                },
+                                'struct.Example': {
+                                    'wrong': ['struct<1>.Param']
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0], 'reason': {'DefinitionMustHaveOneKeyMatchingRegex': {'regex': '^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*'}}}]}}]
+        ],        
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'struct<1>.Param': {
+                                    'field': ['T.0']
+                                },
+                            },
+                            {
+                                'struct.Example': {
+                                    'wrong': ['struct<1>.Param']
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [1, 'struct.Example', 'wrong'], 'reason': {'ArrayLengthUnexpected': {'actual': 1, 'expected': 2}}}]}}]
+        ],        
     ]
 }

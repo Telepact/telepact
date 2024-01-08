@@ -184,14 +184,19 @@ class _ParseSchemaUtil {
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {
         var regex = "^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*";
+        var matches = new ArrayList<String>();
         for (var e : definition.keySet()) {
             if (e.matches(regex)) {
-                return e;
+                matches.add(e);
             }
         }
-        Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex));
-        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                "DefinitionMustHaveOneKeyMatchingRegex", sortedMap)));
+        if (matches.size() == 1) {
+            return matches.get(0);
+        } else {
+            Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                    "DefinitionMustHaveOneKeyMatchingRegex", sortedMap)));
+        }
     }
 
     static List<SchemaParseFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,

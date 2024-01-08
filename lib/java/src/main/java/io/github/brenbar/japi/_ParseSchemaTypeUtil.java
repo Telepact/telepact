@@ -41,9 +41,6 @@ public class _ParseSchemaTypeUtil {
 
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
-        if (nullable) {
-            System.out.println("IS NULLABLE");
-        }
 
         boolean allowTraitsAndInfo = false;
         UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, allowTraitsAndInfo, originalJApiSchema,
@@ -56,9 +53,11 @@ public class _ParseSchemaTypeUtil {
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
+        System.out.println("type parameter count %s %d".formatted(typeName, type.getTypeParameterCount()));
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "IncorrectNumberOfTypeParameters", Map.of())));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                    "ArrayLengthUnexpected",
+                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
         }
 
         var parseFailures = new ArrayList<SchemaParseFailure>();

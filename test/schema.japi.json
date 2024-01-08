@@ -29,7 +29,11 @@
       "StringRegexMatchFailed": {
         "regex": ["string"]
       },
-      "NullableGenericDisallowed": {}
+      "NullableGenericDisallowed": {},
+      "ArrayLengthUnexpected": {
+        "actual": ["integer"],
+        "expected": ["integer"]
+      }
     }
   },
   {
