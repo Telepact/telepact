@@ -96,9 +96,11 @@ public class TestUtility {
                     return response;
                 });
             };
-            var client = new Client(adapter,
-                    new Client.Options().setForceSendJsonDefault(false).setUseBinaryDefault(true)
-                            .setTimeoutMsDefault(600000));
+            var options = new Client.Options();
+            options.forceSendJsonDefault = false;
+            options.useBinaryDefault = true;
+            options.timeoutMsDefault = 600000;
+            var client = new Client(adapter, options);
             client.send(new Message("fn._ping", Map.of())); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });

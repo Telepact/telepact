@@ -44,86 +44,13 @@ public class Client {
     }
 
     public static class Options {
-        Middleware middleware = (m, n) -> n.apply(m);
-        boolean useBinaryDefault = false;
-        boolean forceSendJsonDefault = true;
-        boolean throwOnError = false;
-        long timeoutMsDefault = 5000;
-        SerializationImpl serializationImpl = new _DefaultSerializer();
-        BinaryChecksumStrategy binaryChecksumStrategy = new _DefaultBinaryChecksumStrategy();
-
-        /**
-         * Set a new middleware for this client.
-         * 
-         * @param middleware
-         * @return
-         */
-        public Options setMiddleware(Middleware middleware) {
-            this.middleware = middleware;
-            return this;
-        }
-
-        /**
-         * Set if this client should use binary serialization for communication.
-         * 
-         * @param useBinary
-         * @return
-         */
-        public Options setUseBinaryDefault(boolean useBinary) {
-            this.useBinaryDefault = useBinary;
-            return this;
-        }
-
-        /**
-         * Set if this client should always send requests as JSON, even if receiving
-         * responses as binary.
-         * 
-         * @param forceSendJson
-         * @return
-         */
-        public Options setForceSendJsonDefault(boolean forceSendJson) {
-            this.forceSendJsonDefault = forceSendJson;
-            return this;
-        }
-
-        public Options setThrowOnError(boolean throwOnError) {
-            this.throwOnError = throwOnError;
-            return this;
-        }
-
-        /**
-         * Set the default timeout for all requests.
-         * 
-         * @param timeoutMs
-         * @return
-         */
-        public Options setTimeoutMsDefault(long timeoutMs) {
-            this.timeoutMsDefault = timeoutMs;
-            return this;
-        }
-
-        /**
-         * Set an alternative serialization implementation.
-         * 
-         * @param serializer
-         * @return
-         */
-        public Options setSerializationImpl(SerializationImpl serializationImpl) {
-            this.serializationImpl = serializationImpl;
-            return this;
-        }
-
-        /**
-         * Set the function that determines the binary checksum strategy for upcoming
-         * outgoing requests.
-         * 
-         * @param binaryChecksumStrategy
-         * @return
-         */
-        public Options setBinaryChecksumStrategy(BinaryChecksumStrategy binaryChecksumStrategy) {
-            this.binaryChecksumStrategy = binaryChecksumStrategy;
-            return this;
-        }
+        public Middleware middleware = (m, n) -> n.apply(m);
+        public boolean useBinaryDefault = false;
+        public boolean forceSendJsonDefault = true;
+        public boolean throwOnError = false;
+        public long timeoutMsDefault = 5000;
+        public SerializationImpl serializationImpl = new _DefaultSerializer();
+        public BinaryChecksumStrategy binaryChecksumStrategy = new _DefaultBinaryChecksumStrategy();
     }
 
     private Adapter adapter;

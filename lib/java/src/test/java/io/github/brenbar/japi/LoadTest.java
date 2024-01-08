@@ -73,9 +73,12 @@ public class LoadTest {
                 });
             };
 
-            var client = new Client(adapter,
-                    new Client.Options().setForceSendJsonDefault(false).setUseBinaryDefault(true)
-                            .setTimeoutMsDefault(600000));
+            var options = new Client.Options();
+            options.forceSendJsonDefault = false;
+            options.useBinaryDefault = false;
+            options.timeoutMsDefault = 600000;
+
+            var client = new Client(adapter, options);
 
             // warmup
             var requestMessage = new Message("fn.getPaperTape", Map.of());
