@@ -151,62 +151,57 @@ public class _ParseSchemaTypeUtil {
         }
 
         var customTypeName = matcher.group(2);
-        if (customTypeName != null) {
-            var index = schemaKeysToIndex.get(customTypeName);
-            if (index == null) {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                        "TypeUnknown", Map.of("name", customTypeName))));
-            }
-            var definition = (Map<String, Object>) originalJApiSchema.get(index);
+        var index = schemaKeysToIndex.get(customTypeName);
+        if (index == null) {
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+                    "TypeUnknown", Map.of("name", customTypeName))));
+        }
+        var definition = (Map<String, Object>) originalJApiSchema.get(index);
 
-            var typeParameterCountString = matcher.group(6);
-            int typeParameterCount = 0;
-            if (typeParameterCountString != null) {
-                typeParameterCount = Integer.parseInt(typeParameterCountString);
-            }
-
-            try {
-                UType type;
-                if (customTypeName.startsWith("struct")) {
-                    type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
-                            typeParameterCount,
-                            originalJApiSchema,
-                            schemaKeysToIndex, parsedTypes,
-                            typeExtensions, allParseFailures, failedTypes);
-                } else if (customTypeName.startsWith("union")) {
-                    type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
-                            typeParameterCount,
-                            originalJApiSchema,
-                            schemaKeysToIndex, parsedTypes,
-                            typeExtensions, allParseFailures, failedTypes);
-                } else if (customTypeName.startsWith("fn")) {
-                    type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
-                            originalJApiSchema,
-                            schemaKeysToIndex, parsedTypes,
-                            typeExtensions, false, allParseFailures, failedTypes);
-                } else if (customTypeName.startsWith("ext")) {
-                    var typeExtension = typeExtensions.get(customTypeName);
-                    if (typeExtension == null) {
-                        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                                "TypeExtensionImplementationMissing", Map.of("type", customTypeName))));
-                    }
-                    type = new UExt(customTypeName, typeExtension, typeParameterCount);
-                } else {
-                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                            "InvalidType", Map.of("type", customTypeName))));
-                }
-
-                parsedTypes.put(customTypeName, type);
-
-                return type;
-            } catch (JApiSchemaParseError e) {
-                allParseFailures.addAll(e.schemaParseFailures);
-                failedTypes.add(customTypeName);
-                throw new JApiSchemaParseError(List.of());
-            }
+        var typeParameterCountString = matcher.group(6);
+        int typeParameterCount = 0;
+        if (typeParameterCountString != null) {
+            typeParameterCount = Integer.parseInt(typeParameterCountString);
         }
 
-        throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                "InvalidType", Map.of("type", typeName))));
+        try {
+            UType type;
+            if (customTypeName.startsWith("struct")) {
+                type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
+                        typeParameterCount,
+                        originalJApiSchema,
+                        schemaKeysToIndex, parsedTypes,
+                        typeExtensions, allParseFailures, failedTypes);
+            } else if (customTypeName.startsWith("union")) {
+                type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
+                        typeParameterCount,
+                        originalJApiSchema,
+                        schemaKeysToIndex, parsedTypes,
+                        typeExtensions, allParseFailures, failedTypes);
+            } else if (customTypeName.startsWith("fn")) {
+                type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
+                        originalJApiSchema,
+                        schemaKeysToIndex, parsedTypes,
+                        typeExtensions, false, allParseFailures, failedTypes);
+            } else if (customTypeName.startsWith("ext")) {
+                var typeExtension = typeExtensions.get(customTypeName);
+                if (typeExtension == null) {
+                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                            "TypeExtensionImplementationMissing", Map.of("type", customTypeName))));
+                }
+                type = new UExt(customTypeName, typeExtension, typeParameterCount);
+            } else {
+                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                        "InvalidType", Map.of("type", customTypeName))));
+            }
+
+            parsedTypes.put(customTypeName, type);
+
+            return type;
+        } catch (JApiSchemaParseError e) {
+            allParseFailures.addAll(e.schemaParseFailures);
+            failedTypes.add(customTypeName);
+            throw new JApiSchemaParseError(List.of());
+        }
     }
 }
