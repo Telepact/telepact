@@ -38,16 +38,21 @@ def handler(request):
     target = next(iter(body))
     payload = body[target]
 
+    response_header = {}
+
+    if '_onResponseError' in header:
+        response_header['_onResponseError'] = header['_onResponseError']
+
     match target:
         case 'fn.test':
             if 'Ok' in header:
-                return [{}, {'Ok': header['Ok']}]
+                return [response_header, {'Ok': header['Ok']}]
             elif 'result' in header:
-                return [{}, header['result']]
+                return [response_header, header['result']]
             elif 'throw' in header:
                 return None
             else:
-                return [{}, {}]
+                return [response_header, {}]
 
 
 async def backdoor_handler(backdoor_topic):

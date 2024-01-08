@@ -79,6 +79,14 @@ public class TestServer {
         var server = new Server(jApi, handler, new Options().setOnError((e) -> {
             e.printStackTrace();
             System.err.flush();
+        }).setOnRequest(m -> {
+            if ((Boolean) m.header.getOrDefault("_onRequestError", false)) {
+                throw new RuntimeException();
+            }
+        }).setOnResponse(m -> {
+            if ((Boolean) m.header.getOrDefault("_onResponseError", false)) {
+                throw new RuntimeException();
+            }
         }));
         var alternateServer = new Server(alternateJApi, handler,
                 new Options().setOnError((e) -> e.printStackTrace()));
