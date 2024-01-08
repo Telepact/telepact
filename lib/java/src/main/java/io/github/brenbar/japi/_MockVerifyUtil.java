@@ -6,37 +6,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import io.github.brenbar.japi.MockVerification.AtLeastNumberOfTimes;
-import io.github.brenbar.japi.MockVerification.AtMostNumberOfTimes;
-import io.github.brenbar.japi.MockVerification.ExactNumberOfTimes;
-import io.github.brenbar.japi.MockVerification.VerificationTimes;
-
 class _MockVerifyUtil {
-
-    static VerificationTimes parseFromPseudoJson(Map<String, Object> verifyTimes) {
-        var verifyTimesEntry = UUnion.entry(verifyTimes);
-        var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
-        return switch (verifyTimesEntry.getKey()) {
-            case "unlimited" -> new MockVerification.UnlimitedNumberOfTimes();
-            case "Exact" -> {
-                var times = (Integer) verifyTimesStruct.get("times");
-                yield new MockVerification.ExactNumberOfTimes(times);
-            }
-            case "AtMost" -> {
-                var times = (Integer) verifyTimesStruct.get("times");
-                yield new MockVerification.AtMostNumberOfTimes(times);
-            }
-            case "AtLeast" -> {
-                var times = (Integer) verifyTimesStruct.get("times");
-                yield new MockVerification.AtLeastNumberOfTimes(times);
-            }
-            default -> throw new JApiProcessError("Unknown verification times");
-        };
-    }
 
     static Map<String, Object> verify(String functionName, Map<String, Object> argument,
             boolean exactMatch,
-            VerificationTimes verificationTimes, List<Invocation> invocations) {
+            Map<String, Object> verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
         for (var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
@@ -58,40 +32,45 @@ class _MockVerifyUtil {
         for (var invocation : invocations) {
             allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
         }
+
+        var verifyTimesEntry = UUnion.entry(verificationTimes);
+        var verifyKey = verifyTimesEntry.getKey();
+        var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
         Map<String, Object> verificationFailurePseudoJson = null;
-        if (verificationTimes instanceof ExactNumberOfTimes e) {
-            if (matchesFound > e.times) {
+        if (verifyKey.equals("Exact")) {
+            var times = (Integer) verifyTimesStruct.get("times");
+            if (matchesFound > times) {
                 verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("Exact", Map.of("times", e.times))),
+                                Map.entry("wanted", Map.of("Exact", Map.of("times", times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
-            } else if (matchesFound < e.times) {
+            } else if (matchesFound < times) {
                 verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("Exact", Map.of("times", e.times))),
+                                Map.entry("wanted", Map.of("Exact", Map.of("times", times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
             }
-        } else if (verificationTimes instanceof AtMostNumberOfTimes a) {
-            if (matchesFound > a.times) {
+        } else if (verifyKey.equals("AtMost")) {
+            var times = (Integer) verifyTimesStruct.get("times");
+            if (matchesFound > times) {
                 verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("AtMost", Map.of("times", a.times))),
+                                Map.entry("wanted", Map.of("AtMost", Map.of("times", times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
             }
-        } else if (verificationTimes instanceof AtLeastNumberOfTimes a) {
-            if (matchesFound < a.times) {
+        } else if (verifyKey.equals("AtLeast")) {
+            var times = (Integer) verifyTimesStruct.get("times");
+            if (matchesFound < times) {
                 verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
-                                Map.entry("wanted", Map.of("AtLeast", Map.of("times", a.times))),
+                                Map.entry("wanted", Map.of("AtLeast", Map.of("times", times))),
                                 Map.entry("found", matchesFound),
                                 Map.entry("allCalls", allCallsPseudoJson))));
 
             }
-        } else {
-            throw new JApiProcessError("Unexpected verification times");
         }
 
         if (verificationFailurePseudoJson == null) {

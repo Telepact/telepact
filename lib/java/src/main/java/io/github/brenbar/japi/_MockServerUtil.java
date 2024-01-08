@@ -1,16 +1,10 @@
 package io.github.brenbar.japi;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-
-import io.github.brenbar.japi.MockVerification.AtLeastNumberOfTimes;
-import io.github.brenbar.japi.MockVerification.AtMostNumberOfTimes;
-import io.github.brenbar.japi.MockVerification.ExactNumberOfTimes;
-import io.github.brenbar.japi.MockVerification.VerificationTimes;
 
 class _MockServerUtil {
 
@@ -52,10 +46,8 @@ class _MockServerUtil {
                         Map.of("AtLeast", Map.of("times", 1)));
                 var strictMatch = (Boolean) argument.getOrDefault("strictMatch", false);
 
-                var verificationTimes = _MockVerifyUtil.parseFromPseudoJson(verifyTimes);
-
                 var verificationResult = _MockVerifyUtil.verify(callFunctionName, callArg, strictMatch,
-                        verificationTimes,
+                        verifyTimes,
                         invocations);
                 return new Message(verificationResult);
             }
