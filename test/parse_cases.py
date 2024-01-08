@@ -494,6 +494,25 @@ cases = {
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0], 'reason': {'TypeExtensionImplementationMissing': {'name': 'ext.Broken'}}}]}}]
         ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'fn.broken': False,
+                                "->": {
+                                    "Ok": {}
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'fn.broken'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        ],        
         
     ]
 }

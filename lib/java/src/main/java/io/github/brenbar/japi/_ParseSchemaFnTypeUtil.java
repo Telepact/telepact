@@ -21,12 +21,13 @@ public class _ParseSchemaFnTypeUtil {
 
         var fnPath = _ValidateUtil.append(path, schemaKey);
 
+        var def = functionDefinitionAsParsedJson.get(schemaKey);
+
         Map<String, Object> argumentDefinitionAsParsedJson;
         try {
-            argumentDefinitionAsParsedJson = (Map<String, Object>) functionDefinitionAsParsedJson.get(schemaKey);
+            argumentDefinitionAsParsedJson = (Map<String, Object>) def;
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(fnPath,
-                    "ObjectTypeRequired", Map.of())));
+            throw new JApiSchemaParseError(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(fnPath, def, "Object"));
         }
         var argumentFields = new HashMap<String, UFieldDeclaration>();
         var isForUnion = false;
