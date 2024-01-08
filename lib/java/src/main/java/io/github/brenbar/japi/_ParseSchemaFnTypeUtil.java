@@ -78,8 +78,8 @@ public class _ParseSchemaFnTypeUtil {
             try {
                 unionValueData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
-                parseFailures.add(new SchemaParseFailure(loopPath,
-                        "ObjectTypeRequired", Map.of()));
+                parseFailures.addAll(
+                        _ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, entry.getValue(), "Object"));
                 continue;
             }
 

@@ -570,6 +570,27 @@ cases = {
             ],
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, '->', 'Ok'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]
-        ],        
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'fn.broken': {
+                                },
+                                "->": {
+                                    "Ok": {},
+                                    "Wrong": False
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, '->', 'Wrong'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        ],
     ]
 }
