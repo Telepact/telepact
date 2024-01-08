@@ -69,23 +69,25 @@ class _ParseSchemaCustomTypeUtil {
 
         var values = new HashMap<String, UStruct>();
         for (var entry : definition.entrySet()) {
+            var unionValue = entry.getKey();
+
+            var unionKeyPath = _ValidateUtil.append(thisPath, unionValue);
+
+            var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
+            var regex = Pattern.compile(regexString);
+            var matcher = regex.matcher(unionValue);
+            if (!matcher.find()) {
+                parseFailures.add(new SchemaParseFailure(unionKeyPath,
+                        "StringRegexMatchFailed", Map.of("regex", regexString)));
+                continue;
+            }
+
             Map<String, Object> unionStructData;
             try {
                 unionStructData = (Map<String, Object>) entry.getValue();
             } catch (ClassCastException e) {
-                var unionValue = entry.getKey();
-                parseFailures.add(
-                        new SchemaParseFailure(_ValidateUtil.append(thisPath, unionValue),
-                                "ObjectTypeRequired", Map.of()));
-                continue;
-            }
-            var unionValue = entry.getKey();
-
-            var regex = Pattern.compile("^([a-zA-Z_]+[a-zA-Z0-9_]*)$");
-            var matcher = regex.matcher(unionValue);
-            if (!matcher.find()) {
-                parseFailures.add(new SchemaParseFailure(thisPath,
-                        "InvalidUnionValue", Map.of("value", unionValue)));
+                parseFailures.addAll(
+                        _ParseSchemaUtil.getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object"));
                 continue;
             }
 

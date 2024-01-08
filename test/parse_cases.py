@@ -502,7 +502,7 @@ cases = {
                         'schema': [
                             {
                                 'fn.broken': False,
-                                "->": {
+                                '->': {
                                     "Ok": {}
                                 }
                             }
@@ -523,7 +523,7 @@ cases = {
                                 'fn.broken': {
                                     "field": False
                                 },
-                                "->": {
+                                '->': {
                                     "Ok": {}
                                 }
                             }
@@ -543,7 +543,7 @@ cases = {
                             {
                                 'fn.broken': {
                                 },
-                                "->": False
+                                '->': False
                             }
                         ]
                     }
@@ -561,7 +561,7 @@ cases = {
                             {
                                 'fn.broken': {
                                 },
-                                "->": {
+                                '->': {
                                 }
                             }
                         ]
@@ -580,9 +580,9 @@ cases = {
                             {
                                 'fn.broken': {
                                 },
-                                "->": {
-                                    "Ok": {},
-                                    "Wrong": False
+                                '->': {
+                                    'Ok': {},
+                                    'Wrong': False
                                 }
                             }
                         ]
@@ -601,9 +601,9 @@ cases = {
                             {
                                 'fn.broken': {
                                 },
-                                "->": {
-                                    "Ok": {
-                                        "field": False
+                                '->': {
+                                    'Ok': {
+                                        'field': False
                                     },
                                 }
                             }
@@ -613,6 +613,62 @@ cases = {
             ],
             [{}, {'errorValidationFailure': {
                 'cases': [{'path': [0, '->', 'Ok', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
-        ],        
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'union.Broken': {
+                                    'Case': False
+                                },
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'union.Broken', 'Case'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]
+        ],
+        [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'union.Broken': {
+                                    'Case!': {}
+                                },
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'union.Broken', 'Case!'], 'reason': {'StringRegexMatchFailed': {'regex': '^(_?[A-Z][a-zA-Z0-9_]*)$'}}}]}}]
+        ],
+       [
+            [
+                {},
+                {
+                    'fn.validateSchema': {
+                        'schema': [
+                            {
+                                'union.Broken': {
+                                    'Case': {
+                                        'field': False
+                                    }
+                                },
+                            }
+                        ]
+                    }
+                }
+            ],
+            [{}, {'errorValidationFailure': {
+                'cases': [{'path': [0, 'union.Broken', 'Case', 'field'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]
+        ],
     ]
 }
