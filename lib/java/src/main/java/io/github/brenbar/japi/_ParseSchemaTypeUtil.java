@@ -53,7 +53,6 @@ public class _ParseSchemaTypeUtil {
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
-        System.out.println("type parameter count %s %d".formatted(typeName, type.getTypeParameterCount()));
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
@@ -108,12 +107,12 @@ public class _ParseSchemaTypeUtil {
             return existingType;
         }
 
-        var regex = Pattern.compile(
-                "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$");
+        var regexString = "^(boolean|integer|number|string|any|array|object|T.([0-2]))|((trait|info|fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$";
+        var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "InvalidType", Map.of("type", typeName))));
+                    "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         var standardTypeName = matcher.group(1);
