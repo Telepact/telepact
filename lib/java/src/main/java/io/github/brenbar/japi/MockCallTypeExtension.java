@@ -18,7 +18,7 @@ public class MockCallTypeExtension implements TypeExtension {
 
         Map<String, Object> givenMap;
         try {
-            givenMap = (Map<String, Object>) givenObj;
+            givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }

@@ -87,7 +87,7 @@ class _ParseSchemaTraitUtil {
 
         Map<String, Object> def;
         try {
-            def = (Map<String, Object>) traitDefinitionAsParsedJson.get(schemaKey);
+            def = _CastUtil.asMap(traitDefinitionAsParsedJson.get(schemaKey));
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
                     "ObjectTypeRequired", Map.of())));

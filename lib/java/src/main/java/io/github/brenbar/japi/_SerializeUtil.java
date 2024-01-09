@@ -91,7 +91,7 @@ class _SerializeUtil {
 
         List<Object> messageAsPseudoJsonList;
         try {
-            messageAsPseudoJsonList = (List<Object>) messageAsPseudoJson;
+            messageAsPseudoJsonList = _CastUtil.asList(messageAsPseudoJson);
         } catch (ClassCastException e) {
             throw new DeserializationError(new MessageParseError(List.of("MessageMustBeArrayWithTwoElements")));
         }
@@ -116,18 +116,18 @@ class _SerializeUtil {
         Map<String, Object> body = null;
 
         try {
-            headers = (Map<String, Object>) finalMessageAsPseudoJsonList.get(0);
+            headers = _CastUtil.asMap(finalMessageAsPseudoJsonList.get(0));
         } catch (ClassCastException e) {
             parseFailures.add("HeadersMustBeObject");
         }
 
         try {
-            body = (Map<String, Object>) finalMessageAsPseudoJsonList.get(1);
+            body = _CastUtil.asMap(finalMessageAsPseudoJsonList.get(1));
             if (body.size() != 1) {
                 parseFailures.add("BodyMustBeUnionType");
             } else {
                 try {
-                    var givenPayload = (Map<String, Object>) body.values().stream().findAny().get();
+                    var givenPayload = _CastUtil.asMap(body.values().stream().findAny().get());
                 } catch (ClassCastException e) {
                     parseFailures.add("BodyPayloadMustBeObject");
                 }

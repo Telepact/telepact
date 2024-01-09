@@ -25,8 +25,8 @@ class _ParseSchemaTypeUtil {
 
         String rootTypeString;
         try {
-            rootTypeString = (String) baseType;
-        } catch (ClassCastException ex) {
+            rootTypeString = _CastUtil.asString(baseType);
+        } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
         }
@@ -67,8 +67,8 @@ class _ParseSchemaTypeUtil {
             var loopPath = _ValidateUtil.append(path, index);
             List<Object> l;
             try {
-                l = (List<Object>) e;
-            } catch (ClassCastException ex) {
+                l = _CastUtil.asList(e);
+            } catch (ClassCastException e1) {
                 parseFailures.addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, e, "Array"));
                 continue;
             }

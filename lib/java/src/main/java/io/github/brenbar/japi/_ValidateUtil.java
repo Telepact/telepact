@@ -16,14 +16,14 @@ class _ValidateUtil {
         if (headers.containsKey("_bin")) {
             List<Object> binaryChecksums;
             try {
-                binaryChecksums = (List<Object>) headers.get("_bin");
+                binaryChecksums = _CastUtil.asList(headers.get("_bin"));
                 var i = 0;
                 for (var binaryChecksum : binaryChecksums) {
                     try {
-                        var integerElement = (Integer) binaryChecksum;
+                        var integerElement = _CastUtil.asInt(binaryChecksum);
                     } catch (ClassCastException e) {
                         try {
-                            var longElement = (Long) binaryChecksum;
+                            var longElement = _CastUtil.asLong(binaryChecksum);
                         } catch (ClassCastException e2) {
                             validationFailures
                                     .addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_bin", i),
@@ -43,8 +43,7 @@ class _ValidateUtil {
         if (headers.containsKey("_sel")) {
             Map<String, Object> selectStructFieldsHeader = new HashMap<>();
             try {
-                selectStructFieldsHeader = (Map<String, Object>) headers
-                        .get("_sel");
+                selectStructFieldsHeader = _CastUtil.asMap(headers.get("_sel"));
 
             } catch (ClassCastException e) {
                 validationFailures.addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_sel"),
@@ -78,7 +77,7 @@ class _ValidateUtil {
 
                 List<Object> fields = new ArrayList<>();
                 try {
-                    fields = (List<Object>) entry.getValue();
+                    fields = _CastUtil.asList(entry.getValue());
                 } catch (ClassCastException e) {
                     validationFailures
                             .addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_sel", structName),
@@ -90,7 +89,7 @@ class _ValidateUtil {
                     var field = fields.get(i);
                     String stringField;
                     try {
-                        stringField = (String) field;
+                        stringField = _CastUtil.asString(field);
                     } catch (ClassCastException e) {
                         validationFailures.addAll(getTypeUnexpectedValidationFailure(
                                 List.of("headers", "_sel", structName, i),

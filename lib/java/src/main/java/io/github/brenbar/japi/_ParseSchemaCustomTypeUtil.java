@@ -25,7 +25,7 @@ class _ParseSchemaCustomTypeUtil {
 
         Map<String, Object> definition;
         try {
-            definition = (Map<String, Object>) defInit;
+            definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
@@ -75,7 +75,7 @@ class _ParseSchemaCustomTypeUtil {
 
         Map<String, Object> definition;
         try {
-            definition = (Map<String, Object>) defInit;
+            definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
@@ -108,7 +108,7 @@ class _ParseSchemaCustomTypeUtil {
 
             Map<String, Object> unionStructData;
             try {
-                unionStructData = (Map<String, Object>) entry.getValue();
+                unionStructData = _CastUtil.asMap(entry.getValue());
             } catch (ClassCastException e) {
                 parseFailures.addAll(
                         _ParseSchemaUtil.getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object"));
@@ -172,7 +172,7 @@ class _ParseSchemaCustomTypeUtil {
 
         List<Object> typeDeclarationArray;
         try {
-            typeDeclarationArray = (List<Object>) typeDeclarationValue;
+            typeDeclarationArray = _CastUtil.asList(typeDeclarationValue);
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));

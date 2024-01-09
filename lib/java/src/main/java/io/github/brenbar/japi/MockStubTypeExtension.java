@@ -18,7 +18,7 @@ public class MockStubTypeExtension implements TypeExtension {
 
         Map<String, Object> givenMap;
         try {
-            givenMap = (Map<String, Object>) givenObj;
+            givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }

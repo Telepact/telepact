@@ -30,19 +30,11 @@ public class TestUtility {
         return switch (functionName) {
             case "fn.test" -> {
                 if (requestHeaders.containsKey("Ok")) {
-                    try {
-                        var o = (Map<String, Object>) requestHeaders.get("Ok");
-                        yield new Message(Map.of("Ok", o));
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    var o = (Map<String, Object>) requestHeaders.get("Ok");
+                    yield new Message(Map.of("Ok", o));
                 } else if (requestHeaders.containsKey("result")) {
-                    try {
-                        var r = (Map<String, Object>) requestHeaders.get("result");
-                        yield new Message(r);
-                    } catch (ClassCastException e) {
-                        throw new RuntimeException(e);
-                    }
+                    var r = (Map<String, Object>) requestHeaders.get("result");
+                    yield new Message(r);
                 } else if (Objects.equals(true, requestHeaders.get("throw"))) {
                     throw new RuntimeException();
                 } else {

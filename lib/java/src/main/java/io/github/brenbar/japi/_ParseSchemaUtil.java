@@ -29,7 +29,7 @@ class _ParseSchemaUtil {
 
         List<Object> secondOriginal;
         try {
-            secondOriginal = (List<Object>) secondOriginalInit;
+            secondOriginal = _CastUtil.asList(secondOriginalInit);
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), secondOriginalInit, "Array"),
@@ -82,7 +82,7 @@ class _ParseSchemaUtil {
 
             Map<String, Object> def;
             try {
-                def = (Map<String, Object>) definition;
+                def = _CastUtil.asMap(definition);
             } catch (ClassCastException e) {
                 parseFailures
                         .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, definition, "Object"));
