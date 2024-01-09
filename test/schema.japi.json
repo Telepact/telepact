@@ -54,7 +54,7 @@
   },
   {
     "fn.validateSchema": {
-      "schema": ["any"]
+      "schema": ["any?"]
     },
     "->": {
       "Ok": {},
