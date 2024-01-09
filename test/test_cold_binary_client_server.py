@@ -20,7 +20,7 @@ def cold_binary_client_server_proc(loop, nats_server, dispatcher_server, request
         nats_client = await get_nats_client()
         req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[2], 'backdoorTopic': topics[3]}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)
-        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1]}}])
+        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': True}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t())    
@@ -48,6 +48,6 @@ def test_cold_binary_client_server_multi_case(loop, cold_binary_client_server_pr
 
     async def t():
         for request, expected_response in statements:
-            await verify_client_case(request, expected_response, *topics, use_binary=True)
+            await verify_client_case(request, expected_response, *topics, assert_binary=True)
 
     loop.run_until_complete(t())

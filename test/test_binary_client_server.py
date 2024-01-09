@@ -20,7 +20,7 @@ def binary_client_server_proc(loop, nats_server, dispatcher_server, request):
         nats_client = await get_nats_client()
         req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[2], 'backdoorTopic': topics[3]}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)
-        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1]}}])
+        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': True}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t())         
@@ -32,7 +32,7 @@ def binary_client_server_proc(loop, nats_server, dispatcher_server, request):
 
     try:
         async def warmup():
-            request = [{'_binary': True}, {'fn._ping': {}}]
+            request = [{'_bin': True}, {'fn._ping': {}}]
             await verify_client_case(request, None, *topics)
 
         loop.run_until_complete(warmup())
@@ -56,6 +56,6 @@ def test_binary_client_server_case(loop, binary_client_server_proc, name, req, r
     topics = binary_client_server_proc
 
     async def t():
-        await verify_client_case(req, res, *topics, use_binary=True)
+        await verify_client_case(req, res, *topics, assert_binary=True)
                                                  
     loop.run_until_complete(t())

@@ -13,36 +13,17 @@ class _ClientUtil {
             BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long defaultTimeoutMs,
             boolean defaultBinary) {
         try {
-            Long finalTimeoutMs;
-            if (requestMessage.header.containsKey("_tim")) {
-                finalTimeoutMs = (Long) requestMessage.header.get("_tim");
-            } else {
-                var timeoutMs = requestMessage.header.remove("_timeoutMs");
-                if (timeoutMs != null) {
-                    finalTimeoutMs = (Long) timeoutMs;
-                } else {
-                    finalTimeoutMs = defaultTimeoutMs;
-                }
-                requestMessage.header.put("_tim", finalTimeoutMs);
+            if (!requestMessage.header.containsKey("_tim")) {
+                requestMessage.header.put("_tim", defaultTimeoutMs);
             }
 
-            if (!requestMessage.header.containsKey("_sel")) {
-                var selectFields = requestMessage.header.remove("_select");
-                if (selectFields != null) {
-                    requestMessage.header.put("_sel", selectFields);
-                }
+            if (!requestMessage.header.containsKey("_bin") && defaultBinary) {
+                requestMessage.header.put("_bin", defaultBinary);
             }
 
-            if (requestMessage.header.containsKey("_bin")) {
-                throw new RuntimeException(
-                        "The client manages the _bin header. Use _binary = true to enable binary encoding.");
-            }
+            var timeoutMs = ((Number) requestMessage.header.get("_tim")).longValue();
 
-            if (!requestMessage.header.containsKey("_binary")) {
-                requestMessage.header.put("_binary", defaultBinary);
-            }
-
-            var responseMessage = adapter.apply(requestMessage, serializer).get(finalTimeoutMs,
+            var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs,
                     TimeUnit.MILLISECONDS);
 
             if (Objects.equals(responseMessage.body,
@@ -50,7 +31,7 @@ class _ClientUtil {
                             Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
                 // Try again, but as json
                 requestMessage.header.put("_forceSendJson", true);
-                responseMessage = adapter.apply(requestMessage, serializer).get(finalTimeoutMs,
+                responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs,
                         TimeUnit.MILLISECONDS);
             }
 

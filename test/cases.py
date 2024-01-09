@@ -276,5 +276,8 @@ cases = {
     'serverHooks': [
         [[{'Ok': {}, '_onRequestError': True}, {'fn.test': {}}], [{}, {'Ok': {}}]],
         [[{'Ok': {}, '_onResponseError': True}, {'fn.test': {}}], [{'_onResponseError': True}, {'Ok': {}}]]
+    ],
+    'clientHeaders': [
+        [[{'_tim': 6000}, {'fn._ping': {}}], [{}, {'Ok': {}}]],
     ]
 }

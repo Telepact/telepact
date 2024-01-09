@@ -3,16 +3,11 @@ package io.github.brenbar.japi;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +15,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.brenbar.japi.Server.Options;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
-import io.nats.client.Nats;
 
 public class TestServer {
 
@@ -53,8 +47,8 @@ public class TestServer {
                 io.nats.client.Message natsResponseMessage;
                 try {
                     natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
-                } catch (InterruptedException e1) {
-                    throw new RuntimeException("Interruption");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
                 var responseBytes = natsResponseMessage.getData();
 

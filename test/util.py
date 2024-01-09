@@ -135,7 +135,6 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=
                 request_was_binary = True
                 try:
                     (int_keys, str_keys) = count_int_keys(client_backdoor_request[1])
-                    print('keys {} {}'.format(int_keys, str_keys), flush=True)
                     request_binary_had_enough_integer_keys = int_keys >= str_keys
                 except Exception as e:
                     print(e)
@@ -156,7 +155,6 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=
                 response_was_binary = True
                 try:
                     (int_keys, str_keys) = count_int_keys(frontdoor_response[1])
-                    print('keys {} {}'.format(int_keys, str_keys), flush=True)
                     response_binary_had_enough_integer_keys = int_keys >= str_keys
                 except Exception as e:
                     print(e)
@@ -178,8 +176,6 @@ async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=
         # TODO: This does not block until the subscription ends. Need to find another way to get the binary assertion results
         await sub.unsubscribe(limit=times)
         await done
-
-        print(request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys)
 
         return request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys
     except asyncio.exceptions.CancelledError:
@@ -254,7 +250,7 @@ async def verify_flat_case(request, expected_response, frontdoor_topic):
         assert expected_response == response
 
 
-async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, use_binary=False):
+async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, assert_binary=False):
     assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
     client_times = 1
@@ -263,9 +259,6 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
 
     client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=client_times))    
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
-
-    if use_binary:
-        request[0]['_binary'] = True
 
     try:
         response = await send_case(request, expected_response, client_frontdoor_topic)
@@ -276,7 +269,7 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
         await client_handling_task
         (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys) = client_handling_task.result() or (False, False, False, False)
 
-    if use_binary:
+    if assert_binary:
         if 'Error' not in next(iter(response[1])):
             assert '_bin' in response[0]
         response[0].pop('_bin', None)

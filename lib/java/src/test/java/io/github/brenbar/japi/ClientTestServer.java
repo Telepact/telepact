@@ -1,19 +1,10 @@
 package io.github.brenbar.japi;
 
 import java.io.IOException;
-import java.net.StandardProtocolFamily;
-import java.net.UnixDomainSocketAddress;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,12 +12,11 @@ import io.github.brenbar.japi.Client.Adapter;
 import io.github.brenbar.japi.Client.Options;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
-import io.nats.client.Nats;
 
 public class ClientTestServer {
 
     public static Dispatcher start(Connection connection, String clientFrontdoorTopic,
-            String clientBackdoorTopic)
+            String clientBackdoorTopic, boolean defaultBinary)
             throws IOException, InterruptedException {
         var objectMapper = new ObjectMapper();
 
@@ -47,8 +37,8 @@ public class ClientTestServer {
                     try {
                         natsResponseMessage = connection.request(clientBackdoorTopic, requestBytes,
                                 Duration.ofSeconds(5));
-                    } catch (InterruptedException e1) {
-                        throw new RuntimeException("Interruption");
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                     var responseBytes = natsResponseMessage.getData();
 
@@ -63,7 +53,9 @@ public class ClientTestServer {
             });
         };
 
-        var client = new Client(adapter, new Options());
+        var options = new Options();
+        options.useBinaryDefault = defaultBinary;
+        var client = new Client(adapter, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             try {

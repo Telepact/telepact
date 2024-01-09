@@ -72,8 +72,10 @@ public class TestDispatch {
                             var id = (String) payload.get("id");
                             var clientFrontdoorTopic = (String) payload.get("clientFrontdoorTopic");
                             var clientBackdoorTopic = (String) payload.get("clientBackdoorTopic");
+                            var useBinary = (Boolean) payload.getOrDefault("useBinary", false);
 
-                            var d = ClientTestServer.start(connection, clientFrontdoorTopic, clientBackdoorTopic);
+                            var d = ClientTestServer.start(connection, clientFrontdoorTopic, clientBackdoorTopic,
+                                    useBinary);
 
                             servers.put(id, d);
                         }
