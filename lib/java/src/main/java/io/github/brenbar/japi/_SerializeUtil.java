@@ -59,14 +59,9 @@ class _SerializeUtil {
             SerializationImpl serializer) {
         var headers = message.header;
 
-        var binaryHeader = headers.get("_bin");
-        boolean serializeAsBinary;
-        if (binaryHeader == null) {
-            serializeAsBinary = false;
-        } else if (Objects.equals(binaryHeader, false)) {
-            serializeAsBinary = false;
-        } else {
-            serializeAsBinary = true;
+        boolean serializeAsBinary = false;
+        if (headers.containsKey("_binary")) {
+            serializeAsBinary = Objects.equals(true, headers.remove("_binary"));
         }
 
         List<Object> messageAsPseudoJson = List.of(message.header, message.body);

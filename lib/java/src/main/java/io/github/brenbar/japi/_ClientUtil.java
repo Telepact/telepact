@@ -17,8 +17,8 @@ class _ClientUtil {
                 requestMessage.header.put("_tim", defaultTimeoutMs);
             }
 
-            if (!requestMessage.header.containsKey("_bin") && defaultBinary) {
-                requestMessage.header.put("_bin", defaultBinary);
+            if (defaultBinary) {
+                requestMessage.header.put("_binary", true);
             }
 
             var timeoutMs = ((Number) requestMessage.header.get("_tim")).longValue();
