@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 class _SelectUtil {
 
@@ -44,17 +45,26 @@ class _SelectUtil {
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof UUnion e) {
+        } else if (typeDeclaration.type instanceof UUnion u) {
             var valueAsMap = (Map<String, Object>) value;
             var unionEntry = UUnion.entry(valueAsMap);
             var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = e.cases.get(unionCase);
+            var unionStructReference = u.cases.get(unionCase);
+            var cases = u.cases.keySet().stream().toList();
 
-            var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(unionCase,
-                    Map.of());
-            var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionCase, List.of());
+            var defaultCasesToFields = new HashMap<String, List<String>>();
+            for (var entry : u.cases.entrySet()) {
+                var fields = entry.getValue().fields.keySet().stream().toList();
+                defaultCasesToFields.put(entry.getKey(), fields);
+            }
+
+            var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(u.name,
+                    defaultCasesToFields);
+            var thisUnionCaseSelectedFieldsDefault = defaultCasesToFields.get(unionCase);
+            var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionCase,
+                    thisUnionCaseSelectedFieldsDefault);
 
             var finalMap = new HashMap<>();
             for (var entry : unionData.entrySet()) {
