@@ -58,7 +58,7 @@ class _ValidateUtil {
 
                 if (typeReference == null) {
                     validationFailures.add(new ValidationFailure(List.of("_sel", typeName),
-                            "StructUnknown", Map.of()));
+                            "TypeUnknown", Map.of()));
                     continue;
                 }
 
@@ -68,7 +68,7 @@ class _ValidateUtil {
                         unionCases = _CastUtil.asMap(selectValue);
                     } catch (ClassCastException e) {
                         validationFailures.addAll(
-                                getTypeUnexpectedValidationFailure(List.of("_sel", "->"), selectValue, "Object"));
+                                getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
                         continue;
                     }
 

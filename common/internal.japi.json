@@ -74,8 +74,9 @@
         "expected": ["union._Type"],
         "actual": ["union._Type"]
       },
-      "StructUnknown": {},
-      "StructFieldUnknown": {}
+      "TypeUnknown": {},
+      "StructFieldUnknown": {},
+      "UnionCaseUnknown": {}
     }
   },
 
