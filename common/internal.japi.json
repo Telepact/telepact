@@ -57,8 +57,10 @@
         "reason": ["string"],
         "data": ["object", ["any"]]
       },
-      "RequiredObjectKeyRegexMatchFailed": {
-        "regex": ["string"]
+      "ObjectKeyRegexMatchCountUnexpected": {
+        "regex": ["string"],
+        "expected": ["integer"],
+        "actual": ["integer"]
       },
       "RequiredObjectKeyMissing": {},
       "FunctionUnknown": {}

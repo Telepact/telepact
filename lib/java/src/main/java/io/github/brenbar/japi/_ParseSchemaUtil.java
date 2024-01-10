@@ -66,7 +66,7 @@ class _ParseSchemaUtil {
     }
 
     private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,
-            Map<String, TypeExtension> typeExtensions, int offset) {
+            Map<String, TypeExtension> typeExtensions, int pathOffset) {
         var parsedTypes = new HashMap<String, UType>();
         var parseFailures = new ArrayList<SchemaParseFailure>();
         var failedTypes = new HashSet<String>();
@@ -98,15 +98,16 @@ class _ParseSchemaUtil {
             }
 
             if (schemaKeys.contains(schemaKey)) {
-                parseFailures.add(new SchemaParseFailure(loopPath, "DuplicateSchemaKey",
-                        Map.of("schemaKey", schemaKey)));
+                var otherPathIndex = schemaKeysToIndex.get(schemaKey);
+                parseFailures.add(new SchemaParseFailure(_ValidateUtil.append(loopPath, schemaKey), "PathCollision",
+                        Map.of("other", List.of(otherPathIndex, schemaKey))));
             }
             schemaKeys.add(schemaKey);
             schemaKeysToIndex.put(schemaKey, index);
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
+            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new JApiSchemaParseError(offsetParseFailures);
         }
 
@@ -133,7 +134,7 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
+            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new JApiSchemaParseError(offsetParseFailures);
         }
 
@@ -153,7 +154,7 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, offset);
+            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new JApiSchemaParseError(offsetParseFailures);
         }
 
@@ -164,7 +165,17 @@ class _ParseSchemaUtil {
         return initialFailures.stream().map(f -> {
             List<Object> newPath = new ArrayList<>(f.path);
             newPath.set(0, (Integer) newPath.get(0) - offset);
-            return new SchemaParseFailure(newPath, f.reason, f.data);
+
+            Map<String, Object> finalData;
+            if (f.reason.equals("PathCollision")) {
+                List<Object> otherNewPath = new ArrayList<>((List<Object>) f.data.get("other"));
+                otherNewPath.set(0, (Integer) otherNewPath.get(0) - offset);
+                finalData = Map.of("other", otherNewPath);
+            } else {
+                finalData = f.data;
+            }
+
+            return new SchemaParseFailure(newPath, f.reason, finalData);
         })
                 .toList();
     }
@@ -180,9 +191,10 @@ class _ParseSchemaUtil {
         if (matches.size() == 1) {
             return matches.get(0);
         } else {
-            Map<String, Object> sortedMap = new TreeMap<>(Map.of("regex", regex));
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                    "DefinitionMustHaveOneKeyMatchingRegex", sortedMap)));
+                    "ObjectKeyRegexMatchCountUnexpected",
+                    new TreeMap<>(
+                            Map.of("regex", regex, "actual", matches.size(), "expected", 1)))));
         }
     }
 

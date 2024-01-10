@@ -8,30 +8,20 @@
         "expected": ["union._Type"],
         "actual": ["union._Type"]
       },
-      "DuplicateSchemaKey": {
-        "schemaKey": ["string"]
-      },
-      "DefinitionMustBeObjectType": {},
-      "UndefinedTypeExtension": {
-        "name": ["string"]
-      },
-      "DefinitionMustHaveOneKeyMatchingRegex": {
-        "regex": ["string"]
-      },
-      "TraitArgumentFieldAlreadyInUseByFunction": {
-        "fn": ["string"]
-      },
-      "TraitResultValueAlreadyInUseByFunction": {
-        "fn": ["string"]
-      },
-      "ObjectTypeRequired": {},
       "InvalidTrait": {},
       "TraitDefinitionCannotTargetInternalFunctions": {},
-      "ArrayMustNotBeEmpty": {},
+      "EmptyArrayDisallowed": {},
       "StringRegexMatchFailed": {
         "regex": ["string"]
       },
-      "NullableGenericDisallowed": {},
+      "KeyRegexMatchFailed": {
+        "regex": ["string"]
+      },
+      "ObjectKeyRegexMatchCountUnexpected": {
+        "regex": ["string"],
+        "expected": ["integer"],
+        "actual": ["integer"]
+      },
       "ArrayLengthUnexpected": {
         "actual": ["integer"],
         "expected": ["integer"]
@@ -43,7 +33,10 @@
         "name": ["string"]
       },
       "RequiredObjectKeyMissing": {},
-      "JsonInvalid": {}
+      "JsonInvalid": {},
+      "PathCollision": {
+        "other": ["array", ["any"]]
+      }
     }
   },
   {

@@ -51,10 +51,11 @@ class _ParseSchemaTraitUtil {
             for (var traitArgumentField : traitFnArgFields.entrySet()) {
                 var newKey = traitArgumentField.getKey();
                 if (fnArgFields.containsKey(newKey)) {
+                    var otherPathIndex = schemaKeysToIndex.get(fnName);
                     parseFailures.add(
                             new SchemaParseFailure(
                                     List.of(traitIndex, traitName, traitFnName, newKey),
-                                    "TraitArgumentFieldAlreadyInUseByFunction", Map.of("fn", fnName)));
+                                    "PathCollision", Map.of("other", List.of(otherPathIndex, fnName, newKey))));
                 }
                 fnArgFields.put(newKey, traitArgumentField.getValue());
             }
@@ -62,8 +63,9 @@ class _ParseSchemaTraitUtil {
             for (var traitResultField : traitFnResultValues.entrySet()) {
                 var newKey = traitResultField.getKey();
                 if (fnResultValues.containsKey(newKey)) {
+                    var otherPathIndex = schemaKeysToIndex.get(fnName);
                     parseFailures.add(new SchemaParseFailure(List.of(traitIndex, traitName, "->", newKey),
-                            "TraitResultValueAlreadyInUseByFunction", Map.of("fn", fnName)));
+                            "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey))));
                 }
                 fnResultValues.put(newKey, traitResultField.getValue());
             }
@@ -85,12 +87,14 @@ class _ParseSchemaTraitUtil {
         var index = schemaKeysToIndex.get(schemaKey);
         List<Object> thisPath = List.of(index, schemaKey);
 
+        var defInit = traitDefinitionAsParsedJson.get(schemaKey);
+
         Map<String, Object> def;
         try {
-            def = _CastUtil.asMap(traitDefinitionAsParsedJson.get(schemaKey));
+            def = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
-                    "ObjectTypeRequired", Map.of())));
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
         }
 
         String traitFunctionRegex;
@@ -100,14 +104,14 @@ class _ParseSchemaTraitUtil {
             traitFunctionRegex = "^fn\\.[a-zA-Z]";
         } else if (def.containsKey("fn._?*")) {
             if (!schemaKey.startsWith("trait._")) {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "fn._?*"),
-                        "TraitDefinitionCannotTargetInternalFunctions", Map.of())));
+                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "fn.*"),
+                        "RequiredObjectKeyMissing", Map.of())));
             }
             traitFunctionKey = "fn._?*";
             traitFunctionRegex = "^fn\\.[a-zA-Z_]";
         } else {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(thisPath,
-                    "InvalidTrait", Map.of())));
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "fn.*"),
+                    "RequiredObjectKeyMissing", Map.of())));
         }
 
         var traitFunction = _ParseSchemaFnTypeUtil.parseFunctionType(thisPath, def, traitFunctionKey,

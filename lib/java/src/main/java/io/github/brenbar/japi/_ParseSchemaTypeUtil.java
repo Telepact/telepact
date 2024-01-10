@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 class _ParseSchemaTypeUtil {
@@ -16,7 +17,7 @@ class _ParseSchemaTypeUtil {
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "ArrayMustNotBeEmpty", Map.of())));
+                    "EmptyArrayDisallowed", Map.of())));
         }
 
         var basePath = _ValidateUtil.append(path, 0);
@@ -48,7 +49,7 @@ class _ParseSchemaTypeUtil {
 
         if (type instanceof UGeneric && nullable) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "NullableGenericDisallowed", Map.of())));
+                    "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;

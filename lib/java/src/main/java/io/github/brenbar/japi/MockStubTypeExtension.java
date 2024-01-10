@@ -24,17 +24,17 @@ public class MockStubTypeExtension implements TypeExtension {
         }
 
         var regexString = "^fn\\..*$";
-        var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.matches(regexString))
-                .findAny();
-        if (optionalFunctionName.isEmpty()) {
+        var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        if (matches.size() != 1) {
             return List.of(
                     new ValidationFailure(List.of(),
-                            "RequiredObjectKeyRegexMatchFailed",
-                            Map.of("regex", regexString)));
+                            "ObjectKeyRegexMatchCountUnexpected",
+                            Map.of("regex", regexString, "actual",
+                                    matches.size(), "expected", 1)));
 
         }
 
-        var functionName = optionalFunctionName.get();
+        var functionName = matches.get(0);
         var functionDef = (UFn) this.types.get(functionName);
 
         var input = givenMap.get(functionName);

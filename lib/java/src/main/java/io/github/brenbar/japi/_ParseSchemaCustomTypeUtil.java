@@ -102,7 +102,7 @@ class _ParseSchemaCustomTypeUtil {
             var matcher = regex.matcher(unionValue);
             if (!matcher.find()) {
                 parseFailures.add(new SchemaParseFailure(unionKeyPath,
-                        "StringRegexMatchFailed", Map.of("regex", regexString)));
+                        "KeyRegexMatchFailed", Map.of("regex", regexString)));
                 continue;
             }
 
@@ -161,7 +161,7 @@ class _ParseSchemaCustomTypeUtil {
         var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "StringRegexMatchFailed", Map.of("regex", regexString))));
+                    "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         String fieldName = matcher.group(1);

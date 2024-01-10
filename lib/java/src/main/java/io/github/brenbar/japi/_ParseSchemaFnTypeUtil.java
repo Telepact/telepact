@@ -1,7 +1,6 @@
 package io.github.brenbar.japi;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,20 +21,32 @@ class _ParseSchemaFnTypeUtil {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var typeParameterCount = 0;
-        var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson, schemaKey, 0,
-                originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
-        var callType = new UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
+
+        UUnion callType = null;
+        try {
+            var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson, schemaKey,
+                    typeParameterCount,
+                    originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
+            callType = new UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
+        } catch (JApiSchemaParseError e) {
+            parseFailures.addAll(e.schemaParseFailures);
+        }
 
         var resPath = _ValidateUtil.append(path, "->");
 
+        UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey("->")) {
             parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
-            throw new JApiSchemaParseError(parseFailures);
+        } else {
+            try {
+                resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson, "->",
+                        !isForTrait, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        typeExtensions,
+                        allParseFailures, failedTypes);
+            } catch (JApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
         }
-
-        var resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson, "->",
-                !isForTrait, 0, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
-                allParseFailures, failedTypes);
 
         if (!parseFailures.isEmpty()) {
             throw new JApiSchemaParseError(parseFailures);

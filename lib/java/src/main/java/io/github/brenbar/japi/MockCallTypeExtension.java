@@ -24,12 +24,12 @@ public class MockCallTypeExtension implements TypeExtension {
         }
 
         var regexString = "^fn\\..*$";
-        var optionalFunctionName = givenMap.keySet().stream().filter(k -> k.matches(regexString)).findAny();
-        if (optionalFunctionName.isEmpty()) {
-            return List.of(new ValidationFailure(new ArrayList<Object>(), "RequiredObjectKeyRegexMatchFailed",
-                    Map.of("regex", regexString)));
+        var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        if (matches.size() != 1) {
+            return List.of(new ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
+                    Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
         }
-        var functionName = optionalFunctionName.get();
+        var functionName = matches.get(0);
         var functionDef = (UFn) this.types.get(functionName);
 
         var input = givenMap.get(functionName);
