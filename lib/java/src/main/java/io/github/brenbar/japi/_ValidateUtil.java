@@ -22,14 +22,10 @@ class _ValidateUtil {
                     try {
                         var integerElement = _CastUtil.asInt(binaryChecksum);
                     } catch (ClassCastException e) {
-                        try {
-                            var longElement = _CastUtil.asLong(binaryChecksum);
-                        } catch (ClassCastException e2) {
-                            validationFailures
-                                    .addAll(getTypeUnexpectedValidationFailure(List.of("_bin", i),
-                                            binaryChecksum,
-                                            "Integer"));
-                        }
+                        validationFailures
+                                .addAll(getTypeUnexpectedValidationFailure(List.of("_bin", i),
+                                        binaryChecksum,
+                                        "Integer"));
                     }
                     i += 1;
                 }
