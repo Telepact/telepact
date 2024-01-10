@@ -12,9 +12,9 @@ public class UUnion implements UType {
     public final Map<String, UStruct> cases;
     public final int typeParameterCount;
 
-    public UUnion(String name, Map<String, UStruct> values, int typeParameterCount) {
+    public UUnion(String name, Map<String, UStruct> cases, int typeParameterCount) {
         this.name = name;
-        this.cases = values;
+        this.cases = cases;
         this.typeParameterCount = typeParameterCount;
     }
 
@@ -35,7 +35,7 @@ public class UUnion implements UType {
     }
 
     private List<ValidationFailure> validateUnionCases(
-            Map<String, UStruct> referenceValues,
+            Map<String, UStruct> referenceCases,
             Map<?, ?> actual, List<UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
@@ -46,7 +46,7 @@ public class UUnion implements UType {
         var unionTarget = (String) entry.getKey();
         var unionPayload = entry.getValue();
 
-        var referenceStruct = referenceValues.get(unionTarget);
+        var referenceStruct = referenceCases.get(unionTarget);
         if (referenceStruct == null) {
             return Collections
                     .singletonList(new ValidationFailure(List.of(unionTarget),

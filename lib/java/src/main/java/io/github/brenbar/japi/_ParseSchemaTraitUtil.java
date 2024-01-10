@@ -33,13 +33,13 @@ class _ParseSchemaTraitUtil {
             UStruct fnArg = f.call.cases.get(f.name);
             Map<String, UFieldDeclaration> fnArgFields = fnArg.fields;
             UUnion fnResult = f.result;
-            Map<String, UStruct> fnResultValues = fnResult.cases;
+            Map<String, UStruct> fnResultCases = fnResult.cases;
             UFn traitFn = trait.fn;
             String traitFnName = traitFn.name;
             UStruct traitFnArg = traitFn.call.cases.get(traitFn.name);
             Map<String, UFieldDeclaration> traitFnArgFields = traitFnArg.fields;
             UUnion traitFnResult = traitFn.result;
-            Map<String, UStruct> traitFnResultValues = traitFnResult.cases;
+            Map<String, UStruct> traitFnResultCases = traitFnResult.cases;
 
             if (fnName.startsWith("fn._")) {
                 // Only internal traits can change internal functions
@@ -60,14 +60,14 @@ class _ParseSchemaTraitUtil {
                 fnArgFields.put(newKey, traitArgumentField.getValue());
             }
 
-            for (var traitResultField : traitFnResultValues.entrySet()) {
+            for (var traitResultField : traitFnResultCases.entrySet()) {
                 var newKey = traitResultField.getKey();
-                if (fnResultValues.containsKey(newKey)) {
+                if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
                     parseFailures.add(new SchemaParseFailure(List.of(traitIndex, traitName, "->", newKey),
                             "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey))));
                 }
-                fnResultValues.put(newKey, traitResultField.getValue());
+                fnResultCases.put(newKey, traitResultField.getValue());
             }
         }
 

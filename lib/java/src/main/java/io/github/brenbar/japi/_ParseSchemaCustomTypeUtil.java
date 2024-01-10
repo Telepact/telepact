@@ -62,7 +62,7 @@ class _ParseSchemaCustomTypeUtil {
             List<Object> path,
             Map<String, Object> unionDefinitionAsParsedJson,
             String schemaKey,
-            boolean okValueRequired,
+            boolean okCaseRequired,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
@@ -83,9 +83,9 @@ class _ParseSchemaCustomTypeUtil {
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
-        var values = new HashMap<String, UStruct>();
+        var cases = new HashMap<String, UStruct>();
 
-        if (okValueRequired) {
+        if (okCaseRequired) {
             if (!definition.containsKey("Ok")) {
                 throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "Ok"),
                         "RequiredObjectKeyMissing", Map.of())));
@@ -106,9 +106,9 @@ class _ParseSchemaCustomTypeUtil {
                 continue;
             }
 
-            Map<String, Object> unionStructData;
+            Map<String, Object> unionCaseStruct;
             try {
-                unionStructData = _CastUtil.asMap(entry.getValue());
+                unionCaseStruct = _CastUtil.asMap(entry.getValue());
             } catch (ClassCastException e) {
                 parseFailures.addAll(
                         _ParseSchemaUtil.getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object"));
@@ -116,7 +116,7 @@ class _ParseSchemaCustomTypeUtil {
             }
 
             var fields = new HashMap<String, UFieldDeclaration>();
-            for (var structEntry : unionStructData.entrySet()) {
+            for (var structEntry : unionCaseStruct.entrySet()) {
                 var fieldDeclaration = structEntry.getKey();
                 var typeDeclarationValue = structEntry.getValue();
                 UFieldDeclaration parsedField;
@@ -134,14 +134,14 @@ class _ParseSchemaCustomTypeUtil {
 
             var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
 
-            values.put(unionCase, unionStruct);
+            cases.put(unionCase, unionStruct);
         }
 
         if (!parseFailures.isEmpty()) {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        var type = new UUnion(schemaKey, values, typeParameterCount);
+        var type = new UUnion(schemaKey, cases, typeParameterCount);
 
         return type;
     }
