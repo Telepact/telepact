@@ -135,20 +135,13 @@ class _ParseSchemaCustomTypeUtil {
         for (var structEntry : referenceStruct.entrySet()) {
             var fieldDeclaration = structEntry.getKey();
 
-            if (fieldDeclaration.endsWith("!")) {
-                var test = "%s!".formatted(fieldDeclaration);
-                if (fields.containsKey(test)) {
+            for (var existingField : fields.keySet()) {
+                var existingFieldNoOpt = existingField.split("!")[0];
+                var fieldNoOpt = fieldDeclaration.split("!")[0];
+                if (fieldNoOpt.equals(existingFieldNoOpt)) {
                     parseFailures
                             .add(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration), "PathConflict",
-                                    Map.of("other", _ValidateUtil.append(path, test))));
-                }
-            }
-            if (!fieldDeclaration.endsWith("!")) {
-                var test = fieldDeclaration.substring(0, fieldDeclaration.length() - 1);
-                if (fields.containsKey(test)) {
-                    parseFailures
-                            .add(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration), "PathConflict",
-                                    Map.of("other", _ValidateUtil.append(path, test))));
+                                    Map.of("other", _ValidateUtil.append(path, existingField))));
                 }
             }
 
