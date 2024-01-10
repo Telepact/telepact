@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 class _SelectUtil {
 
@@ -52,7 +51,6 @@ class _SelectUtil {
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
             var unionStructReference = u.cases.get(unionCase);
-            var cases = u.cases.keySet().stream().toList();
 
             var defaultCasesToFields = new HashMap<String, List<String>>();
             for (var entry : u.cases.entrySet()) {

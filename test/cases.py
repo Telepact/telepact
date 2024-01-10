@@ -120,29 +120,29 @@ def generate_basic_cases(given_field: str, the_type, correct_values, additional_
             if has_too_many_keys(correct_value):
                 expected_response_header['_assert'] = {'skipFieldIdCheck': True}
             
-            case = [[{'Ok': {'value': {field: correct_value}}}, {'fn.test': {'value': {field: correct_value}}}], [expected_response_header, {'Ok': {'value': {field: correct_value}}}]]
+            case = [[{'Ok': {'value!': {field: correct_value}}}, {'fn.test': {'value!': {field: correct_value}}}], [expected_response_header, {'Ok': {'value!': {field: correct_value}}}]]
 
             yield case
 
         for incorrect_value, errors in incorrect_values:
             expected_response_header = {}
-            cases = [{'path': ['fn.test', 'value'] + base_path + path, 'reason': reason} for reason, path in errors]
+            cases = [{'path': ['fn.test', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors]
             if len(cases) > 1:
                 expected_response_header.setdefault('_assert', {})['setCompare'] = True
             if has_too_many_keys(incorrect_value):
                 expected_response_header.setdefault('_assert', {})['skipFieldIdCheck'] = True
 
-            yield [[{}, {'fn.test': {'value': {field: incorrect_value}}}], [expected_response_header, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
+            yield [[{}, {'fn.test': {'value!': {field: incorrect_value}}}], [expected_response_header, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
 
         for incorrect_value, errors in incorrect_values:
             expected_response_header = {}
-            cases = [{'path': ['Ok', 'value'] + base_path + path, 'reason': reason} for reason, path in errors]
+            cases = [{'path': ['Ok', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors]
             if len(cases) > 1:
                 expected_response_header.setdefault('_assert', {})['setCompare'] = True
             if has_too_many_keys(incorrect_value):
                 expected_response_header.setdefault('_assert', {})['skipFieldIdCheck'] = True
 
-            yield [[{'Ok': {'value': {field: incorrect_value}}}, {'fn.test': {}}], [expected_response_header, {'_ErrorInvalidResponseBody': {'cases': cases}}]]
+            yield [[{'Ok': {'value!': {field: incorrect_value}}}, {'fn.test': {}}], [expected_response_header, {'_ErrorInvalidResponseBody': {'cases': cases}}]]
 
 
 additional_integer_cases = [
@@ -155,7 +155,7 @@ additional_struct_cases = [
 ]
 additional_union_cases = [
     ({}, [({'ZeroOrManyUnionFieldsDisallowed': {}}, [])]),
-    ({'One': {}, 'Two': {'optional': False, 'required': False}}, [({'ZeroOrManyUnionFieldsDisallowed': {}}, [])]),
+    ({'One': {}, 'Two': {'optional!': False, 'required': False}}, [({'ZeroOrManyUnionFieldsDisallowed': {}}, [])]),
     ({'a': {}}, [({'UnionFieldUnknown': {}}, ['a'])]),
     ({'Two': {}}, [({'RequiredStructFieldMissing': {}}, ['Two', 'required'])]),
     ({'One': False}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['One'])]),
@@ -201,20 +201,20 @@ additional_p2Union_cases = [
 ]
 
 cases = {
-    'boolean': [v for v in generate_basic_cases('bool', bool, [False, True])],
-    'integer': [v for v in generate_basic_cases('int', int, [0, -1, 1, 9223372036854775807, -9223372036854775808], additional_integer_cases)],
-    'number': [v for v in generate_basic_cases('num', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1])],
-    'string': [v for v in generate_basic_cases('str', str, ['', 'abc'])],
-    'array': [v for v in generate_basic_cases('arr', list, [[], [False, 0, 0.1, '']])],
-    'object': [v for v in generate_basic_cases('obj', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
-    'any': [v for v in generate_basic_cases('any', Any, [False, 0, 0.1, '', [], {}])],
-    'struct': [v for v in generate_basic_cases('struct', dict, [{'required': False}, {'optional': False, 'required': False}], additional_struct_cases)],
-    'union': [v for v in generate_basic_cases('union', dict, [{'One': {}}, {'Two':{'required': False}}, {'Two':{'optional': False, 'required': False}}], additional_union_cases)],
-    'fn': [v for v in generate_basic_cases('fn', dict, [{'fn.example':{'required': False}}, {'fn.example':{'optional': False, 'required': False}}], additional_fn_cases)],
-    'p2Str': [v for v in generate_basic_cases('p2Str', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
-    'p2Union': [v for v in generate_basic_cases('p2Union', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)],
+    'boolean': [v for v in generate_basic_cases('bool!', bool, [False, True])],
+    'integer': [v for v in generate_basic_cases('int!', int, [0, -1, 1, 9223372036854775807, -9223372036854775808], additional_integer_cases)],
+    'number': [v for v in generate_basic_cases('num!', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1])],
+    'string': [v for v in generate_basic_cases('str!', str, ['', 'abc'])],
+    'array': [v for v in generate_basic_cases('arr!', list, [[], [False, 0, 0.1, '']])],
+    'object': [v for v in generate_basic_cases('obj!', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
+    'any': [v for v in generate_basic_cases('any!', Any, [False, 0, 0.1, '', [], {}])],
+    'struct' : [v for v in generate_basic_cases('struct!', dict, [{'required': False}, {'optional!': False, 'required': False}], additional_struct_cases)],
+    'union' : [v for v in generate_basic_cases('union!', dict, [{'One': {}}, {'Two':{'required': False}}, {'Two':{'optional!': False, 'required': False}}], additional_union_cases)],
+    'fn' : [v for v in generate_basic_cases('fn!', dict, [{'fn.example':{'required': False}}, {'fn.example':{'optional!': False, 'required': False}}], additional_fn_cases)],
+    'p2Str': [v for v in generate_basic_cases('p2Str!', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
+    'p2Union': [v for v in generate_basic_cases('p2Union!', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)],
     'testPdStr': [
-        [[{'Ok': {'value': {'pdStr': {'dwrap': {'wrap': False}}}}}, {'fn.test': {'value': {'pdStr': {'dwrap': {'wrap': False}}}}}], [{}, {'Ok': {'value': {'pdStr': {'dwrap': {'wrap': False}}}}}]],
+        [[{'Ok': {'value!': {'pdStr!': {'dwrap': {'wrap': False}}}}}, {'fn.test': {'value!': {'pdStr!': {'dwrap': {'wrap': False}}}}}], [{}, {'Ok': {'value!': {'pdStr!': {'dwrap': {'wrap': False}}}}}]],
     ],
     'testPing': [
         [[{}, {'fn._ping': {}}], [{}, {'Ok': {}}]],
@@ -232,17 +232,17 @@ cases = {
         [[{'result': {'errorUnknown': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseBody': {'cases': [{'path': ['errorUnknown'], 'reason': {'UnionFieldUnknown': {}}}]}}]],
     ],
     'testSelectFields': [
-        [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {'optional': False}}}}]],
-        [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'struct': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {}}}}]],
-        [[{'_sel': {'struct.ExStruct': ['optional', 'required']}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}]],
-        [[{'_sel': {'struct.ExStruct': ['optional', 'required']}, 'Ok': {'value': {'struct': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {'required': False}}}}]],
-        [[{'_sel': {'struct.ExStruct': []}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {}}}}]],
-        [[{'_sel': {'struct.ExStruct': []}, 'Ok': {'value': {'struct': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'struct': {}}}}]],
-        [[{'_sel': {'union.ExUnion': {'Two': ['optional']}}, 'Ok': {'value': {'union': {'Two': {'optional': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'union': {'Two': {'optional': False}}}}}]],
-        [[{'_sel': {'->': {'Ok': []}}, 'Ok': {'value': {'struct': {'optional': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {}}]],
-        [[{'_sel': {'fn.example': ['optional']}, 'Ok': {'value': {'fn': {'fn.example': {'required': True, 'optional': True}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'fn': {'fn.example': {'optional': True}}}}}]],
-        [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'arrStruct': [{'required': False}, {'optional': False, 'required': False}]}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'arrStruct': [{}, {'optional': False}]}}}]],
-        [[{'_sel': {'struct.ExStruct': ['optional']}, 'Ok': {'value': {'objStruct': {'a': {'required': False}, 'b': {'optional': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'objStruct': {'a': {}, 'b': {'optional': False}}}}}]],
+        [[{'_sel': {'struct.ExStruct': ['optional!']}, 'Ok': {'value!': {'struct!': {'optional!': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'struct!': {'optional!': False}}}}]],
+        [[{'_sel': {'struct.ExStruct': ['optional!']}, 'Ok': {'value!': {'struct!': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'struct!': {}}}}]],
+        [[{'_sel': {'struct.ExStruct': ['optional!', 'required']}, 'Ok': {'value!': {'struct!': {'optional!': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'struct!': {'optional!': False, 'required': False}}}}]],
+        [[{'_sel': {'struct.ExStruct': ['optional!', 'required']}, 'Ok': {'value!': {'struct!': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'struct!': {'required': False}}}}]],
+        [[{'_sel': {'struct.ExStruct': []}, 'Ok': {'value!': {'struct!': {'optional!': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'struct!': {}}}}]],
+        [[{'_sel': {'struct.ExStruct': []}, 'Ok': {'value!': {'struct!': {'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'struct!': {}}}}]],
+        [[{'_sel': {'union.ExUnion': {'Two': ['optional!']}}, 'Ok': {'value!': {'union!': {'Two': {'optional!': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'union!': {'Two': {'optional!': False}}}}}]],
+        [[{'_sel': {'->': {'Ok': []}}, 'Ok': {'value!': {'struct!': {'optional!': False, 'required': False}}}}, {'fn.test': {}}], [{}, {'Ok': {}}]],
+        [[{'_sel': {'fn.example': ['optional!']}, 'Ok': {'value!': {'fn!': {'fn.example': {'required': True, 'optional!': True}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'fn!': {'fn.example': {'optional!': True}}}}}]],
+        [[{'_sel': {'struct.ExStruct': ['optional!']}, 'Ok': {'value!': {'arrStruct!': [{'required': False}, {'optional!': False, 'required': False}]}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'arrStruct!': [{}, {'optional!': False}]}}}]],
+        [[{'_sel': {'struct.ExStruct': ['optional!']}, 'Ok': {'value!': {'objStruct!': {'a': {'required': False}, 'b': {'optional!': False, 'required': False}}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'objStruct!': {'a': {}, 'b': {'optional!': False}}}}}]],
         [[{'_sel': None}, {'fn.test': {}}], [{'_assert': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['_sel'], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{'_sel': False}, {'fn.test': {}}], [{'_assert': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['_sel'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{'_sel': 0}, {'fn.test': {}}], [{'_assert': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['_sel'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
@@ -266,14 +266,14 @@ cases = {
         [[{'_sel': {'struct.ExStruct': ['']}}, {'fn.test': {}}], [{'_assert': {'skipBinaryCheck': True, 'skipFieldIdCheck': True}}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['_sel', 'struct.ExStruct', 0], 'reason': {'StructFieldUnknown': {}}}]}}]],
     ],
     'testUnsafe': [
-        [[{'_unsafe': True, 'result': {'Ok': {'value': {'bool': 0}}}}, {'fn.test': {}}], [{}, {'Ok': {'value': {'bool': 0}}}]],
+        [[{'_unsafe': True, 'result': {'Ok': {'value!': {'bool!': 0}}}}, {'fn.test': {}}], [{}, {'Ok': {'value!': {'bool!': 0}}}]],
         [[{'_unsafe': True, 'result': {'ErrorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorExample': {'wrong': 'a'}}]],
     ],
     'testApplicationFailure': [
         [[{'throw': True}, {'fn.test': {}}], [{}, {'_ErrorUnknown': {}}]],
     ],
     'multipleFailures': [
-        [[{}, {'fn.test': {'value': {'struct': {'optional': 'wrong', 'a': False}}}}], [{'_assert': {'setCompare': True}}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn.test', 'value', 'struct', 'optional'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}, {'path': ['fn.test', 'value', 'struct', 'required'], 'reason': {'RequiredStructFieldMissing': {}}}, {'path': ['fn.test', 'value', 'struct', 'a'], 'reason': {'StructFieldUnknown': {}}}]}}]],
+        [[{}, {'fn.test': {'value!': {'struct!': {'optional!': 'wrong', 'a': False}}}}], [{'_assert': {'setCompare': True}}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn.test', 'value!', 'struct!', 'optional!'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}, {'path': ['fn.test', 'value!', 'struct!', 'required'], 'reason': {'RequiredStructFieldMissing': {}}}, {'path': ['fn.test', 'value!', 'struct!', 'a'], 'reason': {'StructFieldUnknown': {}}}]}}]],
     ],
     'api': [
         [[{}, {'fn._api': {}}], [{},{"Ok":{"api":[{"///":[" This is the example schema. It is focussed on outlining type edge cases for use in tests. ","                                                                                           "," As a reminder:                                                                            "," - ! means optional field                                                                  "," - ? means nullable type                                                                   "],"info.Example":{}},{"///":" A struct value demonstrating all common type permutations. ","struct.Value":{"bool!":["boolean"],"nullBool!":["boolean?"],"arrBool!":["array",["boolean"]],"arrNullBool!":["array",["boolean?"]],"objBool!":["object",["boolean"]],"objNullBool!":["object",["boolean?"]],"pStrBool!":["struct<1>.PStr",["boolean"]],"pStrNullBool!":["struct<1>.PStr",["boolean?"]],"pUnionBool!":["union<1>.PUnion",["boolean"]],"pUnionNullBool!":["union<1>.PUnion",["boolean?"]],"int!":["integer"],"nullInt!":["integer?"],"arrInt!":["array",["integer"]],"arrNullInt!":["array",["integer?"]],"objInt!":["object",["integer"]],"objNullInt!":["object",["integer?"]],"pStrInt!":["struct<1>.PStr",["integer"]],"pStrNullInt!":["struct<1>.PStr",["integer?"]],"pUnionInt!":["union<1>.PUnion",["integer"]],"pUnionNullInt!":["union<1>.PUnion",["integer?"]],"num!":["number"],"nullNum!":["number?"],"arrNum!":["array",["number"]],"arrNullNum!":["array",["number?"]],"objNum!":["object",["number"]],"objNullNum!":["object",["number?"]],"pStrNum!":["struct<1>.PStr",["number"]],"pStrNullNum!":["struct<1>.PStr",["number?"]],"pUnionNum!":["union<1>.PUnion",["number"]],"pUnionNullNum!":["union<1>.PUnion",["number?"]],"str!":["string"],"nullStr!":["string?"],"arrStr!":["array",["string"]],"arrNullStr!":["array",["string?"]],"objStr!":["object",["string"]],"objNullStr!":["object",["string?"]],"pStrStr!":["struct<1>.PStr",["string"]],"pStrNullStr!":["struct<1>.PStr",["string?"]],"pUnionStr!":["union<1>.PUnion",["string"]],"pUnionNullStr!":["union<1>.PUnion",["string?"]],"arr!":["array",["any"]],"nullArr!":["array?",["any"]],"arrArr!":["array",["array",["any"]]],"arrNullArr!":["array",["array?",["any"]]],"objArr!":["object",["array",["any"]]],"objNullArr!":["object",["array?",["any"]]],"pStrArr!":["struct<1>.PStr",["array",["any"]]],"pStrNullArr!":["struct<1>.PStr",["array?",["any"]]],"pUnionArr!":["union<1>.PUnion",["array",["any"]]],"pUnionNullArr!":["union<1>.PUnion",["array?",["any"]]],"obj!":["object",["any"]],"nullObj!":["object?",["any"]],"arrObj!":["array",["object",["any"]]],"arrNullObj!":["array",["object?",["any"]]],"objObj!":["object",["object",["any"]]],"objNullObj!":["object",["object?",["any"]]],"pStrObj!":["struct<1>.PStr",["object",["any"]]],"pStrNullObj!":["struct<1>.PStr",["object?",["any"]]],"pUnionObj!":["union<1>.PUnion",["object",["any"]]],"pUnionNullObj!":["union<1>.PUnion",["object?",["any"]]],"any!":["any"],"nullAny!":["any?"],"arrAny!":["array",["any"]],"arrNullAny!":["array",["any?"]],"objAny!":["object",["any"]],"objNullAny!":["object",["any?"]],"pStrAny!":["struct<1>.PStr",["any"]],"pStrNullAny!":["struct<1>.PStr",["any?"]],"pUnionAny!":["union<1>.PUnion",["any"]],"pUnionNullAny!":["union<1>.PUnion",["any?"]],"struct!":["struct.ExStruct"],"nullStruct!":["struct.ExStruct?"],"arrStruct!":["array",["struct.ExStruct"]],"arrNullStruct!":["array",["struct.ExStruct?"]],"objStruct!":["object",["struct.ExStruct"]],"objNullStruct!":["object",["struct.ExStruct?"]],"pStrStruct!":["struct<1>.PStr",["struct.ExStruct"]],"pStrNullStruct!":["struct<1>.PStr",["struct.ExStruct?"]],"pUnionStruct!":["union<1>.PUnion",["struct.ExStruct"]],"pUnionNullStruct!":["union<1>.PUnion",["struct.ExStruct?"]],"union!":["union.ExUnion"],"nullUnion!":["union.ExUnion?"],"arrUnion!":["array",["union.ExUnion"]],"arrNullUnion!":["array",["union.ExUnion?"]],"objUnion!":["object",["union.ExUnion"]],"objNullUnion!":["object",["union.ExUnion?"]],"pStrUnion!":["struct<1>.PStr",["union.ExUnion"]],"pStrNullUnion!":["struct<1>.PStr",["union.ExUnion?"]],"pUnionUnion!":["union<1>.PUnion",["union.ExUnion"]],"pUnionNullUnion!":["union<1>.PUnion",["union.ExUnion?"]],"fn!":["fn.example"],"nullFn!":["fn.example?"],"arrFn!":["array",["fn.example"]],"arrNullFn!":["array",["fn.example?"]],"objFn!":["object",["fn.example"]],"objNullFn!":["object",["fn.example?"]],"pStrFn!":["struct<1>.PStr",["fn.example"]],"pStrNullFn!":["struct<1>.PStr",["fn.example?"]],"pUnionFn!":["union<1>.PUnion",["fn.example"]],"pUnionNullFn!":["union<1>.PUnion",["fn.example?"]],"p2Str!":["struct<2>.P2Str",["boolean"],["integer"]],"nullP2Str!":["struct<2>.P2Str?",["boolean"],["integer"]],"arrP2Str!":["array",["struct<2>.P2Str",["boolean"],["integer"]]],"arrNullP2Str!":["array",["struct<2>.P2Str?",["boolean"],["integer"]]],"objP2Str!":["object",["struct<2>.P2Str",["boolean"],["integer"]]],"objNullP2Str!":["object",["struct<2>.P2Str?",["boolean"],["integer"]]],"pStrP2Str!":["struct<1>.PStr",["struct<2>.P2Str",["boolean"],["integer"]]],"pStrNullP2Str!":["struct<1>.PStr",["struct<2>.P2Str?",["boolean"],["integer"]]],"pUnionP2Str!":["union<1>.PUnion",["struct<2>.P2Str",["boolean"],["integer"]]],"pUnionNullP2Str!":["union<1>.PUnion",["struct<2>.P2Str?",["boolean"],["integer"]]],"p2Union!":["union<2>.P2Union",["boolean"],["integer"]],"nullP2Union!":["union<2>.P2Union?",["boolean"],["integer"]],"arrP2Union!":["array",["union<2>.P2Union",["boolean"],["integer"]]],"arrNullP2Union!":["array",["union<2>.P2Union?",["boolean"],["integer"]]],"objP2Union!":["object",["union<2>.P2Union",["boolean"],["integer"]]],"objNullP2Union!":["object",["union<2>.P2Union?",["boolean"],["integer"]]],"pStrP2Union!":["struct<1>.PStr",["union<2>.P2Union",["boolean"],["integer"]]],"pStrNullP2Union!":["struct<1>.PStr",["union<2>.P2Union?",["boolean"],["integer"]]],"pUnionP2Union!":["union<1>.PUnion",["union<2>.P2Union",["boolean"],["integer"]]],"pUnionNullP2Union!":["union<1>.PUnion",["union<2>.P2Union?",["boolean"],["integer"]]],"pdStr!":["struct<1>.PdStr",["struct<1>.PStr",["boolean"]]]}},{"///":[" The main struct example.                                                                ","                                                                                         "," The [required] field must be supplied. The optional field does not need to be supplied. "],"struct.ExStruct":{"required":["boolean"],"optional!":["boolean"]}},{"union.ExUnion":{"One":{},"Two":{"required":["boolean"],"optional!":["boolean"]}}},{"struct<1>.PStr":{"wrap":["T.0"]}},{"struct<1>.PdStr":{"dwrap":["struct<1>.PStr",["boolean"]]}},{"struct<2>.P2Str":{"wrap":["T.0"],"nest":["array",["T.1"]]}},{"union<1>.PUnion":{"One":{},"Two":{"ewrap":["T.0"]}}},{"union<2>.P2Union":{"One":{},"Two":{"ewrap":["T.0"],"enest":["array",["T.1"]]}}},{"///":"An example function.","fn.example":{"required":["boolean"],"optional!":["boolean"]},"->":{"Ok":{}}},{"fn.test":{"value!":["struct.Value"]},"->":{"Ok":{"value!":["struct.Value"]},"ErrorExample":{"property":["string"]}}},{"///":" Ping the server. ","fn._ping":{},"->":{"Ok":{}}},{"///":" Get the jAPI `schema` of this server. ","fn._api":{},"->":{"Ok":{"api":["array",["object",["any"]]]}}},{"///":" A placeholder function when the requested function is unknown. ","fn._unknown":{},"->":{"Ok":{}}},{"///":" A type. ","union._Type":{"Null":{},"Boolean":{},"Integer":{},"Number":{},"String":{},"Array":{},"Object":{},"Any":{},"Unknown":{}}},{"///":" A reason for the validation failure in the body. ","union._BodyValidationFailureReason":{"TypeUnexpected":{"expected":["union._Type"],"actual":["union._Type"]},"NullDisallowed":{},"StructFieldUnknown":{},"RequiredStructFieldMissing":{},"NumberOutOfRange":{},"ZeroOrManyUnionFieldsDisallowed":{},"UnionFieldUnknown":{},"ExtensionValidationFailure":{"message":["string"]},"FunctionUnknown":{}}},{"///":" A reason for the validation failure in the header. ","union._HeaderValidationFailureReason":{"TypeUnexpected":{"expected":["union._Type"],"actual":["union._Type"]},"StructUnknown":{},"StructNameUnknown":{},"StructFieldUnknown":{}}},{"///":" A parse failure. ","union._ParseFailure":{"HeadersMustBeObject":{},"BodyMustBeObject":{},"BodyMustBeUnionType":{},"IncompatibleBinaryEncoding":{},"BinaryDecodeFailure":{},"InvalidJson":{},"MessageMustBeArrayWithTwoElements":{}}},{"///":" A validation failure located at a `path` explained by a `reason`. ","struct._BodyValidationFailure":{"path":["array",["any"]],"reason":["union._BodyValidationFailureReason"]}},{"///":" A validation failure located at a `path` explained by a `reason`. ","struct._HeaderValidationFailure":{"path":["array",["any"]],"reason":["union._HeaderValidationFailureReason"]}},{"///":[" All functions may return a validation error:                                                             "," - `_ErrorInvalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. "," - `_ErrorInvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       "," - `_ErrorInvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ","     outlined by a list of `cases.                                                                        "," - `_ErrorParseFailure`: The Request could not be parsed as a jAPI Message.                               "],"trait._Validated":{"fn._?*":{},"->":{"_ErrorUnknown":{},"_ErrorInvalidRequestHeaders":{"cases":["array",["struct._HeaderValidationFailure"]]},"_ErrorInvalidRequestBody":{"cases":["array",["struct._BodyValidationFailure"]]},"_ErrorInvalidResponseBody":{"cases":["array",["struct._BodyValidationFailure"]]},"_ErrorParseFailure":{"reasons":["array",["union._ParseFailure"]]}}}}]}}]],

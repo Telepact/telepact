@@ -25,7 +25,7 @@ class _MockServerUtil {
                 var stubFunctionName = stubCall.getKey();
                 var stubArg = (Map<String, Object>) stubCall.getValue();
                 var stubResult = (Map<String, Object>) givenStub.get("->");
-                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch", false));
+                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
 
                 var stub = new MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult);
                 if (allowArgumentPartialMatch) {
@@ -42,9 +42,9 @@ class _MockServerUtil {
                         .findAny().get();
                 var callFunctionName = call.getKey();
                 var callArg = (Map<String, Object>) call.getValue();
-                var verifyTimes = (Map<String, Object>) argument.getOrDefault("count",
+                var verifyTimes = (Map<String, Object>) argument.getOrDefault("count!",
                         Map.of("AtLeast", Map.of("times", 1)));
-                var strictMatch = (Boolean) argument.getOrDefault("strictMatch", false);
+                var strictMatch = (Boolean) argument.getOrDefault("strictMatch!", false);
 
                 var verificationResult = _MockVerifyUtil.verify(callFunctionName, callArg, strictMatch,
                         verifyTimes,

@@ -164,7 +164,7 @@ class _ParseSchemaCustomTypeUtil {
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
-        String fieldName = matcher.group(1);
+        String fieldName = matcher.group(0);
 
         boolean optional = matcher.group(2) != null;
 
