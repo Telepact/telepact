@@ -160,7 +160,7 @@ class _ParseSchemaCustomTypeUtil {
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration),
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
