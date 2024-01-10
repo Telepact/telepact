@@ -50,13 +50,19 @@ class _ParseSchemaTraitUtil {
 
             for (var traitArgumentField : traitFnArgFields.entrySet()) {
                 var newKey = traitArgumentField.getKey();
-                if (fnArgFields.containsKey(newKey)) {
-                    var otherPathIndex = schemaKeysToIndex.get(fnName);
-                    parseFailures.add(
-                            new SchemaParseFailure(
-                                    List.of(traitIndex, traitName, traitFnName, newKey),
-                                    "PathCollision", Map.of("other", List.of(otherPathIndex, fnName, newKey))));
+
+                for (var existingField : fnArgFields.keySet()) {
+                    var existingFieldNoOpt = existingField.split("!")[0];
+                    var fieldNoOpt = newKey.split("!")[0];
+                    if (fieldNoOpt.equals(existingFieldNoOpt)) {
+                        var otherPathIndex = schemaKeysToIndex.get(fnName);
+                        parseFailures
+                                .add(new SchemaParseFailure(List.of(traitIndex, traitName, traitFnName, newKey),
+                                        "PathCollision",
+                                        Map.of("other", List.of(otherPathIndex, fnName, existingField))));
+                    }
                 }
+
                 fnArgFields.put(newKey, traitArgumentField.getValue());
             }
 
