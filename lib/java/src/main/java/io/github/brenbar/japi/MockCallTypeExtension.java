@@ -34,7 +34,7 @@ public class MockCallTypeExtension implements TypeExtension {
 
         var input = givenMap.get(functionName);
 
-        var inputFailures = functionDef.call.values.get(functionDef.name).validate(input, List.of(), List.of());
+        var inputFailures = functionDef.call.cases.get(functionDef.name).validate(input, List.of(), List.of());
         var inputFailuresWithPath = inputFailures.stream()
                 .map(f -> new ValidationFailure(_ValidateUtil.prepend(functionName, f.path), f.reason,
                         f.data))

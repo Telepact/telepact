@@ -29,7 +29,7 @@ class _SelectUtil {
             var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = f.call.values.get(unionCase);
+            var unionStructReference = f.call.cases.get(unionCase);
 
             var selectedFields = selectedStructFields.get(unionStructReference.name);
             var finalMap = new HashMap<>();
@@ -50,7 +50,7 @@ class _SelectUtil {
             var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = e.values.get(unionCase);
+            var unionStructReference = e.cases.get(unionCase);
 
             var selectedFields = selectedStructFields.get(unionStructReference.name);
             var finalMap = new HashMap<>();

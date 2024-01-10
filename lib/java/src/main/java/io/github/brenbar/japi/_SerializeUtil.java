@@ -20,18 +20,18 @@ class _SerializeUtil {
             if (entry.getValue() instanceof UStruct s) {
                 allKeys.addAll(s.fields.keySet());
             } else if (entry.getValue() instanceof UUnion e) {
-                for (var entry2 : e.values.entrySet()) {
+                for (var entry2 : e.cases.entrySet()) {
                     allKeys.add(entry2.getKey());
                     var struct = entry2.getValue();
                     allKeys.addAll(struct.fields.keySet());
                 }
             } else if (entry.getValue() instanceof UFn f) {
-                for (var e2 : f.call.values.entrySet()) {
+                for (var e2 : f.call.cases.entrySet()) {
                     allKeys.add(e2.getKey());
                     var struct = e2.getValue();
                     allKeys.addAll(struct.fields.keySet());
                 }
-                for (var e2 : f.result.values.entrySet()) {
+                for (var e2 : f.result.cases.entrySet()) {
                     allKeys.add(e2.getKey());
                     var struct = e2.getValue();
                     allKeys.addAll(struct.fields.keySet());

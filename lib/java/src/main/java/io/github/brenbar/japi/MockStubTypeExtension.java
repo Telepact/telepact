@@ -39,7 +39,7 @@ public class MockStubTypeExtension implements TypeExtension {
 
         var input = givenMap.get(functionName);
 
-        var inputFailures = functionDef.call.values.get(functionDef.name).validate(input, List.of(),
+        var inputFailures = functionDef.call.cases.get(functionDef.name).validate(input, List.of(),
                 List.of());
         var inputFailuresWithPath = inputFailures.stream()
                 .map(f -> new ValidationFailure(

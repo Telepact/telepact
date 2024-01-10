@@ -9,12 +9,12 @@ import java.util.Map;
 public class UUnion implements UType {
 
     public final String name;
-    public final Map<String, UStruct> values;
+    public final Map<String, UStruct> cases;
     public final int typeParameterCount;
 
     public UUnion(String name, Map<String, UStruct> values, int typeParameterCount) {
         this.name = name;
-        this.values = values;
+        this.cases = values;
         this.typeParameterCount = typeParameterCount;
     }
 
@@ -27,7 +27,7 @@ public class UUnion implements UType {
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
-            return validateUnionCases(this.values, m, typeParameters);
+            return validateUnionCases(this.cases, m, typeParameters);
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));
@@ -88,10 +88,10 @@ public class UUnion implements UType {
             RandomGenerator random) {
         if (useStartingValue) {
             var startingUnionCase = (Map<String, Object>) startingValue;
-            return constructRandomUnion(this.values, startingUnionCase, includeRandomOptionalFields,
+            return constructRandomUnion(this.cases, startingUnionCase, includeRandomOptionalFields,
                     typeParameters, random);
         } else {
-            return constructRandomUnion(this.values, new HashMap<>(), includeRandomOptionalFields,
+            return constructRandomUnion(this.cases, new HashMap<>(), includeRandomOptionalFields,
                     typeParameters, random);
         }
     }

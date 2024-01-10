@@ -34,11 +34,11 @@ public class UFn implements UType {
             RandomGenerator random) {
         if (useStartingValue) {
             var startingFnValue = (Map<String, Object>) startingValue;
-            return UUnion.constructRandomUnion(this.call.values, startingFnValue, includeRandomOptionalFields,
+            return UUnion.constructRandomUnion(this.call.cases, startingFnValue, includeRandomOptionalFields,
                     List.of(),
                     random);
         } else {
-            return UUnion.constructRandomUnion(this.call.values, new HashMap<>(), includeRandomOptionalFields,
+            return UUnion.constructRandomUnion(this.call.cases, new HashMap<>(), includeRandomOptionalFields,
                     List.of(),
                     random);
         }

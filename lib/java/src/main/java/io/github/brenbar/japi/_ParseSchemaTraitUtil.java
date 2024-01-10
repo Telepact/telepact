@@ -30,16 +30,16 @@ class _ParseSchemaTraitUtil {
                 continue;
             }
 
-            UStruct fnArg = f.call.values.get(f.name);
+            UStruct fnArg = f.call.cases.get(f.name);
             Map<String, UFieldDeclaration> fnArgFields = fnArg.fields;
             UUnion fnResult = f.result;
-            Map<String, UStruct> fnResultValues = fnResult.values;
+            Map<String, UStruct> fnResultValues = fnResult.cases;
             UFn traitFn = trait.fn;
             String traitFnName = traitFn.name;
-            UStruct traitFnArg = traitFn.call.values.get(traitFn.name);
+            UStruct traitFnArg = traitFn.call.cases.get(traitFn.name);
             Map<String, UFieldDeclaration> traitFnArgFields = traitFnArg.fields;
             UUnion traitFnResult = traitFn.result;
-            Map<String, UStruct> traitFnResultValues = traitFnResult.values;
+            Map<String, UStruct> traitFnResultValues = traitFnResult.cases;
 
             if (fnName.startsWith("fn._")) {
                 // Only internal traits can change internal functions

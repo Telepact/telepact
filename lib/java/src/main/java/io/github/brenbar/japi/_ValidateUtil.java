@@ -55,10 +55,10 @@ class _ValidateUtil {
                 UStruct structReference;
                 if (structName.startsWith("->.")) {
                     var resultUnionCase = structName.split("->.")[1];
-                    structReference = functionType.result.values.get(resultUnionCase);
+                    structReference = functionType.result.cases.get(resultUnionCase);
                 } else if (structName.startsWith("fn.")) {
                     var functionRef = (UFn) jApiSchema.parsed.get(structName);
-                    structReference = functionRef.call.values.get(functionRef.name);
+                    structReference = functionRef.call.cases.get(functionRef.name);
                 } else if (structName.startsWith("struct.")) {
                     structReference = (UStruct) jApiSchema.parsed.get(structName);
                 } else {

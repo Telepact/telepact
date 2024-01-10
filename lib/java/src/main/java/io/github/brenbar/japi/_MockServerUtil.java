@@ -104,7 +104,7 @@ class _MockServerUtil {
 
                 if (definition != null) {
                     var resultUnion = (UUnion) definition.result;
-                    var OkStructRef = resultUnion.values.get("Ok");
+                    var OkStructRef = resultUnion.cases.get("Ok");
                     var useStartingValue = true;
                     var includeRandomOptionalFields = true;
                     var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
