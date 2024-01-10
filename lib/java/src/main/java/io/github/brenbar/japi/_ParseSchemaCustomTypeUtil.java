@@ -93,13 +93,13 @@ class _ParseSchemaCustomTypeUtil {
         }
 
         for (var entry : definition.entrySet()) {
-            var unionValue = entry.getKey();
+            var unionCase = entry.getKey();
 
-            var unionKeyPath = _ValidateUtil.append(thisPath, unionValue);
+            var unionKeyPath = _ValidateUtil.append(thisPath, unionCase);
 
             var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
             var regex = Pattern.compile(regexString);
-            var matcher = regex.matcher(unionValue);
+            var matcher = regex.matcher(unionCase);
             if (!matcher.find()) {
                 parseFailures.add(new SchemaParseFailure(unionKeyPath,
                         "KeyRegexMatchFailed", Map.of("regex", regexString)));
@@ -121,7 +121,7 @@ class _ParseSchemaCustomTypeUtil {
                 var typeDeclarationValue = structEntry.getValue();
                 UFieldDeclaration parsedField;
                 try {
-                    parsedField = parseField(_ValidateUtil.append(thisPath, unionValue), fieldDeclaration,
+                    parsedField = parseField(_ValidateUtil.append(thisPath, unionCase), fieldDeclaration,
                             typeDeclarationValue, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                             parsedTypes,
                             typeExtensions, allParseFailures, failedTypes);
@@ -132,9 +132,9 @@ class _ParseSchemaCustomTypeUtil {
                 }
             }
 
-            var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionValue), fields, typeParameterCount);
+            var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
 
-            values.put(unionValue, unionStruct);
+            values.put(unionCase, unionStruct);
         }
 
         if (!parseFailures.isEmpty()) {

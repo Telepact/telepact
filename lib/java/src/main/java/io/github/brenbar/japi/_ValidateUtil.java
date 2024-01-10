@@ -54,8 +54,8 @@ class _ValidateUtil {
 
                 UStruct structReference;
                 if (structName.startsWith("->.")) {
-                    var resultUnionValue = structName.split("->.")[1];
-                    structReference = functionType.result.values.get(resultUnionValue);
+                    var resultUnionCase = structName.split("->.")[1];
+                    structReference = functionType.result.values.get(resultUnionCase);
                 } else if (structName.startsWith("fn.")) {
                     var functionRef = (UFn) jApiSchema.parsed.get(structName);
                     structReference = functionRef.call.values.get(functionRef.name);

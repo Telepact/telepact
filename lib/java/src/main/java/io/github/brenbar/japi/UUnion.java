@@ -27,14 +27,14 @@ public class UUnion implements UType {
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
-            return validateUnionValues(this.values, m, typeParameters);
+            return validateUnionCases(this.values, m, typeParameters);
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));
         }
     }
 
-    private List<ValidationFailure> validateUnionValues(
+    private List<ValidationFailure> validateUnionCases(
             Map<String, UStruct> referenceValues,
             Map<?, ?> actual, List<UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
@@ -87,8 +87,8 @@ public class UUnion implements UType {
             List<UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
-            var startingUnionValue = (Map<String, Object>) startingValue;
-            return constructRandomUnion(this.values, startingUnionValue, includeRandomOptionalFields,
+            var startingUnionCase = (Map<String, Object>) startingValue;
+            return constructRandomUnion(this.values, startingUnionCase, includeRandomOptionalFields,
                     typeParameters, random);
         } else {
             return constructRandomUnion(this.values, new HashMap<>(), includeRandomOptionalFields,
@@ -96,30 +96,30 @@ public class UUnion implements UType {
         }
     }
 
-    static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionValuesReference,
+    static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionCasesReference,
             Map<String, Object> startingUnion,
             boolean includeRandomOptionalFields,
             List<UTypeDeclaration> typeParameters,
             RandomGenerator random) {
         if (!startingUnion.isEmpty()) {
             var unionEntry = UUnion.entry(startingUnion);
-            var unionValue = unionEntry.getKey();
-            var unionStructType = unionValuesReference.get(unionValue);
-            var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionValue);
+            var unionCase = unionEntry.getKey();
+            var unionStructType = unionCasesReference.get(unionCase);
+            var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
-            return Map.of(unionValue, UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
+            return Map.of(unionCase, UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
                     includeRandomOptionalFields, typeParameters, random));
         } else {
-            var sortedUnionValuesReference = new ArrayList<>(unionValuesReference.entrySet());
-            Collections.sort(sortedUnionValuesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+            var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
+            Collections.sort(sortedUnionCasesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            var randomIndex = random.nextInt(sortedUnionValuesReference.size());
-            var unionEntry = sortedUnionValuesReference.get(randomIndex);
+            var randomIndex = random.nextInt(sortedUnionCasesReference.size());
+            var unionEntry = sortedUnionCasesReference.get(randomIndex);
 
-            var unionValue = unionEntry.getKey();
+            var unionCase = unionEntry.getKey();
             var unionData = unionEntry.getValue();
 
-            return Map.of(unionValue,
+            return Map.of(unionCase,
                     UStruct.constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,
                             typeParameters, random));
         }

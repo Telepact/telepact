@@ -26,10 +26,10 @@ class _SelectUtil {
         } else if (typeDeclaration.type instanceof UFn f) {
             var valueAsMap = (Map<String, Object>) value;
             var unionEntry = UUnion.entry(valueAsMap);
-            var unionValue = unionEntry.getKey();
+            var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = f.call.values.get(unionValue);
+            var unionStructReference = f.call.values.get(unionCase);
 
             var selectedFields = selectedStructFields.get(unionStructReference.name);
             var finalMap = new HashMap<>();
@@ -47,10 +47,10 @@ class _SelectUtil {
         } else if (typeDeclaration.type instanceof UUnion e) {
             var valueAsMap = (Map<String, Object>) value;
             var unionEntry = UUnion.entry(valueAsMap);
-            var unionValue = unionEntry.getKey();
+            var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = e.values.get(unionValue);
+            var unionStructReference = e.values.get(unionCase);
 
             var selectedFields = selectedStructFields.get(unionStructReference.name);
             var finalMap = new HashMap<>();
