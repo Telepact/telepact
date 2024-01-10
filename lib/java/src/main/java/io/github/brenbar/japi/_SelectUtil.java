@@ -8,9 +8,9 @@ import java.util.Map;
 class _SelectUtil {
 
     static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
-            Map<String, List<String>> selectedStructFields) {
+            Map<String, Object> selectedStructFields) {
         if (typeDeclaration.type instanceof UStruct s) {
-            var selectedFields = selectedStructFields.get(s.name);
+            var selectedFields = (List<String>) selectedStructFields.get(s.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
             for (var entry : valueAsMap.entrySet()) {
@@ -29,14 +29,14 @@ class _SelectUtil {
             var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = f.call.cases.get(unionCase);
+            var argStructReference = f.call.cases.get(unionCase);
 
-            var selectedFields = selectedStructFields.get(unionStructReference.name);
+            var selectedFields = (List<String>) selectedStructFields.get(f.name);
             var finalMap = new HashMap<>();
             for (var entry : unionData.entrySet()) {
                 var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = unionStructReference.fields.get(fieldName);
+                    var field = argStructReference.fields.get(fieldName);
                     var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
@@ -52,7 +52,10 @@ class _SelectUtil {
 
             var unionStructReference = e.cases.get(unionCase);
 
-            var selectedFields = selectedStructFields.get(unionStructReference.name);
+            var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(unionCase,
+                    Map.of());
+            var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionCase, List.of());
+
             var finalMap = new HashMap<>();
             for (var entry : unionData.entrySet()) {
                 var fieldName = entry.getKey();

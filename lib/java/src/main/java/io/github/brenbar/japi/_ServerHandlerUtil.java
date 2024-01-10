@@ -115,7 +115,7 @@ class _ServerHandlerUtil {
 
         Map<String, Object> finalResultUnion;
         if (requestHeaders.containsKey("_sel")) {
-            Map<String, List<String>> selectStructFieldsHeader = (Map<String, List<String>>) requestHeaders
+            Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders
                     .get("_sel");
             finalResultUnion = (Map<String, Object>) _SelectUtil.selectStructFields(
                     new UTypeDeclaration(resultUnionType, false, List.of()),

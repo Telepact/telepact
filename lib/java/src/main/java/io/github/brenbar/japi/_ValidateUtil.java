@@ -26,7 +26,7 @@ class _ValidateUtil {
                             var longElement = _CastUtil.asLong(binaryChecksum);
                         } catch (ClassCastException e2) {
                             validationFailures
-                                    .addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_bin", i),
+                                    .addAll(getTypeUnexpectedValidationFailure(List.of("_bin", i),
                                             binaryChecksum,
                                             "Integer"));
                         }
@@ -35,7 +35,7 @@ class _ValidateUtil {
                 }
             } catch (ClassCastException e) {
                 validationFailures
-                        .addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_bin"), headers.get("_bin"),
+                        .addAll(getTypeUnexpectedValidationFailure(List.of("_bin"), headers.get("_bin"),
                                 "Array"));
             }
         }
@@ -46,65 +46,108 @@ class _ValidateUtil {
                 selectStructFieldsHeader = _CastUtil.asMap(headers.get("_sel"));
 
             } catch (ClassCastException e) {
-                validationFailures.addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_sel"),
+                validationFailures.addAll(getTypeUnexpectedValidationFailure(List.of("_sel"),
                         headers.get("_sel"), "Object"));
             }
-            for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
-                var structName = entry.getKey();
+            for (var entry : selectStructFieldsHeader.entrySet()) {
+                var typeName = entry.getKey();
+                var selectValue = entry.getValue();
 
-                UStruct structReference;
-                if (structName.startsWith("->.")) {
-                    var resultUnionCase = structName.split("->.")[1];
-                    structReference = functionType.result.cases.get(resultUnionCase);
-                } else if (structName.startsWith("fn.")) {
-                    var functionRef = (UFn) jApiSchema.parsed.get(structName);
-                    structReference = functionRef.call.cases.get(functionRef.name);
-                } else if (structName.startsWith("struct.")) {
-                    structReference = (UStruct) jApiSchema.parsed.get(structName);
+                UType typeReference;
+                if (typeName.equals("->")) {
+                    typeReference = functionType.result;
                 } else {
-                    structReference = null;
+                    typeReference = jApiSchema.parsed.get(typeName);
                 }
 
-                if (structReference == null) {
-                    validationFailures.add(new ValidationFailure(List.of("headers", "_sel", structName),
+                if (typeReference == null) {
+                    validationFailures.add(new ValidationFailure(List.of("_sel", typeName),
                             "StructUnknown", Map.of()));
                     continue;
                 }
 
-                List<Object> fields = new ArrayList<>();
-                try {
-                    fields = _CastUtil.asList(entry.getValue());
-                } catch (ClassCastException e) {
-                    validationFailures
-                            .addAll(getTypeUnexpectedValidationFailure(List.of("headers", "_sel", structName),
-                                    entry.getValue(),
-                                    "Array"));
-                }
-
-                for (int i = 0; i < fields.size(); i += 1) {
-                    var field = fields.get(i);
-                    String stringField;
+                if (typeReference instanceof UUnion u) {
+                    Map<String, Object> unionCases;
                     try {
-                        stringField = _CastUtil.asString(field);
+                        unionCases = _CastUtil.asMap(selectValue);
                     } catch (ClassCastException e) {
-                        validationFailures.addAll(getTypeUnexpectedValidationFailure(
-                                List.of("headers", "_sel", structName, i),
-                                field,
-                                "String"));
+                        validationFailures.addAll(
+                                getTypeUnexpectedValidationFailure(List.of("_sel", "->"), selectValue, "Object"));
                         continue;
                     }
-                    if (!structReference.fields.containsKey(stringField)) {
-                        validationFailures.add(new ValidationFailure(
-                                List.of("headers", "_sel", structName, i),
-                                "StructFieldUnknown", Map.of()));
+
+                    for (var unionCaseEntry : unionCases.entrySet()) {
+                        var unionCase = unionCaseEntry.getKey();
+                        var selectedCaseStructFields = unionCaseEntry.getValue();
+
+                        var structRef = u.cases.get(unionCase);
+
+                        List<Object> loopPath = List.of("_sel", typeName, unionCase);
+
+                        if (structRef == null) {
+                            validationFailures.add(new ValidationFailure(
+                                    loopPath,
+                                    "UnionCaseUnknown", Map.of()));
+                            continue;
+                        }
+
+                        var nestedValidationFailures = validateSelectStruct(structRef, loopPath,
+                                selectedCaseStructFields);
+                        validationFailures.addAll(nestedValidationFailures);
                     }
+                } else if (typeReference instanceof UFn f) {
+                    var argStruct = f.call.cases.get(f.name);
+                    var nestedValidationFailures = validateSelectStruct(argStruct, List.of("_sel", typeName),
+                            selectValue);
+                    validationFailures.addAll(nestedValidationFailures);
+                } else {
+                    var structRef = (UStruct) typeReference;
+                    var nestedValidationFailures = validateSelectStruct(structRef, List.of("_sel", typeName),
+                            selectValue);
+                    validationFailures.addAll(nestedValidationFailures);
                 }
+
             }
 
         }
 
         return validationFailures;
+    }
 
+    private static List<ValidationFailure> validateSelectStruct(UStruct structReference, List<Object> basePath,
+            Object selectedFields) {
+        var validationFailures = new ArrayList<ValidationFailure>();
+
+        List<Object> fields = new ArrayList<>();
+        try {
+            fields = _CastUtil.asList(selectedFields);
+        } catch (ClassCastException e) {
+            validationFailures
+                    .addAll(getTypeUnexpectedValidationFailure(basePath,
+                            selectedFields,
+                            "Array"));
+        }
+
+        for (int i = 0; i < fields.size(); i += 1) {
+            var field = fields.get(i);
+            String stringField;
+            try {
+                stringField = _CastUtil.asString(field);
+            } catch (ClassCastException e) {
+                validationFailures.addAll(getTypeUnexpectedValidationFailure(
+                        _ValidateUtil.append(basePath, i),
+                        field,
+                        "String"));
+                continue;
+            }
+            if (!structReference.fields.containsKey(stringField)) {
+                validationFailures.add(new ValidationFailure(
+                        _ValidateUtil.append(basePath, i),
+                        "StructFieldUnknown", Map.of()));
+            }
+        }
+
+        return validationFailures;
     }
 
     static String getType(Object value) {
