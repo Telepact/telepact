@@ -140,7 +140,7 @@ class _ParseSchemaCustomTypeUtil {
                 var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
                     parseFailures
-                            .add(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration), "PathConflict",
+                            .add(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration), "PathCollision",
                                     Map.of("other", _ValidateUtil.append(path, existingField))));
                 }
             }

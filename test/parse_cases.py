@@ -1,6 +1,8 @@
 cases = {
     'schema': [
         [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {}}, {'struct.Example': {}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [1, 'struct.Example'], 'reason': {'PathCollision': {'other': [0, 'struct.Example']}}}]}}]],
+        [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {'field': ['boolean'], 'field!': ['integer']}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [0, 'struct.Example', 'field!'], 'reason': {'PathCollision': {'other': [0, 'struct.Example', 'field']}}}]}}]],
+        [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {'field!': ['boolean'], 'field': ['integer']}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [0, 'struct.Example', 'field'], 'reason': {'PathCollision': {'other': [0, 'struct.Example', 'field!']}}}]}}]],
         [[{}, {'fn.validateSchema': {'schema': [{'invalid.Example': {}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [0], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*', 'actual': 0, 'expected': 1}}}]}}]],
         [[{}, {'fn.validateSchema': {'schema': None}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Null': {}}, 'expected': {'Array': {}}}}}]}}]],
         [[{}, {'fn.validateSchema': {'schema': False}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Array': {}}}}}]}}]],
