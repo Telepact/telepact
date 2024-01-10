@@ -43,16 +43,14 @@ def handler(request):
     if '_onResponseError' in header:
         response_header['_onResponseError'] = header['_onResponseError']
 
-    match target:
-        case 'fn.test':
-            if 'Ok' in header:
-                return [response_header, {'Ok': header['Ok']}]
-            elif 'result' in header:
-                return [response_header, header['result']]
-            elif 'throw' in header:
-                return None
-            else:
-                return [response_header, {}]
+    if 'Ok' in header:
+        return [response_header, {'Ok': header['Ok']}]
+    elif 'result' in header:
+        return [response_header, header['result']]
+    elif 'throw' in header:
+        return None
+    else:
+        return [response_header, {}]
 
 
 async def backdoor_handler(backdoor_topic):

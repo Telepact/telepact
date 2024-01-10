@@ -252,7 +252,10 @@
       "optional!": ["boolean"]
     },
     "->": {
-      "Ok": {}
+      "Ok": {
+        "required": ["boolean"],
+        "optional!": ["boolean"]
+      }
     }
   },
 
