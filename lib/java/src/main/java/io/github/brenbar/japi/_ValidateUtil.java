@@ -51,12 +51,6 @@ class _ValidateUtil {
             }
             for (Map.Entry<String, Object> entry : selectStructFieldsHeader.entrySet()) {
                 var structName = entry.getKey();
-                if (!structName.startsWith("struct.") && !structName.startsWith("->.")
-                        && !structName.startsWith("fn.")) {
-                    validationFailures.add(new ValidationFailure(List.of("headers", "_sel", structName),
-                            "SelectHeaderKeyMustBeStructReference", Map.of()));
-                    continue;
-                }
 
                 UStruct structReference;
                 if (structName.startsWith("->.")) {
@@ -65,13 +59,15 @@ class _ValidateUtil {
                 } else if (structName.startsWith("fn.")) {
                     var functionRef = (UFn) jApiSchema.parsed.get(structName);
                     structReference = functionRef.call.values.get(functionRef.name);
-                } else {
+                } else if (structName.startsWith("struct.")) {
                     structReference = (UStruct) jApiSchema.parsed.get(structName);
+                } else {
+                    structReference = null;
                 }
 
                 if (structReference == null) {
                     validationFailures.add(new ValidationFailure(List.of("headers", "_sel", structName),
-                            "StructNameUnknown", Map.of()));
+                            "StructUnknown", Map.of()));
                     continue;
                 }
 

@@ -74,8 +74,7 @@
         "expected": ["union._Type"],
         "actual": ["union._Type"]
       },
-      "SelectHeaderKeyMustBeStructReference": {},
-      "StructNameUnknown": {},
+      "StructUnknown": {},
       "StructFieldUnknown": {}
     }
   },
@@ -83,13 +82,10 @@
   {
     "///": " A parse failure. ",
     "union._ParseFailure": {
-      "HeadersMustBeObject": {},
-      "BodyMustBeObject": {},
-      "BodyMustBeUnionType": {},
       "IncompatibleBinaryEncoding": {},
       "BinaryDecodeFailure": {},
-      "InvalidJson": {},
-      "MessageMustBeArrayWithTwoElements": {}
+      "JsonInvalid": {},
+      "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
     }
   },
 

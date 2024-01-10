@@ -59,13 +59,9 @@ class _ServerUtil {
             } else if (cause instanceof BinaryEncodingMissing e2) {
                 parseFailures = List.of(Map.of("BinaryDecodeFailure", Map.of()));
             } else if (cause instanceof InvalidJsonError e2) {
-                parseFailures = List.of(Map.of("InvalidJson", Map.of()));
-            } else if (cause instanceof MessageParseError e2) {
-                parseFailures = e2.failures.stream().map(f -> (Map<String, Object>) (Object) Map.of(f, Map.of()))
-                        .toList();
+                parseFailures = List.of(Map.of("JsonInvalid", Map.of()));
             } else {
-                // TODO: Change this to something like "CouldNotParse"
-                parseFailures = List.of(Map.of("MessageMustBeArrayWithTwoElements", Map.of()));
+                parseFailures = List.of(Map.of("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject", Map.of()));
             }
 
             var requestHeaders = new HashMap<String, Object>();

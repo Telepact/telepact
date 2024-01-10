@@ -93,11 +93,11 @@ class _SerializeUtil {
         try {
             messageAsPseudoJsonList = _CastUtil.asList(messageAsPseudoJson);
         } catch (ClassCastException e) {
-            throw new DeserializationError(new MessageParseError(List.of("MessageMustBeArrayWithTwoElements")));
+            throw new DeserializationError("ExpectedArrayOfTwoObjects");
         }
 
         if (messageAsPseudoJsonList.size() != 2) {
-            throw new DeserializationError(new MessageParseError(List.of("MessageMustBeArrayWithTwoElements")));
+            throw new DeserializationError("ExpectedArrayOfTwoObjects");
         }
 
         List<Object> finalMessageAsPseudoJsonList;
@@ -111,33 +111,28 @@ class _SerializeUtil {
             finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
         }
 
-        var parseFailures = new ArrayList<String>();
         Map<String, Object> headers = null;
         Map<String, Object> body = null;
 
         try {
             headers = _CastUtil.asMap(finalMessageAsPseudoJsonList.get(0));
         } catch (ClassCastException e) {
-            parseFailures.add("HeadersMustBeObject");
+            throw new DeserializationError("ExpectedArrayOfTwoObjects");
         }
 
         try {
             body = _CastUtil.asMap(finalMessageAsPseudoJsonList.get(1));
             if (body.size() != 1) {
-                parseFailures.add("BodyMustBeUnionType");
+                throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
             } else {
                 try {
                     var givenPayload = _CastUtil.asMap(body.values().stream().findAny().get());
                 } catch (ClassCastException e) {
-                    parseFailures.add("BodyPayloadMustBeObject");
+                    throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
                 }
             }
         } catch (ClassCastException e) {
-            parseFailures.add("BodyMustBeObject");
-        }
-
-        if (parseFailures.size() > 0) {
-            throw new DeserializationError(new MessageParseError(parseFailures));
+            throw new DeserializationError("ExpectedArrayOfTwoObjects");
         }
 
         return new Message(headers, body);
