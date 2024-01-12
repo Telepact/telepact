@@ -212,7 +212,24 @@
         "patternProperties": {
           "^trait\\.[a-zA-Z_]\\w*": {
             "type": "object",
-            "maxProperties": 0
+            "maxProperties": 1,
+            "required": ["->"],
+            "properties": {
+              "->": {
+                "type": "object",
+                "patternProperties": {
+                  "^[a-zA-Z_]\\w*?$": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "patternProperties": {
+                      "^[a-zA-Z_]\\w*!?$": {
+                        "$ref": "#/$defs/typeDeclaration"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "properties": {
@@ -221,20 +238,6 @@
               { "type": "string" },
               { "type": "array", "items": { "type": "string" } }
             ]
-          }
-        },
-        "->": {
-          "type": "object",
-          "patternProperties": {
-            "^[a-zA-Z_]\\w*?$": {
-              "type": "object",
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z_]\\w*!?$": {
-                  "$ref": "#/$defs/typeDeclaration"
-                }
-              }
-            }
           }
         }
       },

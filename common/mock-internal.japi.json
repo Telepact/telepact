@@ -122,9 +122,10 @@
       " error, indicating that the mock could not return a result for that function call ",
       " due to no matching stub being available.                                         "
     ],
-    "trait._Mockable": {},
-    "->": {
-      "_ErrorNoMatchingStub": {}
+    "trait._Mockable": {
+      "->": {
+        "_ErrorNoMatchingStub": {}
+      }
     }
   }
 ]

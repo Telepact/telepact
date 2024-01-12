@@ -41,7 +41,7 @@ invalid_cases = {
         [[{}, {'fn._createStub': {'stub': []}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn._createStub': {'stub': {}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 0, 'expected': 1}}}]}}]],
         [[{}, {'fn._createStub': {'stub': {'fn.test': {}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]],
-    ]
+    ],
 }
 
 cases = {

@@ -29,7 +29,6 @@ class _ParseSchemaTraitUtil {
                 continue;
             }
 
-            UStruct fnArg = f.call.cases.get(f.name);
             UUnion fnResult = f.result;
             Map<String, UStruct> fnResultCases = fnResult.cases;
             UUnion traitFnResult = trait.errors;
@@ -67,14 +66,31 @@ class _ParseSchemaTraitUtil {
             Map<String, TypeExtension> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var index = schemaKeysToIndex.get(schemaKey);
-        List<Object> thisPath = List.of(index);
+        List<Object> thisPath = List.of(index, schemaKey);
 
-        var traitFunction = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, traitDefinitionAsParsedJson, "->",
+        var mapInit = traitDefinitionAsParsedJson.get(schemaKey);
+
+        Map<String, Object> def;
+        try {
+            def = _CastUtil.asMap(mapInit);
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, mapInit, "Object"));
+        }
+
+        var errorPath = _ValidateUtil.append(thisPath, "->");
+
+        if (!def.containsKey("->")) {
+            throw new JApiSchemaParseError(
+                    List.of(new SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of())));
+        }
+
+        var trait = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, "->",
                 false, 0, originalJApiSchema,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions,
                 allParseFailures, failedTypes);
 
-        return new UTrait(schemaKey, traitFunction);
+        return new UTrait(schemaKey, trait);
     }
 }

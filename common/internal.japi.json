@@ -118,20 +118,21 @@
       "     outlined by a list of `cases.                                                                        ",
       " - `_ErrorParseFailure`: The Request could not be parsed as a jAPI Message.                               "
     ],
-    "trait._Validated": {},
-    "->": {
-      "_ErrorUnknown": {},
-      "_ErrorInvalidRequestHeaders": {
-        "cases": ["array", ["struct._HeaderValidationFailure"]]
-      },
-      "_ErrorInvalidRequestBody": {
-        "cases": ["array", ["struct._BodyValidationFailure"]]
-      },
-      "_ErrorInvalidResponseBody": {
-        "cases": ["array", ["struct._BodyValidationFailure"]]
-      },
-      "_ErrorParseFailure": {
-        "reasons": ["array", ["union._ParseFailure"]]
+    "trait._Validated": {
+      "->": {
+        "_ErrorUnknown": {},
+        "_ErrorInvalidRequestHeaders": {
+          "cases": ["array", ["struct._HeaderValidationFailure"]]
+        },
+        "_ErrorInvalidRequestBody": {
+          "cases": ["array", ["struct._BodyValidationFailure"]]
+        },
+        "_ErrorInvalidResponseBody": {
+          "cases": ["array", ["struct._BodyValidationFailure"]]
+        },
+        "_ErrorParseFailure": {
+          "reasons": ["array", ["union._ParseFailure"]]
+        }
       }
     }
   }
