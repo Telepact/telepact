@@ -17,7 +17,7 @@ class _ParseSchemaFnTypeUtil {
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             Map<String, TypeExtension> typeExtensions,
-            boolean isForTrait, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var typeParameterCount = 0;
@@ -40,7 +40,7 @@ class _ParseSchemaFnTypeUtil {
         } else {
             try {
                 resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson, "->",
-                        !isForTrait, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        true, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions,
                         allParseFailures, failedTypes);
             } catch (JApiSchemaParseError e) {

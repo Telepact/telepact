@@ -175,7 +175,7 @@ class _ParseSchemaTypeUtil {
                 type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
                         originalJApiSchema,
                         schemaKeysToIndex, parsedTypes,
-                        typeExtensions, false, allParseFailures, failedTypes);
+                        typeExtensions, allParseFailures, failedTypes);
             } else {
                 var typeExtension = typeExtensions.get(customTypeName);
                 if (typeExtension == null) {
