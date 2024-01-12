@@ -52,17 +52,26 @@ class _ParseSchemaUtil {
 
     static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
         var objectMapper = new ObjectMapper();
-        List<Object> internalJApiSchemaOriginal;
+        Object originalInit;
         try {
-            internalJApiSchemaOriginal = objectMapper.readValue(_InternalJApiUtil.getJson(), new TypeReference<>() {
+            originalInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new JApiSchemaParseError(
+                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
+                    e);
         }
 
-        var internalApi = parseUApiSchema(internalJApiSchemaOriginal, Map.of(), 0);
+        List<Object> secondOriginal;
+        try {
+            secondOriginal = _CastUtil.asList(originalInit);
+        } catch (ClassCastException e) {
+            throw new JApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), originalInit, "Array"),
+                    e);
+        }
 
-        return extendUApiSchema(internalApi, uApiSchemaJson, typeExtensions);
+        return parseUApiSchema(secondOriginal, Map.of(), 0);
     }
 
     private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,

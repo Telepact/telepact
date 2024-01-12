@@ -53,6 +53,9 @@ public class Server {
      */
     public Server(JApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
         this.jApiSchema = jApiSchema;
+
+        this.jApiSchema = JApiSchema.extend(jApiSchema, _InternalJApiUtil.getJson());
+
         this.handler = handler;
 
         this.onError = options.onError;

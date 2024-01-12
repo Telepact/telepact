@@ -3,10 +3,24 @@
     "info.SchemaExample": {}
   },
   {
+    "///": " A type. ",
+    "union.Type": {
+      "Null": {},
+      "Boolean": {},
+      "Integer": {},
+      "Number": {},
+      "String": {},
+      "Array": {},
+      "Object": {},
+      "Any": {},
+      "Unknown": {}
+    }
+  },
+  {
     "union.ValidationFailureReason": {
       "TypeUnexpected": {
-        "expected": ["union._Type"],
-        "actual": ["union._Type"]
+        "expected": ["union.Type"],
+        "actual": ["union.Type"]
       },
       "InvalidTrait": {},
       "TraitDefinitionCannotTargetInternalFunctions": {},
