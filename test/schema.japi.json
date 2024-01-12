@@ -36,7 +36,8 @@
       "JsonInvalid": {},
       "PathCollision": {
         "other": ["array", ["any"]]
-      }
+      },
+      "ObjectKeyDisallowed": {}
     }
   },
   {

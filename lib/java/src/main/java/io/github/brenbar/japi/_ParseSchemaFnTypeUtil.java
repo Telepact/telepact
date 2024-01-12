@@ -48,14 +48,20 @@ class _ParseSchemaFnTypeUtil {
             }
         }
 
-        Object extendsRegexInit = functionDefinitionAsParsedJson.getOrDefault("extends", "^trait\\..*$");
+        var regexPath = _ValidateUtil.append(path, "extends");
+
         String extendsRegex = null;
-        try {
-            extendsRegex = _CastUtil.asString(extendsRegexInit);
-        } catch (ClassCastException e) {
-            var regexPath = _ValidateUtil.append(path, "extends");
-            parseFailures
-                    .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(regexPath, extendsRegexInit, "String"));
+        if (functionDefinitionAsParsedJson.containsKey("extends") && !schemaKey.startsWith("fn._")) {
+            parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
+        } else {
+            Object extendsRegexInit = functionDefinitionAsParsedJson.getOrDefault("extends", "^trait\\..*$");
+            try {
+                extendsRegex = _CastUtil.asString(extendsRegexInit);
+            } catch (ClassCastException e) {
+                parseFailures
+                        .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(regexPath, extendsRegexInit,
+                                "String"));
+            }
         }
 
         if (!parseFailures.isEmpty()) {
