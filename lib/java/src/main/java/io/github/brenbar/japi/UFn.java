@@ -9,11 +9,13 @@ public class UFn implements UType {
     public final String name;
     public final UUnion call;
     public final UUnion result;
+    public final String extendsRegex;
 
-    public UFn(String name, UUnion call, UUnion output) {
+    public UFn(String name, UUnion call, UUnion output, String extendsRegex) {
         this.name = name;
         this.call = call;
         this.result = output;
+        this.extendsRegex = extendsRegex;
     }
 
     @Override

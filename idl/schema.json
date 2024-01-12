@@ -199,6 +199,9 @@
               { "type": "string" },
               { "type": "array", "items": { "type": "string" } }
             ]
+          },
+          "extends": {
+            "type": "string"
           }
         }
       },
@@ -209,34 +212,7 @@
         "patternProperties": {
           "^trait\\.[a-zA-Z_]\\w*": {
             "type": "object",
-            "additionalProperties": {
-              "description": "A function that accepts an argument argument and returns a result union that is either an Ok struct or an error union.",
-              "type": "object",
-              "additionalProperties": false,
-              "patternProperties": {
-                "^[a-zA-Z_]\\w*!?$": {
-                  "$ref": "#/$defs/typeDeclaration"
-                }
-              }
-            },
-            "minProperties": 2,
-            "required": ["->"],
-            "properties": {
-              "->": {
-                "type": "object",
-                "patternProperties": {
-                  "^[a-zA-Z_]\\w*?$": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "patternProperties": {
-                      "^[a-zA-Z_]\\w*!?$": {
-                        "$ref": "#/$defs/typeDeclaration"
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "maxProperties": 0
           }
         },
         "properties": {
@@ -245,6 +221,20 @@
               { "type": "string" },
               { "type": "array", "items": { "type": "string" } }
             ]
+          }
+        },
+        "->": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z_]\\w*?$": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^[a-zA-Z_]\\w*!?$": {
+                  "$ref": "#/$defs/typeDeclaration"
+                }
+              }
+            }
           }
         }
       },

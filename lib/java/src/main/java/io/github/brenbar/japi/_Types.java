@@ -6,13 +6,11 @@ import java.util.stream.Collectors;
 
 class UTrait {
     public final String name;
-    public final UFn fn;
-    public final String regex;
+    public final UUnion errors;
 
-    public UTrait(String name, UFn fn, String regex) {
+    public UTrait(String name, UUnion errors) {
         this.name = name;
-        this.fn = fn;
-        this.regex = regex;
+        this.errors = errors;
     }
 }
 

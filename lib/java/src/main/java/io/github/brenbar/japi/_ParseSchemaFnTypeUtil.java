@@ -48,11 +48,21 @@ class _ParseSchemaFnTypeUtil {
             }
         }
 
+        Object extendsRegexInit = functionDefinitionAsParsedJson.getOrDefault("extends", "^trait\\..*$");
+        String extendsRegex = null;
+        try {
+            extendsRegex = _CastUtil.asString(extendsRegexInit);
+        } catch (ClassCastException e) {
+            var regexPath = _ValidateUtil.append(path, "extends");
+            parseFailures
+                    .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(regexPath, extendsRegexInit, "String"));
+        }
+
         if (!parseFailures.isEmpty()) {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        var type = new UFn(schemaKey, callType, resultType);
+        var type = new UFn(schemaKey, callType, resultType, extendsRegex);
 
         return type;
     }

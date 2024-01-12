@@ -55,7 +55,8 @@
     },
     "->": {
       "Ok": {}
-    }
+    },
+    "extends": "^trait\\._Validated$"
   },
   {
     "///": [
@@ -73,7 +74,8 @@
       "ErrorVerificationFailure": {
         "reason": ["union._VerificationFailure"]
       }
-    }
+    },
+    "extends": "^trait\\._Validated$"
   },
   {
     "///": [
@@ -86,7 +88,8 @@
       "ErrorVerificationFailure": {
         "additionalUnverifiedCalls": ["array", ["ext._Call"]]
       }
-    }
+    },
+    "extends": "^trait\\._Validated$"
   },
   {
     "///": " Clear all stub conditions. ",
@@ -100,7 +103,8 @@
     "fn._clearCalls": {},
     "->": {
       "Ok": {}
-    }
+    },
+    "extends": "^trait\\._Validated$"
   },
   {
     "///": " Set the seed of the random generator. ",
@@ -109,7 +113,8 @@
     },
     "->": {
       "Ok": {}
-    }
+    },
+    "extends": "^trait\\._Validated$"
   },
   {
     "///": [
@@ -117,11 +122,9 @@
       " error, indicating that the mock could not return a result for that function call ",
       " due to no matching stub being available.                                         "
     ],
-    "trait._Mockable": {
-      "fn.*": {},
-      "->": {
-        "_ErrorNoMatchingStub": {}
-      }
+    "trait._Mockable": {},
+    "->": {
+      "_ErrorNoMatchingStub": {}
     }
   }
 ]
