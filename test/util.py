@@ -9,7 +9,6 @@ import nats.aio.client
 import time
 import os
 import copy
-from prometheus_client import Summary
 
 should_abort = False
 
@@ -55,11 +54,9 @@ def handler(request):
         return [response_header, {}]
 
 
-async def backdoor_handler(backdoor_topic):
+async def backdoor_handler(nats_client, backdoor_topic):
     done = asyncio.get_running_loop().create_future()
     try:
-        nats_client = await get_nats_client()
-
         async def nats_handler(msg):
             backdoor_request_bytes = msg.data
             backdoor_request_json = backdoor_request_bytes.decode()
@@ -106,10 +103,8 @@ class NotEnoughIntegerKeys(Exception):
 
 
 
-async def client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=1):
+async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=1):
     try:
-        nats_client = await get_nats_client()
-
         request_was_binary = False
         request_binary_had_enough_integer_keys = False
         response_was_binary = False
@@ -209,10 +204,10 @@ def convert_lists_to_sets(a):
         return a
 
 
-async def verify_server_case(request, expected_response, frontdoor_topic, backdoor_topic):
+async def verify_server_case(nats_client, request, expected_response, frontdoor_topic, backdoor_topic):
     assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
-    backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
+    backdoor_handling_task = asyncio.create_task(backdoor_handler(nats_client, backdoor_topic))
 
     try:
         response = await send_case(nats_client, request, expected_response, frontdoor_topic)
@@ -228,7 +223,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
         assert expected_response == response
 
 
-async def verify_flat_case(request, expected_response, frontdoor_topic):
+async def verify_flat_case(nats_client, request, expected_response, frontdoor_topic):
     assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
     response = await send_case(nats_client, request, expected_response, frontdoor_topic)
@@ -237,16 +232,16 @@ async def verify_flat_case(request, expected_response, frontdoor_topic):
         assert expected_response == response
 
 
-async def verify_client_case(request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, assert_binary=False):
+async def verify_client_case(nats_client, request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, assert_binary=False):
     assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
     client_times = 1
     if assert_rules.get('expectTwoRequests', False):
         client_times = 2
 
-    client_handling_task = None if not client_backdoor_topic else asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=client_times))
+    client_handling_task = None if not client_backdoor_topic else asyncio.create_task(client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=client_times))
 
-    backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(backdoor_handler(backdoor_topic))
+    backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(backdoor_handler(nats_client, backdoor_topic))
 
     try:
         response = await send_case(nats_client, request, expected_response, client_frontdoor_topic)

@@ -61,7 +61,7 @@ def dispatcher_server(loop, nats_server, request, nats_client):
     s: subprocess.Popen = l.start(nats_url, nats_cred_file)
 
     try:                                
-        startup_check(loop, lambda: ping(lib_name), times=20)
+        startup_check(loop, lambda: ping(nats_client, lib_name), times=20)
     except Exception:
         raise       
 
