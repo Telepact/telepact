@@ -23,6 +23,7 @@
       "pStrNullBool!": ["struct<1>.PStr", ["boolean?"]],
       "pUnionBool!": ["union<1>.PUnion", ["boolean"]],
       "pUnionNullBool!": ["union<1>.PUnion", ["boolean?"]],
+      "arrPStrBool!": ["array", ["struct<1>.PStr", ["boolean"]]],
 
       "int!": ["integer"],
       "nullInt!": ["integer?"],
@@ -34,6 +35,7 @@
       "pStrNullInt!": ["struct<1>.PStr", ["integer?"]],
       "pUnionInt!": ["union<1>.PUnion", ["integer"]],
       "pUnionNullInt!": ["union<1>.PUnion", ["integer?"]],
+      "arrPStrInt!": ["array", ["struct<1>.PStr", ["integer"]]],
 
       "num!": ["number"],
       "nullNum!": ["number?"],
@@ -45,6 +47,7 @@
       "pStrNullNum!": ["struct<1>.PStr", ["number?"]],
       "pUnionNum!": ["union<1>.PUnion", ["number"]],
       "pUnionNullNum!": ["union<1>.PUnion", ["number?"]],
+      "arrPStrNum!": ["array", ["struct<1>.PStr", ["number"]]],
 
       "str!": ["string"],
       "nullStr!": ["string?"],
@@ -56,6 +59,7 @@
       "pStrNullStr!": ["struct<1>.PStr", ["string?"]],
       "pUnionStr!": ["union<1>.PUnion", ["string"]],
       "pUnionNullStr!": ["union<1>.PUnion", ["string?"]],
+      "arrPStrStr!": ["array", ["struct<1>.PStr", ["string"]]],
 
       "arr!": ["array", ["any"]],
       "nullArr!": ["array?", ["any"]],
@@ -67,6 +71,7 @@
       "pStrNullArr!": ["struct<1>.PStr", ["array?", ["any"]]],
       "pUnionArr!": ["union<1>.PUnion", ["array", ["any"]]],
       "pUnionNullArr!": ["union<1>.PUnion", ["array?", ["any"]]],
+      "arrPStrArr!": ["array", ["struct<1>.PStr", ["array", ["any"]]]],
 
       "obj!": ["object", ["any"]],
       "nullObj!": ["object?", ["any"]],
@@ -78,6 +83,7 @@
       "pStrNullObj!": ["struct<1>.PStr", ["object?", ["any"]]],
       "pUnionObj!": ["union<1>.PUnion", ["object", ["any"]]],
       "pUnionNullObj!": ["union<1>.PUnion", ["object?", ["any"]]],
+      "arrPStrObj!": ["array", ["struct<1>.PStr", ["object", ["any"]]]],
 
       "any!": ["any"],
       "nullAny!": ["any?"],
@@ -89,6 +95,7 @@
       "pStrNullAny!": ["struct<1>.PStr", ["any?"]],
       "pUnionAny!": ["union<1>.PUnion", ["any"]],
       "pUnionNullAny!": ["union<1>.PUnion", ["any?"]],
+      "arrPStrAny!": ["array", ["struct<1>.PStr", ["any"]]],
 
       "struct!": ["struct.ExStruct"],
       "nullStruct!": ["struct.ExStruct?"],
@@ -100,6 +107,7 @@
       "pStrNullStruct!": ["struct<1>.PStr", ["struct.ExStruct?"]],
       "pUnionStruct!": ["union<1>.PUnion", ["struct.ExStruct"]],
       "pUnionNullStruct!": ["union<1>.PUnion", ["struct.ExStruct?"]],
+      "arrPStrStruct!": ["array", ["struct<1>.PStr", ["struct.ExStruct"]]],
 
       "union!": ["union.ExUnion"],
       "nullUnion!": ["union.ExUnion?"],
@@ -111,6 +119,7 @@
       "pStrNullUnion!": ["struct<1>.PStr", ["union.ExUnion?"]],
       "pUnionUnion!": ["union<1>.PUnion", ["union.ExUnion"]],
       "pUnionNullUnion!": ["union<1>.PUnion", ["union.ExUnion?"]],
+      "arrPStrUnion!": ["array", ["struct<1>.PStr", ["union.ExUnion"]]],
 
       "fn!": ["fn.example"],
       "nullFn!": ["fn.example?"],
@@ -122,6 +131,7 @@
       "pStrNullFn!": ["struct<1>.PStr", ["fn.example?"]],
       "pUnionFn!": ["union<1>.PUnion", ["fn.example"]],
       "pUnionNullFn!": ["union<1>.PUnion", ["fn.example?"]],
+      "arrPStrFn!": ["array", ["struct<1>.PStr", ["fn.example"]]],
 
       "p2Str!": ["struct<2>.P2Str", ["boolean"], ["integer"]],
       "nullP2Str!": ["struct<2>.P2Str?", ["boolean"], ["integer"]],
@@ -151,6 +161,10 @@
         "union<1>.PUnion",
         ["struct<2>.P2Str?", ["boolean"], ["integer"]]
       ],
+      "arrPStrP2Str!": [
+        "array",
+        ["struct<1>.PStr", ["struct<2>.P2Str", ["boolean"], ["integer"]]]
+      ],
 
       "p2Union!": ["union<2>.P2Union", ["boolean"], ["integer"]],
       "nullP2Union!": ["union<2>.P2Union?", ["boolean"], ["integer"]],
@@ -179,6 +193,10 @@
       "pUnionNullP2Union!": [
         "union<1>.PUnion",
         ["union<2>.P2Union?", ["boolean"], ["integer"]]
+      ],
+      "arrPStrP2Union!": [
+        "array",
+        ["struct<1>.PStr", ["union<2>.P2Union", ["boolean"], ["integer"]]]
       ],
 
       "pdStr!": ["struct<1>.PdStr", ["struct<1>.PStr", ["boolean"]]]
