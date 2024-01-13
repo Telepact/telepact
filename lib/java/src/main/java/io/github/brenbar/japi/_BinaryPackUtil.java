@@ -55,13 +55,14 @@ class _BinaryPackUtil {
     static List<Object> packList(List<Object> list) {
         var packedList = new ArrayList<Object>();
         packedList.add(PACKED);
-        var headers = new ArrayList<Object>();
-        packedList.add(headers);
+        var header = new ArrayList<Object>();
+        header.add(null);
+        packedList.add(header);
         var keyIndexMap = new HashMap<Integer, Node>();
         try {
             for (var e : list) {
                 if (e instanceof Map<?, ?> m) {
-                    var row = packMap(m, headers, keyIndexMap);
+                    var row = packMap(m, header, keyIndexMap);
                     packedList.add(row);
                 } else {
                     // This list cannot be packed, abort
@@ -91,7 +92,7 @@ class _BinaryPackUtil {
             var keyIndex = keyIndexMap.get(key);
 
             if (keyIndex == null) {
-                keyIndex = new Node(header.size(), new HashMap<>());
+                keyIndex = new Node(header.size() - 1, new HashMap<>());
                 if (entry.getValue() instanceof Map<?, ?>) {
                     header.add(new ArrayList<>(List.of(key)));
                 } else {
@@ -105,13 +106,13 @@ class _BinaryPackUtil {
             if (entry.getValue() instanceof Map<?, ?> m2) {
                 List<Object> nestedHeader;
                 try {
-                    nestedHeader = (List<Object>) header.get(keyIndex.value);
+                    nestedHeader = (List<Object>) header.get(keyIndex.value + 1);
                 } catch (ClassCastException e) {
                     throw new CannotPack();
                 }
                 packedValue = packMap(m2, nestedHeader, keyIndex.nested);
             } else {
-                if (header.get(keyIndex.value) instanceof List) {
+                if (header.get(keyIndex.value + 1) instanceof List) {
                     throw new CannotPack();
                 }
                 packedValue = pack(entry.getValue());
@@ -183,7 +184,7 @@ class _BinaryPackUtil {
     static Map<Integer, Object> unpackMap(List<Object> row, List<Object> header) {
         var finalMap = new HashMap<Integer, Object>();
         for (int j = 0; j < row.size(); j += 1) {
-            var key = header.get(j);
+            var key = header.get(j + 1);
             var value = row.get(j);
             if (value instanceof MessagePackExtensionType t && t.getType() == UNDEFINED.getType()) {
                 continue;
