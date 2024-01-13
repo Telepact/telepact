@@ -11,7 +11,7 @@ def load_json_server_proc(loop, nats_server, dispatcher_server, request):
     lib_name = request.param
 
     init_topics = ['client-frontdoor', 'frontdoor']
-    topics = tuple('{}.{}.{}'.format(lib_name, 'load', t) for t in init_topics)    
+    topics = tuple('{}.{}.{}'.format(lib_name, 'load-json', t) for t in init_topics)    
 
     cserver_id = '{}.{}'.format(lib_name, 'load-json-client')
     server_id = '{}.{}'.format(lib_name, 'load-json-server')
@@ -57,7 +57,7 @@ def test_load_json_case(loop, load_json_server_proc):
     topics = load_json_server_proc
 
     async def t():
-        for _ in range(10):
+        for _ in range(1000):
             req = [{}, {'fn.getData': {}}]
             await verify_client_case(req, None, topics[0], None, topics[1], None)
                                                  
