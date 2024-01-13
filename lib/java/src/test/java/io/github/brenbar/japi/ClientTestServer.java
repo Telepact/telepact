@@ -72,6 +72,9 @@ public class ClientTestServer {
                 var response = client.send(request);
 
                 var responsePseudoJson = List.of(response.header, response.body);
+
+                System.out.println(responsePseudoJson);
+
                 var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
                 System.out.println("   <-C  %s".formatted(new String(responseBytes)));
@@ -79,6 +82,7 @@ public class ClientTestServer {
 
                 connection.publish(msg.getReplyTo(), responseBytes);
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         });

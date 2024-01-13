@@ -22,7 +22,9 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = encode(messageBody, binaryEncoder);
 
-        return List.of(headers, encodedMessageBody);
+        var packedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
+
+        return List.of(headers, packedMessageBody);
     }
 
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder)
@@ -39,7 +41,9 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
-        var messageBody = decode(encodedMessageBody, binaryEncoder);
+        var unpackedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+
+        var messageBody = decode(unpackedMessageBody, binaryEncoder);
 
         return List.of(headers, messageBody);
     }
@@ -75,7 +79,9 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = encode(messageBody, binaryEncoder);
 
-        return List.of(headers, encodedMessageBody);
+        var packedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
+
+        return List.of(headers, packedMessageBody);
     }
 
     static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
@@ -101,7 +107,9 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
-        var messageBody = decode(encodedMessageBody, binaryEncoder);
+        var unpackedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+
+        var messageBody = decode(unpackedMessageBody, binaryEncoder);
 
         return List.of(headers, messageBody);
     }
