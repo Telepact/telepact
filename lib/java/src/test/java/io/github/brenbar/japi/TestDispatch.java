@@ -22,7 +22,11 @@ public class TestDispatch {
 
     @Test
     public void runDispatcher() throws InterruptedException, IOException {
-        var natsUrl = "nats://127.0.0.1:4222";
+        var natsUrl = System.getenv("NATS_URL");
+        if (natsUrl == null) {
+            throw new RuntimeException("NATS_URL env var not set");
+        }
+
         var objectMapper = new ObjectMapper();
 
         var lock = new ReentrantLock();

@@ -8,7 +8,7 @@ import json
 
 
 @pytest.fixture(scope="module", params=get_lib_modules())
-def server_proc(loop, nats_server, dispatcher_server, request):
+def server_proc(loop, nats_client, dispatcher_server, request):
     lib_name = request.param
 
     init_topics = ['frontdoor', 'backdoor']
@@ -17,21 +17,19 @@ def server_proc(loop, nats_server, dispatcher_server, request):
     server_id = '{}.{}'.format(lib_name, 'server')
 
     async def t():
-        nats_client = await get_nats_client()
         req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[0], 'backdoorTopic': topics[1]}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)
 
     loop.run_until_complete(t())    
     
     try:                                
-        startup_check(loop, lambda: verify_server_case(ping_req, None, *topics))
+        startup_check(loop, lambda: verify_server_case(nats_client, ping_req, None, *topics))
     except Exception:
         raise   
     
     yield topics
 
     async def t2():
-        nats_client = await get_nats_client()
         req = json.dumps([{}, {'Stop': {'id': server_id}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)
 
@@ -39,10 +37,10 @@ def server_proc(loop, nats_server, dispatcher_server, request):
     
     print('basic_server_proc stopped')
 
-def test_server_case(loop, server_proc, name, req, res):
+def test_server_case(loop, server_proc, nats_client, name, req, res):
     topics = server_proc
     
     async def t():
-        await verify_server_case(req, res, *topics)
+        await verify_server_case(nats_client, req, res, *topics)
     
     loop.run_until_complete(t())

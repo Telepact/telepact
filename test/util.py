@@ -9,6 +9,7 @@ import nats.aio.client
 import time
 import os
 import copy
+from prometheus_client import Summary
 
 should_abort = False
 
@@ -185,15 +186,6 @@ def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
-nc = None
-
-async def get_nats_client():
-    global nc
-    if not nc:
-        nc = await nats.connect(Constants.nats_url) 
-    return nc
-
-
 class hashabledict(dict):
   def __key(self):
     return tuple(sorted(self.items()))
@@ -223,7 +215,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
     backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
 
     try:
-        response = await send_case(request, expected_response, frontdoor_topic)
+        response = await send_case(nats_client, request, expected_response, frontdoor_topic)
     finally:
         backdoor_handling_task.cancel()
         await backdoor_handling_task
@@ -239,7 +231,7 @@ async def verify_server_case(request, expected_response, frontdoor_topic, backdo
 async def verify_flat_case(request, expected_response, frontdoor_topic):
     assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
 
-    response = await send_case(request, expected_response, frontdoor_topic)
+    response = await send_case(nats_client, request, expected_response, frontdoor_topic)
 
     if expected_response:
         assert expected_response == response
@@ -257,7 +249,7 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
     backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(backdoor_handler(backdoor_topic))
 
     try:
-        response = await send_case(request, expected_response, client_frontdoor_topic)
+        response = await send_case(nats_client, request, expected_response, client_frontdoor_topic)
     finally:
         if backdoor_handling_task:
             backdoor_handling_task.cancel()
@@ -291,8 +283,8 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
             assert response_binary_had_enough_integer_keys == True
 
 
-async def send_case(request, expected_response, request_topic):
-    nats_client = await get_nats_client()
+
+async def send_case(nats_client, request, expected_response, request_topic):
 
     print('T->     {}'.format(request), flush=True)
 
@@ -321,8 +313,8 @@ async def send_case(request, expected_response, request_topic):
 
 ping_req = [{},{'fn._ping': {}}]
 
-async def ping(topic):
-    nats_client = await get_nats_client()
+
+async def ping(nats_client, topic):
     req = json.dumps([{}, {'Ping': {}}])
     await nats_client.request(topic, req.encode(), timeout=1)
 
