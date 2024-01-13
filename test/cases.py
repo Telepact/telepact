@@ -99,6 +99,13 @@ def get_values(given_field: str, the_type, given_correct_values, additional_inco
     incorrect_values = [([init_correct_values[0], v], [(r, p)]) for v, [(r, p)] in init_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field, 1, 'wrap']
 
+    field = 'arrP2Str{}'.format(cap(given_field))
+    init_correct_values = [{'wrap': False, 'nest': [v]} for v in given_correct_values]
+    correct_values = [[]] + [[v] for v in init_correct_values] + [init_correct_values]
+    init_incorrect_values_w_null = [({'wrap': False, 'nest': [v]}, e) for v, e in given_incorrect_values_w_null]
+    incorrect_values = [([init_correct_values[0], v], [(r, p)]) for v, [(r, p)] in init_incorrect_values_w_null]
+    yield field, correct_values, incorrect_values, [field, 1, 'nest', 0]
+
 
 def is_iter(v):
     try:
