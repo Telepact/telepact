@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.japi.Server.Options;
@@ -18,7 +20,8 @@ import io.nats.client.Dispatcher;
 
 public class TestServer {
 
-    public static Dispatcher start(Connection connection, String apiSchemaPath, String frontdoorTopic,
+    public static Dispatcher start(Connection connection, MetricRegistry metrics, String apiSchemaPath,
+            String frontdoorTopic,
             String backdoorTopic)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
@@ -31,6 +34,8 @@ public class TestServer {
                 ]
                 """);
         var objectMapper = new ObjectMapper();
+
+        var timers = metrics.timer(frontdoorTopic);
 
         var serveAlternateServer = new AtomicBoolean();
 
@@ -86,15 +91,19 @@ public class TestServer {
                 new Options().setOnError((e) -> e.printStackTrace()));
 
         var dispatcher = connection.createDispatcher((msg) -> {
+
             var requestBytes = msg.getData();
 
             System.out.println("    ->S %s".formatted(new String(requestBytes)));
             System.out.flush();
+
             byte[] responseBytes;
-            if (serveAlternateServer.get()) {
-                responseBytes = alternateServer.process(requestBytes);
-            } else {
-                responseBytes = server.process(requestBytes);
+            try (var time = timers.time()) {
+                if (serveAlternateServer.get()) {
+                    responseBytes = alternateServer.process(requestBytes);
+                } else {
+                    responseBytes = server.process(requestBytes);
+                }
             }
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
             System.out.flush();

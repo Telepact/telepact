@@ -5,12 +5,15 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Map;
 
+import com.codahale.metrics.MetricRegistry;
+
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 
 public class MockTestServer {
 
-    public static Dispatcher start(Connection connection, String apiSchemaPath, String frontdoorTopic,
+    public static Dispatcher start(Connection connection, MetricRegistry metrics, String apiSchemaPath,
+            String frontdoorTopic,
             Map<String, Object> config)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
@@ -23,7 +26,10 @@ public class MockTestServer {
         if (config != null) {
             options.generatedCollectionLengthMin = (Integer) config.get("minLength");
             options.generatedCollectionLengthMax = (Integer) config.get("maxLength");
+            options.enableGeneratedDefaultStub = (Boolean) config.get("enableGen");
         }
+
+        var timers = metrics.timer(frontdoorTopic);
 
         var server = new MockServer(jApi, options);
 
@@ -32,7 +38,12 @@ public class MockTestServer {
 
             System.out.println("    ->S %s".formatted(new String(requestBytes)));
             System.out.flush();
-            var responseBytes = server.process(requestBytes);
+
+            byte[] responseBytes;
+            try (var time = timers.time()) {
+                responseBytes = server.process(requestBytes);
+            }
+
             System.out.println("    <-S %s".formatted(new String(responseBytes)));
             System.out.flush();
 

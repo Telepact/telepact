@@ -10,6 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,6 +27,9 @@ public class TestDispatch {
 
         var lock = new ReentrantLock();
         var done = lock.newCondition();
+
+        final var metrics = new MetricRegistry();
+        var metricsReporter = ConsoleReporter.forRegistry(metrics).build();
 
         var servers = new HashMap<String, Dispatcher>();
         try (var connection = Nats.connect(natsUrl)) {
@@ -64,7 +69,7 @@ public class TestDispatch {
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
                             var backdoorTopic = (String) payload.get("backdoorTopic");
 
-                            var d = TestServer.start(connection, apiSchemaPath, frontdoorTopic, backdoorTopic);
+                            var d = TestServer.start(connection, metrics, apiSchemaPath, frontdoorTopic, backdoorTopic);
 
                             servers.put(id, d);
                         }
@@ -74,7 +79,8 @@ public class TestDispatch {
                             var clientBackdoorTopic = (String) payload.get("clientBackdoorTopic");
                             var useBinary = (Boolean) payload.getOrDefault("useBinary", false);
 
-                            var d = ClientTestServer.start(connection, clientFrontdoorTopic, clientBackdoorTopic,
+                            var d = ClientTestServer.start(connection, metrics, clientFrontdoorTopic,
+                                    clientBackdoorTopic,
                                     useBinary);
 
                             servers.put(id, d);
@@ -84,7 +90,7 @@ public class TestDispatch {
                             var apiSchemaPath = (String) payload.get("apiSchemaPath");
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
                             var config = (Map<String, Object>) payload.get("config");
-                            var d = MockTestServer.start(connection, apiSchemaPath, frontdoorTopic, config);
+                            var d = MockTestServer.start(connection, metrics, apiSchemaPath, frontdoorTopic, config);
 
                             servers.put(id, d);
                         }
@@ -92,7 +98,7 @@ public class TestDispatch {
                             var id = (String) payload.get("id");
                             var apiSchemaPath = (String) payload.get("apiSchemaPath");
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
-                            var d = SchemaTestServer.start(connection, apiSchemaPath, frontdoorTopic);
+                            var d = SchemaTestServer.start(connection, metrics, apiSchemaPath, frontdoorTopic);
 
                             servers.put(id, d);
                         }
@@ -121,6 +127,8 @@ public class TestDispatch {
 
             lock.lock();
             done.await();
+
+            metricsReporter.report();
 
             System.out.println("Dispatcher exiting");
         }

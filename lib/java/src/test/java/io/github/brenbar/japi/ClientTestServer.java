@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.japi.Client.Adapter;
@@ -15,10 +16,12 @@ import io.nats.client.Dispatcher;
 
 public class ClientTestServer {
 
-    public static Dispatcher start(Connection connection, String clientFrontdoorTopic,
+    public static Dispatcher start(Connection connection, MetricRegistry metrics, String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary)
             throws IOException, InterruptedException {
         var objectMapper = new ObjectMapper();
+
+        var timers = metrics.timer(clientFrontdoorTopic);
 
         Adapter adapter = (m, s) -> {
             return CompletableFuture.supplyAsync(() -> {
@@ -70,7 +73,10 @@ public class ClientTestServer {
                 var requestBody = (Map<String, Object>) requestPseudoJson.get(1);
                 var request = new Message(requestHeaders, requestBody);
 
-                var response = client.send(request);
+                Message response;
+                try (var time = timers.time()) {
+                    response = client.send(request);
+                }
 
                 var responsePseudoJson = List.of(response.header, response.body);
 

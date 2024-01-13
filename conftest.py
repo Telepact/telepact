@@ -17,7 +17,7 @@ import importlib
 @pytest.fixture(scope='session')
 def nats_server():
     print('Creating NATS fixture')
-    p = subprocess.Popen(['nats-server', '-DV'])
+    p = subprocess.Popen(['nats-server', '-D'])
     yield p
     p.terminate()
     p.wait()

@@ -22,9 +22,11 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = encode(messageBody, binaryEncoder);
 
-        var packedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
+        if (Objects.equals(true, headers.get("_pac"))) {
+            encodedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
+        }
 
-        return List.of(headers, packedMessageBody);
+        return List.of(headers, encodedMessageBody);
     }
 
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder)
@@ -41,9 +43,11 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
-        var unpackedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+        if (Objects.equals(true, headers.get("_pac"))) {
+            encodedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+        }
 
-        var messageBody = decode(unpackedMessageBody, binaryEncoder);
+        var messageBody = decode(encodedMessageBody, binaryEncoder);
 
         return List.of(headers, messageBody);
     }
@@ -79,9 +83,11 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = encode(messageBody, binaryEncoder);
 
-        var packedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
+        if (Objects.equals(true, headers.get("_pac"))) {
+            encodedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
+        }
 
-        return List.of(headers, packedMessageBody);
+        return List.of(headers, encodedMessageBody);
     }
 
     static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
@@ -107,9 +113,11 @@ class _BinaryEncodeUtil {
 
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
-        var unpackedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+        if (Objects.equals(true, headers.get("_pac"))) {
+            encodedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+        }
 
-        var messageBody = decode(unpackedMessageBody, binaryEncoder);
+        var messageBody = decode(encodedMessageBody, binaryEncoder);
 
         return List.of(headers, messageBody);
     }

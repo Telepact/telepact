@@ -7,7 +7,7 @@ import importlib
 import json
 
 @pytest.fixture(scope="module", params=get_lib_modules())
-def load_server_proc(loop, nats_server, dispatcher_server, request):
+def load_json_server_proc(loop, nats_server, dispatcher_server, request):
     lib_name = request.param
 
     init_topics = ['client-frontdoor', 'frontdoor']
@@ -18,9 +18,9 @@ def load_server_proc(loop, nats_server, dispatcher_server, request):
 
     async def t():
         nats_client = await get_nats_client()
-        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config': {'minLength': 100, 'maxLength': 150}}}])
+        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config': {'minLength': 100, 'maxLength': 150, 'enableGen': True}}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)    
-        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': True}}])
+        req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': False}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t())         
@@ -50,15 +50,15 @@ def load_server_proc(loop, nats_server, dispatcher_server, request):
 
     loop.run_until_complete(t2()) 
 
-    print('load_server_proc stopped')
+    print('load_json_server_proc stopped')
 
 
-def test_load_case(loop, load_server_proc):
-    topics = load_server_proc
+def test_load_json_case(loop, load_json_server_proc):
+    topics = load_json_server_proc
 
     async def t():
         for _ in range(10):
-            req = [{'_mockEnableGeneratedStub': True}, {'fn.getData': {}}]
+            req = [{}, {'fn.getData': {}}]
             await verify_client_case(req, None, topics[0], None, topics[1], None)
                                                  
     loop.run_until_complete(t())
