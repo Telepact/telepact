@@ -1,5 +1,6 @@
 package io.github.brenbar.japi;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.CsvReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +31,8 @@ public class TestDispatch {
         var done = lock.newCondition();
 
         final var metrics = new MetricRegistry();
-        var metricsReporter = ConsoleReporter.forRegistry(metrics).build();
+        var metricsFile = new File("./metrics/");
+        var metricsReporter = CsvReporter.forRegistry(metrics).build(metricsFile);
 
         var servers = new HashMap<String, Dispatcher>();
         try (var connection = Nats.connect(natsUrl)) {

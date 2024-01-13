@@ -13,8 +13,8 @@ def load_binary_server_proc(loop, nats_server, dispatcher_server, request):
     init_topics = ['client-frontdoor', 'frontdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'load', t) for t in init_topics)    
 
-    cserver_id = '{}.{}'.format(lib_name, 'load-client')
-    server_id = '{}.{}'.format(lib_name, 'load-server')
+    cserver_id = '{}.{}'.format(lib_name, 'load-json-client')
+    server_id = '{}.{}'.format(lib_name, 'load-json-server')
 
     async def t():
         nats_client = await get_nats_client()

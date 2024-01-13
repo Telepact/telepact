@@ -5,5 +5,4 @@ src/test/java/io/github/brenbar/japi/GeneratedMockInvalidStubTests.java
 target/
 src/main/resources/internal.japi.json
 src/main/resources/mock-internal.japi.json
-
-
+metrics/
