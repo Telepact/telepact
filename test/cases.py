@@ -215,9 +215,9 @@ cases = {
     'array': [v for v in generate_basic_cases('arr!', list, [[], [False, 0, 0.1, '']])],
     'object': [v for v in generate_basic_cases('obj!', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
     'any': [v for v in generate_basic_cases('any!', Any, [False, 0, 0.1, '', [], {}])],
-    'struct' : [v for v in generate_basic_cases('struct!', dict, [{'required': False}, {'optional!': False, 'required': False}], additional_struct_cases)],
-    'union' : [v for v in generate_basic_cases('union!', dict, [{'One': {}}, {'Two':{'required': False}}, {'Two':{'optional!': False, 'required': False}}], additional_union_cases)],
-    'fn' : [v for v in generate_basic_cases('fn!', dict, [{'fn.example':{'required': False}}, {'fn.example':{'optional!': False, 'required': False}}], additional_fn_cases)],
+    'struct' : [v for v in generate_basic_cases('struct!', dict, [{'required': True}, {'optional!': False, 'required': True}, {'optional2!': 0, 'required': True}, {'optional!': False, 'optional2!': 0, 'required': True}], additional_struct_cases)],
+    'union' : [v for v in generate_basic_cases('union!', dict, [{'One': {}}, {'Two':{'required': True}}, {'Two':{'optional!': False, 'required': True}}], additional_union_cases)],
+    'fn' : [v for v in generate_basic_cases('fn!', dict, [{'fn.example':{'required': True}}, {'fn.example':{'optional!': False, 'required': True}}], additional_fn_cases)],
     'p2Str': [v for v in generate_basic_cases('p2Str!', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
     'p2Union': [v for v in generate_basic_cases('p2Union!', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)],
     'testPdStr': [

@@ -211,7 +211,8 @@
     ],
     "struct.ExStruct": {
       "required": ["boolean"],
-      "optional!": ["boolean"]
+      "optional!": ["boolean"],
+      "optional2!": ["integer"]
     }
   },
 
