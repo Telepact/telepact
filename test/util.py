@@ -273,14 +273,6 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
         response[0].pop('_bin', None)
         response[0].pop('_enc', None)
 
-        if not assert_rules.get('skipBinaryCheck', False):
-            assert request_was_binary == True
-            assert response_was_binary == True
-
-        if not assert_rules.get('skipFieldIdCheck', False):
-            assert request_binary_had_enough_integer_keys == True
-            assert response_binary_had_enough_integer_keys == True
-
     if expected_response:
         if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
@@ -288,7 +280,14 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
 
         assert expected_response == response
 
-    # TODO: verify that binary was being done    
+    if assert_binary:
+        if not assert_rules.get('skipBinaryCheck', False):
+            assert request_was_binary == True
+            assert response_was_binary == True
+
+        if not assert_rules.get('skipFieldIdCheck', False):
+            assert request_binary_had_enough_integer_keys == True
+            assert response_binary_had_enough_integer_keys == True
 
 
 async def send_case(request, expected_response, request_topic):

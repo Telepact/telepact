@@ -48,6 +48,7 @@ public class ClientTestServer {
                     var responseMessage = s.deserialize(responseBytes);
                     return responseMessage;
                 } catch (Exception e) {
+                    System.out.println(e);
                     throw new RuntimeException(e);
                 }
             });
@@ -82,7 +83,7 @@ public class ClientTestServer {
 
                 connection.publish(msg.getReplyTo(), responseBytes);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e);
                 throw new RuntimeException(e);
             }
         });

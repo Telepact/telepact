@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.CannotProceedException;
+
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
 class _BinaryPackUtil {
@@ -101,9 +103,17 @@ class _BinaryPackUtil {
 
             Object packedValue;
             if (entry.getValue() instanceof Map<?, ?> m2) {
-                var nestedHeader = (List<Object>) header.get(keyIndex.value);
+                List<Object> nestedHeader;
+                try {
+                    nestedHeader = (List<Object>) header.get(keyIndex.value);
+                } catch (ClassCastException e) {
+                    throw new CannotPack();
+                }
                 packedValue = packMap(m2, nestedHeader, keyIndex.nested);
             } else {
+                if (header.get(keyIndex.value) instanceof List) {
+                    throw new CannotPack();
+                }
                 packedValue = pack(entry.getValue());
             }
 
