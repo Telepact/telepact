@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
+import io.nats.client.Options;
 
 public class TestDispatch {
 
@@ -25,6 +26,14 @@ public class TestDispatch {
         var natsUrl = System.getenv("NATS_URL");
         if (natsUrl == null) {
             throw new RuntimeException("NATS_URL env var not set");
+        }
+
+        var natsOptionsBuilder = new Options.Builder();
+        natsOptionsBuilder.server(natsUrl);
+
+        var natsCredFile = System.getenv("NATS_CRED_FILE");
+        if (natsCredFile != null) {
+            natsOptionsBuilder.authHandler(Nats.credentials(natsCredFile));
         }
 
         var objectMapper = new ObjectMapper();
@@ -37,7 +46,7 @@ public class TestDispatch {
         var metricsReporter = CsvReporter.forRegistry(metrics).build(metricsFile);
 
         var servers = new HashMap<String, Dispatcher>();
-        try (var connection = Nats.connect(natsUrl)) {
+        try (var connection = Nats.connect(natsOptionsBuilder.build())) {
             var dispatcher = connection.createDispatcher((msg) -> {
                 var requestBytes = msg.getData();
 

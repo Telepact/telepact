@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "143d3f6d40e3f64e34744c0380cb1693f1658f9a3818dfb94924642a6231e46c"
+            "sha256": "09e9067e43cd17adc1aa4183386d0762a632d3aee54ede02f8588edef09b2ba8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,8 +16,23 @@
             }
         ]
     },
-    "default": {},
+    "default": {
+        "certifi": {
+            "hashes": [
+                "sha256:9b469f3a900bf28dc19b8cfbf8019bf47f7fdd1a65a1d4ffb98fc14166beb4d1",
+                "sha256:e036ab49d5b79556f99cfc2d9320b34cfbe5be05c5871b51de9329f0603b0474"
+            ],
+            "index": "pypi",
+            "version": "==2023.11.17"
+        }
+    },
     "develop": {
+        "ed25519": {
+            "hashes": [
+                "sha256:02053ee019ceef0df97294be2d4d5a8fc120fc86e81e08bec1245fc0f9403358"
+            ],
+            "version": "==1.5"
+        },
         "iniconfig": {
             "hashes": [
                 "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3",
@@ -94,6 +109,13 @@
             ],
             "index": "pypi",
             "version": "==2.6.0"
+        },
+        "nkeys": {
+            "hashes": [
+                "sha256:93482ab08ff9625882b988c3ea58fd1a6ef0061b60f95946742cc1394578760a"
+            ],
+            "index": "pypi",
+            "version": "==0.1.0"
         },
         "packaging": {
             "hashes": [

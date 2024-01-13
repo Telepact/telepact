@@ -24,8 +24,15 @@ def nats_server(loop, request):
 
     print('Creating NATS fixture')
 
+    p = None
     if nats_cred_file:
-        nats_url = 'tls://connect.ngs.global'
+        print('###########################################################################')
+        print('#                                WARNING!                                 #')
+        print('#                                                                         #')
+        print('#                        Using Global NATS server                         #')
+        print('###########################################################################')
+        print('')
+        nats_url = 'tls://connect.ngs.global:4222'
     else:
         nats_url = 'nats://127.0.0.1:4222'
         p = subprocess.Popen(['nats-server', '-D'])
@@ -43,11 +50,17 @@ def nats_client(loop, nats_server):
 
     client = None
 
+    async def error_cb(e):    
+        print('NATS connection error', e)
+
     async def f():
         nonlocal client
-        client = await nats.connect(url,  user_credentials=cred_file)
+        print('NATS client connecting to {}'.format(url))
+        client = await nats.connect(url,  user_credentials=cred_file, error_cb=error_cb)
 
     loop.run_until_complete(f())
+
+    print('NATS client connected!')
 
     yield client
 
