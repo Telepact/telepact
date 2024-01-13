@@ -17,22 +17,13 @@ public class MockServer {
         public Consumer<Throwable> onError = (e) -> {
         };
         public boolean enableGeneratedDefaultStub = true;
-
-        public Options setOnError(Consumer<Throwable> onError) {
-            this.onError = onError;
-            return this;
-        }
-
-        public Options setEnableGeneratedDefaultStub(boolean enableGeneratedDefaultStub) {
-            this.enableGeneratedDefaultStub = enableGeneratedDefaultStub;
-            return this;
-        }
-
+        public int generatedCollectionLengthMin = 0;
+        public int generatedCollectionLengthMax = 3;
     }
 
     public final Server server;
     private final RandomGenerator random;
-    private boolean enableGeneratedDefaultStub;
+    private final boolean enableGeneratedDefaultStub;
 
     private final List<MockStub> stubs = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
@@ -56,7 +47,7 @@ public class MockServer {
 
         parsedTypes.putAll(server.jApiSchema.parsed);
 
-        this.random = new RandomGenerator();
+        this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
     }
 
@@ -68,23 +59,6 @@ public class MockServer {
      */
     public MockServer resetRandomSeed(int seed) {
         this.random.setSeed(seed);
-        return this;
-    }
-
-    /**
-     * Set an error handler to run on every error that occurs during request
-     * processing.
-     * 
-     * @param onError
-     * @return
-     */
-    public MockServer setOnError(Consumer<Throwable> onError) {
-        this.server.onError = onError;
-        return this;
-    }
-
-    public MockServer setEnableGeneratedDefaultStub(boolean enableGeneratedDefaultStub) {
-        this.enableGeneratedDefaultStub = enableGeneratedDefaultStub;
         return this;
     }
 

@@ -4,7 +4,14 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 public class RandomGenerator {
-    private int seed;
+    private int seed = 0;
+    private int collectionLengthMin;
+    private int collectionLengthMax;
+
+    public RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
+        this.collectionLengthMin = collectionLengthMin;
+        this.collectionLengthMax = collectionLengthMax;
+    }
 
     public void setSeed(int seed) {
         this.seed = seed;
@@ -33,5 +40,9 @@ public class RandomGenerator {
         var x = (double) (nextInt(Integer.MAX_VALUE / 2) + (Integer.MAX_VALUE / 4));
         var y = Integer.MAX_VALUE;
         return x / (x + y);
+    }
+
+    public int nextCollectionLength() {
+        return nextInt(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
     }
 }

@@ -7,33 +7,33 @@ import importlib
 import json
 
 @pytest.fixture(scope="module", params=get_lib_modules())
-def binary_client_server_proc(loop, nats_server, dispatcher_server, request):
+def load_server_proc(loop, nats_server, dispatcher_server, request):
     lib_name = request.param
 
-    init_topics = ['client-frontdoor', 'client-backdoor', 'frontdoor', 'backdoor']
-    topics = tuple('{}.{}.{}'.format(lib_name, 'binary-client-server', t) for t in init_topics)    
+    init_topics = ['client-frontdoor', 'frontdoor']
+    topics = tuple('{}.{}.{}'.format(lib_name, 'load', t) for t in init_topics)    
 
-    cserver_id = '{}.{}'.format(lib_name, 'binary-client-server-client')
-    server_id = '{}.{}'.format(lib_name, 'binary-client-server-server')
+    cserver_id = '{}.{}'.format(lib_name, 'load-client')
+    server_id = '{}.{}'.format(lib_name, 'load-server')
 
     async def t():
         nats_client = await get_nats_client()
-        req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path, 'frontdoorTopic': topics[2], 'backdoorTopic': topics[3]}}])
-        await nats_client.request(lib_name, req.encode(), timeout=1)
+        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config': {'minLength': 100, 'maxLength': 150}}}])
+        await nats_client.request(lib_name, req.encode(), timeout=1)    
         req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': True}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t())         
                
     try:                          
-        startup_check(loop, lambda: verify_client_case(ping_req, None, *topics))
+        startup_check(loop, lambda: verify_client_case(ping_req, None, topics[0], None, topics[1], None))
     except Exception:
         raise                                         
 
     try:
         async def warmup():
             request = [{}, {'fn._ping': {}}]
-            await verify_client_case(request, None, *topics)
+            await verify_client_case(request, None, topics[0], None, topics[1], None)
 
         loop.run_until_complete(warmup())
     except Exception:
@@ -50,12 +50,15 @@ def binary_client_server_proc(loop, nats_server, dispatcher_server, request):
 
     loop.run_until_complete(t2()) 
 
-    print('binary_client_server_proc stopped')
-    
-def test_binary_client_server_case(loop, binary_client_server_proc, name, req, res):
-    topics = binary_client_server_proc
+    print('load_server_proc stopped')
+
+
+def test_load_case(loop, load_server_proc):
+    topics = load_server_proc
 
     async def t():
-        await verify_client_case(req, res, *topics, assert_binary=True)
+        for _ in range(10):
+            req = [{'_mockEnableGeneratedStub': True}, {'fn.getData': {}}]
+            await verify_client_case(req, None, topics[0], None, topics[1], None)
                                                  
     loop.run_until_complete(t())

@@ -28,9 +28,10 @@ public class LoadTest {
 
         var jApiSchema = JApiSchema.fromJson(json);
 
-        var server = new MockServer(jApiSchema, new Options())
-                .setOnError((e) -> e.printStackTrace())
-                .setEnableGeneratedDefaultStub(true);
+        var options = new Options();
+        options.onError = (e) -> e.printStackTrace();
+        options.enableGeneratedDefaultStub = true;
+        var server = new MockServer(jApiSchema, options);
 
         var natsUrl = "nats://127.0.0.1:4222";
 
@@ -73,11 +74,11 @@ public class LoadTest {
                 });
             };
 
-            var options = new Client.Options();
-            options.useBinaryDefault = false;
-            options.timeoutMsDefault = 600000;
+            var clientOptions = new Client.Options();
+            clientOptions.useBinaryDefault = false;
+            clientOptions.timeoutMsDefault = 600000;
 
-            var client = new Client(adapter, options);
+            var client = new Client(adapter, clientOptions);
 
             // warmup
             var requestMessage = new Message("fn.getPaperTape", Map.of());

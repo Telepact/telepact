@@ -53,7 +53,7 @@ public class UObject implements UType {
             }
             return obj;
         } else {
-            var length = random.nextInt(3);
+            var length = random.nextCollectionLength();
             var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
                 var key = random.nextString();

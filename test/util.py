@@ -16,6 +16,7 @@ class Constants:
     example_api_path = '../../test/example.japi.json'
     binary_api_path = '../../test/binary.japi.json'
     schema_api_path = '../../test/schema.japi.json'
+    load_api_path = '../../test/load.japi.json'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'
@@ -193,10 +194,6 @@ async def get_nats_client():
     return nc
 
 
-def start_nats_server():
-    return subprocess.Popen(['nats-server', '-DV'])
-
-
 class hashabledict(dict):
   def __key(self):
     return tuple(sorted(self.items()))
@@ -255,23 +252,27 @@ async def verify_client_case(request, expected_response, client_frontdoor_topic,
     if assert_rules.get('expectTwoRequests', False):
         client_times = 2
 
-    client_handling_task = asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=client_times))    
-    backdoor_handling_task = asyncio.create_task(backdoor_handler(backdoor_topic))
+    client_handling_task = None if not client_backdoor_topic else asyncio.create_task(client_backdoor_handler(client_backdoor_topic, frontdoor_topic, times=client_times))
+
+    backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(backdoor_handler(backdoor_topic))
 
     try:
         response = await send_case(request, expected_response, client_frontdoor_topic)
     finally:
-        backdoor_handling_task.cancel()
-        client_handling_task.cancel()
-        await backdoor_handling_task
-        await client_handling_task
-        (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys) = client_handling_task.result() or (False, False, False, False)
+        if backdoor_handling_task:
+            backdoor_handling_task.cancel()
+            await backdoor_handling_task
+        if client_handling_task:
+            client_handling_task.cancel()
+            await client_handling_task
+            (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys) = client_handling_task.result() or (False, False, False, False)
 
     if assert_binary:
         if 'Error' not in next(iter(response[1])):
             assert '_bin' in response[0]
-        response[0].pop('_bin', None)
-        response[0].pop('_enc', None)
+
+    response[0].pop('_bin', None)
+    response[0].pop('_enc', None)
 
     if expected_response:
         if assert_rules.get('setCompare', False):

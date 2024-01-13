@@ -1,0 +1,36 @@
+[
+  {
+    "struct.Data1": {
+      "id": ["integer"],
+      "name": ["string"],
+      "active": ["boolean"],
+      "reference!": ["struct.Data2"]
+    }
+  },
+
+  {
+    "struct.Data2": {
+      "id": ["integer"],
+      "name": ["string"],
+      "active": ["boolean"],
+      "reference": ["struct.Data3?"]
+    }
+  },
+
+  {
+    "struct.Data3": {
+      "id": ["integer"],
+      "name": ["string"],
+      "active": ["boolean"]
+    }
+  },
+
+  {
+    "fn.getData": {},
+    "->": {
+      "Ok": {
+        "data": ["array", ["struct.Data1"]]
+      }
+    }
+  }
+]

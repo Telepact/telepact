@@ -83,7 +83,8 @@ public class TestDispatch {
                             var id = (String) payload.get("id");
                             var apiSchemaPath = (String) payload.get("apiSchemaPath");
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
-                            var d = MockTestServer.start(connection, apiSchemaPath, frontdoorTopic);
+                            var config = (Map<String, Object>) payload.get("config");
+                            var d = MockTestServer.start(connection, apiSchemaPath, frontdoorTopic, config);
 
                             servers.put(id, d);
                         }

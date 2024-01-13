@@ -50,7 +50,7 @@ public class UArray implements UType {
             }
             return array;
         } else {
-            var length = random.nextInt(3);
+            var length = random.nextCollectionLength();
             var array = new ArrayList<Object>();
             for (int i = 0; i < length; i += 1) {
                 var value = nestedTypeDeclaration.generateRandomValue(null, false,

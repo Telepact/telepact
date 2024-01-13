@@ -134,9 +134,10 @@ public class TestUtility {
     public static MockServer generatedMockTestSetup() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var jApi = JApiSchema.fromJson(json);
-        var server = new MockServer(jApi,
-                new io.github.brenbar.japi.MockServer.Options().setOnError((e) -> e.printStackTrace())
-                        .setEnableGeneratedDefaultStub(false));
+        var options = new io.github.brenbar.japi.MockServer.Options();
+        options.onError = (e) -> e.printStackTrace();
+        options.enableGeneratedDefaultStub = false;
+        var server = new MockServer(jApi, options);
         return server;
     }
 
