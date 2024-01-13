@@ -33,17 +33,6 @@ class _BinaryPackUtil {
         return result;
     }
 
-    static Map<Object, Object> unpackBody(Map<Object, Object> body) {
-        var result = new HashMap<Object, Object>();
-
-        for (var entry : body.entrySet()) {
-            var unpackedValue = pack(entry.getValue());
-            result.put(entry.getKey(), unpackedValue);
-        }
-
-        return result;
-    }
-
     static Object pack(Object value) {
         if (value instanceof List l) {
             return packList(l);
@@ -51,20 +40,6 @@ class _BinaryPackUtil {
             var newMap = new HashMap();
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 newMap.put(entry.getKey(), pack(entry.getValue()));
-            }
-            return newMap;
-        } else {
-            return value;
-        }
-    }
-
-    static Object unpack(Object value) {
-        if (value instanceof List l) {
-            return unpackList(l);
-        } else if (value instanceof Map<?, ?> m) {
-            var newMap = new HashMap<Object, Object>();
-            for (Map.Entry<?, ?> entry : m.entrySet()) {
-                newMap.put(entry.getKey(), unpack(entry.getValue()));
             }
             return newMap;
         } else {
@@ -143,6 +118,31 @@ class _BinaryPackUtil {
             }
         }
         return row;
+    }
+
+    static Map<Object, Object> unpackBody(Map<Object, Object> body) {
+        var result = new HashMap<Object, Object>();
+
+        for (var entry : body.entrySet()) {
+            var unpackedValue = unpack(entry.getValue());
+            result.put(entry.getKey(), unpackedValue);
+        }
+
+        return result;
+    }
+
+    static Object unpack(Object value) {
+        if (value instanceof List l) {
+            return unpackList(l);
+        } else if (value instanceof Map<?, ?> m) {
+            var newMap = new HashMap<Object, Object>();
+            for (Map.Entry<?, ?> entry : m.entrySet()) {
+                newMap.put(entry.getKey(), unpack(entry.getValue()));
+            }
+            return newMap;
+        } else {
+            return value;
+        }
     }
 
     static List<Object> unpackList(List<Object> list) {
