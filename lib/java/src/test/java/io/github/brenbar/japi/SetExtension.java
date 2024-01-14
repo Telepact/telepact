@@ -37,7 +37,7 @@ public class SetExtension implements TypeExtension {
         for (var e : value) {
             var nestedValidationFailures = nestedType.validate(e, generics);
             var newF = nestedValidationFailures.stream()
-                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(null, f.path), f.reason, f.data)).toList();
+                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(-1, f.path), f.reason, f.data)).toList();
             validationFailures.addAll(newF);
         }
 

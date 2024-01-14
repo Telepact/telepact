@@ -96,7 +96,7 @@
   {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
     "struct._BodyValidationFailure": {
-      "path": ["array", ["any"]],
+      "path": ["array", ["any?"]],
       "reason": ["union._BodyValidationFailureReason"]
     }
   },
@@ -104,7 +104,7 @@
   {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
     "struct._HeaderValidationFailure": {
-      "path": ["array", ["any"]],
+      "path": ["array", ["any?"]],
       "reason": ["union._HeaderValidationFailureReason"]
     }
   },

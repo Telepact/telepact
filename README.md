@@ -8,6 +8,9 @@ any inter-process communication boundary.
 
 Wherever JSON can go, a jAPI can be served 🚀
 
+No required client-side toolchains. Many client-side experiences. One
+server-side experience.
+
 HTTP client example (with `cURL`):
 
 ```bash
