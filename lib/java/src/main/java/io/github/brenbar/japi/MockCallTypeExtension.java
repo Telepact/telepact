@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MockCallTypeExtension implements TypeExtension {
+public class MockCallTypeExtension implements UType {
 
     public final Map<String, UType> types;
 
@@ -46,6 +46,24 @@ public class MockCallTypeExtension implements TypeExtension {
         validationFailures.addAll(inputFailuresWithoutMissingRequired);
 
         return validationFailures;
+    }
+
+    @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
+
+    @Override
+    public Object generateRandomValue(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
+            RandomGenerator random) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+    }
+
+    @Override
+    public String getName(List<UTypeDeclaration> generics) {
+        return "_ext._Call";
     }
 
 }

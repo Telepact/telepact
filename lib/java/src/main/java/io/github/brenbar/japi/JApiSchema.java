@@ -8,11 +8,11 @@ public class JApiSchema {
 
     final List<Object> original;
     final Map<String, UType> parsed;
-    final Map<String, TypeExtension> typeExtensions;
+    final Map<String, UType> typeExtensions;
 
     public JApiSchema(List<Object> original,
             Map<String, UType> parsed,
-            Map<String, TypeExtension> typeExtensions) {
+            Map<String, UType> typeExtensions) {
         this.original = original;
         this.parsed = parsed;
         this.typeExtensions = typeExtensions;
@@ -22,11 +22,11 @@ public class JApiSchema {
         return _ParseSchemaUtil.newUApiSchema(json, new HashMap<>());
     }
 
-    public static JApiSchema fromJsonWithExtensions(String json, Map<String, TypeExtension> typeExtensions) {
+    public static JApiSchema fromJsonWithExtensions(String json, Map<String, UType> typeExtensions) {
         return _ParseSchemaUtil.newUApiSchema(json, typeExtensions);
     }
 
-    public static JApiSchema extend(JApiSchema base, String json, Map<String, TypeExtension> typeExtensions) {
+    public static JApiSchema extend(JApiSchema base, String json, Map<String, UType> typeExtensions) {
         return _ParseSchemaUtil.extendUApiSchema(base, json, typeExtensions);
     }
 

@@ -15,7 +15,7 @@ import java.util.TreeMap;
 class _ParseSchemaUtil {
 
     static JApiSchema extendUApiSchema(JApiSchema first, String secondUApiSchemaJson,
-            Map<String, TypeExtension> secondTypeExtensions) {
+            Map<String, UType> secondTypeExtensions) {
         var objectMapper = new ObjectMapper();
         Object secondOriginalInit;
         try {
@@ -37,20 +37,20 @@ class _ParseSchemaUtil {
         }
 
         List<Object> firstOriginal = first.original;
-        Map<String, TypeExtension> firstTypeExtensions = first.typeExtensions;
+        Map<String, UType> firstTypeExtensions = first.typeExtensions;
 
         var original = new ArrayList<Object>();
         original.addAll(firstOriginal);
         original.addAll(secondOriginal);
 
-        var typeExtensions = new HashMap<String, TypeExtension>();
+        var typeExtensions = new HashMap<String, UType>();
         typeExtensions.putAll(firstTypeExtensions);
         typeExtensions.putAll(secondTypeExtensions);
 
         return parseUApiSchema(original, typeExtensions, firstOriginal.size());
     }
 
-    static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, TypeExtension> typeExtensions) {
+    static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, UType> typeExtensions) {
         var objectMapper = new ObjectMapper();
         Object originalInit;
         try {
@@ -75,7 +75,7 @@ class _ParseSchemaUtil {
     }
 
     private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,
-            Map<String, TypeExtension> typeExtensions, int pathOffset) {
+            Map<String, UType> typeExtensions, int pathOffset) {
         var parsedTypes = new HashMap<String, UType>();
         var parseFailures = new ArrayList<SchemaParseFailure>();
         var failedTypes = new HashSet<String>();

@@ -4,10 +4,10 @@ import java.util.List;
 
 public class UExt implements UType {
     public final String name;
-    public final TypeExtension typeExtension;
+    public final UType typeExtension;
     public final int typeParameterCount;
 
-    public UExt(String name, TypeExtension typeExtension, int typeParameterCount) {
+    public UExt(String name, UType typeExtension, int typeParameterCount) {
         this.name = name;
         this.typeExtension = typeExtension;
         this.typeParameterCount = typeParameterCount;
@@ -28,12 +28,12 @@ public class UExt implements UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
             RandomGenerator random) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+        return this.typeExtension.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+                typeParameters, generics, random);
     }
 
     @Override
     public String getName(List<UTypeDeclaration> generics) {
-        return "Any";
+        return this.name;
     }
 }

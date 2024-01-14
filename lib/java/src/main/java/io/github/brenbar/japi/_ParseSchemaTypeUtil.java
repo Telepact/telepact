@@ -12,7 +12,7 @@ class _ParseSchemaTypeUtil {
             int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions,
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
             throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
@@ -94,7 +94,7 @@ class _ParseSchemaTypeUtil {
     static UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, TypeExtension> typeExtensions,
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new JApiSchemaParseError(List.of());

@@ -63,7 +63,7 @@ class _ParseSchemaTraitUtil {
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, TypeExtension> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var index = schemaKeysToIndex.get(schemaKey);
         List<Object> thisPath = List.of(index, schemaKey);

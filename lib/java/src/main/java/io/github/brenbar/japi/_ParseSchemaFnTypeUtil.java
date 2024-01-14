@@ -16,7 +16,7 @@ class _ParseSchemaFnTypeUtil {
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, TypeExtension> typeExtensions,
+            Map<String, UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 

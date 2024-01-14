@@ -17,7 +17,7 @@ class _ParseSchemaCustomTypeUtil {
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, TypeExtension> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var thisPath = _ValidateUtil.append(path, schemaKey);
 
@@ -49,7 +49,7 @@ class _ParseSchemaCustomTypeUtil {
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, TypeExtension> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var thisPath = _ValidateUtil.append(path, schemaKey);
 
@@ -126,7 +126,7 @@ class _ParseSchemaCustomTypeUtil {
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, TypeExtension> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -174,7 +174,7 @@ class _ParseSchemaCustomTypeUtil {
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, TypeExtension> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
         var regex = Pattern.compile(regexString);
