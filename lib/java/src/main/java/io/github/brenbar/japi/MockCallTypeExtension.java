@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MockCallTypeExtension implements UType {
+public class MockCallTypeExtension implements _UType {
 
-    public final Map<String, UType> types;
+    public final Map<String, _UType> types;
 
-    public MockCallTypeExtension(Map<String, UType> types) {
+    public MockCallTypeExtension(Map<String, _UType> types) {
         this.types = types;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         Map<String, Object> givenMap;
@@ -31,7 +31,7 @@ public class MockCallTypeExtension implements UType {
                     Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
         }
         var functionName = matches.get(0);
-        var functionDef = (UFn) this.types.get(functionName);
+        var functionDef = (_UFn) this.types.get(functionName);
 
         var input = givenMap.get(functionName);
 
@@ -55,14 +55,15 @@ public class MockCallTypeExtension implements UType {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return "_ext._Call";
     }
 

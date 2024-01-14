@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class UObject implements UType {
+public class _UObject implements _UType {
 
     @Override
     public int getTypeParameterCount() {
@@ -13,8 +13,8 @@ public class UObject implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
             var nestedTypeDeclaration = typeParameters.get(0);
             var validationFailures = new ArrayList<ValidationFailure>();
@@ -37,8 +37,8 @@ public class UObject implements UType {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         var nestedTypeDeclaration = typeParameters.get(0);
         if (useStartingValue) {
@@ -66,7 +66,7 @@ public class UObject implements UType {
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return "Object";
     }
 

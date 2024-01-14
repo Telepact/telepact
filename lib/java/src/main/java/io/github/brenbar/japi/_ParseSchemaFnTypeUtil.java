@@ -9,32 +9,32 @@ class _ParseSchemaFnTypeUtil {
 
     private static final _ParseSchemaFnTypeUtil INST = new _ParseSchemaFnTypeUtil();
 
-    static UFn parseFunctionType(
+    static _UFn parseFunctionType(
             List<Object> path,
             Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var typeParameterCount = 0;
 
-        UUnion callType = null;
+        _UUnion callType = null;
         try {
             var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson, schemaKey,
                     typeParameterCount,
                     originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
-            callType = new UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
+            callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
         } catch (JApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
 
         var resPath = _ValidateUtil.append(path, "->");
 
-        UUnion resultType = null;
+        _UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey("->")) {
             parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
         } else {
@@ -68,7 +68,7 @@ class _ParseSchemaFnTypeUtil {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        var type = new UFn(schemaKey, callType, resultType, extendsRegex);
+        var type = new _UFn(schemaKey, callType, resultType, extendsRegex);
 
         return type;
     }

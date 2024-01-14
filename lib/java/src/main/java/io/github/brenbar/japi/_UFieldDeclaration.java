@@ -1,13 +1,13 @@
 package io.github.brenbar.japi;
 
-public class UFieldDeclaration {
+public class _UFieldDeclaration {
     public final String fieldName;
-    public final UTypeDeclaration typeDeclaration;
+    public final _UTypeDeclaration typeDeclaration;
     public final boolean optional;
 
-    public UFieldDeclaration(
+    public _UFieldDeclaration(
             String fieldName,
-            UTypeDeclaration typeDeclaration,
+            _UTypeDeclaration typeDeclaration,
             boolean optional) {
         this.fieldName = fieldName;
         this.typeDeclaration = typeDeclaration;

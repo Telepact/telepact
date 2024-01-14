@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 
 class UTrait {
     public final String name;
-    public final UUnion errors;
+    public final _UUnion errors;
 
-    public UTrait(String name, UUnion errors) {
+    public UTrait(String name, _UUnion errors) {
         this.name = name;
         this.errors = errors;
     }

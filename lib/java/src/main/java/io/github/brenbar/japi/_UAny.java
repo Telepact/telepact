@@ -2,22 +2,22 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-public class UAny implements UType {
+public class _UAny implements _UType {
     @Override
     public int getTypeParameterCount() {
         return 0;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         return List.of();
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         var selectType = random.nextInt(3);
         if (selectType == 0) {
@@ -30,7 +30,7 @@ public class UAny implements UType {
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return "Any";
     }
 }

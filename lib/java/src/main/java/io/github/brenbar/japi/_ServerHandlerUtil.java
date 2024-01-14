@@ -18,7 +18,7 @@ class _ServerHandlerUtil {
         var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         var requestHeaders = requestMessage.header;
         var requestBody = requestMessage.body;
-        var requestEntry = UUnion.entry(requestBody);
+        var requestEntry = _UUnion.entry(requestBody);
         String requestTarget;
         Map<String, Object> requestPayload;
         if (requestEntry != null) {
@@ -33,7 +33,7 @@ class _ServerHandlerUtil {
             unknownTarget = requestTarget;
             requestTarget = "fn._unknown";
         }
-        var functionType = (UFn) jApiSchema.parsed.get(requestTarget);
+        var functionType = (_UFn) jApiSchema.parsed.get(requestTarget);
         var resultUnionType = functionType.result;
 
         var callId = requestHeaders.get("_id");
@@ -121,7 +121,7 @@ class _ServerHandlerUtil {
             Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders
                     .get("_sel");
             finalResultUnion = (Map<String, Object>) _SelectUtil.selectStructFields(
-                    new UTypeDeclaration(resultUnionType, false, List.of()),
+                    new _UTypeDeclaration(resultUnionType, false, List.of()),
                     resultUnion,
                     selectStructFieldsHeader);
         } else {
@@ -132,7 +132,7 @@ class _ServerHandlerUtil {
     }
 
     private static Message getInvalidErrorMessage(String error, List<ValidationFailure> validationFailures,
-            UUnion resultUnionType, Map<String, Object> responseHeaders) {
+            _UUnion resultUnionType, Map<String, Object> responseHeaders) {
         var validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
         Map<String, Object> newErrorResult = Map.of(error,
                 Map.of("cases", validationFailureCases));
@@ -152,7 +152,7 @@ class _ServerHandlerUtil {
         return validationFailureCases;
     }
 
-    private static void validateResult(UUnion resultUnionType, Object errorResult) {
+    private static void validateResult(_UUnion resultUnionType, Object errorResult) {
         var newErrorResultValidationFailures = resultUnionType.validate(
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {

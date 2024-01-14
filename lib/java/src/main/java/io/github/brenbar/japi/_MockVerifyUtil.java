@@ -33,7 +33,7 @@ class _MockVerifyUtil {
             allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
         }
 
-        var verifyTimesEntry = UUnion.entry(verificationTimes);
+        var verifyTimesEntry = _UUnion.entry(verificationTimes);
         var verifyKey = verifyTimesEntry.getKey();
         var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
         Map<String, Object> verificationFailurePseudoJson = null;

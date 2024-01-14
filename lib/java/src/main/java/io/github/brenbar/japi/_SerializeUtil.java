@@ -17,15 +17,15 @@ class _SerializeUtil {
         var allKeys = new TreeSet<String>();
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
-            if (entry.getValue() instanceof UStruct s) {
+            if (entry.getValue() instanceof _UStruct s) {
                 allKeys.addAll(s.fields.keySet());
-            } else if (entry.getValue() instanceof UUnion e) {
+            } else if (entry.getValue() instanceof _UUnion e) {
                 for (var entry2 : e.cases.entrySet()) {
                     allKeys.add(entry2.getKey());
                     var struct = entry2.getValue();
                     allKeys.addAll(struct.fields.keySet());
                 }
-            } else if (entry.getValue() instanceof UFn f) {
+            } else if (entry.getValue() instanceof _UFn f) {
                 for (var e2 : f.call.cases.entrySet()) {
                     allKeys.add(e2.getKey());
                     var struct = e2.getValue();

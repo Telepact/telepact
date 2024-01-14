@@ -7,20 +7,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class UNumber implements UType {
+public class _UInteger implements _UType {
     @Override
     public int getTypeParameterCount() {
         return 0;
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
-        if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
+        if (value instanceof Long || value instanceof Integer) {
+            return Collections.emptyList();
+        } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return Collections.singletonList(
                     new ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
-        } else if (value instanceof Number) {
-            return Collections.emptyList();
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));
@@ -29,18 +29,18 @@ public class UNumber implements UType {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
         } else {
-            return random.nextDouble();
+            return random.nextInt();
         }
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
-        return "Number";
+    public String getName(List<_UTypeDeclaration> generics) {
+        return "Integer";
     }
 }

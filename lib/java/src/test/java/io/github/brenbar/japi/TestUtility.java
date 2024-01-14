@@ -25,7 +25,7 @@ public class TestUtility {
 
     private static Message handle(Message requestMessage) {
         var requestHeaders = requestMessage.header;
-        var requestEntry = UUnion.entry(requestMessage.body);
+        var requestEntry = _UUnion.entry(requestMessage.body);
         var functionName = requestEntry.getKey();
         return switch (functionName) {
             case "fn.test" -> {
@@ -98,7 +98,7 @@ public class TestUtility {
 
             var requestHeadersPseudoJson = (Map<String, Object>) requestAsParsedJson.get(0);
             var requestBodyPseudoJson = (Map<String, Object>) requestAsParsedJson.get(1);
-            var requestEntryPsuedoJson = UUnion.entry(requestBodyPseudoJson);
+            var requestEntryPsuedoJson = _UUnion.entry(requestBodyPseudoJson);
             var requestTargetPseudoJson = requestEntryPsuedoJson.getKey();
             var requestPayloadPseudoJson = (Map<String, Object>) requestEntryPsuedoJson.getValue();
 

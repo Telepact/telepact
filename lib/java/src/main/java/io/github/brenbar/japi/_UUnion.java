@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UUnion implements UType {
+public class _UUnion implements _UType {
 
     public final String name;
-    public final Map<String, UStruct> cases;
+    public final Map<String, _UStruct> cases;
     public final int typeParameterCount;
 
-    public UUnion(String name, Map<String, UStruct> cases, int typeParameterCount) {
+    public _UUnion(String name, Map<String, _UStruct> cases, int typeParameterCount) {
         this.name = name;
         this.cases = cases;
         this.typeParameterCount = typeParameterCount;
@@ -24,8 +24,8 @@ public class UUnion implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
             return validateUnionCases(this.cases, m, typeParameters);
         } else {
@@ -35,14 +35,14 @@ public class UUnion implements UType {
     }
 
     private List<ValidationFailure> validateUnionCases(
-            Map<String, UStruct> referenceCases,
-            Map<?, ?> actual, List<UTypeDeclaration> typeParameters) {
+            Map<String, _UStruct> referenceCases,
+            Map<?, ?> actual, List<_UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return Collections.singletonList(
                     new ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
-        var entry = UUnion.entry((Map<String, Object>) actual);
+        var entry = _UUnion.entry((Map<String, Object>) actual);
         var unionTarget = (String) entry.getKey();
         var unionPayload = entry.getValue();
 
@@ -69,12 +69,12 @@ public class UUnion implements UType {
     }
 
     private static List<ValidationFailure> validateUnionStruct(
-            UStruct unionStruct,
+            _UStruct unionStruct,
             String unionCase,
-            Map<String, Object> actual, List<UTypeDeclaration> typeParameters) {
+            Map<String, Object> actual, List<_UTypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
-        var nestedValidationFailures = UStruct.validateStructFields(unionStruct.fields,
+        var nestedValidationFailures = _UStruct.validateStructFields(unionStruct.fields,
                 actual, typeParameters);
         validationFailures.addAll(nestedValidationFailures);
 
@@ -83,8 +83,8 @@ public class UUnion implements UType {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             var startingUnionCase = (Map<String, Object>) startingValue;
@@ -96,18 +96,18 @@ public class UUnion implements UType {
         }
     }
 
-    static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionCasesReference,
+    static Map<String, Object> constructRandomUnion(Map<String, _UStruct> unionCasesReference,
             Map<String, Object> startingUnion,
             boolean includeRandomOptionalFields,
-            List<UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> typeParameters,
             RandomGenerator random) {
         if (!startingUnion.isEmpty()) {
-            var unionEntry = UUnion.entry(startingUnion);
+            var unionEntry = _UUnion.entry(startingUnion);
             var unionCase = unionEntry.getKey();
             var unionStructType = unionCasesReference.get(unionCase);
             var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
-            return Map.of(unionCase, UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
+            return Map.of(unionCase, _UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
                     includeRandomOptionalFields, typeParameters, random));
         } else {
             var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
@@ -120,7 +120,7 @@ public class UUnion implements UType {
             var unionData = unionEntry.getValue();
 
             return Map.of(unionCase,
-                    UStruct.constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,
+                    _UStruct.constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,
                             typeParameters, random));
         }
     }
@@ -130,7 +130,7 @@ public class UUnion implements UType {
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return "Object";
     }
 }

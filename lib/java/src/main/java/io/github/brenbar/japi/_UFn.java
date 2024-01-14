@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UFn implements UType {
+public class _UFn implements _UType {
 
     public final String name;
-    public final UUnion call;
-    public final UUnion result;
+    public final _UUnion call;
+    public final _UUnion result;
     public final String extendsRegex;
 
-    public UFn(String name, UUnion call, UUnion output, String extendsRegex) {
+    public _UFn(String name, _UUnion call, _UUnion output, String extendsRegex) {
         this.name = name;
         this.call = call;
         this.result = output;
@@ -24,30 +24,30 @@ public class UFn implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         return this.call.validate(value, typeParameters, generics);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             var startingFnValue = (Map<String, Object>) startingValue;
-            return UUnion.constructRandomUnion(this.call.cases, startingFnValue, includeRandomOptionalFields,
+            return _UUnion.constructRandomUnion(this.call.cases, startingFnValue, includeRandomOptionalFields,
                     List.of(),
                     random);
         } else {
-            return UUnion.constructRandomUnion(this.call.cases, new HashMap<>(), includeRandomOptionalFields,
+            return _UUnion.constructRandomUnion(this.call.cases, new HashMap<>(), includeRandomOptionalFields,
                     List.of(),
                     random);
         }
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return "Object";
     }
 }

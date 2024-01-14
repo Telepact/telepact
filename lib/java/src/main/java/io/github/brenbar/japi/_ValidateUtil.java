@@ -10,7 +10,7 @@ import java.util.TreeMap;
 class _ValidateUtil {
 
     static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, JApiSchema jApiSchema, UFn functionType) {
+            Map<String, Object> headers, JApiSchema jApiSchema, _UFn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
@@ -49,7 +49,7 @@ class _ValidateUtil {
                 var typeName = entry.getKey();
                 var selectValue = entry.getValue();
 
-                UType typeReference;
+                _UType typeReference;
                 if (typeName.equals("->")) {
                     typeReference = functionType.result;
                 } else {
@@ -62,7 +62,7 @@ class _ValidateUtil {
                     continue;
                 }
 
-                if (typeReference instanceof UUnion u) {
+                if (typeReference instanceof _UUnion u) {
                     Map<String, Object> unionCases;
                     try {
                         unionCases = _CastUtil.asMap(selectValue);
@@ -91,13 +91,13 @@ class _ValidateUtil {
                                 selectedCaseStructFields);
                         validationFailures.addAll(nestedValidationFailures);
                     }
-                } else if (typeReference instanceof UFn f) {
+                } else if (typeReference instanceof _UFn f) {
                     var argStruct = f.call.cases.get(f.name);
                     var nestedValidationFailures = validateSelectStruct(argStruct, List.of("_sel", typeName),
                             selectValue);
                     validationFailures.addAll(nestedValidationFailures);
                 } else {
-                    var structRef = (UStruct) typeReference;
+                    var structRef = (_UStruct) typeReference;
                     var nestedValidationFailures = validateSelectStruct(structRef, List.of("_sel", typeName),
                             selectValue);
                     validationFailures.addAll(nestedValidationFailures);
@@ -110,7 +110,7 @@ class _ValidateUtil {
         return validationFailures;
     }
 
-    private static List<ValidationFailure> validateSelectStruct(UStruct structReference, List<Object> basePath,
+    private static List<ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
             Object selectedFields) {
         var validationFailures = new ArrayList<ValidationFailure>();
 

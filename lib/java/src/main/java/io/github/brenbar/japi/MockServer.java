@@ -34,9 +34,9 @@ public class MockServer {
      * @param jApiSchemaAsJson
      */
     public MockServer(JApiSchema jApiSchema, Options options) {
-        var parsedTypes = new HashMap<String, UType>();
+        var parsedTypes = new HashMap<String, _UType>();
 
-        var typeExtensions = new HashMap<String, UType>();
+        var typeExtensions = new HashMap<String, _UType>();
         typeExtensions.put("_ext._Call", new MockCallTypeExtension(parsedTypes));
         typeExtensions.put("_ext._Stub", new MockStubTypeExtension(parsedTypes));
 

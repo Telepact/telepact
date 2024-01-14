@@ -2,12 +2,12 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-public class UExt implements UType {
+public class _UExt implements _UType {
     public final String name;
-    public final UType typeExtension;
+    public final _UType typeExtension;
     public final int typeParameterCount;
 
-    public UExt(String name, UType typeExtension, int typeParameterCount) {
+    public _UExt(String name, _UType typeExtension, int typeParameterCount) {
         this.name = name;
         this.typeExtension = typeExtension;
         this.typeParameterCount = typeParameterCount;
@@ -19,21 +19,21 @@ public class UExt implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         return this.typeExtension.validate(value, typeParameters, generics);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters, List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters, List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         return this.typeExtension.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
                 typeParameters, generics, random);
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return this.name;
     }
 }

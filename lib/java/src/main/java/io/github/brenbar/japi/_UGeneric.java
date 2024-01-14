@@ -2,10 +2,10 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-public class UGeneric implements UType {
+public class _UGeneric implements _UType {
     public final int index;
 
-    public UGeneric(int index) {
+    public _UGeneric(int index) {
         this.index = index;
     }
 
@@ -15,16 +15,16 @@ public class UGeneric implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, List.of());
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
@@ -32,7 +32,7 @@ public class UGeneric implements UType {
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         var typeDeclaration = generics.get(this.index);
         return typeDeclaration.type.getName(generics);
     }

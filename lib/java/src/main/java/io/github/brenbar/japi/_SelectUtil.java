@@ -7,9 +7,9 @@ import java.util.Map;
 
 class _SelectUtil {
 
-    static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
+    static Object selectStructFields(_UTypeDeclaration typeDeclaration, Object value,
             Map<String, Object> selectedStructFields) {
-        if (typeDeclaration.type instanceof UStruct s) {
+        if (typeDeclaration.type instanceof _UStruct s) {
             var selectedFields = (List<String>) selectedStructFields.get(s.name);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -23,9 +23,9 @@ class _SelectUtil {
                 }
             }
             return finalMap;
-        } else if (typeDeclaration.type instanceof UFn f) {
+        } else if (typeDeclaration.type instanceof _UFn f) {
             var valueAsMap = (Map<String, Object>) value;
-            var unionEntry = UUnion.entry(valueAsMap);
+            var unionEntry = _UUnion.entry(valueAsMap);
             var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
@@ -44,9 +44,9 @@ class _SelectUtil {
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof UUnion u) {
+        } else if (typeDeclaration.type instanceof _UUnion u) {
             var valueAsMap = (Map<String, Object>) value;
-            var unionEntry = UUnion.entry(valueAsMap);
+            var unionEntry = _UUnion.entry(valueAsMap);
             var unionCase = unionEntry.getKey();
             var unionData = (Map<String, Object>) unionEntry.getValue();
 
@@ -76,7 +76,7 @@ class _SelectUtil {
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof UObject o) {
+        } else if (typeDeclaration.type instanceof _UObject o) {
             var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
             var valueAsMap = (Map<String, Object>) value;
             var finalMap = new HashMap<>();
@@ -86,7 +86,7 @@ class _SelectUtil {
                 finalMap.put(entry.getKey(), valueWithSelectedFields);
             }
             return finalMap;
-        } else if (typeDeclaration.type instanceof UArray a) {
+        } else if (typeDeclaration.type instanceof _UArray a) {
             var nestedType = typeDeclaration.typeParameters.get(0);
             var valueAsList = (List<Object>) value;
             var finalList = new ArrayList<>();

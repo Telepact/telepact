@@ -9,15 +9,15 @@ import java.util.regex.Pattern;
 
 class _ParseSchemaCustomTypeUtil {
 
-    static UStruct parseStructType(
+    static _UStruct parseStructType(
             List<Object> path,
             Map<String, Object> structDefinitionAsParsedJson,
             String schemaKey,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var thisPath = _ValidateUtil.append(path, schemaKey);
 
@@ -35,12 +35,12 @@ class _ParseSchemaCustomTypeUtil {
                 originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                 failedTypes);
 
-        var type = new UStruct(schemaKey, fields, typeParameterCount);
+        var type = new _UStruct(schemaKey, fields, typeParameterCount);
 
         return type;
     }
 
-    static UUnion parseUnionType(
+    static _UUnion parseUnionType(
             List<Object> path,
             Map<String, Object> unionDefinitionAsParsedJson,
             String schemaKey,
@@ -48,8 +48,8 @@ class _ParseSchemaCustomTypeUtil {
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var thisPath = _ValidateUtil.append(path, schemaKey);
 
@@ -65,7 +65,7 @@ class _ParseSchemaCustomTypeUtil {
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
-        var cases = new HashMap<String, UStruct>();
+        var cases = new HashMap<String, _UStruct>();
 
         if (okCaseRequired) {
             if (!definition.containsKey("Ok")) {
@@ -97,7 +97,7 @@ class _ParseSchemaCustomTypeUtil {
                 continue;
             }
 
-            Map<String, UFieldDeclaration> fields;
+            Map<String, _UFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
                         originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
@@ -107,7 +107,7 @@ class _ParseSchemaCustomTypeUtil {
                 continue;
             }
 
-            var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
+            var unionStruct = new _UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
 
             cases.put(unionCase, unionStruct);
         }
@@ -116,22 +116,22 @@ class _ParseSchemaCustomTypeUtil {
             throw new JApiSchemaParseError(parseFailures);
         }
 
-        var type = new UUnion(schemaKey, cases, typeParameterCount);
+        var type = new _UUnion(schemaKey, cases, typeParameterCount);
 
         return type;
     }
 
-    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
+    static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
-        var fields = new HashMap<String, UFieldDeclaration>();
+        var fields = new HashMap<String, _UFieldDeclaration>();
         for (var structEntry : referenceStruct.entrySet()) {
             var fieldDeclaration = structEntry.getKey();
 
@@ -146,7 +146,7 @@ class _ParseSchemaCustomTypeUtil {
             }
 
             var typeDeclarationValue = structEntry.getValue();
-            UFieldDeclaration parsedField;
+            _UFieldDeclaration parsedField;
             try {
                 parsedField = parseField(path, fieldDeclaration,
                         typeDeclarationValue, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
@@ -166,15 +166,15 @@ class _ParseSchemaCustomTypeUtil {
         return fields;
     }
 
-    static UFieldDeclaration parseField(
+    static _UFieldDeclaration parseField(
             List<Object> path,
             String fieldDeclaration,
             Object typeDeclarationValue,
             int typeParameterCount,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
         var regex = Pattern.compile(regexString);
@@ -205,6 +205,6 @@ class _ParseSchemaCustomTypeUtil {
                 parsedTypes,
                 typeExtensions, allParseFailures, failedTypes);
 
-        return new UFieldDeclaration(fieldName, typeDeclaration, optional);
+        return new _UFieldDeclaration(fieldName, typeDeclaration, optional);
     }
 }

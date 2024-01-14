@@ -7,16 +7,16 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 class _ParseSchemaTraitUtil {
-    static void applyTraitToParsedTypes(UTrait trait, Map<String, UType> parsedTypes,
+    static void applyTraitToParsedTypes(UTrait trait, Map<String, _UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
         String traitName = trait.name;
         var traitIndex = schemaKeysToIndex.get(traitName);
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
-            UFn f;
+            _UFn f;
             try {
-                f = (UFn) parsedType.getValue();
+                f = (_UFn) parsedType.getValue();
             } catch (ClassCastException e) {
                 continue;
             }
@@ -29,10 +29,10 @@ class _ParseSchemaTraitUtil {
                 continue;
             }
 
-            UUnion fnResult = f.result;
-            Map<String, UStruct> fnResultCases = fnResult.cases;
-            UUnion traitFnResult = trait.errors;
-            Map<String, UStruct> traitFnResultCases = traitFnResult.cases;
+            _UUnion fnResult = f.result;
+            Map<String, _UStruct> fnResultCases = fnResult.cases;
+            _UUnion traitFnResult = trait.errors;
+            Map<String, _UStruct> traitFnResultCases = traitFnResult.cases;
 
             if (fnName.startsWith("fn._")) {
                 // Only internal traits can change internal functions
@@ -62,8 +62,8 @@ class _ParseSchemaTraitUtil {
             String schemaKey,
             List<Object> originalJApiSchema,
             Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         var index = schemaKeysToIndex.get(schemaKey);
         List<Object> thisPath = List.of(index, schemaKey);

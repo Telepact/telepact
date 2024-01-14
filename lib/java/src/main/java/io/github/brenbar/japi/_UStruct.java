@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class UStruct implements UType {
+public class _UStruct implements _UType {
 
     public final String name;
-    public final Map<String, UFieldDeclaration> fields;
+    public final Map<String, _UFieldDeclaration> fields;
     public final int typeParameterCount;
 
-    public UStruct(String name, Map<String, UFieldDeclaration> fields, int typeParameterCount) {
+    public _UStruct(String name, Map<String, _UFieldDeclaration> fields, int typeParameterCount) {
         this.name = name;
         this.fields = fields;
         this.typeParameterCount = typeParameterCount;
@@ -25,8 +25,8 @@ public class UStruct implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
         } else {
@@ -36,12 +36,12 @@ public class UStruct implements UType {
     }
 
     public static List<ValidationFailure> validateStructFields(
-            Map<String, UFieldDeclaration> fields,
-            Map<String, Object> actualStruct, List<UTypeDeclaration> typeParameters) {
+            Map<String, _UFieldDeclaration> fields,
+            Map<String, Object> actualStruct, List<_UTypeDeclaration> typeParameters) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         var missingFields = new ArrayList<String>();
-        for (Map.Entry<String, UFieldDeclaration> entry : fields.entrySet()) {
+        for (Map.Entry<String, _UFieldDeclaration> entry : fields.entrySet()) {
             var fieldName = entry.getKey();
             var fieldDeclaration = entry.getValue();
             if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional) {
@@ -81,8 +81,8 @@ public class UStruct implements UType {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
             var startingStructValue = (Map<String, Object>) startingValue;
@@ -95,8 +95,8 @@ public class UStruct implements UType {
     }
 
     public static Map<String, Object> constructRandomStruct(
-            Map<String, UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
-            boolean includeRandomOptionalFields, List<UTypeDeclaration> typeParameters,
+            Map<String, _UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             RandomGenerator random) {
 
         var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
@@ -134,7 +134,7 @@ public class UStruct implements UType {
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName(List<_UTypeDeclaration> generics) {
         return "Object";
     }
 }
