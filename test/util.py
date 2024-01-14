@@ -261,6 +261,7 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
     response[0].pop('_bin', None)
     response[0].pop('_enc', None)
+    response[0].pop('_pac', None)
 
     if expected_response:
         if assert_rules.get('setCompare', False):

@@ -16,29 +16,28 @@ import importlib
 import nats
 
 def pytest_addoption(parser):
-    parser.addoption('--natscredfile', action='store', default=None)
+    parser.addoption('--remotenats', action='store', default=None)
 
 @pytest.fixture(scope='session')
 def nats_server(loop, request):
-    nats_cred_file = request.config.getoption('--natscredfile')
+    remote_nats = request.config.getoption('--remotenats')
 
     print('Creating NATS fixture')
 
     p = None
-    if nats_cred_file:
+    if remote_nats:
         print('###########################################################################')
         print('#                                WARNING!                                 #')
         print('#                                                                         #')
-        print('#                        Using Global NATS server                         #')
+        print('#                        Using remote NATS server                         #')
         print('###########################################################################')
         print('')
-        nats_url = 'tls://connect.ngs.global:4222'
-    else:
-        #nats_url = 'nats://127.0.0.1:4222'
-        #p = subprocess.Popen(['nats-server', '-D'])
         nats_url = 'nats://demo.nats.io:4222'
+    else:
+        nats_url = 'nats://127.0.0.1:4222'
+        p = subprocess.Popen(['nats-server', '-D'])
     
-    yield nats_url, nats_cred_file
+    yield nats_url
     
     if p:
         p.terminate()
@@ -47,17 +46,14 @@ def nats_server(loop, request):
 
 @pytest.fixture(scope='session')
 def nats_client(loop, nats_server):
-    (url, cred_file) = nats_server
+    url = nats_server
 
     client = None
-
-    async def error_cb(e):    
-        print('NATS connection error', e)
 
     async def f():
         nonlocal client
         print('NATS client connecting to {}'.format(url))
-        client = await nats.connect(url,  user_credentials=cred_file, error_cb=error_cb)
+        client = await nats.connect(url)
 
     loop.run_until_complete(f())
 
@@ -67,12 +63,12 @@ def nats_client(loop, nats_server):
 
 @pytest.fixture(scope='session', params=get_lib_modules())
 def dispatcher_server(loop, nats_server, request, nats_client):
-    (nats_url, nats_cred_file) = nats_server
+    nats_url = nats_server
     lib_name = request.param
     test_module_name = 'lib.{}.dispatch'.format(lib_name)
     l = importlib.import_module(test_module_name)
 
-    s: subprocess.Popen = l.start(nats_url, nats_cred_file)
+    s: subprocess.Popen = l.start(nats_url)
 
     try:                                
         startup_check(loop, lambda: ping(nats_client, lib_name), times=20)
@@ -116,6 +112,8 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     if 'test_server_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]])
     elif 'test_binary_client_server_case' == metafunc.function.__name__:
+        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
+    elif 'test_pbinary_client_server_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
     elif 'test_client_server_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
