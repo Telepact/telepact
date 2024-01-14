@@ -9,8 +9,6 @@ import json
 @pytest.fixture(scope="module", params=get_lib_modules())
 def binary_server_proc(loop, nats_client, dispatcher_server, request):
     lib_name = request.param
-    test_module_name = 'lib.{}.test_server'.format(lib_name)
-    l = importlib.import_module(test_module_name)
 
     init_topics = ['frontdoor', 'backdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'binary-server', t) for t in init_topics)
