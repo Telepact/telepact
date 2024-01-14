@@ -61,6 +61,9 @@ class _ServerHandlerUtil {
             List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
             responseHeaders.put("_binary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+            if (requestHeaders.containsKey("_pac")) {
+                responseHeaders.put("_pac", requestHeaders.get("_pac"));
+            }
         }
 
         if (unknownTarget != null) {
