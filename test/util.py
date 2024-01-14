@@ -17,6 +17,7 @@ class Constants:
     binary_api_path = '../../test/binary.japi.json'
     schema_api_path = '../../test/schema.japi.json'
     load_api_path = '../../test/load.japi.json'
+    calculator_api_path = '../../test/calculator.japi.json'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'

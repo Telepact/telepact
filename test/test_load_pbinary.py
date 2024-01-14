@@ -17,7 +17,7 @@ def load_binary_server_proc(loop, nats_client, dispatcher_server, request):
     server_id = '{}.{}'.format(lib_name, 'load-binary-server')
 
     async def t():
-        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config': {'minLength': 50, 'maxLength': 100, 'enableGen': True}}}])
+        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config': {'minLength': 500, 'maxLength': 500, 'enableGen': True}}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)    
         req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': True}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)
@@ -55,7 +55,7 @@ def test_load_binary_case(loop, load_binary_server_proc, nats_client):
     topics = load_binary_server_proc
 
     async def t():
-        for _ in range(500):
+        for _ in range(50):
             req = [{}, {'fn.getData': {}}]
             await verify_client_case(nats_client, req, None, topics[0], None, topics[1], None)
                                                  

@@ -4,7 +4,7 @@
       "id": ["integer"],
       "name": ["string"],
       "active": ["boolean"],
-      "reference!": ["struct.Data2"]
+      "reference": ["struct.Data2"]
     }
   },
 
@@ -13,7 +13,7 @@
       "id": ["integer"],
       "name": ["string"],
       "active": ["boolean"],
-      "reference": ["struct.Data3?"]
+      "reference": ["struct.Data3"]
     }
   },
 

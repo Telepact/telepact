@@ -34,8 +34,9 @@ def nats_server(loop, request):
         print('')
         nats_url = 'tls://connect.ngs.global:4222'
     else:
-        nats_url = 'nats://127.0.0.1:4222'
-        p = subprocess.Popen(['nats-server', '-D'])
+        #nats_url = 'nats://127.0.0.1:4222'
+        #p = subprocess.Popen(['nats-server', '-D'])
+        nats_url = 'nats://demo.nats.io:4222'
     
     yield nats_url, nats_cred_file
     

@@ -23,6 +23,9 @@ public class RandomGenerator {
     }
 
     public int nextInt(int ceiling) {
+        if (ceiling == 0) {
+            return 0;
+        }
         return (int) nextInt() % ceiling;
     }
 

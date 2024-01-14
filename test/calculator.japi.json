@@ -94,9 +94,6 @@
 
   {
     "trait.Authenticated": {
-      "fn.*": {
-        "token": ["string"]
-      },
       "->": {
         "ErrorInvalidToken": {}
       }
