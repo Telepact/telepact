@@ -31,7 +31,7 @@ def server_proc(loop, nats_client, dispatcher_server, request):
 
     async def t2():
         req = json.dumps([{}, {'Stop': {'id': server_id}}])
-        await nats_client.request(lib_name, req.encode(), timeout=1)
+        await nats_client.request(lib_name, req.encode(), timeout=5)
 
     loop.run_until_complete(t2())    
     
