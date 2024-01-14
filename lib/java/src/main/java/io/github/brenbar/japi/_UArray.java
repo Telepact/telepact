@@ -3,7 +3,7 @@ package io.github.brenbar.japi;
 import java.util.ArrayList;
 import java.util.List;
 
-public class _UArray implements _UType {
+class _UArray implements _UType {
 
     @Override
     public int getTypeParameterCount() {

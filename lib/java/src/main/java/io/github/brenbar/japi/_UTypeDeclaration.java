@@ -3,7 +3,7 @@ package io.github.brenbar.japi;
 import java.util.Collections;
 import java.util.List;
 
-public class _UTypeDeclaration {
+class _UTypeDeclaration {
     public final _UType type;
     public final boolean nullable;
     public final List<_UTypeDeclaration> typeParameters;

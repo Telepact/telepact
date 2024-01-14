@@ -2,7 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-public class _UGeneric implements _UType {
+class _UGeneric implements _UType {
     public final int index;
 
     public _UGeneric(int index) {

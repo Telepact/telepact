@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class _UInteger implements _UType {
+class _UInteger implements _UType {
     @Override
     public int getTypeParameterCount() {
         return 0;

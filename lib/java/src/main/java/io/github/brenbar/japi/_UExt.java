@@ -2,7 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-public class _UExt implements _UType {
+class _UExt implements _UType {
     public final String name;
     public final _UType typeExtension;
     public final int typeParameterCount;
@@ -26,7 +26,8 @@ public class _UExt implements _UType {
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters, List<_UTypeDeclaration> generics,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         return this.typeExtension.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
                 typeParameters, generics, random);

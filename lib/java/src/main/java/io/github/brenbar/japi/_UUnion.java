@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class _UUnion implements _UType {
+class _UUnion implements _UType {
 
     public final String name;
     public final Map<String, _UStruct> cases;

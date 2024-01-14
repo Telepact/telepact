@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class _UFn implements _UType {
+class _UFn implements _UType {
 
     public final String name;
     public final _UUnion call;

@@ -1,6 +1,6 @@
 package io.github.brenbar.japi;
 
-public class _UFieldDeclaration {
+class _UFieldDeclaration {
     public final String fieldName;
     public final _UTypeDeclaration typeDeclaration;
     public final boolean optional;

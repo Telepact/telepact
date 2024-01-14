@@ -3,7 +3,7 @@ package io.github.brenbar.japi;
 import java.util.Collections;
 import java.util.List;
 
-public class _UString implements _UType {
+class _UString implements _UType {
     @Override
     public int getTypeParameterCount() {
         return 0;

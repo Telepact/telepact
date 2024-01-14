@@ -2,7 +2,7 @@ package io.github.brenbar.japi;
 
 import java.util.List;
 
-public class _UAny implements _UType {
+class _UAny implements _UType {
     @Override
     public int getTypeParameterCount() {
         return 0;

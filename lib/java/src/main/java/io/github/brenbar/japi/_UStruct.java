@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class _UStruct implements _UType {
+class _UStruct implements _UType {
 
     public final String name;
     public final Map<String, _UFieldDeclaration> fields;

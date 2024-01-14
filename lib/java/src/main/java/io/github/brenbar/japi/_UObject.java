@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class _UObject implements _UType {
+class _UObject implements _UType {
 
     @Override
     public int getTypeParameterCount() {
