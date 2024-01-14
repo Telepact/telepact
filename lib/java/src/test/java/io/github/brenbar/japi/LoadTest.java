@@ -26,7 +26,7 @@ public class LoadTest {
     public void test() throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
 
-        var jApiSchema = JApiSchema.fromJson(json);
+        var jApiSchema = UApiSchema.fromJson(json);
 
         var options = new Options();
         options.onError = (e) -> e.printStackTrace();

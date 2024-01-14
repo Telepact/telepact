@@ -33,14 +33,14 @@ public class MockServer {
      * 
      * @param jApiSchemaAsJson
      */
-    public MockServer(JApiSchema jApiSchema, Options options) {
+    public MockServer(UApiSchema jApiSchema, Options options) {
         var parsedTypes = new HashMap<String, _UType>();
 
         var typeExtensions = new HashMap<String, _UType>();
         typeExtensions.put("_ext._Call", new _MockCallTypeExtension(parsedTypes));
         typeExtensions.put("_ext._Stub", new _MockStubTypeExtension(parsedTypes));
 
-        var combinedJApiSchema = JApiSchema.extend(jApiSchema, _InternalMockJApiUtil.getJson(), typeExtensions);
+        var combinedJApiSchema = UApiSchema.extend(jApiSchema, _InternalMockUApiUtil.getJson(), typeExtensions);
 
         this.server = new Server(combinedJApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));

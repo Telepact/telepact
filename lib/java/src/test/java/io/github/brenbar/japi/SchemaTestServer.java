@@ -20,7 +20,7 @@ public class SchemaTestServer {
             String frontdoorTopic)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = JApiSchema.fromJson(json);
+        var jApi = UApiSchema.fromJson(json);
         var objectMapper = new ObjectMapper();
 
         var timers = metrics.timer(frontdoorTopic);
@@ -46,9 +46,9 @@ public class SchemaTestServer {
             }
 
             try {
-                var schema = JApiSchema.fromJson(schemaJson);
+                var schema = UApiSchema.fromJson(schemaJson);
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 e.printStackTrace();
                 System.err.flush();
                 return new Message(Map.of(),

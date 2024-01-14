@@ -38,7 +38,7 @@ public class Server {
         }
     }
 
-    JApiSchema jApiSchema;
+    UApiSchema jApiSchema;
     Function<Message, Message> handler;
     Consumer<Throwable> onError;
     Consumer<Message> onRequest;
@@ -51,10 +51,10 @@ public class Server {
      * @param jApiSchemaAsJson
      * @param handler
      */
-    public Server(JApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
+    public Server(UApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
         this.jApiSchema = jApiSchema;
 
-        this.jApiSchema = JApiSchema.extend(jApiSchema, _InternalJApiUtil.getJson());
+        this.jApiSchema = UApiSchema.extend(jApiSchema, _InternalUApiUtil.getJson());
 
         this.handler = handler;
 

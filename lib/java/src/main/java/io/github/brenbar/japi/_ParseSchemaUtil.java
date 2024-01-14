@@ -14,7 +14,7 @@ import java.util.TreeMap;
 
 class _ParseSchemaUtil {
 
-    static JApiSchema extendUApiSchema(JApiSchema first, String secondUApiSchemaJson,
+    static UApiSchema extendUApiSchema(UApiSchema first, String secondUApiSchemaJson,
             Map<String, _UType> secondTypeExtensions) {
         var objectMapper = new ObjectMapper();
         Object secondOriginalInit;
@@ -22,7 +22,7 @@ class _ParseSchemaUtil {
             secondOriginalInit = objectMapper.readValue(secondUApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
                     e);
         }
@@ -31,7 +31,7 @@ class _ParseSchemaUtil {
         try {
             secondOriginal = _CastUtil.asList(secondOriginalInit);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), secondOriginalInit, "Array"),
                     e);
         }
@@ -50,14 +50,14 @@ class _ParseSchemaUtil {
         return parseUApiSchema(original, typeExtensions, firstOriginal.size());
     }
 
-    static JApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
+    static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
         var objectMapper = new ObjectMapper();
         Object originalInit;
         try {
             originalInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
                     e);
         }
@@ -66,7 +66,7 @@ class _ParseSchemaUtil {
         try {
             original = _CastUtil.asList(originalInit);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), originalInit, "Array"),
                     e);
         }
@@ -74,7 +74,7 @@ class _ParseSchemaUtil {
         return parseUApiSchema(original, typeExtensions, 0);
     }
 
-    private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,
+    private static UApiSchema parseUApiSchema(List<Object> originalUApiSchema,
             Map<String, _UType> typeExtensions, int pathOffset) {
         var parsedTypes = new HashMap<String, _UType>();
         var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -101,7 +101,7 @@ class _ParseSchemaUtil {
             String schemaKey;
             try {
                 schemaKey = findSchemaKey(def, index);
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
                 continue;
             }
@@ -117,7 +117,7 @@ class _ParseSchemaUtil {
 
         if (!parseFailures.isEmpty()) {
             var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
-            throw new JApiSchemaParseError(offsetParseFailures);
+            throw new UApiSchemaParseError(offsetParseFailures);
         }
 
         var traitKeys = new HashSet<String>();
@@ -137,14 +137,14 @@ class _ParseSchemaUtil {
                         originalUApiSchema,
                         schemaKeysToIndex,
                         parsedTypes, typeExtensions, parseFailures, failedTypes);
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
 
         if (!parseFailures.isEmpty()) {
             var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
-            throw new JApiSchemaParseError(offsetParseFailures);
+            throw new UApiSchemaParseError(offsetParseFailures);
         }
 
         for (var traitKey : traitKeys) {
@@ -157,17 +157,17 @@ class _ParseSchemaUtil {
                         parsedTypes,
                         typeExtensions, parseFailures, failedTypes);
                 _ParseSchemaTraitUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
 
         if (!parseFailures.isEmpty()) {
             var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
-            throw new JApiSchemaParseError(offsetParseFailures);
+            throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        return new JApiSchema(originalUApiSchema, parsedTypes, typeExtensions);
+        return new UApiSchema(originalUApiSchema, parsedTypes, typeExtensions);
     }
 
     private static List<SchemaParseFailure> offsetSchemaIndex(List<SchemaParseFailure> initialFailures, int offset) {
@@ -200,7 +200,7 @@ class _ParseSchemaUtil {
         if (matches.size() == 1) {
             return matches.get(0);
         } else {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
                     "ObjectKeyRegexMatchCountUnexpected",
                     new TreeMap<>(
                             Map.of("regex", regex, "actual", matches.size(), "expected", 1)))));

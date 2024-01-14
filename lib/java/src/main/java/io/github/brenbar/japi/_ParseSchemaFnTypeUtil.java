@@ -28,7 +28,7 @@ class _ParseSchemaFnTypeUtil {
                     typeParameterCount,
                     originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
-        } catch (JApiSchemaParseError e) {
+        } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
 
@@ -43,7 +43,7 @@ class _ParseSchemaFnTypeUtil {
                         true, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions,
                         allParseFailures, failedTypes);
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
@@ -65,7 +65,7 @@ class _ParseSchemaFnTypeUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
 
         var type = new _UFn(schemaKey, callType, resultType, extendsRegex);

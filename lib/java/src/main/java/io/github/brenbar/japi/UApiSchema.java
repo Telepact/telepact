@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JApiSchema {
+public class UApiSchema {
 
     final List<Object> original;
     final Map<String, _UType> parsed;
     final Map<String, _UType> typeExtensions;
 
-    public JApiSchema(List<Object> original,
+    public UApiSchema(List<Object> original,
             Map<String, _UType> parsed,
             Map<String, _UType> typeExtensions) {
         this.original = original;
@@ -18,19 +18,19 @@ public class JApiSchema {
         this.typeExtensions = typeExtensions;
     }
 
-    public static JApiSchema fromJson(String json) {
+    public static UApiSchema fromJson(String json) {
         return _ParseSchemaUtil.newUApiSchema(json, new HashMap<>());
     }
 
-    public static JApiSchema fromJsonWithExtensions(String json, Map<String, _UType> typeExtensions) {
+    public static UApiSchema fromJsonWithExtensions(String json, Map<String, _UType> typeExtensions) {
         return _ParseSchemaUtil.newUApiSchema(json, typeExtensions);
     }
 
-    public static JApiSchema extend(JApiSchema base, String json, Map<String, _UType> typeExtensions) {
+    public static UApiSchema extend(UApiSchema base, String json, Map<String, _UType> typeExtensions) {
         return _ParseSchemaUtil.extendUApiSchema(base, json, typeExtensions);
     }
 
-    public static JApiSchema extend(JApiSchema base, String json) {
+    public static UApiSchema extend(UApiSchema base, String json) {
         return _ParseSchemaUtil.extendUApiSchema(base, json, new HashMap<>());
     }
 }

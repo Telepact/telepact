@@ -11,7 +11,7 @@ import java.util.function.Function;
 class _ServerHandlerUtil {
 
     static Message handleMessage(Message requestMessage,
-            JApiSchema jApiSchema,
+            UApiSchema jApiSchema,
             Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
@@ -156,7 +156,7 @@ class _ServerHandlerUtil {
         var newErrorResultValidationFailures = resultUnionType.validate(
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
-            throw new JApiProcessError(
+            throw new UApiProcessError(
                     "Failed internal jAPI validation: "
                             + mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures));
         }

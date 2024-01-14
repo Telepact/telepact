@@ -7,18 +7,18 @@ import java.util.TreeMap;
 /**
  * Indicates a failure to parse a jAPI Schema.
  */
-public class JApiSchemaParseError extends RuntimeException {
+public class UApiSchemaParseError extends RuntimeException {
 
     public final List<SchemaParseFailure> schemaParseFailures;
     public final List<Object> schemaParseFailuresPseudoJson;
 
-    public JApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures) {
+    public UApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)));
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
     }
 
-    public JApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures, Throwable cause) {
+    public UApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures, Throwable cause) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)), cause);
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);

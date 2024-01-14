@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 class _SerializeUtil {
 
-    static BinaryEncoding constructBinaryEncoding(JApiSchema jApiSchema) {
+    static BinaryEncoding constructBinaryEncoding(UApiSchema jApiSchema) {
         var allKeys = new TreeSet<String>();
         for (var entry : jApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());

@@ -12,7 +12,7 @@ import io.github.brenbar.japi.Client.Adapter;
 public class Playground {
     public static void main(String[] args) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var jApi = JApiSchema.fromJson(json);
+        var jApi = UApiSchema.fromJson(json);
 
         Function<Message, Message> handler = (requestMessage) -> {
             return new Message(Map.of("Ok", Map.of()));

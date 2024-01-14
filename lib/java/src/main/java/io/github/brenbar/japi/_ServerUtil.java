@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 class _ServerUtil {
-    static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
+    static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, UApiSchema jApiSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Message, Message> handler) {
         try {
@@ -40,7 +40,7 @@ class _ServerUtil {
         }
     }
 
-    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, JApiSchema jApiSchema,
+    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema jApiSchema,
             Consumer<Throwable> onError) {
 
         Message requestMessage;

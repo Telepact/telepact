@@ -10,7 +10,7 @@ import java.util.TreeMap;
 class _ValidateUtil {
 
     static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, JApiSchema jApiSchema, _UFn functionType) {
+            Map<String, Object> headers, UApiSchema jApiSchema, _UFn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {

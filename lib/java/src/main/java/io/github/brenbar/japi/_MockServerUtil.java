@@ -9,7 +9,7 @@ import java.util.TreeMap;
 class _MockServerUtil {
 
     static Message handle(Message requestMessage, List<MockStub> stubs,
-            List<Invocation> invocations, RandomGenerator random, JApiSchema jApiSchema,
+            List<Invocation> invocations, RandomGenerator random, UApiSchema jApiSchema,
             boolean enableGeneratedDefaultStub) {
 
         var enableGenerationStub = (Boolean) requestMessage.header.getOrDefault("_mockEnableGeneratedStub", false);
@@ -111,7 +111,7 @@ class _MockServerUtil {
                             includeRandomOptionalFields, List.of(), List.of(), random);
                     return new Message(Map.of("Ok", randomOkStruct));
                 } else {
-                    throw new JApiProcessError("Unexpected unknown function: %s".formatted(functionName));
+                    throw new UApiProcessError("Unexpected unknown function: %s".formatted(functionName));
                 }
             }
         }

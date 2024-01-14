@@ -27,7 +27,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
         }
 
@@ -59,7 +59,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
         }
 
@@ -69,7 +69,7 @@ class _ParseSchemaCustomTypeUtil {
 
         if (okCaseRequired) {
             if (!definition.containsKey("Ok")) {
-                throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "Ok"),
+                throw new UApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "Ok"),
                         "RequiredObjectKeyMissing", Map.of())));
             }
         }
@@ -102,7 +102,7 @@ class _ParseSchemaCustomTypeUtil {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
                         originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                         failedTypes);
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
                 continue;
             }
@@ -113,7 +113,7 @@ class _ParseSchemaCustomTypeUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
 
         var type = new _UUnion(schemaKey, cases, typeParameterCount);
@@ -154,13 +154,13 @@ class _ParseSchemaCustomTypeUtil {
                         typeExtensions, allParseFailures, failedTypes);
                 String fieldName = parsedField.fieldName;
                 fields.put(fieldName, parsedField);
-            } catch (JApiSchemaParseError e) {
+            } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
 
         return fields;
@@ -180,7 +180,7 @@ class _ParseSchemaCustomTypeUtil {
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration),
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration),
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
@@ -194,7 +194,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             typeDeclarationArray = _CastUtil.asList(typeDeclarationValue);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));
         }
 

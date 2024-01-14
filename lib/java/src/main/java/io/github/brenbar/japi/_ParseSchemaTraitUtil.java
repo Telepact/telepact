@@ -53,7 +53,7 @@ class _ParseSchemaTraitUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
     }
 
@@ -74,14 +74,14 @@ class _ParseSchemaTraitUtil {
         try {
             def = _CastUtil.asMap(mapInit);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, mapInit, "Object"));
         }
 
         var errorPath = _ValidateUtil.append(thisPath, "->");
 
         if (!def.containsKey("->")) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     List.of(new SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of())));
         }
 

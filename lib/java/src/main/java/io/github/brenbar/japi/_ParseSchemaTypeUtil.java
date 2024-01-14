@@ -15,7 +15,7 @@ class _ParseSchemaTypeUtil {
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "EmptyArrayDisallowed", Map.of())));
         }
 
@@ -27,7 +27,7 @@ class _ParseSchemaTypeUtil {
         try {
             rootTypeString = _CastUtil.asString(baseType);
         } catch (ClassCastException e) {
-            throw new JApiSchemaParseError(
+            throw new UApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
         }
 
@@ -35,7 +35,7 @@ class _ParseSchemaTypeUtil {
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
@@ -47,13 +47,13 @@ class _ParseSchemaTypeUtil {
                 typeExtensions, allParseFailures, failedTypes);
 
         if (type instanceof _UGeneric && nullable) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
         }
 
         var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
                     Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
         }
@@ -79,13 +79,13 @@ class _ParseSchemaTypeUtil {
                         originalJApiSchema,
                         schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
                 typeParameters.add(typeParameterTypeDeclaration);
-            } catch (JApiSchemaParseError e2) {
+            } catch (UApiSchemaParseError e2) {
                 parseFailures.addAll(e2.schemaParseFailures);
             }
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new JApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
 
         return new _UTypeDeclaration(type, nullable, typeParameters);
@@ -97,7 +97,7 @@ class _ParseSchemaTypeUtil {
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
-            throw new JApiSchemaParseError(List.of());
+            throw new UApiSchemaParseError(List.of());
         }
 
         var existingType = parsedTypes.get(typeName);
@@ -118,7 +118,7 @@ class _ParseSchemaTypeUtil {
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
@@ -144,7 +144,7 @@ class _ParseSchemaTypeUtil {
         var customTypeName = matcher.group(2);
         var index = schemaKeysToIndex.get(customTypeName);
         if (index == null) {
-            throw new JApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName))));
         }
         var definition = (Map<String, Object>) originalJApiSchema.get(index);
@@ -178,7 +178,7 @@ class _ParseSchemaTypeUtil {
             } else {
                 var typeExtension = typeExtensions.get(customTypeName);
                 if (typeExtension == null) {
-                    throw new JApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                    throw new UApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
                             "TypeExtensionImplementationMissing", Map.of("name", customTypeName))));
                 }
                 type = new _UExt(customTypeName, typeExtension, typeParameterCount);
@@ -187,10 +187,10 @@ class _ParseSchemaTypeUtil {
             parsedTypes.put(customTypeName, type);
 
             return type;
-        } catch (JApiSchemaParseError e) {
+        } catch (UApiSchemaParseError e) {
             allParseFailures.addAll(e.schemaParseFailures);
             failedTypes.add(customTypeName);
-            throw new JApiSchemaParseError(List.of());
+            throw new UApiSchemaParseError(List.of());
         }
     }
 }
