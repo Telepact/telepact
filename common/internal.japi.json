@@ -58,7 +58,7 @@
       "UnionFieldUnknown": {},
       "ExtensionValidationFailed": {
         "reason": ["string"],
-        "data": ["object", ["any"]]
+        "data!": ["object", ["any"]]
       },
       "ObjectKeyRegexMatchCountUnexpected": {
         "regex": ["string"],

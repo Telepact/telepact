@@ -62,16 +62,16 @@ class _ParseSchemaUtil {
                     e);
         }
 
-        List<Object> secondOriginal;
+        List<Object> original;
         try {
-            secondOriginal = _CastUtil.asList(originalInit);
+            original = _CastUtil.asList(originalInit);
         } catch (ClassCastException e) {
             throw new JApiSchemaParseError(
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), originalInit, "Array"),
                     e);
         }
 
-        return parseUApiSchema(secondOriginal, Map.of(), 0);
+        return parseUApiSchema(original, typeExtensions, 0);
     }
 
     private static JApiSchema parseUApiSchema(List<Object> originalUApiSchema,

@@ -25,6 +25,7 @@
       "pUnionNullBool!": ["union<1>.PUnion", ["boolean?"]],
       "arrPStrBool!": ["array", ["struct<1>.PStr", ["boolean"]]],
       "arrP2StrBool!": ["array", ["struct<2>.P2Str", ["boolean"], ["boolean"]]],
+      "setBool!": ["ext<1>.Set", ["boolean"]],
 
       "int!": ["integer"],
       "nullInt!": ["integer?"],
@@ -303,6 +304,10 @@
         "enest": ["array", ["T.1"]]
       }
     }
+  },
+
+  {
+    "ext<1>.Set": {}
   },
 
   {

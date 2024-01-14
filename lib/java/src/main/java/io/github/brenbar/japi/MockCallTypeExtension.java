@@ -13,7 +13,8 @@ public class MockCallTypeExtension implements TypeExtension {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj) {
+    public List<ValidationFailure> validate(Object givenObj, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         Map<String, Object> givenMap;

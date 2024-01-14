@@ -21,7 +21,7 @@ public class UExt implements UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        return this.typeExtension.validate(value);
+        return this.typeExtension.validate(value, typeParameters, generics);
     }
 
     @Override
