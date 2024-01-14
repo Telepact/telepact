@@ -25,7 +25,6 @@
       "pUnionNullBool!": ["union<1>.PUnion", ["boolean?"]],
       "arrPStrBool!": ["array", ["struct<1>.PStr", ["boolean"]]],
       "arrP2StrBool!": ["array", ["struct<2>.P2Str", ["boolean"], ["boolean"]]],
-      "setBool!": ["ext<1>.Set", ["boolean"]],
 
       "int!": ["integer"],
       "nullInt!": ["integer?"],
@@ -39,7 +38,6 @@
       "pUnionNullInt!": ["union<1>.PUnion", ["integer?"]],
       "arrPStrInt!": ["array", ["struct<1>.PStr", ["integer"]]],
       "arrP2StrInt!": ["array", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
-      "setInt!": ["ext<1>.Set", ["integer"]],
 
       "num!": ["number"],
       "nullNum!": ["number?"],
@@ -53,7 +51,6 @@
       "pUnionNullNum!": ["union<1>.PUnion", ["number?"]],
       "arrPStrNum!": ["array", ["struct<1>.PStr", ["number"]]],
       "arrP2StrNum!": ["array", ["struct<2>.P2Str", ["boolean"], ["number"]]],
-      "setNum!": ["ext<1>.Set", ["number"]],
 
       "str!": ["string"],
       "nullStr!": ["string?"],
@@ -67,7 +64,6 @@
       "pUnionNullStr!": ["union<1>.PUnion", ["string?"]],
       "arrPStrStr!": ["array", ["struct<1>.PStr", ["string"]]],
       "arrP2StrStr!": ["array", ["struct<2>.P2Str", ["boolean"], ["string"]]],
-      "setStr!": ["ext<1>.Set", ["string"]],
 
       "arr!": ["array", ["any"]],
       "nullArr!": ["array?", ["any"]],
@@ -84,7 +80,6 @@
         "array",
         ["struct<2>.P2Str", ["boolean"], ["array", ["any"]]]
       ],
-      "setArr!": ["ext<1>.Set", ["array", ["any"]]],
 
       "obj!": ["object", ["any"]],
       "nullObj!": ["object?", ["any"]],
@@ -101,7 +96,6 @@
         "array",
         ["struct<2>.P2Str", ["boolean"], ["object", ["any"]]]
       ],
-      "setObj!": ["ext<1>.Set", ["object", ["any"]]],
 
       "any!": ["any"],
       "nullAny!": ["any?"],
@@ -115,7 +109,6 @@
       "pUnionNullAny!": ["union<1>.PUnion", ["any?"]],
       "arrPStrAny!": ["array", ["struct<1>.PStr", ["any"]]],
       "arrP2StrAny!": ["array", ["struct<2>.P2Str", ["boolean"], ["any"]]],
-      "setAny!": ["ext<1>.Set", ["any"]],
 
       "struct!": ["struct.ExStruct"],
       "nullStruct!": ["struct.ExStruct?"],
@@ -132,7 +125,6 @@
         "array",
         ["struct<2>.P2Str", ["boolean"], ["struct.ExStruct"]]
       ],
-      "setStruct!": ["ext<1>.Set", ["struct.ExStruct"]],
 
       "union!": ["union.ExUnion"],
       "nullUnion!": ["union.ExUnion?"],
@@ -149,7 +141,6 @@
         "array",
         ["struct<2>.P2Str", ["boolean"], ["union.ExUnion"]]
       ],
-      "setUnion!": ["ext<1>.Set", ["union.ExUnion"]],
 
       "fn!": ["fn.example"],
       "nullFn!": ["fn.example?"],
@@ -166,7 +157,6 @@
         "array",
         ["struct<2>.P2Str", ["boolean"], ["fn.example"]]
       ],
-      "setFn!": ["ext<1>.Set", ["fn.example"]],
 
       "p2Str!": ["struct<2>.P2Str", ["boolean"], ["integer"]],
       "nullP2Str!": ["struct<2>.P2Str?", ["boolean"], ["integer"]],
@@ -208,10 +198,6 @@
           ["struct<2>.P2Str", ["boolean"], ["integer"]]
         ]
       ],
-      "setP2Str!": [
-        "ext<1>.Set",
-        ["struct<2>.P2Str", ["boolean"], ["integer"]]
-      ],
 
       "p2Union!": ["union<2>.P2Union", ["boolean"], ["integer"]],
       "nullP2Union!": ["union<2>.P2Union?", ["boolean"], ["integer"]],
@@ -252,10 +238,6 @@
           ["boolean"],
           ["union<2>.P2Union", ["boolean"], ["integer"]]
         ]
-      ],
-      "setP2Union!": [
-        "ext<1>.Set",
-        ["union<2>.P2Union", ["boolean"], ["integer"]]
       ],
 
       "pdStr!": ["struct<1>.PdStr", ["struct<1>.PStr", ["boolean"]]]
@@ -321,10 +303,6 @@
         "enest": ["array", ["T.1"]]
       }
     }
-  },
-
-  {
-    "ext<1>.Set": {}
   },
 
   {

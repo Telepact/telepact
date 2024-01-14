@@ -1,11 +1,11 @@
 [
   {
     "///": " A stubbed result for matching input. ",
-    "ext._Stub": {}
+    "_ext._Stub": {}
   },
   {
     "///": " A call of a function. ",
-    "ext._Call": {}
+    "_ext._Call": {}
   },
   {
     "///": " The number of times a function is allowed to be called. ",
@@ -27,12 +27,12 @@
       "TooFewMatchingCalls": {
         "wanted": ["union._CallCountCriteria"],
         "found": ["integer"],
-        "allCalls": ["array", ["ext._Call"]]
+        "allCalls": ["array", ["_ext._Call"]]
       },
       "TooManyMatchingCalls": {
         "wanted": ["union._CallCountCriteria"],
         "found": ["integer"],
-        "allCalls": ["array", ["ext._Call"]]
+        "allCalls": ["array", ["_ext._Call"]]
       }
     }
   },
@@ -50,7 +50,7 @@
       " response validation.                                                                                     "
     ],
     "fn._createStub": {
-      "stub": ["ext._Stub"],
+      "stub": ["_ext._Stub"],
       "strictMatch!": ["boolean"]
     },
     "->": {
@@ -65,7 +65,7 @@
       " match calls where the given `call` argument is Exactly a json sub-structure of the actual argument.    "
     ],
     "fn._verify": {
-      "call": ["ext._Call"],
+      "call": ["_ext._Call"],
       "strictMatch!": ["boolean"],
       "count!": ["union._CallCountCriteria"]
     },
@@ -86,7 +86,7 @@
     "->": {
       "Ok": {},
       "ErrorVerificationFailure": {
-        "additionalUnverifiedCalls": ["array", ["ext._Call"]]
+        "additionalUnverifiedCalls": ["array", ["_ext._Call"]]
       }
     },
     "extends": "^trait\\._Validated$"

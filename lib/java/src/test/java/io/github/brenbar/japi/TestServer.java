@@ -24,7 +24,7 @@ public class TestServer {
             String backdoorTopic)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = JApiSchema.fromJsonWithExtensions(json, Map.of("ext<1>.Set", new SetExtension()));
+        var jApi = JApiSchema.fromJson(json);
         var alternateJApi = JApiSchema.extend(jApi, """
                 [
                     {

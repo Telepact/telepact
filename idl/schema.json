@@ -246,7 +246,7 @@
         "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
-          "^ext(<[1-3]>)?\\.[a-zA-Z_]\\w*": {
+          "^_ext(<[1-3]>)?\\.[a-zA-Z_]\\w*": {
             "type": "object",
             "description": "A type extension.",
             "additionalProperties": false
@@ -270,7 +270,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -278,7 +278,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -290,7 +290,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -298,7 +298,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclaration" },
@@ -310,7 +310,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -318,7 +318,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclaration" },
@@ -330,7 +330,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -338,7 +338,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclaration" },
@@ -349,7 +349,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any|array|object)|(fn|(union|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
@@ -363,7 +363,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -371,7 +371,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -383,7 +383,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -391,7 +391,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclarationParam1" },
@@ -403,7 +403,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -411,7 +411,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclarationParam1" },
@@ -423,7 +423,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -431,7 +431,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclarationParam1" },
@@ -442,7 +442,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any|T\\.0|array|object)|(fn|(union|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|T\\.0|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
@@ -456,7 +456,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -464,7 +464,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -476,7 +476,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -484,7 +484,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclarationParam2" },
@@ -496,7 +496,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -504,7 +504,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclarationParam2" },
@@ -516,7 +516,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -524,7 +524,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclarationParam2" },
@@ -535,7 +535,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any|T\\.[0-1]|array|object)|(fn|(union|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|T\\.[0-1]|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }
@@ -549,7 +549,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ]
       },
@@ -557,7 +557,7 @@
         "prefixItems": [
           {
             "type": "string",
-            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|union|struct|ext)\\.([a-zA-Z_]\\w*))(\\?)?$"
+            "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
           }
         ],
         "items": false,
@@ -569,7 +569,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ]
         },
@@ -577,7 +577,7 @@
           "prefixItems": [
             {
               "type": "string",
-              "pattern": "^((array|object)|(fn|(union|struct|ext)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
+              "pattern": "^((array|object)|(fn|(union|struct)<1>)\\.([a-zA-Z_]\\w*))(\\?)?$"
             }
           ],
           "items": { "$ref": "#/$defs/typeDeclarationParam3" },
@@ -589,7 +589,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ]
           },
@@ -597,7 +597,7 @@
             "prefixItems": [
               {
                 "type": "string",
-                "pattern": "^(fn|(union|struct|ext)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                "pattern": "^(fn|(union|struct)<2>)\\.([a-zA-Z_]\\w*)(\\?)?$"
               }
             ],
             "items": { "$ref": "#/$defs/typeDeclarationParam3" },
@@ -609,7 +609,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ]
             },
@@ -617,7 +617,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^(fn|(union|struct|ext)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
+                  "pattern": "^(fn|(union|struct)<3>)\\.([a-zA-Z_]\\w*)(\\?)?$"
                 }
               ],
               "items": { "$ref": "#/$defs/typeDeclarationParam3" },
@@ -628,7 +628,7 @@
               "prefixItems": [
                 {
                   "type": "string",
-                  "pattern": "^((boolean|integer|number|string|any|T\\.[0-2]|array|object)|(fn|(union|struct|ext)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                  "pattern": "^((boolean|integer|number|string|any|T\\.[0-2]|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                 }
               ]
             }

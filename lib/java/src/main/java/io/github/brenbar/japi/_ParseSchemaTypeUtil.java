@@ -113,7 +113,7 @@ class _ParseSchemaTypeUtil {
             genericRegex = "";
         }
 
-        var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
+        var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
                 .formatted(genericRegex);
         var regex = Pattern.compile(regexString);
         var matcher = regex.matcher(typeName);

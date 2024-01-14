@@ -106,14 +106,6 @@ def get_values(given_field: str, the_type, given_correct_values, additional_inco
     incorrect_values = [([init_correct_values[0], v], [(r, p)]) for v, [(r, p)] in init_incorrect_values_w_null]
     yield field, correct_values, incorrect_values, [field, 1, 'nest', 0]
 
-    field = 'set{}'.format(cap(given_field))
-    correct_values = [[]] + [[v] for v in given_correct_values] + [given_correct_values]
-    incorrect_values = [([given_correct_values[0], v], [(r, p)]) for v, [(r, p)] in given_incorrect_values_w_null]
-    if incorrect_values:
-        incorrect_values += [([v for v, e in given_incorrect_values_w_null], [(r, p) for i, (v, [(r, p)]) in enumerate(given_incorrect_values_w_null)])]
-    yield field, correct_values, incorrect_values, [field, -1]
-
-
 
 def is_iter(v):
     try:

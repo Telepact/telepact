@@ -190,7 +190,7 @@ class _ParseSchemaUtil {
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {
-        var regex = "^((fn|trait|info)|((struct|union|ext)(<[0-2]>)?))\\..*";
+        var regex = "^((fn|trait|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
         var matches = new ArrayList<String>();
         for (var e : definition.keySet()) {
             if (e.matches(regex)) {

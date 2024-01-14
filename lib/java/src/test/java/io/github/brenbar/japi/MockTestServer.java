@@ -17,7 +17,7 @@ public class MockTestServer {
             Map<String, Object> config)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = JApiSchema.fromJsonWithExtensions(json, Map.of("ext<1>.Set", new SetExtension()));
+        var jApi = JApiSchema.fromJson(json);
 
         var options = new MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
