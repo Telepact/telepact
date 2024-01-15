@@ -7,8 +7,6 @@ import java.util.Set;
 
 class _ParseSchemaFnTypeUtil {
 
-    private static final _ParseSchemaFnTypeUtil INST = new _ParseSchemaFnTypeUtil();
-
     static _UFn parseFunctionType(
             List<Object> path,
             Map<String, Object> functionDefinitionAsParsedJson,
@@ -23,7 +21,7 @@ class _ParseSchemaFnTypeUtil {
 
         _UUnion callType = null;
         try {
-            final var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson,
+            final _UStruct argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson,
                     schemaKey, typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
                     allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
@@ -31,29 +29,32 @@ class _ParseSchemaFnTypeUtil {
             parseFailures.addAll(e.schemaParseFailures);
         }
 
-        var resPath = _ValidateUtil.append(path, "->");
+        final var resultSchemaKey = "->";
+        final var okCaseRequired = false;
+        final List<Object> resPath = _ValidateUtil.append(path, resultSchemaKey);
 
         _UUnion resultType = null;
-        if (!functionDefinitionAsParsedJson.containsKey("->")) {
+        if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
             parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
         } else {
             try {
-                resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson, "->",
-                        true, typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes,
-                        typeExtensions,
-                        allParseFailures, failedTypes);
+                resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson,
+                        resultSchemaKey, okCaseRequired, typeParameterCount, originalUApiSchema, schemaKeysToIndex,
+                        parsedTypes, typeExtensions, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
 
-        var regexPath = _ValidateUtil.append(path, "extends");
+        final var extendsRegexKey = "extends";
+        final var regexPath = _ValidateUtil.append(path, extendsRegexKey);
 
         String extendsRegex = null;
-        if (functionDefinitionAsParsedJson.containsKey("extends") && !schemaKey.startsWith("fn._")) {
+        if (functionDefinitionAsParsedJson.containsKey(extendsRegexKey) && !schemaKey.startsWith("fn._")) {
             parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
-            Object extendsRegexInit = functionDefinitionAsParsedJson.getOrDefault("extends", "^trait\\..*$");
+            final Object extendsRegexInit = functionDefinitionAsParsedJson.getOrDefault(extendsRegexKey,
+                    "^trait\\..*$");
             try {
                 extendsRegex = _CastUtil.asString(extendsRegexInit);
             } catch (ClassCastException e) {
@@ -67,8 +68,6 @@ class _ParseSchemaFnTypeUtil {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        var type = new _UFn(schemaKey, callType, resultType, extendsRegex);
-
-        return type;
+        return new _UFn(schemaKey, callType, resultType, extendsRegex);
     }
 }
