@@ -129,12 +129,12 @@ class _MockServerUtil {
     }
 
     private static boolean isSubMapEntryEqual(Object partValue, Object wholeValue) {
-        if (partValue instanceof Map m1 && wholeValue instanceof Map m2) {
+        if (partValue instanceof final Map m1 && wholeValue instanceof final Map m2) {
             return isSubMap(m1, m2);
-        } else if (partValue instanceof List partList && wholeValue instanceof List<?> wholeList) {
+        } else if (partValue instanceof final List partList && wholeValue instanceof final List wholeList) {
             for (int i = 0; i < partList.size(); i += 1) {
                 final var partElement = partList.get(i);
-                var partMatches = partiallyMatches((List<Object>) wholeList, partElement);
+                final var partMatches = partiallyMatches(wholeList, partElement);
                 if (!partMatches) {
                     return false;
                 }

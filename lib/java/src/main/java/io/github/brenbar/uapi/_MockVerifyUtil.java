@@ -12,7 +12,7 @@ class _MockVerifyUtil {
             boolean exactMatch,
             Map<String, Object> verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
-        for (var invocation : invocations) {
+        for (final var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
                 if (exactMatch) {
                     if (Objects.equals(invocation.functionArgument, argument)) {
@@ -20,7 +20,8 @@ class _MockVerifyUtil {
                         matchesFound += 1;
                     }
                 } else {
-                    if (_MockServerUtil.isSubMap(argument, invocation.functionArgument)) {
+                    boolean isSubMap = _MockServerUtil.isSubMap(argument, invocation.functionArgument);
+                    if (isSubMap) {
                         invocation.verified = true;
                         matchesFound += 1;
                     }
@@ -28,17 +29,18 @@ class _MockVerifyUtil {
             }
         }
 
-        var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
-        for (var invocation : invocations) {
+        final var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
+        for (final var invocation : invocations) {
             allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
         }
 
-        var verifyTimesEntry = _UUnion.entry(verificationTimes);
-        var verifyKey = verifyTimesEntry.getKey();
-        var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
+        final Map.Entry<String, Object> verifyTimesEntry = _UUnion.entry(verificationTimes);
+        final var verifyKey = verifyTimesEntry.getKey();
+        final var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
+
         Map<String, Object> verificationFailurePseudoJson = null;
         if (verifyKey.equals("Exact")) {
-            var times = (Integer) verifyTimesStruct.get("times");
+            final var times = (Integer) verifyTimesStruct.get("times");
             if (matchesFound > times) {
                 verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
@@ -53,7 +55,7 @@ class _MockVerifyUtil {
                                 Map.entry("allCalls", allCallsPseudoJson))));
             }
         } else if (verifyKey.equals("AtMost")) {
-            var times = (Integer) verifyTimesStruct.get("times");
+            final var times = (Integer) verifyTimesStruct.get("times");
             if (matchesFound > times) {
                 verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
@@ -62,7 +64,7 @@ class _MockVerifyUtil {
                                 Map.entry("allCalls", allCallsPseudoJson))));
             }
         } else if (verifyKey.equals("AtLeast")) {
-            var times = (Integer) verifyTimesStruct.get("times");
+            final var times = (Integer) verifyTimesStruct.get("times");
             if (matchesFound < times) {
                 verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
                         new TreeMap<>(Map.ofEntries(
@@ -81,11 +83,11 @@ class _MockVerifyUtil {
     }
 
     static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
-        var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
+        final var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
 
         if (invocationsNotVerified.size() > 0) {
-            var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
-            for (var invocation : invocationsNotVerified) {
+            final var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
+            for (final var invocation : invocationsNotVerified) {
                 unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
             }
             return Map.of("ErrorVerificationFailure",

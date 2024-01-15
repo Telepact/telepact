@@ -19,25 +19,23 @@ class _ParseSchemaCustomTypeUtil {
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
-        var thisPath = _ValidateUtil.append(path, schemaKey);
+        final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
+        final Object defInit = structDefinitionAsParsedJson.get(schemaKey);
 
-        Object defInit = structDefinitionAsParsedJson.get(schemaKey);
-
-        Map<String, Object> definition;
+        final Map<String, Object> definition;
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
+            final List<SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
+                    .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
+            throw new UApiSchemaParseError(finalParseFailures);
         }
 
-        var fields = parseStructFields(definition, thisPath, typeParameterCount,
+        final var fields = parseStructFields(definition, thisPath, typeParameterCount,
                 originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                 failedTypes);
 
-        var type = new _UStruct(schemaKey, fields, typeParameterCount);
-
-        return type;
+        return new _UStruct(schemaKey, fields, typeParameterCount);
     }
 
     static _UUnion parseUnionType(
@@ -51,53 +49,54 @@ class _ParseSchemaCustomTypeUtil {
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
-        var thisPath = _ValidateUtil.append(path, schemaKey);
-
+        final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
         Object defInit = unionDefinitionAsParsedJson.get(schemaKey);
 
-        Map<String, Object> definition;
+        final Map<String, Object> definition;
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, defInit, "Object"));
+            final List<SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
+                    .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
+            throw new UApiSchemaParseError(finalParseFailures);
         }
 
-        var parseFailures = new ArrayList<SchemaParseFailure>();
-
-        var cases = new HashMap<String, _UStruct>();
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var cases = new HashMap<String, _UStruct>();
 
         if (okCaseRequired) {
             if (!definition.containsKey("Ok")) {
-                throw new UApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(thisPath, "Ok"),
+                final List<Object> finalPath = _ValidateUtil.append(thisPath, "Ok");
+                throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
                         "RequiredObjectKeyMissing", Map.of())));
             }
         }
 
-        for (var entry : definition.entrySet()) {
-            var unionCase = entry.getKey();
+        for (final var entry : definition.entrySet()) {
+            final var unionCase = entry.getKey();
+            final List<Object> unionKeyPath = _ValidateUtil.append(thisPath, unionCase);
+            final var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
+            final var regex = Pattern.compile(regexString);
 
-            var unionKeyPath = _ValidateUtil.append(thisPath, unionCase);
-
-            var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
-            var regex = Pattern.compile(regexString);
-            var matcher = regex.matcher(unionCase);
+            final var matcher = regex.matcher(unionCase);
             if (!matcher.find()) {
                 parseFailures.add(new SchemaParseFailure(unionKeyPath,
                         "KeyRegexMatchFailed", Map.of("regex", regexString)));
                 continue;
             }
 
-            Map<String, Object> unionCaseStruct;
+            final Map<String, Object> unionCaseStruct;
             try {
                 unionCaseStruct = _CastUtil.asMap(entry.getValue());
             } catch (ClassCastException e) {
-                parseFailures.addAll(
-                        _ParseSchemaUtil.getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object"));
+                List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                        .getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object");
+
+                parseFailures.addAll(thisParseFailures);
                 continue;
             }
 
-            Map<String, _UFieldDeclaration> fields;
+            final Map<String, _UFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
                         originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
@@ -107,7 +106,7 @@ class _ParseSchemaCustomTypeUtil {
                 continue;
             }
 
-            var unionStruct = new _UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
+            final var unionStruct = new _UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
 
             cases.put(unionCase, unionStruct);
         }
@@ -116,9 +115,7 @@ class _ParseSchemaCustomTypeUtil {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        var type = new _UUnion(schemaKey, cases, typeParameterCount);
-
-        return type;
+        return new _UUnion(schemaKey, cases, typeParameterCount);
     }
 
     static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
@@ -128,31 +125,35 @@ class _ParseSchemaCustomTypeUtil {
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var fields = new HashMap<String, _UFieldDeclaration>();
 
-        var parseFailures = new ArrayList<SchemaParseFailure>();
+        for (final var structEntry : referenceStruct.entrySet()) {
+            final var fieldDeclaration = structEntry.getKey();
 
-        var fields = new HashMap<String, _UFieldDeclaration>();
-        for (var structEntry : referenceStruct.entrySet()) {
-            var fieldDeclaration = structEntry.getKey();
-
-            for (var existingField : fields.keySet()) {
-                var existingFieldNoOpt = existingField.split("!")[0];
-                var fieldNoOpt = fieldDeclaration.split("!")[0];
+            for (final var existingField : fields.keySet()) {
+                final var existingFieldNoOpt = existingField.split("!")[0];
+                final var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
+                    final List<Object> finalPath = _ValidateUtil.append(path, fieldDeclaration);
+                    final List<Object> finalOtherPath = _ValidateUtil.append(path, existingField);
+
                     parseFailures
-                            .add(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration), "PathCollision",
-                                    Map.of("other", _ValidateUtil.append(path, existingField))));
+                            .add(new SchemaParseFailure(finalPath, "PathCollision",
+                                    Map.of("other", finalOtherPath)));
                 }
             }
 
-            var typeDeclarationValue = structEntry.getValue();
-            _UFieldDeclaration parsedField;
+            final var typeDeclarationValue = structEntry.getValue();
+
+            final _UFieldDeclaration parsedField;
             try {
                 parsedField = parseField(path, fieldDeclaration,
                         typeDeclarationValue, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
                         parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
-                String fieldName = parsedField.fieldName;
+                final String fieldName = parsedField.fieldName;
+
                 fields.put(fieldName, parsedField);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -176,21 +177,21 @@ class _ParseSchemaCustomTypeUtil {
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
-        var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
-        var regex = Pattern.compile(regexString);
-        var matcher = regex.matcher(fieldDeclaration);
+        final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
+        final var regex = Pattern.compile(regexString);
+
+        final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(_ValidateUtil.append(path, fieldDeclaration),
+            final List<Object> finalPath = _ValidateUtil.append(path, fieldDeclaration);
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
-        String fieldName = matcher.group(0);
+        final var fieldName = matcher.group(0);
+        final var optional = matcher.group(2) != null;
+        final List<Object> thisPath = _ValidateUtil.append(path, fieldName);
 
-        boolean optional = matcher.group(2) != null;
-
-        var thisPath = _ValidateUtil.append(path, fieldName);
-
-        List<Object> typeDeclarationArray;
+        final List<Object> typeDeclarationArray;
         try {
             typeDeclarationArray = _CastUtil.asList(typeDeclarationValue);
         } catch (ClassCastException e) {
@@ -198,7 +199,7 @@ class _ParseSchemaCustomTypeUtil {
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));
         }
 
-        var typeDeclaration = _ParseSchemaTypeUtil.parseTypeDeclaration(thisPath,
+        final var typeDeclaration = _ParseSchemaTypeUtil.parseTypeDeclaration(thisPath,
                 typeDeclarationArray, typeParameterCount,
                 originalJApiSchema,
                 schemaKeysToIndex,
