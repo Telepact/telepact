@@ -14,6 +14,30 @@ import java.util.TreeMap;
 
 class _ParseSchemaUtil {
 
+    static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
+        var objectMapper = new ObjectMapper();
+        Object originalInit;
+        try {
+            originalInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
+            });
+        } catch (IOException e) {
+            throw new UApiSchemaParseError(
+                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
+                    e);
+        }
+
+        List<Object> original;
+        try {
+            original = _CastUtil.asList(originalInit);
+        } catch (ClassCastException e) {
+            throw new UApiSchemaParseError(
+                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), originalInit, "Array"),
+                    e);
+        }
+
+        return parseUApiSchema(original, typeExtensions, 0);
+    }
+
     static UApiSchema extendUApiSchema(UApiSchema first, String secondUApiSchemaJson,
             Map<String, _UType> secondTypeExtensions) {
         var objectMapper = new ObjectMapper();
@@ -48,30 +72,6 @@ class _ParseSchemaUtil {
         typeExtensions.putAll(secondTypeExtensions);
 
         return parseUApiSchema(original, typeExtensions, firstOriginal.size());
-    }
-
-    static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
-        var objectMapper = new ObjectMapper();
-        Object originalInit;
-        try {
-            originalInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            throw new UApiSchemaParseError(
-                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
-                    e);
-        }
-
-        List<Object> original;
-        try {
-            original = _CastUtil.asList(originalInit);
-        } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), originalInit, "Array"),
-                    e);
-        }
-
-        return parseUApiSchema(original, typeExtensions, 0);
     }
 
     private static UApiSchema parseUApiSchema(List<Object> originalUApiSchema,
