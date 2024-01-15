@@ -11,7 +11,7 @@ import javax.xml.validation.Schema;
 class _ParseSchemaTypeUtil {
 
     static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
-            int thisTypeParameterCount, List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex,
+            int thisTypeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
@@ -43,7 +43,7 @@ class _ParseSchemaTypeUtil {
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, originalUApiSchema,
+        final _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, uApiSchemaPseudoJson,
                 schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
 
         if (type instanceof _UGeneric && nullable) {
@@ -81,7 +81,7 @@ class _ParseSchemaTypeUtil {
             final _UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
-                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                         failedTypes);
 
                 typeParameters.add(typeParameterTypeDeclaration);
@@ -98,7 +98,7 @@ class _ParseSchemaTypeUtil {
     }
 
     static _UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
-            List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
+            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
@@ -152,7 +152,7 @@ class _ParseSchemaTypeUtil {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName))));
         }
-        final var definition = (Map<String, Object>) originalUApiSchema.get(index);
+        final var definition = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
 
         final var typeParameterCountString = matcher.group(6);
         final int typeParameterCount;
@@ -166,16 +166,16 @@ class _ParseSchemaTypeUtil {
             final _UType type;
             if (customTypeName.startsWith("struct")) {
                 type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
-                        typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
+                        typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
                 boolean okCaseRequired = false;
                 type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
-                        okCaseRequired, typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes,
+                        okCaseRequired, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
                 type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
-                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                         failedTypes);
             } else {
                 type = typeExtensions.get(customTypeName);

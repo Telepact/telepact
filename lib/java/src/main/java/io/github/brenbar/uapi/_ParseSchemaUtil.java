@@ -78,7 +78,7 @@ class _ParseSchemaUtil {
         return parseUApiSchema(original, typeExtensions, firstOriginal.size());
     }
 
-    private static UApiSchema parseUApiSchema(List<Object> originalUApiSchema,
+    private static UApiSchema parseUApiSchema(List<Object> uApiSchemaPseudoJson,
             Map<String, _UType> typeExtensions, int pathOffset) {
         final var parsedTypes = new HashMap<String, _UType>();
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -87,7 +87,7 @@ class _ParseSchemaUtil {
         final var schemaKeys = new HashSet<String>();
 
         var index = -1;
-        for (final var definition : originalUApiSchema) {
+        for (final var definition : uApiSchemaPseudoJson) {
             index += 1;
 
             final List<Object> loopPath = List.of(index);
@@ -142,7 +142,8 @@ class _ParseSchemaUtil {
 
             try {
                 _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
-                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
+                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures,
+                        failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -155,10 +156,10 @@ class _ParseSchemaUtil {
 
         for (final var traitKey : traitKeys) {
             final var thisIndex = schemaKeysToIndex.get(traitKey);
-            final var def = (Map<String, Object>) originalUApiSchema.get(thisIndex);
+            final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
 
             try {
-                final var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, originalUApiSchema,
+                final var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, uApiSchemaPseudoJson,
                         schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                 _ParseSchemaTraitUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
             } catch (UApiSchemaParseError e) {
@@ -171,7 +172,7 @@ class _ParseSchemaUtil {
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        return new UApiSchema(originalUApiSchema, parsedTypes, typeExtensions);
+        return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, typeExtensions);
     }
 
     private static List<SchemaParseFailure> offsetSchemaIndex(List<SchemaParseFailure> initialFailures, int offset) {

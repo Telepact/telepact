@@ -59,7 +59,7 @@ class _ParseSchemaTraitUtil {
     }
 
     public static UTrait parseTraitType(Map<String, Object> traitDefinitionAsParsedJson, String schemaKey,
-            List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
+            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var defInit = traitDefinitionAsParsedJson.get(schemaKey);
         final var index = schemaKeysToIndex.get(schemaKey);
@@ -84,7 +84,7 @@ class _ParseSchemaTraitUtil {
         }
 
         final _UUnion trait = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, resultSchemaKey,
-                okCaseRequired, 0, originalUApiSchema,
+                okCaseRequired, 0, uApiSchemaPseudoJson,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions,
                 allParseFailures, failedTypes);
