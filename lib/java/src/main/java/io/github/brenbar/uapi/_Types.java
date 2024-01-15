@@ -59,9 +59,9 @@ class SchemaParseFailure {
 }
 
 class Invocation {
-    final String functionName;
-    final Map<String, Object> functionArgument;
-    boolean verified = false;
+    public final String functionName;
+    public final Map<String, Object> functionArgument;
+    public boolean verified = false;
 
     public Invocation(String functionName, Map<String, Object> functionArgument) {
         this.functionName = functionName;

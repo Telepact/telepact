@@ -3,6 +3,7 @@ package io.github.brenbar.uapi;
 import java.util.List;
 
 class _UAny implements _UType {
+
     @Override
     public int getTypeParameterCount() {
         return 0;
@@ -19,7 +20,7 @@ class _UAny implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             RandomGenerator random) {
-        var selectType = random.nextInt(3);
+        final var selectType = random.nextInt(3);
         if (selectType == 0) {
             return random.nextBoolean();
         } else if (selectType == 1) {

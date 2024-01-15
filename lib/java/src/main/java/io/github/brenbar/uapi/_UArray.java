@@ -13,20 +13,24 @@ class _UArray implements _UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        if (value instanceof List l) {
-            var nestedTypeDeclaration = typeParameters.get(0);
-            var validationFailures = new ArrayList<ValidationFailure>();
+        if (value instanceof final List l) {
+            final var nestedTypeDeclaration = typeParameters.get(0);
+            final var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
-                var element = l.get(i);
-                var nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
+                final var element = l.get(i);
+                final var nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
                 final var index = i;
-                var nestedValidationFailuresWithPath = nestedValidationFailures
-                        .stream()
-                        .map(f -> new ValidationFailure(_ValidateUtil.prepend(index, f.path), f.reason,
-                                f.data))
-                        .toList();
+
+                final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+                for (var f : nestedValidationFailures) {
+                    final List<Object> finalPath = _ValidateUtil.prepend(index, f.path);
+                    nestedValidationFailuresWithPath.add(new ValidationFailure(finalPath, f.reason,
+                            f.data));
+                }
+
                 validationFailures.addAll(nestedValidationFailuresWithPath);
             }
+
             return validationFailures;
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
@@ -39,23 +43,26 @@ class _UArray implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             RandomGenerator random) {
-        var nestedTypeDeclaration = typeParameters.get(0);
+        final var nestedTypeDeclaration = typeParameters.get(0);
+
         if (useStartingValue) {
-            var startingArray = (List<Object>) startingValue;
-            var array = new ArrayList<Object>();
-            for (var startingArrayValue : startingArray) {
-                var value = nestedTypeDeclaration.generateRandomValue(startingArrayValue, true,
+            final var startingArray = (List<Object>) startingValue;
+            final var array = new ArrayList<Object>();
+            for (final var startingArrayValue : startingArray) {
+                final var value = nestedTypeDeclaration.generateRandomValue(startingArrayValue, true,
                         includeRandomOptionalFields, generics, random);
+
                 array.add(value);
             }
             return array;
         } else {
-            var length = random.nextCollectionLength();
-            var array = new ArrayList<Object>();
+            final var length = random.nextCollectionLength();
+            final var array = new ArrayList<Object>();
             for (int i = 0; i < length; i += 1) {
-                var value = nestedTypeDeclaration.generateRandomValue(null, false,
+                final var value = nestedTypeDeclaration.generateRandomValue(null, false,
                         includeRandomOptionalFields,
                         generics, random);
+
                 array.add(value);
             }
             return array;
