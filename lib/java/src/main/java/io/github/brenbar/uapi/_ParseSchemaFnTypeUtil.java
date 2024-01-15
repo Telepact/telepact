@@ -18,15 +18,14 @@ class _ParseSchemaFnTypeUtil {
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        var parseFailures = new ArrayList<SchemaParseFailure>();
-
-        var typeParameterCount = 0;
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var typeParameterCount = 0;
 
         _UUnion callType = null;
         try {
-            var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson, schemaKey,
-                    typeParameterCount,
-                    originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
+            final var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson,
+                    schemaKey, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
+                    allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
