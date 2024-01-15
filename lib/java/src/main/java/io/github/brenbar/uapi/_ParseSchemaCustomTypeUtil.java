@@ -11,7 +11,7 @@ class _ParseSchemaCustomTypeUtil {
 
     static _UStruct parseStructType(
             List<Object> path,
-            Map<String, Object> structDefinitionAsParsedJson,
+            Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey,
             int typeParameterCount,
             List<Object> originalJApiSchema,
@@ -20,7 +20,7 @@ class _ParseSchemaCustomTypeUtil {
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
-        final Object defInit = structDefinitionAsParsedJson.get(schemaKey);
+        final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
         final Map<String, Object> definition;
         try {
