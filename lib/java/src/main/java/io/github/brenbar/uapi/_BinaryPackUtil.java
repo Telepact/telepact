@@ -23,10 +23,10 @@ class _BinaryPackUtil {
     }
 
     static Map<Object, Object> packBody(Map<Object, Object> body) {
-        var result = new HashMap<Object, Object>();
+        final var result = new HashMap<Object, Object>();
 
-        for (var entry : body.entrySet()) {
-            var packedValue = pack(entry.getValue());
+        for (final var entry : body.entrySet()) {
+            final var packedValue = pack(entry.getValue());
             result.put(entry.getKey(), packedValue);
         }
 
@@ -34,13 +34,15 @@ class _BinaryPackUtil {
     }
 
     static Object pack(Object value) {
-        if (value instanceof List l) {
+        if (value instanceof final List l) {
             return packList(l);
-        } else if (value instanceof Map<?, ?> m) {
-            var newMap = new HashMap();
-            for (Map.Entry<?, ?> entry : m.entrySet()) {
+        } else if (value instanceof final Map<?, ?> m) {
+            final var newMap = new HashMap<Object, Object>();
+
+            for (final var entry : m.entrySet()) {
                 newMap.put(entry.getKey(), pack(entry.getValue()));
             }
+
             return newMap;
         } else {
             return value;
@@ -51,16 +53,21 @@ class _BinaryPackUtil {
     }
 
     static List<Object> packList(List<Object> list) {
-        var packedList = new ArrayList<Object>();
+        final var packedList = new ArrayList<Object>();
+        final var header = new ArrayList<Object>();
+
         packedList.add(PACKED);
-        var header = new ArrayList<Object>();
+
         header.add(null);
+
         packedList.add(header);
-        var keyIndexMap = new HashMap<Integer, Node>();
+
+        final var keyIndexMap = new HashMap<Integer, Node>();
         try {
-            for (var e : list) {
-                if (e instanceof Map<?, ?> m) {
-                    var row = packMap(m, header, keyIndexMap);
+            for (final var e : list) {
+                if (e instanceof final Map<?, ?> m) {
+                    final var row = packMap(m, header, keyIndexMap);
+
                     packedList.add(row);
                 } else {
                     // This list cannot be packed, abort
@@ -68,9 +75,9 @@ class _BinaryPackUtil {
                 }
             }
             return packedList;
-        } catch (CannotPack ex) {
-            var newList = new ArrayList<Object>();
-            for (var e : list) {
+        } catch (final CannotPack ex) {
+            final var newList = new ArrayList<Object>();
+            for (final var e : list) {
                 newList.add(pack(e));
             }
             return newList;
@@ -79,61 +86,66 @@ class _BinaryPackUtil {
 
     static List<Object> packMap(Map<?, ?> m, List<Object> header,
             Map<Integer, Node> keyIndexMap) throws CannotPack {
-        var row = new ArrayList<Object>();
-        for (var entry : m.entrySet()) {
-            if (entry.getKey() instanceof String s) {
+        final var row = new ArrayList<Object>();
+        for (final var entry : m.entrySet()) {
+            if (entry.getKey() instanceof final String s) {
                 throw new CannotPack();
             }
 
-            var key = (Integer) entry.getKey();
+            final var key = (Integer) entry.getKey();
+            final var keyIndex = keyIndexMap.get(key);
 
-            var keyIndex = keyIndexMap.get(key);
-
+            final Node finalKeyIndex;
             if (keyIndex == null) {
-                keyIndex = new Node(header.size() - 1, new HashMap<>());
+                finalKeyIndex = new Node(header.size() - 1, new HashMap<>());
+
                 if (entry.getValue() instanceof Map<?, ?>) {
                     header.add(new ArrayList<>(List.of(key)));
                 } else {
                     header.add(key);
                 }
 
-                keyIndexMap.put(key, keyIndex);
+                keyIndexMap.put(key, finalKeyIndex);
+            } else {
+                finalKeyIndex = keyIndex;
             }
 
-            Object packedValue;
+            final Object packedValue;
             if (entry.getValue() instanceof Map<?, ?> m2) {
-                List<Object> nestedHeader;
+                final List<Object> nestedHeader;
                 try {
-                    nestedHeader = (List<Object>) header.get(keyIndex.value + 1);
+                    nestedHeader = (List<Object>) header.get(finalKeyIndex.value + 1);
                 } catch (ClassCastException e) {
                     throw new CannotPack();
                 }
-                packedValue = packMap(m2, nestedHeader, keyIndex.nested);
+
+                packedValue = packMap(m2, nestedHeader, finalKeyIndex.nested);
             } else {
-                if (header.get(keyIndex.value + 1) instanceof List) {
+                if (header.get(finalKeyIndex.value + 1) instanceof List) {
                     throw new CannotPack();
                 }
+
                 packedValue = pack(entry.getValue());
             }
 
-            while (row.size() < keyIndex.value) {
+            while (row.size() < finalKeyIndex.value) {
                 row.add(UNDEFINED);
             }
 
-            if (row.size() == keyIndex.value) {
+            if (row.size() == finalKeyIndex.value) {
                 row.add(packedValue);
             } else {
-                row.set(keyIndex.value, packedValue);
+                row.set(finalKeyIndex.value, packedValue);
             }
         }
         return row;
     }
 
     static Map<Object, Object> unpackBody(Map<Object, Object> body) {
-        var result = new HashMap<Object, Object>();
+        final var result = new HashMap<Object, Object>();
 
-        for (var entry : body.entrySet()) {
-            var unpackedValue = unpack(entry.getValue());
+        for (final var entry : body.entrySet()) {
+            final var unpackedValue = unpack(entry.getValue());
             result.put(entry.getKey(), unpackedValue);
         }
 
@@ -141,13 +153,15 @@ class _BinaryPackUtil {
     }
 
     static Object unpack(Object value) {
-        if (value instanceof List l) {
+        if (value instanceof final List l) {
             return unpackList(l);
-        } else if (value instanceof Map<?, ?> m) {
-            var newMap = new HashMap<Object, Object>();
+        } else if (value instanceof final Map<?, ?> m) {
+            final var newMap = new HashMap<Object, Object>();
+
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 newMap.put(entry.getKey(), unpack(entry.getValue()));
             }
+
             return newMap;
         } else {
             return value;
@@ -159,20 +173,21 @@ class _BinaryPackUtil {
             return list;
         }
 
-        if (!(list.get(0) instanceof MessagePackExtensionType t && t.getType() == PACKED.getType())) {
-            var newList = new ArrayList<Object>();
-            for (var e : list) {
+        if (!(list.get(0) instanceof final MessagePackExtensionType t && t.getType() == PACKED.getType())) {
+            final var newList = new ArrayList<Object>();
+            for (final var e : list) {
                 newList.add(unpack(e));
             }
             return newList;
         }
 
-        var unpackedList = new ArrayList<Object>();
+        final var unpackedList = new ArrayList<Object>();
+        final var headers = (List<Object>) list.get(1);
 
-        var headers = (List<Object>) list.get(1);
         for (int i = 2; i < list.size(); i += 1) {
-            var row = (List<Object>) list.get(i);
-            var m = unpackMap(row, headers);
+            final var row = (List<Object>) list.get(i);
+            final var m = unpackMap(row, headers);
+
             unpackedList.add(m);
         }
 
@@ -180,24 +195,30 @@ class _BinaryPackUtil {
     }
 
     static Map<Integer, Object> unpackMap(List<Object> row, List<Object> header) {
-        var finalMap = new HashMap<Integer, Object>();
+        final var finalMap = new HashMap<Integer, Object>();
+
         for (int j = 0; j < row.size(); j += 1) {
-            var key = header.get(j + 1);
-            var value = row.get(j);
-            if (value instanceof MessagePackExtensionType t && t.getType() == UNDEFINED.getType()) {
+            final var key = header.get(j + 1);
+            final var value = row.get(j);
+
+            if (value instanceof final MessagePackExtensionType t && t.getType() == UNDEFINED.getType()) {
                 continue;
             }
-            if (key instanceof Integer i) {
-                var unpackedValue = unpack(value);
+
+            if (key instanceof final Integer i) {
+                final var unpackedValue = unpack(value);
+
                 finalMap.put(i, unpackedValue);
             } else {
-                var nestedHeader = (List<Object>) key;
-                var nestedRow = (List<Object>) value;
-                var m = unpackMap(nestedRow, nestedHeader);
-                var i = (Integer) nestedHeader.get(0);
+                final var nestedHeader = (List<Object>) key;
+                final var nestedRow = (List<Object>) value;
+                final var m = unpackMap(nestedRow, nestedHeader);
+                final var i = (Integer) nestedHeader.get(0);
+
                 finalMap.put(i, m);
             }
         }
+
         return finalMap;
     }
 }

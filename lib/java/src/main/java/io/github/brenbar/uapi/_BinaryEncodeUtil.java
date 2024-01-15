@@ -57,6 +57,7 @@ class _BinaryEncodeUtil {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
+
         headers.put("_bin", binaryChecksumStrategy.get());
 
         if (Objects.equals(forceSendJson, true)) {
@@ -100,6 +101,7 @@ class _BinaryEncodeUtil {
         if (headers.containsKey("_enc")) {
             final var binaryEncoding = (Map<String, Integer>) headers.get("_enc");
             final var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
+
             recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
         }
 
@@ -131,7 +133,7 @@ class _BinaryEncodeUtil {
     private static Object encodeKeys(Object given, BinaryEncoding binaryEncoder) {
         if (given == null) {
             return given;
-        } else if (given instanceof Map<?, ?> m) {
+        } else if (given instanceof final Map<?, ?> m) {
             final var newMap = new HashMap<Object, Object>();
 
             for (final var e : m.entrySet()) {
@@ -145,6 +147,7 @@ class _BinaryEncodeUtil {
                 }
 
                 final var encodedValue = encodeKeys(e.getValue(), binaryEncoder);
+
                 newMap.put(finalKey, encodedValue);
             }
 
@@ -162,17 +165,18 @@ class _BinaryEncodeUtil {
 
             for (final var e : m.entrySet()) {
                 final String key;
-                if (e.getKey() instanceof String s) {
+                if (e.getKey() instanceof final String s) {
                     key = s;
                 } else {
                     key = (String) get(e.getKey(), binaryEncoder.decodeMap);
                 }
                 final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
+
                 newMap.put(key, encodedValue);
             }
 
             return newMap;
-        } else if (given instanceof List<?> l) {
+        } else if (given instanceof final List<?> l) {
             return l.stream().map(e -> decodeKeys(e, binaryEncoder)).toList();
         } else {
             return given;
