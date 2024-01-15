@@ -142,9 +142,7 @@ class _ParseSchemaUtil {
 
             try {
                 _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
-                        originalUApiSchema,
-                        schemaKeysToIndex,
-                        parsedTypes, typeExtensions, parseFailures, failedTypes);
+                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -161,9 +159,7 @@ class _ParseSchemaUtil {
 
             try {
                 final var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, originalUApiSchema,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        typeExtensions, parseFailures, failedTypes);
+                        schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                 _ParseSchemaTraitUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -182,14 +178,14 @@ class _ParseSchemaUtil {
         final var finalList = new ArrayList<SchemaParseFailure>();
 
         for (final var f : initialFailures) {
-            String reason = f.reason;
-            List<Object> path = f.path;
-            Map<String, Object> data = f.data;
+            final String reason = f.reason;
+            final List<Object> path = f.path;
+            final Map<String, Object> data = f.data;
             final var newPath = new ArrayList<>(path);
 
             newPath.set(0, (Integer) newPath.get(0) - offset);
 
-            Map<String, Object> finalData;
+            final Map<String, Object> finalData;
             if (reason.equals("PathCollision")) {
                 final var otherNewPath = new ArrayList<>((List<Object>) data.get("other"));
 
