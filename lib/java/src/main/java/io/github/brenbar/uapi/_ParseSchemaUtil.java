@@ -15,10 +15,11 @@ import java.util.TreeMap;
 class _ParseSchemaUtil {
 
     static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
-        var objectMapper = new ObjectMapper();
-        Object originalInit;
+        final var objectMapper = new ObjectMapper();
+
+        final Object uApiSchemaPseudoJsonInit;
         try {
-            originalInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
+            uApiSchemaPseudoJsonInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new UApiSchemaParseError(
@@ -26,24 +27,25 @@ class _ParseSchemaUtil {
                     e);
         }
 
-        List<Object> original;
+        final List<Object> uApiSchemaPseudoJson;
         try {
-            original = _CastUtil.asList(originalInit);
+            uApiSchemaPseudoJson = _CastUtil.asList(uApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), originalInit, "Array"),
-                    e);
+            final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                    .getTypeUnexpectedValidationFailure(List.of(), uApiSchemaPseudoJsonInit, "Array");
+            throw new UApiSchemaParseError(thisParseFailures, e);
         }
 
-        return parseUApiSchema(original, typeExtensions, 0);
+        return parseUApiSchema(uApiSchemaPseudoJson, typeExtensions, 0);
     }
 
     static UApiSchema extendUApiSchema(UApiSchema first, String secondUApiSchemaJson,
             Map<String, _UType> secondTypeExtensions) {
-        var objectMapper = new ObjectMapper();
-        Object secondOriginalInit;
+        final var objectMapper = new ObjectMapper();
+
+        final Object secondUApiSchemaPseudoJsonInit;
         try {
-            secondOriginalInit = objectMapper.readValue(secondUApiSchemaJson, new TypeReference<>() {
+            secondUApiSchemaPseudoJsonInit = objectMapper.readValue(secondUApiSchemaJson, new TypeReference<>() {
             });
         } catch (IOException e) {
             throw new UApiSchemaParseError(
@@ -51,23 +53,25 @@ class _ParseSchemaUtil {
                     e);
         }
 
-        List<Object> secondOriginal;
+        final List<Object> secondUApiSchemaPseudoJson;
         try {
-            secondOriginal = _CastUtil.asList(secondOriginalInit);
+            secondUApiSchemaPseudoJson = _CastUtil.asList(secondUApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(List.of(), secondOriginalInit, "Array"),
-                    e);
+            final List<SchemaParseFailure> thisParseFailure = _ParseSchemaUtil
+                    .getTypeUnexpectedValidationFailure(List.of(), secondUApiSchemaPseudoJsonInit, "Array");
+            throw new UApiSchemaParseError(thisParseFailure, e);
         }
 
-        var firstOriginal = (List<Object>) first.original;
-        var firstTypeExtensions = (Map<String, _UType>) first.typeExtensions;
+        final List<Object> firstOriginal = first.original;
+        final Map<String, _UType> firstTypeExtensions = first.typeExtensions;
 
-        var original = new ArrayList<Object>();
+        final var original = new ArrayList<Object>();
+
         original.addAll(firstOriginal);
-        original.addAll(secondOriginal);
+        original.addAll(secondUApiSchemaPseudoJson);
 
-        var typeExtensions = new HashMap<String, _UType>();
+        final var typeExtensions = new HashMap<String, _UType>();
+
         typeExtensions.putAll(firstTypeExtensions);
         typeExtensions.putAll(secondTypeExtensions);
 
@@ -76,29 +80,30 @@ class _ParseSchemaUtil {
 
     private static UApiSchema parseUApiSchema(List<Object> originalUApiSchema,
             Map<String, _UType> typeExtensions, int pathOffset) {
-        var parsedTypes = new HashMap<String, _UType>();
-        var parseFailures = new ArrayList<SchemaParseFailure>();
-        var failedTypes = new HashSet<String>();
+        final var parsedTypes = new HashMap<String, _UType>();
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var failedTypes = new HashSet<String>();
+        final var schemaKeysToIndex = new HashMap<String, Integer>();
+        final var schemaKeys = new HashSet<String>();
 
-        var schemaKeysToIndex = new HashMap<String, Integer>();
-
-        var schemaKeys = new HashSet<String>();
         var index = -1;
-        for (var definition : originalUApiSchema) {
+        for (final var definition : originalUApiSchema) {
             index += 1;
 
-            List<Object> loopPath = List.of(index);
+            final List<Object> loopPath = List.of(index);
 
-            Map<String, Object> def;
+            final Map<String, Object> def;
             try {
                 def = _CastUtil.asMap(definition);
             } catch (ClassCastException e) {
-                parseFailures
-                        .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, definition, "Object"));
+                final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                        .getTypeUnexpectedValidationFailure(loopPath, definition, "Object");
+
+                parseFailures.addAll(thisParseFailures);
                 continue;
             }
 
-            String schemaKey;
+            final String schemaKey;
             try {
                 schemaKey = findSchemaKey(def, index);
             } catch (UApiSchemaParseError e) {
@@ -107,8 +112,10 @@ class _ParseSchemaUtil {
             }
 
             if (schemaKeys.contains(schemaKey)) {
-                var otherPathIndex = schemaKeysToIndex.get(schemaKey);
-                parseFailures.add(new SchemaParseFailure(_ValidateUtil.append(loopPath, schemaKey), "PathCollision",
+                final var otherPathIndex = schemaKeysToIndex.get(schemaKey);
+                final List<Object> finalPath = _ValidateUtil.append(loopPath, schemaKey);
+
+                parseFailures.add(new SchemaParseFailure(finalPath, "PathCollision",
                         Map.of("other", List.of(otherPathIndex, schemaKey))));
             }
             schemaKeys.add(schemaKey);
@@ -116,22 +123,23 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        var traitKeys = new HashSet<String>();
+        final var traitKeys = new HashSet<String>();
+        final var rootTypeParameterCount = 0;
 
-        var rootTypeParameterCount = 0;
-        for (var schemaKey : schemaKeys) {
+        for (final var schemaKey : schemaKeys) {
             if (schemaKey.startsWith("info.")) {
                 continue;
-            }
-            if (schemaKey.startsWith("trait.")) {
+            } else if (schemaKey.startsWith("trait.")) {
                 traitKeys.add(schemaKey);
                 continue;
             }
-            var thisIndex = schemaKeysToIndex.get(schemaKey);
+
+            final var thisIndex = schemaKeysToIndex.get(schemaKey);
+
             try {
                 _ParseSchemaTypeUtil.getOrParseType(List.of(thisIndex), schemaKey, rootTypeParameterCount,
                         originalUApiSchema,
@@ -143,16 +151,16 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        for (var traitKey : traitKeys) {
-            var thisIndex = schemaKeysToIndex.get(traitKey);
-            var def = (Map<String, Object>) originalUApiSchema.get(thisIndex);
+        for (final var traitKey : traitKeys) {
+            final var thisIndex = schemaKeysToIndex.get(traitKey);
+            final var def = (Map<String, Object>) originalUApiSchema.get(thisIndex);
 
             try {
-                var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, originalUApiSchema,
+                final var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, originalUApiSchema,
                         schemaKeysToIndex,
                         parsedTypes,
                         typeExtensions, parseFailures, failedTypes);
@@ -163,7 +171,7 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -171,32 +179,42 @@ class _ParseSchemaUtil {
     }
 
     private static List<SchemaParseFailure> offsetSchemaIndex(List<SchemaParseFailure> initialFailures, int offset) {
-        return initialFailures.stream().map(f -> {
-            List<Object> newPath = new ArrayList<>(f.path);
+        final var finalList = new ArrayList<SchemaParseFailure>();
+
+        for (final var f : initialFailures) {
+            String reason = f.reason;
+            List<Object> path = f.path;
+            Map<String, Object> data = f.data;
+            final var newPath = new ArrayList<>(path);
+
             newPath.set(0, (Integer) newPath.get(0) - offset);
 
             Map<String, Object> finalData;
-            if (f.reason.equals("PathCollision")) {
-                List<Object> otherNewPath = new ArrayList<>((List<Object>) f.data.get("other"));
+            if (reason.equals("PathCollision")) {
+                final var otherNewPath = new ArrayList<>((List<Object>) data.get("other"));
+
                 otherNewPath.set(0, (Integer) otherNewPath.get(0) - offset);
                 finalData = Map.of("other", otherNewPath);
             } else {
-                finalData = f.data;
+                finalData = data;
             }
 
-            return new SchemaParseFailure(newPath, f.reason, finalData);
-        })
-                .toList();
+            finalList.add(new SchemaParseFailure(newPath, reason, finalData));
+        }
+
+        return finalList;
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {
-        var regex = "^((fn|trait|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
-        var matches = new ArrayList<String>();
-        for (var e : definition.keySet()) {
+        final var regex = "^((fn|trait|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
+        final var matches = new ArrayList<String>();
+
+        for (final var e : definition.keySet()) {
             if (e.matches(regex)) {
                 matches.add(e);
             }
         }
+
         if (matches.size() == 1) {
             return matches.get(0);
         } else {
@@ -209,8 +227,8 @@ class _ParseSchemaUtil {
 
     static List<SchemaParseFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
             String expectedType) {
-        var actualType = _ValidateUtil.getType(value);
-        Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
+        final var actualType = _ValidateUtil.getType(value);
+        final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
         return Collections.singletonList(
                 new SchemaParseFailure(path, "TypeUnexpected", data));
