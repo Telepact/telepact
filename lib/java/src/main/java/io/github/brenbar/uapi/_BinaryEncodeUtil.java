@@ -42,7 +42,7 @@ class _BinaryEncodeUtil {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("_pac"))) {
-            finalEncodedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+            finalEncodedMessageBody = _BinaryUnpackUtil.unpackBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;
         }
@@ -113,7 +113,7 @@ class _BinaryEncodeUtil {
 
         final Map<Object, Object> finalEncodedMessageBody;
         if (Objects.equals(true, headers.get("_pac"))) {
-            finalEncodedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
+            finalEncodedMessageBody = _BinaryUnpackUtil.unpackBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;
         }
