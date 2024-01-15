@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.util.ArrayList;
 import java.util.HashMap;

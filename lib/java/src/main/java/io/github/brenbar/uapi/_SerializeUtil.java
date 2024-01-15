@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

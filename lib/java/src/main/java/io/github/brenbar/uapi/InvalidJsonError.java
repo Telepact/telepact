@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 /**
  * Indicates a failure to parse a jAPI Message due invalid JSON.

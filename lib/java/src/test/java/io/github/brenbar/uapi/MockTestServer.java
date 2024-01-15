@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -7,6 +7,8 @@ import java.util.Map;
 
 import com.codahale.metrics.MetricRegistry;
 
+import io.github.brenbar.uapi.MockServer;
+import io.github.brenbar.uapi.UApiSchema;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 

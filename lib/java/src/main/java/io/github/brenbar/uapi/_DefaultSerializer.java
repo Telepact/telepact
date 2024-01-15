@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

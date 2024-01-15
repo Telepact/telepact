@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class MockServer {
         public int generatedCollectionLengthMax = 3;
     }
 
-    public final Server server;
+    private final Server server;
     private final RandomGenerator random;
     private final boolean enableGeneratedDefaultStub;
 
@@ -40,7 +40,8 @@ public class MockServer {
         typeExtensions.put("_ext._Call", new _MockCallTypeExtension(parsedTypes));
         typeExtensions.put("_ext._Stub", new _MockStubTypeExtension(parsedTypes));
 
-        var combinedJApiSchema = UApiSchema.extend(jApiSchema, _InternalMockUApiUtil.getJson(), typeExtensions);
+        var combinedJApiSchema = UApiSchema.extendWithExtensions(jApiSchema, _InternalMockUApiUtil.getJson(),
+                typeExtensions);
 
         this.server = new Server(combinedJApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));

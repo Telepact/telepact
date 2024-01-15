@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 /**
  * Indicates a critical failure occurred during client-side processing of a jAPI

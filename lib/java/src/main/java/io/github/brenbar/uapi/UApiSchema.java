@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +26,7 @@ public class UApiSchema {
         return _ParseSchemaUtil.newUApiSchema(json, typeExtensions);
     }
 
-    public static UApiSchema extend(UApiSchema base, String json, Map<String, _UType> typeExtensions) {
+    public static UApiSchema extendWithExtensions(UApiSchema base, String json, Map<String, _UType> typeExtensions) {
         return _ParseSchemaUtil.extendUApiSchema(base, json, typeExtensions);
     }
 

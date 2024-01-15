@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 
-import io.github.brenbar.japi.Client.Adapter;
-import io.github.brenbar.japi.MockServer.Options;
+import io.github.brenbar.uapi.Client.Adapter;
+import io.github.brenbar.uapi.MockServer.Options;
 import io.nats.client.Nats;
 
 public class LoadTest {

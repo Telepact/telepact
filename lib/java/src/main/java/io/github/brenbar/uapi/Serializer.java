@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 /**
  * A serializer that converts a Message to and from a serialized form.

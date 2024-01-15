@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import io.github.brenbar.japi.Client.Adapter;
+import io.github.brenbar.uapi.Client.Adapter;
 
 public class Playground {
     public static void main(String[] args) throws IOException {

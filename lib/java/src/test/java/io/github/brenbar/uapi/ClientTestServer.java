@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.brenbar.japi.Client.Adapter;
-import io.github.brenbar.japi.Client.Options;
+import io.github.brenbar.uapi.Client.Adapter;
+import io.github.brenbar.uapi.Client.Options;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 

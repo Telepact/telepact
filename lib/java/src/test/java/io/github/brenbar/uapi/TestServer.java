@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -13,7 +13,7 @@ import java.util.function.Function;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.brenbar.japi.Server.Options;
+import io.github.brenbar.uapi.Server.Options;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 

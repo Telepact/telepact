@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 class _UFieldDeclaration {
     public final String fieldName;

@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 public class BinaryEncodingMissing extends RuntimeException {
 

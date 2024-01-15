@@ -1,4 +1,4 @@
-package io.github.brenbar.japi;
+package io.github.brenbar.uapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,8 +18,8 @@ import java.util.concurrent.CompletableFuture;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.brenbar.japi.Client.Adapter;
-import io.github.brenbar.japi.Server.Options;
+import io.github.brenbar.uapi.Client.Adapter;
+import io.github.brenbar.uapi.Server.Options;
 
 public class TestUtility {
 
@@ -134,7 +134,7 @@ public class TestUtility {
     public static MockServer generatedMockTestSetup() throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
         var jApi = UApiSchema.fromJson(json);
-        var options = new io.github.brenbar.japi.MockServer.Options();
+        var options = new io.github.brenbar.uapi.MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
         options.enableGeneratedDefaultStub = false;
         var server = new MockServer(jApi, options);
