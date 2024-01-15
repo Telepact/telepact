@@ -9,7 +9,6 @@ class _BinaryEncodeUtil {
 
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         var headers = (Map<String, Object>) message.get(0);
-
         var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
@@ -17,10 +16,8 @@ class _BinaryEncodeUtil {
         }
 
         headers.put("_bin", List.of(binaryEncoder.checksum));
-
         var messageBody = (Map<String, Object>) message.get(1);
-
-        var encodedMessageBody = encode(messageBody, binaryEncoder);
+        var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
         if (Objects.equals(true, headers.get("_pac"))) {
             encodedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
@@ -32,9 +29,7 @@ class _BinaryEncodeUtil {
     static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder)
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
-
         var clientKnownBinaryChecksums = (List<Integer>) headers.get("_bin");
-
         var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
         if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
@@ -47,8 +42,7 @@ class _BinaryEncodeUtil {
             encodedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
         }
 
-        var messageBody = decode(encodedMessageBody, binaryEncoder);
-
+        var messageBody = decodeBody(encodedMessageBody, binaryEncoder);
         return List.of(headers, messageBody);
     }
 
@@ -56,9 +50,7 @@ class _BinaryEncodeUtil {
             BinaryChecksumStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
-
         headers.put("_bin", binaryChecksumStrategy.get());
-
         var forceSendJson = headers.remove("_forceSendJson");
 
         if (Objects.equals(forceSendJson, true)) {
@@ -80,8 +72,7 @@ class _BinaryEncodeUtil {
         }
 
         var messageBody = (Map<String, Object>) message.get(1);
-
-        var encodedMessageBody = encode(messageBody, binaryEncoder);
+        var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
         if (Objects.equals(true, headers.get("_pac"))) {
             encodedMessageBody = _BinaryPackUtil.packBody(encodedMessageBody);
@@ -94,7 +85,6 @@ class _BinaryEncodeUtil {
             BinaryChecksumStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         var headers = (Map<String, Object>) message.get(0);
-
         var binaryChecksums = (List<Integer>) headers.get("_bin");
         var binaryChecksum = binaryChecksums.get(0);
 
@@ -106,33 +96,25 @@ class _BinaryEncodeUtil {
         }
 
         binaryChecksumStrategy.update(binaryChecksum);
-        List<Integer> newCurrentChecksumStrategy = binaryChecksumStrategy.get();
+        var newCurrentChecksumStrategy = binaryChecksumStrategy.get();
         recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
-
         var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);
-
         var encodedMessageBody = (Map<Object, Object>) message.get(1);
 
         if (Objects.equals(true, headers.get("_pac"))) {
             encodedMessageBody = _BinaryPackUtil.unpackBody(encodedMessageBody);
         }
 
-        var messageBody = decode(encodedMessageBody, binaryEncoder);
-
+        var messageBody = decodeBody(encodedMessageBody, binaryEncoder);
         return List.of(headers, messageBody);
     }
 
-    private static Map<Object, Object> encode(Map<String, Object> messageBody, BinaryEncoding binaryEncoder) {
-        var encodedMessageBody = (Map<Object, Object>) encodeKeys(messageBody, binaryEncoder);
-        return encodedMessageBody;
+    private static Map<Object, Object> encodeBody(Map<String, Object> messageBody, BinaryEncoding binaryEncoder) {
+        return (Map<Object, Object>) encodeKeys(messageBody, binaryEncoder);
     }
 
-    static Map<String, Object> decode(Map<Object, Object> encodedMessageBody, BinaryEncoding binaryEncoder) {
+    static Map<String, Object> decodeBody(Map<Object, Object> encodedMessageBody, BinaryEncoding binaryEncoder) {
         return (Map<String, Object>) decodeKeys(encodedMessageBody, binaryEncoder);
-        // TODO: move this logic somewhere else
-        // if (this.checksum != null && !givenChecksums.contains(this.checksum)) {
-        // throw new BinaryChecksumMismatchException();
-        // }
     }
 
     private static Object encodeKeys(Object given, BinaryEncoding binaryEncoder) {
