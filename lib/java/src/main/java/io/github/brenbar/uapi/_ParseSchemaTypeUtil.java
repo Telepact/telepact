@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.xml.validation.Schema;
+
 class _ParseSchemaTypeUtil {
 
     static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
@@ -24,8 +26,9 @@ class _ParseSchemaTypeUtil {
         try {
             rootTypeString = _CastUtil.asString(baseType);
         } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
+            final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                    .getTypeUnexpectedValidationFailure(basePath, baseType, "String");
+            throw new UApiSchemaParseError(thisParseFailures);
         }
 
         final var regexString = "^(.+?)(\\?)?$";
@@ -68,15 +71,19 @@ class _ParseSchemaTypeUtil {
             try {
                 l = _CastUtil.asList(e);
             } catch (ClassCastException e1) {
-                parseFailures.addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(loopPath, e, "Array"));
+                final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                        .getTypeUnexpectedValidationFailure(loopPath, e, "Array");
+
+                parseFailures.addAll(thisParseFailures);
                 continue;
             }
 
             final _UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
-                        originalUApiSchema,
-                        schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
+                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        failedTypes);
+
                 typeParameters.add(typeParameterTypeDeclaration);
             } catch (UApiSchemaParseError e2) {
                 parseFailures.addAll(e2.schemaParseFailures);
