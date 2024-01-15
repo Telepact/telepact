@@ -9,7 +9,10 @@ class _SelectUtil {
 
     static Object selectStructFields(_UTypeDeclaration typeDeclaration, Object value,
             Map<String, Object> selectedStructFields) {
-        if (typeDeclaration.type instanceof final _UStruct s) {
+        final _UType typeDeclarationType = typeDeclaration.type;
+        final List<_UTypeDeclaration> typeDeclarationTypeParams = typeDeclaration.typeParameters;
+
+        if (typeDeclarationType instanceof final _UStruct s) {
             final Map<String, _UFieldDeclaration> fields = s.fields;
             final String structName = s.name;
             final var selectedFields = (List<String>) selectedStructFields.get(structName);
@@ -29,7 +32,7 @@ class _SelectUtil {
             }
 
             return finalMap;
-        } else if (typeDeclaration.type instanceof final _UFn f) {
+        } else if (typeDeclarationType instanceof final _UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
             final Map.Entry<String, Object> unionEntry = _UUnion.entry(valueAsMap);
             final var unionCase = unionEntry.getKey();
@@ -55,7 +58,7 @@ class _SelectUtil {
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof final _UUnion u) {
+        } else if (typeDeclarationType instanceof final _UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
             final var unionEntry = _UUnion.entry(valueAsMap);
             final var unionCase = unionEntry.getKey();
@@ -91,8 +94,8 @@ class _SelectUtil {
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof final _UObject o) {
-            final var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
+        } else if (typeDeclarationType instanceof final _UObject o) {
+            final var nestedTypeDeclaration = typeDeclarationTypeParams.get(0);
             final var valueAsMap = (Map<String, Object>) value;
 
             final var finalMap = new HashMap<>();
@@ -103,8 +106,8 @@ class _SelectUtil {
             }
 
             return finalMap;
-        } else if (typeDeclaration.type instanceof _UArray a) {
-            final var nestedType = typeDeclaration.typeParameters.get(0);
+        } else if (typeDeclarationType instanceof final _UArray a) {
+            final var nestedType = typeDeclarationTypeParams.get(0);
             final var valueAsList = (List<Object>) value;
 
             final var finalList = new ArrayList<>();
