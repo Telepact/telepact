@@ -98,9 +98,9 @@ public class TestUtility {
 
             var requestHeadersPseudoJson = (Map<String, Object>) requestAsParsedJson.get(0);
             var requestBodyPseudoJson = (Map<String, Object>) requestAsParsedJson.get(1);
-            var requestEntryPsuedoJson = _UUnion.entry(requestBodyPseudoJson);
-            var requestTargetPseudoJson = requestEntryPsuedoJson.getKey();
-            var requestPayloadPseudoJson = (Map<String, Object>) requestEntryPsuedoJson.getValue();
+            var requestEntryPseudoJson = _UUnion.entry(requestBodyPseudoJson);
+            var requestTargetPseudoJson = requestEntryPseudoJson.getKey();
+            var requestPayloadPseudoJson = (Map<String, Object>) requestEntryPseudoJson.getValue();
 
             var responseMessage = client.send(new Message(requestHeadersPseudoJson, Map.of(requestTargetPseudoJson,
                     requestPayloadPseudoJson)));
