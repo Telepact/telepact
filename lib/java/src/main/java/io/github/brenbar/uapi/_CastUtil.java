@@ -9,6 +9,7 @@ class _CastUtil {
         if (object == null) {
             throw new ClassCastException();
         }
+
         return (Integer) object;
     }
 
@@ -16,6 +17,7 @@ class _CastUtil {
         if (object == null) {
             throw new ClassCastException();
         }
+
         return (Long) object;
     }
 
@@ -23,6 +25,7 @@ class _CastUtil {
         if (object == null) {
             throw new ClassCastException();
         }
+
         return (String) object;
     }
 
@@ -30,6 +33,7 @@ class _CastUtil {
         if (object == null) {
             throw new ClassCastException();
         }
+
         return (List<Object>) object;
     }
 
@@ -37,6 +41,7 @@ class _CastUtil {
         if (object == null) {
             throw new ClassCastException();
         }
+
         return (Map<String, Object>) object;
     }
 
