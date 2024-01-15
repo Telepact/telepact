@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * A jAPI Server.
+ * A uAPI Server.
  */
 public class Server {
 
@@ -38,7 +38,7 @@ public class Server {
         }
     }
 
-    UApiSchema jApiSchema;
+    UApiSchema uApiSchema;
     Function<Message, Message> handler;
     Consumer<Throwable> onError;
     Consumer<Message> onRequest;
@@ -46,15 +46,15 @@ public class Server {
     Serializer serializer;
 
     /**
-     * Create a server with the given jAPI schema and handler.
+     * Create a server with the given uAPI schema and handler.
      * 
-     * @param jApiSchemaAsJson
+     * @param uApiSchemaAsJson
      * @param handler
      */
-    public Server(UApiSchema jApiSchema, Function<Message, Message> handler, Options options) {
-        this.jApiSchema = jApiSchema;
+    public Server(UApiSchema uApiSchema, Function<Message, Message> handler, Options options) {
+        this.uApiSchema = uApiSchema;
 
-        this.jApiSchema = UApiSchema.extend(jApiSchema, _InternalUApiUtil.getJson());
+        this.uApiSchema = UApiSchema.extend(uApiSchema, _InternalUApiUtil.getJson());
 
         this.handler = handler;
 
@@ -62,19 +62,19 @@ public class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.jApiSchema);
+        var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.uApiSchema);
         var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }
 
     /**
-     * Process a given jAPI Request Message into a jAPI Response Message.
+     * Process a given uAPI Request Message into a uAPI Response Message.
      * 
      * @param requestMessageBytes
      * @return
      */
     public byte[] process(byte[] requestMessageBytes) {
-        return _ServerUtil.processBytes(requestMessageBytes, this.serializer, this.jApiSchema, this.onError,
+        return _ServerUtil.processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
 }

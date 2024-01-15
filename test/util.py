@@ -13,11 +13,11 @@ import copy
 should_abort = False
 
 class Constants:
-    example_api_path = '../../test/example.japi.json'
-    binary_api_path = '../../test/binary.japi.json'
-    schema_api_path = '../../test/schema.japi.json'
-    load_api_path = '../../test/load.japi.json'
-    calculator_api_path = '../../test/calculator.japi.json'
+    example_api_path = '../../test/example.uapi.json'
+    binary_api_path = '../../test/binary.uapi.json'
+    schema_api_path = '../../test/schema.uapi.json'
+    load_api_path = '../../test/load.uapi.json'
+    calculator_api_path = '../../test/calculator.uapi.json'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'
     intermediate_topic = 'intermediate'

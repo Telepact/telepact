@@ -5,9 +5,9 @@ package io.github.brenbar.uapi;
  */
 public interface SerializationImpl {
 
-    byte[] toJson(Object japiMessage);
+    byte[] toJson(Object uapiMessage);
 
-    byte[] toMsgPack(Object japiMessage);
+    byte[] toMsgPack(Object uapiMessage);
 
     Object fromJson(byte[] bytes);
 

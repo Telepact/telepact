@@ -17,7 +17,7 @@ public class MockTestServer {
             Map<String, Object> config)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = UApiSchema.fromJson(json);
+        var uApi = UApiSchema.fromJson(json);
 
         var options = new MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
@@ -31,7 +31,7 @@ public class MockTestServer {
 
         var timers = metrics.timer(frontdoorTopic);
 
-        var server = new MockServer(jApi, options);
+        var server = new MockServer(uApi, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();

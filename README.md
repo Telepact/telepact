@@ -1,12 +1,12 @@
 # Introduction
 
-jAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogramming
+uAPI (pronounced "Jay-Pee-Eye") or **J**SON **A**pplication **P**rogramming
 **I**nterface is an API expressed purely with JSON. Familiar API concepts, such
 as function calls and return values, are represented entirely with JSON
-payloads. Consequently, A jAPI can satisfy API needs across not only HTTP, but
+payloads. Consequently, A uAPI can satisfy API needs across not only HTTP, but
 any inter-process communication boundary.
 
-Wherever JSON can go, a jAPI can be served 🚀
+Wherever JSON can go, a uAPI can be served 🚀
 
 No required client-side toolchains. Many client-side experiences. One
 server-side experience.
@@ -24,7 +24,7 @@ $ curl -X '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2
 Websocket client example (with `python`):
 
 ```python
-# japi_ws.py
+# uapi_ws.py
 
 import sys
 import json
@@ -35,15 +35,15 @@ print('{}'.format((ws.recv())))
 ```
 
 ```
-$ python japi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
+$ python uapi_ws.py '["function.add", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
 ["function.add", {}, {"result": 3}]
-$ python japi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
+$ python uapi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x": 1, "y": 2}]'
 ["function.add", {}, {"result": -1}]
 ```
 
 # Motivation
 
-| Capability                                                | OpenAPI | gRPC | GraphQL | jAPI |
+| Capability                                                | OpenAPI | gRPC | GraphQL | uAPI |
 | --------------------------------------------------------- | ------- | ---- | ------- | ---- |
 | Transport agnosticism (can use something other than HTTP) | ❌      | ❌   | ✅      | ✅   |
 | No transport details leaked into API                      | ❌      | ✅   | ✅      | ✅   |
@@ -99,25 +99,25 @@ serialization is technically possible through manual configuration, it is
 largely not observed in practice due to the accessibility tax it would incur on
 both servers and clients.
 
-## Why jAPI?
+## Why uAPI?
 
-jAPI takes all of the strengths of REST, gRPC, and GraphQL and combines them
+uAPI takes all of the strengths of REST, gRPC, and GraphQL and combines them
 into a simple but careful design. It is built, first and foremost, on JSON with
 transport agnosticism to maximize accessibility to clients that want to
 integrate using only the native JSON and networking capabilities of their
 preferred programming language and/or industry standard library. It achieves
 type safety through built-in server-side validation against a server-defined API
 schema, complete with typing options that allow for modeling all common
-programming data types. And then from that baseline, jAPI critically allows
+programming data types. And then from that baseline, uAPI critically allows
 clients to upgrade their experience as deemed appropriate by the client,
 optionally using:
 
-- jAPI client libraries that help facilitate crafting of jAPI messages
+- uAPI client libraries that help facilitate crafting of uAPI messages
 - Generated code for further increased type safety
 - A built-in binary serialization protocol for optimized efficiency
 - A built-in mechanism to omit fields from responses for optimized efficiency
 
-These client features are built-in via the jAPI library used by the server, such
+These client features are built-in via the uAPI library used by the server, such
 that all of these features are available to the client automatically, without
 any configuration by the server.
 
@@ -125,12 +125,12 @@ any configuration by the server.
 
 ### Why have both optional and nullable fields?
 
-jAPI allows API designers to mark a field as optional (the field might be
+uAPI allows API designers to mark a field as optional (the field might be
 omitted) as well as mark the field type as nullable (the field might appear with
 a null value).
 
 These design options are both present to maximize the design expressiveness of
-the API. jAPI leverages optionality to accomplish the expressiveness of
+the API. uAPI leverages optionality to accomplish the expressiveness of
 `undefined` in languages like TypeScript. While `null` is a value that can be
 passed around like a string or number, `undefined` or optionality can not be
 passed around but is rather an incidental property of the shape of the data
@@ -139,9 +139,9 @@ to erase just one field of a model, where null can be used to indicate the
 erasure of data, and optionality can be used to omit all fields except the one
 field you want to erase.
 
-### Why do functions in jAPI not support positional arguments?
+### Why do functions in uAPI not support positional arguments?
 
-jAPI functions are automatically associated with an argument struct and an
+uAPI functions are automatically associated with an argument struct and an
 result struct that API designers can use to colloquially define arguments and
 return values, respectively. The colloquial arguments being supplied via the
 argument struct will be inherently unordered due to the nature of JSON objects,
@@ -156,10 +156,10 @@ languages. By making the design entry point a struct, API designers are
 predisposed for backwards-compatible changes like appending optional struct
 fields.
 
-### Why are unions in jAPI not like traditional unions seen in C or Java?
+### Why are unions in uAPI not like traditional unions seen in C or Java?
 
-jAPI unions take the form of the tagged unions paradigm as featured in modern
-programming languages like rust. In the particular case of jAPI, it is very
+uAPI unions take the form of the tagged unions paradigm as featured in modern
+programming languages like rust. In the particular case of uAPI, it is very
 similar to the traditional union, except that a struct is automatically attached
 to each union value.
 
@@ -169,12 +169,12 @@ traditional union can be approximated by simply leaving all union structs blank.
 
 ### Why force servers to perform result validation?
 
-jAPI automatically performs validation of function results (as well as errors)
-against the jAPI schema, and there is no setting for servers to turn off this
+uAPI automatically performs validation of function results (as well as errors)
+against the uAPI schema, and there is no setting for servers to turn off this
 behavior.
 
 This design decision is intentional. It helps maintain the high standard of type
-safety in the jAPI ecosystem by preventing API providers from indulging in the
+safety in the uAPI ecosystem by preventing API providers from indulging in the
 plausible deniability of claiming malformed data is just an inconvenience and
 are instead forced to deal with a hard failure through bug reports. Hard
 failures also help draw attention to type safety deficits early in the
@@ -187,8 +187,8 @@ to turn off this result validation by submitting their requests with the
 
 ### If all I want is compact binary serialization, why not just use gRPC?
 
-jAPI and gRPC both have compact binary serialization for drastically improved
-efficiency over conventional serialization such as JSON. However, jAPI brings a
+uAPI and gRPC both have compact binary serialization for drastically improved
+efficiency over conventional serialization such as JSON. However, uAPI brings a
 critical new innovation to the space of RPC and binary serialization in that it
 _does not leak the ABI into the API_.
 
@@ -205,9 +205,9 @@ need to guard against interface drift between the API and the ABI, typically by
 complying with a set of policies concerning how those field ids are defined and
 how they can change.
 
-jAPI breaks free from the conventional practice of defining and maintaining
+uAPI breaks free from the conventional practice of defining and maintaining
 field ids, and instead accomplishes client and server agreement over field ids
-through a client-server handshake at runtime. In consequence, jAPI boasts a far
+through a client-server handshake at runtime. In consequence, uAPI boasts a far
 simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
@@ -232,18 +232,18 @@ generated code incorporating native unions, and many of these languages will
 simply not compile when a new union value appears in the context of a `switch`
 or `match` statement until that new value has a handling procedure implemented.
 
-jAPI takes the stance that adding a new union value to an existing union _is_ a
+uAPI takes the stance that adding a new union value to an existing union _is_ a
 backwards compatible change, on the basis of the following:
 
 - Unions are powerful typing constructs that replace otherwise type unsafe
   patterns, and classifying evolution of an union as backwards incompatible
   discourages use in favor of far more flimsy data types like strings, violating
-  jAPI's core principles of encouraging the strongest of type patterns.
-- jAPI does not run the risk of build-time failures with unions since jAPI
+  uAPI's core principles of encouraging the strongest of type patterns.
+- uAPI does not run the risk of build-time failures with unions since uAPI
   unions are represented as special objects in generated code rather than native
   unions.
 - Clients are capable of implementing error-prone code regardless of how a
-  server evolves it's API, and jAPI cannot uphold its core principle of enabling
+  server evolves it's API, and uAPI cannot uphold its core principle of enabling
   API evolution if it holds servers accountable for client-side design failures.
   Clients can neglect proper handling of null, derive internal non-public
   implementation details by parsing strings, or base critical computation on an
@@ -261,30 +261,30 @@ backwards compatible change, on the basis of the following:
 ## Glossary
 
 - **Body** - A structured JSON object containing the primary data payload of the
-  jAPI Message.
+  uAPI Message.
 
-- **Client** - An entity consuming a jAPI.
+- **Client** - An entity consuming a uAPI.
 
 - **Argument** - The colloquial name for the body of a `function.*`-targeted
-  jAPI Message sent from the Client.
+  uAPI Message sent from the Client.
 
-- **Headers** - An unstructured JSON object consisting of metadata about a jAPI
+- **Headers** - An unstructured JSON object consisting of metadata about a uAPI
   Message.
 
 - **Message** - The JSON payload sent over the IPC boundary, comprised of a
   single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
 
-- **Result** - The colloquial name for the body of a `function.*`-targeted jAPI
+- **Result** - The colloquial name for the body of a `function.*`-targeted uAPI
   Message sent from the Server.
 
-- **Server** - An entity providing an implementation of a jAPI and adhering to
-  the jAPI specification.
+- **Server** - An entity providing an implementation of a uAPI and adhering to
+  the uAPI specification.
 
-- **Target** - A reference to a top-level definition in the jAPI description of
-  the jAPI server.
+- **Target** - A reference to a top-level definition in the uAPI description of
+  the uAPI server.
 
-- **jAPI Schema** - The JSON document describing the API. This document is
-  written in the JSON language following a jAPI-flavored JSON schema, but
+- **uAPI Schema** - The JSON document describing the API. This document is
+  written in the JSON language following a uAPI-flavored JSON schema, but
   conventionally, this document would be written using an IDL.
 
 # Navigation

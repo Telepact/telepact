@@ -8,8 +8,8 @@
       "type": "java",
       "name": "Playground",
       "request": "launch",
-      "mainClass": "io.github.brenbar.japi.Playground",
-      "projectName": "japi"
+      "mainClass": "io.github.brenbar.uapi.Playground",
+      "projectName": "uapi"
     },
     {
       "type": "java",
@@ -21,8 +21,8 @@
       "type": "java",
       "name": "TestServer",
       "request": "launch",
-      "mainClass": "io.github.brenbar.japi.TestServer",
-      "projectName": "japi"
+      "mainClass": "io.github.brenbar.uapi.TestServer",
+      "projectName": "uapi"
     }
   ]
 }

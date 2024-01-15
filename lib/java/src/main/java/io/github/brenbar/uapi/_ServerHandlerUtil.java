@@ -11,7 +11,7 @@ import java.util.function.Function;
 class _ServerHandlerUtil {
 
     static Message handleMessage(Message requestMessage,
-            UApiSchema jApiSchema,
+            UApiSchema uApiSchema,
             Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         boolean unsafeResponseEnabled = false;
@@ -29,11 +29,11 @@ class _ServerHandlerUtil {
             requestPayload = Map.of();
         }
         var unknownTarget = (String) null;
-        if (!jApiSchema.parsed.containsKey(requestTarget)) {
+        if (!uApiSchema.parsed.containsKey(requestTarget)) {
             unknownTarget = requestTarget;
             requestTarget = "fn._unknown";
         }
-        var functionType = (_UFn) jApiSchema.parsed.get(requestTarget);
+        var functionType = (_UFn) uApiSchema.parsed.get(requestTarget);
         var resultUnionType = functionType.result;
 
         var callId = requestHeaders.get("_id");
@@ -50,7 +50,7 @@ class _ServerHandlerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders, jApiSchema, functionType);
+        var headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders, uApiSchema, functionType);
 
         if (!headerValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,
@@ -89,7 +89,7 @@ class _ServerHandlerUtil {
         if (requestTarget.equals("fn._ping")) {
             resultMessage = new Message("Ok", Map.of());
         } else if (requestTarget.equals("fn._api")) {
-            resultMessage = new Message("Ok", Map.of("api", jApiSchema.original));
+            resultMessage = new Message("Ok", Map.of("api", uApiSchema.original));
         } else {
             try {
                 resultMessage = handler.apply(callMessage);
@@ -157,7 +157,7 @@ class _ServerHandlerUtil {
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
             throw new UApiProcessError(
-                    "Failed internal jAPI validation: "
+                    "Failed internal uAPI validation: "
                             + mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures));
         }
     }

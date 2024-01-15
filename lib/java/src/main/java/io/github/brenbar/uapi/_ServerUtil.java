@@ -7,19 +7,19 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 class _ServerUtil {
-    static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, UApiSchema jApiSchema,
+    static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Message, Message> handler) {
         try {
             var requestMessage = parseRequestMessage(requestMessageBytes, serializer,
-                    jApiSchema, onError);
+                    uApiSchema, onError);
 
             try {
                 onRequest.accept(requestMessage);
             } catch (Throwable ignored) {
             }
 
-            var responseMessage = _ServerHandlerUtil.handleMessage(requestMessage, jApiSchema, handler, onError);
+            var responseMessage = _ServerHandlerUtil.handleMessage(requestMessage, uApiSchema, handler, onError);
 
             try {
                 onResponse.accept(responseMessage);
@@ -38,7 +38,7 @@ class _ServerUtil {
         }
     }
 
-    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema jApiSchema,
+    static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,
             Consumer<Throwable> onError) {
 
         Message requestMessage;

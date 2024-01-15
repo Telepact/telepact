@@ -20,7 +20,7 @@ public class SchemaTestServer {
             String frontdoorTopic)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var jApi = UApiSchema.fromJson(json);
+        var uApi = UApiSchema.fromJson(json);
         var objectMapper = new ObjectMapper();
 
         var timers = metrics.timer(frontdoorTopic);
@@ -56,7 +56,7 @@ public class SchemaTestServer {
             }
         };
 
-        var server = new Server(jApi, handler, new Options().setOnError((e) -> {
+        var server = new Server(uApi, handler, new Options().setOnError((e) -> {
             e.printStackTrace();
             System.err.flush();
         }));

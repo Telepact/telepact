@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Indicates a failure to parse a jAPI Schema.
+ * Indicates a failure to parse a uAPI Schema.
  */
 public class UApiSchemaParseError extends RuntimeException {
 

@@ -1,7 +1,7 @@
 {
   "json.schemas": [
     {
-      "fileMatch": ["*.japi.json"],
+      "fileMatch": ["*.uapi.json"],
       "url": "./idl/schema.json"
     }
   ],

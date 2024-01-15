@@ -1,8 +1,8 @@
 .idea/
-src/test/java/io/github/brenbar/japi/GeneratedTests.java
-src/test/java/io/github/brenbar/japi/GeneratedMockTests.java
-src/test/java/io/github/brenbar/japi/GeneratedMockInvalidStubTests.java
+src/test/java/io/github/brenbar/uapi/GeneratedTests.java
+src/test/java/io/github/brenbar/uapi/GeneratedMockTests.java
+src/test/java/io/github/brenbar/uapi/GeneratedMockInvalidStubTests.java
 target/
-src/main/resources/internal.japi.json
-src/main/resources/mock-internal.japi.json
+src/main/resources/internal.uapi.json
+src/main/resources/mock-internal.uapi.json
 metrics/

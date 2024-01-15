@@ -11,14 +11,14 @@ import io.github.brenbar.uapi.Client.Adapter;
 
 public class Playground {
     public static void main(String[] args) throws IOException {
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var jApi = UApiSchema.fromJson(json);
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.uapi.json"));
+        var uApi = UApiSchema.fromJson(json);
 
         Function<Message, Message> handler = (requestMessage) -> {
             return new Message(Map.of("Ok", Map.of()));
         };
 
-        var server = new Server(jApi, handler, new Server.Options());
+        var server = new Server(uApi, handler, new Server.Options());
 
         Adapter adapter = (m, s) -> {
             return CompletableFuture.supplyAsync(() -> {

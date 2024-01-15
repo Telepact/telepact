@@ -9,7 +9,7 @@
   },
 
   {
-    "///": " Get the jAPI `schema` of this server. ",
+    "///": " Get the uAPI `schema` of this server. ",
     "fn._api": {},
     "->": {
       "Ok": {
@@ -116,7 +116,7 @@
       " - `_ErrorInvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
       " - `_ErrorInvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
       "     outlined by a list of `cases.                                                                        ",
-      " - `_ErrorParseFailure`: The Request could not be parsed as a jAPI Message.                               "
+      " - `_ErrorParseFailure`: The Request could not be parsed as a uAPI Message.                               "
     ],
     "trait._Validated": {
       "->": {

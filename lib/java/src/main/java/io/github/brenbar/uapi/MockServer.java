@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * A Mock instance of a jAPI server.
+ * A Mock instance of a uAPI server.
  * 
  * Clients can use this class as an alternative transport in their adapters to
- * interact with a functional jAPI with common mocking strategies.
+ * interact with a functional uAPI with common mocking strategies.
  */
 public class MockServer {
 
@@ -29,24 +29,24 @@ public class MockServer {
     private final List<Invocation> invocations = new ArrayList<>();
 
     /**
-     * Create a mock server with the given jAPI Schema.
+     * Create a mock server with the given uAPI Schema.
      * 
-     * @param jApiSchemaAsJson
+     * @param uApiSchemaAsJson
      */
-    public MockServer(UApiSchema jApiSchema, Options options) {
+    public MockServer(UApiSchema uApiSchema, Options options) {
         var parsedTypes = new HashMap<String, _UType>();
 
         var typeExtensions = new HashMap<String, _UType>();
         typeExtensions.put("_ext._Call", new _UMockCall(parsedTypes));
         typeExtensions.put("_ext._Stub", new _UMockStub(parsedTypes));
 
-        var combinedJApiSchema = UApiSchema.extendWithExtensions(jApiSchema, _InternalMockUApiUtil.getJson(),
+        var combinedJApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
                 typeExtensions);
 
         this.server = new Server(combinedJApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));
 
-        parsedTypes.putAll(server.jApiSchema.parsed);
+        parsedTypes.putAll(server.uApiSchema.parsed);
 
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
@@ -64,7 +64,7 @@ public class MockServer {
     }
 
     /**
-     * Process a given jAPI Request Message into a jAPI Response Message.
+     * Process a given uAPI Request Message into a uAPI Response Message.
      * 
      * @param requestMessageBytes
      * @return
@@ -75,6 +75,6 @@ public class MockServer {
 
     private Message handle(Message requestMessage) {
         return _MockServerUtil.handle(requestMessage, this.stubs, this.invocations, this.random,
-                this.server.jApiSchema, this.enableGeneratedDefaultStub);
+                this.server.uApiSchema, this.enableGeneratedDefaultStub);
     }
 }

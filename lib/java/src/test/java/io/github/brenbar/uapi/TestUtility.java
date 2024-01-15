@@ -48,9 +48,9 @@ public class TestUtility {
 
     public static void test(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test/example.japi.json"));
-        var jApi = UApiSchema.fromJson(json);
-        var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test/example.uapi.json"));
+        var uApi = UApiSchema.fromJson(json);
+        var server = new Server(uApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
@@ -69,9 +69,9 @@ public class TestUtility {
 
     public static void testBinary(String requestJson, String expectedResponseJson) throws IOException {
         var objectMapper = new ObjectMapper();
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var jApi = UApiSchema.fromJson(json);
-        var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.uapi.json"));
+        var uApi = UApiSchema.fromJson(json);
+        var server = new Server(uApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
@@ -110,9 +110,9 @@ public class TestUtility {
     }
 
     public static void testBinaryExact(byte[] requestBytes, byte[] expectedResponseBytes) throws IOException {
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test/binary", "binary.japi.json"));
-        var jApi = UApiSchema.fromJson(json);
-        var server = new Server(jApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test/binary", "binary.uapi.json"));
+        var uApi = UApiSchema.fromJson(json);
+        var server = new Server(uApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
 
         // test json
         {
@@ -132,12 +132,12 @@ public class TestUtility {
     }
 
     public static MockServer generatedMockTestSetup() throws IOException {
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.japi.json"));
-        var jApi = UApiSchema.fromJson(json);
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.uapi.json"));
+        var uApi = UApiSchema.fromJson(json);
         var options = new io.github.brenbar.uapi.MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
         options.enableGeneratedDefaultStub = false;
-        var server = new MockServer(jApi, options);
+        var server = new MockServer(uApi, options);
         return server;
     }
 

@@ -80,17 +80,17 @@ class _DefaultSerializer implements SerializationImpl {
                     .addDeserializer(Map.class, new MessagePackMapDeserializer()));
 
     @Override
-    public byte[] toJson(Object japiMessage) {
+    public byte[] toJson(Object uapiMessage) {
         try {
-            return jsonMapper.writeValueAsBytes(japiMessage);
+            return jsonMapper.writeValueAsBytes(uapiMessage);
         } catch (JsonProcessingException e) {
             throw new SerializationError(e);
         }
     }
 
-    public byte[] toMsgPack(Object japiMessage) {
+    public byte[] toMsgPack(Object uapiMessage) {
         try {
-            return binaryMapper.writeValueAsBytes(japiMessage);
+            return binaryMapper.writeValueAsBytes(uapiMessage);
         } catch (JsonProcessingException e) {
             throw new SerializationError(e);
         }

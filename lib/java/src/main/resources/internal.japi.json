@@ -1,0 +1,139 @@
+[
+  {
+    "///": " Ping the server. ",
+    "fn._ping": {},
+    "->": {
+      "Ok": {}
+    },
+    "extends": "^trait\\._Validated$"
+  },
+
+  {
+    "///": " Get the uAPI `schema` of this server. ",
+    "fn._api": {},
+    "->": {
+      "Ok": {
+        "api": ["array", ["object", ["any"]]]
+      }
+    },
+    "extends": "^trait\\._Validated$"
+  },
+
+  {
+    "///": " A placeholder function when the requested function is unknown. ",
+    "fn._unknown": {},
+    "->": {
+      "Ok": {}
+    },
+    "extends": "^trait\\._Validated$"
+  },
+
+  {
+    "///": " A type. ",
+    "union._Type": {
+      "Null": {},
+      "Boolean": {},
+      "Integer": {},
+      "Number": {},
+      "String": {},
+      "Array": {},
+      "Object": {},
+      "Any": {},
+      "Unknown": {}
+    }
+  },
+
+  {
+    "///": " A reason for the validation failure in the body. ",
+    "union._BodyValidationFailureReason": {
+      "TypeUnexpected": {
+        "expected": ["union._Type"],
+        "actual": ["union._Type"]
+      },
+      "NullDisallowed": {},
+      "StructFieldUnknown": {},
+      "RequiredStructFieldMissing": {},
+      "NumberOutOfRange": {},
+      "ZeroOrManyUnionFieldsDisallowed": {},
+      "UnionFieldUnknown": {},
+      "ExtensionValidationFailed": {
+        "reason": ["string"],
+        "data!": ["object", ["any"]]
+      },
+      "ObjectKeyRegexMatchCountUnexpected": {
+        "regex": ["string"],
+        "expected": ["integer"],
+        "actual": ["integer"]
+      },
+      "RequiredObjectKeyMissing": {},
+      "FunctionUnknown": {}
+    }
+  },
+
+  {
+    "///": " A reason for the validation failure in the header. ",
+    "union._HeaderValidationFailureReason": {
+      "TypeUnexpected": {
+        "expected": ["union._Type"],
+        "actual": ["union._Type"]
+      },
+      "TypeUnknown": {},
+      "StructFieldUnknown": {},
+      "UnionCaseUnknown": {}
+    }
+  },
+
+  {
+    "///": " A parse failure. ",
+    "union._ParseFailure": {
+      "IncompatibleBinaryEncoding": {},
+      "BinaryDecodeFailure": {},
+      "JsonInvalid": {},
+      "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+    }
+  },
+
+  {
+    "///": " A validation failure located at a `path` explained by a `reason`. ",
+    "struct._BodyValidationFailure": {
+      "path": ["array", ["any?"]],
+      "reason": ["union._BodyValidationFailureReason"]
+    }
+  },
+
+  {
+    "///": " A validation failure located at a `path` explained by a `reason`. ",
+    "struct._HeaderValidationFailure": {
+      "path": ["array", ["any?"]],
+      "reason": ["union._HeaderValidationFailureReason"]
+    }
+  },
+
+  {
+    "///": [
+      " All functions may return a validation error:                                                             ",
+      " - `_ErrorInvalidRequestHeaders`: The Headers on the Request is invalid as outlined by a list of `cases`. ",
+      " - `_ErrorInvalidRequestBody`: The Body on the Request is invalid as outlined by a list of `cases`.       ",
+      " - `_ErrorInvalidResponseBody`: The Body that the Server attempted to put on the Response is invalid as   ",
+      "     outlined by a list of `cases.                                                                        ",
+      " - `_ErrorParseFailure`: The Request could not be parsed as a uAPI Message.                               "
+    ],
+    "trait._Validated": {
+      "->": {
+        "_ErrorUnknown": {},
+        "_ErrorInvalidRequestHeaders": {
+          "cases": ["array", ["struct._HeaderValidationFailure"]]
+        },
+        "_ErrorInvalidRequestBody": {
+          "cases": ["array", ["struct._BodyValidationFailure"]]
+        },
+        "_ErrorInvalidResponseBody": {
+          "cases": ["array", ["struct._BodyValidationFailure"]]
+        },
+        "_ErrorParseFailure": {
+          "reasons": ["array", ["union._ParseFailure"]]
+        }
+      }
+    }
+  }
+]

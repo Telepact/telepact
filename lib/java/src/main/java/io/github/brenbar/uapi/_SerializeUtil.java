@@ -12,9 +12,9 @@ import java.util.TreeSet;
 
 class _SerializeUtil {
 
-    static BinaryEncoding constructBinaryEncoding(UApiSchema jApiSchema) {
+    static BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {
         var allKeys = new TreeSet<String>();
-        for (var entry : jApiSchema.parsed.entrySet()) {
+        for (var entry : uApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
             if (entry.getValue() instanceof _UStruct s) {
                 allKeys.addAll(s.fields.keySet());

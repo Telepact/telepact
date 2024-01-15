@@ -1,7 +1,7 @@
 package io.github.brenbar.uapi;
 
 /**
- * Indicates a critical failure occurred during client-side processing of a jAPI
+ * Indicates a critical failure occurred during client-side processing of a uAPI
  * Request.
  */
 public class ClientProcessError extends RuntimeException {

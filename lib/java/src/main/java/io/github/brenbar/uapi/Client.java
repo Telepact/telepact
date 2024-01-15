@@ -4,7 +4,7 @@ import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
 /**
- * A jAPI client.
+ * A uAPI client.
  */
 public class Client {
 
@@ -54,7 +54,7 @@ public class Client {
     }
 
     /**
-     * Submit a jAPI Request Message. Returns a jAPI Response Message.
+     * Submit a uAPI Request Message. Returns a uAPI Response Message.
      * 
      * @param request
      * @return

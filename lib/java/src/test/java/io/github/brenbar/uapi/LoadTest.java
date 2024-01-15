@@ -23,14 +23,14 @@ public class LoadTest {
     @Test
     @Disabled("Test preserved for record")
     public void test() throws IOException, InterruptedException {
-        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.japi.json"));
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test", "calculator.uapi.json"));
 
-        var jApiSchema = UApiSchema.fromJson(json);
+        var uApiSchema = UApiSchema.fromJson(json);
 
         var options = new Options();
         options.onError = (e) -> e.printStackTrace();
         options.enableGeneratedDefaultStub = true;
-        var server = new MockServer(jApiSchema, options);
+        var server = new MockServer(uApiSchema, options);
 
         var natsUrl = "nats://127.0.0.1:4222";
 

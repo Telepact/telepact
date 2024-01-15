@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 class _InternalUApiUtil {
 
   public static String getJson() {
-    final var stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("internal.japi.json");
+    final var stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("internal.uapi.json");
     return new BufferedReader(new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
   };
 }

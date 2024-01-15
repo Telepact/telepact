@@ -9,7 +9,7 @@ import java.util.TreeMap;
 class _MockServerUtil {
 
     static Message handle(Message requestMessage, List<_MockStub> stubs,
-            List<Invocation> invocations, RandomGenerator random, UApiSchema jApiSchema,
+            List<Invocation> invocations, RandomGenerator random, UApiSchema uApiSchema,
             boolean enableGeneratedDefaultStub) {
         final Map<String, Object> header = requestMessage.header;
 
@@ -71,7 +71,7 @@ class _MockServerUtil {
             default -> {
                 invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
 
-                final var definition = (_UFn) jApiSchema.parsed.get(functionName);
+                final var definition = (_UFn) uApiSchema.parsed.get(functionName);
 
                 for (final var stub : stubs) {
                     if (Objects.equals(stub.whenFunction, functionName)) {

@@ -10,7 +10,7 @@ import java.util.TreeMap;
 class _ValidateUtil {
 
     static List<ValidationFailure> validateHeaders(
-            Map<String, Object> headers, UApiSchema jApiSchema, _UFn functionType) {
+            Map<String, Object> headers, UApiSchema uApiSchema, _UFn functionType) {
         var validationFailures = new ArrayList<ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
@@ -53,7 +53,7 @@ class _ValidateUtil {
                 if (typeName.equals("->")) {
                     typeReference = functionType.result;
                 } else {
-                    typeReference = jApiSchema.parsed.get(typeName);
+                    typeReference = uApiSchema.parsed.get(typeName);
                 }
 
                 if (typeReference == null) {

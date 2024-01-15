@@ -1,7 +1,7 @@
 package io.github.brenbar.uapi;
 
 /**
- * Indicates deserialization of a jAPI message was unsuccessful.
+ * Indicates deserialization of a uAPI message was unsuccessful.
  */
 public class DeserializationError extends RuntimeException {
 
