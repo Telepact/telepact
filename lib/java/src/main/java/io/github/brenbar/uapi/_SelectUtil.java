@@ -9,91 +9,110 @@ class _SelectUtil {
 
     static Object selectStructFields(_UTypeDeclaration typeDeclaration, Object value,
             Map<String, Object> selectedStructFields) {
-        if (typeDeclaration.type instanceof _UStruct s) {
-            var selectedFields = (List<String>) selectedStructFields.get(s.name);
-            var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var fieldName = entry.getKey();
+        if (typeDeclaration.type instanceof final _UStruct s) {
+            final Map<String, _UFieldDeclaration> fields = s.fields;
+            final String structName = s.name;
+            final var selectedFields = (List<String>) selectedStructFields.get(structName);
+            final var valueAsMap = (Map<String, Object>) value;
+            final var finalMap = new HashMap<>();
+
+            for (final var entry : valueAsMap.entrySet()) {
+                final var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = s.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
+                    final var field = fields.get(fieldName);
+                    final _UTypeDeclaration fieldTypeDeclaration = field.typeDeclaration;
+                    final var valueWithSelectedFields = selectStructFields(fieldTypeDeclaration, entry.getValue(),
                             selectedStructFields);
+
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
+
             return finalMap;
-        } else if (typeDeclaration.type instanceof _UFn f) {
-            var valueAsMap = (Map<String, Object>) value;
-            var unionEntry = _UUnion.entry(valueAsMap);
-            var unionCase = unionEntry.getKey();
-            var unionData = (Map<String, Object>) unionEntry.getValue();
+        } else if (typeDeclaration.type instanceof final _UFn f) {
+            final var valueAsMap = (Map<String, Object>) value;
+            final Map.Entry<String, Object> unionEntry = _UUnion.entry(valueAsMap);
+            final var unionCase = unionEntry.getKey();
+            final var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var argStructReference = f.call.cases.get(unionCase);
+            final String fnName = f.name;
+            final _UUnion fnCall = f.call;
+            final Map<String, _UStruct> fnCallCases = fnCall.cases;
 
-            var selectedFields = (List<String>) selectedStructFields.get(f.name);
-            var finalMap = new HashMap<>();
-            for (var entry : unionData.entrySet()) {
-                var fieldName = entry.getKey();
+            final var argStructReference = fnCallCases.get(unionCase);
+            final var selectedFields = (List<String>) selectedStructFields.get(fnName);
+            final var finalMap = new HashMap<>();
+
+            for (final var entry : unionData.entrySet()) {
+                final var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = argStructReference.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
+                    final var field = argStructReference.fields.get(fieldName);
+                    final var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
+
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof _UUnion u) {
-            var valueAsMap = (Map<String, Object>) value;
-            var unionEntry = _UUnion.entry(valueAsMap);
-            var unionCase = unionEntry.getKey();
-            var unionData = (Map<String, Object>) unionEntry.getValue();
+        } else if (typeDeclaration.type instanceof final _UUnion u) {
+            final var valueAsMap = (Map<String, Object>) value;
+            final var unionEntry = _UUnion.entry(valueAsMap);
+            final var unionCase = unionEntry.getKey();
+            final var unionData = (Map<String, Object>) unionEntry.getValue();
 
-            var unionStructReference = u.cases.get(unionCase);
+            final Map<String, _UStruct> unionCases = u.cases;
+            final var unionStructReference = unionCases.get(unionCase);
+            final var unionStructRefFields = unionStructReference.fields;
+            final var defaultCasesToFields = new HashMap<String, List<String>>();
 
-            var defaultCasesToFields = new HashMap<String, List<String>>();
-            for (var entry : u.cases.entrySet()) {
-                var fields = entry.getValue().fields.keySet().stream().toList();
+            for (final var entry : unionCases.entrySet()) {
+                final var unionStruct = entry.getValue();
+                final var unionStructFields = unionStruct.fields;
+                final var fields = unionStructFields.keySet().stream().toList();
                 defaultCasesToFields.put(entry.getKey(), fields);
             }
 
-            var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(u.name,
+            final var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(u.name,
                     defaultCasesToFields);
-            var thisUnionCaseSelectedFieldsDefault = defaultCasesToFields.get(unionCase);
-            var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionCase,
+            final var thisUnionCaseSelectedFieldsDefault = defaultCasesToFields.get(unionCase);
+            final var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionCase,
                     thisUnionCaseSelectedFieldsDefault);
 
-            var finalMap = new HashMap<>();
-            for (var entry : unionData.entrySet()) {
-                var fieldName = entry.getKey();
+            final var finalMap = new HashMap<>();
+            for (final var entry : unionData.entrySet()) {
+                final var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
-                    var field = unionStructReference.fields.get(fieldName);
-                    var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
+                    final var field = unionStructRefFields.get(fieldName);
+                    final var valueWithSelectedFields = selectStructFields(field.typeDeclaration, entry.getValue(),
                             selectedStructFields);
                     finalMap.put(entry.getKey(), valueWithSelectedFields);
                 }
             }
 
             return Map.of(unionEntry.getKey(), finalMap);
-        } else if (typeDeclaration.type instanceof _UObject o) {
-            var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
-            var valueAsMap = (Map<String, Object>) value;
-            var finalMap = new HashMap<>();
-            for (var entry : valueAsMap.entrySet()) {
-                var valueWithSelectedFields = selectStructFields(nestedTypeDeclaration, entry.getValue(),
+        } else if (typeDeclaration.type instanceof final _UObject o) {
+            final var nestedTypeDeclaration = typeDeclaration.typeParameters.get(0);
+            final var valueAsMap = (Map<String, Object>) value;
+
+            final var finalMap = new HashMap<>();
+            for (final var entry : valueAsMap.entrySet()) {
+                final var valueWithSelectedFields = selectStructFields(nestedTypeDeclaration, entry.getValue(),
                         selectedStructFields);
                 finalMap.put(entry.getKey(), valueWithSelectedFields);
             }
+
             return finalMap;
         } else if (typeDeclaration.type instanceof _UArray a) {
-            var nestedType = typeDeclaration.typeParameters.get(0);
-            var valueAsList = (List<Object>) value;
-            var finalList = new ArrayList<>();
-            for (var entry : valueAsList) {
-                var valueWithSelectedFields = selectStructFields(nestedType, entry, selectedStructFields);
+            final var nestedType = typeDeclaration.typeParameters.get(0);
+            final var valueAsList = (List<Object>) value;
+
+            final var finalList = new ArrayList<>();
+            for (final var entry : valueAsList) {
+                final var valueWithSelectedFields = selectStructFields(nestedType, entry, selectedStructFields);
                 finalList.add(valueWithSelectedFields);
             }
+
             return finalList;
         } else {
             return value;
