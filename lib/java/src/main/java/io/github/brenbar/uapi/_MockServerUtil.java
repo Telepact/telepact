@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 class _MockServerUtil {
 
-    static Message handle(Message requestMessage, List<MockStub> stubs,
+    static Message handle(Message requestMessage, List<_MockStub> stubs,
             List<Invocation> invocations, RandomGenerator random, UApiSchema jApiSchema,
             boolean enableGeneratedDefaultStub) {
 
@@ -27,10 +27,8 @@ class _MockServerUtil {
                 var stubResult = (Map<String, Object>) givenStub.get("->");
                 var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
 
-                var stub = new MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult);
-                if (allowArgumentPartialMatch) {
-                    stub.setAllowArgumentPartialMatch(allowArgumentPartialMatch);
-                }
+                var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
+                        allowArgumentPartialMatch);
 
                 stubs.add(0, stub);
                 return new Message(Map.of("Ok", Map.of()));

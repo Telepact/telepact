@@ -25,7 +25,7 @@ public class MockServer {
     private final RandomGenerator random;
     private final boolean enableGeneratedDefaultStub;
 
-    private final List<MockStub> stubs = new ArrayList<>();
+    private final List<_MockStub> stubs = new ArrayList<>();
     private final List<Invocation> invocations = new ArrayList<>();
 
     /**
