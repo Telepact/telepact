@@ -47,6 +47,7 @@ class _UArray implements _UType {
 
         if (useStartingValue) {
             final var startingArray = (List<Object>) startingValue;
+
             final var array = new ArrayList<Object>();
             for (final var startingArrayValue : startingArray) {
                 final var value = nestedTypeDeclaration.generateRandomValue(startingArrayValue, true,
@@ -54,9 +55,11 @@ class _UArray implements _UType {
 
                 array.add(value);
             }
+
             return array;
         } else {
             final var length = random.nextCollectionLength();
+
             final var array = new ArrayList<Object>();
             for (int i = 0; i < length; i += 1) {
                 final var value = nestedTypeDeclaration.generateRandomValue(null, false,
@@ -65,6 +68,7 @@ class _UArray implements _UType {
 
                 array.add(value);
             }
+
             return array;
         }
     }
