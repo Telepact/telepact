@@ -32,17 +32,15 @@ class _UFn implements _UType {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics,
-            RandomGenerator random) {
+            List<_UTypeDeclaration> generics, RandomGenerator random) {
+        final Map<String, _UStruct> callCases = this.call.cases;
         if (useStartingValue) {
-            var startingFnValue = (Map<String, Object>) startingValue;
-            return _UUnion.constructRandomUnion(this.call.cases, startingFnValue, includeRandomOptionalFields,
-                    List.of(),
-                    random);
+            final var startingFnValue = (Map<String, Object>) startingValue;
+            return _UUnion.constructRandomUnion(callCases, startingFnValue, includeRandomOptionalFields,
+                    List.of(), random);
         } else {
-            return _UUnion.constructRandomUnion(this.call.cases, new HashMap<>(), includeRandomOptionalFields,
-                    List.of(),
-                    random);
+            return _UUnion.constructRandomUnion(callCases, new HashMap<>(), includeRandomOptionalFields,
+                    List.of(), random);
         }
     }
 

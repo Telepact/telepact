@@ -17,7 +17,7 @@ class _UGeneric implements _UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        var typeDeclaration = generics.get(this.index);
+        final var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, List.of());
     }
 
@@ -26,14 +26,14 @@ class _UGeneric implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             RandomGenerator random) {
-        var genericTypeDeclaration = generics.get(this.index);
+        final var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
                 includeRandomOptionalFields, List.of(), random);
     }
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        var typeDeclaration = generics.get(this.index);
+        final var typeDeclaration = generics.get(this.index);
         return typeDeclaration.type.getName(generics);
     }
 }

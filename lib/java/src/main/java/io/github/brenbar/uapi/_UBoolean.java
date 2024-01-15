@@ -15,8 +15,7 @@ class _UBoolean implements _UType {
         if (value instanceof Boolean) {
             return List.of();
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
-                    this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, this.getName(generics));
         }
     }
 
