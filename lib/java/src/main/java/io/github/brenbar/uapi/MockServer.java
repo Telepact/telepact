@@ -40,10 +40,10 @@ public class MockServer {
         typeExtensions.put("_ext._Call", new _UMockCall(parsedTypes));
         typeExtensions.put("_ext._Stub", new _UMockStub(parsedTypes));
 
-        var combinedJApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
+        var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
                 typeExtensions);
 
-        this.server = new Server(combinedJApiSchema, this::handle,
+        this.server = new Server(combinedUApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));
 
         parsedTypes.putAll(server.uApiSchema.parsed);

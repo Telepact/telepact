@@ -60,7 +60,7 @@ class _ParseSchemaTraitUtil {
     public static UTrait parseTraitType(
             Map<String, Object> traitDefinitionAsParsedJson,
             String schemaKey,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
@@ -86,7 +86,7 @@ class _ParseSchemaTraitUtil {
         }
 
         var trait = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, "->",
-                false, 0, originalJApiSchema,
+                false, 0, originalUApiSchema,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions,
                 allParseFailures, failedTypes);

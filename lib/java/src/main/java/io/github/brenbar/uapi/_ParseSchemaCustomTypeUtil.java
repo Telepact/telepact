@@ -14,7 +14,7 @@ class _ParseSchemaCustomTypeUtil {
             Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey,
             int typeParameterCount,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
@@ -32,7 +32,7 @@ class _ParseSchemaCustomTypeUtil {
         }
 
         final var fields = parseStructFields(definition, thisPath, typeParameterCount,
-                originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                 failedTypes);
 
         return new _UStruct(schemaKey, fields, typeParameterCount);
@@ -40,17 +40,17 @@ class _ParseSchemaCustomTypeUtil {
 
     static _UUnion parseUnionType(
             List<Object> path,
-            Map<String, Object> unionDefinitionAsParsedJson,
+            Map<String, Object> unionDefinitionAsPseudoJson,
             String schemaKey,
             boolean okCaseRequired,
             int typeParameterCount,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
-        Object defInit = unionDefinitionAsParsedJson.get(schemaKey);
+        Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
         final Map<String, Object> definition;
         try {
@@ -99,7 +99,7 @@ class _ParseSchemaCustomTypeUtil {
             final Map<String, _UFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
-                        originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                         failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -120,7 +120,7 @@ class _ParseSchemaCustomTypeUtil {
 
     static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
             int typeParameterCount,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
@@ -149,7 +149,7 @@ class _ParseSchemaCustomTypeUtil {
             final _UFieldDeclaration parsedField;
             try {
                 parsedField = parseField(path, fieldDeclaration,
-                        typeDeclarationValue, typeParameterCount, originalJApiSchema, schemaKeysToIndex,
+                        typeDeclarationValue, typeParameterCount, originalUApiSchema, schemaKeysToIndex,
                         parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
                 final String fieldName = parsedField.fieldName;
@@ -172,7 +172,7 @@ class _ParseSchemaCustomTypeUtil {
             String fieldDeclaration,
             Object typeDeclarationValue,
             int typeParameterCount,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
@@ -201,7 +201,7 @@ class _ParseSchemaCustomTypeUtil {
 
         final var typeDeclaration = _ParseSchemaTypeUtil.parseTypeDeclaration(thisPath,
                 typeDeclarationArray, typeParameterCount,
-                originalJApiSchema,
+                originalUApiSchema,
                 schemaKeysToIndex,
                 parsedTypes,
                 typeExtensions, allParseFailures, failedTypes);

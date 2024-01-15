@@ -13,7 +13,7 @@ class _ParseSchemaFnTypeUtil {
             List<Object> path,
             Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions,
@@ -24,7 +24,7 @@ class _ParseSchemaFnTypeUtil {
         _UUnion callType = null;
         try {
             final var argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
+                    schemaKey, typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
                     allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
         } catch (UApiSchemaParseError e) {
@@ -39,7 +39,7 @@ class _ParseSchemaFnTypeUtil {
         } else {
             try {
                 resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson, "->",
-                        true, typeParameterCount, originalJApiSchema, schemaKeysToIndex, parsedTypes,
+                        true, typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions,
                         allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {

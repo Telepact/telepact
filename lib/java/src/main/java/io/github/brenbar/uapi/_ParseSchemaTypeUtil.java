@@ -10,7 +10,7 @@ class _ParseSchemaTypeUtil {
 
     static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -42,7 +42,7 @@ class _ParseSchemaTypeUtil {
         var typeName = matcher.group(1);
         var nullable = matcher.group(2) != null;
 
-        _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, originalJApiSchema,
+        _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, originalUApiSchema,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions, allParseFailures, failedTypes);
 
@@ -76,7 +76,7 @@ class _ParseSchemaTypeUtil {
             _UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
-                        originalJApiSchema,
+                        originalUApiSchema,
                         schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
                 typeParameters.add(typeParameterTypeDeclaration);
             } catch (UApiSchemaParseError e2) {
@@ -92,7 +92,7 @@ class _ParseSchemaTypeUtil {
     }
 
     static _UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
-            List<Object> originalJApiSchema,
+            List<Object> originalUApiSchema,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -147,7 +147,7 @@ class _ParseSchemaTypeUtil {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName))));
         }
-        var definition = (Map<String, Object>) originalJApiSchema.get(index);
+        var definition = (Map<String, Object>) originalUApiSchema.get(index);
 
         var typeParameterCountString = matcher.group(6);
         int typeParameterCount = 0;
@@ -160,19 +160,19 @@ class _ParseSchemaTypeUtil {
             if (customTypeName.startsWith("struct")) {
                 type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
                         typeParameterCount,
-                        originalJApiSchema,
+                        originalUApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
                 boolean okCaseRequired = false;
                 type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
                         okCaseRequired, typeParameterCount,
-                        originalJApiSchema,
+                        originalUApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
                 type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
-                        originalJApiSchema,
+                        originalUApiSchema,
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else {

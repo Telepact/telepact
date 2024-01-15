@@ -25,7 +25,7 @@ public class TestServer {
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var uApi = UApiSchema.fromJson(json);
-        var alternateJApi = UApiSchema.extend(uApi, """
+        var alternateUApi = UApiSchema.extend(uApi, """
                 [
                     {
                         "struct.BackwardsCompatibleChange": {}
@@ -86,7 +86,7 @@ public class TestServer {
                 throw new RuntimeException();
             }
         }));
-        var alternateServer = new Server(alternateJApi, handler,
+        var alternateServer = new Server(alternateUApi, handler,
                 new Options().setOnError((e) -> e.printStackTrace()));
 
         var dispatcher = connection.createDispatcher((msg) -> {
