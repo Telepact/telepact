@@ -58,7 +58,7 @@ class _BinaryEncodeUtil {
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
 
-        headers.put("_bin", binaryChecksumStrategy.get());
+        headers.put("_bin", binaryChecksumStrategy.getCurrent());
 
         if (Objects.equals(forceSendJson, true)) {
             throw new BinaryEncoderUnavailableError();
@@ -106,7 +106,7 @@ class _BinaryEncodeUtil {
         }
 
         binaryChecksumStrategy.update(binaryChecksum);
-        final var newCurrentChecksumStrategy = binaryChecksumStrategy.get();
+        final var newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrent();
 
         recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
         final var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);

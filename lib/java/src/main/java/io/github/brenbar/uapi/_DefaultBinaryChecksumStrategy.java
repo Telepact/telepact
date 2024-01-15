@@ -8,7 +8,7 @@ class _DefaultBinaryChecksumStrategy implements BinaryChecksumStrategy {
 
     private static class Checksum {
         public final int value;
-        public AtomicInteger expiration;
+        public final AtomicInteger expiration;
 
         public Checksum(int value, AtomicInteger expiration) {
             this.value = value;
@@ -38,7 +38,7 @@ class _DefaultBinaryChecksumStrategy implements BinaryChecksumStrategy {
     }
 
     @Override
-    public List<Integer> get() {
+    public List<Integer> getCurrent() {
         if (primary == null) {
             return List.of();
         } else if (secondary == null) {

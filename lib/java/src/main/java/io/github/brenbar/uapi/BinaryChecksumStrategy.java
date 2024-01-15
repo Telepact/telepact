@@ -6,6 +6,6 @@ public interface BinaryChecksumStrategy {
 
     void update(Integer checksum);
 
-    List<Integer> get();
+    List<Integer> getCurrent();
 
 }
