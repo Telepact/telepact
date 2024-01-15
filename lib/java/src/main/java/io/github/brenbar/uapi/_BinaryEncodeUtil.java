@@ -47,7 +47,7 @@ class _BinaryEncodeUtil {
             finalEncodedMessageBody = encodedMessageBody;
         }
 
-        final var messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+        final var messageBody = (Map<String, Object>) decodeBody(finalEncodedMessageBody, binaryEncoder);
         return List.of(headers, messageBody);
     }
 

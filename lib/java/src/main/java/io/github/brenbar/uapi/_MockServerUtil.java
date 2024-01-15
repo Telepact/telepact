@@ -11,46 +11,47 @@ class _MockServerUtil {
     static Message handle(Message requestMessage, List<_MockStub> stubs,
             List<Invocation> invocations, RandomGenerator random, UApiSchema jApiSchema,
             boolean enableGeneratedDefaultStub) {
+        final Map<String, Object> header = requestMessage.header;
 
-        var enableGenerationStub = (Boolean) requestMessage.header.getOrDefault("_mockEnableGeneratedStub", false);
-        var functionName = requestMessage.getBodyTarget();
-        var argument = requestMessage.getBodyPayload();
+        final var enableGenerationStub = (Boolean) header.getOrDefault("_mockEnableGeneratedStub", false);
+        final String functionName = requestMessage.getBodyTarget();
+        final Map<String, Object> argument = requestMessage.getBodyPayload();
 
         switch (functionName) {
             case "fn._createStub" -> {
-                var givenStub = (Map<String, Object>) argument.get("stub");
+                final var givenStub = (Map<String, Object>) argument.get("stub");
 
-                var stubCall = givenStub.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                final var stubCall = givenStub.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
                         .findAny().get();
-                var stubFunctionName = stubCall.getKey();
-                var stubArg = (Map<String, Object>) stubCall.getValue();
-                var stubResult = (Map<String, Object>) givenStub.get("->");
-                var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
+                final var stubFunctionName = stubCall.getKey();
+                final var stubArg = (Map<String, Object>) stubCall.getValue();
+                final var stubResult = (Map<String, Object>) givenStub.get("->");
+                final var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
 
-                var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
+                final var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
                         allowArgumentPartialMatch);
 
                 stubs.add(0, stub);
                 return new Message(Map.of("Ok", Map.of()));
             }
             case "fn._verify" -> {
-                var givenCall = (Map<String, Object>) argument.get("call");
+                final var givenCall = (Map<String, Object>) argument.get("call");
 
-                var call = givenCall.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                final var call = givenCall.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
                         .findAny().get();
-                var callFunctionName = call.getKey();
-                var callArg = (Map<String, Object>) call.getValue();
-                var verifyTimes = (Map<String, Object>) argument.getOrDefault("count!",
+                final var callFunctionName = call.getKey();
+                final var callArg = (Map<String, Object>) call.getValue();
+                final var verifyTimes = (Map<String, Object>) argument.getOrDefault("count!",
                         Map.of("AtLeast", Map.of("times", 1)));
-                var strictMatch = (Boolean) argument.getOrDefault("strictMatch!", false);
+                final var strictMatch = (Boolean) argument.getOrDefault("strictMatch!", false);
 
-                var verificationResult = _MockVerifyUtil.verify(callFunctionName, callArg, strictMatch,
+                final var verificationResult = _MockVerifyUtil.verify(callFunctionName, callArg, strictMatch,
                         verifyTimes,
                         invocations);
                 return new Message(verificationResult);
             }
             case "fn._verifyNoMoreInteractions" -> {
-                var verificationResult = _MockVerifyUtil.verifyNoMoreInteractions(invocations);
+                final var verificationResult = _MockVerifyUtil.verifyNoMoreInteractions(invocations);
                 return new Message(verificationResult);
             }
             case "fn._clearCalls" -> {
@@ -62,7 +63,7 @@ class _MockServerUtil {
                 return new Message(Map.of("Ok", Map.of()));
             }
             case "fn._setRandomSeed" -> {
-                var givenSeed = (Integer) argument.get("seed");
+                final var givenSeed = (Integer) argument.get("seed");
 
                 random.setSeed(givenSeed);
                 return new Message(Map.of("Ok", Map.of()));
@@ -70,24 +71,24 @@ class _MockServerUtil {
             default -> {
                 invocations.add(new Invocation(functionName, new TreeMap<>(argument)));
 
-                var definition = (_UFn) jApiSchema.parsed.get(functionName);
+                final var definition = (_UFn) jApiSchema.parsed.get(functionName);
 
-                for (var stub : stubs) {
+                for (final var stub : stubs) {
                     if (Objects.equals(stub.whenFunction, functionName)) {
                         if (stub.allowArgumentPartialMatch) {
                             if (isSubMap(stub.whenArgument, argument)) {
-                                var useStartingValue = true;
-                                var includeRandomOptionalFields = false;
-                                var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                final var useStartingValue = true;
+                                final var includeRandomOptionalFields = false;
+                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useStartingValue,
                                         includeRandomOptionalFields, List.of(), List.of(), random);
                                 return new Message(result);
                             }
                         } else {
                             if (Objects.equals(stub.whenArgument, argument)) {
-                                var useStartingValue = true;
-                                var includeRandomOptionalFields = false;
-                                var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                final var useStartingValue = true;
+                                final var includeRandomOptionalFields = false;
+                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useStartingValue,
                                         includeRandomOptionalFields, List.of(), List.of(), random);
                                 return new Message(result);
@@ -101,11 +102,11 @@ class _MockServerUtil {
                 }
 
                 if (definition != null) {
-                    var resultUnion = (_UUnion) definition.result;
-                    var OkStructRef = resultUnion.cases.get("Ok");
-                    var useStartingValue = true;
-                    var includeRandomOptionalFields = true;
-                    var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
+                    final var resultUnion = (_UUnion) definition.result;
+                    final var OkStructRef = resultUnion.cases.get("Ok");
+                    final var useStartingValue = true;
+                    final var includeRandomOptionalFields = true;
+                    final var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
                             includeRandomOptionalFields, List.of(), List.of(), random);
                     return new Message(Map.of("Ok", randomOkStruct));
                 } else {
@@ -116,10 +117,10 @@ class _MockServerUtil {
     }
 
     static boolean isSubMap(Map<String, Object> part, Map<String, Object> whole) {
-        for (var partKey : part.keySet()) {
-            var wholeValue = whole.get(partKey);
-            var partValue = part.get(partKey);
-            var entryIsEqual = isSubMapEntryEqual(partValue, wholeValue);
+        for (final var partKey : part.keySet()) {
+            final var wholeValue = whole.get(partKey);
+            final var partValue = part.get(partKey);
+            final var entryIsEqual = isSubMapEntryEqual(partValue, wholeValue);
             if (!entryIsEqual) {
                 return false;
             }
@@ -130,24 +131,29 @@ class _MockServerUtil {
     private static boolean isSubMapEntryEqual(Object partValue, Object wholeValue) {
         if (partValue instanceof Map m1 && wholeValue instanceof Map m2) {
             return isSubMap(m1, m2);
-        } else if (partValue instanceof List partList && wholeValue instanceof List wholeList) {
+        } else if (partValue instanceof List partList && wholeValue instanceof List<?> wholeList) {
             for (int i = 0; i < partList.size(); i += 1) {
-                var partElement = partList.get(i);
-                var partMatches = false;
-                for (var wholeElement : wholeList) {
-                    if (isSubMapEntryEqual(partElement, wholeElement)) {
-                        partMatches = true;
-                        break;
-                    }
-                }
+                final var partElement = partList.get(i);
+                var partMatches = partiallyMatches((List<Object>) wholeList, partElement);
                 if (!partMatches) {
                     return false;
                 }
             }
+
             return true;
         } else {
             return Objects.equals(partValue, wholeValue);
         }
+    }
+
+    private static boolean partiallyMatches(List<Object> wholeList, Object partElement) {
+        for (final var wholeElement : wholeList) {
+            if (isSubMapEntryEqual(partElement, wholeElement)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

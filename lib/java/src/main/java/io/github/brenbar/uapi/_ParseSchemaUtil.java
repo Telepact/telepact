@@ -36,8 +36,8 @@ class _ParseSchemaUtil {
                     e);
         }
 
-        List<Object> firstOriginal = first.original;
-        Map<String, _UType> firstTypeExtensions = first.typeExtensions;
+        var firstOriginal = (List<Object>) first.original;
+        var firstTypeExtensions = (Map<String, _UType>) first.typeExtensions;
 
         var original = new ArrayList<Object>();
         original.addAll(firstOriginal);
