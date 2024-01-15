@@ -176,12 +176,11 @@ class _ParseSchemaTypeUtil {
                         schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else {
-                var typeExtension = typeExtensions.get(customTypeName);
-                if (typeExtension == null) {
+                type = typeExtensions.get(customTypeName);
+                if (type == null) {
                     throw new UApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
                             "TypeExtensionImplementationMissing", Map.of("name", customTypeName))));
                 }
-                type = new _UExt(customTypeName, typeExtension, typeParameterCount);
             }
 
             parsedTypes.put(customTypeName, type);

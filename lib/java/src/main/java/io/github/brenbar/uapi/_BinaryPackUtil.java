@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.CannotProceedException;
-
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
 class _BinaryPackUtil {
