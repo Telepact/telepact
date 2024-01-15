@@ -4,7 +4,7 @@ import java.util.List;
 
 class _ServerBinaryEncoder implements BinaryEncoder {
 
-    private BinaryEncoding binaryEncoder;
+    private final BinaryEncoding binaryEncoder;
 
     public _ServerBinaryEncoder(BinaryEncoding binaryEncoder) {
         this.binaryEncoder = binaryEncoder;

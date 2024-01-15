@@ -7,11 +7,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 class _ServerUtil {
+
     static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,
             Consumer<Throwable> onError, Consumer<Message> onRequest, Consumer<Message> onResponse,
             Function<Message, Message> handler) {
         try {
-            var requestMessage = parseRequestMessage(requestMessageBytes, serializer,
+            final var requestMessage = parseRequestMessage(requestMessageBytes, serializer,
                     uApiSchema, onError);
 
             try {
@@ -19,7 +20,7 @@ class _ServerUtil {
             } catch (Throwable ignored) {
             }
 
-            var responseMessage = _ServerHandlerUtil.handleMessage(requestMessage, uApiSchema, handler, onError);
+            final var responseMessage = _ServerHandlerUtil.handleMessage(requestMessage, uApiSchema, handler, onError);
 
             try {
                 onResponse.accept(responseMessage);
@@ -41,7 +42,7 @@ class _ServerUtil {
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,
             Consumer<Throwable> onError) {
 
-        Message requestMessage;
+        final Message requestMessage;
         try {
             requestMessage = serializer.deserialize(requestMessageBytes);
         } catch (DeserializationError e) {
@@ -49,9 +50,10 @@ class _ServerUtil {
                 onError.accept(e);
             } catch (Throwable ignored) {
             }
-            var cause = e.getCause();
 
-            List<Map<String, Object>> parseFailures;
+            final var cause = e.getCause();
+
+            final List<Map<String, Object>> parseFailures;
             if (cause instanceof BinaryEncoderUnavailableError e2) {
                 parseFailures = List.of(Map.of("IncompatibleBinaryEncoding", Map.of()));
             } else if (cause instanceof BinaryEncodingMissing e2) {
@@ -62,7 +64,7 @@ class _ServerUtil {
                 parseFailures = List.of(Map.of("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject", Map.of()));
             }
 
-            var requestHeaders = new HashMap<String, Object>();
+            final var requestHeaders = new HashMap<String, Object>();
             requestHeaders.put("_parseFailures", parseFailures);
 
             return new Message(requestHeaders, Map.of());

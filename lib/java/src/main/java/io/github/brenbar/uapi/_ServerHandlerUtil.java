@@ -10,67 +10,76 @@ import java.util.function.Function;
 
 class _ServerHandlerUtil {
 
-    static Message handleMessage(Message requestMessage,
-            UApiSchema uApiSchema,
-            Function<Message, Message> handler,
+    static Message handleMessage(Message requestMessage, UApiSchema uApiSchema, Function<Message, Message> handler,
             Consumer<Throwable> onError) {
-        boolean unsafeResponseEnabled = false;
-        var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
-        var requestHeaders = requestMessage.header;
-        var requestBody = requestMessage.body;
-        var requestEntry = _UUnion.entry(requestBody);
-        String requestTarget;
-        Map<String, Object> requestPayload;
+        final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
+        final Map<String, Object> requestHeaders = requestMessage.header;
+        final Map<String, Object> requestBody = requestMessage.body;
+        final Map<String, _UType> parsedUApiSchema = uApiSchema.parsed;
+        final Map.Entry<String, Object> requestEntry = _UUnion.entry(requestBody);
+
+        final String requestTargetInit;
+        final Map<String, Object> requestPayload;
         if (requestEntry != null) {
-            requestTarget = requestEntry.getKey();
+            requestTargetInit = requestEntry.getKey();
             requestPayload = (Map<String, Object>) requestEntry.getValue();
         } else {
-            requestTarget = "fn._unknown";
+            requestTargetInit = "fn._unknown";
             requestPayload = Map.of();
         }
-        var unknownTarget = (String) null;
-        if (!uApiSchema.parsed.containsKey(requestTarget)) {
-            unknownTarget = requestTarget;
-            requestTarget = "fn._unknown";
-        }
-        var functionType = (_UFn) uApiSchema.parsed.get(requestTarget);
-        var resultUnionType = functionType.result;
 
-        var callId = requestHeaders.get("_id");
+        final String unknownTarget;
+        final String requestTarget;
+        if (!parsedUApiSchema.containsKey(requestTargetInit)) {
+            unknownTarget = requestTargetInit;
+            requestTarget = "fn._unknown";
+        } else {
+            unknownTarget = null;
+            requestTarget = requestTargetInit;
+        }
+
+        final var functionType = (_UFn) parsedUApiSchema.get(requestTarget);
+        final var resultUnionType = functionType.result;
+
+        final var callId = requestHeaders.get("_id");
         if (callId != null) {
             responseHeaders.put("_id", callId);
         }
 
         if (requestHeaders.containsKey("_parseFailures")) {
-            var parseFailures = (List<Object>) requestHeaders.get("_parseFailures");
-            Map<String, Object> newErrorResult = Map.of("_ErrorParseFailure",
+            final var parseFailures = (List<Object>) requestHeaders.get("_parseFailures");
+            final Map<String, Object> newErrorResult = Map.of("_ErrorParseFailure",
                     Map.of("reasons", parseFailures));
+
             validateResult(resultUnionType, newErrorResult);
 
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders, uApiSchema, functionType);
-
+        final List<ValidationFailure> headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders,
+                uApiSchema, functionType);
         if (!headerValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,
                     responseHeaders);
         }
 
         if (requestHeaders.containsKey("_bin")) {
-            List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
+            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
+
             responseHeaders.put("_binary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
+
             if (requestHeaders.containsKey("_pac")) {
                 responseHeaders.put("_pac", requestHeaders.get("_pac"));
             }
         }
 
         if (unknownTarget != null) {
-            Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
+            final Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
                     Map.of("cases",
                             List.of(Map.of("path", List.of(unknownTarget), "reason",
                                     Map.of("FunctionUnknown", Map.of())))));
+
             validateResult(resultUnionType, newErrorResult);
             return new Message(responseHeaders, newErrorResult);
         }
@@ -81,11 +90,11 @@ class _ServerHandlerUtil {
                     responseHeaders);
         }
 
-        unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
+        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
 
-        var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
+        final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 
-        Message resultMessage;
+        final Message resultMessage;
         if (requestTarget.equals("fn._ping")) {
             resultMessage = new Message("Ok", Map.of());
         } else if (requestTarget.equals("fn._api")) {
@@ -99,12 +108,13 @@ class _ServerHandlerUtil {
                 } catch (Throwable ignored) {
 
                 }
-                resultMessage = new Message("_ErrorUnknown", Map.of());
+                return new Message(responseHeaders, Map.of("_ErrorUnknown", Map.of()));
             }
         }
-        var skipResultValidation = unsafeResponseEnabled;
+
+        final var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
-            var resultValidationFailures = resultUnionType.validate(
+            final var resultValidationFailures = resultUnionType.validate(
                     resultMessage.body, List.of(), List.of());
             if (!resultValidationFailures.isEmpty()) {
                 return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType,
@@ -112,11 +122,12 @@ class _ServerHandlerUtil {
             }
         }
 
-        Map<String, Object> resultUnion = resultMessage.body;
-        resultMessage.header.putAll(responseHeaders);
-        responseHeaders = resultMessage.header;
+        final Map<String, Object> resultUnion = resultMessage.body;
 
-        Map<String, Object> finalResultUnion;
+        resultMessage.header.putAll(responseHeaders);
+        final Map<String, Object> finalResponseHeaders = resultMessage.header;
+
+        final Map<String, Object> finalResultUnion;
         if (requestHeaders.containsKey("_sel")) {
             Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders
                     .get("_sel");
@@ -128,32 +139,34 @@ class _ServerHandlerUtil {
             finalResultUnion = resultUnion;
         }
 
-        return new Message(responseHeaders, finalResultUnion);
+        return new Message(finalResponseHeaders, finalResultUnion);
     }
 
     private static Message getInvalidErrorMessage(String error, List<ValidationFailure> validationFailures,
             _UUnion resultUnionType, Map<String, Object> responseHeaders) {
-        var validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
-        Map<String, Object> newErrorResult = Map.of(error,
+        final var validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
+        final Map<String, Object> newErrorResult = Map.of(error,
                 Map.of("cases", validationFailureCases));
+
         validateResult(resultUnionType, newErrorResult);
         return new Message(responseHeaders, newErrorResult);
     }
 
     private static List<Map<String, Object>> mapValidationFailuresToInvalidFieldCases(
             List<ValidationFailure> argumentValidationFailures) {
-        var validationFailureCases = new ArrayList<Map<String, Object>>();
-        for (var validationFailure : argumentValidationFailures) {
-            Map<String, Object> validationFailureCase = Map.of(
+        final var validationFailureCases = new ArrayList<Map<String, Object>>();
+        for (final var validationFailure : argumentValidationFailures) {
+            final Map<String, Object> validationFailureCase = Map.of(
                     "path", validationFailure.path,
                     "reason", Map.of(validationFailure.reason, validationFailure.data));
             validationFailureCases.add(validationFailureCase);
         }
+
         return validationFailureCases;
     }
 
     private static void validateResult(_UUnion resultUnionType, Object errorResult) {
-        var newErrorResultValidationFailures = resultUnionType.validate(
+        final var newErrorResultValidationFailures = resultUnionType.validate(
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
             throw new UApiProcessError(
