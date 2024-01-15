@@ -9,16 +9,10 @@ import java.util.regex.Pattern;
 
 class _ParseSchemaCustomTypeUtil {
 
-    static _UStruct parseStructType(
-            List<Object> path,
-            Map<String, Object> structDefinitionAsPseudoJson,
-            String schemaKey,
-            int typeParameterCount,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
+    static _UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
+            String schemaKey, int typeParameterCount, List<Object> originalUApiSchema,
+            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
@@ -38,17 +32,10 @@ class _ParseSchemaCustomTypeUtil {
         return new _UStruct(schemaKey, fields, typeParameterCount);
     }
 
-    static _UUnion parseUnionType(
-            List<Object> path,
-            Map<String, Object> unionDefinitionAsPseudoJson,
-            String schemaKey,
-            boolean okCaseRequired,
-            int typeParameterCount,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
+    static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
+            boolean okCaseRequired, int typeParameterCount, List<Object> originalUApiSchema,
+            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
         Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
@@ -119,12 +106,9 @@ class _ParseSchemaCustomTypeUtil {
     }
 
     static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
-            int typeParameterCount,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
+            int typeParameterCount, List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex,
+            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, _UFieldDeclaration>();
 
@@ -167,16 +151,10 @@ class _ParseSchemaCustomTypeUtil {
         return fields;
     }
 
-    static _UFieldDeclaration parseField(
-            List<Object> path,
-            String fieldDeclaration,
-            Object typeDeclarationValue,
-            int typeParameterCount,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
+    static _UFieldDeclaration parseField(List<Object> path, String fieldDeclaration, Object typeDeclarationValue,
+            int typeParameterCount, List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex,
+            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
         final var regex = Pattern.compile(regexString);
 

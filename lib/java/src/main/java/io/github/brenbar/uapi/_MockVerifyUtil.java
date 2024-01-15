@@ -8,8 +8,7 @@ import java.util.TreeMap;
 
 class _MockVerifyUtil {
 
-    static Map<String, Object> verify(String functionName, Map<String, Object> argument,
-            boolean exactMatch,
+    static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,
             Map<String, Object> verificationTimes, List<Invocation> invocations) {
         var matchesFound = 0;
         for (final var invocation : invocations) {

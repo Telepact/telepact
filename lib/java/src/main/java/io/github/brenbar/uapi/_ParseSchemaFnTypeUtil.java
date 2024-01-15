@@ -7,14 +7,9 @@ import java.util.Set;
 
 class _ParseSchemaFnTypeUtil {
 
-    static _UFn parseFunctionType(
-            List<Object> path,
-            Map<String, Object> functionDefinitionAsParsedJson,
-            String schemaKey,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions,
+    static _UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
+            String schemaKey, List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex,
+            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var typeParameterCount = 0;
@@ -30,7 +25,7 @@ class _ParseSchemaFnTypeUtil {
         }
 
         final var resultSchemaKey = "->";
-        final var okCaseRequired = false;
+        final var okCaseRequired = true;
         final List<Object> resPath = _ValidateUtil.append(path, resultSchemaKey);
 
         _UUnion resultType = null;
@@ -58,9 +53,11 @@ class _ParseSchemaFnTypeUtil {
             try {
                 extendsRegex = _CastUtil.asString(extendsRegexInit);
             } catch (ClassCastException e) {
+                final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil.getTypeUnexpectedValidationFailure(
+                        regexPath, extendsRegexInit, "String");
+
                 parseFailures
-                        .addAll(_ParseSchemaUtil.getTypeUnexpectedValidationFailure(regexPath, extendsRegexInit,
-                                "String"));
+                        .addAll(thisParseFailures);
             }
         }
 

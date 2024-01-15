@@ -9,9 +9,7 @@ import java.util.regex.Pattern;
 class _ParseSchemaTypeUtil {
 
     static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
-            int thisTypeParameterCount,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
+            int thisTypeParameterCount, List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
@@ -19,11 +17,10 @@ class _ParseSchemaTypeUtil {
                     "EmptyArrayDisallowed", Map.of())));
         }
 
-        var basePath = _ValidateUtil.append(path, 0);
+        final List<Object> basePath = _ValidateUtil.append(path, 0);
+        final var baseType = typeDeclarationArray.get(0);
 
-        var baseType = typeDeclarationArray.get(0);
-
-        String rootTypeString;
+        final String rootTypeString;
         try {
             rootTypeString = _CastUtil.asString(baseType);
         } catch (ClassCastException e) {
@@ -31,41 +28,43 @@ class _ParseSchemaTypeUtil {
                     _ParseSchemaUtil.getTypeUnexpectedValidationFailure(basePath, baseType, "String"));
         }
 
-        var regexString = "^(.+?)(\\?)?$";
-        var regex = Pattern.compile(regexString);
-        var matcher = regex.matcher(rootTypeString);
+        final var regexString = "^(.+?)(\\?)?$";
+        final var regex = Pattern.compile(regexString);
+
+        final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
-        var typeName = matcher.group(1);
-        var nullable = matcher.group(2) != null;
+        final var typeName = matcher.group(1);
+        final var nullable = matcher.group(2) != null;
 
-        _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, originalUApiSchema,
-                schemaKeysToIndex, parsedTypes,
-                typeExtensions, allParseFailures, failedTypes);
+        final _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, originalUApiSchema,
+                schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
 
         if (type instanceof _UGeneric && nullable) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
         }
 
-        var givenTypeParameterCount = typeDeclarationArray.size() - 1;
+        final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
                     Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
         }
 
-        var parseFailures = new ArrayList<SchemaParseFailure>();
-        var typeParameters = new ArrayList<_UTypeDeclaration>();
-        var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var typeParameters = new ArrayList<_UTypeDeclaration>();
+        final var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
+
         var index = 0;
-        for (var e : givenTypeParameters) {
+        for (final var e : givenTypeParameters) {
             index += 1;
-            var loopPath = _ValidateUtil.append(path, index);
-            List<Object> l;
+            final List<Object> loopPath = _ValidateUtil.append(path, index);
+
+            final List<Object> l;
             try {
                 l = _CastUtil.asList(e);
             } catch (ClassCastException e1) {
@@ -73,7 +72,7 @@ class _ParseSchemaTypeUtil {
                 continue;
             }
 
-            _UTypeDeclaration typeParameterTypeDeclaration;
+            final _UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
                         originalUApiSchema,
@@ -92,20 +91,18 @@ class _ParseSchemaTypeUtil {
     }
 
     static _UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
         }
 
-        var existingType = parsedTypes.get(typeName);
+        final var existingType = parsedTypes.get(typeName);
         if (existingType != null) {
             return existingType;
         }
 
-        String genericRegex;
+        final String genericRegex;
         if (thisTypeParameterCount > 0) {
             genericRegex = "|(T.([%s]))"
                     .formatted(thisTypeParameterCount > 1 ? "0-%d".formatted(thisTypeParameterCount - 1) : "0");
@@ -113,16 +110,17 @@ class _ParseSchemaTypeUtil {
             genericRegex = "";
         }
 
-        var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
+        final var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
                 .formatted(genericRegex);
-        var regex = Pattern.compile(regexString);
-        var matcher = regex.matcher(typeName);
+        final var regex = Pattern.compile(regexString);
+
+        final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
-        var standardTypeName = matcher.group(1);
+        final var standardTypeName = matcher.group(1);
         if (standardTypeName != null) {
             return switch (standardTypeName) {
                 case "boolean" -> new _UBoolean();
@@ -136,45 +134,42 @@ class _ParseSchemaTypeUtil {
         }
 
         if (thisTypeParameterCount > 0) {
-            var genericParameterIndexString = matcher.group(9);
-            var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
+            final var genericParameterIndexString = matcher.group(9);
+            final var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
             return new _UGeneric(genericParameterIndex);
         }
 
-        var customTypeName = matcher.group(2);
-        var index = schemaKeysToIndex.get(customTypeName);
+        final var customTypeName = matcher.group(2);
+        final var index = schemaKeysToIndex.get(customTypeName);
         if (index == null) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName))));
         }
-        var definition = (Map<String, Object>) originalUApiSchema.get(index);
+        final var definition = (Map<String, Object>) originalUApiSchema.get(index);
 
-        var typeParameterCountString = matcher.group(6);
-        int typeParameterCount = 0;
+        final var typeParameterCountString = matcher.group(6);
+        final int typeParameterCount;
         if (typeParameterCountString != null) {
             typeParameterCount = Integer.parseInt(typeParameterCountString);
+        } else {
+            typeParameterCount = 0;
         }
 
         try {
-            _UType type;
+            final _UType type;
             if (customTypeName.startsWith("struct")) {
                 type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
-                        typeParameterCount,
-                        originalUApiSchema,
-                        schemaKeysToIndex, parsedTypes,
-                        typeExtensions, allParseFailures, failedTypes);
+                        typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions,
+                        allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
                 boolean okCaseRequired = false;
                 type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
-                        okCaseRequired, typeParameterCount,
-                        originalUApiSchema,
-                        schemaKeysToIndex, parsedTypes,
+                        okCaseRequired, typeParameterCount, originalUApiSchema, schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
                 type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,
-                        originalUApiSchema,
-                        schemaKeysToIndex, parsedTypes,
-                        typeExtensions, allParseFailures, failedTypes);
+                        originalUApiSchema, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        failedTypes);
             } else {
                 type = typeExtensions.get(customTypeName);
                 if (type == null) {

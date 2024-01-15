@@ -58,36 +58,33 @@ class _ParseSchemaTraitUtil {
         }
     }
 
-    public static UTrait parseTraitType(
-            Map<String, Object> traitDefinitionAsParsedJson,
-            String schemaKey,
-            List<Object> originalUApiSchema,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
-        var index = schemaKeysToIndex.get(schemaKey);
-        List<Object> thisPath = List.of(index, schemaKey);
+    public static UTrait parseTraitType(Map<String, Object> traitDefinitionAsParsedJson, String schemaKey,
+            List<Object> originalUApiSchema, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var defInit = traitDefinitionAsParsedJson.get(schemaKey);
+        final var index = schemaKeysToIndex.get(schemaKey);
+        final List<Object> thisPath = List.of(index, schemaKey);
 
-        var mapInit = traitDefinitionAsParsedJson.get(schemaKey);
-
-        Map<String, Object> def;
+        final Map<String, Object> def;
         try {
-            def = _CastUtil.asMap(mapInit);
+            def = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, mapInit, "Object"));
+            final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                    .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
+            throw new UApiSchemaParseError(thisParseFailures);
         }
 
-        var errorPath = _ValidateUtil.append(thisPath, "->");
+        final var resultSchemaKey = "->";
+        final var okCaseRequired = false;
+        final List<Object> errorPath = _ValidateUtil.append(thisPath, resultSchemaKey);
 
-        if (!def.containsKey("->")) {
+        if (!def.containsKey(resultSchemaKey)) {
             throw new UApiSchemaParseError(
                     List.of(new SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of())));
         }
 
-        var trait = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, "->",
-                false, 0, originalUApiSchema,
+        final _UUnion trait = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, resultSchemaKey,
+                okCaseRequired, 0, originalUApiSchema,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions,
                 allParseFailures, failedTypes);
