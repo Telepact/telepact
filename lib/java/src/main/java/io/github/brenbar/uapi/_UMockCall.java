@@ -15,37 +15,37 @@ class _UMockCall implements _UType {
     @Override
     public List<ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        var validationFailures = new ArrayList<ValidationFailure>();
-
-        Map<String, Object> givenMap;
+        final Map<String, Object> givenMap;
         try {
             givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }
 
-        var regexString = "^fn\\..*$";
-        var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        final var regexString = "^fn\\..*$";
+
+        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(new ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
                     Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
         }
-        var functionName = matches.get(0);
-        var functionDef = (_UFn) this.types.get(functionName);
 
-        var input = givenMap.get(functionName);
+        final var functionName = matches.get(0);
+        final var functionDef = (_UFn) this.types.get(functionName);
 
-        var inputFailures = functionDef.call.cases.get(functionDef.name).validate(input, List.of(), List.of());
-        var inputFailuresWithPath = inputFailures.stream()
-                .map(f -> new ValidationFailure(_ValidateUtil.prepend(functionName, f.path), f.reason,
-                        f.data))
-                .toList();
-        var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
+        final var input = givenMap.get(functionName);
+
+        final var inputFailures = functionDef.call.cases.get(functionDef.name).validate(input, List.of(), List.of());
+
+        final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
+        for (var f : inputFailures) {
+            List<Object> newPath = _ValidateUtil.prepend(functionName, f.path);
+            inputFailuresWithPath.add(new ValidationFailure(newPath, f.reason,
+                    f.data));
+        }
+
+        return inputFailuresWithPath.stream()
                 .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
-
-        validationFailures.addAll(inputFailuresWithoutMissingRequired);
-
-        return validationFailures;
     }
 
     @Override

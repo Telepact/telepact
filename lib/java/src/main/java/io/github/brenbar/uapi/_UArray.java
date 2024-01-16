@@ -15,6 +15,7 @@ class _UArray implements _UType {
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
+
             final var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
