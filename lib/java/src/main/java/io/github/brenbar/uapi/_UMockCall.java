@@ -32,16 +32,19 @@ class _UMockCall implements _UType {
 
         final var functionName = matches.get(0);
         final var functionDef = (_UFn) this.types.get(functionName);
-
         final var input = givenMap.get(functionName);
 
-        final var inputFailures = functionDef.call.cases.get(functionDef.name).validate(input, List.of(), List.of());
+        final _UUnion functionDefCall = functionDef.call;
+        final String functionDefName = functionDef.name;
+        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
+
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (var f : inputFailures) {
             List<Object> newPath = _ValidateUtil.prepend(functionName, f.path);
-            inputFailuresWithPath.add(new ValidationFailure(newPath, f.reason,
-                    f.data));
+
+            inputFailuresWithPath.add(new ValidationFailure(newPath, f.reason, f.data));
         }
 
         return inputFailuresWithPath.stream()

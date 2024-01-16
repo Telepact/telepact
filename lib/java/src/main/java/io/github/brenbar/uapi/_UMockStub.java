@@ -3,6 +3,7 @@ package io.github.brenbar.uapi;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 class _UMockStub implements _UType {
 
@@ -15,17 +16,18 @@ class _UMockStub implements _UType {
     @Override
     public List<ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        var validationFailures = new ArrayList<ValidationFailure>();
+        final var validationFailures = new ArrayList<ValidationFailure>();
 
-        Map<String, Object> givenMap;
+        final Map<String, Object> givenMap;
         try {
             givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
 
-        var regexString = "^fn\\..*$";
-        var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        final var regexString = "^fn\\..*$";
+
+        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(
                     new ValidationFailure(List.of(),
@@ -35,42 +37,48 @@ class _UMockStub implements _UType {
 
         }
 
-        var functionName = matches.get(0);
-        var functionDef = (_UFn) this.types.get(functionName);
+        final var functionName = matches.get(0);
+        final var functionDef = (_UFn) this.types.get(functionName);
+        final var input = givenMap.get(functionName);
 
-        var input = givenMap.get(functionName);
+        final _UUnion functionDefCall = functionDef.call;
+        final String functionDefName = functionDef.name;
+        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
 
-        var inputFailures = functionDef.call.cases.get(functionDef.name).validate(input, List.of(),
-                List.of());
-        var inputFailuresWithPath = inputFailures.stream()
-                .map(f -> new ValidationFailure(
-                        _ValidateUtil.prepend(functionName, f.path),
-                        f.reason,
-                        f.data))
-                .toList();
+        final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
+        for (final var f : inputFailures) {
+            final List<Object> thisPath = _ValidateUtil.prepend(functionName, f.path);
 
-        var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
-                .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
+            inputFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+        }
+
+        final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
+                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing")).toList();
 
         validationFailures.addAll(inputFailuresWithoutMissingRequired);
 
-        if (!givenMap.containsKey("->")) {
-            return List.of(new ValidationFailure(List.of("->"),
+        final var resultDefKey = "->";
+
+        if (!givenMap.containsKey(resultDefKey)) {
+            return List.of(new ValidationFailure(List.of(resultDefKey),
                     "RequiredObjectKeyMissing",
                     Map.of()));
         }
 
-        var output = givenMap.get("->");
+        final var output = givenMap.get(resultDefKey);
+        final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
 
-        var outputFailures = functionDef.result.validate(output, List.of(), List.of());
-        var outputFailuresWithPath = outputFailures.stream()
-                .map(f -> new ValidationFailure(
-                        _ValidateUtil.prepend("->", f.path), f.reason,
-                        f.data))
-                .toList();
-        var failuresWithoutMissingRequired = outputFailuresWithPath
+        final var outputFailuresWithPath = new ArrayList<ValidationFailure>();
+        for (final var f : outputFailures) {
+            final List<Object> thisPath = _ValidateUtil.prepend(resultDefKey, f.path);
+
+            outputFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+        }
+
+        final var failuresWithoutMissingRequired = outputFailuresWithPath
                 .stream()
-                .filter(f -> !f.reason.equals("RequiredStructFieldMissing"))
+                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing"))
                 .toList();
 
         validationFailures.addAll(failuresWithoutMissingRequired);
