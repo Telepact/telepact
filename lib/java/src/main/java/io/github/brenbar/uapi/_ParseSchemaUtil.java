@@ -227,7 +227,7 @@ class _ParseSchemaUtil {
         final var actualType = _ValidateUtil.getType(value);
         final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
-        return Collections.singletonList(
+        return List.of(
                 new SchemaParseFailure(path, "TypeUnexpected", data));
     }
 

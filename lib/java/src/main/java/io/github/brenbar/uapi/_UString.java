@@ -13,7 +13,7 @@ class _UString implements _UType {
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof String) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));

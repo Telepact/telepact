@@ -3,7 +3,6 @@ package io.github.brenbar.uapi;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +16,9 @@ class _UInteger implements _UType {
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof Long || value instanceof Integer) {
-            return Collections.emptyList();
+            return List.of();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
-            return Collections.singletonList(
+            return List.of(
                     new ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,

@@ -169,7 +169,7 @@ class _ValidateUtil {
         var actualType = _ValidateUtil.getType(value);
         Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
-        return Collections.singletonList(
+        return List.of(
                 new ValidationFailure(path, "TypeUnexpected", data));
     }
 

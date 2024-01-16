@@ -38,7 +38,7 @@ class _UUnion implements _UType {
             Map<String, _UStruct> referenceCases,
             Map<?, ?> actual, List<_UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
-            return Collections.singletonList(
+            return List.of(
                     new ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }

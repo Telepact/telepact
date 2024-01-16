@@ -17,10 +17,10 @@ class _UNumber implements _UType {
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
-            return Collections.singletonList(
+            return List.of(
                     new ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
         } else if (value instanceof Number) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));

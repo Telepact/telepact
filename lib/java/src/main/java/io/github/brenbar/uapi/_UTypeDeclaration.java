@@ -25,7 +25,7 @@ class _UTypeDeclaration {
                 return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                         this.type.getName(generics));
             } else {
-                return Collections.emptyList();
+                return List.of();
             }
         } else {
             return this.type.validate(value, this.typeParameters, generics);
