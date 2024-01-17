@@ -137,7 +137,7 @@ public class TestUtility {
         var uApi = UApiSchema.fromJson(json);
         var options = new io.github.brenbar.uapi.MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
-        options.enableGeneratedDefaultStub = false;
+        options.enableMessageResponseGeneration = false;
         var server = new MockServer(uApi, options);
         return server;
     }

@@ -30,7 +30,7 @@ public class LoadTest {
 
         var options = new Options();
         options.onError = (e) -> e.printStackTrace();
-        options.enableGeneratedDefaultStub = true;
+        options.enableMessageResponseGeneration = true;
         var server = new MockServer(uApiSchema, options);
 
         var natsUrl = "nats://127.0.0.1:4222";

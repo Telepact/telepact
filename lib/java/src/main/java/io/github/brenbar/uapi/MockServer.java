@@ -3,6 +3,7 @@ package io.github.brenbar.uapi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -10,16 +11,36 @@ import java.util.function.Consumer;
  */
 public class MockServer {
 
+    /**
+     * Options for the MockServer.
+     */
     public static class Options {
+
+        /**
+         * Handler for errors thrown during message processing.
+         */
         public Consumer<Throwable> onError = (e) -> {
         };
-        public boolean enableGeneratedDefaultStub = true;
+
+        /**
+         * Flag to indicate if message responses should be randomly generated when no
+         * stub is available.
+         */
+        public boolean enableMessageResponseGeneration = true;
+
+        /**
+         * Minimum length for randomly generated arrays and objects.
+         */
         public int generatedCollectionLengthMin = 0;
+
+        /**
+         * Maximum length for randomly generated arrays and objects.
+         */
         public int generatedCollectionLengthMax = 3;
     }
 
     private final Server server;
-    private final RandomGenerator random;
+    private final _RandomGenerator random;
     private final boolean enableGeneratedDefaultStub;
 
     private final List<_MockStub> stubs = new ArrayList<>();
@@ -31,33 +52,25 @@ public class MockServer {
      * @param uApiSchemaAsJson
      */
     public MockServer(UApiSchema uApiSchema, Options options) {
-        var parsedTypes = new HashMap<String, _UType>();
+        this.random = new _RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
+        this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
 
-        var typeExtensions = new HashMap<String, _UType>();
+        final var parsedTypes = new HashMap<String, _UType>();
+        final var typeExtensions = new HashMap<String, _UType>();
+
         typeExtensions.put("_ext._Call", new _UMockCall(parsedTypes));
         typeExtensions.put("_ext._Stub", new _UMockStub(parsedTypes));
 
-        var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
+        final var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
                 typeExtensions);
 
         this.server = new Server(combinedUApiSchema, this::handle,
                 new Server.Options().setOnError(options.onError));
 
-        parsedTypes.putAll(server.uApiSchema.parsed);
+        final UApiSchema finalUApiSchema = server.uApiSchema;
+        final Map<String, _UType> finalParsedUApiSchema = finalUApiSchema.parsed;
 
-        this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
-        this.enableGeneratedDefaultStub = options.enableGeneratedDefaultStub;
-    }
-
-    /**
-     * Set an alternative RNG seed to be used for stub data generation.
-     * 
-     * @param seed
-     * @return
-     */
-    public MockServer resetRandomSeed(int seed) {
-        this.random.setSeed(seed);
-        return this;
+        parsedTypes.putAll(finalParsedUApiSchema);
     }
 
     /**

@@ -82,7 +82,7 @@ class _UUnion implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            RandomGenerator random) {
+            _RandomGenerator random) {
         if (useStartingValue) {
             final var startingUnionCase = (Map<String, Object>) startingValue;
             return constructRandomUnion(this.cases, startingUnionCase, includeRandomOptionalFields,
@@ -97,7 +97,7 @@ class _UUnion implements _UType {
             Map<String, Object> startingUnion,
             boolean includeRandomOptionalFields,
             List<_UTypeDeclaration> typeParameters,
-            RandomGenerator random) {
+            _RandomGenerator random) {
         if (!startingUnion.isEmpty()) {
             final var unionEntry = _UUnion.entry(startingUnion);
             final var unionCase = unionEntry.getKey();

@@ -32,7 +32,7 @@ class _UFn implements _UType {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, RandomGenerator random) {
+            List<_UTypeDeclaration> generics, _RandomGenerator random) {
         final Map<String, _UStruct> callCases = this.call.cases;
         if (useStartingValue) {
             final var startingFnValue = (Map<String, Object>) startingValue;

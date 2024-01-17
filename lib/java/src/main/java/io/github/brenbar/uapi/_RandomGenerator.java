@@ -3,12 +3,12 @@ package io.github.brenbar.uapi;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
-public class RandomGenerator {
+class _RandomGenerator {
     private int seed = 0;
     private int collectionLengthMin;
     private int collectionLengthMax;
 
-    public RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
+    public _RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
         this.collectionLengthMin = collectionLengthMin;
         this.collectionLengthMax = collectionLengthMax;
     }

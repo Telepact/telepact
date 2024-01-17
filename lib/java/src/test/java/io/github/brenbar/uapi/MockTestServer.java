@@ -21,12 +21,12 @@ public class MockTestServer {
 
         var options = new MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
-        options.enableGeneratedDefaultStub = false;
+        options.enableMessageResponseGeneration = false;
 
         if (config != null) {
             options.generatedCollectionLengthMin = (Integer) config.get("minLength");
             options.generatedCollectionLengthMax = (Integer) config.get("maxLength");
-            options.enableGeneratedDefaultStub = (Boolean) config.get("enableGen");
+            options.enableMessageResponseGeneration = (Boolean) config.get("enableGen");
         }
 
         var timers = metrics.timer(frontdoorTopic);

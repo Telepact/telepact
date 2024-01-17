@@ -89,7 +89,7 @@ class _UStruct implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            RandomGenerator random) {
+            _RandomGenerator random) {
         if (useStartingValue) {
             final var startingStructValue = (Map<String, Object>) startingValue;
             return constructRandomStruct(this.fields, startingStructValue, includeRandomOptionalFields,
@@ -103,7 +103,7 @@ class _UStruct implements _UType {
     public static Map<String, Object> constructRandomStruct(
             Map<String, _UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            RandomGenerator random) {
+            _RandomGenerator random) {
 
         final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));

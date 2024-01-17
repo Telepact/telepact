@@ -9,7 +9,7 @@ import java.util.TreeMap;
 class _MockServerUtil {
 
     static Message handle(Message requestMessage, List<_MockStub> stubs, List<Invocation> invocations,
-            RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub) {
+            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub) {
         final Map<String, Object> header = requestMessage.header;
 
         final var enableGenerationStub = (Boolean) header.getOrDefault("_mockEnableGeneratedStub", false);

@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
 public class Client {
 
     /**
-     * Options for the client.
+     * Options for the Client.
      */
     public static class Options {
 

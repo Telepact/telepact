@@ -60,7 +60,7 @@ class _UMockCall implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            RandomGenerator random) {
+            _RandomGenerator random) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }

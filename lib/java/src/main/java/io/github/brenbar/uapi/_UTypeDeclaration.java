@@ -39,7 +39,7 @@ class _UTypeDeclaration {
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
-            RandomGenerator random) {
+            _RandomGenerator random) {
         if (this.nullable && !useStartingValue && random.nextBoolean()) {
             return null;
         } else {

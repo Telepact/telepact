@@ -23,7 +23,7 @@ class _UString implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            RandomGenerator random) {
+            _RandomGenerator random) {
         if (useStartingValue) {
             return startingValue;
         } else {

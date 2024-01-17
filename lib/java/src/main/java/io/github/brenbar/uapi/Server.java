@@ -38,12 +38,12 @@ public class Server {
         }
     }
 
-    UApiSchema uApiSchema;
-    Function<Message, Message> handler;
-    Consumer<Throwable> onError;
-    Consumer<Message> onRequest;
-    Consumer<Message> onResponse;
-    Serializer serializer;
+    final UApiSchema uApiSchema;
+    private final Function<Message, Message> handler;
+    private final Consumer<Throwable> onError;
+    private final Consumer<Message> onRequest;
+    private final Consumer<Message> onResponse;
+    private final Serializer serializer;
 
     /**
      * Create a server with the given uAPI schema and handler.
@@ -52,18 +52,14 @@ public class Server {
      * @param handler
      */
     public Server(UApiSchema uApiSchema, Function<Message, Message> handler, Options options) {
-        this.uApiSchema = uApiSchema;
-
         this.uApiSchema = UApiSchema.extend(uApiSchema, _InternalUApiUtil.getJson());
-
         this.handler = handler;
-
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.uApiSchema);
-        var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
+        final var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.uApiSchema);
+        final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }
 
