@@ -127,14 +127,14 @@ class _ParseSchemaUtil {
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        final var traitKeys = new HashSet<String>();
+        final var errorKeys = new HashSet<String>();
         final var rootTypeParameterCount = 0;
 
         for (final var schemaKey : schemaKeys) {
             if (schemaKey.startsWith("info.")) {
                 continue;
-            } else if (schemaKey.startsWith("trait.")) {
-                traitKeys.add(schemaKey);
+            } else if (schemaKey.startsWith("error.")) {
+                errorKeys.add(schemaKey);
                 continue;
             }
 
@@ -154,14 +154,14 @@ class _ParseSchemaUtil {
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        for (final var traitKey : traitKeys) {
-            final var thisIndex = schemaKeysToIndex.get(traitKey);
+        for (final var errorKey : errorKeys) {
+            final var thisIndex = schemaKeysToIndex.get(errorKey);
             final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
 
             try {
-                final var trait = _ParseSchemaTraitUtil.parseTraitType(def, traitKey, uApiSchemaPseudoJson,
+                final var error = _ParseSchemaErrorUtil.parseErrorType(def, errorKey, uApiSchemaPseudoJson,
                         schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-                _ParseSchemaTraitUtil.applyTraitToParsedTypes(trait, parsedTypes, schemaKeysToIndex);
+                _ParseSchemaErrorUtil.applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -203,7 +203,7 @@ class _ParseSchemaUtil {
     }
 
     private static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^((fn|trait|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
+        final var regex = "^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
         final var matches = new ArrayList<String>();
 
         for (final var e : definition.keySet()) {

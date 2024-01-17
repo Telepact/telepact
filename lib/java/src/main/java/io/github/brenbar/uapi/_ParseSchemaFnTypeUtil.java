@@ -41,20 +41,20 @@ class _ParseSchemaFnTypeUtil {
             }
         }
 
-        final var extendsRegexKey = "extends";
-        final var regexPath = _ValidateUtil.append(path, extendsRegexKey);
+        final var errorsRegexKey = "errors";
+        final var regexPath = _ValidateUtil.append(path, errorsRegexKey);
 
-        String extendsRegex = null;
-        if (functionDefinitionAsParsedJson.containsKey(extendsRegexKey) && !schemaKey.startsWith("fn._")) {
+        String errorsRegex = null;
+        if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
             parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
-            final Object extendsRegexInit = functionDefinitionAsParsedJson.getOrDefault(extendsRegexKey,
-                    "^trait\\..*$");
+            final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
+                    "^error\\..*$");
             try {
-                extendsRegex = _CastUtil.asString(extendsRegexInit);
+                errorsRegex = _CastUtil.asString(errorsRegexInit);
             } catch (ClassCastException e) {
                 final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil.getTypeUnexpectedValidationFailure(
-                        regexPath, extendsRegexInit, "String");
+                        regexPath, errorsRegexInit, "String");
 
                 parseFailures
                         .addAll(thisParseFailures);
@@ -65,6 +65,6 @@ class _ParseSchemaFnTypeUtil {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        return new _UFn(schemaKey, callType, resultType, extendsRegex);
+        return new _UFn(schemaKey, callType, resultType, errorsRegex);
     }
 }

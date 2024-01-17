@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class UTrait {
+class UError {
     public final String name;
     public final _UUnion errors;
 
-    public UTrait(String name, _UUnion errors) {
+    public UError(String name, _UUnion errors) {
         this.name = name;
         this.errors = errors;
     }

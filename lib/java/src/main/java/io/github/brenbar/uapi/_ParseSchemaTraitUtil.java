@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-class _ParseSchemaTraitUtil {
+class _ParseSchemaErrorUtil {
 
-    static void applyTraitToParsedTypes(UTrait trait, Map<String, _UType> parsedTypes,
+    static void applyErrorToParsedTypes(UError error, Map<String, _UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
-        String traitName = trait.name;
-        var traitIndex = schemaKeysToIndex.get(traitName);
+        String errorName = error.name;
+        var errorIndex = schemaKeysToIndex.get(errorName);
 
         var parseFailures = new ArrayList<SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
@@ -24,32 +24,32 @@ class _ParseSchemaTraitUtil {
 
             String fnName = f.name;
 
-            var regex = Pattern.compile(f.extendsRegex);
-            var matcher = regex.matcher(traitName);
+            var regex = Pattern.compile(f.errorsRegex);
+            var matcher = regex.matcher(errorName);
             if (!matcher.find()) {
                 continue;
             }
 
             _UUnion fnResult = f.result;
             Map<String, _UStruct> fnResultCases = fnResult.cases;
-            _UUnion traitFnResult = trait.errors;
-            Map<String, _UStruct> traitFnResultCases = traitFnResult.cases;
+            _UUnion errorFnResult = error.errors;
+            Map<String, _UStruct> errorFnResultCases = errorFnResult.cases;
 
             if (fnName.startsWith("fn._")) {
-                // Only internal traits can change internal functions
-                if (!traitName.startsWith("trait._")) {
+                // Only internal errors can change internal functions
+                if (!errorName.startsWith("error._")) {
                     continue;
                 }
             }
 
-            for (var traitResultField : traitFnResultCases.entrySet()) {
-                var newKey = traitResultField.getKey();
+            for (var errorResultField : errorFnResultCases.entrySet()) {
+                var newKey = errorResultField.getKey();
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
-                    parseFailures.add(new SchemaParseFailure(List.of(traitIndex, traitName, "->", newKey),
+                    parseFailures.add(new SchemaParseFailure(List.of(errorIndex, errorName, "->", newKey),
                             "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey))));
                 }
-                fnResultCases.put(newKey, traitResultField.getValue());
+                fnResultCases.put(newKey, errorResultField.getValue());
             }
         }
 
@@ -58,10 +58,10 @@ class _ParseSchemaTraitUtil {
         }
     }
 
-    public static UTrait parseTraitType(Map<String, Object> traitDefinitionAsParsedJson, String schemaKey,
+    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String schemaKey,
             List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var defInit = traitDefinitionAsParsedJson.get(schemaKey);
+        final var defInit = errorDefinitionAsParsedJson.get(schemaKey);
         final var index = schemaKeysToIndex.get(schemaKey);
         final List<Object> thisPath = List.of(index, schemaKey);
 
@@ -83,12 +83,12 @@ class _ParseSchemaTraitUtil {
                     List.of(new SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of())));
         }
 
-        final _UUnion trait = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, resultSchemaKey,
+        final _UUnion error = _ParseSchemaCustomTypeUtil.parseUnionType(thisPath, def, resultSchemaKey,
                 okCaseRequired, 0, uApiSchemaPseudoJson,
                 schemaKeysToIndex, parsedTypes,
                 typeExtensions,
                 allParseFailures, failedTypes);
 
-        return new UTrait(schemaKey, trait);
+        return new UError(schemaKey, error);
     }
 }

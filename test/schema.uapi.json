@@ -22,8 +22,8 @@
         "expected": ["union.Type"],
         "actual": ["union.Type"]
       },
-      "InvalidTrait": {},
-      "TraitDefinitionCannotTargetInternalFunctions": {},
+      "InvalidError": {},
+      "ErrorDefinitionCannotTargetInternalFunctions": {},
       "EmptyArrayDisallowed": {},
       "StringRegexMatchFailed": {
         "regex": ["string"]

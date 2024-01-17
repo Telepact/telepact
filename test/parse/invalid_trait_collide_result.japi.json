@@ -8,7 +8,7 @@
     }
   },
   {
-    "trait.Collide": {
+    "error.Collide": {
       "fn.*": {},
       "->": {
         "Ok": {

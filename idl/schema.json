@@ -200,7 +200,7 @@
               { "type": "array", "items": { "type": "string" } }
             ]
           },
-          "extends": {
+          "errors": {
             "type": "string"
           }
         }
@@ -210,7 +210,7 @@
         "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
-          "^trait\\.[a-zA-Z_]\\w*": {
+          "^error\\.[a-zA-Z_]\\w*": {
             "type": "object",
             "maxProperties": 1,
             "required": ["->"],

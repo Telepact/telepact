@@ -5,7 +5,7 @@
     "->": {
       "Ok": {}
     },
-    "extends": "^trait\\._Validated$"
+    "errors": "^error\\._Validated$"
   },
 
   {
@@ -16,7 +16,7 @@
         "api": ["array", ["object", ["any"]]]
       }
     },
-    "extends": "^trait\\._Validated$"
+    "errors": "^error\\._Validated$"
   },
 
   {
@@ -25,7 +25,7 @@
     "->": {
       "Ok": {}
     },
-    "extends": "^trait\\._Validated$"
+    "errors": "^error\\._Validated$"
   },
 
   {
@@ -118,7 +118,7 @@
       "     outlined by a list of `cases.                                                                        ",
       " - `_ErrorParseFailure`: The Request could not be parsed as a uAPI Message.                               "
     ],
-    "trait._Validated": {
+    "error._Validated": {
       "->": {
         "_ErrorUnknown": {},
         "_ErrorInvalidRequestHeaders": {

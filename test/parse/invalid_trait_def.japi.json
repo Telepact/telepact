@@ -1,5 +1,5 @@
 [
   {
-    "trait.Example": ["wrong"]
+    "error.Example": ["wrong"]
   }
 ]
