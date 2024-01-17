@@ -64,8 +64,10 @@ public class MockServer {
         final var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
                 typeExtensions);
 
-        this.server = new Server(combinedUApiSchema, this::handle,
-                new Server.Options().setOnError(options.onError));
+        final var serverOptions = new Server.Options();
+        serverOptions.onError = options.onError;
+
+        this.server = new Server(combinedUApiSchema, this::handle, serverOptions);
 
         final UApiSchema finalUApiSchema = server.uApiSchema;
         final Map<String, _UType> finalParsedUApiSchema = finalUApiSchema.parsed;

@@ -74,20 +74,28 @@ public class TestServer {
             }
         };
 
-        var server = new Server(uApi, handler, new Options().setOnError((e) -> {
+        var options = new Options();
+        options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
-        }).setOnRequest(m -> {
+        };
+        options.onRequest = m -> {
             if ((Boolean) m.header.getOrDefault("_onRequestError", false)) {
                 throw new RuntimeException();
             }
-        }).setOnResponse(m -> {
+        };
+        options.onResponse = m -> {
             if ((Boolean) m.header.getOrDefault("_onResponseError", false)) {
                 throw new RuntimeException();
             }
-        }));
-        var alternateServer = new Server(alternateUApi, handler,
-                new Options().setOnError((e) -> e.printStackTrace()));
+        };
+
+        var server = new Server(uApi, handler, options);
+
+        var alternateOptions = new Options();
+        alternateOptions.onError = (e) -> e.printStackTrace();
+
+        var alternateServer = new Server(alternateUApi, handler, alternateOptions);
 
         var dispatcher = connection.createDispatcher((msg) -> {
 

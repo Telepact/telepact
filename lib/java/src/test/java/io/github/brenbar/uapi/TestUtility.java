@@ -51,7 +51,9 @@ public class TestUtility {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test/example.uapi.json"));
         var uApi = UApiSchema.fromJson(json);
-        var server = new Server(uApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
+        var options = new Options();
+        options.onError = (e) -> e.printStackTrace();
+        var server = new Server(uApi, TestUtility::handle, options);
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
@@ -72,7 +74,9 @@ public class TestUtility {
         var objectMapper = new ObjectMapper();
         var json = Files.readString(FileSystems.getDefault().getPath("../../test", "example.uapi.json"));
         var uApi = UApiSchema.fromJson(json);
-        var server = new Server(uApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
+        var options = new Options();
+        options.onError = (e) -> e.printStackTrace();
+        var server = new Server(uApi, TestUtility::handle, options);
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {
                 });
@@ -89,10 +93,10 @@ public class TestUtility {
                     return response;
                 });
             };
-            var options = new Client.Options();
-            options.useBinary = true;
-            options.timeoutMsDefault = 600000;
-            var client = new Client(adapter, options);
+            var clientOptions = new Client.Options();
+            clientOptions.useBinary = true;
+            clientOptions.timeoutMsDefault = 600000;
+            var client = new Client(adapter, clientOptions);
             client.request(new Message("fn._ping", Map.of())); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
@@ -113,7 +117,9 @@ public class TestUtility {
     public static void testBinaryExact(byte[] requestBytes, byte[] expectedResponseBytes) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../test/binary", "binary.uapi.json"));
         var uApi = UApiSchema.fromJson(json);
-        var server = new Server(uApi, TestUtility::handle, new Options().setOnError((e) -> e.printStackTrace()));
+        var options = new Options();
+        options.onError = (e) -> e.printStackTrace();
+        var server = new Server(uApi, TestUtility::handle, options);
 
         // test json
         {

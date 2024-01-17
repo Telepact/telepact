@@ -56,10 +56,12 @@ public class SchemaTestServer {
             }
         };
 
-        var server = new Server(uApi, handler, new Options().setOnError((e) -> {
+        var options = new Options();
+        options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
-        }));
+        };
+        var server = new Server(uApi, handler, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
             var requestBytes = msg.getData();

@@ -16,26 +16,6 @@ public class Server {
         public Consumer<Message> onResponse = (m) -> {
         };
         public SerializationImpl serializer = new _DefaultSerializer();
-
-        public Options setOnError(Consumer<Throwable> onError) {
-            this.onError = onError;
-            return this;
-        }
-
-        public Options setOnRequest(Consumer<Message> onRequest) {
-            this.onRequest = onRequest;
-            return this;
-        }
-
-        public Options setOnResponse(Consumer<Message> onResponse) {
-            this.onResponse = onResponse;
-            return this;
-        }
-
-        public Options setSerializer(SerializationImpl serializer) {
-            this.serializer = serializer;
-            return this;
-        }
     }
 
     final UApiSchema uApiSchema;
