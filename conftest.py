@@ -9,8 +9,6 @@ from test.mock_cases import invalid_cases as mock_invalid_cases
 from test.parse_cases import cases as parse_cases
 from copy import deepcopy as dc
 from test.util import increment, get_lib_modules, ping, startup_check
-import functools
-import operator
 import json
 import importlib
 import nats

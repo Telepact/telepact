@@ -31,11 +31,6 @@ public class TestDispatch {
         var natsOptionsBuilder = new Options.Builder();
         natsOptionsBuilder.server(natsUrl);
 
-        var natsCredFile = System.getenv("NATS_CRED_FILE");
-        if (natsCredFile != null) {
-            natsOptionsBuilder.authHandler(Nats.credentials(natsCredFile));
-        }
-
         var objectMapper = new ObjectMapper();
 
         var lock = new ReentrantLock();
