@@ -22,7 +22,6 @@
         "expected": ["union.Type"],
         "actual": ["union.Type"]
       },
-      "InvalidError": {},
       "ErrorDefinitionCannotTargetInternalFunctions": {},
       "EmptyArrayDisallowed": {},
       "StringRegexMatchFailed": {
