@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.function.BiFunction;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.MetricRegistry;
 
-import io.github.brenbar.uapi.Client.Adapter;
 import io.github.brenbar.uapi.MockServer.Options;
 import io.nats.client.Nats;
 
@@ -49,7 +50,7 @@ public class LoadTest {
             });
             dispatcher.subscribe("example-api");
 
-            Adapter adapter = (m, s) -> {
+            BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
                 return CompletableFuture.supplyAsync(() -> {
                     var requestBytes = s.serialize(m);
 
@@ -74,21 +75,21 @@ public class LoadTest {
             };
 
             var clientOptions = new Client.Options();
-            clientOptions.useBinaryDefault = false;
+            clientOptions.useBinary = false;
             clientOptions.timeoutMsDefault = 600000;
 
             var client = new Client(adapter, clientOptions);
 
             // warmup
             var requestMessage = new Message("fn.getPaperTape", Map.of());
-            client.send(requestMessage);
+            client.request(requestMessage);
 
             var jsonTimers = metrics.timer("roundtrip-json");
 
             for (int i = 0; i < 25; i += 1) {
                 try (var time = jsonTimers.time()) {
                     var requestMessage2 = new Message("fn.getPaperTape", Map.of());
-                    client.send(requestMessage2);
+                    client.request(requestMessage2);
                 }
             }
 
@@ -97,7 +98,7 @@ public class LoadTest {
             for (int i = 0; i < 25; i += 1) {
                 try (var time = binaryTimers.time()) {
                     var requestMessage3 = new Message(Map.of("_binary", true), Map.of("fn.getPaperTape", Map.of()));
-                    client.send(requestMessage3);
+                    client.request(requestMessage3);
                 }
             }
 

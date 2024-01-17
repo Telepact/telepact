@@ -7,9 +7,6 @@ import java.util.function.Consumer;
 
 /**
  * A Mock instance of a uAPI server.
- * 
- * Clients can use this class as an alternative transport in their adapters to
- * interact with a functional uAPI with common mocking strategies.
  */
 public class MockServer {
 

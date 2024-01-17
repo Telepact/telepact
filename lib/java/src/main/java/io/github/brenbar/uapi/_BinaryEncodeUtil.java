@@ -52,13 +52,13 @@ class _BinaryEncodeUtil {
     }
 
     static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
-            BinaryChecksumStrategy binaryChecksumStrategy)
+            ClientBinaryStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
 
-        headers.put("_bin", binaryChecksumStrategy.getCurrent());
+        headers.put("_bin", binaryChecksumStrategy.getCurrentChecksums());
 
         if (Objects.equals(forceSendJson, true)) {
             throw new BinaryEncoderUnavailableError();
@@ -90,7 +90,7 @@ class _BinaryEncodeUtil {
     }
 
     static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
-            BinaryChecksumStrategy binaryChecksumStrategy)
+            ClientBinaryStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
@@ -106,7 +106,7 @@ class _BinaryEncodeUtil {
         }
 
         binaryChecksumStrategy.update(binaryChecksum);
-        final var newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrent();
+        final var newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
         recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
         final var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);

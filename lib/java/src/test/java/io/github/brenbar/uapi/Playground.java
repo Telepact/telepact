@@ -5,9 +5,9 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import io.github.brenbar.uapi.Client.Adapter;
 
 public class Playground {
     public static void main(String[] args) throws IOException {
@@ -20,7 +20,7 @@ public class Playground {
 
         var server = new Server(uApi, handler, new Server.Options());
 
-        Adapter adapter = (m, s) -> {
+        BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
             return CompletableFuture.supplyAsync(() -> {
                 var requestBytes = s.serialize(m);
                 var responseBytes = server.process(requestBytes);
@@ -29,11 +29,11 @@ public class Playground {
         };
 
         var clientOptions = new Client.Options();
-        clientOptions.useBinaryDefault = true;
+        clientOptions.useBinary = true;
         clientOptions.timeoutMsDefault = 100000000000L;
         var client = new Client(adapter, clientOptions);
         var result = client
-                .send(new Message(Map.of("fn.test", Map.of("value!", Map.of("pStrBool!", Map.of("wrap", 0))))));
+                .request(new Message(Map.of("fn.test", Map.of("value!", Map.of("pStrBool!", Map.of("wrap", 0))))));
         System.out.println(result.body);
     }
 }

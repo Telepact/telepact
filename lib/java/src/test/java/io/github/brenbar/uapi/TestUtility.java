@@ -14,11 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.function.BiFunction;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.brenbar.uapi.Client.Adapter;
 import io.github.brenbar.uapi.Server.Options;
 
 public class TestUtility {
@@ -78,7 +79,7 @@ public class TestUtility {
 
         // test binary
         {
-            Adapter adapter = (m, s) -> {
+            BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
                 return CompletableFuture.supplyAsync(() -> {
                     var requestBytes = s.serialize(m);
                     System.out.println("--> %s".formatted(new String(requestBytes)));
@@ -89,10 +90,10 @@ public class TestUtility {
                 });
             };
             var options = new Client.Options();
-            options.useBinaryDefault = true;
+            options.useBinary = true;
             options.timeoutMsDefault = 600000;
             var client = new Client(adapter, options);
-            client.send(new Message("fn._ping", Map.of())); // warmup
+            client.request(new Message("fn._ping", Map.of())); // warmup
             var requestAsParsedJson = objectMapper.readValue(requestJson, new TypeReference<List<Object>>() {
             });
 
@@ -102,7 +103,7 @@ public class TestUtility {
             var requestTargetPseudoJson = requestEntryPseudoJson.getKey();
             var requestPayloadPseudoJson = (Map<String, Object>) requestEntryPseudoJson.getValue();
 
-            var responseMessage = client.send(new Message(requestHeadersPseudoJson, Map.of(requestTargetPseudoJson,
+            var responseMessage = client.request(new Message(requestHeadersPseudoJson, Map.of(requestTargetPseudoJson,
                     requestPayloadPseudoJson)));
             var resultAsPseudoJson = responseMessage.body;
             assertEquals(expectedResponseAsParsedJson.get(1), resultAsPseudoJson);

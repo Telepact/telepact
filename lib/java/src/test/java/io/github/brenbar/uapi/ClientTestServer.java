@@ -5,11 +5,12 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.function.BiFunction;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.brenbar.uapi.Client.Adapter;
 import io.github.brenbar.uapi.Client.Options;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
@@ -23,7 +24,7 @@ public class ClientTestServer {
 
         var timers = metrics.timer(clientFrontdoorTopic);
 
-        Adapter adapter = (m, s) -> {
+        BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
             return CompletableFuture.supplyAsync(() -> {
                 try {
                     byte[] requestBytes;
@@ -58,7 +59,7 @@ public class ClientTestServer {
         };
 
         var options = new Options();
-        options.useBinaryDefault = defaultBinary;
+        options.useBinary = defaultBinary;
         var client = new Client(adapter, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
@@ -75,7 +76,7 @@ public class ClientTestServer {
 
                 Message response;
                 try (var time = timers.time()) {
-                    response = client.send(request);
+                    response = client.request(request);
                 }
 
                 var responsePseudoJson = List.of(response.header, response.body);

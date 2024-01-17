@@ -3,6 +3,9 @@ package io.github.brenbar.uapi;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A uAPI Message.
+ */
 public class Message {
     public final Map<String, Object> header;
     public final Map<String, Object> body;

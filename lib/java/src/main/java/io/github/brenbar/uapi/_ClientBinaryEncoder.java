@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 class _ClientBinaryEncoder implements BinaryEncoder {
 
     private final Map<Integer, BinaryEncoding> recentBinaryEncoders;
-    private final BinaryChecksumStrategy binaryChecksumStrategy;
+    private final ClientBinaryStrategy binaryChecksumStrategy;
 
-    public _ClientBinaryEncoder(BinaryChecksumStrategy binaryChecksumStrategy) {
+    public _ClientBinaryEncoder(ClientBinaryStrategy binaryChecksumStrategy) {
         this.recentBinaryEncoders = new ConcurrentHashMap<>();
         this.binaryChecksumStrategy = binaryChecksumStrategy;
     }

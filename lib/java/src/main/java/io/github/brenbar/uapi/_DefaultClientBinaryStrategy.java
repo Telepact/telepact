@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
-class _DefaultBinaryChecksumStrategy implements BinaryChecksumStrategy {
+class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
 
     private static class Checksum {
         public final int value;
@@ -46,7 +46,7 @@ class _DefaultBinaryChecksumStrategy implements BinaryChecksumStrategy {
     }
 
     @Override
-    public List<Integer> getCurrent() {
+    public List<Integer> getCurrentChecksums() {
         try {
             lock.lock();
 

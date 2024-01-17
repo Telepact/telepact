@@ -9,11 +9,45 @@ import java.util.function.BiFunction;
 public class Client {
 
     /**
-     * A transport adapter that defines how Request/Response Messages are marshalled
-     * to and from the transport.
+     * Options for the client.
+     */
+    public static class Options {
+
+        /**
+         * Indicates if the client should use binary payloads instead of JSON.
+         */
+        public boolean useBinary = false;
+
+        /**
+         * Indicates the default timeout that should be used if the _tim header is not
+         * set.
+         */
+        public long timeoutMsDefault = 5000;
+
+        /**
+         * The serialization that should be used to serialize and deserialize messages.
+         */
+        public SerializationImpl serializationImpl = new _DefaultSerializer();
+
+        /**
+         * The client binary strategy that should be used to maintain binary
+         * compatibility with the server.
+         */
+        public ClientBinaryStrategy binaryStrategy = new _DefaultClientBinaryStrategy();
+    }
+
+    private final BiFunction<Message, Serializer, Future<Message>> adapter;
+    private final Serializer serializer;
+    private final boolean useBinaryDefault;
+    private final long timeoutMsDefault;
+
+    /**
+     * Create a client with the given transport adapter.
+     * 
+     * Example transport adapter:
      * 
      * <pre>
-     * var transport = (requestMessage, serializer) -> {
+     * var adapter = (requestMessage, serializer) -> {
      *     return CompletableFuture.supplyAsync(() -> {
      *         var requestMessageBytes = serializer.serialize(requestMessage);
      *         var responseMessageBytes = YOUR_TRANSPORT.transport(requestMessageBytes);
@@ -22,35 +56,15 @@ public class Client {
      *     });
      * };
      * </pre>
-     */
-    interface Adapter extends BiFunction<Message, Serializer, Future<Message>> {
-    }
-
-    public static class Options {
-        public boolean useBinaryDefault = false;
-        public long timeoutMsDefault = 5000;
-        public SerializationImpl serializationImpl = new _DefaultSerializer();
-        public BinaryChecksumStrategy binaryChecksumStrategy = new _DefaultBinaryChecksumStrategy();
-    }
-
-    private final Adapter adapter;
-    private final Serializer serializer;
-    private final boolean useBinaryDefault;
-    private final long timeoutMsDefault;
-
-    /**
-     * Create a client with the given transport adapter.
      * 
      * @param adapter
      */
-    public Client(Adapter adapter, Options options) {
+    public Client(BiFunction<Message, Serializer, Future<Message>> adapter, Options options) {
         this.adapter = adapter;
-
-        this.useBinaryDefault = options.useBinaryDefault;
+        this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;
-
         this.serializer = new Serializer(options.serializationImpl,
-                new _ClientBinaryEncoder(options.binaryChecksumStrategy));
+                new _ClientBinaryEncoder(options.binaryStrategy));
     }
 
     /**
@@ -59,7 +73,7 @@ public class Client {
      * @param request
      * @return
      */
-    public Message send(Message requestMessage) {
+    public Message request(Message requestMessage) {
         return _ClientUtil.processRequestObject(requestMessage, this.adapter, this.serializer,
                 this.timeoutMsDefault, this.useBinaryDefault);
     }
