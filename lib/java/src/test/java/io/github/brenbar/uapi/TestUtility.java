@@ -76,6 +76,7 @@ public class TestUtility {
         var uApi = UApiSchema.fromJson(json);
         var options = new Options();
         options.onError = (e) -> e.printStackTrace();
+
         var server = new Server(uApi, TestUtility::handle, options);
         var expectedResponseAsParsedJson = objectMapper.readValue(expectedResponseJson,
                 new TypeReference<List<Object>>() {

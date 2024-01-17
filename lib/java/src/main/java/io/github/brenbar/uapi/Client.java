@@ -25,7 +25,8 @@ public class Client {
         public long timeoutMsDefault = 5000;
 
         /**
-         * The serialization that should be used to serialize and deserialize messages.
+         * The serialization implementation that should be used to serialize and
+         * deserialize messages.
          */
         public SerializationImpl serializationImpl = new _DefaultSerializer();
 

@@ -8,13 +8,33 @@ import java.util.function.Function;
  */
 public class Server {
 
+    /**
+     * Options for the Server.
+     */
     public static class Options {
+
+        /**
+         * Handler for errors thrown during message processing.
+         */
         public Consumer<Throwable> onError = (e) -> {
         };
+
+        /**
+         * Execution hook that runs when a request Message is received.
+         */
         public Consumer<Message> onRequest = (m) -> {
         };
+
+        /**
+         * Execution hook that runs when a response Message is about to be returned.
+         */
         public Consumer<Message> onResponse = (m) -> {
         };
+
+        /**
+         * The serialization implementation that should be used to serialize and
+         * deserialize messages.
+         */
         public SerializationImpl serializer = new _DefaultSerializer();
     }
 
