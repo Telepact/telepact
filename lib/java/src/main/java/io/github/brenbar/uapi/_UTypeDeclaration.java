@@ -1,6 +1,5 @@
 package io.github.brenbar.uapi;
 
-import java.util.Collections;
 import java.util.List;
 
 class _UTypeDeclaration {
@@ -18,9 +17,15 @@ class _UTypeDeclaration {
 
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> generics) {
         if (value == null) {
-            var isNullable = this.type instanceof _UGeneric g
-                    ? generics.get(g.index).nullable
-                    : this.nullable;
+            final boolean isNullable;
+            if (this.type instanceof _UGeneric g) {
+                final int genericIndex = g.index;
+                final var generic = generics.get(genericIndex);
+                isNullable = generic.nullable;
+            } else {
+                isNullable = this.nullable;
+            }
+
             if (!isNullable) {
                 return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                         this.type.getName(generics));

@@ -42,11 +42,11 @@ class _UUnion implements _UType {
                     new ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
-        var entry = _UUnion.entry((Map<String, Object>) actual);
-        var unionTarget = (String) entry.getKey();
-        var unionPayload = entry.getValue();
+        final var entry = _UUnion.entry((Map<String, Object>) actual);
+        final var unionTarget = (String) entry.getKey();
+        final var unionPayload = entry.getValue();
 
-        var referenceStruct = referenceCases.get(unionTarget);
+        final var referenceStruct = referenceCases.get(unionTarget);
         if (referenceStruct == null) {
             return Collections
                     .singletonList(new ValidationFailure(List.of(unionTarget),
@@ -54,13 +54,16 @@ class _UUnion implements _UType {
         }
 
         if (unionPayload instanceof Map<?, ?> m2) {
-            var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
+            final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
                     (Map<String, Object>) m2, typeParameters);
-            var nestedValidationFailuresWithPath = nestedValidationFailures
-                    .stream()
-                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(unionTarget, f.path), f.reason,
-                            f.data))
-                    .toList();
+
+            final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+            for (final var f : nestedValidationFailures) {
+                final List<Object> thisPath = _ValidateUtil.prepend(unionTarget, f.path);
+
+                nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+            }
+
             return nestedValidationFailuresWithPath;
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(unionTarget),
@@ -72,13 +75,7 @@ class _UUnion implements _UType {
             _UStruct unionStruct,
             String unionCase,
             Map<String, Object> actual, List<_UTypeDeclaration> typeParameters) {
-        var validationFailures = new ArrayList<ValidationFailure>();
-
-        var nestedValidationFailures = _UStruct.validateStructFields(unionStruct.fields,
-                actual, typeParameters);
-        validationFailures.addAll(nestedValidationFailures);
-
-        return validationFailures;
+        return _UStruct.validateStructFields(unionStruct.fields, actual, typeParameters);
     }
 
     @Override
@@ -87,7 +84,7 @@ class _UUnion implements _UType {
             List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
-            var startingUnionCase = (Map<String, Object>) startingValue;
+            final var startingUnionCase = (Map<String, Object>) startingValue;
             return constructRandomUnion(this.cases, startingUnionCase, includeRandomOptionalFields,
                     typeParameters, random);
         } else {
@@ -102,22 +99,22 @@ class _UUnion implements _UType {
             List<_UTypeDeclaration> typeParameters,
             RandomGenerator random) {
         if (!startingUnion.isEmpty()) {
-            var unionEntry = _UUnion.entry(startingUnion);
-            var unionCase = unionEntry.getKey();
-            var unionStructType = unionCasesReference.get(unionCase);
-            var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
+            final var unionEntry = _UUnion.entry(startingUnion);
+            final var unionCase = unionEntry.getKey();
+            final var unionStructType = unionCasesReference.get(unionCase);
+            final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
             return Map.of(unionCase, _UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
                     includeRandomOptionalFields, typeParameters, random));
         } else {
-            var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
+            final var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
+
             Collections.sort(sortedUnionCasesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            var randomIndex = random.nextInt(sortedUnionCasesReference.size());
-            var unionEntry = sortedUnionCasesReference.get(randomIndex);
-
-            var unionCase = unionEntry.getKey();
-            var unionData = unionEntry.getValue();
+            final var randomIndex = random.nextInt(sortedUnionCasesReference.size());
+            final var unionEntry = sortedUnionCasesReference.get(randomIndex);
+            final var unionCase = unionEntry.getKey();
+            final var unionData = unionEntry.getValue();
 
             return Map.of(unionCase,
                     _UStruct.constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,

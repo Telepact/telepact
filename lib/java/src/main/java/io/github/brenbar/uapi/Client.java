@@ -33,10 +33,10 @@ public class Client {
         public BinaryChecksumStrategy binaryChecksumStrategy = new _DefaultBinaryChecksumStrategy();
     }
 
-    private Adapter adapter;
-    private Serializer serializer;
-    private boolean useBinaryDefault;
-    private long timeoutMsDefault;
+    private final Adapter adapter;
+    private final Serializer serializer;
+    private final boolean useBinaryDefault;
+    private final long timeoutMsDefault;
 
     /**
      * Create a client with the given transport adapter.
