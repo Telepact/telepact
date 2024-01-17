@@ -65,7 +65,7 @@ def nats_client(loop, nats_server):
 def dispatcher_server(loop, nats_server, request, nats_client):
     nats_url = nats_server
     lib_name = request.param
-    test_module_name = 'lib.{}.dispatch'.format(lib_name)
+    test_module_name = 'lib.{}.build_test'.format(lib_name)
     l = importlib.import_module(test_module_name)
 
     s: subprocess.Popen = l.start(nats_url)
