@@ -1,6 +1,5 @@
 package io.github.brenbar.uapi;
 
-import java.util.Collections;
 import java.util.List;
 
 class _UString implements _UType {

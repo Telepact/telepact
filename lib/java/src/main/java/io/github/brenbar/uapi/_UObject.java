@@ -15,19 +15,25 @@ class _UObject implements _UType {
     @Override
     public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        if (value instanceof Map<?, ?> m) {
-            var nestedTypeDeclaration = typeParameters.get(0);
-            var validationFailures = new ArrayList<ValidationFailure>();
+        if (value instanceof final Map<?, ?> m) {
+            final var nestedTypeDeclaration = typeParameters.get(0);
+
+            final var validationFailures = new ArrayList<ValidationFailure>();
             for (Map.Entry<?, ?> entry : m.entrySet()) {
-                var k = (String) entry.getKey();
-                var v = entry.getValue();
-                var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
-                var nestedValidationFailuresWithPath = nestedValidationFailures
-                        .stream()
-                        .map(f -> new ValidationFailure(_ValidateUtil.prepend(k, f.path), f.reason, f.data))
-                        .toList();
+                final var k = (String) entry.getKey();
+                final var v = entry.getValue();
+                final var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
+
+                final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+                for (var f : nestedValidationFailures) {
+                    final List<Object> thisPath = _ValidateUtil.prepend(k, f.path);
+
+                    nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+                }
+
                 validationFailures.addAll(nestedValidationFailuresWithPath);
             }
+
             return validationFailures;
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
@@ -40,27 +46,32 @@ class _UObject implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             RandomGenerator random) {
-        var nestedTypeDeclaration = typeParameters.get(0);
+        final var nestedTypeDeclaration = typeParameters.get(0);
+
         if (useStartingValue) {
-            var startingObj = (Map<String, Object>) startingValue;
-            var obj = new TreeMap<String, Object>();
-            for (var startingObjEntry : startingObj.entrySet()) {
-                var key = startingObjEntry.getKey();
-                var startingObjValue = startingObjEntry.getValue();
-                var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
+            final var startingObj = (Map<String, Object>) startingValue;
+
+            final var obj = new TreeMap<String, Object>();
+            for (final var startingObjEntry : startingObj.entrySet()) {
+                final var key = startingObjEntry.getKey();
+                final var startingObjValue = startingObjEntry.getValue();
+                final var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
                         includeRandomOptionalFields, generics, random);
                 obj.put(key, value);
             }
+
             return obj;
         } else {
-            var length = random.nextCollectionLength();
-            var obj = new TreeMap<String, Object>();
+            final var length = random.nextCollectionLength();
+
+            final var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
-                var key = random.nextString();
-                var value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields,
+                final var key = random.nextString();
+                final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields,
                         generics, random);
                 obj.put(key, value);
             }
+
             return obj;
         }
     }

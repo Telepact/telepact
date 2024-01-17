@@ -30,49 +30,55 @@ class _UStruct implements _UType {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
-                    this.getName(generics));
+            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, this.getName(generics));
         }
     }
 
     public static List<ValidationFailure> validateStructFields(
             Map<String, _UFieldDeclaration> fields,
             Map<String, Object> actualStruct, List<_UTypeDeclaration> typeParameters) {
-        var validationFailures = new ArrayList<ValidationFailure>();
+        final var validationFailures = new ArrayList<ValidationFailure>();
 
-        var missingFields = new ArrayList<String>();
-        for (Map.Entry<String, _UFieldDeclaration> entry : fields.entrySet()) {
-            var fieldName = entry.getKey();
-            var fieldDeclaration = entry.getValue();
-            if (!actualStruct.containsKey(fieldName) && !fieldDeclaration.optional) {
+        final var missingFields = new ArrayList<String>();
+        for (final var entry : fields.entrySet()) {
+            final var fieldName = entry.getKey();
+            final var fieldDeclaration = entry.getValue();
+            final boolean isOptional = fieldDeclaration.optional;
+            if (!actualStruct.containsKey(fieldName) && !isOptional) {
                 missingFields.add(fieldName);
             }
         }
 
-        for (var missingField : missingFields) {
-            var validationFailure = new ValidationFailure(List.of(missingField),
-                    "RequiredStructFieldMissing", Map.of());
-            validationFailures
-                    .add(validationFailure);
+        for (final var missingField : missingFields) {
+            final var validationFailure = new ValidationFailure(List.of(missingField), "RequiredStructFieldMissing",
+                    Map.of());
+
+            validationFailures.add(validationFailure);
         }
 
-        for (Map.Entry<String, Object> entry : actualStruct.entrySet()) {
-            var fieldName = entry.getKey();
-            var fieldValue = entry.getValue();
-            var referenceField = fields.get(fieldName);
+        for (final var entry : actualStruct.entrySet()) {
+            final var fieldName = entry.getKey();
+            final var fieldValue = entry.getValue();
+
+            final var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new ValidationFailure(List.of(fieldName),
-                        "StructFieldUnknown", Map.of());
-                validationFailures
-                        .add(validationFailure);
+                var validationFailure = new ValidationFailure(List.of(fieldName), "StructFieldUnknown", Map.of());
+
+                validationFailures.add(validationFailure);
                 continue;
             }
-            var nestedValidationFailures = referenceField.typeDeclaration.validate(fieldValue, typeParameters);
-            var nestedValidationFailuresWithPath = nestedValidationFailures
-                    .stream()
-                    .map(f -> new ValidationFailure(_ValidateUtil.prepend(fieldName, f.path), f.reason,
-                            f.data))
-                    .toList();
+
+            final _UTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
+
+            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, typeParameters);
+
+            final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+            for (final var f : nestedValidationFailures) {
+                final List<Object> thisPath = _ValidateUtil.prepend(fieldName, f.path);
+
+                nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+            }
+
             validationFailures.addAll(nestedValidationFailuresWithPath);
         }
 
@@ -85,7 +91,7 @@ class _UStruct implements _UType {
             List<_UTypeDeclaration> generics,
             RandomGenerator random) {
         if (useStartingValue) {
-            var startingStructValue = (Map<String, Object>) startingValue;
+            final var startingStructValue = (Map<String, Object>) startingValue;
             return constructRandomStruct(this.fields, startingStructValue, includeRandomOptionalFields,
                     typeParameters, random);
         } else {
@@ -99,20 +105,20 @@ class _UStruct implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             RandomGenerator random) {
 
-        var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
+        final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-        var obj = new TreeMap<String, Object>();
-        for (var field : sortedReferenceStruct) {
-            var fieldName = field.getKey();
-            var fieldDeclaration = field.getValue();
-            var startingValue = startingStruct.get(fieldName);
-            var useStartingValue = startingStruct.containsKey(fieldName);
-            Object value;
+        final var obj = new TreeMap<String, Object>();
+        for (final var field : sortedReferenceStruct) {
+            final var fieldName = field.getKey();
+            final var fieldDeclaration = field.getValue();
+            final var startingValue = startingStruct.get(fieldName);
+            final var useStartingValue = startingStruct.containsKey(fieldName);
+
+            final Object value;
             if (useStartingValue) {
                 value = fieldDeclaration.typeDeclaration.generateRandomValue(startingValue, useStartingValue,
-                        includeRandomOptionalFields, typeParameters,
-                        random);
+                        includeRandomOptionalFields, typeParameters, random);
             } else {
                 if (!fieldDeclaration.optional) {
                     value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
@@ -128,6 +134,7 @@ class _UStruct implements _UType {
                             includeRandomOptionalFields, typeParameters, random);
                 }
             }
+
             obj.put(fieldName, value);
         }
         return obj;
