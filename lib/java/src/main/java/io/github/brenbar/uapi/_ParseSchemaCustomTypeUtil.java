@@ -2,6 +2,7 @@ package io.github.brenbar.uapi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,19 +11,42 @@ import java.util.regex.Pattern;
 class _ParseSchemaCustomTypeUtil {
 
     static _UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
-            String schemaKey, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
+            String schemaKey, boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var otherKeys = new HashSet<>(structDefinitionAsPseudoJson.keySet());
+
+        otherKeys.remove(schemaKey);
+        otherKeys.remove("///");
+        if (isForFn) {
+            otherKeys.remove("->");
+            otherKeys.remove("errors");
+        }
+
+        if (otherKeys.size() > 0) {
+            for (final var k : otherKeys) {
+                final List<Object> loopPath = _ValidateUtil.append(path, k);
+
+                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+            }
+        }
+
         final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
-        final Map<String, Object> definition;
+        Map<String, Object> definition = null;
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
+            final List<SchemaParseFailure> branchParseFailures = _ParseSchemaUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
-            throw new UApiSchemaParseError(finalParseFailures);
+
+            parseFailures.addAll(branchParseFailures);
+        }
+
+        if (parseFailures.size() > 0) {
+            throw new UApiSchemaParseError(parseFailures);
         }
 
         final var fields = parseStructFields(definition, thisPath, typeParameterCount,
@@ -33,11 +57,28 @@ class _ParseSchemaCustomTypeUtil {
     }
 
     static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
-            boolean okCaseRequired, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
+            boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+
+        final var otherKeys = new HashSet<>(unionDefinitionAsPseudoJson.keySet());
+
+        otherKeys.remove(schemaKey);
+        otherKeys.remove("///");
+
+        if (!isForFn) {
+            if (otherKeys.size() > 0) {
+                for (final var k : otherKeys) {
+                    final List<Object> loopPath = _ValidateUtil.append(path, k);
+
+                    parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                }
+            }
+        }
+
         final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
-        Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
+        final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
         final Map<String, Object> definition;
         try {
@@ -45,17 +86,20 @@ class _ParseSchemaCustomTypeUtil {
         } catch (ClassCastException e) {
             final List<SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
-            throw new UApiSchemaParseError(finalParseFailures);
+
+            parseFailures.addAll(finalParseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
 
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var cases = new HashMap<String, _UStruct>();
 
-        if (okCaseRequired) {
+        if (definition.size() == 0 && !isForFn) {
+            parseFailures.add(new SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
+        } else if (isForFn) {
             if (!definition.containsKey("Ok")) {
-                final List<Object> finalPath = _ValidateUtil.append(thisPath, "Ok");
-                throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
-                        "RequiredObjectKeyMissing", Map.of())));
+                final List<Object> branchPath = _ValidateUtil.append(thisPath, "Ok");
+
+                parseFailures.add(new SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of()));
             }
         }
 

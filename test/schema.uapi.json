@@ -24,6 +24,7 @@
       },
       "ErrorDefinitionCannotTargetInternalFunctions": {},
       "EmptyArrayDisallowed": {},
+      "EmptyObjectDisallowed": {},
       "StringRegexMatchFailed": {
         "regex": ["string"]
       },

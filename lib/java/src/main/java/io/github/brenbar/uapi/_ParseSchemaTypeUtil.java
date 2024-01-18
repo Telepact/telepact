@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.validation.Schema;
-
 class _ParseSchemaTypeUtil {
 
     static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
@@ -165,13 +163,14 @@ class _ParseSchemaTypeUtil {
         try {
             final _UType type;
             if (customTypeName.startsWith("struct")) {
-                type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName,
+                final var isForFn = false;
+                type = _ParseSchemaCustomTypeUtil.parseStructType(List.of(index), definition, customTypeName, isForFn,
                         typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
-                boolean okCaseRequired = false;
-                type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName,
-                        okCaseRequired, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                final var isForFn = false;
+                type = _ParseSchemaCustomTypeUtil.parseUnionType(List.of(index), definition, customTypeName, isForFn,
+                        typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
                 type = _ParseSchemaFnTypeUtil.parseFunctionType(List.of(index), definition, customTypeName,

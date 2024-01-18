@@ -13,11 +13,13 @@ class _ParseSchemaFnTypeUtil {
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var typeParameterCount = 0;
+        final var isForFn = true;
 
         _UUnion callType = null;
         try {
             final _UStruct argType = _ParseSchemaCustomTypeUtil.parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
+                    schemaKey, isForFn, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                    typeExtensions,
                     allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
         } catch (UApiSchemaParseError e) {
@@ -25,7 +27,6 @@ class _ParseSchemaFnTypeUtil {
         }
 
         final var resultSchemaKey = "->";
-        final var okCaseRequired = true;
         final List<Object> resPath = _ValidateUtil.append(path, resultSchemaKey);
 
         _UUnion resultType = null;
@@ -34,8 +35,8 @@ class _ParseSchemaFnTypeUtil {
         } else {
             try {
                 resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson,
-                        resultSchemaKey, okCaseRequired, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
-                        parsedTypes, typeExtensions, allParseFailures, failedTypes);
+                        resultSchemaKey, isForFn, typeParameterCount, uApiSchemaPseudoJson,
+                        schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
