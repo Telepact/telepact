@@ -9,7 +9,7 @@ import java.util.TreeMap;
 class _MockVerifyUtil {
 
     static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,
-            Map<String, Object> verificationTimes, List<Invocation> invocations) {
+            Map<String, Object> verificationTimes, List<_MockInvocation> invocations) {
         var matchesFound = 0;
         for (final var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {
@@ -81,7 +81,7 @@ class _MockVerifyUtil {
         return Map.of("ErrorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
     }
 
-    static Map<String, Object> verifyNoMoreInteractions(List<Invocation> invocations) {
+    static Map<String, Object> verifyNoMoreInteractions(List<_MockInvocation> invocations) {
         final var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
 
         if (invocationsNotVerified.size() > 0) {

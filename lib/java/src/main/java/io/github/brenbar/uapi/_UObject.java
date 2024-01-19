@@ -13,22 +13,22 @@ class _UObject implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
-            final var validationFailures = new ArrayList<ValidationFailure>();
+            final var validationFailures = new ArrayList<_ValidationFailure>();
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 final var k = (String) entry.getKey();
                 final var v = entry.getValue();
                 final var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
 
-                final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+                final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
                 for (var f : nestedValidationFailures) {
                     final List<Object> thisPath = _ValidateUtil.prepend(k, f.path);
 
-                    nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+                    nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
                 }
 
                 validationFailures.addAll(nestedValidationFailuresWithPath);

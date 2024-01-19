@@ -6,9 +6,9 @@ import os
 import importlib
 import json
 
-@pytest.fixture(scope="module", params=get_lib_modules())
-def load_binary_server_proc(loop, nats_client, dispatcher_server, request):
-    lib_name = request.param
+@pytest.fixture(scope="module")
+def load_binary_server_proc(loop, nats_client, dispatcher_server):
+    lib_name = dispatcher_server
 
     init_topics = ['client-frontdoor', 'frontdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'load-binary', t) for t in init_topics)    

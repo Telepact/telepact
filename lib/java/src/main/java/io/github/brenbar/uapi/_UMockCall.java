@@ -13,7 +13,7 @@ class _UMockCall implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         final Map<String, Object> givenMap;
         try {
@@ -26,7 +26,7 @@ class _UMockCall implements _UType {
 
         final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
-            return List.of(new ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
+            return List.of(new _ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
                     Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
         }
 
@@ -40,11 +40,11 @@ class _UMockCall implements _UType {
 
         final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
 
-        final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
+        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
         for (var f : inputFailures) {
             List<Object> newPath = _ValidateUtil.prepend(functionName, f.path);
 
-            inputFailuresWithPath.add(new ValidationFailure(newPath, f.reason, f.data));
+            inputFailuresWithPath.add(new _ValidationFailure(newPath, f.reason, f.data));
         }
 
         return inputFailuresWithPath.stream()

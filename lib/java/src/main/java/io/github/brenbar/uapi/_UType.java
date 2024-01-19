@@ -5,7 +5,7 @@ import java.util.List;
 interface _UType {
         public int getTypeParameterCount();
 
-        public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+        public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
                         List<_UTypeDeclaration> generics);
 
         public Object generateRandomValue(Object startingValue, boolean useStartingValue,

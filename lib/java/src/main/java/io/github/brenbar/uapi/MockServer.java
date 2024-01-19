@@ -44,7 +44,7 @@ public class MockServer {
     private final boolean enableGeneratedDefaultStub;
 
     private final List<_MockStub> stubs = new ArrayList<>();
-    private final List<Invocation> invocations = new ArrayList<>();
+    private final List<_MockInvocation> invocations = new ArrayList<>();
 
     /**
      * Create a mock server with the given uAPI Schema.

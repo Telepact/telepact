@@ -10,7 +10,7 @@ class _UAny implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return List.of();
     }

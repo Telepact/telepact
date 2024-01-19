@@ -15,7 +15,7 @@ class _UTypeDeclaration {
         this.typeParameters = typeParameters;
     }
 
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> generics) {
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> generics) {
         if (value == null) {
             final boolean isNullable;
             if (this.type instanceof _UGeneric g) {

@@ -11,9 +11,9 @@ class _ParseSchemaTypeUtil {
     static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.size() == 0) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "EmptyArrayDisallowed", Map.of())));
         }
 
@@ -24,7 +24,7 @@ class _ParseSchemaTypeUtil {
         try {
             rootTypeString = _CastUtil.asString(baseType);
         } catch (ClassCastException e) {
-            final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
                     .getTypeUnexpectedValidationFailure(basePath, baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
@@ -34,7 +34,7 @@ class _ParseSchemaTypeUtil {
 
         final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
@@ -45,18 +45,18 @@ class _ParseSchemaTypeUtil {
                 schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
 
         if (type instanceof _UGeneric && nullable) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
         }
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
                     Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
         }
 
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
         final var typeParameters = new ArrayList<_UTypeDeclaration>();
         final var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
 
@@ -69,7 +69,7 @@ class _ParseSchemaTypeUtil {
             try {
                 l = _CastUtil.asList(e);
             } catch (ClassCastException e1) {
-                final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
                         .getTypeUnexpectedValidationFailure(loopPath, e, "Array");
 
                 parseFailures.addAll(thisParseFailures);
@@ -97,7 +97,7 @@ class _ParseSchemaTypeUtil {
 
     static _UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
             List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
         }
@@ -121,7 +121,7 @@ class _ParseSchemaTypeUtil {
 
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
@@ -147,7 +147,7 @@ class _ParseSchemaTypeUtil {
         final var customTypeName = matcher.group(2);
         final var index = schemaKeysToIndex.get(customTypeName);
         if (index == null) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName))));
         }
         final var definition = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
@@ -179,7 +179,7 @@ class _ParseSchemaTypeUtil {
             } else {
                 type = typeExtensions.get(customTypeName);
                 if (type == null) {
-                    throw new UApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
+                    throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
                             "TypeExtensionImplementationMissing", Map.of("name", customTypeName))));
                 }
             }

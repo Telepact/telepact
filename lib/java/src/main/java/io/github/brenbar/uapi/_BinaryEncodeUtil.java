@@ -7,7 +7,7 @@ import java.util.Objects;
 
 class _BinaryEncodeUtil {
 
-    static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
+    static List<Object> serverBinaryEncode(List<Object> message, _BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
@@ -29,7 +29,7 @@ class _BinaryEncodeUtil {
         return List.of(headers, finalEncodedMessageBody);
     }
 
-    static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder)
+    static List<Object> serverBinaryDecode(List<Object> message, _BinaryEncoding binaryEncoder)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
@@ -51,7 +51,7 @@ class _BinaryEncodeUtil {
         return List.of(headers, messageBody);
     }
 
-    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
+    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
             ClientBinaryStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
@@ -70,7 +70,7 @@ class _BinaryEncodeUtil {
 
         final var checksums = recentBinaryEncoders.keySet().stream().toList();
 
-        final BinaryEncoding binaryEncoder;
+        final _BinaryEncoding binaryEncoder;
         try {
             binaryEncoder = recentBinaryEncoders.get(checksums.get(0));
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -89,7 +89,7 @@ class _BinaryEncodeUtil {
         return List.of(headers, finalEncodedMessageBody);
     }
 
-    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
+    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
             ClientBinaryStrategy binaryChecksumStrategy)
             throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
@@ -100,7 +100,7 @@ class _BinaryEncodeUtil {
         // If there is a binary encoding included on this message, cache it
         if (headers.containsKey("_enc")) {
             final var binaryEncoding = (Map<String, Integer>) headers.get("_enc");
-            final var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
+            final var newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
 
             recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
         }
@@ -122,15 +122,15 @@ class _BinaryEncodeUtil {
         return List.of(headers, messageBody);
     }
 
-    private static Map<Object, Object> encodeBody(Map<String, Object> messageBody, BinaryEncoding binaryEncoder) {
+    private static Map<Object, Object> encodeBody(Map<String, Object> messageBody, _BinaryEncoding binaryEncoder) {
         return (Map<Object, Object>) encodeKeys(messageBody, binaryEncoder);
     }
 
-    static Map<String, Object> decodeBody(Map<Object, Object> encodedMessageBody, BinaryEncoding binaryEncoder) {
+    static Map<String, Object> decodeBody(Map<Object, Object> encodedMessageBody, _BinaryEncoding binaryEncoder) {
         return (Map<String, Object>) decodeKeys(encodedMessageBody, binaryEncoder);
     }
 
-    private static Object encodeKeys(Object given, BinaryEncoding binaryEncoder) {
+    private static Object encodeKeys(Object given, _BinaryEncoding binaryEncoder) {
         if (given == null) {
             return given;
         } else if (given instanceof final Map<?, ?> m) {
@@ -141,7 +141,7 @@ class _BinaryEncodeUtil {
 
                 final Object finalKey;
                 if (binaryEncoder.encodeMap.containsKey(key)) {
-                    finalKey = get(key, binaryEncoder.encodeMap);
+                    finalKey = encodeOrDecode(key, binaryEncoder.encodeMap);
                 } else {
                     finalKey = key;
                 }
@@ -159,7 +159,7 @@ class _BinaryEncodeUtil {
         }
     }
 
-    private static Object decodeKeys(Object given, BinaryEncoding binaryEncoder) {
+    private static Object decodeKeys(Object given, _BinaryEncoding binaryEncoder) {
         if (given instanceof Map<?, ?> m) {
             final var newMap = new HashMap<String, Object>();
 
@@ -168,7 +168,7 @@ class _BinaryEncodeUtil {
                 if (e.getKey() instanceof final String s) {
                     key = s;
                 } else {
-                    key = (String) get(e.getKey(), binaryEncoder.decodeMap);
+                    key = (String) encodeOrDecode(e.getKey(), binaryEncoder.decodeMap);
                 }
                 final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
 
@@ -183,7 +183,7 @@ class _BinaryEncodeUtil {
         }
     }
 
-    private static Object get(Object key, Map<?, ?> map) {
+    private static Object encodeOrDecode(Object key, Map<?, ?> map) {
         final var value = map.get(key);
 
         if (value == null) {

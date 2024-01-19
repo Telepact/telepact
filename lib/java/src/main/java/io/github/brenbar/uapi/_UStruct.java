@@ -25,7 +25,7 @@ class _UStruct implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(this.fields, (Map<String, Object>) m, typeParameters);
@@ -34,10 +34,10 @@ class _UStruct implements _UType {
         }
     }
 
-    public static List<ValidationFailure> validateStructFields(
+    public static List<_ValidationFailure> validateStructFields(
             Map<String, _UFieldDeclaration> fields,
             Map<String, Object> actualStruct, List<_UTypeDeclaration> typeParameters) {
-        final var validationFailures = new ArrayList<ValidationFailure>();
+        final var validationFailures = new ArrayList<_ValidationFailure>();
 
         final var missingFields = new ArrayList<String>();
         for (final var entry : fields.entrySet()) {
@@ -50,7 +50,7 @@ class _UStruct implements _UType {
         }
 
         for (final var missingField : missingFields) {
-            final var validationFailure = new ValidationFailure(List.of(missingField), "RequiredStructFieldMissing",
+            final var validationFailure = new _ValidationFailure(List.of(missingField), "RequiredStructFieldMissing",
                     Map.of());
 
             validationFailures.add(validationFailure);
@@ -62,7 +62,7 @@ class _UStruct implements _UType {
 
             final var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new ValidationFailure(List.of(fieldName), "StructFieldUnknown", Map.of());
+                var validationFailure = new _ValidationFailure(List.of(fieldName), "StructFieldUnknown", Map.of());
 
                 validationFailures.add(validationFailure);
                 continue;
@@ -72,11 +72,11 @@ class _UStruct implements _UType {
 
             final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, typeParameters);
 
-            final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+            final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : nestedValidationFailures) {
                 final List<Object> thisPath = _ValidateUtil.prepend(fieldName, f.path);
 
-                nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+                nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
             }
 
             validationFailures.addAll(nestedValidationFailuresWithPath);

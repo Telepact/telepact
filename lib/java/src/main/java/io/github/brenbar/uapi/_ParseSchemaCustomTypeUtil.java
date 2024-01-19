@@ -13,8 +13,8 @@ class _ParseSchemaCustomTypeUtil {
     static _UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey, boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
         final var otherKeys = new HashSet<>(structDefinitionAsPseudoJson.keySet());
 
         otherKeys.remove(schemaKey);
@@ -28,7 +28,7 @@ class _ParseSchemaCustomTypeUtil {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = _ValidateUtil.append(path, k);
 
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
@@ -39,7 +39,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<SchemaParseFailure> branchParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> branchParseFailures = _ParseSchemaUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);
@@ -59,8 +59,8 @@ class _ParseSchemaCustomTypeUtil {
     static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
 
         final var otherKeys = new HashSet<>(unionDefinitionAsPseudoJson.keySet());
 
@@ -72,7 +72,7 @@ class _ParseSchemaCustomTypeUtil {
                 for (final var k : otherKeys) {
                     final List<Object> loopPath = _ValidateUtil.append(path, k);
 
-                    parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                    parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
                 }
             }
         }
@@ -84,7 +84,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
 
             parseFailures.addAll(finalParseFailures);
@@ -94,12 +94,12 @@ class _ParseSchemaCustomTypeUtil {
         final var cases = new HashMap<String, _UStruct>();
 
         if (definition.size() == 0 && !isForFn) {
-            parseFailures.add(new SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
         } else if (isForFn) {
             if (!definition.containsKey("Ok")) {
                 final List<Object> branchPath = _ValidateUtil.append(thisPath, "Ok");
 
-                parseFailures.add(new SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of()));
+                parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of()));
             }
         }
 
@@ -111,7 +111,7 @@ class _ParseSchemaCustomTypeUtil {
 
             final var matcher = regex.matcher(unionCase);
             if (!matcher.find()) {
-                parseFailures.add(new SchemaParseFailure(unionKeyPath,
+                parseFailures.add(new _SchemaParseFailure(unionKeyPath,
                         "KeyRegexMatchFailed", Map.of("regex", regexString)));
                 continue;
             }
@@ -120,7 +120,7 @@ class _ParseSchemaCustomTypeUtil {
             try {
                 unionCaseStruct = _CastUtil.asMap(entry.getValue());
             } catch (ClassCastException e) {
-                List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
                         .getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -152,8 +152,8 @@ class _ParseSchemaCustomTypeUtil {
     static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
         final var fields = new HashMap<String, _UFieldDeclaration>();
 
         for (final var structEntry : referenceStruct.entrySet()) {
@@ -167,7 +167,7 @@ class _ParseSchemaCustomTypeUtil {
                     final List<Object> finalOtherPath = _ValidateUtil.append(path, existingField);
 
                     parseFailures
-                            .add(new SchemaParseFailure(finalPath, "PathCollision",
+                            .add(new _SchemaParseFailure(finalPath, "PathCollision",
                                     Map.of("other", finalOtherPath)));
                 }
             }
@@ -198,14 +198,14 @@ class _ParseSchemaCustomTypeUtil {
     static _UFieldDeclaration parseField(List<Object> path, String fieldDeclaration, Object typeDeclarationValue,
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
         final var regex = Pattern.compile(regexString);
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
             final List<Object> finalPath = _ValidateUtil.append(path, fieldDeclaration);
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
+            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(finalPath,
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 

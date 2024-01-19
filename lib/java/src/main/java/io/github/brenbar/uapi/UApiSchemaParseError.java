@@ -9,23 +9,23 @@ import java.util.TreeMap;
  */
 public class UApiSchemaParseError extends RuntimeException {
 
-    public final List<SchemaParseFailure> schemaParseFailures;
+    public final List<_SchemaParseFailure> schemaParseFailures;
     public final List<Object> schemaParseFailuresPseudoJson;
 
-    public UApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures) {
+    public UApiSchemaParseError(List<_SchemaParseFailure> schemaParseFailures) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)));
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
     }
 
-    public UApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures, Throwable cause) {
+    public UApiSchemaParseError(List<_SchemaParseFailure> schemaParseFailures, Throwable cause) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)), cause);
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
     }
 
     private static List<Object> mapSchemaParseFailuresToPseudoJson(
-            List<SchemaParseFailure> schemaParseFailures) {
+            List<_SchemaParseFailure> schemaParseFailures) {
         return (List<Object>) schemaParseFailures.stream()
                 .map(f -> (Object) new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data))))
                 .toList();

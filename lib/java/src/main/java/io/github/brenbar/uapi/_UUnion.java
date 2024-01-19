@@ -24,7 +24,7 @@ class _UUnion implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof Map<?, ?> m) {
             return validateUnionCases(this.cases, m, typeParameters);
@@ -34,12 +34,12 @@ class _UUnion implements _UType {
         }
     }
 
-    private List<ValidationFailure> validateUnionCases(
+    private List<_ValidationFailure> validateUnionCases(
             Map<String, _UStruct> referenceCases,
             Map<?, ?> actual, List<_UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return List.of(
-                    new ValidationFailure(new ArrayList<Object>(),
+                    new _ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
         final var entry = _UUnion.entry((Map<String, Object>) actual);
@@ -49,7 +49,7 @@ class _UUnion implements _UType {
         final var referenceStruct = referenceCases.get(unionTarget);
         if (referenceStruct == null) {
             return Collections
-                    .singletonList(new ValidationFailure(List.of(unionTarget),
+                    .singletonList(new _ValidationFailure(List.of(unionTarget),
                             "UnionFieldUnknown", Map.of()));
         }
 
@@ -57,11 +57,11 @@ class _UUnion implements _UType {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
                     (Map<String, Object>) m2, typeParameters);
 
-            final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+            final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : nestedValidationFailures) {
                 final List<Object> thisPath = _ValidateUtil.prepend(unionTarget, f.path);
 
-                nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
+                nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
             }
 
             return nestedValidationFailuresWithPath;
@@ -71,7 +71,7 @@ class _UUnion implements _UType {
         }
     }
 
-    private static List<ValidationFailure> validateUnionStruct(
+    private static List<_ValidationFailure> validateUnionStruct(
             _UStruct unionStruct,
             String unionCase,
             Map<String, Object> actual, List<_UTypeDeclaration> typeParameters) {

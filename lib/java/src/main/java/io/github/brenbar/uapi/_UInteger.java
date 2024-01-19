@@ -13,13 +13,13 @@ class _UInteger implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof Long || value instanceof Integer) {
             return List.of();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return List.of(
-                    new ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
+                    new _ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
         } else {
             return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
                     this.getName(generics));

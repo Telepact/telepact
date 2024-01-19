@@ -6,9 +6,9 @@ package io.github.brenbar.uapi;
 public class Serializer {
 
     private SerializationImpl serializationImpl;
-    private BinaryEncoder binaryEncoder;
+    private _BinaryEncoder binaryEncoder;
 
-    Serializer(SerializationImpl serializationImpl, BinaryEncoder binaryEncoder) {
+    Serializer(SerializationImpl serializationImpl, _BinaryEncoder binaryEncoder) {
         this.serializationImpl = serializationImpl;
         this.binaryEncoder = binaryEncoder;
     }

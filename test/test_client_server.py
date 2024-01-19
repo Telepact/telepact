@@ -5,9 +5,9 @@ import time
 import importlib
 import json
 
-@pytest.fixture(scope="module", params=get_lib_modules())
-def client_server_proc(loop, nats_client, dispatcher_server, request):
-    lib_name = request.param
+@pytest.fixture(scope="module")
+def client_server_proc(loop, nats_client, dispatcher_server):
+    lib_name = dispatcher_server
 
     init_topics = ['client-frontdoor', 'client-backdoor', 'frontdoor', 'backdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'client-server', t) for t in init_topics)     

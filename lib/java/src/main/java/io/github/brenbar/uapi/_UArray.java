@@ -11,21 +11,21 @@ class _UArray implements _UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
-            final var validationFailures = new ArrayList<ValidationFailure>();
+            final var validationFailures = new ArrayList<_ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
                 final var nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
                 final var index = i;
 
-                final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
+                final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
                 for (var f : nestedValidationFailures) {
                     final List<Object> finalPath = _ValidateUtil.prepend(index, f.path);
-                    nestedValidationFailuresWithPath.add(new ValidationFailure(finalPath, f.reason,
+                    nestedValidationFailuresWithPath.add(new _ValidationFailure(finalPath, f.reason,
                             f.data));
                 }
 

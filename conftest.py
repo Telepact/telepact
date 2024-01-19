@@ -73,7 +73,7 @@ def dispatcher_server(loop, nats_server, request, nats_client):
     except Exception:
         raise       
 
-    yield s
+    yield lib_name
 
     async def t2():
         req = json.dumps([{}, {'End': {}}])

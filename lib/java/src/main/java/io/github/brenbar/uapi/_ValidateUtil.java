@@ -8,9 +8,9 @@ import java.util.TreeMap;
 
 class _ValidateUtil {
 
-    static List<ValidationFailure> validateHeaders(
+    static List<_ValidationFailure> validateHeaders(
             Map<String, Object> headers, UApiSchema uApiSchema, _UFn functionType) {
-        final var validationFailures = new ArrayList<ValidationFailure>();
+        final var validationFailures = new ArrayList<_ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
             final List<Object> binaryChecksums;
@@ -43,7 +43,7 @@ class _ValidateUtil {
         return validationFailures;
     }
 
-    private static List<ValidationFailure> validateSelectHeaders(Map<String, Object> headers,
+    private static List<_ValidationFailure> validateSelectHeaders(Map<String, Object> headers,
             UApiSchema uApiSchema, _UFn functionType) {
         Map<String, Object> selectStructFieldsHeader;
         try {
@@ -53,7 +53,7 @@ class _ValidateUtil {
                     headers.get("_sel"), "Object");
         }
 
-        final var validationFailures = new ArrayList<ValidationFailure>();
+        final var validationFailures = new ArrayList<_ValidationFailure>();
 
         for (final var entry : selectStructFieldsHeader.entrySet()) {
             final var typeName = entry.getKey();
@@ -68,7 +68,7 @@ class _ValidateUtil {
             }
 
             if (typeReference == null) {
-                validationFailures.add(new ValidationFailure(List.of("_sel", typeName),
+                validationFailures.add(new _ValidationFailure(List.of("_sel", typeName),
                         "TypeUnknown", Map.of()));
                 continue;
             }
@@ -91,7 +91,7 @@ class _ValidateUtil {
                     final List<Object> loopPath = List.of("_sel", typeName, unionCase);
 
                     if (structRef == null) {
-                        validationFailures.add(new ValidationFailure(
+                        validationFailures.add(new _ValidationFailure(
                                 loopPath,
                                 "UnionCaseUnknown", Map.of()));
                         continue;
@@ -123,9 +123,9 @@ class _ValidateUtil {
         return validationFailures;
     }
 
-    private static List<ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
+    private static List<_ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
             Object selectedFields) {
-        final var validationFailures = new ArrayList<ValidationFailure>();
+        final var validationFailures = new ArrayList<_ValidationFailure>();
 
         final List<Object> fields;
         try {
@@ -148,7 +148,7 @@ class _ValidateUtil {
             if (!structReference.fields.containsKey(stringField)) {
                 final List<Object> thisPath = _ValidateUtil.append(basePath, i);
 
-                validationFailures.add(new ValidationFailure(thisPath, "StructFieldUnknown", Map.of()));
+                validationFailures.add(new _ValidationFailure(thisPath, "StructFieldUnknown", Map.of()));
             }
         }
 
@@ -173,13 +173,13 @@ class _ValidateUtil {
         }
     }
 
-    static List<ValidationFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
+    static List<_ValidationFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
             String expectedType) {
         final var actualType = _ValidateUtil.getType(value);
         final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
         return List.of(
-                new ValidationFailure(path, "TypeUnexpected", data));
+                new _ValidationFailure(path, "TypeUnexpected", data));
     }
 
     static List<Object> prepend(Object value, List<Object> original) {

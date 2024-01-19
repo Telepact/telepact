@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 class _SerializeUtil {
 
-    static BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {
+    static _BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {
         final var allKeys = new TreeSet<String>();
         for (final var entry : uApiSchema.parsed.entrySet()) {
             allKeys.add(entry.getKey());
@@ -64,10 +64,10 @@ class _SerializeUtil {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        return new BinaryEncoding(binaryEncoding, checksum);
+        return new _BinaryEncoding(binaryEncoding, checksum);
     }
 
-    static byte[] serialize(Message message, BinaryEncoder binaryEncoder,
+    static byte[] serialize(Message message, _BinaryEncoder binaryEncoder,
             SerializationImpl serializer) {
         final var headers = message.header;
 
@@ -93,7 +93,7 @@ class _SerializeUtil {
     }
 
     static Message deserialize(byte[] messageBytes, SerializationImpl serializer,
-            BinaryEncoder binaryEncoder) {
+            _BinaryEncoder binaryEncoder) {
         final Object messageAsPseudoJson;
         final boolean isMsgPack;
         if (messageBytes[0] == (byte) 0x92) { // MsgPack

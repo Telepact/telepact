@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-class _ClientBinaryEncoder implements BinaryEncoder {
+class _ClientBinaryEncoder implements _BinaryEncoder {
 
-    private final Map<Integer, BinaryEncoding> recentBinaryEncoders;
+    private final Map<Integer, _BinaryEncoding> recentBinaryEncoders;
     private final ClientBinaryStrategy binaryChecksumStrategy;
 
     public _ClientBinaryEncoder(ClientBinaryStrategy binaryChecksumStrategy) {

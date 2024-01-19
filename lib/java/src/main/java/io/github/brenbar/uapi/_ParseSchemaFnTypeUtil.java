@@ -10,8 +10,8 @@ class _ParseSchemaFnTypeUtil {
     static _UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
         final var typeParameterCount = 0;
         final var isForFn = true;
 
@@ -31,7 +31,7 @@ class _ParseSchemaFnTypeUtil {
 
         _UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
         } else {
             try {
                 resultType = _ParseSchemaCustomTypeUtil.parseUnionType(path, functionDefinitionAsParsedJson,
@@ -47,14 +47,14 @@ class _ParseSchemaFnTypeUtil {
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
-            parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^error\\..*$");
             try {
                 errorsRegex = _CastUtil.asString(errorsRegexInit);
             } catch (ClassCastException e) {
-                final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil.getTypeUnexpectedValidationFailure(
+                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil.getTypeUnexpectedValidationFailure(
                         regexPath, errorsRegexInit, "String");
 
                 parseFailures

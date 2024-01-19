@@ -9,12 +9,12 @@ import java.util.regex.Pattern;
 
 class _ParseSchemaErrorUtil {
 
-    static void applyErrorToParsedTypes(UError error, Map<String, _UType> parsedTypes,
+    static void applyErrorToParsedTypes(_UError error, Map<String, _UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
         String errorName = error.name;
         var errorIndex = schemaKeysToIndex.get(errorName);
 
-        var parseFailures = new ArrayList<SchemaParseFailure>();
+        var parseFailures = new ArrayList<_SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
             _UFn f;
             try {
@@ -47,7 +47,7 @@ class _ParseSchemaErrorUtil {
                 var newKey = errorResultField.getKey();
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
-                    parseFailures.add(new SchemaParseFailure(List.of(errorIndex, errorName, "->", newKey),
+                    parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, errorName, "->", newKey),
                             "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey))));
                 }
                 fnResultCases.put(newKey, errorResultField.getValue());
@@ -59,13 +59,13 @@ class _ParseSchemaErrorUtil {
         }
     }
 
-    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String schemaKey,
+    public static _UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String schemaKey,
             List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var index = schemaKeysToIndex.get(schemaKey);
         final List<Object> basePath = List.of(index);
 
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
 
         final var otherKeys = new HashSet<>(errorDefinitionAsParsedJson.keySet());
 
@@ -76,7 +76,7 @@ class _ParseSchemaErrorUtil {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = _ValidateUtil.append(basePath, k);
 
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
@@ -87,7 +87,7 @@ class _ParseSchemaErrorUtil {
         try {
             def = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
 
             parseFailures.addAll(thisParseFailures);
@@ -100,7 +100,7 @@ class _ParseSchemaErrorUtil {
         final List<Object> errorPath = _ValidateUtil.append(thisPath, resultSchemaKey);
 
         if (!def.containsKey(resultSchemaKey)) {
-            parseFailures.add(new SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of()));
         }
 
         if (parseFailures.size() > 0) {
@@ -111,6 +111,6 @@ class _ParseSchemaErrorUtil {
                 typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                 allParseFailures, failedTypes);
 
-        return new UError(schemaKey, error);
+        return new _UError(schemaKey, error);
     }
 }

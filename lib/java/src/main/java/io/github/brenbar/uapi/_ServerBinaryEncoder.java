@@ -2,11 +2,11 @@ package io.github.brenbar.uapi;
 
 import java.util.List;
 
-class _ServerBinaryEncoder implements BinaryEncoder {
+class _ServerBinaryEncoder implements _BinaryEncoder {
 
-    private final BinaryEncoding binaryEncoder;
+    private final _BinaryEncoding binaryEncoder;
 
-    public _ServerBinaryEncoder(BinaryEncoding binaryEncoder) {
+    public _ServerBinaryEncoder(_BinaryEncoding binaryEncoder) {
         this.binaryEncoder = binaryEncoder;
     }
 
