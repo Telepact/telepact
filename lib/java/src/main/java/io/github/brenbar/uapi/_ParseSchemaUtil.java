@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 class _ParseSchemaUtil {
 
@@ -110,13 +113,20 @@ class _ParseSchemaUtil {
                 continue;
             }
 
-            if (schemaKeys.contains(schemaKey)) {
-                final var otherPathIndex = schemaKeysToIndex.get(schemaKey);
+            System.out.println(schemaKeysToIndex);
+            System.out.println(schemaKeys);
+            System.out.println(schemaKey);
+            final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
+            if (matchingSchemaKey != null) {
+                final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
                 final List<Object> finalPath = _ValidateUtil.append(loopPath, schemaKey);
+                System.out.print(otherPathIndex);
 
                 parseFailures.add(new SchemaParseFailure(finalPath, "PathCollision",
-                        Map.of("other", List.of(otherPathIndex, schemaKey))));
+                        Map.of("other", List.of(otherPathIndex, matchingSchemaKey))));
+                continue;
             }
+
             schemaKeys.add(schemaKey);
             schemaKeysToIndex.put(schemaKey, index);
         }
@@ -219,6 +229,17 @@ class _ParseSchemaUtil {
                     new TreeMap<>(
                             Map.of("regex", regex, "actual", matches.size(), "expected", 1)))));
         }
+    }
+
+    private static String findMatchingSchemaKey(Set<String> schemaKeys, String schemaKey) {
+        for (final var k : schemaKeys) {
+            var splitK = k.split("\\.")[1];
+            var splitSchemaKey = schemaKey.split("\\.")[1];
+            if (Objects.equals(splitK, splitSchemaKey)) {
+                return k;
+            }
+        }
+        return null;
     }
 
     static List<SchemaParseFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
