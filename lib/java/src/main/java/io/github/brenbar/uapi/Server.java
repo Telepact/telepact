@@ -70,7 +70,7 @@ public class Server {
      * @return
      */
     public byte[] process(byte[] requestMessageBytes) {
-        return _ServerUtil.processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
+        return _Util.processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
 }
