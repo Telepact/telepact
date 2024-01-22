@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
-import static io.github.brenbar.uapi._BinaryPackUtil.PACKED;
-import static io.github.brenbar.uapi._BinaryPackUtil.UNDEFINED;;
+import static io.github.brenbar.uapi._BinaryPackUtil.PACKED_BYTE;
+import static io.github.brenbar.uapi._BinaryPackUtil.UNDEFINED_BYTE;
 
 class _BinaryUnpackUtil {
     static Map<Object, Object> unpackBody(Map<Object, Object> body) {
@@ -43,7 +43,7 @@ class _BinaryUnpackUtil {
             return list;
         }
 
-        if (!(list.get(0) instanceof final MessagePackExtensionType t && t.getType() == PACKED.getType())) {
+        if (!(list.get(0) instanceof final MessagePackExtensionType t && t.getType() == PACKED_BYTE)) {
             final var newList = new ArrayList<Object>();
             for (final var e : list) {
                 newList.add(unpack(e));
@@ -71,7 +71,7 @@ class _BinaryUnpackUtil {
             final var key = header.get(j + 1);
             final var value = row.get(j);
 
-            if (value instanceof final MessagePackExtensionType t && t.getType() == UNDEFINED.getType()) {
+            if (value instanceof final MessagePackExtensionType t && t.getType() == UNDEFINED_BYTE) {
                 continue;
             }
 

@@ -94,7 +94,7 @@ class _UMockStub implements _UType {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, _RandomGenerator random) {
+            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
     }

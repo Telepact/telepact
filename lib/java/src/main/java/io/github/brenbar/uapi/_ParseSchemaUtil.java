@@ -9,10 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 class _ParseSchemaUtil {
 
@@ -33,7 +29,7 @@ class _ParseSchemaUtil {
         try {
             uApiSchemaPseudoJson = _CastUtil.asList(uApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
                     .getTypeUnexpectedValidationFailure(List.of(), uApiSchemaPseudoJsonInit, "Array");
             throw new UApiSchemaParseError(thisParseFailures, e);
         }
@@ -59,7 +55,7 @@ class _ParseSchemaUtil {
         try {
             secondUApiSchemaPseudoJson = _CastUtil.asList(secondUApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailure = _ParseSchemaUtil
+            final List<_SchemaParseFailure> thisParseFailure = _ParseSchemaToolUtil
                     .getTypeUnexpectedValidationFailure(List.of(), secondUApiSchemaPseudoJsonInit, "Array");
             throw new UApiSchemaParseError(thisParseFailure, e);
         }
@@ -98,7 +94,7 @@ class _ParseSchemaUtil {
             try {
                 def = _CastUtil.asMap(definition);
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
                         .getTypeUnexpectedValidationFailure(loopPath, definition, "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -107,7 +103,7 @@ class _ParseSchemaUtil {
 
             final String schemaKey;
             try {
-                schemaKey = findSchemaKey(def, index);
+                schemaKey = _ParseSchemaToolUtil.findSchemaKey(def, index);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
                 continue;
@@ -116,7 +112,7 @@ class _ParseSchemaUtil {
             System.out.println(schemaKeysToIndex);
             System.out.println(schemaKeys);
             System.out.println(schemaKey);
-            final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
+            final var matchingSchemaKey = _ParseSchemaToolUtil.findMatchingSchemaKey(schemaKeys, schemaKey);
             if (matchingSchemaKey != null) {
                 final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
                 final List<Object> finalPath = _ValidateUtil.append(loopPath, schemaKey);
@@ -132,7 +128,7 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = _ParseSchemaToolUtil.offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -159,7 +155,7 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = _ParseSchemaToolUtil.offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -177,78 +173,10 @@ class _ParseSchemaUtil {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = _ParseSchemaToolUtil.offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
         return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, typeExtensions);
     }
-
-    private static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset) {
-        final var finalList = new ArrayList<_SchemaParseFailure>();
-
-        for (final var f : initialFailures) {
-            final String reason = f.reason;
-            final List<Object> path = f.path;
-            final Map<String, Object> data = f.data;
-            final var newPath = new ArrayList<>(path);
-
-            newPath.set(0, (Integer) newPath.get(0) - offset);
-
-            final Map<String, Object> finalData;
-            if (reason.equals("PathCollision")) {
-                final var otherNewPath = new ArrayList<>((List<Object>) data.get("other"));
-
-                otherNewPath.set(0, (Integer) otherNewPath.get(0) - offset);
-                finalData = Map.of("other", otherNewPath);
-            } else {
-                finalData = data;
-            }
-
-            finalList.add(new _SchemaParseFailure(newPath, reason, finalData));
-        }
-
-        return finalList;
-    }
-
-    private static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
-        final var matches = new ArrayList<String>();
-
-        for (final var e : definition.keySet()) {
-            if (e.matches(regex)) {
-                matches.add(e);
-            }
-        }
-
-        if (matches.size() == 1) {
-            return matches.get(0);
-        } else {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
-                    "ObjectKeyRegexMatchCountUnexpected",
-                    new TreeMap<>(
-                            Map.of("regex", regex, "actual", matches.size(), "expected", 1)))));
-        }
-    }
-
-    private static String findMatchingSchemaKey(Set<String> schemaKeys, String schemaKey) {
-        for (final var k : schemaKeys) {
-            var splitK = k.split("\\.")[1];
-            var splitSchemaKey = schemaKey.split("\\.")[1];
-            if (Objects.equals(splitK, splitSchemaKey)) {
-                return k;
-            }
-        }
-        return null;
-    }
-
-    static List<_SchemaParseFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
-            String expectedType) {
-        final var actualType = _ValidateUtil.getType(value);
-        final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
-                Map.entry("expected", Map.of(expectedType, Map.of()))));
-        return List.of(
-                new _SchemaParseFailure(path, "TypeUnexpected", data));
-    }
-
 }

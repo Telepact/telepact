@@ -19,14 +19,14 @@ class _UAny implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            _RandomGenerator random) {
-        final var selectType = random.nextInt(3);
+            _RandomGenerator randomGenerator) {
+        final var selectType = randomGenerator.nextInt(3);
         if (selectType == 0) {
-            return random.nextBoolean();
+            return randomGenerator.nextBoolean();
         } else if (selectType == 1) {
-            return random.nextInt();
+            return randomGenerator.nextInt();
         } else {
-            return random.nextString();
+            return randomGenerator.nextString();
         }
     }
 

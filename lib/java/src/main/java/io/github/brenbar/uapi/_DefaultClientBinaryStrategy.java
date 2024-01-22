@@ -2,16 +2,15 @@ package io.github.brenbar.uapi;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
 
     private static class Checksum {
         public final int value;
-        public final AtomicInteger expiration;
+        public int expiration;
 
-        public Checksum(int value, AtomicInteger expiration) {
+        public Checksum(int value, int expiration) {
             this.value = value;
             this.expiration = expiration;
         }
@@ -28,14 +27,14 @@ class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
             lock.lock();
 
             if (this.primary == null) {
-                this.primary = new Checksum(newChecksum, new AtomicInteger());
+                this.primary = new Checksum(newChecksum, 0);
                 return;
             }
 
             if (this.primary.value != newChecksum) {
                 this.secondary = this.primary;
-                this.primary = new Checksum(newChecksum, new AtomicInteger());
-                this.secondary.expiration.incrementAndGet();
+                this.primary = new Checksum(newChecksum, 0);
+                this.secondary.expiration += 1;
                 return;
             }
 
@@ -60,9 +59,9 @@ class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
                 // Every 10 minute interval of non-use is a penalty point
                 var penalty = ((int) (Math.floor(minutesSinceLastUpdate / 10))) + 1;
 
-                secondary.expiration.addAndGet(1 * penalty);
+                secondary.expiration += 1 * penalty;
 
-                if (secondary.expiration.get() > 5) {
+                if (secondary.expiration > 5) {
                     secondary = null;
                     return List.of(primary.value);
                 } else {

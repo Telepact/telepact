@@ -25,10 +25,10 @@ class _UGeneric implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            _RandomGenerator random) {
+            _RandomGenerator randomGenerator) {
         final var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(startingValue, useStartingValue,
-                includeRandomOptionalFields, List.of(), random);
+                includeRandomOptionalFields, List.of(), randomGenerator);
     }
 
     @Override

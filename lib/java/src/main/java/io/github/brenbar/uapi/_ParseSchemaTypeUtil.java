@@ -24,7 +24,7 @@ class _ParseSchemaTypeUtil {
         try {
             rootTypeString = _CastUtil.asString(baseType);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
                     .getTypeUnexpectedValidationFailure(basePath, baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
@@ -69,7 +69,7 @@ class _ParseSchemaTypeUtil {
             try {
                 l = _CastUtil.asList(e);
             } catch (ClassCastException e1) {
-                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
                         .getTypeUnexpectedValidationFailure(loopPath, e, "Array");
 
                 parseFailures.addAll(thisParseFailures);

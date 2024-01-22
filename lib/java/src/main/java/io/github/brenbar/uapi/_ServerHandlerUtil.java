@@ -84,7 +84,9 @@ class _ServerHandlerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        var callValidationFailures = functionType.call.validate(requestBody, List.of(), List.of());
+        final _UUnion functionTypeCall = functionType.call;
+
+        final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(), List.of());
         if (!callValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestBody", callValidationFailures, resultUnionType,
                     responseHeaders);

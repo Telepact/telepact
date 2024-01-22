@@ -103,7 +103,7 @@ class _UStruct implements _UType {
     public static Map<String, Object> constructRandomStruct(
             Map<String, _UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            _RandomGenerator random) {
+            _RandomGenerator randomGenerator) {
 
         final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -118,20 +118,20 @@ class _UStruct implements _UType {
             final Object value;
             if (useStartingValue) {
                 value = fieldDeclaration.typeDeclaration.generateRandomValue(startingValue, useStartingValue,
-                        includeRandomOptionalFields, typeParameters, random);
+                        includeRandomOptionalFields, typeParameters, randomGenerator);
             } else {
                 if (!fieldDeclaration.optional) {
                     value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
-                            includeRandomOptionalFields, typeParameters, random);
+                            includeRandomOptionalFields, typeParameters, randomGenerator);
                 } else {
                     if (!includeRandomOptionalFields) {
                         continue;
                     }
-                    if (random.nextBoolean()) {
+                    if (randomGenerator.nextBoolean()) {
                         continue;
                     }
                     value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
-                            includeRandomOptionalFields, typeParameters, random);
+                            includeRandomOptionalFields, typeParameters, randomGenerator);
                 }
             }
 

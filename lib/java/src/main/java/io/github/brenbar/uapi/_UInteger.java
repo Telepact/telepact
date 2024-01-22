@@ -29,11 +29,11 @@ class _UInteger implements _UType {
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, _RandomGenerator random) {
+            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
         } else {
-            return random.nextInt();
+            return randomGenerator.nextInt();
         }
     }
 

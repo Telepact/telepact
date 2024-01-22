@@ -39,7 +39,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> branchParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> branchParseFailures = _ParseSchemaToolUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);
@@ -84,7 +84,7 @@ class _ParseSchemaCustomTypeUtil {
         try {
             definition = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> finalParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> finalParseFailures = _ParseSchemaToolUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
 
             parseFailures.addAll(finalParseFailures);
@@ -120,7 +120,7 @@ class _ParseSchemaCustomTypeUtil {
             try {
                 unionCaseStruct = _CastUtil.asMap(entry.getValue());
             } catch (ClassCastException e) {
-                List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+                List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
                         .getTypeUnexpectedValidationFailure(unionKeyPath, entry.getValue(), "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -218,7 +218,7 @@ class _ParseSchemaCustomTypeUtil {
             typeDeclarationArray = _CastUtil.asList(typeDeclarationValue);
         } catch (ClassCastException e) {
             throw new UApiSchemaParseError(
-                    _ParseSchemaUtil.getTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));
+                    _ParseSchemaToolUtil.getTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));
         }
 
         final var typeDeclaration = _ParseSchemaTypeUtil.parseTypeDeclaration(thisPath,

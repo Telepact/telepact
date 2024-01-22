@@ -54,8 +54,9 @@ class _ParseSchemaFnTypeUtil {
             try {
                 errorsRegex = _CastUtil.asString(errorsRegexInit);
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil.getTypeUnexpectedValidationFailure(
-                        regexPath, errorsRegexInit, "String");
+                final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
+                        .getTypeUnexpectedValidationFailure(
+                                regexPath, errorsRegexInit, "String");
 
                 parseFailures
                         .addAll(thisParseFailures);

@@ -39,12 +39,12 @@ class _UTypeDeclaration {
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
-            _RandomGenerator random) {
-        if (this.nullable && !useStartingValue && random.nextBoolean()) {
+            _RandomGenerator randomGenerator) {
+        if (this.nullable && !useStartingValue && randomGenerator.nextBoolean()) {
             return null;
         } else {
             return this.type.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
-                    this.typeParameters, generics, random);
+                    this.typeParameters, generics, randomGenerator);
         }
     }
 }

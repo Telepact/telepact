@@ -97,7 +97,7 @@ class _UUnion implements _UType {
             Map<String, Object> startingUnion,
             boolean includeRandomOptionalFields,
             List<_UTypeDeclaration> typeParameters,
-            _RandomGenerator random) {
+            _RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
             final var unionEntry = _UUnion.entry(startingUnion);
             final var unionCase = unionEntry.getKey();
@@ -105,20 +105,20 @@ class _UUnion implements _UType {
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
             return Map.of(unionCase, _UStruct.constructRandomStruct(unionStructType.fields, unionStartingStruct,
-                    includeRandomOptionalFields, typeParameters, random));
+                    includeRandomOptionalFields, typeParameters, randomGenerator));
         } else {
             final var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
 
             Collections.sort(sortedUnionCasesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            final var randomIndex = random.nextInt(sortedUnionCasesReference.size());
+            final var randomIndex = randomGenerator.nextInt(sortedUnionCasesReference.size());
             final var unionEntry = sortedUnionCasesReference.get(randomIndex);
             final var unionCase = unionEntry.getKey();
             final var unionData = unionEntry.getValue();
 
             return Map.of(unionCase,
                     _UStruct.constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,
-                            typeParameters, random));
+                            typeParameters, randomGenerator));
         }
     }
 

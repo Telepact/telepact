@@ -87,7 +87,7 @@ class _ParseSchemaErrorUtil {
         try {
             def = _CastUtil.asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaUtil
+            final List<_SchemaParseFailure> thisParseFailures = _ParseSchemaToolUtil
                     .getTypeUnexpectedValidationFailure(thisPath, defInit, "Object");
 
             parseFailures.addAll(thisParseFailures);

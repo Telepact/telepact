@@ -9,8 +9,8 @@ import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
 class _BinaryPackUtil {
 
-    public static final MessagePackExtensionType PACKED = new MessagePackExtensionType((byte) 17, new byte[0]);
-    public static final MessagePackExtensionType UNDEFINED = new MessagePackExtensionType((byte) 18, new byte[0]);
+    public static final byte PACKED_BYTE = (byte) 17;
+    public static final byte UNDEFINED_BYTE = (byte) 18;
 
     private static class _BinaryPackNode {
         public final Integer value;
@@ -56,7 +56,7 @@ class _BinaryPackUtil {
         final var packedList = new ArrayList<Object>();
         final var header = new ArrayList<Object>();
 
-        packedList.add(PACKED);
+        packedList.add(new MessagePackExtensionType(PACKED_BYTE, new byte[0]));
 
         header.add(null);
 
@@ -132,7 +132,7 @@ class _BinaryPackUtil {
             }
 
             while (row.size() < keyIndexValue) {
-                row.add(UNDEFINED);
+                row.add(new MessagePackExtensionType(UNDEFINED_BYTE, new byte[0]));
             }
 
             if (row.size() == keyIndexValue) {

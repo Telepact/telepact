@@ -45,7 +45,7 @@ class _UObject implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            _RandomGenerator random) {
+            _RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
 
         if (useStartingValue) {
@@ -56,19 +56,19 @@ class _UObject implements _UType {
                 final var key = startingObjEntry.getKey();
                 final var startingObjValue = startingObjEntry.getValue();
                 final var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
-                        includeRandomOptionalFields, generics, random);
+                        includeRandomOptionalFields, generics, randomGenerator);
                 obj.put(key, value);
             }
 
             return obj;
         } else {
-            final var length = random.nextCollectionLength();
+            final var length = randomGenerator.nextCollectionLength();
 
             final var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
-                final var key = random.nextString();
+                final var key = randomGenerator.nextString();
                 final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields,
-                        generics, random);
+                        generics, randomGenerator);
                 obj.put(key, value);
             }
 
