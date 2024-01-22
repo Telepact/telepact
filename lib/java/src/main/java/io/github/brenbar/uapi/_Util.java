@@ -52,12 +52,121 @@ class _Util {
                 new _ValidationFailure(path, "TypeUnexpected", data));
     }
 
+    static List<_ValidationFailure> validateValueOfType(Object value, List<_UTypeDeclaration> generics,
+            _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
+        if (value == null) {
+            final boolean isNullable;
+            if (thisType instanceof _UGeneric g) {
+                final int genericIndex = g.index;
+                final var generic = generics.get(genericIndex);
+                isNullable = generic.nullable;
+            } else {
+                isNullable = nullable;
+            }
+
+            if (!isNullable) {
+                return getTypeUnexpectedValidationFailure(List.of(), value,
+                        thisType.getName(generics));
+            } else {
+                return List.of();
+            }
+        } else {
+            return thisType.validate(value, typeParameters, generics);
+        }
+    }
+
+    static Object generateRandomValueOfType(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
+            _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
+            List<_UTypeDeclaration> typeParameters) {
+        if (nullable && !useStartingValue && randomGenerator.nextBoolean()) {
+            return null;
+        } else {
+            return thisType.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+                    typeParameters, generics, randomGenerator);
+        }
+    }
+
     static Object generateRandomAny(_RandomGenerator randomGenerator) {
         final var selectType = randomGenerator.nextInt(3);
         if (selectType == 0) {
             return randomGenerator.nextBoolean();
         } else if (selectType == 1) {
             return randomGenerator.nextInt();
+        } else {
+            return randomGenerator.nextString();
+        }
+    }
+
+    static List<_ValidationFailure> validateBoolean(Object value) {
+        if (value instanceof Boolean) {
+            return List.of();
+        } else {
+            return getTypeUnexpectedValidationFailure(List.of(), value, _BOOLEAN_NAME);
+        }
+    }
+
+    static Object generateRandomBoolean(Object startingValue, boolean useStartingValue,
+            _RandomGenerator randomGenerator) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return randomGenerator.nextBoolean();
+        }
+    }
+
+    static List<_ValidationFailure> validateInteger(Object value) {
+        if (value instanceof Long || value instanceof Integer) {
+            return List.of();
+        } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
+            return List.of(
+                    new _ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
+        } else {
+            return getTypeUnexpectedValidationFailure(List.of(), value, _INTEGER_NAME);
+        }
+    }
+
+    static Object generateRandomInteger(Object startingValue, boolean useStartingValue,
+            _RandomGenerator randomGenerator) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return randomGenerator.nextInt();
+        }
+    }
+
+    static List<_ValidationFailure> validateNumber(Object value) {
+        if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
+            return List.of(
+                    new _ValidationFailure(List.of(), "NumberOutOfRange", Map.of()));
+        } else if (value instanceof Number) {
+            return List.of();
+        } else {
+            return getTypeUnexpectedValidationFailure(List.of(), value, _NUMBER_NAME);
+        }
+    }
+
+    static Object generateRandomNumber(Object startingValue, boolean useStartingValue,
+            _RandomGenerator randomGenerator) {
+        if (useStartingValue) {
+            return startingValue;
+        } else {
+            return randomGenerator.nextDouble();
+        }
+    }
+
+    static List<_ValidationFailure> validateString(Object value) {
+        if (value instanceof String) {
+            return List.of();
+        } else {
+            return getTypeUnexpectedValidationFailure(List.of(), value, _STRING_NAME);
+        }
+    }
+
+    static Object generateRandomString(Object startingValue, boolean useStartingValue,
+            _RandomGenerator randomGenerator) {
+        if (useStartingValue) {
+            return startingValue;
         } else {
             return randomGenerator.nextString();
         }
@@ -125,188 +234,6 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateBoolean(Object value) {
-        if (value instanceof Boolean) {
-            return List.of();
-        } else {
-            return getTypeUnexpectedValidationFailure(List.of(), value, _BOOLEAN_NAME);
-        }
-    }
-
-    static Object generateRandomBoolean(Object startingValue, boolean useStartingValue,
-            _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextBoolean();
-        }
-    }
-
-    static Object generateRandomFn(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator, Map<String, _UStruct> callCases) {
-        if (useStartingValue) {
-            final var startingFnValue = (Map<String, Object>) startingValue;
-            return constructRandomUnion(callCases, startingFnValue, includeRandomOptionalFields,
-                    List.of(), randomGenerator);
-        } else {
-            return constructRandomUnion(callCases, new HashMap<>(), includeRandomOptionalFields,
-                    List.of(), randomGenerator);
-        }
-    }
-
-    static List<_ValidationFailure> validateInteger(Object value) {
-        if (value instanceof Long || value instanceof Integer) {
-            return List.of();
-        } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
-            return List.of(
-                    new _ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
-        } else {
-            return getTypeUnexpectedValidationFailure(List.of(), value, _INTEGER_NAME);
-        }
-    }
-
-    static Object generateRandomInteger(Object startingValue, boolean useStartingValue,
-            _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextInt();
-        }
-    }
-
-    static List<_ValidationFailure> validateMockCall(Object givenObj,
-            List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
-        final Map<String, Object> givenMap;
-        try {
-            givenMap = _CastUtil.asMap(givenObj);
-        } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
-        }
-
-        final var regexString = "^fn\\..*$";
-
-        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
-        if (matches.size() != 1) {
-            return List.of(new _ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
-                    Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
-        }
-
-        final var functionName = matches.get(0);
-        final var functionDef = (_UFn) types.get(functionName);
-        final var input = givenMap.get(functionName);
-
-        final _UUnion functionDefCall = functionDef.call;
-        final String functionDefName = functionDef.name;
-        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
-
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
-
-        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
-        for (var f : inputFailures) {
-            List<Object> newPath = _ValidateUtil.prepend(functionName, f.path);
-
-            inputFailuresWithPath.add(new _ValidationFailure(newPath, f.reason, f.data));
-        }
-
-        return inputFailuresWithPath.stream()
-                .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
-    }
-
-    static List<_ValidationFailure> validateMockStub(Object givenObj,
-            List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
-
-        final Map<String, Object> givenMap;
-        try {
-            givenMap = _CastUtil.asMap(givenObj);
-        } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
-        }
-
-        final var regexString = "^fn\\..*$";
-
-        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
-        if (matches.size() != 1) {
-            return List.of(
-                    new _ValidationFailure(List.of(),
-                            "ObjectKeyRegexMatchCountUnexpected",
-                            Map.of("regex", regexString, "actual",
-                                    matches.size(), "expected", 1)));
-
-        }
-
-        final var functionName = matches.get(0);
-        final var functionDef = (_UFn) types.get(functionName);
-        final var input = givenMap.get(functionName);
-
-        final _UUnion functionDefCall = functionDef.call;
-        final String functionDefName = functionDef.name;
-        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
-
-        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
-        for (final var f : inputFailures) {
-            final List<Object> thisPath = _ValidateUtil.prepend(functionName, f.path);
-
-            inputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
-        }
-
-        final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
-                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing")).toList();
-
-        validationFailures.addAll(inputFailuresWithoutMissingRequired);
-
-        final var resultDefKey = "->";
-
-        if (!givenMap.containsKey(resultDefKey)) {
-            return List.of(new _ValidationFailure(List.of(resultDefKey),
-                    "RequiredObjectKeyMissing",
-                    Map.of()));
-        }
-
-        final var output = givenMap.get(resultDefKey);
-        final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
-
-        final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
-        for (final var f : outputFailures) {
-            final List<Object> thisPath = _ValidateUtil.prepend(resultDefKey, f.path);
-
-            outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
-        }
-
-        final var failuresWithoutMissingRequired = outputFailuresWithPath
-                .stream()
-                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing"))
-                .toList();
-
-        validationFailures.addAll(failuresWithoutMissingRequired);
-
-        return validationFailures;
-    }
-
-    static List<_ValidationFailure> validateNumber(Object value) {
-        if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
-            return List.of(
-                    new _ValidationFailure(List.of(), "NumberOutOfRange", Map.of()));
-        } else if (value instanceof Number) {
-            return List.of();
-        } else {
-            return getTypeUnexpectedValidationFailure(List.of(), value, _NUMBER_NAME);
-        }
-    }
-
-    static Object generateRandomNumber(Object startingValue, boolean useStartingValue,
-            _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextDouble();
-        }
-    }
-
     static List<_ValidationFailure> validateObject(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
@@ -364,23 +291,6 @@ class _Util {
             }
 
             return obj;
-        }
-    }
-
-    static List<_ValidationFailure> validateString(Object value) {
-        if (value instanceof String) {
-            return List.of();
-        } else {
-            return getTypeUnexpectedValidationFailure(List.of(), value, _STRING_NAME);
-        }
-    }
-
-    static Object generateRandomString(Object startingValue, boolean useStartingValue,
-            _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextString();
         }
     }
 
@@ -499,39 +409,8 @@ class _Util {
         return obj;
     }
 
-    static List<_ValidationFailure> validateValueOfType(Object value, List<_UTypeDeclaration> generics,
-            _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
-        if (value == null) {
-            final boolean isNullable;
-            if (thisType instanceof _UGeneric g) {
-                final int genericIndex = g.index;
-                final var generic = generics.get(genericIndex);
-                isNullable = generic.nullable;
-            } else {
-                isNullable = nullable;
-            }
-
-            if (!isNullable) {
-                return getTypeUnexpectedValidationFailure(List.of(), value,
-                        thisType.getName(generics));
-            } else {
-                return List.of();
-            }
-        } else {
-            return thisType.validate(value, typeParameters, generics);
-        }
-    }
-
-    static Object generateRandomValueOfType(Object startingValue, boolean useStartingValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
-            _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
-            List<_UTypeDeclaration> typeParameters) {
-        if (nullable && !useStartingValue && randomGenerator.nextBoolean()) {
-            return null;
-        } else {
-            return thisType.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
-                    typeParameters, generics, randomGenerator);
-        }
+    static Map.Entry<String, Object> unionEntry(Map<String, Object> union) {
+        return union.entrySet().stream().findAny().orElse(null);
     }
 
     static List<_ValidationFailure> validateUnion(Object value, List<_UTypeDeclaration> typeParameters,
@@ -631,7 +510,128 @@ class _Util {
         }
     }
 
-    static Map.Entry<String, Object> unionEntry(Map<String, Object> union) {
-        return union.entrySet().stream().findAny().orElse(null);
+    static Object generateRandomFn(Object startingValue, boolean useStartingValue,
+            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator, Map<String, _UStruct> callCases) {
+        if (useStartingValue) {
+            final var startingFnValue = (Map<String, Object>) startingValue;
+            return constructRandomUnion(callCases, startingFnValue, includeRandomOptionalFields,
+                    List.of(), randomGenerator);
+        } else {
+            return constructRandomUnion(callCases, new HashMap<>(), includeRandomOptionalFields,
+                    List.of(), randomGenerator);
+        }
+    }
+
+    static List<_ValidationFailure> validateMockCall(Object givenObj,
+            List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
+        final Map<String, Object> givenMap;
+        try {
+            givenMap = _CastUtil.asMap(givenObj);
+        } catch (ClassCastException e) {
+            return getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
+        }
+
+        final var regexString = "^fn\\..*$";
+
+        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        if (matches.size() != 1) {
+            return List.of(new _ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
+                    Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
+        }
+
+        final var functionName = matches.get(0);
+        final var functionDef = (_UFn) types.get(functionName);
+        final var input = givenMap.get(functionName);
+
+        final _UUnion functionDefCall = functionDef.call;
+        final String functionDefName = functionDef.name;
+        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
+
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
+
+        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        for (var f : inputFailures) {
+            List<Object> newPath = _ValidateUtil.prepend(functionName, f.path);
+
+            inputFailuresWithPath.add(new _ValidationFailure(newPath, f.reason, f.data));
+        }
+
+        return inputFailuresWithPath.stream()
+                .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
+    }
+
+    static List<_ValidationFailure> validateMockStub(Object givenObj,
+            List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
+        final var validationFailures = new ArrayList<_ValidationFailure>();
+
+        final Map<String, Object> givenMap;
+        try {
+            givenMap = _CastUtil.asMap(givenObj);
+        } catch (ClassCastException e) {
+            return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
+        }
+
+        final var regexString = "^fn\\..*$";
+
+        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        if (matches.size() != 1) {
+            return List.of(
+                    new _ValidationFailure(List.of(),
+                            "ObjectKeyRegexMatchCountUnexpected",
+                            Map.of("regex", regexString, "actual",
+                                    matches.size(), "expected", 1)));
+
+        }
+
+        final var functionName = matches.get(0);
+        final var functionDef = (_UFn) types.get(functionName);
+        final var input = givenMap.get(functionName);
+
+        final _UUnion functionDefCall = functionDef.call;
+        final String functionDefName = functionDef.name;
+        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
+
+        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        for (final var f : inputFailures) {
+            final List<Object> thisPath = _ValidateUtil.prepend(functionName, f.path);
+
+            inputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+        }
+
+        final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
+                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing")).toList();
+
+        validationFailures.addAll(inputFailuresWithoutMissingRequired);
+
+        final var resultDefKey = "->";
+
+        if (!givenMap.containsKey(resultDefKey)) {
+            return List.of(new _ValidationFailure(List.of(resultDefKey),
+                    "RequiredObjectKeyMissing",
+                    Map.of()));
+        }
+
+        final var output = givenMap.get(resultDefKey);
+        final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
+
+        final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        for (final var f : outputFailures) {
+            final List<Object> thisPath = _ValidateUtil.prepend(resultDefKey, f.path);
+
+            outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+        }
+
+        final var failuresWithoutMissingRequired = outputFailuresWithPath
+                .stream()
+                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing"))
+                .toList();
+
+        validationFailures.addAll(failuresWithoutMissingRequired);
+
+        return validationFailures;
     }
 }
