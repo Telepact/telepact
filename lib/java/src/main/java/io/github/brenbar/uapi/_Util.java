@@ -1,6 +1,8 @@
 package io.github.brenbar.uapi;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -17,9 +19,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +46,57 @@ class _Util {
     static final String _STRING_NAME = "String";
     static final String _STRUCT_NAME = "Object";
     static final String _UNION_NAME = "Object";
+
+    public static String getInternalUApiJson() {
+        final var stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("internal.uapi.json");
+        return new BufferedReader(new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
+    };
+
+    public static String getMockUApiJson() {
+        final var stream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("mock-internal.uapi.json");
+        return new BufferedReader(new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
+    };
+
+    public static Integer asInt(Object object) {
+        if (object == null) {
+            throw new ClassCastException();
+        }
+
+        return (Integer) object;
+    }
+
+    public static Long asLong(Object object) {
+        if (object == null) {
+            throw new ClassCastException();
+        }
+
+        return (Long) object;
+    }
+
+    public static String asString(Object object) {
+        if (object == null) {
+            throw new ClassCastException();
+        }
+
+        return (String) object;
+    }
+
+    public static List<Object> asList(Object object) {
+        if (object == null) {
+            throw new ClassCastException();
+        }
+
+        return (List<Object>) object;
+    }
+
+    public static Map<String, Object> asMap(Object object) {
+        if (object == null) {
+            throw new ClassCastException();
+        }
+
+        return (Map<String, Object>) object;
+    }
 
     public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset) {
         final var finalList = new ArrayList<_SchemaParseFailure>();
@@ -97,7 +156,7 @@ class _Util {
         return null;
     }
 
-    public static List<_SchemaParseFailure> schgetTypeUnexpectedValidationFailure(List<Object> path, Object value,
+    public static List<_SchemaParseFailure> getTypeUnexpectedParseFailure(List<Object> path, Object value,
             String expectedType) {
         final var actualType = _Util.getType(value);
         final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
@@ -134,9 +193,9 @@ class _Util {
 
         final String rootTypeString;
         try {
-            rootTypeString = _CastUtil.asString(baseType);
+            rootTypeString = asString(baseType);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(basePath,
+            final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(basePath,
                     baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
@@ -179,9 +238,9 @@ class _Util {
 
             final List<Object> l;
             try {
-                l = _CastUtil.asList(e);
+                l = asList(e);
             } catch (ClassCastException e1) {
-                final List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(loopPath, e,
+                final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e,
                         "Array");
 
                 parseFailures.addAll(thisParseFailures);
@@ -336,9 +395,9 @@ class _Util {
 
         Map<String, Object> definition = null;
         try {
-            definition = _CastUtil.asMap(defInit);
+            definition = asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> branchParseFailures = schgetTypeUnexpectedValidationFailure(thisPath,
+            final List<_SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);
@@ -382,9 +441,9 @@ class _Util {
 
         final Map<String, Object> definition;
         try {
-            definition = _CastUtil.asMap(defInit);
+            definition = asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> finalParseFailures = schgetTypeUnexpectedValidationFailure(thisPath,
+            final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Object");
 
             parseFailures.addAll(finalParseFailures);
@@ -418,9 +477,9 @@ class _Util {
 
             final Map<String, Object> unionCaseStruct;
             try {
-                unionCaseStruct = _CastUtil.asMap(entry.getValue());
+                unionCaseStruct = asMap(entry.getValue());
             } catch (ClassCastException e) {
-                List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(unionKeyPath,
+                List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,
                         entry.getValue(), "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -515,10 +574,10 @@ class _Util {
 
         final List<Object> typeDeclarationArray;
         try {
-            typeDeclarationArray = _CastUtil.asList(typeDeclarationValue);
+            typeDeclarationArray = asList(typeDeclarationValue);
         } catch (ClassCastException e) {
             throw new UApiSchemaParseError(
-                    schgetTypeUnexpectedValidationFailure(thisPath, typeDeclarationValue, "Array"));
+                    getTypeUnexpectedParseFailure(thisPath, typeDeclarationValue, "Array"));
         }
 
         final var typeDeclaration = parseTypeDeclaration(thisPath,
@@ -609,9 +668,9 @@ class _Util {
 
         final Map<String, Object> def;
         try {
-            def = _CastUtil.asMap(defInit);
+            def = asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(thisPath, defInit,
+            final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit,
                     "Object");
 
             parseFailures.addAll(thisParseFailures);
@@ -683,9 +742,9 @@ class _Util {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^error\\..*$");
             try {
-                errorsRegex = _CastUtil.asString(errorsRegexInit);
+                errorsRegex = asString(errorsRegexInit);
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(
+                final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
                         regexPath, errorsRegexInit, "String");
 
                 parseFailures
@@ -715,9 +774,9 @@ class _Util {
 
         final List<Object> uApiSchemaPseudoJson;
         try {
-            uApiSchemaPseudoJson = _CastUtil.asList(uApiSchemaPseudoJsonInit);
+            uApiSchemaPseudoJson = asList(uApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(List.of(),
+            final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(List.of(),
                     uApiSchemaPseudoJsonInit, "Array");
             throw new UApiSchemaParseError(thisParseFailures, e);
         }
@@ -741,9 +800,9 @@ class _Util {
 
         final List<Object> secondUApiSchemaPseudoJson;
         try {
-            secondUApiSchemaPseudoJson = _CastUtil.asList(secondUApiSchemaPseudoJsonInit);
+            secondUApiSchemaPseudoJson = asList(secondUApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailure = schgetTypeUnexpectedValidationFailure(List.of(),
+            final List<_SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(List.of(),
                     secondUApiSchemaPseudoJsonInit, "Array");
             throw new UApiSchemaParseError(thisParseFailure, e);
         }
@@ -780,9 +839,9 @@ class _Util {
 
             final Map<String, Object> def;
             try {
-                def = _CastUtil.asMap(definition);
+                def = asMap(definition);
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> thisParseFailures = schgetTypeUnexpectedValidationFailure(loopPath,
+                final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
                         definition, "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -866,6 +925,408 @@ class _Util {
         }
 
         return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, typeExtensions);
+    }
+
+    public static final byte PACKED_BYTE = (byte) 17;
+    public static final byte UNDEFINED_BYTE = (byte) 18;
+
+    private static class _BinaryPackNode {
+        public final Integer value;
+        public final Map<Integer, _BinaryPackNode> nested;
+
+        public _BinaryPackNode(Integer value, Map<Integer, _BinaryPackNode> nested) {
+            this.value = value;
+            this.nested = nested;
+        }
+    }
+
+    static Map<Object, Object> packBody(Map<Object, Object> body) {
+        final var result = new HashMap<Object, Object>();
+
+        for (final var entry : body.entrySet()) {
+            final var packedValue = pack(entry.getValue());
+            result.put(entry.getKey(), packedValue);
+        }
+
+        return result;
+    }
+
+    static Object pack(Object value) {
+        if (value instanceof final List l) {
+            return packList(l);
+        } else if (value instanceof final Map<?, ?> m) {
+            final var newMap = new HashMap<Object, Object>();
+
+            for (final var entry : m.entrySet()) {
+                newMap.put(entry.getKey(), pack(entry.getValue()));
+            }
+
+            return newMap;
+        } else {
+            return value;
+        }
+    }
+
+    static class CannotPack extends Exception {
+    }
+
+    static List<Object> packList(List<Object> list) {
+        final var packedList = new ArrayList<Object>();
+        final var header = new ArrayList<Object>();
+
+        packedList.add(new MessagePackExtensionType(PACKED_BYTE, new byte[0]));
+
+        header.add(null);
+
+        packedList.add(header);
+
+        final var keyIndexMap = new HashMap<Integer, _BinaryPackNode>();
+        try {
+            for (final var e : list) {
+                if (e instanceof final Map<?, ?> m) {
+                    final var row = packMap(m, header, keyIndexMap);
+
+                    packedList.add(row);
+                } else {
+                    // This list cannot be packed, abort
+                    throw new CannotPack();
+                }
+            }
+            return packedList;
+        } catch (final CannotPack ex) {
+            final var newList = new ArrayList<Object>();
+            for (final var e : list) {
+                newList.add(pack(e));
+            }
+            return newList;
+        }
+    }
+
+    static List<Object> packMap(Map<?, ?> m, List<Object> header,
+            Map<Integer, _BinaryPackNode> keyIndexMap) throws CannotPack {
+        final var row = new ArrayList<Object>();
+        for (final var entry : m.entrySet()) {
+            if (entry.getKey() instanceof final String s) {
+                throw new CannotPack();
+            }
+
+            final var key = (Integer) entry.getKey();
+            final var keyIndex = keyIndexMap.get(key);
+
+            final _BinaryPackNode finalKeyIndex;
+            if (keyIndex == null) {
+                finalKeyIndex = new _BinaryPackNode(header.size() - 1, new HashMap<>());
+
+                if (entry.getValue() instanceof Map<?, ?>) {
+                    header.add(new ArrayList<>(List.of(key)));
+                } else {
+                    header.add(key);
+                }
+
+                keyIndexMap.put(key, finalKeyIndex);
+            } else {
+                finalKeyIndex = keyIndex;
+            }
+
+            final Integer keyIndexValue = finalKeyIndex.value;
+            final Map<Integer, _BinaryPackNode> keyIndexNested = finalKeyIndex.nested;
+
+            final Object packedValue;
+            if (entry.getValue() instanceof Map<?, ?> m2) {
+                final List<Object> nestedHeader;
+                try {
+                    nestedHeader = (List<Object>) header.get(keyIndexValue + 1);
+                } catch (ClassCastException e) {
+                    throw new CannotPack();
+                }
+
+                packedValue = packMap(m2, nestedHeader, keyIndexNested);
+            } else {
+                if (header.get(keyIndexValue + 1) instanceof List) {
+                    throw new CannotPack();
+                }
+
+                packedValue = pack(entry.getValue());
+            }
+
+            while (row.size() < keyIndexValue) {
+                row.add(new MessagePackExtensionType(UNDEFINED_BYTE, new byte[0]));
+            }
+
+            if (row.size() == keyIndexValue) {
+                row.add(packedValue);
+            } else {
+                row.set(keyIndexValue, packedValue);
+            }
+        }
+        return row;
+    }
+
+    static Map<Object, Object> unpackBody(Map<Object, Object> body) {
+        final var result = new HashMap<Object, Object>();
+
+        for (final var entry : body.entrySet()) {
+            final var unpackedValue = unpack(entry.getValue());
+            result.put(entry.getKey(), unpackedValue);
+        }
+
+        return result;
+    }
+
+    static Object unpack(Object value) {
+        if (value instanceof final List l) {
+            return unpackList(l);
+        } else if (value instanceof final Map<?, ?> m) {
+            final var newMap = new HashMap<Object, Object>();
+
+            for (Map.Entry<?, ?> entry : m.entrySet()) {
+                newMap.put(entry.getKey(), unpack(entry.getValue()));
+            }
+
+            return newMap;
+        } else {
+            return value;
+        }
+    }
+
+    static List<Object> unpackList(List<Object> list) {
+        if (list.size() == 0) {
+            return list;
+        }
+
+        if (!(list.get(0) instanceof final MessagePackExtensionType t && t.getType() == PACKED_BYTE)) {
+            final var newList = new ArrayList<Object>();
+            for (final var e : list) {
+                newList.add(unpack(e));
+            }
+            return newList;
+        }
+
+        final var unpackedList = new ArrayList<Object>();
+        final var headers = (List<Object>) list.get(1);
+
+        for (int i = 2; i < list.size(); i += 1) {
+            final var row = (List<Object>) list.get(i);
+            final var m = unpackMap(row, headers);
+
+            unpackedList.add(m);
+        }
+
+        return unpackedList;
+    }
+
+    static Map<Integer, Object> unpackMap(List<Object> row, List<Object> header) {
+        final var finalMap = new HashMap<Integer, Object>();
+
+        for (int j = 0; j < row.size(); j += 1) {
+            final var key = header.get(j + 1);
+            final var value = row.get(j);
+
+            if (value instanceof final MessagePackExtensionType t && t.getType() == UNDEFINED_BYTE) {
+                continue;
+            }
+
+            if (key instanceof final Integer i) {
+                final var unpackedValue = unpack(value);
+
+                finalMap.put(i, unpackedValue);
+            } else {
+                final var nestedHeader = (List<Object>) key;
+                final var nestedRow = (List<Object>) value;
+                final var m = unpackMap(nestedRow, nestedHeader);
+                final var i = (Integer) nestedHeader.get(0);
+
+                finalMap.put(i, m);
+            }
+        }
+
+        return finalMap;
+    }
+
+    static List<Object> serverBinaryEncode(List<Object> message, _BinaryEncoding binaryEncoder) {
+        final var headers = (Map<String, Object>) message.get(0);
+        final var messageBody = (Map<String, Object>) message.get(1);
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
+
+        if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
+            headers.put("_enc", binaryEncoder.encodeMap);
+        }
+
+        headers.put("_bin", List.of(binaryEncoder.checksum));
+        final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+
+        final Map<Object, Object> finalEncodedMessageBody;
+        if (Objects.equals(true, headers.get("_pac"))) {
+            finalEncodedMessageBody = packBody(encodedMessageBody);
+        } else {
+            finalEncodedMessageBody = encodedMessageBody;
+        }
+
+        return List.of(headers, finalEncodedMessageBody);
+    }
+
+    static List<Object> serverBinaryDecode(List<Object> message, _BinaryEncoding binaryEncoder)
+            throws BinaryEncoderUnavailableError {
+        final var headers = (Map<String, Object>) message.get(0);
+        final var encodedMessageBody = (Map<Object, Object>) message.get(1);
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.get("_bin");
+        final var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
+
+        if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        final Map<Object, Object> finalEncodedMessageBody;
+        if (Objects.equals(true, headers.get("_pac"))) {
+            finalEncodedMessageBody = unpackBody(encodedMessageBody);
+        } else {
+            finalEncodedMessageBody = encodedMessageBody;
+        }
+
+        final var messageBody = (Map<String, Object>) decodeBody(finalEncodedMessageBody, binaryEncoder);
+        return List.of(headers, messageBody);
+    }
+
+    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
+            ClientBinaryStrategy binaryChecksumStrategy)
+            throws BinaryEncoderUnavailableError {
+        final var headers = (Map<String, Object>) message.get(0);
+        final var messageBody = (Map<String, Object>) message.get(1);
+        final var forceSendJson = headers.remove("_forceSendJson");
+
+        headers.put("_bin", binaryChecksumStrategy.getCurrentChecksums());
+
+        if (Objects.equals(forceSendJson, true)) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        if (recentBinaryEncoders.size() > 1) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        final var checksums = recentBinaryEncoders.keySet().stream().toList();
+
+        final _BinaryEncoding binaryEncoder;
+        try {
+            binaryEncoder = recentBinaryEncoders.get(checksums.get(0));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new BinaryEncoderUnavailableError();
+        }
+
+        final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+
+        final Map<Object, Object> finalEncodedMessageBody;
+        if (Objects.equals(true, headers.get("_pac"))) {
+            finalEncodedMessageBody = packBody(encodedMessageBody);
+        } else {
+            finalEncodedMessageBody = encodedMessageBody;
+        }
+
+        return List.of(headers, finalEncodedMessageBody);
+    }
+
+    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
+            ClientBinaryStrategy binaryChecksumStrategy)
+            throws BinaryEncoderUnavailableError {
+        final var headers = (Map<String, Object>) message.get(0);
+        final var encodedMessageBody = (Map<Object, Object>) message.get(1);
+        final var binaryChecksums = (List<Integer>) headers.get("_bin");
+        final var binaryChecksum = binaryChecksums.get(0);
+
+        // If there is a binary encoding included on this message, cache it
+        if (headers.containsKey("_enc")) {
+            final var binaryEncoding = (Map<String, Integer>) headers.get("_enc");
+            final var newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
+
+            recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
+        }
+
+        binaryChecksumStrategy.update(binaryChecksum);
+        final var newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
+
+        recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
+        final var binaryEncoder = recentBinaryEncoders.get(binaryChecksum);
+
+        final Map<Object, Object> finalEncodedMessageBody;
+        if (Objects.equals(true, headers.get("_pac"))) {
+            finalEncodedMessageBody = unpackBody(encodedMessageBody);
+        } else {
+            finalEncodedMessageBody = encodedMessageBody;
+        }
+
+        final var messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
+        return List.of(headers, messageBody);
+    }
+
+    private static Map<Object, Object> encodeBody(Map<String, Object> messageBody, _BinaryEncoding binaryEncoder) {
+        return (Map<Object, Object>) encodeKeys(messageBody, binaryEncoder);
+    }
+
+    static Map<String, Object> decodeBody(Map<Object, Object> encodedMessageBody, _BinaryEncoding binaryEncoder) {
+        return (Map<String, Object>) decodeKeys(encodedMessageBody, binaryEncoder);
+    }
+
+    private static Object encodeKeys(Object given, _BinaryEncoding binaryEncoder) {
+        if (given == null) {
+            return given;
+        } else if (given instanceof final Map<?, ?> m) {
+            final var newMap = new HashMap<Object, Object>();
+
+            for (final var e : m.entrySet()) {
+                final var key = e.getKey();
+
+                final Object finalKey;
+                if (binaryEncoder.encodeMap.containsKey(key)) {
+                    finalKey = encodeOrDecode(key, binaryEncoder.encodeMap);
+                } else {
+                    finalKey = key;
+                }
+
+                final var encodedValue = encodeKeys(e.getValue(), binaryEncoder);
+
+                newMap.put(finalKey, encodedValue);
+            }
+
+            return newMap;
+        } else if (given instanceof List<?> l) {
+            return l.stream().map(e -> encodeKeys(e, binaryEncoder)).toList();
+        } else {
+            return given;
+        }
+    }
+
+    private static Object decodeKeys(Object given, _BinaryEncoding binaryEncoder) {
+        if (given instanceof Map<?, ?> m) {
+            final var newMap = new HashMap<String, Object>();
+
+            for (final var e : m.entrySet()) {
+                final String key;
+                if (e.getKey() instanceof final String s) {
+                    key = s;
+                } else {
+                    key = (String) encodeOrDecode(e.getKey(), binaryEncoder.decodeMap);
+                }
+                final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
+
+                newMap.put(key, encodedValue);
+            }
+
+            return newMap;
+        } else if (given instanceof final List<?> l) {
+            return l.stream().map(e -> decodeKeys(e, binaryEncoder)).toList();
+        } else {
+            return given;
+        }
+    }
+
+    private static Object encodeOrDecode(Object key, Map<?, ?> map) {
+        final var value = map.get(key);
+
+        if (value == null) {
+            throw new BinaryEncodingMissing(key);
+        }
+
+        return value;
     }
 
     static _BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {
@@ -962,7 +1423,7 @@ class _Util {
 
         final List<Object> messageAsPseudoJsonList;
         try {
-            messageAsPseudoJsonList = _CastUtil.asList(messageAsPseudoJson);
+            messageAsPseudoJsonList = asList(messageAsPseudoJson);
         } catch (ClassCastException e) {
             throw new DeserializationError("ExpectedArrayOfTwoObjects");
         }
@@ -986,18 +1447,18 @@ class _Util {
         Map<String, Object> body = null;
 
         try {
-            headers = _CastUtil.asMap(finalMessageAsPseudoJsonList.get(0));
+            headers = asMap(finalMessageAsPseudoJsonList.get(0));
         } catch (ClassCastException e) {
             throw new DeserializationError("ExpectedArrayOfTwoObjects");
         }
 
         try {
-            body = _CastUtil.asMap(finalMessageAsPseudoJsonList.get(1));
+            body = asMap(finalMessageAsPseudoJsonList.get(1));
             if (body.size() != 1) {
                 throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
             } else {
                 try {
-                    var givenPayload = _CastUtil.asMap(body.values().stream().findAny().get());
+                    var givenPayload = asMap(body.values().stream().findAny().get());
                 } catch (ClassCastException e) {
                     throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
                 }
@@ -1043,11 +1504,11 @@ class _Util {
         if (headers.containsKey("_bin")) {
             final List<Object> binaryChecksums;
             try {
-                binaryChecksums = _CastUtil.asList(headers.get("_bin"));
+                binaryChecksums = asList(headers.get("_bin"));
                 var i = 0;
                 for (final var binaryChecksum : binaryChecksums) {
                     try {
-                        var integerElement = _CastUtil.asInt(binaryChecksum);
+                        var integerElement = asInt(binaryChecksum);
                     } catch (ClassCastException e) {
                         validationFailures
                                 .addAll(_Util.getTypeUnexpectedValidationFailure(List.of("_bin", i),
@@ -1075,7 +1536,7 @@ class _Util {
             UApiSchema uApiSchema, _UFn functionType) {
         Map<String, Object> selectStructFieldsHeader;
         try {
-            selectStructFieldsHeader = _CastUtil.asMap(headers.get("_sel"));
+            selectStructFieldsHeader = asMap(headers.get("_sel"));
         } catch (ClassCastException e) {
             return _Util.getTypeUnexpectedValidationFailure(List.of("_sel"),
                     headers.get("_sel"), "Object");
@@ -1104,7 +1565,7 @@ class _Util {
             if (typeReference instanceof final _UUnion u) {
                 final Map<String, Object> unionCases;
                 try {
-                    unionCases = _CastUtil.asMap(selectValue);
+                    unionCases = asMap(selectValue);
                 } catch (ClassCastException e) {
                     validationFailures.addAll(
                             _Util.getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
@@ -1157,7 +1618,7 @@ class _Util {
 
         final List<Object> fields;
         try {
-            fields = _CastUtil.asList(selectedFields);
+            fields = asList(selectedFields);
         } catch (ClassCastException e) {
             return _Util.getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
         }
@@ -1166,7 +1627,7 @@ class _Util {
             var field = fields.get(i);
             String stringField;
             try {
-                stringField = _CastUtil.asString(field);
+                stringField = asString(field);
             } catch (ClassCastException e) {
                 final List<Object> thisPath = append(basePath, i);
 
@@ -1659,7 +2120,7 @@ class _Util {
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final Map<String, Object> givenMap;
         try {
-            givenMap = _CastUtil.asMap(givenObj);
+            givenMap = asMap(givenObj);
         } catch (ClassCastException e) {
             return getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }
@@ -1700,7 +2161,7 @@ class _Util {
 
         final Map<String, Object> givenMap;
         try {
-            givenMap = _CastUtil.asMap(givenObj);
+            givenMap = asMap(givenObj);
         } catch (ClassCastException e) {
             return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
@@ -2110,6 +2571,382 @@ class _Util {
 
             return serializer
                     .serialize(new Message(new HashMap<>(), Map.of("_ErrorUnknown", Map.of())));
+        }
+    }
+
+    static boolean isSubMap(Map<String, Object> part, Map<String, Object> whole) {
+        for (final var partKey : part.keySet()) {
+            final var wholeValue = whole.get(partKey);
+            final var partValue = part.get(partKey);
+            final var entryIsEqual = isSubMapEntryEqual(partValue, wholeValue);
+            if (!entryIsEqual) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isSubMapEntryEqual(Object partValue, Object wholeValue) {
+        if (partValue instanceof final Map m1 && wholeValue instanceof final Map m2) {
+            return isSubMap(m1, m2);
+        } else if (partValue instanceof final List partList && wholeValue instanceof final List wholeList) {
+            for (int i = 0; i < partList.size(); i += 1) {
+                final var partElement = partList.get(i);
+                final var partMatches = partiallyMatches(wholeList, partElement);
+                if (!partMatches) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return Objects.equals(partValue, wholeValue);
+        }
+    }
+
+    private static boolean partiallyMatches(List<Object> wholeList, Object partElement) {
+        for (final var wholeElement : wholeList) {
+            if (isSubMapEntryEqual(partElement, wholeElement)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static Message handle(Message requestMessage, List<_MockStub> stubs, List<_MockInvocation> invocations,
+            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub) {
+        final Map<String, Object> header = requestMessage.header;
+
+        final var enableGenerationStub = (Boolean) header.getOrDefault("_mockEnableGeneratedStub", false);
+        final String functionName = requestMessage.getBodyTarget();
+        final Map<String, Object> argument = requestMessage.getBodyPayload();
+
+        switch (functionName) {
+            case "fn._createStub" -> {
+                final var givenStub = (Map<String, Object>) argument.get("stub");
+
+                final var stubCall = givenStub.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                        .findAny().get();
+                final var stubFunctionName = stubCall.getKey();
+                final var stubArg = (Map<String, Object>) stubCall.getValue();
+                final var stubResult = (Map<String, Object>) givenStub.get("->");
+                final var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
+
+                final var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
+                        allowArgumentPartialMatch);
+
+                stubs.add(0, stub);
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            case "fn._verify" -> {
+                final var givenCall = (Map<String, Object>) argument.get("call");
+
+                final var call = givenCall.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                        .findAny().get();
+                final var callFunctionName = call.getKey();
+                final var callArg = (Map<String, Object>) call.getValue();
+                final var verifyTimes = (Map<String, Object>) argument.getOrDefault("count!",
+                        Map.of("AtLeast", Map.of("times", 1)));
+                final var strictMatch = (Boolean) argument.getOrDefault("strictMatch!", false);
+
+                final var verificationResult = _Util.verify(callFunctionName, callArg, strictMatch,
+                        verifyTimes,
+                        invocations);
+                return new Message(verificationResult);
+            }
+            case "fn._verifyNoMoreInteractions" -> {
+                final var verificationResult = _Util.verifyNoMoreInteractions(invocations);
+                return new Message(verificationResult);
+            }
+            case "fn._clearCalls" -> {
+                invocations.clear();
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            case "fn._clearStubs" -> {
+                stubs.clear();
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            case "fn._setRandomSeed" -> {
+                final var givenSeed = (Integer) argument.get("seed");
+
+                random.setSeed(givenSeed);
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            default -> {
+                invocations.add(new _MockInvocation(functionName, new TreeMap<>(argument)));
+
+                final var definition = (_UFn) uApiSchema.parsed.get(functionName);
+
+                for (final var stub : stubs) {
+                    if (Objects.equals(stub.whenFunction, functionName)) {
+                        if (stub.allowArgumentPartialMatch) {
+                            if (isSubMap(stub.whenArgument, argument)) {
+                                final var useStartingValue = true;
+                                final var includeRandomOptionalFields = false;
+                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                        stub.thenResult, useStartingValue,
+                                        includeRandomOptionalFields, List.of(), List.of(), random);
+                                return new Message(result);
+                            }
+                        } else {
+                            if (Objects.equals(stub.whenArgument, argument)) {
+                                final var useStartingValue = true;
+                                final var includeRandomOptionalFields = false;
+                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                        stub.thenResult, useStartingValue,
+                                        includeRandomOptionalFields, List.of(), List.of(), random);
+                                return new Message(result);
+                            }
+                        }
+                    }
+                }
+
+                if (!enableGeneratedDefaultStub && !enableGenerationStub) {
+                    return new Message(Map.of("_ErrorNoMatchingStub", Map.of()));
+                }
+
+                if (definition != null) {
+                    final var resultUnion = (_UUnion) definition.result;
+                    final var OkStructRef = resultUnion.cases.get("Ok");
+                    final var useStartingValue = true;
+                    final var includeRandomOptionalFields = true;
+                    final var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
+                            includeRandomOptionalFields, List.of(), List.of(), random);
+                    return new Message(Map.of("Ok", randomOkStruct));
+                } else {
+                    throw new UApiProcessError("Unexpected unknown function: %s".formatted(functionName));
+                }
+            }
+        }
+    }
+
+    static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,
+            Map<String, Object> verificationTimes, List<_MockInvocation> invocations) {
+        var matchesFound = 0;
+        for (final var invocation : invocations) {
+            if (Objects.equals(invocation.functionName, functionName)) {
+                if (exactMatch) {
+                    if (Objects.equals(invocation.functionArgument, argument)) {
+                        invocation.verified = true;
+                        matchesFound += 1;
+                    }
+                } else {
+                    boolean isSubMap = isSubMap(argument, invocation.functionArgument);
+                    if (isSubMap) {
+                        invocation.verified = true;
+                        matchesFound += 1;
+                    }
+                }
+            }
+        }
+
+        final var allCallsPseudoJson = new ArrayList<Map<String, Object>>();
+        for (final var invocation : invocations) {
+            allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
+        }
+
+        final Map.Entry<String, Object> verifyTimesEntry = _Util.unionEntry(verificationTimes);
+        final var verifyKey = verifyTimesEntry.getKey();
+        final var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
+
+        Map<String, Object> verificationFailurePseudoJson = null;
+        if (verifyKey.equals("Exact")) {
+            final var times = (Integer) verifyTimesStruct.get("times");
+            if (matchesFound > times) {
+                verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("Exact", Map.of("times", times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+            } else if (matchesFound < times) {
+                verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("Exact", Map.of("times", times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+            }
+        } else if (verifyKey.equals("AtMost")) {
+            final var times = (Integer) verifyTimesStruct.get("times");
+            if (matchesFound > times) {
+                verificationFailurePseudoJson = Map.of("TooManyMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("AtMost", Map.of("times", times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+            }
+        } else if (verifyKey.equals("AtLeast")) {
+            final var times = (Integer) verifyTimesStruct.get("times");
+            if (matchesFound < times) {
+                verificationFailurePseudoJson = Map.of("TooFewMatchingCalls",
+                        new TreeMap<>(Map.ofEntries(
+                                Map.entry("wanted", Map.of("AtLeast", Map.of("times", times))),
+                                Map.entry("found", matchesFound),
+                                Map.entry("allCalls", allCallsPseudoJson))));
+
+            }
+        }
+
+        if (verificationFailurePseudoJson == null) {
+            return Map.of("Ok", Map.of());
+        }
+
+        return Map.of("ErrorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
+    }
+
+    static Map<String, Object> verifyNoMoreInteractions(List<_MockInvocation> invocations) {
+        final var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
+
+        if (invocationsNotVerified.size() > 0) {
+            final var unverifiedCallsPseudoJson = new ArrayList<Map<String, Object>>();
+            for (final var invocation : invocationsNotVerified) {
+                unverifiedCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
+            }
+            return Map.of("ErrorVerificationFailure",
+                    Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
+        }
+
+        return Map.of("Ok", Map.of());
+    }
+
+    static Message mockHandle(Message requestMessage, List<_MockStub> stubs, List<_MockInvocation> invocations,
+            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub) {
+        final Map<String, Object> header = requestMessage.header;
+
+        final var enableGenerationStub = (Boolean) header.getOrDefault("_mockEnableGeneratedStub", false);
+        final String functionName = requestMessage.getBodyTarget();
+        final Map<String, Object> argument = requestMessage.getBodyPayload();
+
+        switch (functionName) {
+            case "fn._createStub" -> {
+                final var givenStub = (Map<String, Object>) argument.get("stub");
+
+                final var stubCall = givenStub.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                        .findAny().get();
+                final var stubFunctionName = stubCall.getKey();
+                final var stubArg = (Map<String, Object>) stubCall.getValue();
+                final var stubResult = (Map<String, Object>) givenStub.get("->");
+                final var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
+
+                final var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
+                        allowArgumentPartialMatch);
+
+                stubs.add(0, stub);
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            case "fn._verify" -> {
+                final var givenCall = (Map<String, Object>) argument.get("call");
+
+                final var call = givenCall.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
+                        .findAny().get();
+                final var callFunctionName = call.getKey();
+                final var callArg = (Map<String, Object>) call.getValue();
+                final var verifyTimes = (Map<String, Object>) argument.getOrDefault("count!",
+                        Map.of("AtLeast", Map.of("times", 1)));
+                final var strictMatch = (Boolean) argument.getOrDefault("strictMatch!", false);
+
+                final var verificationResult = _Util.verify(callFunctionName, callArg, strictMatch,
+                        verifyTimes,
+                        invocations);
+                return new Message(verificationResult);
+            }
+            case "fn._verifyNoMoreInteractions" -> {
+                final var verificationResult = _Util.verifyNoMoreInteractions(invocations);
+                return new Message(verificationResult);
+            }
+            case "fn._clearCalls" -> {
+                invocations.clear();
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            case "fn._clearStubs" -> {
+                stubs.clear();
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            case "fn._setRandomSeed" -> {
+                final var givenSeed = (Integer) argument.get("seed");
+
+                random.setSeed(givenSeed);
+                return new Message(Map.of("Ok", Map.of()));
+            }
+            default -> {
+                invocations.add(new _MockInvocation(functionName, new TreeMap<>(argument)));
+
+                final var definition = (_UFn) uApiSchema.parsed.get(functionName);
+
+                for (final var stub : stubs) {
+                    if (Objects.equals(stub.whenFunction, functionName)) {
+                        if (stub.allowArgumentPartialMatch) {
+                            if (isSubMap(stub.whenArgument, argument)) {
+                                final var useStartingValue = true;
+                                final var includeRandomOptionalFields = false;
+                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                        stub.thenResult, useStartingValue,
+                                        includeRandomOptionalFields, List.of(), List.of(), random);
+                                return new Message(result);
+                            }
+                        } else {
+                            if (Objects.equals(stub.whenArgument, argument)) {
+                                final var useStartingValue = true;
+                                final var includeRandomOptionalFields = false;
+                                final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                        stub.thenResult, useStartingValue,
+                                        includeRandomOptionalFields, List.of(), List.of(), random);
+                                return new Message(result);
+                            }
+                        }
+                    }
+                }
+
+                if (!enableGeneratedDefaultStub && !enableGenerationStub) {
+                    return new Message(Map.of("_ErrorNoMatchingStub", Map.of()));
+                }
+
+                if (definition != null) {
+                    final var resultUnion = (_UUnion) definition.result;
+                    final var OkStructRef = resultUnion.cases.get("Ok");
+                    final var useStartingValue = true;
+                    final var includeRandomOptionalFields = true;
+                    final var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useStartingValue,
+                            includeRandomOptionalFields, List.of(), List.of(), random);
+                    return new Message(Map.of("Ok", randomOkStruct));
+                } else {
+                    throw new UApiProcessError("Unexpected unknown function: %s".formatted(functionName));
+                }
+            }
+        }
+    }
+
+    static Message processRequestObject(Message requestMessage,
+            BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMsDefault,
+            boolean useBinaryDefault) {
+        final Map<String, Object> header = requestMessage.header;
+
+        try {
+            if (!header.containsKey("_tim")) {
+                header.put("_tim", timeoutMsDefault);
+            }
+
+            if (useBinaryDefault) {
+                header.put("_binary", true);
+            }
+
+            final var timeoutMs = ((Number) header.get("_tim")).longValue();
+
+            final var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
+
+            if (Objects.equals(responseMessage.body,
+                    Map.of("_ErrorParseFailure",
+                            Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
+                // Try again, but as json
+                header.put("_forceSendJson", true);
+
+                return adapter.apply(requestMessage, serializer).get(timeoutMs,
+                        TimeUnit.MILLISECONDS);
+            }
+
+            return responseMessage;
+        } catch (Exception e) {
+            throw new ClientProcessError(e);
         }
     }
 }

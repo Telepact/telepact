@@ -52,7 +52,7 @@ public class Server {
      * @param handler
      */
     public Server(UApiSchema uApiSchema, Function<Message, Message> handler, Options options) {
-        this.uApiSchema = UApiSchema.extend(uApiSchema, _InternalUApiUtil.getJson());
+        this.uApiSchema = UApiSchema.extend(uApiSchema, _Util.getInternalUApiJson());
         this.handler = handler;
         this.onError = options.onError;
         this.onRequest = options.onRequest;

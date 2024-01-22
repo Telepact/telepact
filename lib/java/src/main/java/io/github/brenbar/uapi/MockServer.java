@@ -61,7 +61,7 @@ public class MockServer {
         typeExtensions.put("_ext._Call", new _UMockCall(parsedTypes));
         typeExtensions.put("_ext._Stub", new _UMockStub(parsedTypes));
 
-        final var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _InternalMockUApiUtil.getJson(),
+        final var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _Util.getMockUApiJson(),
                 typeExtensions);
 
         final var serverOptions = new Server.Options();
@@ -86,7 +86,7 @@ public class MockServer {
     }
 
     private Message handle(Message requestMessage) {
-        return _MockServerUtil.handle(requestMessage, this.stubs, this.invocations, this.random,
+        return _Util.mockHandle(requestMessage, this.stubs, this.invocations, this.random,
                 this.server.uApiSchema, this.enableGeneratedDefaultStub);
     }
 }

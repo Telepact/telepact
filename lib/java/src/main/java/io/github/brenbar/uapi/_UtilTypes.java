@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 class _SchemaParseFailure {
     public final List<Object> path;
@@ -550,6 +552,26 @@ class _UError {
     }
 }
 
+class _BinaryEncoding {
+
+    public final Map<String, Integer> encodeMap;
+    public final Map<Integer, String> decodeMap;
+    public final Integer checksum;
+
+    public _BinaryEncoding(Map<String, Integer> binaryEncoding, Integer checksum) {
+        this.encodeMap = binaryEncoding;
+        this.decodeMap = binaryEncoding.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+        this.checksum = checksum;
+    }
+}
+
+interface _BinaryEncoder {
+    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
+
+    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
+}
+
 class _ServerBinaryEncoder implements _BinaryEncoder {
 
     private final _BinaryEncoding binaryEncoder;
@@ -560,12 +582,61 @@ class _ServerBinaryEncoder implements _BinaryEncoder {
 
     @Override
     public List<Object> encode(List<Object> message) {
-        return _BinaryEncodeUtil.serverBinaryEncode(message, binaryEncoder);
+        return _Util.serverBinaryEncode(message, binaryEncoder);
     }
 
     @Override
     public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
-        return _BinaryEncodeUtil.serverBinaryDecode(message, binaryEncoder);
+        return _Util.serverBinaryDecode(message, binaryEncoder);
     }
 
+}
+
+class _ClientBinaryEncoder implements _BinaryEncoder {
+
+    private final Map<Integer, _BinaryEncoding> recentBinaryEncoders;
+    private final ClientBinaryStrategy binaryChecksumStrategy;
+
+    public _ClientBinaryEncoder(ClientBinaryStrategy binaryChecksumStrategy) {
+        this.recentBinaryEncoders = new ConcurrentHashMap<>();
+        this.binaryChecksumStrategy = binaryChecksumStrategy;
+    }
+
+    @Override
+    public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
+        return _Util.clientBinaryEncode(message, this.recentBinaryEncoders,
+                this.binaryChecksumStrategy);
+    }
+
+    @Override
+    public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
+        return _Util.clientBinaryDecode(message, this.recentBinaryEncoders, this.binaryChecksumStrategy);
+    }
+
+}
+
+class _MockStub {
+    final String whenFunction;
+    final Map<String, Object> whenArgument;
+    final Map<String, Object> thenResult;
+    final boolean allowArgumentPartialMatch;
+
+    public _MockStub(String whenFunction, Map<String, Object> whenArgument,
+            Map<String, Object> thenResult, boolean allowArgumentPartialMatch) {
+        this.whenFunction = whenFunction;
+        this.whenArgument = whenArgument;
+        this.thenResult = thenResult;
+        this.allowArgumentPartialMatch = allowArgumentPartialMatch;
+    }
+}
+
+class _MockInvocation {
+    public final String functionName;
+    public final Map<String, Object> functionArgument;
+    public boolean verified = false;
+
+    public _MockInvocation(String functionName, Map<String, Object> functionArgument) {
+        this.functionName = functionName;
+        this.functionArgument = functionArgument;
+    }
 }

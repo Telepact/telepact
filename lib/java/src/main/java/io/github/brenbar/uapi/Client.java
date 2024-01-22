@@ -75,7 +75,7 @@ public class Client {
      * @return
      */
     public Message request(Message requestMessage) {
-        return _ClientUtil.processRequestObject(requestMessage, this.adapter, this.serializer,
+        return _Util.processRequestObject(requestMessage, this.adapter, this.serializer,
                 this.timeoutMsDefault, this.useBinaryDefault);
     }
 
