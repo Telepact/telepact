@@ -20,7 +20,7 @@ public class Serializer {
      * @return
      */
     public byte[] serialize(Message message) {
-        return _SerializeUtil.serialize(message, this.binaryEncoder, this.serializationImpl);
+        return _Util.serialize(message, this.binaryEncoder, this.serializationImpl);
     }
 
     /**
@@ -30,6 +30,6 @@ public class Serializer {
      * @return
      */
     public Message deserialize(byte[] messageBytes) {
-        return _SerializeUtil.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
+        return _Util.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
     }
 }

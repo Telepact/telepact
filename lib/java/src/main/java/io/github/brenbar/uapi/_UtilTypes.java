@@ -5,6 +5,18 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+class _SchemaParseFailure {
+    public final List<Object> path;
+    public final String reason;
+    public final Map<String, Object> data;
+
+    public _SchemaParseFailure(List<Object> path, String reason, Map<String, Object> data) {
+        this.path = path;
+        this.reason = reason;
+        this.data = data;
+    }
+}
+
 class _RandomGenerator {
     private int seed = 0;
     private int collectionLengthMin;

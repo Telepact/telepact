@@ -58,7 +58,7 @@ public class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        final var binaryEncoding = _SerializeUtil.constructBinaryEncoding(this.uApiSchema);
+        final var binaryEncoding = _Util.constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
     }

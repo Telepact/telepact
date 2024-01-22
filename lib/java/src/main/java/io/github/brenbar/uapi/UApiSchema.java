@@ -22,18 +22,18 @@ public class UApiSchema {
     }
 
     public static UApiSchema fromJson(String json) {
-        return _ParseSchemaUtil.newUApiSchema(json, new HashMap<>());
+        return _Util.newUApiSchema(json, new HashMap<>());
     }
 
     public static UApiSchema extend(UApiSchema base, String json) {
-        return _ParseSchemaUtil.extendUApiSchema(base, json, new HashMap<>());
+        return _Util.extendUApiSchema(base, json, new HashMap<>());
     }
 
     static UApiSchema fromJsonWithExtensions(String json, Map<String, _UType> typeExtensions) {
-        return _ParseSchemaUtil.newUApiSchema(json, typeExtensions);
+        return _Util.newUApiSchema(json, typeExtensions);
     }
 
     static UApiSchema extendWithExtensions(UApiSchema base, String json, Map<String, _UType> typeExtensions) {
-        return _ParseSchemaUtil.extendUApiSchema(base, json, typeExtensions);
+        return _Util.extendUApiSchema(base, json, typeExtensions);
     }
 }
