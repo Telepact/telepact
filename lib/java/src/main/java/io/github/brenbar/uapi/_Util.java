@@ -48,7 +48,7 @@ class _Util {
                 new _ValidationFailure(path, "TypeUnexpected", data));
     }
 
-    static Object _anyGenerateRandomValue(_RandomGenerator randomGenerator) {
+    static Object anyGenerateRandomValue(_RandomGenerator randomGenerator) {
         final var selectType = randomGenerator.nextInt(3);
         if (selectType == 0) {
             return randomGenerator.nextBoolean();
@@ -59,7 +59,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> _arrayValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> arrayValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -87,7 +87,7 @@ class _Util {
         }
     }
 
-    static Object _arrayGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object arrayGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
@@ -121,7 +121,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> _booleanValidate(Object value) {
+    static List<_ValidationFailure> booleanValidate(Object value) {
         if (value instanceof Boolean) {
             return List.of();
         } else {
@@ -129,7 +129,7 @@ class _Util {
         }
     }
 
-    static Object _booleanGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object booleanGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -138,7 +138,7 @@ class _Util {
         }
     }
 
-    static Object _fnGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object fnGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator, Map<String, _UStruct> callCases) {
         if (useStartingValue) {
@@ -151,7 +151,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> _integerValidate(Object value) {
+    static List<_ValidationFailure> integerValidate(Object value) {
         if (value instanceof Long || value instanceof Integer) {
             return List.of();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
@@ -162,7 +162,7 @@ class _Util {
         }
     }
 
-    static Object _integerGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object integerGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -171,7 +171,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> _mockCallValidate(Object givenObj,
+    static List<_ValidationFailure> mockCallValidate(Object givenObj,
             List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final Map<String, Object> givenMap;
@@ -210,7 +210,7 @@ class _Util {
                 .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
     }
 
-    static List<_ValidationFailure> _mockStubValidate(Object givenObj,
+    static List<_ValidationFailure> mockStubValidate(Object givenObj,
             List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
@@ -283,7 +283,7 @@ class _Util {
         return validationFailures;
     }
 
-    static List<_ValidationFailure> _numberValidate(Object value) {
+    static List<_ValidationFailure> numberValidate(Object value) {
         if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return List.of(
                     new _ValidationFailure(List.of(), "NumberOutOfRange", Map.of()));
@@ -294,7 +294,7 @@ class _Util {
         }
     }
 
-    static Object _numberGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object numberGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -305,7 +305,7 @@ class _Util {
 
     static final String _OBJECT_NAME = "Object";
 
-    static List<_ValidationFailure> _objectValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> objectValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -332,7 +332,7 @@ class _Util {
         }
     }
 
-    static Object _objectGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object objectGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
@@ -367,7 +367,7 @@ class _Util {
 
     static final String _STRING_NAME = "String";
 
-    static List<_ValidationFailure> _stringValidate(Object value) {
+    static List<_ValidationFailure> stringValidate(Object value) {
         if (value instanceof String) {
             return List.of();
         } else {
@@ -375,7 +375,7 @@ class _Util {
         }
     }
 
-    static Object _stringGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object stringGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -386,7 +386,7 @@ class _Util {
 
     static final String _STRUCT_NAME = "Object";
 
-    static List<_ValidationFailure> _structValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> structValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UFieldDeclaration> fields) {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(fields, (Map<String, Object>) m, typeParameters);
@@ -448,7 +448,7 @@ class _Util {
         return validationFailures;
     }
 
-    static Object _structGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object structGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator random, Map<String, _UFieldDeclaration> fields) {
         if (useStartingValue) {
@@ -501,7 +501,7 @@ class _Util {
         return obj;
     }
 
-    static List<_ValidationFailure> _typeDeclarationValidate(Object value, List<_UTypeDeclaration> generics,
+    static List<_ValidationFailure> typeDeclarationValidate(Object value, List<_UTypeDeclaration> generics,
             _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
         if (value == null) {
             final boolean isNullable;
@@ -524,7 +524,7 @@ class _Util {
         }
     }
 
-    static Object _typeDeclarationGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object typeDeclarationGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
             List<_UTypeDeclaration> typeParameters) {
@@ -538,7 +538,7 @@ class _Util {
 
     static final String _UNION_NAME = "Object";
 
-    static List<_ValidationFailure> _unionValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> unionValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
             return validateUnionCases(cases, m, typeParameters);
@@ -556,7 +556,7 @@ class _Util {
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
 
-        final var entry = _Util.entry((Map<String, Object>) actual);
+        final var entry = _Util.unionEntry((Map<String, Object>) actual);
         final var unionTarget = (String) entry.getKey();
         final var unionPayload = entry.getValue();
 
@@ -592,7 +592,7 @@ class _Util {
         return validateStructFields(unionStruct.fields, actual, typeParameters);
     }
 
-    static Object _unionGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object unionGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random, Map<String, _UStruct> cases) {
@@ -612,7 +612,7 @@ class _Util {
             List<_UTypeDeclaration> typeParameters,
             _RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
-            final var unionEntry = _Util.entry(startingUnion);
+            final var unionEntry = _Util.unionEntry(startingUnion);
             final var unionCase = unionEntry.getKey();
             final var unionStructType = unionCasesReference.get(unionCase);
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
@@ -635,7 +635,7 @@ class _Util {
         }
     }
 
-    static Map.Entry<String, Object> entry(Map<String, Object> union) {
+    static Map.Entry<String, Object> unionEntry(Map<String, Object> union) {
         return union.entrySet().stream().findAny().orElse(null);
     }
 }

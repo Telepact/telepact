@@ -11,7 +11,7 @@ class _UString implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util._stringValidate(value);
+        return _Util.stringValidate(value);
     }
 
     @Override
@@ -19,7 +19,7 @@ class _UString implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util._stringGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
+        return _Util.stringGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override

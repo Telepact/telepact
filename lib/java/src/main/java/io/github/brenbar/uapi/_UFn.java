@@ -31,7 +31,7 @@ class _UFn implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        return _Util._fnGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+        return _Util.fnGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
                 typeParameters, generics, randomGenerator, this.call.cases);
     }
 

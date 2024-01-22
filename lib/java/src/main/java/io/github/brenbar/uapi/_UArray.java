@@ -12,7 +12,7 @@ class _UArray implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util._arrayValidate(value, typeParameters, generics);
+        return _Util.arrayValidate(value, typeParameters, generics);
     }
 
     @Override
@@ -20,7 +20,7 @@ class _UArray implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util._arrayGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+        return _Util.arrayGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
                 typeParameters, generics, randomGenerator);
     }
 

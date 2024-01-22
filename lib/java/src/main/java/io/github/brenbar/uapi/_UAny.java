@@ -20,7 +20,7 @@ class _UAny implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util._anyGenerateRandomValue(randomGenerator);
+        return _Util.anyGenerateRandomValue(randomGenerator);
     }
 
     @Override
