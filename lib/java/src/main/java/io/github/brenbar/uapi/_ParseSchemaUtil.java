@@ -115,7 +115,7 @@ class _ParseSchemaUtil {
             final var matchingSchemaKey = _ParseSchemaToolUtil.findMatchingSchemaKey(schemaKeys, schemaKey);
             if (matchingSchemaKey != null) {
                 final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
-                final List<Object> finalPath = _ValidateUtil.append(loopPath, schemaKey);
+                final List<Object> finalPath = _Util.append(loopPath, schemaKey);
                 System.out.print(otherPathIndex);
 
                 parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",

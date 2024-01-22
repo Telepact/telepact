@@ -27,7 +27,7 @@ class _ParseSchemaFnTypeUtil {
         }
 
         final var resultSchemaKey = "->";
-        final List<Object> resPath = _ValidateUtil.append(path, resultSchemaKey);
+        final List<Object> resPath = _Util.append(path, resultSchemaKey);
 
         _UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
@@ -43,7 +43,7 @@ class _ParseSchemaFnTypeUtil {
         }
 
         final var errorsRegexKey = "errors";
-        final var regexPath = _ValidateUtil.append(path, errorsRegexKey);
+        final var regexPath = _Util.append(path, errorsRegexKey);
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.startsWith("fn._")) {

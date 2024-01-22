@@ -56,7 +56,7 @@ class _ServerHandlerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final List<_ValidationFailure> headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders,
+        final List<_ValidationFailure> headerValidationFailures = _Util.validateHeaders(requestHeaders,
                 uApiSchema, functionType);
         if (!headerValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,

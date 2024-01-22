@@ -17,7 +17,7 @@ class _ParseSchemaTypeUtil {
                     "EmptyArrayDisallowed", Map.of())));
         }
 
-        final List<Object> basePath = _ValidateUtil.append(path, 0);
+        final List<Object> basePath = _Util.append(path, 0);
         final var baseType = typeDeclarationArray.get(0);
 
         final String rootTypeString;
@@ -63,7 +63,7 @@ class _ParseSchemaTypeUtil {
         var index = 0;
         for (final var e : givenTypeParameters) {
             index += 1;
-            final List<Object> loopPath = _ValidateUtil.append(path, index);
+            final List<Object> loopPath = _Util.append(path, index);
 
             final List<Object> l;
             try {

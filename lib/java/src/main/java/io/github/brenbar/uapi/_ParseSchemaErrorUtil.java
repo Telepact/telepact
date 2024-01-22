@@ -76,14 +76,14 @@ class _ParseSchemaErrorUtil {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = _ValidateUtil.append(basePath, k);
+                final List<Object> loopPath = _Util.append(basePath, k);
 
                 parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
         final var defInit = errorDefinitionAsParsedJson.get(schemaKey);
-        final List<Object> thisPath = _ValidateUtil.append(basePath, schemaKey);
+        final List<Object> thisPath = _Util.append(basePath, schemaKey);
 
         final Map<String, Object> def;
         try {
@@ -99,7 +99,7 @@ class _ParseSchemaErrorUtil {
         final var resultSchemaKey = "->";
         final var okCaseRequired = false;
         final var typeParameterCount = 0;
-        final List<Object> errorPath = _ValidateUtil.append(thisPath, resultSchemaKey);
+        final List<Object> errorPath = _Util.append(thisPath, resultSchemaKey);
 
         if (!def.containsKey(resultSchemaKey)) {
             parseFailures.add(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of()));

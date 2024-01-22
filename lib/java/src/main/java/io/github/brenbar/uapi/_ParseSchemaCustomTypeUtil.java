@@ -27,13 +27,13 @@ class _ParseSchemaCustomTypeUtil {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = _ValidateUtil.append(path, k);
+                final List<Object> loopPath = _Util.append(path, k);
 
                 parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
-        final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
+        final List<Object> thisPath = _Util.append(path, schemaKey);
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
         Map<String, Object> definition = null;
@@ -72,14 +72,14 @@ class _ParseSchemaCustomTypeUtil {
         if (!isForFn) {
             if (otherKeys.size() > 0) {
                 for (final var k : otherKeys) {
-                    final List<Object> loopPath = _ValidateUtil.append(path, k);
+                    final List<Object> loopPath = _Util.append(path, k);
 
                     parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
                 }
             }
         }
 
-        final List<Object> thisPath = _ValidateUtil.append(path, schemaKey);
+        final List<Object> thisPath = _Util.append(path, schemaKey);
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
         final Map<String, Object> definition;
@@ -99,7 +99,7 @@ class _ParseSchemaCustomTypeUtil {
             parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
         } else if (isForFn) {
             if (!definition.containsKey("Ok")) {
-                final List<Object> branchPath = _ValidateUtil.append(thisPath, "Ok");
+                final List<Object> branchPath = _Util.append(thisPath, "Ok");
 
                 parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of()));
             }
@@ -107,7 +107,7 @@ class _ParseSchemaCustomTypeUtil {
 
         for (final var entry : definition.entrySet()) {
             final var unionCase = entry.getKey();
-            final List<Object> unionKeyPath = _ValidateUtil.append(thisPath, unionCase);
+            final List<Object> unionKeyPath = _Util.append(thisPath, unionCase);
             final var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
             final var regex = Pattern.compile(regexString);
 
@@ -165,8 +165,8 @@ class _ParseSchemaCustomTypeUtil {
                 final var existingFieldNoOpt = existingField.split("!")[0];
                 final var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
-                    final List<Object> finalPath = _ValidateUtil.append(path, fieldDeclaration);
-                    final List<Object> finalOtherPath = _ValidateUtil.append(path, existingField);
+                    final List<Object> finalPath = _Util.append(path, fieldDeclaration);
+                    final List<Object> finalOtherPath = _Util.append(path, existingField);
 
                     parseFailures
                             .add(new _SchemaParseFailure(finalPath, "PathCollision",
@@ -206,14 +206,14 @@ class _ParseSchemaCustomTypeUtil {
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            final List<Object> finalPath = _ValidateUtil.append(path, fieldDeclaration);
+            final List<Object> finalPath = _Util.append(path, fieldDeclaration);
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(finalPath,
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         final var fieldName = matcher.group(0);
         final var optional = matcher.group(2) != null;
-        final List<Object> thisPath = _ValidateUtil.append(path, fieldName);
+        final List<Object> thisPath = _Util.append(path, fieldName);
 
         final List<Object> typeDeclarationArray;
         try {
