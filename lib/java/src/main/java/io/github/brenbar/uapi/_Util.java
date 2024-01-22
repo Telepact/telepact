@@ -12,9 +12,55 @@ import java.util.TreeMap;
 
 class _Util {
 
-    public static final String _ANY_NAME = "Any";
+    static final String _ANY_NAME = "Any";
+    static final String _ARRAY_NAME = "Array";
+    static final String _BOOLEAN_NAME = "Boolean";
+    static final String _FN_NAME = "Object";
+    static final String _INTEGER_NAME = "Integer";
+    static final String _MOCK_CALL_NAME = "_ext._Call";
+    static final String _MOCK_STUB_NAME = "_ext._Stub";
+    static final String _NUMBER_NAME = "Number";
 
-    public static Object _anyGenerateRandomValue(_RandomGenerator randomGenerator) {
+    static class _ValidationFailure {
+        public final List<Object> path;
+        public final String reason;
+        public final Map<String, Object> data;
+
+        public _ValidationFailure(List<Object> path, String reason, Map<String, Object> data) {
+            this.path = path;
+            this.reason = reason;
+            this.data = data;
+        }
+    }
+
+    static String getType(Object value) {
+        if (value == null) {
+            return "Null";
+        } else if (value instanceof Boolean) {
+            return "Boolean";
+        } else if (value instanceof Number) {
+            return "Number";
+        } else if (value instanceof String) {
+            return "String";
+        } else if (value instanceof List) {
+            return "Array";
+        } else if (value instanceof Map) {
+            return "Object";
+        } else {
+            return "Unknown";
+        }
+    }
+
+    static List<_Util._ValidationFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
+            String expectedType) {
+        final var actualType = getType(value);
+        final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
+                Map.entry("expected", Map.of(expectedType, Map.of()))));
+        return List.of(
+                new _Util._ValidationFailure(path, "TypeUnexpected", data));
+    }
+
+    static Object _anyGenerateRandomValue(_RandomGenerator randomGenerator) {
         final var selectType = randomGenerator.nextInt(3);
         if (selectType == 0) {
             return randomGenerator.nextBoolean();
@@ -25,23 +71,21 @@ class _Util {
         }
     }
 
-    public static final String _ARRAY_NAME = "Array";
-
-    public static List<_ValidationFailure> _arrayValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_Util._ValidationFailure> _arrayValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
-            final var validationFailures = new ArrayList<_ValidationFailure>();
+            final var validationFailures = new ArrayList<_Util._ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
                 final var nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
                 final var index = i;
 
-                final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
+                final var nestedValidationFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
                 for (var f : nestedValidationFailures) {
                     final List<Object> finalPath = _ValidateUtil.prepend(index, f.path);
-                    nestedValidationFailuresWithPath.add(new _ValidationFailure(finalPath, f.reason,
+                    nestedValidationFailuresWithPath.add(new _Util._ValidationFailure(finalPath, f.reason,
                             f.data));
                 }
 
@@ -50,12 +94,12 @@ class _Util {
 
             return validationFailures;
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+            return getTypeUnexpectedValidationFailure(List.of(), value,
                     _ARRAY_NAME);
         }
     }
 
-    public static Object _arrayGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _arrayGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
@@ -89,17 +133,15 @@ class _Util {
         }
     }
 
-    public static final String _BOOLEAN_NAME = "Boolean";
-
-    public static List<_ValidationFailure> _booleanValidate(Object value) {
+    static List<_Util._ValidationFailure> _booleanValidate(Object value) {
         if (value instanceof Boolean) {
             return List.of();
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _BOOLEAN_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _BOOLEAN_NAME);
         }
     }
 
-    public static Object _booleanGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _booleanGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -108,9 +150,7 @@ class _Util {
         }
     }
 
-    public static final String _FN_NAME = "Object";
-
-    public static Object _fnGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _fnGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator, Map<String, _UStruct> callCases) {
         if (useStartingValue) {
@@ -123,20 +163,18 @@ class _Util {
         }
     }
 
-    public static final String _INTEGER_NAME = "Integer";
-
-    public static List<_ValidationFailure> _integerValidate(Object value) {
+    static List<_Util._ValidationFailure> _integerValidate(Object value) {
         if (value instanceof Long || value instanceof Integer) {
             return List.of();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return List.of(
-                    new _ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
+                    new _Util._ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _INTEGER_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _INTEGER_NAME);
         }
     }
 
-    public static Object _integerGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _integerGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -145,22 +183,20 @@ class _Util {
         }
     }
 
-    public static final String _MOCK_CALL_NAME = "_ext._Call";
-
-    public static List<_ValidationFailure> _mockCallValidate(Object givenObj, List<_UTypeDeclaration> typeParameters,
+    static List<_Util._ValidationFailure> _mockCallValidate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final Map<String, Object> givenMap;
         try {
             givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
+            return getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }
 
         final var regexString = "^fn\\..*$";
 
         final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
-            return List.of(new _ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
+            return List.of(new _Util._ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
                     Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
         }
 
@@ -174,28 +210,26 @@ class _Util {
 
         final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
 
-        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        final var inputFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
         for (var f : inputFailures) {
             List<Object> newPath = _ValidateUtil.prepend(functionName, f.path);
 
-            inputFailuresWithPath.add(new _ValidationFailure(newPath, f.reason, f.data));
+            inputFailuresWithPath.add(new _Util._ValidationFailure(newPath, f.reason, f.data));
         }
 
         return inputFailuresWithPath.stream()
                 .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
     }
 
-    public static final String _MOCK_STUB_NAME = "_ext._Stub";
-
-    public static List<_ValidationFailure> _mockStubValidate(Object givenObj, List<_UTypeDeclaration> typeParameters,
+    static List<_Util._ValidationFailure> _mockStubValidate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<_Util._ValidationFailure>();
 
         final Map<String, Object> givenMap;
         try {
             givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
+            return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
 
         final var regexString = "^fn\\..*$";
@@ -203,7 +237,7 @@ class _Util {
         final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(
-                    new _ValidationFailure(List.of(),
+                    new _Util._ValidationFailure(List.of(),
                             "ObjectKeyRegexMatchCountUnexpected",
                             Map.of("regex", regexString, "actual",
                                     matches.size(), "expected", 1)));
@@ -219,11 +253,11 @@ class _Util {
         final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
         final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
 
-        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        final var inputFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
         for (final var f : inputFailures) {
             final List<Object> thisPath = _ValidateUtil.prepend(functionName, f.path);
 
-            inputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+            inputFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
         }
 
         final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
@@ -234,7 +268,7 @@ class _Util {
         final var resultDefKey = "->";
 
         if (!givenMap.containsKey(resultDefKey)) {
-            return List.of(new _ValidationFailure(List.of(resultDefKey),
+            return List.of(new _Util._ValidationFailure(List.of(resultDefKey),
                     "RequiredObjectKeyMissing",
                     Map.of()));
         }
@@ -242,11 +276,11 @@ class _Util {
         final var output = givenMap.get(resultDefKey);
         final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
 
-        final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        final var outputFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
         for (final var f : outputFailures) {
             final List<Object> thisPath = _ValidateUtil.prepend(resultDefKey, f.path);
 
-            outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+            outputFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
         }
 
         final var failuresWithoutMissingRequired = outputFailuresWithPath
@@ -259,20 +293,18 @@ class _Util {
         return validationFailures;
     }
 
-    public static final String _NUMBER_NAME = "Number";
-
-    public static List<_ValidationFailure> _numberValidate(Object value) {
+    static List<_Util._ValidationFailure> _numberValidate(Object value) {
         if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return List.of(
-                    new _ValidationFailure(List.of(), "NumberOutOfRange", Map.of()));
+                    new _Util._ValidationFailure(List.of(), "NumberOutOfRange", Map.of()));
         } else if (value instanceof Number) {
             return List.of();
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _NUMBER_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _NUMBER_NAME);
         }
     }
 
-    public static Object _numberGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _numberGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -281,24 +313,24 @@ class _Util {
         }
     }
 
-    public static final String _OBJECT_NAME = "Object";
+    static final String _OBJECT_NAME = "Object";
 
-    public static List<_ValidationFailure> _objectValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_Util._ValidationFailure> _objectValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
-            final var validationFailures = new ArrayList<_ValidationFailure>();
+            final var validationFailures = new ArrayList<_Util._ValidationFailure>();
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 final var k = (String) entry.getKey();
                 final var v = entry.getValue();
                 final var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
 
-                final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
+                final var nestedValidationFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
                 for (var f : nestedValidationFailures) {
                     final List<Object> thisPath = _ValidateUtil.prepend(k, f.path);
 
-                    nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+                    nestedValidationFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
                 }
 
                 validationFailures.addAll(nestedValidationFailuresWithPath);
@@ -306,11 +338,11 @@ class _Util {
 
             return validationFailures;
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _OBJECT_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _OBJECT_NAME);
         }
     }
 
-    public static Object _objectGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _objectGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
@@ -343,17 +375,17 @@ class _Util {
         }
     }
 
-    public static final String _STRING_NAME = "String";
+    static final String _STRING_NAME = "String";
 
-    public static List<_ValidationFailure> _stringValidate(Object value) {
+    static List<_Util._ValidationFailure> _stringValidate(Object value) {
         if (value instanceof String) {
             return List.of();
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _STRING_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _STRING_NAME);
         }
     }
 
-    public static Object _stringGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _stringGenerateRandomValue(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -362,21 +394,21 @@ class _Util {
         }
     }
 
-    public static final String _STRUCT_NAME = "Object";
+    static final String _STRUCT_NAME = "Object";
 
-    public static List<_ValidationFailure> _structValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_Util._ValidationFailure> _structValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UFieldDeclaration> fields) {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(fields, (Map<String, Object>) m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _STRUCT_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _STRUCT_NAME);
         }
     }
 
-    public static List<_ValidationFailure> validateStructFields(
+    static List<_Util._ValidationFailure> validateStructFields(
             Map<String, _UFieldDeclaration> fields,
             Map<String, Object> actualStruct, List<_UTypeDeclaration> typeParameters) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<_Util._ValidationFailure>();
 
         final var missingFields = new ArrayList<String>();
         for (final var entry : fields.entrySet()) {
@@ -389,7 +421,8 @@ class _Util {
         }
 
         for (final var missingField : missingFields) {
-            final var validationFailure = new _ValidationFailure(List.of(missingField), "RequiredStructFieldMissing",
+            final var validationFailure = new _Util._ValidationFailure(List.of(missingField),
+                    "RequiredStructFieldMissing",
                     Map.of());
 
             validationFailures.add(validationFailure);
@@ -401,7 +434,8 @@ class _Util {
 
             final var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new _ValidationFailure(List.of(fieldName), "StructFieldUnknown", Map.of());
+                var validationFailure = new _Util._ValidationFailure(List.of(fieldName), "StructFieldUnknown",
+                        Map.of());
 
                 validationFailures.add(validationFailure);
                 continue;
@@ -411,11 +445,11 @@ class _Util {
 
             final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, typeParameters);
 
-            final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
+            final var nestedValidationFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
             for (final var f : nestedValidationFailures) {
                 final List<Object> thisPath = _ValidateUtil.prepend(fieldName, f.path);
 
-                nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+                nestedValidationFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
             }
 
             validationFailures.addAll(nestedValidationFailuresWithPath);
@@ -424,7 +458,7 @@ class _Util {
         return validationFailures;
     }
 
-    public static Object _structGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _structGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator random, Map<String, _UFieldDeclaration> fields) {
         if (useStartingValue) {
@@ -437,7 +471,7 @@ class _Util {
         }
     }
 
-    public static Map<String, Object> constructRandomStruct(
+    static Map<String, Object> constructRandomStruct(
             Map<String, _UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             _RandomGenerator randomGenerator) {
@@ -477,7 +511,7 @@ class _Util {
         return obj;
     }
 
-    public static List<_ValidationFailure> _typeDeclarationValidate(Object value, List<_UTypeDeclaration> generics,
+    static List<_Util._ValidationFailure> _typeDeclarationValidate(Object value, List<_UTypeDeclaration> generics,
             _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
         if (value == null) {
             final boolean isNullable;
@@ -490,7 +524,7 @@ class _Util {
             }
 
             if (!isNullable) {
-                return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
+                return getTypeUnexpectedValidationFailure(List.of(), value,
                         thisType.getName(generics));
             } else {
                 return List.of();
@@ -500,7 +534,7 @@ class _Util {
         }
     }
 
-    public static Object _typeDeclarationGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _typeDeclarationGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
             List<_UTypeDeclaration> typeParameters) {
@@ -512,23 +546,23 @@ class _Util {
         }
     }
 
-    public static final String _UNION_NAME = "Object";
+    static final String _UNION_NAME = "Object";
 
-    public static List<_ValidationFailure> _unionValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_Util._ValidationFailure> _unionValidate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
             return validateUnionCases(cases, m, typeParameters);
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, _UNION_NAME);
+            return getTypeUnexpectedValidationFailure(List.of(), value, _UNION_NAME);
         }
     }
 
-    private static List<_ValidationFailure> validateUnionCases(
+    private static List<_Util._ValidationFailure> validateUnionCases(
             Map<String, _UStruct> referenceCases,
             Map<?, ?> actual, List<_UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return List.of(
-                    new _ValidationFailure(new ArrayList<Object>(),
+                    new _Util._ValidationFailure(new ArrayList<Object>(),
                             "ZeroOrManyUnionFieldsDisallowed", Map.of()));
         }
 
@@ -539,7 +573,7 @@ class _Util {
         final var referenceStruct = referenceCases.get(unionTarget);
         if (referenceStruct == null) {
             return Collections
-                    .singletonList(new _ValidationFailure(List.of(unionTarget),
+                    .singletonList(new _Util._ValidationFailure(List.of(unionTarget),
                             "UnionFieldUnknown", Map.of()));
         }
 
@@ -547,28 +581,28 @@ class _Util {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
                     (Map<String, Object>) m2, typeParameters);
 
-            final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
+            final var nestedValidationFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
             for (final var f : nestedValidationFailures) {
                 final List<Object> thisPath = _ValidateUtil.prepend(unionTarget, f.path);
 
-                nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+                nestedValidationFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
             }
 
             return nestedValidationFailuresWithPath;
         } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(unionTarget),
+            return getTypeUnexpectedValidationFailure(List.of(unionTarget),
                     unionPayload, "Object");
         }
     }
 
-    private static List<_ValidationFailure> validateUnionStruct(
+    private static List<_Util._ValidationFailure> validateUnionStruct(
             _UStruct unionStruct,
             String unionCase,
             Map<String, Object> actual, List<_UTypeDeclaration> typeParameters) {
         return validateStructFields(unionStruct.fields, actual, typeParameters);
     }
 
-    public static Object _unionGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object _unionGenerateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random, Map<String, _UStruct> cases) {

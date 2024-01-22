@@ -7,9 +7,9 @@ import java.util.TreeMap;
 
 class _ValidateUtil {
 
-    static List<_ValidationFailure> validateHeaders(
+    static List<_Util._ValidationFailure> validateHeaders(
             Map<String, Object> headers, UApiSchema uApiSchema, _UFn functionType) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<_Util._ValidationFailure>();
 
         if (headers.containsKey("_bin")) {
             final List<Object> binaryChecksums;
@@ -21,7 +21,7 @@ class _ValidateUtil {
                         var integerElement = _CastUtil.asInt(binaryChecksum);
                     } catch (ClassCastException e) {
                         validationFailures
-                                .addAll(getTypeUnexpectedValidationFailure(List.of("_bin", i),
+                                .addAll(_Util.getTypeUnexpectedValidationFailure(List.of("_bin", i),
                                         binaryChecksum,
                                         "Integer"));
                     }
@@ -29,7 +29,7 @@ class _ValidateUtil {
                 }
             } catch (ClassCastException e) {
                 validationFailures
-                        .addAll(getTypeUnexpectedValidationFailure(List.of("_bin"), headers.get("_bin"),
+                        .addAll(_Util.getTypeUnexpectedValidationFailure(List.of("_bin"), headers.get("_bin"),
                                 "Array"));
             }
         }
@@ -42,17 +42,17 @@ class _ValidateUtil {
         return validationFailures;
     }
 
-    private static List<_ValidationFailure> validateSelectHeaders(Map<String, Object> headers,
+    private static List<_Util._ValidationFailure> validateSelectHeaders(Map<String, Object> headers,
             UApiSchema uApiSchema, _UFn functionType) {
         Map<String, Object> selectStructFieldsHeader;
         try {
             selectStructFieldsHeader = _CastUtil.asMap(headers.get("_sel"));
         } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(List.of("_sel"),
+            return _Util.getTypeUnexpectedValidationFailure(List.of("_sel"),
                     headers.get("_sel"), "Object");
         }
 
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<_Util._ValidationFailure>();
 
         for (final var entry : selectStructFieldsHeader.entrySet()) {
             final var typeName = entry.getKey();
@@ -67,7 +67,7 @@ class _ValidateUtil {
             }
 
             if (typeReference == null) {
-                validationFailures.add(new _ValidationFailure(List.of("_sel", typeName),
+                validationFailures.add(new _Util._ValidationFailure(List.of("_sel", typeName),
                         "TypeUnknown", Map.of()));
                 continue;
             }
@@ -78,7 +78,7 @@ class _ValidateUtil {
                     unionCases = _CastUtil.asMap(selectValue);
                 } catch (ClassCastException e) {
                     validationFailures.addAll(
-                            getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
+                            _Util.getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
                     continue;
                 }
 
@@ -90,7 +90,7 @@ class _ValidateUtil {
                     final List<Object> loopPath = List.of("_sel", typeName, unionCase);
 
                     if (structRef == null) {
-                        validationFailures.add(new _ValidationFailure(
+                        validationFailures.add(new _Util._ValidationFailure(
                                 loopPath,
                                 "UnionCaseUnknown", Map.of()));
                         continue;
@@ -122,15 +122,15 @@ class _ValidateUtil {
         return validationFailures;
     }
 
-    private static List<_ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
+    private static List<_Util._ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
             Object selectedFields) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<_Util._ValidationFailure>();
 
         final List<Object> fields;
         try {
             fields = _CastUtil.asList(selectedFields);
         } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
+            return _Util.getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
         }
 
         for (int i = 0; i < fields.size(); i += 1) {
@@ -141,44 +141,17 @@ class _ValidateUtil {
             } catch (ClassCastException e) {
                 final List<Object> thisPath = _ValidateUtil.append(basePath, i);
 
-                validationFailures.addAll(getTypeUnexpectedValidationFailure(thisPath, field, "String"));
+                validationFailures.addAll(_Util.getTypeUnexpectedValidationFailure(thisPath, field, "String"));
                 continue;
             }
             if (!structReference.fields.containsKey(stringField)) {
                 final List<Object> thisPath = _ValidateUtil.append(basePath, i);
 
-                validationFailures.add(new _ValidationFailure(thisPath, "StructFieldUnknown", Map.of()));
+                validationFailures.add(new _Util._ValidationFailure(thisPath, "StructFieldUnknown", Map.of()));
             }
         }
 
         return validationFailures;
-    }
-
-    static String getType(Object value) {
-        if (value == null) {
-            return "Null";
-        } else if (value instanceof Boolean) {
-            return "Boolean";
-        } else if (value instanceof Number) {
-            return "Number";
-        } else if (value instanceof String) {
-            return "String";
-        } else if (value instanceof List) {
-            return "Array";
-        } else if (value instanceof Map) {
-            return "Object";
-        } else {
-            return "Unknown";
-        }
-    }
-
-    static List<_ValidationFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
-            String expectedType) {
-        final var actualType = _ValidateUtil.getType(value);
-        final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
-                Map.entry("expected", Map.of(expectedType, Map.of()))));
-        return List.of(
-                new _ValidationFailure(path, "TypeUnexpected", data));
     }
 
     static List<Object> prepend(Object value, List<Object> original) {

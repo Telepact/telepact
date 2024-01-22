@@ -69,7 +69,7 @@ class _ParseSchemaToolUtil {
 
     public static List<_SchemaParseFailure> getTypeUnexpectedValidationFailure(List<Object> path, Object value,
             String expectedType) {
-        final var actualType = _ValidateUtil.getType(value);
+        final var actualType = _Util.getType(value);
         final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
         return List.of(

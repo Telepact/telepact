@@ -21,7 +21,7 @@ class _UUnion implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_Util._ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util._unionValidate(value, typeParameters, generics, this.cases);
     }

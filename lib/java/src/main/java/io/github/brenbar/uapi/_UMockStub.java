@@ -19,15 +19,15 @@ class _UMockStub implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
+    public List<_Util._ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<_Util._ValidationFailure>();
 
         final Map<String, Object> givenMap;
         try {
             givenMap = _CastUtil.asMap(givenObj);
         } catch (ClassCastException e) {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
+            return _Util.getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
 
         final var regexString = "^fn\\..*$";
@@ -35,7 +35,7 @@ class _UMockStub implements _UType {
         final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(
-                    new _ValidationFailure(List.of(),
+                    new _Util._ValidationFailure(List.of(),
                             "ObjectKeyRegexMatchCountUnexpected",
                             Map.of("regex", regexString, "actual",
                                     matches.size(), "expected", 1)));
@@ -51,11 +51,11 @@ class _UMockStub implements _UType {
         final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
         final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
 
-        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        final var inputFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
         for (final var f : inputFailures) {
             final List<Object> thisPath = _ValidateUtil.prepend(functionName, f.path);
 
-            inputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+            inputFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
         }
 
         final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
@@ -66,7 +66,7 @@ class _UMockStub implements _UType {
         final var resultDefKey = "->";
 
         if (!givenMap.containsKey(resultDefKey)) {
-            return List.of(new _ValidationFailure(List.of(resultDefKey),
+            return List.of(new _Util._ValidationFailure(List.of(resultDefKey),
                     "RequiredObjectKeyMissing",
                     Map.of()));
         }
@@ -74,11 +74,11 @@ class _UMockStub implements _UType {
         final var output = givenMap.get(resultDefKey);
         final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
 
-        final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        final var outputFailuresWithPath = new ArrayList<_Util._ValidationFailure>();
         for (final var f : outputFailures) {
             final List<Object> thisPath = _ValidateUtil.prepend(resultDefKey, f.path);
 
-            outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+            outputFailuresWithPath.add(new _Util._ValidationFailure(thisPath, f.reason, f.data));
         }
 
         final var failuresWithoutMissingRequired = outputFailuresWithPath
