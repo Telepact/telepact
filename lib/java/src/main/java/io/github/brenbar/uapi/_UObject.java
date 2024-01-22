@@ -1,9 +1,6 @@
 package io.github.brenbar.uapi;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 class _UObject implements _UType {
 
@@ -15,70 +12,20 @@ class _UObject implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        if (value instanceof final Map<?, ?> m) {
-            final var nestedTypeDeclaration = typeParameters.get(0);
-
-            final var validationFailures = new ArrayList<_ValidationFailure>();
-            for (Map.Entry<?, ?> entry : m.entrySet()) {
-                final var k = (String) entry.getKey();
-                final var v = entry.getValue();
-                final var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
-
-                final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
-                for (var f : nestedValidationFailures) {
-                    final List<Object> thisPath = _ValidateUtil.prepend(k, f.path);
-
-                    nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
-                }
-
-                validationFailures.addAll(nestedValidationFailuresWithPath);
-            }
-
-            return validationFailures;
-        } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
-                    this.getName(generics));
-        }
+        return _Util._objectValidate(value, typeParameters, generics);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics,
-            _RandomGenerator randomGenerator) {
-        final var nestedTypeDeclaration = typeParameters.get(0);
-
-        if (useStartingValue) {
-            final var startingObj = (Map<String, Object>) startingValue;
-
-            final var obj = new TreeMap<String, Object>();
-            for (final var startingObjEntry : startingObj.entrySet()) {
-                final var key = startingObjEntry.getKey();
-                final var startingObjValue = startingObjEntry.getValue();
-                final var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
-                        includeRandomOptionalFields, generics, randomGenerator);
-                obj.put(key, value);
-            }
-
-            return obj;
-        } else {
-            final var length = randomGenerator.nextCollectionLength();
-
-            final var obj = new TreeMap<String, Object>();
-            for (int i = 0; i < length; i += 1) {
-                final var key = randomGenerator.nextString();
-                final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields,
-                        generics, randomGenerator);
-                obj.put(key, value);
-            }
-
-            return obj;
-        }
+            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
+        return _Util._objectGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+                typeParameters, generics, randomGenerator);
     }
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        return "Object";
+        return _Util._OBJECT_NAME;
     }
 
 }

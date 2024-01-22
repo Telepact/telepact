@@ -1,10 +1,6 @@
 package io.github.brenbar.uapi;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 class _UNumber implements _UType {
     @Override
@@ -15,15 +11,7 @@ class _UNumber implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
-            return List.of(
-                    new _ValidationFailure(new ArrayList<Object>(), "NumberOutOfRange", Map.of()));
-        } else if (value instanceof Number) {
-            return List.of();
-        } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
-                    this.getName(generics));
-        }
+        return _Util._numberValidate(value);
     }
 
     @Override
@@ -31,11 +19,7 @@ class _UNumber implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextDouble();
-        }
+        return _Util._numberGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override

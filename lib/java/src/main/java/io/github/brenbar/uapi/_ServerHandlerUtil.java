@@ -16,7 +16,7 @@ class _ServerHandlerUtil {
         final Map<String, Object> requestHeaders = requestMessage.header;
         final Map<String, Object> requestBody = requestMessage.body;
         final Map<String, _UType> parsedUApiSchema = uApiSchema.parsed;
-        final Map.Entry<String, Object> requestEntry = _UUnion.entry(requestBody);
+        final Map.Entry<String, Object> requestEntry = _Util.entry(requestBody);
 
         final String requestTargetInit;
         final Map<String, Object> requestPayload;

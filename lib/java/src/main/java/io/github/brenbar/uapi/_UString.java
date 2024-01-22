@@ -11,12 +11,7 @@ class _UString implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        if (value instanceof String) {
-            return List.of();
-        } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
-                    this.getName(generics));
-        }
+        return _Util._stringValidate(value);
     }
 
     @Override
@@ -24,15 +19,11 @@ class _UString implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextString();
-        }
+        return _Util._stringGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        return "String";
+        return _Util._STRING_NAME;
     }
 }

@@ -34,7 +34,7 @@ class _SelectUtil {
             return finalMap;
         } else if (typeDeclarationType instanceof final _UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
-            final Map.Entry<String, Object> unionEntry = _UUnion.entry(valueAsMap);
+            final Map.Entry<String, Object> unionEntry = _Util.entry(valueAsMap);
             final var unionCase = unionEntry.getKey();
             final var unionData = (Map<String, Object>) unionEntry.getValue();
 
@@ -60,7 +60,7 @@ class _SelectUtil {
             return Map.of(unionEntry.getKey(), finalMap);
         } else if (typeDeclarationType instanceof final _UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
-            final var unionEntry = _UUnion.entry(valueAsMap);
+            final var unionEntry = _Util.entry(valueAsMap);
             final var unionCase = unionEntry.getKey();
             final var unionData = (Map<String, Object>) unionEntry.getValue();
 

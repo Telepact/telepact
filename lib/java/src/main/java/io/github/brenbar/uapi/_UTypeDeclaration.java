@@ -16,35 +16,13 @@ class _UTypeDeclaration {
     }
 
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> generics) {
-        if (value == null) {
-            final boolean isNullable;
-            if (this.type instanceof _UGeneric g) {
-                final int genericIndex = g.index;
-                final var generic = generics.get(genericIndex);
-                isNullable = generic.nullable;
-            } else {
-                isNullable = this.nullable;
-            }
-
-            if (!isNullable) {
-                return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value,
-                        this.type.getName(generics));
-            } else {
-                return List.of();
-            }
-        } else {
-            return this.type.validate(value, this.typeParameters, generics);
-        }
+        return _Util._typeDeclarationValidate(value, generics, this.type, this.nullable, this.typeParameters);
     }
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        if (this.nullable && !useStartingValue && randomGenerator.nextBoolean()) {
-            return null;
-        } else {
-            return this.type.generateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
-                    this.typeParameters, generics, randomGenerator);
-        }
+        return _Util._typeDeclarationGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+                generics, randomGenerator, this.type, this.nullable, this.typeParameters);
     }
 }

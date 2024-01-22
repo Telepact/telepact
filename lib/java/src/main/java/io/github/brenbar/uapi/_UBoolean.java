@@ -12,11 +12,7 @@ class _UBoolean implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        if (value instanceof Boolean) {
-            return List.of();
-        } else {
-            return _ValidateUtil.getTypeUnexpectedValidationFailure(List.of(), value, this.getName(generics));
-        }
+        return _Util._booleanValidate(value);
     }
 
     @Override
@@ -24,16 +20,12 @@ class _UBoolean implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        if (useStartingValue) {
-            return startingValue;
-        } else {
-            return randomGenerator.nextBoolean();
-        }
+        return _Util._booleanGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        return "Boolean";
+        return _Util._BOOLEAN_NAME;
     }
 
 }

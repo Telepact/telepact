@@ -14,6 +14,11 @@ class _UMockStub implements _UType {
     }
 
     @Override
+    public int getTypeParameterCount() {
+        return 0;
+    }
+
+    @Override
     public List<_ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
@@ -87,11 +92,6 @@ class _UMockStub implements _UType {
     }
 
     @Override
-    public int getTypeParameterCount() {
-        return 0;
-    }
-
-    @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
@@ -101,7 +101,7 @@ class _UMockStub implements _UType {
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        return "_ext._Stub";
+        return _Util._MOCK_STUB_NAME;
     }
 
 }

@@ -1,8 +1,6 @@
 package io.github.brenbar.uapi;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class _UFn implements _UType {
 
@@ -33,19 +31,12 @@ class _UFn implements _UType {
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        final Map<String, _UStruct> callCases = this.call.cases;
-        if (useStartingValue) {
-            final var startingFnValue = (Map<String, Object>) startingValue;
-            return _UUnion.constructRandomUnion(callCases, startingFnValue, includeRandomOptionalFields,
-                    List.of(), randomGenerator);
-        } else {
-            return _UUnion.constructRandomUnion(callCases, new HashMap<>(), includeRandomOptionalFields,
-                    List.of(), randomGenerator);
-        }
+        return _Util._fnGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+                typeParameters, generics, randomGenerator, this.call.cases);
     }
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        return "Object";
+        return _Util._FN_NAME;
     }
 }

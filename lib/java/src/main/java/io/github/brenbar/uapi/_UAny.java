@@ -20,18 +20,11 @@ class _UAny implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        final var selectType = randomGenerator.nextInt(3);
-        if (selectType == 0) {
-            return randomGenerator.nextBoolean();
-        } else if (selectType == 1) {
-            return randomGenerator.nextInt();
-        } else {
-            return randomGenerator.nextString();
-        }
+        return _Util._anyGenerateRandomValue(randomGenerator);
     }
 
     @Override
     public String getName(List<_UTypeDeclaration> generics) {
-        return "Any";
+        return _Util._ANY_NAME;
     }
 }

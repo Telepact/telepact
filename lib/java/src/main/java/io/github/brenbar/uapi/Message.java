@@ -26,12 +26,12 @@ public class Message {
     }
 
     public String getBodyTarget() {
-        var entry = _UUnion.entry(body);
+        var entry = _Util.entry(body);
         return entry.getKey();
     }
 
     public Map<String, Object> getBodyPayload() {
-        var entry = _UUnion.entry(body);
+        var entry = _Util.entry(body);
         return (Map<String, Object>) entry.getValue();
     }
 }
