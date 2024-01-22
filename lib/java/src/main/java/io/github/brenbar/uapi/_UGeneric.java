@@ -15,7 +15,7 @@ class _UGeneric implements _UType {
     }
 
     @Override
-    public List<_Util._ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         final var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, List.of());

@@ -96,8 +96,10 @@ class _ParseSchemaTypeUtil {
     }
 
     static _UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
-            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures,
+            Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
         }

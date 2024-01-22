@@ -22,7 +22,7 @@ class _UFn implements _UType {
     }
 
     @Override
-    public List<_Util._ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return this.call.validate(value, typeParameters, generics);
     }

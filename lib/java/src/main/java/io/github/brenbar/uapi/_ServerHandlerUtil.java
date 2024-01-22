@@ -56,7 +56,7 @@ class _ServerHandlerUtil {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final List<_Util._ValidationFailure> headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders,
+        final List<_ValidationFailure> headerValidationFailures = _ValidateUtil.validateHeaders(requestHeaders,
                 uApiSchema, functionType);
         if (!headerValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,
@@ -144,7 +144,7 @@ class _ServerHandlerUtil {
         return new Message(finalResponseHeaders, finalResultUnion);
     }
 
-    private static Message getInvalidErrorMessage(String error, List<_Util._ValidationFailure> validationFailures,
+    private static Message getInvalidErrorMessage(String error, List<_ValidationFailure> validationFailures,
             _UUnion resultUnionType, Map<String, Object> responseHeaders) {
         final var validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
         final Map<String, Object> newErrorResult = Map.of(error,
@@ -155,7 +155,7 @@ class _ServerHandlerUtil {
     }
 
     private static List<Map<String, Object>> mapValidationFailuresToInvalidFieldCases(
-            List<_Util._ValidationFailure> argumentValidationFailures) {
+            List<_ValidationFailure> argumentValidationFailures) {
         final var validationFailureCases = new ArrayList<Map<String, Object>>();
         for (final var validationFailure : argumentValidationFailures) {
             final Map<String, Object> validationFailureCase = Map.of(

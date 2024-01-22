@@ -12,7 +12,8 @@ class _ParseSchemaCustomTypeUtil {
 
     static _UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey, boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
-            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
         final var otherKeys = new HashSet<>(structDefinitionAsPseudoJson.keySet());
@@ -58,7 +59,8 @@ class _ParseSchemaCustomTypeUtil {
 
     static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
-            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
 

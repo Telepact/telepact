@@ -60,8 +60,10 @@ class _ParseSchemaErrorUtil {
     }
 
     public static _UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String schemaKey,
-            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            Map<String, _UType> parsedTypes,
+            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures,
+            Set<String> failedTypes) {
         final var index = schemaKeysToIndex.get(schemaKey);
         final List<Object> basePath = List.of(index);
 
