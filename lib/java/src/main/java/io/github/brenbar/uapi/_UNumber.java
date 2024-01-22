@@ -11,7 +11,7 @@ class _UNumber implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.numberValidate(value);
+        return _Util.validateNumber(value);
     }
 
     @Override
@@ -19,7 +19,7 @@ class _UNumber implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util.numberGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
+        return _Util.generateRandomNumber(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override

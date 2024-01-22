@@ -12,14 +12,14 @@ class _UObject implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.objectValidate(value, typeParameters, generics);
+        return _Util.validateObject(value, typeParameters, generics);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        return _Util.objectGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+        return _Util.generateRandomObject(startingValue, useStartingValue, includeRandomOptionalFields,
                 typeParameters, generics, randomGenerator);
     }
 

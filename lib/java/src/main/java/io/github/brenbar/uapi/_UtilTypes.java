@@ -32,13 +32,13 @@ class _UTypeDeclaration {
     }
 
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> generics) {
-        return _Util.typeDeclarationValidate(value, generics, this.type, this.nullable, this.typeParameters);
+        return _Util.validateValueOfType(value, generics, this.type, this.nullable, this.typeParameters);
     }
 
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util.typeDeclarationGenerateRandomValue(startingValue, useStartingValue,
+        return _Util.generateRandomValueOfType(startingValue, useStartingValue,
                 includeRandomOptionalFields,
                 generics, randomGenerator, this.type, this.nullable, this.typeParameters);
     }

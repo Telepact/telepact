@@ -12,7 +12,7 @@ class _UBoolean implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.booleanValidate(value);
+        return _Util.validateBoolean(value);
     }
 
     @Override
@@ -20,7 +20,7 @@ class _UBoolean implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util.booleanGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
+        return _Util.generateRandomBoolean(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override

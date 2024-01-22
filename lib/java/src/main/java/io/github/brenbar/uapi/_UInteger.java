@@ -11,14 +11,14 @@ class _UInteger implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.integerValidate(value);
+        return _Util.validateInteger(value);
     }
 
     @Override
     public Object generateRandomValue(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        return _Util.integerGenerateRandomValue(startingValue, useStartingValue, randomGenerator);
+        return _Util.generateRandomInteger(startingValue, useStartingValue, randomGenerator);
     }
 
     @Override

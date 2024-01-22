@@ -20,6 +20,10 @@ class _Util {
     static final String _MOCK_CALL_NAME = "_ext._Call";
     static final String _MOCK_STUB_NAME = "_ext._Stub";
     static final String _NUMBER_NAME = "Number";
+    static final String _OBJECT_NAME = "Object";
+    static final String _STRING_NAME = "String";
+    static final String _STRUCT_NAME = "Object";
+    static final String _UNION_NAME = "Object";
 
     static String getType(Object value) {
         if (value == null) {
@@ -48,7 +52,7 @@ class _Util {
                 new _ValidationFailure(path, "TypeUnexpected", data));
     }
 
-    static Object anyGenerateRandomValue(_RandomGenerator randomGenerator) {
+    static Object generateRandomAny(_RandomGenerator randomGenerator) {
         final var selectType = randomGenerator.nextInt(3);
         if (selectType == 0) {
             return randomGenerator.nextBoolean();
@@ -59,7 +63,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> arrayValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateArray(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -87,7 +91,7 @@ class _Util {
         }
     }
 
-    static Object arrayGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomArray(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
@@ -121,7 +125,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> booleanValidate(Object value) {
+    static List<_ValidationFailure> validateBoolean(Object value) {
         if (value instanceof Boolean) {
             return List.of();
         } else {
@@ -129,7 +133,7 @@ class _Util {
         }
     }
 
-    static Object booleanGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomBoolean(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -138,7 +142,7 @@ class _Util {
         }
     }
 
-    static Object fnGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomFn(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator, Map<String, _UStruct> callCases) {
         if (useStartingValue) {
@@ -151,7 +155,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> integerValidate(Object value) {
+    static List<_ValidationFailure> validateInteger(Object value) {
         if (value instanceof Long || value instanceof Integer) {
             return List.of();
         } else if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
@@ -162,7 +166,7 @@ class _Util {
         }
     }
 
-    static Object integerGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomInteger(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -171,7 +175,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> mockCallValidate(Object givenObj,
+    static List<_ValidationFailure> validateMockCall(Object givenObj,
             List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final Map<String, Object> givenMap;
@@ -210,7 +214,7 @@ class _Util {
                 .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
     }
 
-    static List<_ValidationFailure> mockStubValidate(Object givenObj,
+    static List<_ValidationFailure> validateMockStub(Object givenObj,
             List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
@@ -283,7 +287,7 @@ class _Util {
         return validationFailures;
     }
 
-    static List<_ValidationFailure> numberValidate(Object value) {
+    static List<_ValidationFailure> validateNumber(Object value) {
         if (value instanceof BigInteger bi || value instanceof BigDecimal bd) {
             return List.of(
                     new _ValidationFailure(List.of(), "NumberOutOfRange", Map.of()));
@@ -294,7 +298,7 @@ class _Util {
         }
     }
 
-    static Object numberGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomNumber(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -303,9 +307,7 @@ class _Util {
         }
     }
 
-    static final String _OBJECT_NAME = "Object";
-
-    static List<_ValidationFailure> objectValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateObject(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -332,7 +334,7 @@ class _Util {
         }
     }
 
-    static Object objectGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomObject(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
@@ -365,9 +367,7 @@ class _Util {
         }
     }
 
-    static final String _STRING_NAME = "String";
-
-    static List<_ValidationFailure> stringValidate(Object value) {
+    static List<_ValidationFailure> validateString(Object value) {
         if (value instanceof String) {
             return List.of();
         } else {
@@ -375,7 +375,7 @@ class _Util {
         }
     }
 
-    static Object stringGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomString(Object startingValue, boolean useStartingValue,
             _RandomGenerator randomGenerator) {
         if (useStartingValue) {
             return startingValue;
@@ -384,9 +384,7 @@ class _Util {
         }
     }
 
-    static final String _STRUCT_NAME = "Object";
-
-    static List<_ValidationFailure> structValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateStruct(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UFieldDeclaration> fields) {
         if (value instanceof Map<?, ?> m) {
             return validateStructFields(fields, (Map<String, Object>) m, typeParameters);
@@ -448,7 +446,7 @@ class _Util {
         return validationFailures;
     }
 
-    static Object structGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomStruct(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator random, Map<String, _UFieldDeclaration> fields) {
         if (useStartingValue) {
@@ -501,7 +499,7 @@ class _Util {
         return obj;
     }
 
-    static List<_ValidationFailure> typeDeclarationValidate(Object value, List<_UTypeDeclaration> generics,
+    static List<_ValidationFailure> validateValueOfType(Object value, List<_UTypeDeclaration> generics,
             _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
         if (value == null) {
             final boolean isNullable;
@@ -524,7 +522,7 @@ class _Util {
         }
     }
 
-    static Object typeDeclarationGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomValueOfType(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
             List<_UTypeDeclaration> typeParameters) {
@@ -536,9 +534,7 @@ class _Util {
         }
     }
 
-    static final String _UNION_NAME = "Object";
-
-    static List<_ValidationFailure> unionValidate(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateUnion(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
             return validateUnionCases(cases, m, typeParameters);
@@ -592,7 +588,7 @@ class _Util {
         return validateStructFields(unionStruct.fields, actual, typeParameters);
     }
 
-    static Object unionGenerateRandomValue(Object startingValue, boolean useStartingValue,
+    static Object generateRandomUnion(Object startingValue, boolean useStartingValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random, Map<String, _UStruct> cases) {

@@ -23,7 +23,7 @@ class _UStruct implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.structValidate(value, typeParameters, generics, this.fields);
+        return _Util.validateStruct(value, typeParameters, generics, this.fields);
     }
 
     @Override
@@ -31,7 +31,7 @@ class _UStruct implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random) {
-        return _Util.structGenerateRandomValue(startingValue, useStartingValue, includeRandomOptionalFields,
+        return _Util.generateRandomStruct(startingValue, useStartingValue, includeRandomOptionalFields,
                 typeParameters, generics, random, this.fields);
     }
 

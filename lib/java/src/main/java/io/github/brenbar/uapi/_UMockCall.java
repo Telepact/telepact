@@ -19,7 +19,7 @@ class _UMockCall implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object givenObj, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.mockCallValidate(givenObj, typeParameters, generics, this.types);
+        return _Util.validateMockCall(givenObj, typeParameters, generics, this.types);
     }
 
     @Override
