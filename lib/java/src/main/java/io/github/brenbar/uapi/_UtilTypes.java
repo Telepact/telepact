@@ -552,25 +552,25 @@ class _UError {
     }
 }
 
-class DeserializationError extends RuntimeException {
+class _DeserializationError extends RuntimeException {
 
-    public DeserializationError(Throwable cause) {
+    public _DeserializationError(Throwable cause) {
         super(cause);
     }
 
-    public DeserializationError(String message) {
+    public _DeserializationError(String message) {
         super(message);
     }
 
 }
 
-class BinaryEncoderUnavailableError extends RuntimeException {
+class _BinaryEncoderUnavailableError extends RuntimeException {
 
 }
 
-class BinaryEncodingMissing extends RuntimeException {
+class _BinaryEncodingMissing extends RuntimeException {
 
-    public BinaryEncodingMissing(Object key) {
+    public _BinaryEncodingMissing(Object key) {
         super("Missing binary encoding for %s".formatted(String.valueOf(key)));
     }
 
@@ -627,13 +627,13 @@ class _ClientBinaryEncoder implements _BinaryEncoder {
     }
 
     @Override
-    public List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError {
+    public List<Object> encode(List<Object> message) throws _BinaryEncoderUnavailableError {
         return _Util.clientBinaryEncode(message, this.recentBinaryEncoders,
                 this.binaryChecksumStrategy);
     }
 
     @Override
-    public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
+    public List<Object> decode(List<Object> message) throws _BinaryEncoderUnavailableError {
         return _Util.clientBinaryDecode(message, this.recentBinaryEncoders, this.binaryChecksumStrategy);
     }
 

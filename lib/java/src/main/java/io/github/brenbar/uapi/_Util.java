@@ -1158,7 +1158,7 @@ class _Util {
         final var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
         if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
-            throw new BinaryEncoderUnavailableError();
+            throw new _BinaryEncoderUnavailableError();
         }
 
         final Map<Object, Object> finalEncodedMessageBody;
@@ -1174,7 +1174,7 @@ class _Util {
 
     static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
             ClientBinaryStrategy binaryChecksumStrategy)
-            throws BinaryEncoderUnavailableError {
+            throws _BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
@@ -1182,11 +1182,11 @@ class _Util {
         headers.put("_bin", binaryChecksumStrategy.getCurrentChecksums());
 
         if (Objects.equals(forceSendJson, true)) {
-            throw new BinaryEncoderUnavailableError();
+            throw new _BinaryEncoderUnavailableError();
         }
 
         if (recentBinaryEncoders.size() > 1) {
-            throw new BinaryEncoderUnavailableError();
+            throw new _BinaryEncoderUnavailableError();
         }
 
         final var checksums = recentBinaryEncoders.keySet().stream().toList();
@@ -1195,7 +1195,7 @@ class _Util {
         try {
             binaryEncoder = recentBinaryEncoders.get(checksums.get(0));
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new BinaryEncoderUnavailableError();
+            throw new _BinaryEncoderUnavailableError();
         }
 
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
@@ -1212,7 +1212,7 @@ class _Util {
 
     static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
             ClientBinaryStrategy binaryChecksumStrategy)
-            throws BinaryEncoderUnavailableError {
+            throws _BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
         final var binaryChecksums = (List<Integer>) headers.get("_bin");
@@ -1308,7 +1308,7 @@ class _Util {
         final var value = map.get(key);
 
         if (value == null) {
-            throw new BinaryEncodingMissing(key);
+            throw new _BinaryEncodingMissing(key);
         }
 
         return value;
@@ -1387,7 +1387,7 @@ class _Util {
                 try {
                     final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
                     return serializer.toMsgPack(encodedMessage);
-                } catch (BinaryEncoderUnavailableError e) {
+                } catch (_BinaryEncoderUnavailableError e) {
                     // We can still submit as json
                     return serializer.toJson(messageAsPseudoJson);
                 }
@@ -1413,18 +1413,18 @@ class _Util {
                 messageAsPseudoJson = serializer.fromJson(messageBytes);
             }
         } catch (Throwable e) {
-            throw new DeserializationError(e);
+            throw new _DeserializationError(e);
         }
 
         final List<Object> messageAsPseudoJsonList;
         try {
             messageAsPseudoJsonList = asList(messageAsPseudoJson);
         } catch (ClassCastException e) {
-            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
+            throw new _DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         if (messageAsPseudoJsonList.size() != 2) {
-            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
+            throw new _DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         final List<Object> finalMessageAsPseudoJsonList;
@@ -1440,22 +1440,22 @@ class _Util {
         try {
             headers = asMap(finalMessageAsPseudoJsonList.get(0));
         } catch (ClassCastException e) {
-            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
+            throw new _DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         try {
             body = asMap(finalMessageAsPseudoJsonList.get(1));
             if (body.size() != 1) {
-                throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
+                throw new _DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
             } else {
                 try {
                     var givenPayload = asMap(body.values().stream().findAny().get());
                 } catch (ClassCastException e) {
-                    throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
+                    throw new _DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
                 }
             }
         } catch (ClassCastException e) {
-            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
+            throw new _DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         return new Message(headers, body);
@@ -2509,11 +2509,11 @@ class _Util {
             onError.accept(e);
 
             String reason;
-            if (e instanceof BinaryEncoderUnavailableError) {
+            if (e instanceof _BinaryEncoderUnavailableError) {
                 reason = "IncompatibleBinaryEncoding";
-            } else if (e instanceof BinaryEncodingMissing) {
+            } else if (e instanceof _BinaryEncodingMissing) {
                 reason = "BinaryDecodeFailure";
-            } else if (e instanceof DeserializationError e1) {
+            } else if (e instanceof _DeserializationError e1) {
                 reason = e1.getMessage();
             } else {
                 reason = "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject";
