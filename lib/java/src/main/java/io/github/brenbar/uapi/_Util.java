@@ -841,9 +841,6 @@ class _Util {
                 continue;
             }
 
-            System.out.println(schemaKeysToIndex);
-            System.out.println(schemaKeys);
-            System.out.println(schemaKey);
             final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
             if (matchingSchemaKey != null) {
                 final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
@@ -2811,6 +2808,7 @@ class _Util {
                     Map.of("_ErrorParseFailure",
                             Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
                 // Try again, but as json
+                header.put("_binary", true);
                 header.put("_forceSendJson", true);
 
                 return adapter.apply(requestMessage, serializer).get(timeoutMs,
