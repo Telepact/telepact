@@ -1,7 +1,7 @@
 cases = {
     'binary': [
         [b'\x92\x81\xA4_bin\x91\xd2\x00\x00\x00\x00\x81\x00\x80', [{}, {'_ErrorParseFailure': {'reasons': [{'IncompatibleBinaryEncoding': {}}]}}]],
-        [b'\x80', [{}, {'_ErrorParseFailure': {'reasons': [{'JsonInvalid': {}}]}}]],
+        [b'\x80', [{}, {'_ErrorParseFailure': {'reasons': [{'ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject': {}}]}}]],
         [b'\x92\x81\xA4_bin\x91\xd2\xc9t\xd9\xeb\x81(\x80', b'\x92\x81\xa4_bin\x91\xd2\xc9t\xd9\xeb\x81\x12\x80'],
         [b'\x92\x81\xA4_bin\x91\xd2\xc9t\xd9\xeb\x81\x7f\x80', [{}, {'_ErrorParseFailure': {'reasons': [{'BinaryDecodeFailure': {}}]}}]],
         [b'false', [{}, {'_ErrorParseFailure': {'reasons': [{'ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject': {}}]}}]],

@@ -552,6 +552,30 @@ class _UError {
     }
 }
 
+class DeserializationError extends RuntimeException {
+
+    public DeserializationError(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DeserializationError(String message) {
+        super(message);
+    }
+
+}
+
+class BinaryEncoderUnavailableError extends RuntimeException {
+
+}
+
+class BinaryEncodingMissing extends RuntimeException {
+
+    public BinaryEncodingMissing(Object key) {
+        super("Missing binary encoding for %s".formatted(String.valueOf(key)));
+    }
+
+}
+
 class _BinaryEncoding {
 
     public final Map<String, Integer> encodeMap;
@@ -567,9 +591,9 @@ class _BinaryEncoding {
 }
 
 interface _BinaryEncoder {
-    List<Object> encode(List<Object> message) throws BinaryEncoderUnavailableError;
+    List<Object> encode(List<Object> message);
 
-    List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError;
+    List<Object> decode(List<Object> message);
 }
 
 class _ServerBinaryEncoder implements _BinaryEncoder {
@@ -586,7 +610,7 @@ class _ServerBinaryEncoder implements _BinaryEncoder {
     }
 
     @Override
-    public List<Object> decode(List<Object> message) throws BinaryEncoderUnavailableError {
+    public List<Object> decode(List<Object> message) {
         return _Util.serverBinaryDecode(message, binaryEncoder);
     }
 

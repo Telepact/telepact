@@ -1165,8 +1165,7 @@ class _Util {
         return List.of(headers, finalEncodedMessageBody);
     }
 
-    static List<Object> serverBinaryDecode(List<Object> message, _BinaryEncoding binaryEncoder)
-            throws BinaryEncoderUnavailableError {
+    static List<Object> serverBinaryDecode(List<Object> message, _BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
         final var clientKnownBinaryChecksums = (List<Integer>) headers.get("_bin");
@@ -1425,20 +1424,16 @@ class _Util {
         try {
             messageAsPseudoJsonList = asList(messageAsPseudoJson);
         } catch (ClassCastException e) {
-            throw new DeserializationError("ExpectedArrayOfTwoObjects");
+            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         if (messageAsPseudoJsonList.size() != 2) {
-            throw new DeserializationError("ExpectedArrayOfTwoObjects");
+            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         final List<Object> finalMessageAsPseudoJsonList;
         if (isMsgPack) {
-            try {
-                finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
-            } catch (Exception e) {
-                throw new DeserializationError(e);
-            }
+            finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
         } else {
             finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
         }
@@ -1449,7 +1444,7 @@ class _Util {
         try {
             headers = asMap(finalMessageAsPseudoJsonList.get(0));
         } catch (ClassCastException e) {
-            throw new DeserializationError("ExpectedArrayOfTwoObjects");
+            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         try {
@@ -1464,7 +1459,7 @@ class _Util {
                 }
             }
         } catch (ClassCastException e) {
-            throw new DeserializationError("ExpectedArrayOfTwoObjects");
+            throw new DeserializationError("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject");
         }
 
         return new Message(headers, body);
@@ -2512,35 +2507,25 @@ class _Util {
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,
             Consumer<Throwable> onError) {
 
-        final Message requestMessage;
         try {
-            requestMessage = serializer.deserialize(requestMessageBytes);
-        } catch (DeserializationError e) {
-            try {
-                onError.accept(e);
-            } catch (Throwable ignored) {
-            }
+            return serializer.deserialize(requestMessageBytes);
+        } catch (Exception e) {
+            onError.accept(e);
 
-            final var cause = e.getCause();
-
-            final List<Map<String, Object>> parseFailures;
-            if (cause instanceof BinaryEncoderUnavailableError e2) {
-                parseFailures = List.of(Map.of("IncompatibleBinaryEncoding", Map.of()));
-            } else if (cause instanceof BinaryEncodingMissing e2) {
-                parseFailures = List.of(Map.of("BinaryDecodeFailure", Map.of()));
-            } else if (cause instanceof InvalidJsonError e2) {
-                parseFailures = List.of(Map.of("JsonInvalid", Map.of()));
+            String reason;
+            if (e instanceof BinaryEncoderUnavailableError) {
+                reason = "IncompatibleBinaryEncoding";
+            } else if (e instanceof BinaryEncodingMissing) {
+                reason = "BinaryDecodeFailure";
+            } else if (e instanceof DeserializationError e1) {
+                reason = e1.getMessage();
             } else {
-                parseFailures = List.of(Map.of("ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject", Map.of()));
+                reason = "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject";
             }
 
-            final var requestHeaders = new HashMap<String, Object>();
-            requestHeaders.put("_parseFailures", parseFailures);
-
-            return new Message(requestHeaders, Map.of());
+            return new Message(Map.of("_parseFailures", List.of(Map.of(reason, Map.of()))),
+                    Map.of("_unknown", Map.of()));
         }
-
-        return requestMessage;
     }
 
     static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,

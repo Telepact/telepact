@@ -8,9 +8,7 @@ import java.util.Set;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.msgpack.jackson.dataformat.MessagePackParser;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -83,16 +81,16 @@ class _DefaultSerializer implements SerializationImpl {
     public byte[] toJson(Object uapiMessage) {
         try {
             return jsonMapper.writeValueAsBytes(uapiMessage);
-        } catch (JsonProcessingException e) {
-            throw new SerializationError(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     public byte[] toMsgPack(Object uapiMessage) {
         try {
             return binaryMapper.writeValueAsBytes(uapiMessage);
-        } catch (JsonProcessingException e) {
-            throw new SerializationError(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -101,10 +99,8 @@ class _DefaultSerializer implements SerializationImpl {
         try {
             return jsonMapper.readValue(bytes, new TypeReference<Object>() {
             });
-        } catch (JsonParseException e) {
-            throw new DeserializationError(new InvalidJsonError(e));
-        } catch (IOException e) {
-            throw new DeserializationError(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -113,8 +109,8 @@ class _DefaultSerializer implements SerializationImpl {
         try {
             return binaryMapper.readValue(bytes, new TypeReference<Object>() {
             });
-        } catch (IOException e) {
-            throw new DeserializationError(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -30,8 +30,12 @@ public class ClientTestServer {
                     byte[] requestBytes;
                     try {
                         requestBytes = s.serialize(m);
-                    } catch (IllegalArgumentException e) {
-                        return new Message(Map.of("numberTooBig", true), Map.of("_ErrorUnknown", Map.of()));
+                    } catch (RuntimeException e) {
+                        if (e.getCause() instanceof IllegalArgumentException) {
+                            return new Message(Map.of("numberTooBig", true), Map.of("_ErrorUnknown", Map.of()));
+                        } else {
+                            throw e;
+                        }
                     }
 
                     System.out.println("   <-c  %s".formatted(new String(requestBytes)));
