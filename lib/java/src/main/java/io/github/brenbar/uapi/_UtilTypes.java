@@ -576,6 +576,21 @@ class _BinaryEncodingMissing extends RuntimeException {
 
 }
 
+class _InvalidMessage extends RuntimeException {
+
+    public _InvalidMessage() {
+        super();
+    }
+
+    public _InvalidMessage(Throwable cause) {
+        super(cause);
+    }
+}
+
+class _InvalidMessageBody extends RuntimeException {
+
+}
+
 class _BinaryEncoding {
 
     public final Map<String, Integer> encodeMap;

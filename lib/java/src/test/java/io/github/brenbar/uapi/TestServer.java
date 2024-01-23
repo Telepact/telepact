@@ -38,6 +38,9 @@ public class TestServer {
 
         var serveAlternateServer = new AtomicBoolean();
 
+        class ThisError extends RuntimeException {
+        }
+
         Function<Message, Message> handler = (requestMessage) -> {
             try {
                 var requestHeaders = requestMessage.header;
@@ -68,6 +71,11 @@ public class TestServer {
                     serveAlternateServer.set(!serveAlternateServer.get());
                 }
 
+                var throwError = requestHeaders.get("_throwError");
+                if (Objects.equals(true, throwError)) {
+                    throw new ThisError();
+                }
+
                 return new Message(responseHeaders, responseBody);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -78,6 +86,9 @@ public class TestServer {
         options.onError = (e) -> {
             e.printStackTrace();
             System.err.flush();
+            if (e.getCause() instanceof ThisError) {
+                throw new RuntimeException();
+            }
         };
         options.onRequest = m -> {
             if ((Boolean) m.header.getOrDefault("_onRequestError", false)) {

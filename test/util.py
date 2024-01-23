@@ -206,7 +206,7 @@ def convert_lists_to_sets(a):
 
 
 async def verify_server_case(nats_client, request, expected_response, frontdoor_topic, backdoor_topic):
-    assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
+    assert_rules = {} if not expected_response or type(expected_response) == bytes else expected_response[0].pop('_assert', {})
 
     backdoor_handling_task = asyncio.create_task(backdoor_handler(nats_client, backdoor_topic))
 
@@ -298,13 +298,16 @@ async def send_case(nats_client, request, expected_response, request_topic):
     if type(expected_response) == bytes:
         response = response_bytes
     else:
-        response_json = response_bytes.decode()
-        response = json.loads(response_json)
+        try:        
+            response_json = response_bytes.decode()
+            response = json.loads(response_json)
+            print('T<-     {}'.format(response), flush=True)
+        except:
+            response = msgpack.loads(response_bytes, strict_map_key=False)
+            print('T<-     {}'.format(response_bytes), flush=True)
 
-    print('T<-     {}'.format(response), flush=True)
-
-    if 'numberTooBig' in response[0]:
-        pytest.skip('Cannot use big numbers with msgpack')
+        if 'numberTooBig' in response[0]:
+            pytest.skip('Cannot use big numbers with msgpack')
 
     return response
 

@@ -89,7 +89,8 @@
       "IncompatibleBinaryEncoding": {},
       "BinaryDecodeFailure": {},
       "JsonInvalid": {},
-      "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+      "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {},
+      "ExpectedJsonArrayOfTwoObjects": {}
     }
   },
 
