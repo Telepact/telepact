@@ -34,7 +34,7 @@ invalid_cases = {
     'fn': [v for v in generate_mock_cases('fn!', dict, [{'fn.example': {'required': False}}, {'fn.example': {'optional!': False, 'required': False}}], additional_fn_cases)],
     'p2Str': [v for v in generate_mock_cases('p2Str!', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
     'p2Union': [v for v in generate_mock_cases('p2Union!', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)],
-    'mockExt': [
+    'stub': [
         [[{}, {'fn._createStub': {'stub': False}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn._createStub': {'stub': 0}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn._createStub': {'stub': ''}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]],
