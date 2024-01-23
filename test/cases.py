@@ -330,5 +330,8 @@ cases = {
     ],
     'clientHeaders': [
         [[{'_tim': 6000}, {'fn._ping': {}}], [{}, {'Ok': {}}]],
+    ],
+    'big': [
+        [[{'Ok': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}, {'fn.getBigList': {}}], [{}, {'Ok': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}]]
     ]
 }

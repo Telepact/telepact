@@ -306,6 +306,15 @@
   },
 
   {
+    "struct.Big": {
+      "aF": ["boolean"],
+      "cF": ["boolean"],
+      "bF": ["boolean"],
+      "dF": ["boolean"]
+    }
+  },
+
+  {
     "///": "An example function.",
     "fn.example": {
       "required": ["boolean"],
@@ -329,6 +338,15 @@
       },
       "ErrorExample": {
         "property": ["string"]
+      }
+    }
+  },
+
+  {
+    "fn.getBigList": {},
+    "->": {
+      "Ok": {
+        "items": ["array", ["struct.Big"]]
       }
     }
   }
