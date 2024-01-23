@@ -66,14 +66,6 @@ class _Util {
         return (Integer) object;
     }
 
-    public static Long asLong(Object object) {
-        if (object == null) {
-            throw new ClassCastException();
-        }
-
-        return (Long) object;
-    }
-
     public static String asString(Object object) {
         if (object == null) {
             throw new ClassCastException();
@@ -616,13 +608,6 @@ class _Util {
             Map<String, _UStruct> fnResultCases = fnResult.cases;
             _UUnion errorFnResult = error.errors;
             Map<String, _UStruct> errorFnResultCases = errorFnResult.cases;
-
-            if (fnName.startsWith("fn._")) {
-                // Only internal errors can change internal functions
-                if (!errorName.startsWith("error._")) {
-                    continue;
-                }
-            }
 
             for (var errorResultField : errorFnResultCases.entrySet()) {
                 var newKey = errorResultField.getKey();

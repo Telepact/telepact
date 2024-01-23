@@ -62,7 +62,8 @@
   },
   {
     "fn.validateSchema": {
-      "schema": ["any?"]
+      "schema": ["any?"],
+      "extend!": ["any?"]
     },
     "->": {
       "Ok": {},

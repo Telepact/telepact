@@ -30,6 +30,7 @@ public class SchemaTestServer {
 
             var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
             var schemaPseudoJson = arg.get("schema");
+            var extendSchemaJson = (String) arg.get("extend!");
 
             var serializeSchema = (Boolean) requestMessage.header.getOrDefault("_serializeSchema", true);
 
@@ -47,6 +48,9 @@ public class SchemaTestServer {
 
             try {
                 var schema = UApiSchema.fromJson(schemaJson);
+                if (extendSchemaJson != null) {
+                    UApiSchema.extend(schema, extendSchemaJson);
+                }
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             } catch (UApiSchemaParseError e) {
                 e.printStackTrace();
