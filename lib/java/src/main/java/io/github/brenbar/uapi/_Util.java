@@ -2696,9 +2696,10 @@ class _Util {
                 final var stubArg = (Map<String, Object>) stubCall.getValue();
                 final var stubResult = (Map<String, Object>) givenStub.get("->");
                 final var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
+                final var stubCount = (Integer) argument.getOrDefault("count!", -1);
 
                 final var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
-                        allowArgumentPartialMatch);
+                        allowArgumentPartialMatch, stubCount);
 
                 stubs.add(0, stub);
                 return new Message(Map.of("Ok", Map.of()));
@@ -2743,6 +2744,10 @@ class _Util {
                 final var definition = (_UFn) uApiSchema.parsed.get(functionName);
 
                 for (final var stub : stubs) {
+                    System.out.println(stub.whenArgument + " " + stub.count);
+                    if (stub.count == 0) {
+                        continue;
+                    }
                     if (Objects.equals(stub.whenFunction, functionName)) {
                         if (stub.allowArgumentPartialMatch) {
                             if (isSubMap(stub.whenArgument, argument)) {
@@ -2751,6 +2756,9 @@ class _Util {
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
                                         includeRandomOptionalFields, List.of(), List.of(), random);
+                                if (stub.count > 0) {
+                                    stub.count -= 1;
+                                }
                                 return new Message(result);
                             }
                         } else {
@@ -2760,6 +2768,9 @@ class _Util {
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
                                         includeRandomOptionalFields, List.of(), List.of(), random);
+                                if (stub.count > 0) {
+                                    stub.count -= 1;
+                                }
                                 return new Message(result);
                             }
                         }

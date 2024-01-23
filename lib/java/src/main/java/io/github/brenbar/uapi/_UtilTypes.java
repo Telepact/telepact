@@ -497,8 +497,7 @@ class _UMockCall implements _UType {
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -531,8 +530,7 @@ class _UMockStub implements _UType {
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateRandomValue'");
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
@@ -659,13 +657,15 @@ class _MockStub {
     final Map<String, Object> whenArgument;
     final Map<String, Object> thenResult;
     final boolean allowArgumentPartialMatch;
+    int count;
 
     public _MockStub(String whenFunction, Map<String, Object> whenArgument,
-            Map<String, Object> thenResult, boolean allowArgumentPartialMatch) {
+            Map<String, Object> thenResult, boolean allowArgumentPartialMatch, int count) {
         this.whenFunction = whenFunction;
         this.whenArgument = whenArgument;
         this.thenResult = thenResult;
         this.allowArgumentPartialMatch = allowArgumentPartialMatch;
+        this.count = count;
     }
 }
 

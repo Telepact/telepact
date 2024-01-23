@@ -51,7 +51,8 @@
     ],
     "fn._createStub": {
       "stub": ["_ext._Stub"],
-      "strictMatch!": ["boolean"]
+      "strictMatch!": ["boolean"],
+      "count!": ["integer"]
     },
     "->": {
       "Ok": {}
