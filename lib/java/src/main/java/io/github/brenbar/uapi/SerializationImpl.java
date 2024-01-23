@@ -9,11 +9,11 @@ package io.github.brenbar.uapi;
  */
 public interface SerializationImpl {
 
-    byte[] toJson(Object message);
+    byte[] toJson(Object message) throws Throwable;
 
-    byte[] toMsgPack(Object message);
+    byte[] toMsgPack(Object message) throws Throwable;
 
-    Object fromJson(byte[] bytes);
+    Object fromJson(byte[] bytes) throws Throwable;
 
-    Object fromMsgPack(byte[] bytes);
+    Object fromMsgPack(byte[] bytes) throws Throwable;
 }

@@ -78,40 +78,24 @@ class _DefaultSerializer implements SerializationImpl {
                     .addDeserializer(Map.class, new MessagePackMapDeserializer()));
 
     @Override
-    public byte[] toJson(Object uapiMessage) {
-        try {
-            return jsonMapper.writeValueAsBytes(uapiMessage);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public byte[] toJson(Object uapiMessage) throws Throwable {
+        return jsonMapper.writeValueAsBytes(uapiMessage);
     }
 
-    public byte[] toMsgPack(Object uapiMessage) {
-        try {
-            return binaryMapper.writeValueAsBytes(uapiMessage);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public byte[] toMsgPack(Object uapiMessage) throws Throwable {
+        return binaryMapper.writeValueAsBytes(uapiMessage);
     }
 
     @Override
-    public Object fromJson(byte[] bytes) {
-        try {
-            return jsonMapper.readValue(bytes, new TypeReference<Object>() {
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public Object fromJson(byte[] bytes) throws Throwable {
+        return jsonMapper.readValue(bytes, new TypeReference<Object>() {
+        });
     }
 
     @Override
-    public Object fromMsgPack(byte[] bytes) {
-        try {
-            return binaryMapper.readValue(bytes, new TypeReference<Object>() {
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public Object fromMsgPack(byte[] bytes) throws Throwable {
+        return binaryMapper.readValue(bytes, new TypeReference<Object>() {
+        });
     }
 
 }

@@ -554,8 +554,8 @@ class _UError {
 
 class DeserializationError extends RuntimeException {
 
-    public DeserializationError(String message, Throwable cause) {
-        super(message, cause);
+    public DeserializationError(Throwable cause) {
+        super(cause);
     }
 
     public DeserializationError(String message) {

@@ -1395,16 +1395,21 @@ class _Util {
         }
 
         final List<Object> messageAsPseudoJson = List.of(message.header, message.body);
-        if (serializeAsBinary) {
-            try {
-                final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
-                return serializer.toMsgPack(encodedMessage);
-            } catch (BinaryEncoderUnavailableError e) {
-                // We can still submit as json
+
+        try {
+            if (serializeAsBinary) {
+                try {
+                    final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
+                    return serializer.toMsgPack(encodedMessage);
+                } catch (BinaryEncoderUnavailableError e) {
+                    // We can still submit as json
+                    return serializer.toJson(messageAsPseudoJson);
+                }
+            } else {
                 return serializer.toJson(messageAsPseudoJson);
             }
-        } else {
-            return serializer.toJson(messageAsPseudoJson);
+        } catch (Throwable e) {
+            throw new SerializationError(e);
         }
     }
 
@@ -1412,12 +1417,17 @@ class _Util {
             _BinaryEncoder binaryEncoder) {
         final Object messageAsPseudoJson;
         final boolean isMsgPack;
-        if (messageBytes[0] == (byte) 0x92) { // MsgPack
-            isMsgPack = true;
-            messageAsPseudoJson = serializer.fromMsgPack(messageBytes);
-        } else {
-            isMsgPack = false;
-            messageAsPseudoJson = serializer.fromJson(messageBytes);
+
+        try {
+            if (messageBytes[0] == (byte) 0x92) { // MsgPack
+                isMsgPack = true;
+                messageAsPseudoJson = serializer.fromMsgPack(messageBytes);
+            } else {
+                isMsgPack = false;
+                messageAsPseudoJson = serializer.fromJson(messageBytes);
+            }
+        } catch (Throwable e) {
+            throw new DeserializationError(e);
         }
 
         final List<Object> messageAsPseudoJsonList;
@@ -2364,7 +2374,7 @@ class _Util {
         final var newErrorResultValidationFailures = resultUnionType.validate(
                 errorResult, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
-            throw new UApiProcessError(
+            throw new UApiError(
                     "Failed internal uAPI validation: "
                             + mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures));
         }
@@ -2700,7 +2710,7 @@ class _Util {
                             includeRandomOptionalFields, List.of(), List.of(), random);
                     return new Message(Map.of("Ok", randomOkStruct));
                 } else {
-                    throw new UApiProcessError("Unexpected unknown function: %s".formatted(functionName));
+                    throw new UApiError("Unexpected unknown function: %s".formatted(functionName));
                 }
             }
         }
@@ -2895,7 +2905,7 @@ class _Util {
                             includeRandomOptionalFields, List.of(), List.of(), random);
                     return new Message(Map.of("Ok", randomOkStruct));
                 } else {
-                    throw new UApiProcessError("Unexpected unknown function: %s".formatted(functionName));
+                    throw new UApiError("Unexpected unknown function: %s".formatted(functionName));
                 }
             }
         }
@@ -2931,7 +2941,7 @@ class _Util {
 
             return responseMessage;
         } catch (Exception e) {
-            throw new ClientProcessError(e);
+            throw new UApiError(e);
         }
     }
 }
