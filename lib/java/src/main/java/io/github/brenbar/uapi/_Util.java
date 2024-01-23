@@ -2374,15 +2374,8 @@ class _Util {
         final Map<String, _UType> parsedUApiSchema = uApiSchema.parsed;
         final Map.Entry<String, Object> requestEntry = _Util.unionEntry(requestBody);
 
-        final String requestTargetInit;
-        final Map<String, Object> requestPayload;
-        if (requestEntry != null) {
-            requestTargetInit = requestEntry.getKey();
-            requestPayload = (Map<String, Object>) requestEntry.getValue();
-        } else {
-            requestTargetInit = "fn._unknown";
-            requestPayload = Map.of();
-        }
+        final String requestTargetInit = requestEntry.getKey();
+        final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();
 
         final String unknownTarget;
         final String requestTarget;
