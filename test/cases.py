@@ -163,6 +163,10 @@ additional_integer_cases = [
     (9223372036854775808, [({'NumberOutOfRange': {}}, [])]), 
     (-9223372036854775809, [({'NumberOutOfRange': {}}, [])])
 ]
+additional_number_cases = [
+    (9223372036854775808, [({'NumberOutOfRange': {}}, [])]),
+    (-9223372036854775809, [({'NumberOutOfRange': {}}, [])])
+]
 additional_struct_cases = [
     ({}, [({'RequiredStructFieldMissing': {}}, ['required'])]),
     ({'required': False, 'a': False}, [({'StructFieldUnknown': {}}, ['a'])])
@@ -217,7 +221,7 @@ additional_p2Union_cases = [
 cases = {
     'boolean': [v for v in generate_basic_cases('bool!', bool, [False, True])],
     'integer': [v for v in generate_basic_cases('int!', int, [0, -1, 1, 9223372036854775807, -9223372036854775808], additional_integer_cases)],
-    'number': [v for v in generate_basic_cases('num!', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1])],
+    'number': [v for v in generate_basic_cases('num!', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1], additional_number_cases)],
     'string': [v for v in generate_basic_cases('str!', str, ['', 'abc'])],
     'array': [v for v in generate_basic_cases('arr!', list, [[], [False, 0, 0.1, '']])],
     'object': [v for v in generate_basic_cases('obj!', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],

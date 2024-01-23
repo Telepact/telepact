@@ -175,7 +175,7 @@ class _Util {
             int thisTypeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        if (typeDeclarationArray.size() == 0) {
+        if (typeDeclarationArray.isEmpty()) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "EmptyArrayDisallowed", Map.of())));
         }
@@ -444,7 +444,7 @@ class _Util {
 
         final var cases = new HashMap<String, _UStruct>();
 
-        if (definition.size() == 0 && !isForFn) {
+        if (definition.isEmpty() && !isForFn) {
             parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
         } else if (isForFn) {
             if (!definition.containsKey("Ok")) {
@@ -953,6 +953,10 @@ class _Util {
     }
 
     static List<Object> packList(List<Object> list) {
+        if (list.isEmpty()) {
+            return list;
+        }
+
         final var packedList = new ArrayList<Object>();
         final var header = new ArrayList<Object>();
 
@@ -1072,7 +1076,7 @@ class _Util {
     }
 
     static List<Object> unpackList(List<Object> list) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return list;
         }
 

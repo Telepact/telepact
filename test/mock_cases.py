@@ -1,7 +1,7 @@
 from typing import Any
 
 from test.cases import get_values
-from test.cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_p2Union_cases, additional_p2Str_cases, additional_struct_cases
+from test.cases import additional_union_cases, additional_fn_cases, additional_integer_cases, additional_number_cases, additional_p2Union_cases, additional_p2Str_cases, additional_struct_cases
 
 
 def generate_mock_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
@@ -24,7 +24,7 @@ def generate_mock_cases(given_field: str, the_type, correct_values, additional_i
 invalid_cases = {
     'boolean': [v for v in generate_mock_cases('bool!', bool, [False, True])],
     'integer': [v for v in generate_mock_cases('int!', int, [0, -1, 1, 9223372036854775807, -9223372036854775808], additional_integer_cases)],
-    'number': [v for v in generate_mock_cases('num!', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1])],
+    'number': [v for v in generate_mock_cases('num!', float, [0, -1, 1, -1.7976931348623157e+308, -2.2250738585072014e-308, 2.2250738585072014e-308, 1.7976931348623157e+308, -0.1, 0.1], additional_number_cases)],
     'string': [v for v in generate_mock_cases('str!', str, ['', 'abc'])],
     'array': [v for v in generate_mock_cases('arr!', list, [[], [False, 0, 0.1, '']])],
     'object': [v for v in generate_mock_cases('obj!', dict, [{}, {'a': False, 'b': 0, 'c': 0.1, 'd': ''}])],
