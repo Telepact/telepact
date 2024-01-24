@@ -150,7 +150,7 @@ class _Util {
 
     public static List<_SchemaParseFailure> getTypeUnexpectedParseFailure(List<Object> path, Object value,
             String expectedType) {
-        final var actualType = _Util.getType(value);
+        final var actualType = getType(value);
         final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
         return List.of(
@@ -180,7 +180,7 @@ class _Util {
                     "EmptyArrayDisallowed", Map.of())));
         }
 
-        final List<Object> basePath = _Util.append(path, 0);
+        final List<Object> basePath = append(path, 0);
         final var baseType = typeDeclarationArray.get(0);
 
         final String rootTypeString;
@@ -226,7 +226,7 @@ class _Util {
         var index = 0;
         for (final var e : givenTypeParameters) {
             index += 1;
-            final List<Object> loopPath = _Util.append(path, index);
+            final List<Object> loopPath = append(path, index);
 
             final List<Object> l;
             try {
@@ -376,13 +376,13 @@ class _Util {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = _Util.append(path, k);
+                final List<Object> loopPath = append(path, k);
 
                 parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
-        final List<Object> thisPath = _Util.append(path, schemaKey);
+        final List<Object> thisPath = append(path, schemaKey);
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
         Map<String, Object> definition = null;
@@ -421,14 +421,14 @@ class _Util {
         if (!isForFn) {
             if (otherKeys.size() > 0) {
                 for (final var k : otherKeys) {
-                    final List<Object> loopPath = _Util.append(path, k);
+                    final List<Object> loopPath = append(path, k);
 
                     parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
                 }
             }
         }
 
-        final List<Object> thisPath = _Util.append(path, schemaKey);
+        final List<Object> thisPath = append(path, schemaKey);
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
         final Map<String, Object> definition;
@@ -448,7 +448,7 @@ class _Util {
             parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
         } else if (isForFn) {
             if (!definition.containsKey("Ok")) {
-                final List<Object> branchPath = _Util.append(thisPath, "Ok");
+                final List<Object> branchPath = append(thisPath, "Ok");
 
                 parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of()));
             }
@@ -456,7 +456,7 @@ class _Util {
 
         for (final var entry : definition.entrySet()) {
             final var unionCase = entry.getKey();
-            final List<Object> unionKeyPath = _Util.append(thisPath, unionCase);
+            final List<Object> unionKeyPath = append(thisPath, unionCase);
             final var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
             final var regex = Pattern.compile(regexString);
 
@@ -514,8 +514,8 @@ class _Util {
                 final var existingFieldNoOpt = existingField.split("!")[0];
                 final var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
-                    final List<Object> finalPath = _Util.append(path, fieldDeclaration);
-                    final List<Object> finalOtherPath = _Util.append(path, existingField);
+                    final List<Object> finalPath = append(path, fieldDeclaration);
+                    final List<Object> finalOtherPath = append(path, existingField);
 
                     parseFailures
                             .add(new _SchemaParseFailure(finalPath, "PathCollision",
@@ -555,14 +555,14 @@ class _Util {
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            final List<Object> finalPath = _Util.append(path, fieldDeclaration);
+            final List<Object> finalPath = append(path, fieldDeclaration);
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(finalPath,
                     "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         final var fieldName = matcher.group(0);
         final var optional = matcher.group(2) != null;
-        final List<Object> thisPath = _Util.append(path, fieldName);
+        final List<Object> thisPath = append(path, fieldName);
 
         final List<Object> typeDeclarationArray;
         try {
@@ -642,14 +642,14 @@ class _Util {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = _Util.append(basePath, k);
+                final List<Object> loopPath = append(basePath, k);
 
                 parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
         final var defInit = errorDefinitionAsParsedJson.get(schemaKey);
-        final List<Object> thisPath = _Util.append(basePath, schemaKey);
+        final List<Object> thisPath = append(basePath, schemaKey);
 
         final Map<String, Object> def;
         try {
@@ -665,7 +665,7 @@ class _Util {
         final var resultSchemaKey = "->";
         final var okCaseRequired = false;
         final var typeParameterCount = 0;
-        final List<Object> errorPath = _Util.append(thisPath, resultSchemaKey);
+        final List<Object> errorPath = append(thisPath, resultSchemaKey);
 
         if (!def.containsKey(resultSchemaKey)) {
             parseFailures.add(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of()));
@@ -702,7 +702,7 @@ class _Util {
         }
 
         final var resultSchemaKey = "->";
-        final List<Object> resPath = _Util.append(path, resultSchemaKey);
+        final List<Object> resPath = append(path, resultSchemaKey);
 
         _UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
@@ -718,7 +718,7 @@ class _Util {
         }
 
         final var errorsRegexKey = "errors";
-        final var regexPath = _Util.append(path, errorsRegexKey);
+        final var regexPath = append(path, errorsRegexKey);
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
@@ -844,7 +844,7 @@ class _Util {
             final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
             if (matchingSchemaKey != null) {
                 final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
-                final List<Object> finalPath = _Util.append(loopPath, schemaKey);
+                final List<Object> finalPath = append(loopPath, schemaKey);
                 System.out.print(otherPathIndex);
 
                 parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",
@@ -1502,7 +1502,7 @@ class _Util {
                         var integerElement = asInt(binaryChecksum);
                     } catch (ClassCastException e) {
                         validationFailures
-                                .addAll(_Util.getTypeUnexpectedValidationFailure(List.of("_bin", i),
+                                .addAll(getTypeUnexpectedValidationFailure(List.of("_bin", i),
                                         binaryChecksum,
                                         "Integer"));
                     }
@@ -1510,7 +1510,7 @@ class _Util {
                 }
             } catch (ClassCastException e) {
                 validationFailures
-                        .addAll(_Util.getTypeUnexpectedValidationFailure(List.of("_bin"), headers.get("_bin"),
+                        .addAll(getTypeUnexpectedValidationFailure(List.of("_bin"), headers.get("_bin"),
                                 "Array"));
             }
         }
@@ -1529,7 +1529,7 @@ class _Util {
         try {
             selectStructFieldsHeader = asMap(headers.get("_sel"));
         } catch (ClassCastException e) {
-            return _Util.getTypeUnexpectedValidationFailure(List.of("_sel"),
+            return getTypeUnexpectedValidationFailure(List.of("_sel"),
                     headers.get("_sel"), "Object");
         }
 
@@ -1559,7 +1559,7 @@ class _Util {
                     unionCases = asMap(selectValue);
                 } catch (ClassCastException e) {
                     validationFailures.addAll(
-                            _Util.getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
+                            getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
                     continue;
                 }
 
@@ -1611,7 +1611,7 @@ class _Util {
         try {
             fields = asList(selectedFields);
         } catch (ClassCastException e) {
-            return _Util.getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
+            return getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
         }
 
         for (int i = 0; i < fields.size(); i += 1) {
@@ -1622,7 +1622,7 @@ class _Util {
             } catch (ClassCastException e) {
                 final List<Object> thisPath = append(basePath, i);
 
-                validationFailures.addAll(_Util.getTypeUnexpectedValidationFailure(thisPath, field, "String"));
+                validationFailures.addAll(getTypeUnexpectedValidationFailure(thisPath, field, "String"));
                 continue;
             }
             if (!structReference.fields.containsKey(stringField)) {
@@ -2014,7 +2014,7 @@ class _Util {
                             "ObjectSizeUnexpected", Map.of("actual", actual.size(), "expected", 1)));
         }
 
-        final var entry = _Util.unionEntry((Map<String, Object>) actual);
+        final var entry = unionEntry((Map<String, Object>) actual);
         final var unionTarget = (String) entry.getKey();
         final var unionPayload = entry.getValue();
 
@@ -2070,7 +2070,7 @@ class _Util {
             List<_UTypeDeclaration> typeParameters,
             _RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
-            final var unionEntry = _Util.unionEntry(startingUnion);
+            final var unionEntry = unionEntry(startingUnion);
             final var unionCase = unionEntry.getKey();
             final var unionStructType = unionCasesReference.get(unionCase);
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
@@ -2252,7 +2252,7 @@ class _Util {
             return finalMap;
         } else if (typeDeclarationType instanceof final _UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
-            final Map.Entry<String, Object> unionEntry = _Util.unionEntry(valueAsMap);
+            final Map.Entry<String, Object> unionEntry = unionEntry(valueAsMap);
             final var unionCase = unionEntry.getKey();
             final var unionData = (Map<String, Object>) unionEntry.getValue();
 
@@ -2278,7 +2278,7 @@ class _Util {
             return Map.of(unionEntry.getKey(), finalMap);
         } else if (typeDeclarationType instanceof final _UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
-            final var unionEntry = _Util.unionEntry(valueAsMap);
+            final var unionEntry = unionEntry(valueAsMap);
             final var unionCase = unionEntry.getKey();
             final var unionData = (Map<String, Object>) unionEntry.getValue();
 
@@ -2379,7 +2379,7 @@ class _Util {
         final Map<String, Object> requestHeaders = requestMessage.header;
         final Map<String, Object> requestBody = requestMessage.body;
         final Map<String, _UType> parsedUApiSchema = uApiSchema.parsed;
-        final Map.Entry<String, Object> requestEntry = _Util.unionEntry(requestBody);
+        final Map.Entry<String, Object> requestEntry = unionEntry(requestBody);
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();
@@ -2412,7 +2412,7 @@ class _Util {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final List<_ValidationFailure> headerValidationFailures = _Util.validateHeaders(requestHeaders,
+        final List<_ValidationFailure> headerValidationFailures = validateHeaders(requestHeaders,
                 uApiSchema, functionType);
         if (!headerValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,
@@ -2489,7 +2489,7 @@ class _Util {
         if (requestHeaders.containsKey("_sel")) {
             Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders
                     .get("_sel");
-            finalResultUnion = (Map<String, Object>) _Util.selectStructFields(
+            finalResultUnion = (Map<String, Object>) selectStructFields(
                     new _UTypeDeclaration(resultUnionType, false, List.of()),
                     resultUnion,
                     selectStructFieldsHeader);
@@ -2622,7 +2622,7 @@ class _Util {
             allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
         }
 
-        final Map.Entry<String, Object> verifyTimesEntry = _Util.unionEntry(verificationTimes);
+        final Map.Entry<String, Object> verifyTimesEntry = unionEntry(verificationTimes);
         final var verifyKey = verifyTimesEntry.getKey();
         final var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
 
@@ -2722,13 +2722,13 @@ class _Util {
                         Map.of("AtLeast", Map.of("times", 1)));
                 final var strictMatch = (Boolean) argument.getOrDefault("strictMatch!", false);
 
-                final var verificationResult = _Util.verify(callFunctionName, callArg, strictMatch,
+                final var verificationResult = verify(callFunctionName, callArg, strictMatch,
                         verifyTimes,
                         invocations);
                 return new Message(verificationResult);
             }
             case "fn._verifyNoMoreInteractions" -> {
-                final var verificationResult = _Util.verifyNoMoreInteractions(invocations);
+                final var verificationResult = verifyNoMoreInteractions(invocations);
                 return new Message(verificationResult);
             }
             case "fn._clearCalls" -> {
