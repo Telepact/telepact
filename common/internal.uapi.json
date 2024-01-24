@@ -51,11 +51,12 @@
         "actual": ["union._Type"]
       },
       "NullDisallowed": {},
-      "StructFieldUnknown": {},
-      "RequiredStructFieldMissing": {},
+      "ObjectKeyDisallowed": {},
       "NumberOutOfRange": {},
-      "ZeroOrManyUnionFieldsDisallowed": {},
-      "UnionFieldUnknown": {},
+      "ObjectSizeUnexpected": {
+        "expected": ["integer"],
+        "actual": ["integer"]
+      },
       "ExtensionValidationFailed": {
         "reason": ["string"],
         "data!": ["object", ["any"]]
@@ -78,7 +79,7 @@
         "actual": ["union._Type"]
       },
       "TypeUnknown": {},
-      "StructFieldUnknown": {},
+      "ObjectKeyDisallowed": {},
       "UnionCaseUnknown": {}
     }
   },

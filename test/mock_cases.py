@@ -7,14 +7,14 @@ from test.cases import additional_union_cases, additional_fn_cases, additional_i
 def generate_mock_cases(given_field: str, the_type, correct_values, additional_incorrect_values = []):
     for field, _, incorrect_values, base_path in get_values(given_field, the_type, correct_values, additional_incorrect_values):
         for incorrect_value, errors in incorrect_values:
-            cases = [{'path': ['fn._createStub', 'stub', 'fn.test', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors if 'RequiredStructFieldMissing' not in reason]
+            cases = [{'path': ['fn._createStub', 'stub', 'fn.test', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors if 'RequiredObjectKeyMissing' not in reason]
             if not cases:
                 continue
 
             yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value!': {field: incorrect_value}}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
 
         for incorrect_value, errors in incorrect_values:
-            cases = [{'path': ['fn._createStub', 'stub', '->', 'Ok', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors if 'RequiredStructFieldMissing' not in reason]
+            cases = [{'path': ['fn._createStub', 'stub', '->', 'Ok', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors if 'RequiredObjectKeyMissing' not in reason]
             if not cases:
                 continue
             yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'Ok': {'value!': {field: incorrect_value}}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
@@ -41,6 +41,9 @@ invalid_cases = {
         [[{}, {'fn._createStub': {'stub': []}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn._createStub': {'stub': {}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 0, 'expected': 1}}}]}}]],
         [[{}, {'fn._createStub': {'stub': {'fn.test': {}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'ObjectSizeUnexpected': {'actual': 0, 'expected': 1}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'fn.testAnother': {}, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 2, 'expected': 1}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'wrong': True, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', 'wrong'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],
 }
 

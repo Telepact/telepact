@@ -1628,7 +1628,7 @@ class _Util {
             if (!structReference.fields.containsKey(stringField)) {
                 final List<Object> thisPath = append(basePath, i);
 
-                validationFailures.add(new _ValidationFailure(thisPath, "StructFieldUnknown", Map.of()));
+                validationFailures.add(new _ValidationFailure(thisPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
@@ -1903,7 +1903,7 @@ class _Util {
 
         for (final var missingField : missingFields) {
             final var validationFailure = new _ValidationFailure(List.of(missingField),
-                    "RequiredStructFieldMissing",
+                    "RequiredObjectKeyMissing",
                     Map.of());
 
             validationFailures.add(validationFailure);
@@ -1915,7 +1915,7 @@ class _Util {
 
             final var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new _ValidationFailure(List.of(fieldName), "StructFieldUnknown",
+                var validationFailure = new _ValidationFailure(List.of(fieldName), "ObjectKeyDisallowed",
                         Map.of());
 
                 validationFailures.add(validationFailure);
@@ -2011,7 +2011,7 @@ class _Util {
         if (actual.size() != 1) {
             return List.of(
                     new _ValidationFailure(new ArrayList<Object>(),
-                            "ZeroOrManyUnionFieldsDisallowed", Map.of()));
+                            "ObjectSizeUnexpected", Map.of("actual", actual.size(), "expected", 1)));
         }
 
         final var entry = _Util.unionEntry((Map<String, Object>) actual);
@@ -2022,7 +2022,7 @@ class _Util {
         if (referenceStruct == null) {
             return Collections
                     .singletonList(new _ValidationFailure(List.of(unionTarget),
-                            "UnionFieldUnknown", Map.of()));
+                            "ObjectKeyDisallowed", Map.of()));
         }
 
         if (unionPayload instanceof Map<?, ?> m2) {
@@ -2142,7 +2142,7 @@ class _Util {
         }
 
         return inputFailuresWithPath.stream()
-                .filter(f -> !f.reason.equals("RequiredStructFieldMissing")).toList();
+                .filter(f -> !f.reason.equals("RequiredObjectKeyMissing")).toList();
     }
 
     static List<_ValidationFailure> validateMockStub(Object givenObj,
@@ -2186,34 +2186,41 @@ class _Util {
         }
 
         final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
-                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing")).toList();
+                .filter(f -> !Objects.equals(f.reason, "RequiredObjectKeyMissing")).toList();
 
         validationFailures.addAll(inputFailuresWithoutMissingRequired);
 
         final var resultDefKey = "->";
 
         if (!givenMap.containsKey(resultDefKey)) {
-            return List.of(new _ValidationFailure(List.of(resultDefKey),
+            validationFailures.add(new _ValidationFailure(List.of(resultDefKey),
                     "RequiredObjectKeyMissing",
                     Map.of()));
+        } else {
+            final var output = givenMap.get(resultDefKey);
+            final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
+
+            final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
+            for (final var f : outputFailures) {
+                final List<Object> thisPath = prepend(resultDefKey, f.path);
+
+                outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+            }
+
+            final var failuresWithoutMissingRequired = outputFailuresWithPath
+                    .stream()
+                    .filter(f -> !Objects.equals(f.reason, "RequiredObjectKeyMissing"))
+                    .toList();
+
+            validationFailures.addAll(failuresWithoutMissingRequired);
         }
 
-        final var output = givenMap.get(resultDefKey);
-        final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
-
-        final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
-        for (final var f : outputFailures) {
-            final List<Object> thisPath = prepend(resultDefKey, f.path);
-
-            outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+        final var disallowedFields = givenMap.keySet().stream()
+                .filter(k -> !matches.contains(k) && !Objects.equals(k, resultDefKey)).toList();
+        for (final var disallowedField : disallowedFields) {
+            validationFailures
+                    .add(new _ValidationFailure(List.of(disallowedField), "ObjectKeyDisallowed", Map.of()));
         }
-
-        final var failuresWithoutMissingRequired = outputFailuresWithPath
-                .stream()
-                .filter(f -> !Objects.equals(f.reason, "RequiredStructFieldMissing"))
-                .toList();
-
-        validationFailures.addAll(failuresWithoutMissingRequired);
 
         return validationFailures;
     }
