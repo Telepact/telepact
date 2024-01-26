@@ -2790,10 +2790,10 @@ class _Util {
 
                 if (definition != null) {
                     final var resultUnion = (_UUnion) definition.result;
-                    final var OkStructRef = resultUnion.cases.get("Ok");
+                    final var okStructRef = resultUnion.cases.get("Ok");
                     final var useBlueprintValue = true;
                     final var includeRandomOptionalFields = true;
-                    final var randomOkStruct = OkStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
+                    final var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
                             includeRandomOptionalFields, List.of(), List.of(), random);
                     return new Message(Map.of("Ok", randomOkStruct));
                 } else {
@@ -2836,5 +2836,12 @@ class _Util {
         } catch (Exception e) {
             throw new UApiError(e);
         }
+    }
+
+    static List<Object> mapSchemaParseFailuresToPseudoJson(
+            List<_SchemaParseFailure> schemaParseFailures) {
+        return (List<Object>) schemaParseFailures.stream()
+                .map(f -> (Object) new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data))))
+                .toList();
     }
 }
