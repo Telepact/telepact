@@ -30,8 +30,8 @@ def increment():
         count += 1
 
 def get_lib_modules():
-    result = [f for f in os.listdir('lib')
-                 if os.path.isdir('lib/{}'.format(f))]    
+    result = [f for f in os.listdir('../lib')
+                 if os.path.isdir('../lib/{}'.format(f))]    
     return result
 
 def handler(request):
