@@ -1,36 +1,13 @@
-# Assuming Message class is imported from the appropriate module
-from uapi._util_types import _MockStub, _MockInvocation, _RandomGenerator
 from concurrent.futures import Future
-from typing import Any, Dict, List, Tuple, Callable, Union
-from typing import Callable, List, Union, Dict, Any, Tuple
-from uapi._util_types import _UUnion, _ValidationFailure, _UType, _UFn, _UTypeDeclaration
-from typing import List, Dict, Any, Tuple, Callable, Union
-from typing import List, Dict, Any, Union
-from uapi._util_types import _ValidationFailure, _UFieldDeclaration, _UTypeDeclaration, _RandomGenerator, _UStruct
-from random import randint, choice
-from typing import Any, Dict, List, Tuple, Union
-import uapi._util_types as util_types
-import uapi._util_types as _UTypes
-from typing import Any, List, Dict, Union, Tuple
-from uapi.types import Message, UApiError, UApiSchema
-from uapi.types import SerializationImpl
-from uapi._util_types import _BinaryEncodingMissing, _BinaryEncoderUnavailableError, _InvalidMessage, _InvalidMessageBody, _ValidationFailure
-from uapi._util_types import _BinaryEncoding, _UFieldDeclaration, _UUnion, _UStruct, _UFn, _BinaryEncoder
+from typing import Any, Dict, List, Tuple, Callable, Union, Callable, List, Union, Dict, Any, Tuple,  Optional, Set, Pattern
 from collections import defaultdict
 from hashlib import sha256
-from uapi._util_types import _BinaryEncoding
-from typing import List, Dict, Union, Any, Tuple
-from typing import Any, Dict, List, Union
-from typing import List, Dict, Union, Any, Tuple, Set
 import json
-from uapi._util_types import (
-    _UFieldDeclaration, _SchemaParseFailure, _UUnion, _UType, _UFn, _UError)
-from uapi._util_types import _UStruct, _UType, _SchemaParseFailure, _UUnion, _UFieldDeclaration
-from typing import List, Dict, Optional, Set, Pattern
-from uapi._util_types import _UTypeDeclaration, _UType, _SchemaParseFailure, _UBoolean, _UInteger, _UNumber, _UString, _UArray, _UObject, _UAny, _UGeneric
-from typing import List, Dict, Pattern, Any, Union, Set
-from typing import List, Set, Any, Union
-from uapi._util_types import _SchemaParseFailure
+import uapi
+import uapi._util_types as _types
+import uapi.types as types
+import re
+from msgpack import ExtType
 
 _ANY_NAME = "Any"
 _ARRAY_NAME = "Array"
@@ -47,7 +24,6 @@ _UNION_NAME = "Object"
 
 
 def get_internal_uapi_json() -> str:
-    from io import BufferedReader, InputStreamReader
     import os
     import json
 
@@ -58,7 +34,6 @@ def get_internal_uapi_json() -> str:
 
 
 def get_mock_uapi_json() -> str:
-    from io import BufferedReader, InputStreamReader
     import os
 
     mock_internal_uapi_path = os.path.join(
@@ -91,7 +66,7 @@ def as_map(obj: Any) -> Dict[str, Any]:
     return dict(obj)
 
 
-def offset_schema_index(initial_failures: List[_SchemaParseFailure], offset: int) -> List[_SchemaParseFailure]:
+def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int) -> List[_types._SchemaParseFailure]:
     final_list = []
 
     for f in initial_failures:
@@ -108,7 +83,8 @@ def offset_schema_index(initial_failures: List[_SchemaParseFailure], offset: int
         else:
             final_data = data
 
-        final_list.append(_SchemaParseFailure(new_path, reason, final_data))
+        final_list.append(_types._SchemaParseFailure(
+            new_path, reason, final_data))
 
     return final_list
 
@@ -126,8 +102,8 @@ def find_schema_key(definition: dict[str, Any], index: int) -> str:
     if len(matches) == 1:
         return matches[0]
     else:
-        raise UApiSchemaParseError([_SchemaParseFailure([index], "ObjectKeyRegexMatchCountUnexpected",
-                                                        {"regex": regex, "actual": len(matches), "expected": 1})])
+        raise UApiSchemaParseError([_types._SchemaParseFailure([index], "ObjectKeyRegexMatchCountUnexpected",
+                                                               {"regex": regex, "actual": len(matches), "expected": 1})])
 
 
 def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[str, None]:
@@ -139,10 +115,10 @@ def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[st
     return None
 
 
-def get_type_unexpected_parse_failure(path: List[Any], value: Any, expected_type: str) -> List[_SchemaParseFailure]:
+def get_type_unexpected_parse_failure(path: List[Any], value: Any, expected_type: str) -> List[_types._SchemaParseFailure]:
     actual_type = get_type(value)
     data = {"actual": {actual_type: {}}, "expected": {expected_type: {}}}
-    return [_SchemaParseFailure(path, "TypeUnexpected", data)]
+    return [_types._SchemaParseFailure(path, "TypeUnexpected", data)]
 
 
 def prepend(value: Any, original: List[Any]) -> List[Any]:
@@ -159,11 +135,11 @@ def append(original: List[Any], value: Any) -> List[Any]:
 
 def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], this_type_parameter_count: int,
                            u_api_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
-                           parsed_types: Dict[str, _UType], type_extensions: Dict[str, _UType],
-                           all_parse_failures: List[_SchemaParseFailure], failed_types: Set[str]) -> _UTypeDeclaration:
+                           parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                           all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UTypeDeclaration:
     if not type_declaration_array:
         raise UApiSchemaParseError(
-            [_SchemaParseFailure(path, "EmptyArrayDisallowed", {})])
+            [_types._SchemaParseFailure(path, "EmptyArrayDisallowed", {})])
 
     base_path = append(path, 0)
     base_type = type_declaration_array[0]
@@ -180,7 +156,7 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
 
     matcher = regex.matcher(root_type_string)
     if not matcher.find():
-        raise UApiSchemaParseError([_SchemaParseFailure(
+        raise UApiSchemaParseError([_types._SchemaParseFailure(
             base_path, "StringRegexMatchFailed", {"regex": regex_string})])
 
     type_name = matcher.group(1)
@@ -189,15 +165,15 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
     type_obj = get_or_parse_type(base_path, type_name, this_type_parameter_count, u_api_schema_pseudo_json,
                                  schema_keys_to_index, parsed_types, type_extensions, all_parse_failures, failed_types)
 
-    if isinstance(type_obj, _UGeneric) and nullable:
-        raise UApiSchemaParseError([_SchemaParseFailure(
+    if isinstance(type_obj, _types._UGeneric) and nullable:
+        raise UApiSchemaParseError([_types._SchemaParseFailure(
             base_path, "StringRegexMatchFailed", {"regex": "^(.+?)[^\\?]$"})])
 
     given_type_parameter_count = len(type_declaration_array) - 1
     if type_obj.get_type_parameter_count() != given_type_parameter_count:
-        raise UApiSchemaParseError([_SchemaParseFailure(path, "ArrayLengthUnexpected",
-                                                        {"actual": len(type_declaration_array),
-                                                         "expected": type_obj.get_type_parameter_count() + 1})])
+        raise UApiSchemaParseError([_types._SchemaParseFailure(path, "ArrayLengthUnexpected",
+                                                               {"actual": len(type_declaration_array),
+                                                                "expected": type_obj.get_type_parameter_count() + 1})])
 
     parse_failures = []
     type_parameters = []
@@ -228,13 +204,13 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
-    return _UTypeDeclaration(type_obj, nullable, type_parameters)
+    return _types._UTypeDeclaration(type_obj, nullable, type_parameters)
 
 
 def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count: int,
                       u_api_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
-                      parsed_types: Dict[str, _UType], type_extensions: Dict[str, _UType],
-                      all_parse_failures: List[_SchemaParseFailure], failed_types: Set[str]) -> _UType:
+                      parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                      all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UType:
     if type_name in failed_types:
         raise UApiSchemaParseError([])
 
@@ -249,33 +225,33 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
         generic_regex = ""
 
     regex_string = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$" % generic_regex
-    regex = Pattern.compile(regex_string)
+    regex = re.compile(regex_string)
 
-    matcher = regex.matcher(type_name)
-    if not matcher.find():
-        raise UApiSchemaParseError([_SchemaParseFailure(
-            path, "StringRegexMatchFailed", {"regex": regex_string})])
+    matcher = regex.search(type_name)
+    if not matcher:
+        raise Exception([{"path": path, "error_type": "StringRegexMatchFailed", "details": {
+                        "regex": regex_string}}])
 
     standard_type_name = matcher.group(1)
     if standard_type_name:
         return {
-            "boolean": _UBoolean(),
-            "integer": _UInteger(),
-            "number": _UNumber(),
-            "string": _UString(),
-            "array": _UArray(),
-            "object": _UObject(),
-        }.get(standard_type_name, _UAny())
+            "boolean": _types._UBoolean(),
+            "integer": _types._UInteger(),
+            "number": _types._UNumber(),
+            "string": _types._UString(),
+            "array": _types._UArray(),
+            "object": _types._UObject(),
+        }.get(standard_type_name, _types._UAny())
 
     if this_type_parameter_count > 0:
         generic_parameter_index_string = matcher.group(9)
         generic_parameter_index = int(generic_parameter_index_string)
-        return _UGeneric(generic_parameter_index)
+        return _types._UGeneric(generic_parameter_index)
 
     custom_type_name = matcher.group(2)
     index = schema_keys_to_index.get(custom_type_name)
     if index is None:
-        raise UApiSchemaParseError([_SchemaParseFailure(
+        raise UApiSchemaParseError([_types._SchemaParseFailure(
             path, "TypeUnknown", {"name": custom_type_name})])
 
     definition = u_api_schema_pseudo_json[index]
@@ -302,8 +278,8 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
         else:
             type_obj = type_extensions.get(custom_type_name)
             if not type_obj:
-                raise UApiSchemaParseError([_SchemaParseFailure([index], "TypeExtensionImplementationMissing",
-                                                                {"name": custom_type_name})])
+                raise UApiSchemaParseError([_types._SchemaParseFailure([index], "TypeExtensionImplementationMissing",
+                                                                       {"name": custom_type_name})])
             return type_obj
     except UApiSchemaParseError as e:
         all_parse_failures.extend(e.schema_parse_failures)
@@ -314,8 +290,8 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
 def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict[str, object],
                       schema_key: str, is_for_fn: bool, type_parameter_count: int,
                       uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                      parsed_types: Dict[str, _UType], type_extensions: Dict[str, _UType],
-                      all_parse_failures: List[_SchemaParseFailure], failed_types: Set[str]) -> _UStruct:
+                      parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                      all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UStruct:
     parse_failures = []
 
     other_keys = set(struct_definition_as_pseudo_json.keys())
@@ -329,7 +305,7 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
     if other_keys:
         for k in other_keys:
             loop_path = path + [k]
-            parse_failures.append(_SchemaParseFailure(
+            parse_failures.append(_types._SchemaParseFailure(
                 loop_path, "ObjectKeyDisallowed", {}))
 
     this_path = path + [schema_key]
@@ -349,14 +325,14 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
                                  uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
                                  type_extensions, all_parse_failures, failed_types)
 
-    return _UStruct(schema_key, fields, type_parameter_count)
+    return _types._UStruct(schema_key, fields, type_parameter_count)
 
 
 def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[str, object],
                      schema_key: str, is_for_fn: bool, type_parameter_count: int,
                      uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                     parsed_types: Dict[str, _UType], type_extensions: Dict[str, _UType],
-                     all_parse_failures: List[_SchemaParseFailure], failed_types: Set[str]) -> _UUnion:
+                     parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                     all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UUnion:
     parse_failures = []
 
     other_keys = set(union_definition_as_pseudo_json.keys())
@@ -366,7 +342,7 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
     if not is_for_fn and other_keys:
         for k in other_keys:
             loop_path = path + [k]
-            parse_failures.append(_SchemaParseFailure(
+            parse_failures.append(_types._SchemaParseFailure(
                 loop_path, "ObjectKeyDisallowed", {}))
 
     this_path = path + [schema_key]
@@ -383,22 +359,22 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
     cases = {}
 
     if not definition and not is_for_fn:
-        parse_failures.append(_SchemaParseFailure(
+        parse_failures.append(_types._SchemaParseFailure(
             this_path, "EmptyObjectDisallowed", {}))
     elif is_for_fn and "Ok" not in definition:
         branch_path = this_path + ["Ok"]
-        parse_failures.append(_SchemaParseFailure(
+        parse_failures.append(_types._SchemaParseFailure(
             branch_path, "RequiredObjectKeyMissing", {}))
 
     for union_case, entry_value in definition.items():
         union_key_path = this_path + [union_case]
         regex_string = r"^(_?[A-Z][a-zA-Z0-9_]*)$"
-        regex = Pattern.compile(regex_string)
-        matcher = regex.matcher(union_case)
+        regex = re.compile(regex_string)
+        matcher = regex.search(union_case)
 
-        if not matcher.find():
-            parse_failures.append(_SchemaParseFailure(union_key_path, "KeyRegexMatchFailed",
-                                                      {"regex": regex_string}))
+        if not matcher:
+            parse_failures.append(_types._SchemaParseFailure(union_key_path, "KeyRegexMatchFailed",
+                                                             {"regex": regex_string}))
             continue
 
         try:
@@ -417,21 +393,21 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
             parse_failures.extend(e.schema_parse_failures)
             continue
 
-        union_struct = _UStruct(
+        union_struct = _types._UStruct(
             f"{schema_key}.{union_case}", fields, type_parameter_count)
         cases[union_case] = union_struct
 
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
-    return _UUnion(schema_key, cases, type_parameter_count)
+    return _types._UUnion(schema_key, cases, type_parameter_count)
 
 
 def parse_struct_fields(reference_struct: Dict[str, object], path: List[object],
                         type_parameter_count: int, uapi_schema_pseudo_json: List[object],
-                        schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, _UType],
-                        type_extensions: Dict[str, _UType], all_parse_failures: List[_SchemaParseFailure],
-                        failed_types: Set[str]) -> Dict[str, _UFieldDeclaration]:
+                        schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, _types._UType],
+                        type_extensions: Dict[str, _types._UType], all_parse_failures: List[_types._SchemaParseFailure],
+                        failed_types: Set[str]) -> Dict[str, _types._UFieldDeclaration]:
     parse_failures = []
     fields = {}
 
@@ -445,8 +421,8 @@ def parse_struct_fields(reference_struct: Dict[str, object], path: List[object],
             if field_no_opt == existing_field_no_opt:
                 final_path = path + [field_declaration]
                 final_other_path = path + [existing_field]
-                parse_failures.append(_SchemaParseFailure(final_path, "PathCollision",
-                                                          {"other": final_other_path}))
+                parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision",
+                                                                 {"other": final_other_path}))
 
         type_declaration_value = struct_entry_value
 
@@ -469,16 +445,16 @@ def parse_struct_fields(reference_struct: Dict[str, object], path: List[object],
 
 def parse_field(path: List[object], field_declaration: str, type_declaration_value: object,
                 type_parameter_count: int, uapi_schema_pseudo_json: List[object],
-                schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, _UType],
-                type_extensions: Dict[str, _UType], all_parse_failures: List[_SchemaParseFailure],
-                failed_types: Set[str]) -> _UFieldDeclaration:
+                schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, _types._UType],
+                type_extensions: Dict[str, _types._UType], all_parse_failures: List[_types._SchemaParseFailure],
+                failed_types: Set[str]) -> _types._UFieldDeclaration:
     regex_string = r"^(_?[a-z][a-zA-Z0-9_]*)(!)?$"
-    regex = Pattern.compile(regex_string)
+    regex = re.compile(regex_string)
 
-    matcher = regex.matcher(field_declaration)
-    if not matcher.find():
+    matcher = regex.search(field_declaration)
+    if not matcher:
         final_path = path + [field_declaration]
-        raise UApiSchemaParseError([_SchemaParseFailure(
+        raise UApiSchemaParseError([_types._SchemaParseFailure(
             final_path, "KeyRegexMatchFailed", {"regex": regex_string})])
 
     field_name = matcher.group(0)
@@ -495,10 +471,10 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
                                               uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
                                               type_extensions, all_parse_failures, failed_types)
 
-    return _UFieldDeclaration(field_name, type_declaration, optional)
+    return _types._UFieldDeclaration(field_name, type_declaration, optional)
 
 
-def apply_error_to_parsed_types(error: _UError, parsed_types: Dict[str, _UType],
+def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _types._UType],
                                 schema_keys_to_index: Dict[str, int]) -> None:
     error_name = error.name
     error_index = schema_keys_to_index.get(error_name)
@@ -506,15 +482,15 @@ def apply_error_to_parsed_types(error: _UError, parsed_types: Dict[str, _UType],
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
         try:
-            f = _UFn(parsed_type)
+            f = _types._UFn(parsed_type)
         except TypeError:
             continue
 
         fn_name = f.name
 
-        regex = Pattern.compile(f.errors_regex)
-        matcher = regex.matcher(error_name)
-        if not matcher.find():
+        regex = re.compile(f.errors_regex)
+        matcher = regex.search(error_name)
+        if not matcher:
             continue
 
         fn_result = f.result
@@ -526,8 +502,8 @@ def apply_error_to_parsed_types(error: _UError, parsed_types: Dict[str, _UType],
             new_key = error_result_field
             if new_key in fn_result_cases:
                 other_path_index = schema_keys_to_index.get(fn_name)
-                parse_failures.append(_SchemaParseFailure([error_index, error_name, "->", new_key],
-                                                          "PathCollision", {"other": [other_path_index, "->", new_key]}))
+                parse_failures.append(_types._SchemaParseFailure([error_index, error_name, "->", new_key],
+                                                                 "PathCollision", {"other": [other_path_index, "->", new_key]}))
             fn_result_cases[new_key] = error_result_struct
 
     if parse_failures:
@@ -536,8 +512,8 @@ def apply_error_to_parsed_types(error: _UError, parsed_types: Dict[str, _UType],
 
 def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_key: str,
                      uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                     parsed_types: Dict[str, _UType], type_extensions: Dict[str, _UType],
-                     all_parse_failures: List[_SchemaParseFailure], failed_types: Set[str]) -> _UError:
+                     parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                     all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UError:
     index = schema_keys_to_index.get(schema_key)
     base_path = [index]
 
@@ -550,7 +526,7 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
     if other_keys:
         for k in other_keys:
             loop_path = base_path + [k]
-            parse_failures.append(_SchemaParseFailure(
+            parse_failures.append(_types._SchemaParseFailure(
                 loop_path, "ObjectKeyDisallowed", {}))
 
     def_init = error_definition_as_parsed_json.get(schema_key)
@@ -570,7 +546,7 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
     error_path = this_path + [result_schema_key]
 
     if result_schema_key not in def_dict:
-        parse_failures.append(_SchemaParseFailure(
+        parse_failures.append(_types._SchemaParseFailure(
             error_path, "RequiredObjectKeyMissing", {}))
 
     if parse_failures:
@@ -580,13 +556,13 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
                              uapi_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
                              all_parse_failures, failed_types)
 
-    return _UError(schema_key, error)
+    return _types._UError(schema_key, error)
 
 
 def parse_function_type(path: List[object], function_definition_as_parsed_json: Dict[str, object],
                         schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                        parsed_types: Dict[str, _UType], type_extensions: Dict[str, _UType],
-                        all_parse_failures: List[_SchemaParseFailure], failed_types: Set[str]) -> _UFn:
+                        parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                        all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UFn:
     parse_failures = []
     type_parameter_count = 0
     is_for_fn = True
@@ -596,7 +572,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
         arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, is_for_fn,
                                      type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
                                      parsed_types, type_extensions, all_parse_failures, failed_types)
-        call_type = _UUnion(
+        call_type = _types._UUnion(
             schema_key, {schema_key: arg_type}, type_parameter_count)
     except UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
@@ -606,7 +582,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
 
     result_type = None
     if result_schema_key not in function_definition_as_parsed_json:
-        parse_failures.append(_SchemaParseFailure(
+        parse_failures.append(_types._SchemaParseFailure(
             res_path, "RequiredObjectKeyMissing", {}))
     else:
         try:
@@ -621,7 +597,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
 
     errors_regex = None
     if errors_regex_key in function_definition_as_parsed_json and not schema_key.startswith("fn._"):
-        parse_failures.append(_SchemaParseFailure(
+        parse_failures.append(_types._SchemaParseFailure(
             regex_path, "ObjectKeyDisallowed", {}))
     else:
         errors_regex_init = function_definition_as_parsed_json.get(
@@ -636,7 +612,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
-    return _UFn(schema_key, call_type, result_type, errors_regex)
+    return _types._UFn(schema_key, call_type, result_type, errors_regex)
 
 
 class UApiSchemaParseError(Exception):
@@ -645,7 +621,7 @@ class UApiSchemaParseError(Exception):
         self.inner_exception = inner_exception
 
 
-def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, Any]) -> 'UApiSchema':
+def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, Any]) -> types.UApiSchema:
     try:
         uapi_schema_pseudo_json_init = json.loads(uapi_schema_json)
     except json.JSONDecodeError as e:
@@ -661,7 +637,7 @@ def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, Any]) -> '
     return parse_uapi_schema(uapi_schema_pseudo_json, type_extensions, 0)
 
 
-def extend_uapi_schema(first: 'UApiSchema', second_uapi_schema_json: str, second_type_extensions: Dict[str, Any]) -> 'UApiSchema':
+def extend_uapi_schema(first: types.UApiSchema, second_uapi_schema_json: str, second_type_extensions: Dict[str, Any]) -> types.UApiSchema:
     try:
         second_uapi_schema_pseudo_json_init = json.loads(
             second_uapi_schema_json)
@@ -687,7 +663,7 @@ def extend_uapi_schema(first: 'UApiSchema', second_uapi_schema_json: str, second
     return parse_uapi_schema(original, type_extensions, len(first_original))
 
 
-def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Dict[str, Any], path_offset: int) -> 'UApiSchema':
+def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Dict[str, Any], path_offset: int) -> types.UApiSchema:
     parsed_types: Dict[str, Any] = {}
     parse_failures: List[Tuple[List[object], str, Dict[str, object]]] = []
     failed_types: Set[str] = set()
@@ -770,7 +746,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
             parse_failures, path_offset)
         raise UApiSchemaParseError(offset_parse_failures)
 
-    return UApiSchema(uapi_schema_pseudo_json, parsed_types, type_extensions)
+    return types.UApiSchema(uapi_schema_pseudo_json, parsed_types, type_extensions)
 
 
 class _BinaryPackNode:
@@ -818,7 +794,7 @@ def pack_list(lst: List[Any]) -> List[Any]:
     packed_list: List[Any] = []
     header: List[Any] = []
 
-    packed_list.append(MessagePackExtensionType(PACKED_BYTE, bytes()))
+    packed_list.append(ExtType(PACKED_BYTE, bytes()))
 
     header.append(None)
 
@@ -876,7 +852,7 @@ def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, _Bin
             packed_value = pack(value)
 
         while len(row) < key_index_value:
-            row.append(MessagePackExtensionType(UNDEFINED_BYTE, bytes()))
+            row.append(ExtType(UNDEFINED_BYTE, bytes()))
 
         if len(row) == key_index_value:
             row.append(packed_value)
@@ -914,7 +890,7 @@ def unpack_list(lst: List[Any]) -> List[Any]:
     if not lst:
         return lst
 
-    if isinstance(lst[0], MessagePackExtensionType) and lst[0].type == PACKED_BYTE:
+    if isinstance(lst[0], ExtType) and lst[0].code == PACKED_BYTE:
         unpacked_list: List[Any] = []
         headers = lst[1]
 
@@ -936,7 +912,7 @@ def unpack_map(row: List[Any], header: List[Any]) -> Dict[int, Any]:
         key = header[j + 1]
         value = row[j]
 
-        if isinstance(value, MessagePackExtensionType) and value.getType() == UNDEFINED_BYTE:
+        if isinstance(value, ExtType) and value.code == UNDEFINED_BYTE:
             continue
 
         if isinstance(key, int):
@@ -954,14 +930,14 @@ def unpack_map(row: List[Any], header: List[Any]) -> Dict[int, Any]:
     return final_map
 
 
-def server_binary_encode(message: List[Any], binary_encoder: _BinaryEncoding) -> List[Any]:
-    headers = message[0]
+def server_binary_encode(message: List[Any], binary_encoder: _types._BinaryEncoding) -> List[Any]:
+    headers: dict[str, Any] = message[0]
     message_body = message[1]
     client_known_binary_checksums = headers.pop(
         "_clientKnownBinaryChecksums", None)
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
-        headers["_enc"] = binary_encoder.encodeMap
+        headers["_enc"] = binary_encoder.encode_map
 
     headers["_bin"] = [binary_encoder.checksum]
     encoded_message_body = encode_body(message_body, binary_encoder)
@@ -972,14 +948,14 @@ def server_binary_encode(message: List[Any], binary_encoder: _BinaryEncoding) ->
     return [headers, final_encoded_message_body]
 
 
-def server_binary_decode(message: List[Any], binary_encoder: _BinaryEncoding) -> List[Any]:
+def server_binary_decode(message: List[Any], binary_encoder: _types._BinaryEncoding) -> List[Any]:
     headers = message[0]
     encoded_message_body = message[1]
     client_known_binary_checksums = headers["_bin"]
     binary_checksum_used_by_client_on_this_message = client_known_binary_checksums[0]
 
     if binary_checksum_used_by_client_on_this_message != binary_encoder.checksum:
-        raise _BinaryEncoderUnavailableError()
+        raise _types._BinaryEncoderUnavailableError()
 
     final_encoded_message_body = unpack_body(
         encoded_message_body) if headers.get("_pac") else encoded_message_body
@@ -988,25 +964,25 @@ def server_binary_decode(message: List[Any], binary_encoder: _BinaryEncoding) ->
     return [headers, message_body]
 
 
-def client_binary_encode(message: List[Any], recent_binary_encoders: Dict[int, _BinaryEncoding],
-                         binary_checksum_strategy: ClientBinaryStrategy) -> List[Any]:
-    headers = message[0]
+def client_binary_encode(message: List[Any], recent_binary_encoders: Dict[int, _types._BinaryEncoding],
+                         binary_checksum_strategy: types.ClientBinaryStrategy) -> List[Any]:
+    headers: dict[str, Any] = message[0]
     message_body = message[1]
     force_send_json = headers.pop("_forceSendJson", None)
 
     headers["_bin"] = binary_checksum_strategy.get_current_checksums()
 
     if force_send_json:
-        raise _BinaryEncoderUnavailableError()
+        raise _types._BinaryEncoderUnavailableError()
 
     if len(recent_binary_encoders) > 1:
-        raise _BinaryEncoderUnavailableError()
+        raise _types._BinaryEncoderUnavailableError()
 
     checksums = list(recent_binary_encoders.keys())
     try:
         binary_encoder = recent_binary_encoders[checksums[0]]
     except IndexError:
-        raise _BinaryEncoderUnavailableError()
+        raise _types._BinaryEncoderUnavailableError()
 
     encoded_message_body = encode_body(message_body, binary_encoder)
 
@@ -1016,8 +992,8 @@ def client_binary_encode(message: List[Any], recent_binary_encoders: Dict[int, _
     return [headers, final_encoded_message_body]
 
 
-def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, _BinaryEncoding],
-                         binary_checksum_strategy: ClientBinaryStrategy) -> List[Any]:
+def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, _types._BinaryEncoding],
+                         binary_checksum_strategy: types.ClientBinaryStrategy) -> List[Any]:
     headers = message[0]
     encoded_message_body = message[1]
     binary_checksums = headers["_bin"]
@@ -1025,7 +1001,8 @@ def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, _
 
     if "_enc" in headers:
         binary_encoding = headers["_enc"]
-        new_binary_encoder = _BinaryEncoding(binary_encoding, binary_checksum)
+        new_binary_encoder = _types._BinaryEncoding(
+            binary_encoding, binary_checksum)
         recent_binary_encoders[binary_checksum] = new_binary_encoder
 
     binary_checksum_strategy.update(binary_checksum)
@@ -1044,22 +1021,22 @@ def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, _
     return [headers, message_body]
 
 
-def encode_body(message_body: Dict[str, Any], binary_encoder: _BinaryEncoding) -> Dict[Any, Any]:
-    return {encode_or_decode(k, binary_encoder.encodeMap): encode_keys(v, binary_encoder) for k, v in message_body.items()}
+def encode_body(message_body: Dict[str, Any], binary_encoder: _types._BinaryEncoding) -> Dict[Any, Any]:
+    return {encode_or_decode(k, binary_encoder.encode_map): encode_keys(v, binary_encoder) for k, v in message_body.items()}
 
 
-def decode_body(encoded_message_body: Dict[Any, Any], binary_encoder: _BinaryEncoding) -> Dict[str, Any]:
+def decode_body(encoded_message_body: Dict[Any, Any], binary_encoder: _types._BinaryEncoding) -> Dict[str, Any]:
     return {k if isinstance(k, str) else encode_or_decode(k, binary_encoder.decodeMap): decode_keys(v, binary_encoder) for k, v in encoded_message_body.items()}
 
 
-def encode_keys(given: Any, binary_encoder: _BinaryEncoding) -> Any:
+def encode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
     if given is None:
         return given
     elif isinstance(given, dict):
         new_map = {}
         for key, value in given.items():
             final_key = encode_or_decode(
-                key, binary_encoder.encodeMap) if key in binary_encoder.encodeMap else key
+                key, binary_encoder.encode_map) if key in binary_encoder.encode_map else key
             encoded_value = encode_keys(value, binary_encoder)
             new_map[final_key] = encoded_value
         return new_map
@@ -1069,12 +1046,12 @@ def encode_keys(given: Any, binary_encoder: _BinaryEncoding) -> Any:
         return given
 
 
-def decode_keys(given: Any, binary_encoder: _BinaryEncoding) -> Any:
+def decode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
     if isinstance(given, dict):
         new_map = {}
         for key, value in given.items():
             final_key = key if isinstance(key, str) else encode_or_decode(
-                key, binary_encoder.decodeMap)
+                key, binary_encoder.decode_map)
             decoded_value = decode_keys(value, binary_encoder)
             new_map[final_key] = decoded_value
         return new_map
@@ -1091,44 +1068,47 @@ def encode_or_decode(key: Any, encoding_map: Dict[Any, Any]) -> Any:
 def encode_or_decode(key: Any, map: Dict[Any, Any]) -> Any:
     value = map.get(key)
     if value is None:
-        raise _BinaryEncodingMissing(key)
+        raise _types._BinaryEncodingMissing(key)
     return value
 
 
-def construct_binary_encoding(u_api_schema: UApiSchema) -> _BinaryEncoding:
-    all_keys = set()
+def construct_binary_encoding(u_api_schema: types.UApiSchema) -> _types._BinaryEncoding:
+    all_keys: Set[str] = set()
+
     for key, value in u_api_schema.parsed.items():
         all_keys.add(key)
-        if isinstance(value, _UStruct):
-            struct_fields = value.fields
+
+        if isinstance(value, _types._UStruct):
+            struct_fields: Dict[str, _types._UFieldDeclaration] = value.fields
             all_keys.update(struct_fields.keys())
-        elif isinstance(value, _UUnion):
-            union_cases = value.cases
-            for case_key, struct in union_cases.items():
+        elif isinstance(value, _types._UUnion):
+            union_cases: Dict[str, _types._UStruct] = value.cases
+            for case_key, case_value in union_cases.items():
                 all_keys.add(case_key)
-                all_keys.update(struct.fields.keys())
-        elif isinstance(value, _UFn):
-            fn_call_cases = value.call.cases
-            fn_result_cases = value.result.cases
+                struct_fields = case_value.fields
+                all_keys.update(struct_fields.keys())
+        elif isinstance(value, _types._UFn):
+            fn_call_cases: Dict[str, _types._UStruct] = value.call.cases
+            fn_result_cases: Dict[str, _types._UStruct] = value.result.cases
 
-            for e2 in fn_call_cases.items():
-                case_key, struct = e2
+            for case_key, case_value in fn_call_cases.items():
                 all_keys.add(case_key)
-                all_keys.update(struct.fields.keys())
+                struct_fields = case_value.fields
+                all_keys.update(struct_fields.keys())
 
-            for e2 in fn_result_cases.items():
-                case_key, struct = e2
+            for case_key, case_value in fn_result_cases.items():
                 all_keys.add(case_key)
-                all_keys.update(struct.fields.keys())
+                struct_fields = case_value.fields
+                all_keys.update(struct_fields.keys())
 
     binary_encoding = {key: i for i, key in enumerate(sorted(all_keys))}
     final_string = "\n".join(all_keys)
     checksum = sha256(final_string.encode("utf-8")).digest()
     checksum = int.from_bytes(checksum, byteorder="big")
-    return _BinaryEncoding(binary_encoding, checksum)
+    return _types._BinaryEncoding(binary_encoding, checksum)
 
 
-def serialize(message: Message, binary_encoder: _BinaryEncoder, serializer: SerializationImpl) -> bytes:
+def serialize(message: types.Message, binary_encoder: _types._BinaryEncoder, serializer: types.SerializationImpl) -> bytes:
     headers = message.header
     serialize_as_binary = headers.pop("_binary", False)
 
@@ -1139,22 +1119,22 @@ def serialize(message: Message, binary_encoder: _BinaryEncoder, serializer: Seri
             try:
                 encoded_message = binary_encoder.encode(message_as_pseudo_json)
                 return serializer.to_msg_pack(encoded_message)
-            except _BinaryEncoderUnavailableError:
+            except _types._BinaryEncoderUnavailableError:
                 return serializer.to_json(message_as_pseudo_json)
         else:
             return serializer.to_json(message_as_pseudo_json)
     except Exception as e:
-        raise SerializationError(e)
+        raise types.SerializationError(e)
 
 
-def deserialize(message_bytes: bytes, serializer: SerializationImpl, binary_encoder: _BinaryEncoder) -> Message:
+def deserialize(message_bytes: bytes, serializer: types.SerializationImpl, binary_encoder: _types._BinaryEncoder) -> types.Message:
     is_msg_pack = message_bytes[0] == 0x92  # MsgPack
-    message_as_pseudo_json = serializer.from_msg_pack(
+    message_as_pseudo_json = serializer.from_msgpack(
         message_bytes) if is_msg_pack else serializer.from_json(message_bytes)
     message_as_pseudo_json_list = list(message_as_pseudo_json)
 
     if len(message_as_pseudo_json_list) != 2:
-        raise _InvalidMessage()
+        raise _types._InvalidMessage()
 
     final_message_as_pseudo_json_list = binary_encoder.decode(
         message_as_pseudo_json_list) if is_msg_pack else message_as_pseudo_json_list
@@ -1163,15 +1143,15 @@ def deserialize(message_bytes: bytes, serializer: SerializationImpl, binary_enco
     body = final_message_as_pseudo_json_list[1]
 
     if not isinstance(headers, dict) or not isinstance(body, dict) or len(body) != 1:
-        raise _InvalidMessage()
+        raise _types._InvalidMessage()
 
     try:
         payload = list(body.values())[0]
         payload = dict(payload)
     except Exception:
-        raise _InvalidMessageBody()
+        raise _types._InvalidMessageBody()
 
-    return Message(headers, payload)
+    return types.Message(headers, payload)
 
 
 def get_type(value: Any) -> str:
@@ -1191,17 +1171,17 @@ def get_type(value: Any) -> str:
         return "Unknown"
 
 
-def get_type_unexpected_validation_failure(path: List[Any], value: Any, expected_type: str) -> List[_ValidationFailure]:
+def get_type_unexpected_validation_failure(path: List[Any], value: Any, expected_type: str) -> List[_types._ValidationFailure]:
     actual_type = get_type(value)
     data = {
         "actual": {actual_type: {}},
         "expected": {expected_type: {}}
     }
-    return [_ValidationFailure(path, "TypeUnexpected", data)]
+    return [_types._ValidationFailure(path, "TypeUnexpected", data)]
 
 
-def validate_headers(headers: Dict[str, Any], uapi_schema: _UTypes.UApiSchema, function_type: _UTypes._UFn) -> List[_UTypes._ValidationFailure]:
-    validation_failures: List[_UTypes._ValidationFailure] = []
+def validate_headers(headers: Dict[str, Any], uapi_schema: _types.UApiSchema, function_type: _types._UFn) -> List[_types._ValidationFailure]:
+    validation_failures: List[_types._ValidationFailure] = []
 
     if "_bin" in headers:
         try:
@@ -1224,24 +1204,24 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: _UTypes.UApiSchema, f
     return validation_failures
 
 
-def validate_select_headers(headers: Dict[str, Any], uapi_schema: _UTypes.UApiSchema, function_type: _UTypes._UFn) -> List[_UTypes._ValidationFailure]:
+def validate_select_headers(headers: Dict[str, Any], uapi_schema: _types.UApiSchema, function_type: _types._UFn) -> List[_types._ValidationFailure]:
     try:
         select_struct_fields_header = dict(headers["_sel"])
     except TypeError:
         return get_type_unexpected_validation_failure(["_sel"], headers["_sel"], "Object")
 
-    validation_failures: List[_UTypes._ValidationFailure] = []
+    validation_failures: List[_types._ValidationFailure] = []
 
     for type_name, select_value in select_struct_fields_header.items():
         type_reference = function_type.result if type_name == "->" else uapi_schema.parsed.get(
             type_name)
 
         if type_reference is None:
-            validation_failures.append(_UTypes._ValidationFailure(
+            validation_failures.append(_types._ValidationFailure(
                 ["_sel", type_name], "TypeUnknown", {}))
             continue
 
-        if isinstance(type_reference, _UTypes._UUnion):
+        if isinstance(type_reference, _types._UUnion):
             try:
                 union_cases = dict(select_value)
             except TypeError:
@@ -1254,14 +1234,14 @@ def validate_select_headers(headers: Dict[str, Any], uapi_schema: _UTypes.UApiSc
                 loop_path = ["_sel", type_name, union_case]
 
                 if struct_ref is None:
-                    validation_failures.append(_UTypes._ValidationFailure(
+                    validation_failures.append(_types._ValidationFailure(
                         loop_path, "UnionCaseUnknown", {}))
                     continue
 
                 nested_validation_failures = validate_select_struct(
                     struct_ref, loop_path, selected_case_struct_fields)
                 validation_failures.extend(nested_validation_failures)
-        elif isinstance(type_reference, _UTypes._UFn):
+        elif isinstance(type_reference, _types._UFn):
             fn_call = type_reference.call
             fn_call_cases = fn_call.cases
             fn_name = type_reference.name
@@ -1278,8 +1258,8 @@ def validate_select_headers(headers: Dict[str, Any], uapi_schema: _UTypes.UApiSc
     return validation_failures
 
 
-def validate_select_struct(struct_reference: _UTypes._UStruct, base_path: List[Any], selected_fields: Any) -> List[_UTypes._ValidationFailure]:
-    validation_failures: List[_UTypes._ValidationFailure] = []
+def validate_select_struct(struct_reference: _types._UStruct, base_path: List[Any], selected_fields: Any) -> List[_types._ValidationFailure]:
+    validation_failures: List[_types._ValidationFailure] = []
 
     try:
         fields = list(selected_fields)
@@ -1296,16 +1276,16 @@ def validate_select_struct(struct_reference: _UTypes._UStruct, base_path: List[A
             continue
         if string_field not in struct_reference.fields:
             this_path = base_path + [i]
-            validation_failures.append(_UTypes._ValidationFailure(
+            validation_failures.append(_types._ValidationFailure(
                 this_path, "ObjectKeyDisallowed", {}))
 
     return validation_failures
 
 
-def validate_value_of_type(value: Any, generics: List[_UTypes._UTypeDeclaration], this_type: _UTypes._UType, nullable: bool, type_parameters: List[_UTypes._UTypeDeclaration]) -> List[_UTypes._ValidationFailure]:
+def validate_value_of_type(value: Any, generics: List[_types._UTypeDeclaration], this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if value is None:
         is_nullable = generics[this_type.index].nullable if isinstance(
-            this_type, _UTypes._UGeneric) else nullable
+            this_type, _types._UGeneric) else nullable
         if not is_nullable:
             return get_type_unexpected_validation_failure([], value, this_type.get_name(generics))
         else:
@@ -1314,14 +1294,14 @@ def validate_value_of_type(value: Any, generics: List[_UTypes._UTypeDeclaration]
         return this_type.validate(value, type_parameters, generics)
 
 
-def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: bool, include_random_optional_fields: bool, generics: List[_UTypes._UTypeDeclaration], random_generator: _UTypes._RandomGenerator, this_type: _UTypes._UType, nullable: bool, type_parameters: List[_UTypes._UTypeDeclaration]) -> Any:
+def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: bool, include_random_optional_fields: bool, generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator, this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> Any:
     if nullable and not use_blueprint_value and random_generator.next_boolean():
         return None
     else:
         return this_type.generate_random_value(blueprint_value, use_blueprint_value, include_random_optional_fields, type_parameters, generics, random_generator)
 
 
-def generate_random_any(random_generator: _UTypes._RandomGenerator) -> Any:
+def generate_random_any(random_generator: _types._RandomGenerator) -> Any:
     select_type = random_generator.next_int(3)
     if select_type == 0:
         return random_generator.next_boolean()
@@ -1331,26 +1311,19 @@ def generate_random_any(random_generator: _UTypes._RandomGenerator) -> Any:
         return random_generator.next_string()
 
 
-def validate_boolean(value: Any) -> List[_UTypes._ValidationFailure]:
+def validate_boolean(value: Any) -> List[_types._ValidationFailure]:
     if isinstance(value, bool):
         return []
     else:
-        return get_type_unexpected_validation_failure([], value, _UTypes._BOOLEAN_NAME)
+        return get_type_unexpected_validation_failure([], value, _BOOLEAN_NAME)
 
 
-def generate_random_boolean(blueprint_value: Any, use_blueprint_value: bool, random_generator: _UTypes._RandomGenerator) -> Any:
+def generate_random_boolean(blueprint_value: Any, use_blueprint_value: bool, random_generator: _types._RandomGenerator) -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
         return random_generator.next_boolean()
 
-    from typing import List, Union, Dict, TypeVar, Any
-
-
-_UTypeDeclaration = TypeVar('_UTypeDeclaration')
-UFieldDeclaration = TypeVar('UFieldDeclaration')
-_ValidationFailure = TypeVar('_ValidationFailure')
-_RandomGenerator = TypeVar('_RandomGenerator')
 
 _INTEGER_NAME = "Integer"
 _NUMBER_NAME = "Number"
@@ -1360,41 +1333,41 @@ _OBJECT_NAME = "Object"
 _STRUCT_NAME = "Struct"
 
 
-def validate_integer(value: Any) -> List[_ValidationFailure]:
+def validate_integer(value: Any) -> List[_types._ValidationFailure]:
     if isinstance(value, (int, float)):
         return []
     elif isinstance(value, (int, float)):
-        return [_ValidationFailure([], "NumberOutOfRange", {})]
+        return [_types._ValidationFailure([], "NumberOutOfRange", {})]
     else:
         return get_type_unexpected_validation_failure([], value, _INTEGER_NAME)
 
 
 def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,
-                            random_generator: _RandomGenerator) -> Any:
+                            random_generator: _types._RandomGenerator) -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
         return random_generator.randint()
 
 
-def validate_number(value: Any) -> List[_ValidationFailure]:
+def validate_number(value: Any) -> List[_types._ValidationFailure]:
     if isinstance(value, (float, int)):
         return []
     elif isinstance(value, (int, float)):
-        return [_ValidationFailure([], "NumberOutOfRange", {})]
+        return [_types._ValidationFailure([], "NumberOutOfRange", {})]
     else:
         return get_type_unexpected_validation_failure([], value, _NUMBER_NAME)
 
 
 def generate_random_number(blueprint_value: Any, use_blueprint_value: bool,
-                           random_generator: _RandomGenerator) -> Any:
+                           random_generator: _types._RandomGenerator) -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
         return random_generator.uniform()
 
 
-def validate_string(value: Any) -> List[_ValidationFailure]:
+def validate_string(value: Any) -> List[_types._ValidationFailure]:
     if isinstance(value, str):
         return []
     else:
@@ -1402,15 +1375,15 @@ def validate_string(value: Any) -> List[_ValidationFailure]:
 
 
 def generate_random_string(blueprint_value: Any, use_blueprint_value: bool,
-                           random_generator: _RandomGenerator) -> str:
+                           random_generator: _types._RandomGenerator) -> str:
     if use_blueprint_value:
         return blueprint_value
     else:
         return random_generator.random_string()
 
 
-def validate_array(value: Any, type_parameters: List[_UTypeDeclaration],
-                   generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+def validate_array(value: Any, type_parameters: List[_types._UTypeDeclaration],
+                   generics: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, list):
         nested_type_declaration = type_parameters[0]
         validation_failures = []
@@ -1421,7 +1394,8 @@ def validate_array(value: Any, type_parameters: List[_UTypeDeclaration],
             index = i
 
             nested_validation_failures_with_path = [
-                _ValidationFailure(prepend(index, f.path), f.reason, f.data)
+                _types._ValidationFailure(
+                    prepend(index, f.path), f.reason, f.data)
                 for f in nested_validation_failures
             ]
 
@@ -1433,8 +1407,8 @@ def validate_array(value: Any, type_parameters: List[_UTypeDeclaration],
 
 
 def generate_random_array(blueprint_value: Any, use_blueprint_value: bool,
-                          include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration],
-                          generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> List[Any]:
+                          include_random_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
+                          generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator) -> List[Any]:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:
@@ -1452,21 +1426,21 @@ def generate_random_array(blueprint_value: Any, use_blueprint_value: bool,
         return array
 
 
-def validate_object(value: Any, type_parameters: List[_UTypeDeclaration],
-                    generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+def validate_object(value: Any, type_parameters: List[_types._UTypeDeclaration],
+                    generics: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
         nested_type_declaration = type_parameters[0]
-        validation_failures = []
 
+        validation_failures = []
         for k, v in value.items():
             nested_validation_failures = nested_type_declaration.validate(
                 v, generics)
-            this_path = prepend(k, f.path)
 
-            nested_validation_failures_with_path = [
-                _ValidationFailure(this_path, f.reason, f.data)
-                for f in nested_validation_failures
-            ]
+            nested_validation_failures_with_path = []
+            for f in nested_validation_failures:
+                this_path = prepend(k, f.path)
+                nested_validation_failures_with_path.append(
+                    _types._ValidationFailure(this_path, f.reason, f.data))
 
             validation_failures.extend(nested_validation_failures_with_path)
 
@@ -1476,8 +1450,8 @@ def validate_object(value: Any, type_parameters: List[_UTypeDeclaration],
 
 
 def generate_random_object(blueprint_value: Any, use_blueprint_value: bool,
-                           include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration],
-                           generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> Dict[str, Any]:
+                           include_random_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
+                           generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator) -> Dict[str, Any]:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:
@@ -1496,32 +1470,32 @@ def generate_random_object(blueprint_value: Any, use_blueprint_value: bool,
         return obj
 
 
-def validate_struct(value: Any, type_parameters: List[_UTypeDeclaration],
-                    generics: List[_UTypeDeclaration], fields: Dict[str, UFieldDeclaration]) -> List[_ValidationFailure]:
+def validate_struct(value: Any, type_parameters: List[_types._UTypeDeclaration],
+                    generics: List[_types._UTypeDeclaration], fields: Dict[str, _types._UFieldDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
         return validate_struct_fields(fields, value, type_parameters)
     else:
         return get_type_unexpected_validation_failure([], value, _STRUCT_NAME)
 
 
-def validate_struct_fields(fields: Dict[str, _UFieldDeclaration],
+def validate_struct_fields(fields: Dict[str, _types._UFieldDeclaration],
                            actual_struct: Dict[str, Any],
-                           type_parameters: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
-    validation_failures: List[_ValidationFailure] = []
+                           type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
+    validation_failures: List[_types._ValidationFailure] = []
 
     missing_fields = [field_name for field_name, field_declaration in fields.items()
                       if field_name not in actual_struct and not field_declaration.optional]
 
     for missing_field in missing_fields:
-        validation_failure = _ValidationFailure([missing_field],
-                                                "RequiredObjectKeyMissing",
-                                                {})
+        validation_failure = _types._ValidationFailure([missing_field],
+                                                       "RequiredObjectKeyMissing",
+                                                       {})
         validation_failures.append(validation_failure)
 
     for field_name, field_value in actual_struct.items():
         reference_field = fields.get(field_name)
         if reference_field is None:
-            validation_failure = _ValidationFailure(
+            validation_failure = _types._ValidationFailure(
                 [field_name], "ObjectKeyDisallowed", {})
             validation_failures.append(validation_failure)
             continue
@@ -1533,7 +1507,7 @@ def validate_struct_fields(fields: Dict[str, _UFieldDeclaration],
 
         for failure in nested_validation_failures:
             this_path = [field_name] + failure.path
-            nested_validation_failures_with_path = _ValidationFailure(
+            nested_validation_failures_with_path = _types._ValidationFailure(
                 this_path, failure.reason, failure.data)
             validation_failures.append(nested_validation_failures_with_path)
 
@@ -1543,9 +1517,9 @@ def validate_struct_fields(fields: Dict[str, _UFieldDeclaration],
 def generate_random_struct(blueprint_value: Any,
                            use_blueprint_value: bool,
                            include_random_optional_fields: bool,
-                           type_parameters: List[_UTypeDeclaration],
-                           random: _RandomGenerator,
-                           fields: Dict[str, _UFieldDeclaration]) -> Dict[str, Any]:
+                           type_parameters: List[_types._UTypeDeclaration],
+                           random: _types._RandomGenerator,
+                           fields: Dict[str, _types._UFieldDeclaration]) -> Dict[str, Any]:
     starting_struct_value = blueprint_value if use_blueprint_value else {}
 
     sorted_reference_struct = sorted(fields.items())
@@ -1580,33 +1554,33 @@ def generate_random_struct(blueprint_value: Any,
     return obj
 
 
-def union_entry(union: Dict[str, Any]) -> Tuple[str, Any]:
-    return choice(list(union.items()))
+def union_entry(union: Dict[str, Any]) -> Optional[Tuple[str, Any]]:
+    return next(iter(union.items()), None)
 
 
 def validate_union(value: Any,
-                   type_parameters: List[_UTypeDeclaration],
-                   generics: List[_UTypeDeclaration],
-                   cases: Dict[str, _UStruct]) -> List[_ValidationFailure]:
+                   type_parameters: List[_types._UTypeDeclaration],
+                   generics: List[_types._UTypeDeclaration],
+                   cases: Dict[str, _types._UStruct]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
         return validate_union_cases(cases, value, type_parameters)
     else:
         return get_type_unexpected_validation_failure([], value, "_UNION_NAME")
 
 
-def validate_union_cases(reference_cases: Dict[str, _UStruct],
+def validate_union_cases(reference_cases: Dict[str, _types._UStruct],
                          actual: Dict[str, Any],
-                         type_parameters: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+                         type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if len(actual) != 1:
-        return [_ValidationFailure([],
-                                   "ObjectSizeUnexpected",
-                                   {"actual": len(actual), "expected": 1})]
+        return [_types._ValidationFailure([],
+                                          "ObjectSizeUnexpected",
+                                          {"actual": len(actual), "expected": 1})]
 
     union_target, union_payload = union_entry(actual)
 
     reference_struct = reference_cases.get(union_target)
     if reference_struct is None:
-        return [_ValidationFailure([union_target], "ObjectKeyDisallowed", {})]
+        return [_types._ValidationFailure([union_target], "ObjectKeyDisallowed", {})]
 
     if isinstance(union_payload, dict):
         nested_validation_failures = validate_union_struct(
@@ -1616,26 +1590,26 @@ def validate_union_cases(reference_cases: Dict[str, _UStruct],
         for failure in nested_validation_failures:
             this_path = [union_target] + failure.path
             nested_validation_failures_with_path.append(
-                _ValidationFailure(this_path, failure.reason, failure.data))
+                _types._ValidationFailure(this_path, failure.reason, failure.data))
 
         return nested_validation_failures_with_path
     else:
         return get_type_unexpected_validation_failure([union_target], union_payload, "Object")
 
 
-def validate_union_struct(union_struct: _UStruct,
+def validate_union_struct(union_struct: _types._UStruct,
                           union_case: str,
                           actual: Dict[str, Any],
-                          type_parameters: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+                          type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     return validate_struct_fields(union_struct.fields, actual, type_parameters)
 
 
 def generate_random_union(blueprint_value: Any,
                           use_blueprint_value: bool,
                           include_random_optional_fields: bool,
-                          type_parameters: List[_UTypeDeclaration],
-                          random: _RandomGenerator,
-                          cases: Dict[str, _UStruct]) -> Dict[str, Any]:
+                          type_parameters: List[_types._UTypeDeclaration],
+                          random_generator: _types._RandomGenerator,
+                          cases: Dict[str, _types._UStruct]) -> Dict[str, Any]:
     if use_blueprint_value:
         starting_union_case = blueprint_value
     else:
@@ -1648,27 +1622,28 @@ def generate_random_union(blueprint_value: Any,
                                                     union_starting_struct,
                                                     include_random_optional_fields,
                                                     type_parameters,
-                                                    random)}
+                                                    random_generator)}
     else:
         sorted_union_cases_reference = sorted(cases.items())
 
-        random_index = randint(0, len(sorted_union_cases_reference) - 1)
+        random_index = random_generator.next_int(
+            len(sorted_union_cases_reference))
         union_case, union_data = sorted_union_cases_reference[random_index]
 
         return {union_case: construct_random_struct(union_data.fields,
                                                     {},
                                                     include_random_optional_fields,
                                                     type_parameters,
-                                                    random)}
+                                                    random_generator)}
 
 
 def generate_random_fn(blueprint_value: Any,
                        use_blueprint_value: bool,
                        include_random_optional_fields: bool,
-                       type_parameters: List[_UTypeDeclaration],
-                       generics: List[_UTypeDeclaration],
-                       random: _RandomGenerator,
-                       call_cases: Dict[str, _UStruct]) -> Dict[str, Any]:
+                       type_parameters: List[_types._UTypeDeclaration],
+                       generics: List[_types._UTypeDeclaration],
+                       random: _types._RandomGenerator,
+                       call_cases: Dict[str, _types._UStruct]) -> Dict[str, Any]:
     if use_blueprint_value:
         starting_fn_value = blueprint_value
     else:
@@ -1682,8 +1657,8 @@ def generate_random_fn(blueprint_value: Any,
                                  call_cases)
 
 
-def validate_mock_call(given_obj: Any, type_parameters: List['_UTypeDeclaration'],
-                       generics: List['_UTypeDeclaration'], types: Dict[str, '_UType']) -> List['_ValidationFailure']:
+def validate_mock_call(given_obj: Any, type_parameters: List['_types._UTypeDeclaration'],
+                       generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
     try:
         given_map = as_map(given_obj)
     except TypeError:
@@ -1693,8 +1668,8 @@ def validate_mock_call(given_obj: Any, type_parameters: List['_UTypeDeclaration'
 
     matches = [k for k in given_map.keys() if re.match(regex_string, k)]
     if len(matches) != 1:
-        return [_ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
-                                   {"regex": regex_string, "actual": len(matches), "expected": 1})]
+        return [_types._ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
+                                          {"regex": regex_string, "actual": len(matches), "expected": 1})]
 
     function_name = matches[0]
     function_def = types[function_name]
@@ -1711,13 +1686,13 @@ def validate_mock_call(given_obj: Any, type_parameters: List['_UTypeDeclaration'
     for f in input_failures:
         new_path = [function_name] + f.path
         input_failures_with_path.append(
-            _ValidationFailure(new_path, f.reason, f.data))
+            _types._ValidationFailure(new_path, f.reason, f.data))
 
     return [f for f in input_failures_with_path if f.reason != "RequiredObjectKeyMissing"]
 
 
-def validate_mock_stub(given_obj: Any, type_parameters: List['_UTypeDeclaration'],
-                       generics: List['_UTypeDeclaration'], types: Dict[str, '_UType']) -> List['_ValidationFailure']:
+def validate_mock_stub(given_obj: Any, type_parameters: List['_types._UTypeDeclaration'],
+                       generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
     validation_failures = []
 
     try:
@@ -1729,8 +1704,8 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_UTypeDeclaration'
 
     matches = [k for k in given_map.keys() if re.match(regex_string, k)]
     if len(matches) != 1:
-        return [_ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
-                                   {"regex": regex_string, "actual": len(matches), "expected": 1})]
+        return [_types._ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
+                                          {"regex": regex_string, "actual": len(matches), "expected": 1})]
 
     function_name = matches[0]
     function_def = types[function_name]
@@ -1747,7 +1722,7 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_UTypeDeclaration'
     for f in input_failures:
         this_path = [function_name] + f.path
         input_failures_with_path.append(
-            _ValidationFailure(this_path, f.reason, f.data))
+            _types._ValidationFailure(this_path, f.reason, f.data))
 
     input_failures_without_missing_required = [
         f for f in input_failures_with_path if f.reason != "RequiredObjectKeyMissing"]
@@ -1756,7 +1731,7 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_UTypeDeclaration'
     result_def_key = "->"
 
     if result_def_key not in given_map:
-        validation_failures.append(_ValidationFailure(
+        validation_failures.append(_types._ValidationFailure(
             [result_def_key], "RequiredObjectKeyMissing", {}))
     else:
         output = given_map[result_def_key]
@@ -1766,7 +1741,7 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_UTypeDeclaration'
         for f in output_failures:
             this_path = [result_def_key] + f.path
             output_failures_with_path.append(
-                _ValidationFailure(this_path, f.reason, f.data))
+                _types._ValidationFailure(this_path, f.reason, f.data))
 
         failures_without_missing_required = [
             f for f in output_failures_with_path if f.reason != "RequiredObjectKeyMissing"]
@@ -1775,18 +1750,18 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_UTypeDeclaration'
     disallowed_fields = [k for k in given_map.keys(
     ) if k not in matches and k != result_def_key]
     for disallowed_field in disallowed_fields:
-        validation_failures.append(_ValidationFailure(
+        validation_failures.append(_types._ValidationFailure(
             [disallowed_field], "ObjectKeyDisallowed", {}))
 
     return validation_failures
 
 
-def select_struct_fields(type_declaration: '_UTypeDeclaration', value: Any,
+def select_struct_fields(type_declaration: '_types._UTypeDeclaration', value: Any,
                          selected_struct_fields: Dict[str, Any]) -> Any:
     type_declaration_type = type_declaration.type
     type_declaration_type_params = type_declaration.type_parameters
 
-    if isinstance(type_declaration_type, _UStruct):
+    if isinstance(type_declaration_type, _types._UStruct):
         fields = type_declaration_type.fields
         struct_name = type_declaration_type.name
         selected_fields = selected_struct_fields.get(struct_name, None)
@@ -1804,7 +1779,7 @@ def select_struct_fields(type_declaration: '_UTypeDeclaration', value: Any,
 
         return final_map
 
-    elif isinstance(type_declaration_type, _UFn):
+    elif isinstance(type_declaration_type, _types._UFn):
         value_as_map = value
         union_entry = union_entry(value_as_map)
         union_case = union_entry[0]
@@ -1828,7 +1803,7 @@ def select_struct_fields(type_declaration: '_UTypeDeclaration', value: Any,
 
         return {union_case: final_map}
 
-    elif isinstance(type_declaration_type, _UUnion):
+    elif isinstance(type_declaration_type, _types._UUnion):
         value_as_map = value
         union_entry = union_entry(value_as_map)
         union_case = union_entry[0]
@@ -1862,7 +1837,7 @@ def select_struct_fields(type_declaration: '_UTypeDeclaration', value: Any,
 
         return {union_case: final_map}
 
-    elif isinstance(type_declaration_type, _UObject):
+    elif isinstance(type_declaration_type, _types._UObject):
         nested_type_declaration = type_declaration_type_params[0]
         value_as_map = value
 
@@ -1874,7 +1849,7 @@ def select_struct_fields(type_declaration: '_UTypeDeclaration', value: Any,
 
         return final_map
 
-    elif isinstance(type_declaration_type, _UArray):
+    elif isinstance(type_declaration_type, _types._UArray):
         nested_type = type_declaration_type_params[0]
         value_as_list = value
 
@@ -1890,8 +1865,8 @@ def select_struct_fields(type_declaration: '_UTypeDeclaration', value: Any,
         return value
 
 
-def get_invalid_error_message(error: str, validation_failures: List[_ValidationFailure],
-                              result_union_type: _UUnion, response_headers: Dict[str, Any]) -> Message:
+def get_invalid_error_message(error: str, validation_failures: List[_types._ValidationFailure],
+                              result_union_type: _types._UUnion, response_headers: Dict[str, Any]) -> Message:
     validation_failure_cases = map_validation_failures_to_invalid_field_cases(
         validation_failures)
     new_error_result = {error: {"cases": validation_failure_cases}}
@@ -1900,7 +1875,7 @@ def get_invalid_error_message(error: str, validation_failures: List[_ValidationF
     return Message(response_headers, new_error_result)
 
 
-def map_validation_failures_to_invalid_field_cases(argument_validation_failures: List[_ValidationFailure]) -> List[Dict[str, Any]]:
+def map_validation_failures_to_invalid_field_cases(argument_validation_failures: List[_types._ValidationFailure]) -> List[Dict[str, Any]]:
     validation_failure_cases = []
     for validation_failure in argument_validation_failures:
         validation_failure_case = {"path": validation_failure.path,
@@ -1910,7 +1885,7 @@ def map_validation_failures_to_invalid_field_cases(argument_validation_failures:
     return validation_failure_cases
 
 
-def validate_result(result_union_type: _UUnion, error_result: Any) -> None:
+def validate_result(result_union_type: _types._UUnion, error_result: Any) -> None:
     new_error_result_validation_failures = result_union_type.validate(
         error_result, [], [])
     if new_error_result_validation_failures:
@@ -1923,7 +1898,7 @@ def handle_message(request_message: Message, u_api_schema: UApiSchema, handler: 
     response_headers: Dict[str, Any] = {}
     request_headers: Dict[str, Any] = request_message.header
     request_body: Dict[str, Any] = request_message.body
-    parsed_u_api_schema: Dict[str, _UType] = u_api_schema.parsed
+    parsed_u_api_schema: Dict[str, _types._UType] = u_api_schema.parsed
     request_entry: Tuple[str, Any] = unionEntry(request_body)
 
     request_target_init: str = request_entry[0]
@@ -1938,8 +1913,8 @@ def handle_message(request_message: Message, u_api_schema: UApiSchema, handler: 
         unknown_target = ""
         request_target = request_target_init
 
-    function_type: _UFn = parsed_u_api_schema.get(request_target)
-    result_union_type: _UUnion = function_type.result
+    function_type: _types._UFn = parsed_u_api_schema.get(request_target)
+    result_union_type: _types._UUnion = function_type.result
 
     call_id = request_headers.get("_id")
     if call_id is not None:
@@ -2022,8 +1997,8 @@ def parse_request_message(request_message_bytes: bytes, serializer: Serializer, 
         on_error(e)
 
         error_reason = {
-            _BinaryEncoderUnavailableError: "IncompatibleBinaryEncoding",
-            _BinaryEncodingMissing: "BinaryDecodeFailure",
+            _types._BinaryEncoderUnavailableError: "IncompatibleBinaryEncoding",
+            _types._BinaryEncodingMissing: "BinaryDecodeFailure",
             _InvalidMessage: "ExpectedJsonArrayOfTwoObjects",
             _InvalidMessageBody: "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject"
         }.get(type(e), "ExpectedJsonArrayOfTwoObjects")
@@ -2165,7 +2140,7 @@ def verify_no_more_interactions(invocations: List["_MockInvocation"]) -> Dict[st
 
 
 def mock_handle(request_message: Message, stubs: List[_MockStub], invocations: List[_MockInvocation],
-                random: _RandomGenerator, u_api_schema: UApiSchema, enable_generated_default_stub: bool) -> Message:
+                random: _types._RandomGenerator, u_api_schema: UApiSchema, enable_generated_default_stub: bool) -> Message:
     header: Dict[str, Any] = request_message.header
 
     enable_generation_stub: bool = header.get(
@@ -2299,7 +2274,7 @@ def process_request_object(request_message: Message,
         raise UApiError(e)
 
 
-def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: List[_SchemaParseFailure]) -> List[Dict[str, Any]]:
+def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: List[_types._SchemaParseFailure]) -> List[Dict[str, Any]]:
     """
     Map schema parse failures to pseudo JSON format.
     """

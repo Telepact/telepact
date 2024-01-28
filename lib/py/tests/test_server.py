@@ -1,39 +1,36 @@
-from prometheus_client.exposition import Histogram, push_to_gateway
-from prometheus_client import MetricRegistry, generate_latest, CONTENT_TYPE_LATEST, Summary
+from prometheus_client import CONTENT_TYPE_LATEST, Summary, CollectorRegistry, generate_latest, write_to_textfile
 from nats.aio.client import Client as NatsClient
-from typing import List, Map, Any
+from nats.aio.msg import Msg
+from typing import List, Any
 from threading import Lock, Condition
 import csv
-from prometheus_client import CollectorRegistry, generate_latest, write_to_textfile
-from nats.aio.options import Options
-from nats import NATS, Msg
 from typing import Any, Dict, List, Optional
 import threading
 import os
 from datetime import timedelta
-from threading import AtomicBoolean
 from time import time as timer
 from typing import Callable, Any, Dict, List, Union
-from nats.aio.client import Client as NATSClient
 from typing import Dict
 from pathlib import Path
 from typing import Dict, Any, List, Callable, Union
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import json
-from nats.aio.client import Client as NATSClient, Msg, Subscription
+from nats.aio.client import Client as NATSClient, Subscription
 from uapi.types import UApiSchema, MockServer, UApiSchemaParseError
 import asyncio
+from uapi.types import Client, Serializer
+import nats
 
 
-async def start_client_test_server(connection: NATSClient, metrics: CollectorRegistry,
+async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
                                    client_frontdoor_topic: str,
                                    client_backdoor_topic: str,
                                    default_binary: bool) -> Subscription:
 
     timers = Summary(client_frontdoor_topic, registry=metrics)
 
-    def adapter(m: Msg, s: Any) -> Union[Dict[str, bool], Dict[str, Dict[str, Any]]]:
+    def adapter(m: Msg, s: Serializer) -> Union[Dict[str, bool], Dict[str, Dict[str, Any]]]:
         async def async_task() -> Union[Dict[str, bool], Dict[str, Dict[str, Any]]]:
             try:
                 request_bytes = await s.serialize(m)
@@ -62,7 +59,7 @@ async def start_client_test_server(connection: NATSClient, metrics: CollectorReg
     options = {
         "use_binary": default_binary
     }
-    client = NATSClient(adapter, **options)
+    client = Client(adapter, **options)
 
     async def message_handler(msg: Msg) -> None:
         try:
@@ -94,7 +91,7 @@ async def start_client_test_server(connection: NATSClient, metrics: CollectorReg
     return connection.subscribe(client_frontdoor_topic, cb=message_handler)
 
 
-async def start_mock_test_server(connection: NATSClient, metrics: Any, api_schema_path: str,
+async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schema_path: str,
                                  frontdoor_topic: str, config: Dict[str, Any]) -> Subscription:
     api_schema_content = Path(api_schema_path).read_text()
     u_api = UApiSchema.from_json(api_schema_content)
@@ -157,7 +154,7 @@ class Server:
         return self.handler(request_bytes)
 
 
-def start_schema_test_server(connection: Any, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
+def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = UApiSchema.from_json(json_data)
 
@@ -195,7 +192,7 @@ def start_schema_test_server(connection: Any, metrics: CollectorRegistry, api_sc
     options.onError = lambda e: print(e)  # Error handling
     server = Server(u_api, handler, options)
 
-    def handle_message(msg: Any, timers: Summary, server: Server, connection: Any, frontdoor_topic: str) -> None:
+    def handle_message(msg: Any, timers: Summary, server: Server, connection: NatsClient, frontdoor_topic: str) -> None:
         request_bytes = msg.get_data()
 
         print(f"    ->S {request_bytes}")
@@ -280,7 +277,7 @@ def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_sc
     alternate_options.onError = lambda e: print(e)  # Error handling
     alternate_server = Server(alternate_u_api, handler, alternate_options)
 
-    def handle_test_message(msg: Any, timers: Any, server: Server, alternate_server: Server, connection: Any, frontdoor_topic: str) -> None:
+    def handle_test_message(msg: Any, timers: Any, server: Server, alternate_server: Server, connection: NatsClient, frontdoor_topic: str) -> None:
         nonlocal serve_alternate_server
         request_bytes = msg.get_data()
 
@@ -311,10 +308,6 @@ async def run_dispatcher_server():
     if nats_url is None:
         raise RuntimeError("NATS_URL env var not set")
 
-    nats_options = {
-        "servers": [nats_url],
-    }
-
     done = asyncio.get_running_loop().create_future()
 
     metrics = CollectorRegistry()
@@ -326,8 +319,7 @@ async def run_dispatcher_server():
         with open(metrics_file, "w") as f:
             f.write(generate_latest(metrics).decode("utf-8"))
 
-    connection = NatsClient()
-    await connection.connect(**nats_options)
+    connection = nats.connect(nats_url)
 
     async def message_handler(msg):
         request_bytes = msg.data
@@ -342,49 +334,48 @@ async def run_dispatcher_server():
             target = entry[0]
             payload = entry[1]
 
-            with histogram.time():
-                if target == "Ping":
-                    pass
-                elif target == "End":
-                    done.set_result(True)
-                elif target == "Stop":
-                    server_id = payload["id"]
-                    server = servers.get(server_id)
-                    if server:
-                        await server.drain()
-                elif target == "StartServer":
-                    server_id = payload["id"]
-                    api_schema_path = payload["apiSchemaPath"]
-                    frontdoor_topic = payload["frontdoorTopic"]
-                    backdoor_topic = payload["backdoorTopic"]
-                    server = start_test_server(
-                        connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic)
-                    servers[server_id] = server
-                elif target == "StartClientServer":
-                    server_id = payload["id"]
-                    client_frontdoor_topic = payload["clientFrontdoorTopic"]
-                    client_backdoor_topic = payload["clientBackdoorTopic"]
-                    use_binary = payload.get("useBinary", False)
-                    server = start_client_test_server(
-                        connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary)
-                    servers[server_id] = server
-                elif target == "StartMockServer":
-                    server_id = payload["id"]
-                    api_schema_path = payload["apiSchemaPath"]
-                    frontdoor_topic = payload["frontdoorTopic"]
-                    config = payload["config"]
-                    server = start_mock_test_server(
-                        connection, metrics, api_schema_path, frontdoor_topic, config)
-                    servers[server_id] = server
-                elif target == "StartSchemaServer":
-                    server_id = payload["id"]
-                    api_schema_path = payload["apiSchemaPath"]
-                    frontdoor_topic = payload["frontdoorTopic"]
-                    server = start_schema_test_server(
-                        connection, metrics, api_schema_path, frontdoor_topic)
-                    servers[server_id] = server
-                else:
-                    raise RuntimeError("no matching server")
+            if target == "Ping":
+                pass
+            elif target == "End":
+                done.set_result(True)
+            elif target == "Stop":
+                server_id = payload["id"]
+                server = servers.get(server_id)
+                if server:
+                    await server.drain()
+            elif target == "StartServer":
+                server_id = payload["id"]
+                api_schema_path = payload["apiSchemaPath"]
+                frontdoor_topic = payload["frontdoorTopic"]
+                backdoor_topic = payload["backdoorTopic"]
+                server = start_test_server(
+                    connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic)
+                servers[server_id] = server
+            elif target == "StartClientServer":
+                server_id = payload["id"]
+                client_frontdoor_topic = payload["clientFrontdoorTopic"]
+                client_backdoor_topic = payload["clientBackdoorTopic"]
+                use_binary = payload.get("useBinary", False)
+                server = start_client_test_server(
+                    connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary)
+                servers[server_id] = server
+            elif target == "StartMockServer":
+                server_id = payload["id"]
+                api_schema_path = payload["apiSchemaPath"]
+                frontdoor_topic = payload["frontdoorTopic"]
+                config = payload["config"]
+                server = start_mock_test_server(
+                    connection, metrics, api_schema_path, frontdoor_topic, config)
+                servers[server_id] = server
+            elif target == "StartSchemaServer":
+                server_id = payload["id"]
+                api_schema_path = payload["apiSchemaPath"]
+                frontdoor_topic = payload["frontdoorTopic"]
+                server = start_schema_test_server(
+                    connection, metrics, api_schema_path, frontdoor_topic)
+                servers[server_id] = server
+            else:
+                raise RuntimeError("no matching server")
 
             response_bytes = json.dumps([{}, {"Ok": {}}]).encode("utf-8")
 

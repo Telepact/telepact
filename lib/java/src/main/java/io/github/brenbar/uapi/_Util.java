@@ -1941,14 +1941,15 @@ class _Util {
 
     static Object generateRandomStruct(Object blueprintValue, boolean useBlueprintValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, _RandomGenerator random, Map<String, _UFieldDeclaration> fields) {
+            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator,
+            Map<String, _UFieldDeclaration> fields) {
         if (useBlueprintValue) {
             final var startingStructValue = (Map<String, Object>) blueprintValue;
             return constructRandomStruct(fields, startingStructValue, includeRandomOptionalFields,
-                    typeParameters, random);
+                    typeParameters, randomGenerator);
         } else {
             return constructRandomStruct(fields, new HashMap<>(), includeRandomOptionalFields,
-                    typeParameters, random);
+                    typeParameters, randomGenerator);
         }
     }
 
@@ -2053,14 +2054,14 @@ class _Util {
     static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
             boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
-            _RandomGenerator random, Map<String, _UStruct> cases) {
+            _RandomGenerator randomGenerator, Map<String, _UStruct> cases) {
         if (useBlueprintValue) {
             final var startingUnionCase = (Map<String, Object>) blueprintValue;
             return constructRandomUnion(cases, startingUnionCase, includeRandomOptionalFields,
-                    typeParameters, random);
+                    typeParameters, randomGenerator);
         } else {
             return constructRandomUnion(cases, new HashMap<>(), includeRandomOptionalFields,
-                    typeParameters, random);
+                    typeParameters, randomGenerator);
         }
     }
 

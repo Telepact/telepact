@@ -1,35 +1,11 @@
 from __future__ import annotations
-from uapi._util import map_schema_parse_failures_to_pseudo_json
-from uapi._util_types import _SchemaParseFailure
-from typing import List, Dict, Any
-from uapi._util import new_uapi_schema, extend_uapi_schema
-from uapi._util import newUApiSchema, extendUApiSchema
-from uapi._util_types import _UType
-from typing import List, Dict
-from uapi._util import _Util, Serializer, _DefaultSerializer, _ServerBinaryEncoder, processBytes, constructBinaryEncoding, getInternalUApiJson
-from uapi._util_types import Consumer, SerializationImpl, UApiSchema, Message
-from typing import Callable, Optional, Any, Union
-from uapi._util_types import Message
-from uapi._util import serialize, deserialize
-from typing import Any, List, Dict
-from uapi._util import RuntimeException
-from uapi._util_types import Throwable
-from mock_call import MockCall
-from mock_stub import MockStub
-from random_generator import _RandomGenerator
-from uapi_schema import UApiSchema
-from server import Server
-from uapi._util import mockHandle
-from uapi._util_types import Consumer
-from typing import Callable, List, Dict
-from uapi._util import union_entry
-from uapi._util_types import Map
-from typing import Any, Dict, Tuple
+import uapi
+import uapi._util as _util
+import uapi._util_types as _types
+import uapi._default_serializer
+import uapi._default_client_binary_strategy
+from typing import List, Dict, Any, Callable, Optional, Union, Tuple, Type
 from concurrent.futures import Future
-from typing import Callable, Type
-
-from uapi._util import process_request_object, process_bytes
-from uapi._util_types import SerializationImpl, Serializer, ClientBinaryStrategy, Message
 
 
 class Client:
@@ -48,8 +24,8 @@ class Client:
             """
             self.use_binary: bool = False
             self.timeout_ms_default: int = 5000
-            self.serialization_impl: SerializationImpl = _DefaultSerializer()
-            self.binary_strategy: ClientBinaryStrategy = _DefaultClientBinaryStrategy()
+            self.serialization_impl: SerializationImpl = uapi._default_serializer._DefaultSerializer()
+            self.binary_strategy: ClientBinaryStrategy = uapi._default_client_binary_strategy._DefaultClientBinaryStrategy()
 
     def __init__(self, adapter: Callable[[Message, Serializer], Future[Message]], options: Options):
         """
@@ -70,7 +46,7 @@ class Client:
         self.use_binary_default = options.use_binary
         self.timeout_ms_default = options.timeout_ms_default
         self.serializer = Serializer(
-            options.serialization_impl, _ClientBinaryEncoder(options.binary_strategy))
+            options.serialization_impl, _types._ClientBinaryEncoder(options.binary_strategy))
 
     def request(self, request_message: Message) -> Message:
         """
@@ -79,8 +55,8 @@ class Client:
         :param request_message: The uAPI Request Message.
         :return: The uAPI Response Message.
         """
-        return process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default,
-                                      self.use_binary_default)
+        return _util.process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default,
+                                            self.use_binary_default)
 
 
 class ClientBinaryStrategy:
@@ -89,7 +65,7 @@ class ClientBinaryStrategy:
     the server.
     """
 
-    def update(self, checksum: Integer) -> None:
+    def update(self, checksum: int) -> None:
         """
         Update the strategy according to a recent binary encoding checksum returned
         by the server.
@@ -98,7 +74,7 @@ class ClientBinaryStrategy:
         """
         pass
 
-    def get_current_checksums(self) -> List[Integer]:
+    def get_current_checksums(self) -> List[int]:
         """
         Get the current binary encoding strategy as a list of binary encoding
         checksums that should be sent to the server.
@@ -113,26 +89,26 @@ class Message:
     A uAPI Message.
     """
 
-    def __init__(self, header: Map[str, Any] = None, body: Map[str, Any] = None):
-        self.header: Map[str, Any] = {} if header is None else header.copy()
-        self.body: Map[str, Any] = {} if body is None else body.copy()
+    def __init__(self, header: dict[str, Any] = None, body: dict[str, Any] = None):
+        self.header: dict[str, Any] = {} if header is None else header.copy()
+        self.body: dict[str, Any] = {} if body is None else body.copy()
 
     def get_body_target(self) -> str:
         """
         Get the target from the body.
         """
-        entry: Tuple[str, Any] = union_entry(self.body)
+        entry: Tuple[str, Any] = _util.union_entry(self.body)
         return entry[0]
 
-    def get_body_payload(self) -> Map[str, Any]:
+    def get_body_payload(self) -> dict[str, Any]:
         """
         Get the payload from the body.
         """
-        entry: Tuple[str, Any] = union_entry(self.body)
+        entry: Tuple[str, Any] = _util.union_entry(self.body)
         return entry[1]
 
     @classmethod
-    def from_target_and_payload(cls, target: str, payload: Map[str, Any]) -> 'Message':
+    def from_target_and_payload(cls, target: str, payload: dict[str, Any]) -> 'Message':
         """
         Create a Message instance from target and payload.
         """
@@ -150,30 +126,30 @@ class MockServer:
         """
 
         def __init__(self) -> None:
-            self.onError: Callable[[Exception], None] = lambda e: None
-            self.enableMessageResponseGeneration: bool = True
-            self.generatedCollectionLengthMin: int = 0
-            self.generatedCollectionLengthMax: int = 3
+            self.on_error: Callable[[Exception], None] = lambda e: None
+            self.enable_message_response_generation: bool = True
+            self.generated_collection_length_min: int = 0
+            self.generated_collection_length_max: int = 3
 
     def __init__(self, u_api_schema: UApiSchema, options: Options) -> None:
-        self.random: _RandomGenerator = _RandomGenerator(
-            options.generatedCollectionLengthMin, options.generatedCollectionLengthMax)
-        self.enableGeneratedDefaultStub: bool = options.enableMessageResponseGeneration
+        self.random: _types._RandomGenerator = _types._RandomGenerator(
+            options.generated_collection_length_min, options.generated_collection_length_max)
+        self.enableGeneratedDefaultStub: bool = options.enable_message_response_generation
 
-        self.stubs: List[MockStub] = []
+        self.stubs: List[_types._MockStub] = []
         self.invocations: List[str] = []
 
         parsed_types: Dict[str, type] = {}
         type_extensions: Dict[str, type] = {}
 
-        type_extensions["_ext._Call"] = MockCall(parsed_types)
-        type_extensions["_ext._Stub"] = MockStub(parsed_types)
+        type_extensions["_ext._Call"] = _types._UMockCall(parsed_types)
+        type_extensions["_ext._Stub"] = _types._UMockStub(parsed_types)
 
         combined_u_api_schema: UApiSchema = UApiSchema.extendWithExtensions(
-            u_api_schema, _Util.getMockUApiJson(), type_extensions)
+            u_api_schema, _util.getMockUApiJson(), type_extensions)
 
         server_options: Server.Options = Server.Options()
-        server_options.onError = options.onError
+        server_options.on_error = options.on_error
 
         self.server: Server = Server(
             combined_u_api_schema, self.handle, server_options)
@@ -199,16 +175,16 @@ class MockServer:
         :param request_message: The uAPI request message.
         :return: The uAPI response message.
         """
-        return mockHandle(request_message, self.stubs, self.invocations, self.random,
-                          self.server.u_api_schema, self.enableGeneratedDefaultStub)
+        return _util.mock_handle(request_message, self.stubs, self.invocations, self.random,
+                                 self.server.u_api_schema, self.enableGeneratedDefaultStub)
 
 
-class SerializationError(RuntimeException):
+class SerializationError(Exception):
     """
     Indicates failure to serialize a uAPI Message.
     """
 
-    def __init__(self, cause: Throwable) -> None:
+    def __init__(self, cause: Exception) -> None:
         """
         Initialize SerializationError with the given cause.
 
@@ -227,7 +203,7 @@ class SerializationImpl:
     objects as Maps and JSON arrays as Lists.
     """
 
-    def toJson(self, message: Any) -> bytes:
+    def to_json(self, message: Any) -> bytes:
         """
         Convert the given message to a byte array JSON payload.
 
@@ -241,7 +217,7 @@ class SerializationImpl:
         """
         raise NotImplementedError
 
-    def toMsgPack(self, message: Any) -> bytes:
+    def to_msgpack(self, message: Any) -> bytes:
         """
         Convert the given message to a byte array using MessagePack format.
 
@@ -255,7 +231,7 @@ class SerializationImpl:
         """
         raise NotImplementedError
 
-    def fromJson(self, bytes: bytes) -> Any:
+    def from_json(self, bytes: bytes) -> Any:
         """
         Convert the given byte array JSON payload to an object.
 
@@ -269,7 +245,7 @@ class SerializationImpl:
         """
         raise NotImplementedError
 
-    def fromMsgPack(self, bytes: bytes) -> Any:
+    def from_msgpack(self, bytes: bytes) -> Any:
         """
         Convert the given byte array in MessagePack format to an object.
 
@@ -289,7 +265,7 @@ class Serializer:
     A serializer that converts a Message to and from a serialized form.
     """
 
-    def __init__(self, serialization_impl: SerializationImpl, binary_encoder: _BinaryEncoder) -> None:
+    def __init__(self, serialization_impl: SerializationImpl, binary_encoder: _types._BinaryEncoder) -> None:
         """
         Initialize Serializer with the provided SerializationImpl and _BinaryEncoder.
 
@@ -310,7 +286,7 @@ class Serializer:
         Returns:
             bytes: The serialized message.
         """
-        return serialize(message, self.binary_encoder, self.serialization_impl)
+        return _util.serialize(message, self.binary_encoder, self.serialization_impl)
 
     def deserialize(self, message_bytes: bytes) -> Message:
         """
@@ -322,7 +298,7 @@ class Serializer:
         Returns:
             Message: The deserialized message.
         """
-        return deserialize(message_bytes, self.serialization_impl, self.binary_encoder)
+        return _util.deserialize(message_bytes, self.serialization_impl, self.binary_encoder)
 
 
 class Server:
@@ -336,22 +312,22 @@ class Server:
         """
 
         def __init__(self) -> None:
-            self.on_error: Consumer[Throwable] = lambda e: None
-            self.on_request: Consumer[Message] = lambda m: None
-            self.on_response: Consumer[Message] = lambda m: None
-            self.serializer: SerializationImpl = _DefaultSerializer()
+            self.on_error: Callable[[Exception], None] = lambda e: None
+            self.on_request: Callable[[Message], None] = lambda m: None
+            self.on_response: Callable[[Message], None] = lambda m: None
+            self.serializer: SerializationImpl = uapi._default_serializer._DefaultSerializer()
 
     def __init__(self, u_api_schema: UApiSchema, handler: Callable[[Message], Message], options: Optional[Options] = None) -> None:
         if options is None:
             options = Server.Options()
         self.u_api_schema: UApiSchema = UApiSchema.extend(
-            u_api_schema, getInternalUApiJson())
+            u_api_schema, _util.get_internal_uapi_json())
         self.handler: Callable[[Message], Message] = handler
-        self.on_error: Consumer[Throwable] = options.on_error
-        self.on_request: Consumer[Message] = options.on_request
-        self.on_response: Consumer[Message] = options.on_response
-        binary_encoding = constructBinaryEncoding(self.u_api_schema)
-        binary_encoder = _ServerBinaryEncoder(binary_encoding)
+        self.on_error: Callable[[Exception], None] = options.on_error
+        self.on_request: Callable[[Message], None] = options.on_request
+        self.on_response: Callable[[Message], None] = options.on_response
+        binary_encoding = _util.construct_binary_encoding(self.u_api_schema)
+        binary_encoder = _types._ServerBinaryEncoder(binary_encoding)
         self.serializer: SerializationImpl = Serializer(
             options.serializer, binary_encoder)
 
@@ -365,7 +341,7 @@ class Server:
         Returns:
             bytes: The response message bytes.
         """
-        return process_bytes(request_message_bytes, self.serializer, self.u_api_schema, self.on_error, self.on_request, self.on_response, self.handler)
+        return _util.process_bytes(request_message_bytes, self.serializer, self.u_api_schema, self.on_error, self.on_request, self.on_response, self.handler)
 
 
 class UApiError(RuntimeError):
@@ -373,7 +349,7 @@ class UApiError(RuntimeError):
     Indicates critical failure in uAPI processing logic.
     """
 
-    def __init__(self, message: str = None, cause: Throwable = None):
+    def __init__(self, message: str = None, cause: Exception = None):
         """
         Initialize UApiError instance.
 
@@ -389,7 +365,7 @@ class UApiSchema:
     A parsed uAPI schema.
     """
 
-    def __init__(self, original: List[object], parsed: Dict[str, _UType], type_extensions: Dict[str, _UType]):
+    def __init__(self, original: List[object], parsed: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType]):
         self.original = original
         self.parsed = parsed
         self.type_extensions = type_extensions
@@ -399,28 +375,28 @@ class UApiSchema:
         """
         Create a UApiSchema object from JSON.
         """
-        return new_uapi_schema(json, {})
+        return _util.new_uapi_schema(json, {})
 
     @staticmethod
     def extend(base: 'UApiSchema', json: str) -> 'UApiSchema':
         """
         Extend a UApiSchema object with JSON.
         """
-        return extend_uapi_schema(base, json, {})
+        return _util.extend_uapi_schema(base, json, {})
 
     @staticmethod
-    def from_json_with_extensions(json: str, type_extensions: Dict[str, _UType]) -> 'UApiSchema':
+    def from_json_with_extensions(json: str, type_extensions: Dict[str, _types._UType]) -> 'UApiSchema':
         """
         Create a UApiSchema object from JSON with type extensions.
         """
-        return new_uapi_schema(json, type_extensions)
+        return _util.new_uapi_schema(json, type_extensions)
 
     @staticmethod
-    def extend_with_extensions(base: 'UApiSchema', json: str, type_extensions: Dict[str, _UType]) -> 'UApiSchema':
+    def extend_with_extensions(base: 'UApiSchema', json: str, type_extensions: Dict[str, _types._UType]) -> 'UApiSchema':
         """
         Extend a UApiSchema object with JSON and type extensions.
         """
-        return extend_uapi_schema(base, json, type_extensions)
+        return _util.extend_uapi_schema(base, json, type_extensions)
 
 
 class UApiSchemaParseError(RuntimeError):
@@ -428,14 +404,14 @@ class UApiSchemaParseError(RuntimeError):
     Indicates failure to parse a uAPI Schema.
     """
 
-    def __init__(self, schema_parse_failures: List[_SchemaParseFailure], cause: Exception = None):
-        super().__init__(str(map_schema_parse_failures_to_pseudo_json(schema_parse_failures)))
+    def __init__(self, schema_parse_failures: List[_util._SchemaParseFailure], cause: Exception = None):
+        super().__init__(str(_util.map_schema_parse_failures_to_pseudo_json(schema_parse_failures)))
         self.schema_parse_failures = schema_parse_failures
-        self.schema_parse_failures_pseudo_json = map_schema_parse_failures_to_pseudo_json(
+        self.schema_parse_failures_pseudo_json = _util.map_schema_parse_failures_to_pseudo_json(
             schema_parse_failures)
 
     @staticmethod
-    def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: List[_SchemaParseFailure]) -> List[Dict[str, Any]]:
+    def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: List[_types._SchemaParseFailure]) -> List[Dict[str, Any]]:
         """
         Map schema parse failures to pseudo JSON format.
         """
