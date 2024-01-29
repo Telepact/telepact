@@ -89,7 +89,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         except Exception as e:
             raise RuntimeError(e)
 
-    return connection.subscribe(client_frontdoor_topic, cb=message_handler)
+    return await connection.subscribe(client_frontdoor_topic, cb=message_handler)
 
 
 async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schema_path: str,
@@ -130,7 +130,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
         except Exception as e:
             raise RuntimeError(e)
 
-    return connection.subscribe(frontdoor_topic, cb=message_handler)
+    return await connection.subscribe(frontdoor_topic, cb=message_handler)
 
 
 class Message:
@@ -155,7 +155,7 @@ class Server:
         return self.handler(request_bytes)
 
 
-def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
+async def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
 
@@ -207,13 +207,13 @@ def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry,
         print(f"    <-S {response_bytes}")
         connection.publish(msg.reply, response_bytes)
 
-    dispatcher = connection.subscribe(frontdoor_topic, lambda msg: handle_message(
+    dispatcher = await connection.subscribe(frontdoor_topic, lambda msg: handle_message(
         msg, timers, server, connection, frontdoor_topic))
 
     return dispatcher
 
 
-def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str) -> Subscription:
+async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
     alternate_u_api = types.UApiSchema.extend(u_api, """
@@ -278,9 +278,12 @@ def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_sc
     alternate_options.onError = lambda e: print(e)  # Error handling
     alternate_server = Server(alternate_u_api, handler, alternate_options)
 
-    def handle_test_message(msg: Any, timers: Any, server: Server, alternate_server: Server, connection: NatsClient, frontdoor_topic: str) -> None:
+    async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server
-        request_bytes = msg.get_data()
+        nonlocal alternate_server
+        nonlocal server
+        nonlocal connection
+        request_bytes = msg.data
 
         print(f"    ->S {request_bytes}")
 
@@ -294,10 +297,9 @@ def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_sc
         response_bytes = s()
 
         print(f"    <-S {response_bytes}")
-        connection.publish(msg.get_reply_to(), response_bytes)
+        connection.publish(msg.reply, response_bytes)
 
-    dispatcher = connection.subscribe(frontdoor_topic, cb=lambda msg: handle_test_message(
-        msg, timers, server, alternate_server, connection, frontdoor_topic))
+    dispatcher = await connection.subscribe(frontdoor_topic, cb=handle_test_message)
 
     print(f"Test server listening on {frontdoor_topic}")
 
@@ -350,7 +352,7 @@ async def run_dispatcher_server():
                 api_schema_path = payload["apiSchemaPath"]
                 frontdoor_topic = payload["frontdoorTopic"]
                 backdoor_topic = payload["backdoorTopic"]
-                server = start_test_server(
+                server = await start_test_server(
                     connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic)
                 servers[server_id] = server
             elif target == "StartClientServer":
@@ -358,7 +360,7 @@ async def run_dispatcher_server():
                 client_frontdoor_topic = payload["clientFrontdoorTopic"]
                 client_backdoor_topic = payload["clientBackdoorTopic"]
                 use_binary = payload.get("useBinary", False)
-                server = start_client_test_server(
+                server = await start_client_test_server(
                     connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary)
                 servers[server_id] = server
             elif target == "StartMockServer":
@@ -366,14 +368,14 @@ async def run_dispatcher_server():
                 api_schema_path = payload["apiSchemaPath"]
                 frontdoor_topic = payload["frontdoorTopic"]
                 config = payload["config"]
-                server = start_mock_test_server(
+                server = await start_mock_test_server(
                     connection, metrics, api_schema_path, frontdoor_topic, config)
                 servers[server_id] = server
             elif target == "StartSchemaServer":
                 server_id = payload["id"]
                 api_schema_path = payload["apiSchemaPath"]
                 frontdoor_topic = payload["frontdoorTopic"]
-                server = start_schema_test_server(
+                server = await start_schema_test_server(
                     connection, metrics, api_schema_path, frontdoor_topic)
                 servers[server_id] = server
             else:

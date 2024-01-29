@@ -33,7 +33,7 @@ def nats_server(loop, request):
         nats_url = 'nats://demo.nats.io:4222'
     else:
         nats_url = 'nats://127.0.0.1:4222'
-        p = subprocess.Popen(['nats-server', '-D'])
+        p = subprocess.Popen(['nats-server', '-DV'])
     
     yield nats_url
     
