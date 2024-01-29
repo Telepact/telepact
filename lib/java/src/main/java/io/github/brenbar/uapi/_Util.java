@@ -1967,14 +1967,15 @@ class _Util {
             final var fieldDeclaration = field.getValue();
             final var blueprintValue = startingStruct.get(fieldName);
             final var useBlueprintValue = startingStruct.containsKey(fieldName);
+            final _UTypeDeclaration typeDeclaration = fieldDeclaration.typeDeclaration;
 
             final Object value;
             if (useBlueprintValue) {
-                value = fieldDeclaration.typeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
+                value = typeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
                         includeRandomOptionalFields, typeParameters, randomGenerator);
             } else {
                 if (!fieldDeclaration.optional) {
-                    value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
+                    value = typeDeclaration.generateRandomValue(null, false,
                             includeRandomOptionalFields, typeParameters, randomGenerator);
                 } else {
                     if (!includeRandomOptionalFields) {
@@ -1983,7 +1984,7 @@ class _Util {
                     if (randomGenerator.nextBoolean()) {
                         continue;
                     }
-                    value = fieldDeclaration.typeDeclaration.generateRandomValue(null, false,
+                    value = typeDeclaration.generateRandomValue(null, false,
                             includeRandomOptionalFields, typeParameters, randomGenerator);
                 }
             }

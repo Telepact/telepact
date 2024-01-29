@@ -1,7 +1,7 @@
 import uapi
 import uapi._util
 from typing import List, Dict
-import uapi.types
+import uapi.types as types
 
 
 class _SchemaParseFailure:
@@ -353,7 +353,7 @@ class _ServerBinaryEncoder(_BinaryEncoder):
 
 
 class _ClientBinaryEncoder(_BinaryEncoder):
-    def __init__(self, binary_checksum_strategy: uapi.types.ClientBinaryStrategy):
+    def __init__(self, binary_checksum_strategy: 'types.ClientBinaryStrategy'):
         self.recent_binary_encoders = {}
         self.binary_checksum_strategy = binary_checksum_strategy
 
