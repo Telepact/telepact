@@ -2,8 +2,6 @@ from __future__ import annotations
 import uapi
 import uapi._util as _util
 import uapi._util_types as _types
-import uapi._default_serializer
-import uapi._default_client_binary_strategy
 from typing import List, Dict, Any, Callable, Optional, Union, Tuple, Type
 from concurrent.futures import Future
 
@@ -22,10 +20,12 @@ class Client:
             """
             Initializes Options with default values.
             """
+            import uapi._default_serializer as def_ser
+            import uapi._default_client_binary_strategy as def_cbin
             self.use_binary: bool = False
             self.timeout_ms_default: int = 5000
-            self.serialization_impl: SerializationImpl = uapi._default_serializer._DefaultSerializer()
-            self.binary_strategy: ClientBinaryStrategy = uapi._default_client_binary_strategy._DefaultClientBinaryStrategy()
+            self.serialization_impl: 'SerializationImpl' = def_ser._DefaultSerializer()
+            self.binary_strategy: 'ClientBinaryStrategy' = def_cbin._DefaultClientBinaryStrategy()
 
     def __init__(self, adapter: Callable[[Message, Serializer], Future[Message]], options: Options):
         """
@@ -265,7 +265,7 @@ class Serializer:
     A serializer that converts a Message to and from a serialized form.
     """
 
-    def __init__(self, serialization_impl: SerializationImpl, binary_encoder: _types._BinaryEncoder) -> None:
+    def __init__(self, serialization_impl: 'SerializationImpl', binary_encoder: _types._BinaryEncoder) -> None:
         """
         Initialize Serializer with the provided SerializationImpl and _BinaryEncoder.
 
@@ -312,10 +312,11 @@ class Server:
         """
 
         def __init__(self) -> None:
+            import uapi._default_serializer as def_ser
             self.on_error: Callable[[Exception], None] = lambda e: None
             self.on_request: Callable[[Message], None] = lambda m: None
             self.on_response: Callable[[Message], None] = lambda m: None
-            self.serializer: SerializationImpl = uapi._default_serializer._DefaultSerializer()
+            self.serializer: 'SerializationImpl' = def_ser._DefaultSerializer()
 
     def __init__(self, u_api_schema: UApiSchema, handler: Callable[[Message], Message], options: Optional[Options] = None) -> None:
         if options is None:
@@ -328,7 +329,7 @@ class Server:
         self.on_response: Callable[[Message], None] = options.on_response
         binary_encoding = _util.construct_binary_encoding(self.u_api_schema)
         binary_encoder = _types._ServerBinaryEncoder(binary_encoding)
-        self.serializer: SerializationImpl = Serializer(
+        self.serializer: 'SerializationImpl' = Serializer(
             options.serializer, binary_encoder)
 
     def process(self, request_message_bytes: bytes) -> bytes:
@@ -404,7 +405,7 @@ class UApiSchemaParseError(RuntimeError):
     Indicates failure to parse a uAPI Schema.
     """
 
-    def __init__(self, schema_parse_failures: List[_util._SchemaParseFailure], cause: Exception = None):
+    def __init__(self, schema_parse_failures: List[_types._SchemaParseFailure], cause: Exception = None):
         super().__init__(str(_util.map_schema_parse_failures_to_pseudo_json(schema_parse_failures)))
         self.schema_parse_failures = schema_parse_failures
         self.schema_parse_failures_pseudo_json = _util.map_schema_parse_failures_to_pseudo_json(

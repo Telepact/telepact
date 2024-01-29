@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Union
 import msgpack
 import json
-import uapi.types
+import uapi.types as types
 
 
-class _DefaultSerializer(uapi.types.SerializationImpl):
+class _DefaultSerializer(types.SerializationImpl):
     class MessagePackMapDeserializer(msgpack.Unpacker):
         @staticmethod
         def deserialize_key(s: str) -> Union[int, str]:
