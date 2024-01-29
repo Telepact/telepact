@@ -20,6 +20,8 @@ from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
 import uapi.types as types
+import traceback
+import sys
 
 
 async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
@@ -303,6 +305,7 @@ def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_sc
 
 
 async def run_dispatcher_server():
+    print('Starting dispatcher')
     nats_url = os.getenv("NATS_URL")
     if nats_url is None:
         raise RuntimeError("NATS_URL env var not set")
@@ -310,7 +313,7 @@ async def run_dispatcher_server():
     done = asyncio.get_running_loop().create_future()
 
     metrics = CollectorRegistry()
-    metrics_file = "./metrics/metrics.txt"
+    metrics_file = "./metrics.txt"
 
     servers: dict[str, Subscription] = {}
 
@@ -380,6 +383,7 @@ async def run_dispatcher_server():
 
         except Exception as e:
             print(e)
+            traceback.print_exc(file=sys.stdout)
             try:
                 response_bytes = json.dumps(
                     [{}, {"ErrorUnknown": {}}]).encode("utf-8")
@@ -389,14 +393,10 @@ async def run_dispatcher_server():
         print(f"    <-S {response_bytes.decode('utf-8')}")
         await connection.publish(msg.reply, response_bytes)
 
-    dispatcher = await connection.subscribe("python", cb=message_handler)
+    dispatcher = await connection.subscribe("py", cb=message_handler)
 
     await done
 
     publish_metrics()
 
     print("Dispatcher exiting")
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(run_dispatcher_server())

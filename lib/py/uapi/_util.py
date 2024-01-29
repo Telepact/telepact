@@ -152,10 +152,10 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
         raise types.UApiSchemaParseError(this_parse_failures)
 
     regex_string = "^(.+?)(\\?)?$"
-    regex = Pattern.compile(regex_string)
+    regex = re.compile(regex_string)
 
-    matcher = regex.matcher(root_type_string)
-    if not matcher.find():
+    matcher = regex.search(root_type_string)
+    if not matcher:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(
             base_path, "StringRegexMatchFailed", {"regex": regex_string})])
 

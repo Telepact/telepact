@@ -10,6 +10,6 @@ def start(nats_url):
     this_env['NATS_URL'] = nats_url
 
     p = subprocess.Popen(['pipenv', 'run', 'python',
-                         '-m', 'tests.test_server'], cwd=this_path, env=this_env)
+                         '-m', 'tests'], cwd=this_path, env=this_env)
 
     return p
