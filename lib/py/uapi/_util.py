@@ -245,8 +245,9 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
 
     if this_type_parameter_count > 0:
         generic_parameter_index_string = matcher.group(9)
-        generic_parameter_index = int(generic_parameter_index_string)
-        return _types._UGeneric(generic_parameter_index)
+        if generic_parameter_index_string:
+            generic_parameter_index = int(generic_parameter_index_string)
+            return _types._UGeneric(generic_parameter_index)
 
     custom_type_name = matcher.group(2)
     index = schema_keys_to_index.get(custom_type_name)

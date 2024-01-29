@@ -305,8 +305,10 @@ class _Util {
 
         if (thisTypeParameterCount > 0) {
             final var genericParameterIndexString = matcher.group(9);
-            final var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
-            return new _UGeneric(genericParameterIndex);
+            if (genericParameterIndexString != null) {
+                final var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
+                return new _UGeneric(genericParameterIndex);
+            }
         }
 
         final var customTypeName = matcher.group(2);
