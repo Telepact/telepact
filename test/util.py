@@ -9,6 +9,7 @@ import nats.aio.client
 import time
 import os
 import copy
+from nats.aio.msg import Msg
 
 should_abort = False
 
@@ -55,10 +56,10 @@ def handler(request):
         return [response_header, {'Ok': {}}]
 
 
-async def backdoor_handler(nats_client, backdoor_topic):
+async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):
     done = asyncio.get_running_loop().create_future()
     try:
-        async def nats_handler(msg):
+        async def nats_handler(msg: Msg):
             backdoor_request_bytes = msg.data
             backdoor_request_json = backdoor_request_bytes.decode()
             backdoor_request = json.loads(backdoor_request_json)

@@ -1329,11 +1329,12 @@ _STRUCT_NAME = "Struct"
 
 def validate_integer(value: Any) -> List[_types._ValidationFailure]:
     if isinstance(value, (int)) and not isinstance(value, (bool, float)):
-        return []
-    elif isinstance(value, (int, float)) and (value > 2**63-1 or value < -(2**63)):
-        return [_types._ValidationFailure([], "NumberOutOfRange", {})]
-    else:
-        return get_type_unexpected_validation_failure([], value, _INTEGER_NAME)
+        if (value > 2**63-1 or value < -(2**63)):
+            return [_types._ValidationFailure([], "NumberOutOfRange", {})]
+        else:
+            return []
+
+    return get_type_unexpected_validation_failure([], value, _INTEGER_NAME)
 
 
 def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,
