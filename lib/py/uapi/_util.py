@@ -475,21 +475,16 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
 def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _types._UType],
                                 schema_keys_to_index: Dict[str, int]) -> None:
     import pprint
-    pprint.pprint(f'Applying errors: {error}')
-    pprint.pprint(f'parsed_types: {parsed_types}')
     error_name = error.name
     error_index = schema_keys_to_index.get(error_name)
 
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
         if not isinstance(parsed_type, _types._UFn):
-            print(f'type_error for: {parsed_type_name}')
             continue
 
         f: _types._UFn = parsed_type
         fn_name = f.name
-
-        print(f'fn_regex: {f.errors_regex}')
 
         regex = re.compile(f.errors_regex)
         matcher = regex.search(error_name)
@@ -508,7 +503,6 @@ def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _
                 parse_failures.append(_types._SchemaParseFailure([error_index, error_name, "->", new_key],
                                                                  "PathCollision", {"other": [other_path_index, "->", new_key]}))
 
-            print(f'APPENDING ERROR: {error_result_struct}')
             fn_result_cases[new_key] = error_result_struct
 
     if parse_failures:
@@ -1896,7 +1890,6 @@ def map_validation_failures_to_invalid_field_cases(argument_validation_failures:
 
 def validate_result(result_union_type: _types._UUnion, error_result: Any) -> None:
     import pprint
-    pprint.pprint(f'result_union_type: {result_union_type}')
     new_error_result_validation_failures = result_union_type.validate(
         error_result, [], [])
     if new_error_result_validation_failures:
