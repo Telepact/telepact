@@ -1966,7 +1966,8 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     if request_target == 'fn._ping':
         result_message: types.Message = types.Message({}, {'Ok': {}})
     elif request_target == 'fn._api':
-        result_message = types.Message({}, {'api': u_api_schema['original']})
+        result_message = types.Message(
+            {}, {'Ok': {'api': u_api_schema.original}})
     else:
         try:
             result_message = await handler(call_message)
