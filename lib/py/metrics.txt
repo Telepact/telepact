@@ -1,7 +1,7 @@
 # HELP py_binary_server_frontdoor 
 # TYPE py_binary_server_frontdoor summary
 py_binary_server_frontdoor_count 2.0
-py_binary_server_frontdoor_sum 6.095040589570999e-06
+py_binary_server_frontdoor_sum 6.075948476791382e-06
 # HELP py_binary_server_frontdoor_created 
 # TYPE py_binary_server_frontdoor_created gauge
-py_binary_server_frontdoor_created 1.706639211512495e+09
+py_binary_server_frontdoor_created 1.70664179970281e+09

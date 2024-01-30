@@ -1,3 +1,4 @@
+import binascii
 from concurrent.futures import Future
 from typing import Any, Coroutine, Dict, List, Tuple, Callable, Union, Callable, List, Union, Dict, Any, Tuple,  Optional, Set, Pattern, cast
 from collections import OrderedDict, defaultdict
@@ -948,6 +949,9 @@ def server_binary_decode(message: List[Any], binary_encoder: _types._BinaryEncod
     client_known_binary_checksums = headers["_bin"]
     binary_checksum_used_by_client_on_this_message = client_known_binary_checksums[0]
 
+    print(
+        f'binary_checksum_used_by_client_on_this_message: {binary_checksum_used_by_client_on_this_message}')
+
     if binary_checksum_used_by_client_on_this_message != binary_encoder.checksum:
         raise _types._BinaryEncoderUnavailableError()
 
@@ -1095,11 +1099,16 @@ def construct_binary_encoding(u_api_schema: 'types.UApiSchema') -> _types._Binar
                 struct_fields = case_value.fields
                 all_keys.update(struct_fields.keys())
 
-    binary_encoding = {key: i for i, key in enumerate(sorted(all_keys))}
-    final_string = "\n".join(all_keys)
-    checksum = sha256(final_string.encode("utf-8")).digest()
-    checksum = int.from_bytes(checksum, byteorder="big")
+    sorted_all_keys = sorted(all_keys)
+    binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
+    final_string = "\n".join(sorted_all_keys)
+    checksum = create_checksum(final_string)
     return _types._BinaryEncoding(binary_encoding, checksum)
+
+
+def create_checksum(value: str) -> int:
+    crc32_hash = binascii.crc32(value.encode('utf-8')) & 0xffffffff
+    return crc32_hash
 
 
 def serialize(message: 'types.Message', binary_encoder: _types._BinaryEncoder, serializer: 'types.SerializationImpl') -> bytes:

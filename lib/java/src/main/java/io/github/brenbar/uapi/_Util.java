@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.CRC32;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
 
@@ -1360,15 +1361,24 @@ class _Util {
             i += 1;
         }
         final var finalString = String.join("\n", allKeys);
-        final int checksum;
-        try {
-            final var hash = MessageDigest.getInstance("SHA-256").digest(finalString.getBytes(StandardCharsets.UTF_8));
-            final var buffer = ByteBuffer.wrap(hash);
-            checksum = buffer.getInt();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        System.out.println("finalString: " + finalString);
+        final int checksum = createChecksum(finalString);
         return new _BinaryEncoding(binaryEncoding, checksum);
+    }
+
+    static int createChecksum(String value) {
+        var c = new CRC32();
+        c.update(value.getBytes(StandardCharsets.UTF_8));
+        return (int) c.getValue();
+        // try {
+        // final var hash =
+        // MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
+        // final var buffer = ByteBuffer.wrap(hash);
+        // System.out.println("b: " + buffer);
+        // return buffer.getInt();
+        // } catch (NoSuchAlgorithmException e) {
+        // throw new RuntimeException(e);
+        // }
     }
 
     static byte[] serialize(Message message, _BinaryEncoder binaryEncoder,
