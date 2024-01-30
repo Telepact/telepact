@@ -22,6 +22,7 @@ import nats
 import uapi.types as types
 import traceback
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
 
 async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
@@ -133,35 +134,13 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
     return await connection.subscribe(frontdoor_topic, cb=message_handler)
 
 
-class Message:
-    def __init__(self, header: Dict[str, Any], body: Dict[str, Any]):
-        self.header = header
-        self.body = body
-
-
-class Server:
-    class Options:
-        def __init__(self):
-            self.onError = None
-            self.onRequest = None
-            self.onResponse = None
-
-    def __init__(self, u_api, handler: Callable[[Message], Message], options: Options):
-        self.u_api = u_api
-        self.handler = handler
-        self.options = options
-
-    def process(self, request_bytes: bytes) -> bytes:
-        return self.handler(request_bytes)
-
-
 async def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
 
     timers = Summary(frontdoor_topic, registry=metrics)
 
-    def handler(request_message: Message) -> Message:
+    def handler(request_message: 'types.Message') -> 'types.Message':
         request_body = request_message.body
 
         arg = request_body.get("fn.validateSchema", {})
@@ -184,16 +163,16 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
             schema = types.UApiSchema.from_json(schema_json)
             if extend_schema_json:
                 types.UApiSchema.extend(schema, extend_schema_json)
-            return Message({}, {"Ok": {}})
+            return types.Message({}, {"Ok": {}})
         except types.UApiSchemaParseError as e:
             e.printStackTrace()
-            return Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
+            return types.Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
 
-    options = Server.Options()
+    options = types.Server.Options()
     options.onError = lambda e: print(e)  # Error handling
-    server = Server(u_api, handler, options)
+    server = types.Server(u_api, handler, options)
 
-    def handle_message(msg: Msg, timers: Summary, server: Server, connection: NatsClient, frontdoor_topic: str) -> None:
+    def handle_message(msg: Msg, timers: Summary, server: 'types.Server', connection: NatsClient, frontdoor_topic: str) -> None:
         request_bytes = msg.data
 
         print(f"    ->S {request_bytes}")
@@ -216,6 +195,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
+    print(f'u_api: {u_api.parsed}')
     alternate_u_api = types.UApiSchema.extend(u_api, """
             [
                 {
@@ -228,55 +208,60 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
     serve_alternate_server = False
 
+    executor = ThreadPoolExecutor()
+
     class ThisError(RuntimeError):
         pass
 
-    def handler(request_message: Message) -> Message:
+    async def handler(request_message: 'types.Message') -> 'types.Message':
         nonlocal serve_alternate_server
-        try:
-            request_headers = request_message.header
-            request_body = request_message.body
-            request_pseudo_json = [request_headers, request_body]
-            request_bytes = json.dumps(request_pseudo_json).encode('utf-8')
+        nonlocal executor
 
-            print(f"    <-s {request_bytes}")
+        request_headers = request_message.header
+        request_body = request_message.body
+        request_pseudo_json = [request_headers, request_body]
+        request_bytes = json.dumps(request_pseudo_json).encode('utf-8')
 
-            try:
-                nats_response_message = connection.request(
-                    backdoor_topic, request_bytes, timedelta(seconds=5))
-            except Exception as e:
-                raise RuntimeError(e)
+        print(f"    <-s {request_bytes}")
 
-            response_bytes = nats_response_message.get_data()
+        nats_response_message: Msg = await connection.request(
+            backdoor_topic, request_bytes, timeout=5)
 
-            print(f"    ->s {response_bytes}")
+        response_bytes = nats_response_message.data
 
-            response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
-            response_headers = response_pseudo_json[0]
-            response_body = response_pseudo_json[1]
+        print(f"    ->s {response_bytes}")
 
-            toggle_alternate_server = request_headers.get(
-                "_toggleAlternateServer")
-            if toggle_alternate_server == True:
-                serve_alternate_server = not serve_alternate_server
+        response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
+        response_headers = response_pseudo_json[0]
+        response_body = response_pseudo_json[1]
 
-            throw_error = request_headers.get("_throwError")
-            if throw_error == True:
-                raise ThisError()
+        toggle_alternate_server = request_headers.get(
+            "_toggleAlternateServer")
+        if toggle_alternate_server == True:
+            serve_alternate_server = not serve_alternate_server
 
-            return Message(response_headers, response_body)
-        except Exception as e:
-            raise RuntimeError(e)
+        throw_error = request_headers.get("_throwError")
+        if throw_error == True:
+            raise ThisError()
 
-    options = Server.Options()
-    options.onError = lambda e: print(e)  # Error handling
-    options.onRequest = lambda m: None  # onRequest handling
-    options.onResponse = lambda m: None  # onResponse handling
+        return types.Message(response_headers, response_body)
 
-    server = Server(u_api, handler, options)
-    alternate_options = Server.Options()
-    alternate_options.onError = lambda e: print(e)  # Error handling
-    alternate_server = Server(alternate_u_api, handler, alternate_options)
+    options = types.Server.Options()
+
+    def on_err(e):
+        print("BOOM!")
+        print(e)
+        traceback.print_tb(e.__traceback__)
+
+    options.on_error = on_err
+    options.on_request = lambda m: None  # onRequest handling
+    options.on_response = lambda m: None  # onResponse handling
+
+    server = types.Server(u_api, handler, options)
+    alternate_options = types.Server.Options()
+    alternate_options.on_error = on_err
+    alternate_server = types.Server(
+        alternate_u_api, handler, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:
         nonlocal serve_alternate_server
@@ -288,16 +273,20 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         print(f"    ->S {request_bytes}")
 
         @timers.time()
-        def s():
-            if serve_alternate_server:
-                return alternate_server.process(request_bytes)
-            else:
-                return server.process(request_bytes)
+        async def s():
+            nonlocal serve_alternate_server
+            nonlocal alternate_server
+            nonlocal server
 
-        response_bytes = s()
+            if serve_alternate_server:
+                return await alternate_server.process(request_bytes)
+            else:
+                return await server.process(request_bytes)
+
+        response_bytes = await s()
 
         print(f"    <-S {response_bytes}")
-        connection.publish(msg.reply, response_bytes)
+        await connection.publish(msg.reply, response_bytes)
 
     dispatcher = await connection.subscribe(frontdoor_topic, cb=handle_test_message)
 

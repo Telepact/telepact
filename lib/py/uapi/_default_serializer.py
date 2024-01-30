@@ -20,7 +20,7 @@ class _DefaultSerializer(types.SerializationImpl):
         self.binary_mapper = msgpack
 
     def to_json(self, uapi_message: Any) -> bytes:
-        return self.json_mapper.dumps(uapi_message)
+        return self.json_mapper.dumps(uapi_message).encode()
 
     def to_msgpack(self, uapi_message: Any) -> bytes:
         return self.binary_mapper.dumps(uapi_message)

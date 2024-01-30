@@ -2,7 +2,7 @@ from __future__ import annotations
 import uapi
 import uapi._util as _util
 import uapi._util_types as _types
-from typing import List, Dict, Any, Callable, Optional, Union, Tuple, Type
+from typing import Coroutine, List, Dict, Any, Callable, Optional, Union, Tuple, Type
 from concurrent.futures import Future
 
 
@@ -27,7 +27,7 @@ class Client:
             self.serialization_impl: 'SerializationImpl' = def_ser._DefaultSerializer()
             self.binary_strategy: 'ClientBinaryStrategy' = def_cbin._DefaultClientBinaryStrategy()
 
-    def __init__(self, adapter: Callable[[Message, Serializer], Future[Message]], options: Options):
+    def __init__(self, adapter: Callable[[Message, Serializer], Coroutine[Any, Any, Message]], options: Options):
         """
         Create a client with the given transport adapter.
 
@@ -48,7 +48,7 @@ class Client:
         self.serializer = Serializer(
             options.serialization_impl, _types._ClientBinaryEncoder(options.binary_strategy))
 
-    def request(self, request_message: Message) -> Message:
+    async def request(self, request_message: Message) -> Message:
         """
         Submit a uAPI Request Message. Returns a uAPI Response Message.
 
@@ -318,7 +318,7 @@ class Server:
             self.on_response: Callable[[Message], None] = lambda m: None
             self.serializer: 'SerializationImpl' = def_ser._DefaultSerializer()
 
-    def __init__(self, u_api_schema: UApiSchema, handler: Callable[[Message], Message], options: Optional[Options] = None) -> None:
+    def __init__(self, u_api_schema: UApiSchema, handler: Callable[[Message], Coroutine[Any, Any, Message]], options: Optional[Options] = None) -> None:
         if options is None:
             options = Server.Options()
         self.u_api_schema: UApiSchema = UApiSchema.extend(
@@ -332,7 +332,7 @@ class Server:
         self.serializer: 'SerializationImpl' = Serializer(
             options.serializer, binary_encoder)
 
-    def process(self, request_message_bytes: bytes) -> bytes:
+    async def process(self, request_message_bytes: bytes) -> bytes:
         """
         Process a given uAPI Request Message into a uAPI Response Message.
 
@@ -342,7 +342,7 @@ class Server:
         Returns:
             bytes: The response message bytes.
         """
-        return _util.process_bytes(request_message_bytes, self.serializer, self.u_api_schema, self.on_error, self.on_request, self.on_response, self.handler)
+        return await _util.process_bytes(request_message_bytes, self.serializer, self.u_api_schema, self.on_error, self.on_request, self.on_response, self.handler)
 
 
 class UApiError(RuntimeError):

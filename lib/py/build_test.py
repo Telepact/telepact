@@ -8,6 +8,7 @@ this_env = os.environ.copy()
 
 def start(nats_url):
     this_env['NATS_URL'] = nats_url
+    this_env['PYTHONTRACEMALLOC'] = '1'
 
     p = subprocess.Popen(['pipenv', 'run', 'python',
                          '-m', 'tests'], cwd=this_path, env=this_env)

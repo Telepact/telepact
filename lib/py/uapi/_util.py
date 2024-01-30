@@ -1,5 +1,5 @@
 from concurrent.futures import Future
-from typing import Any, Dict, List, Tuple, Callable, Union, Callable, List, Union, Dict, Any, Tuple,  Optional, Set, Pattern, cast
+from typing import Any, Coroutine, Dict, List, Tuple, Callable, Union, Callable, List, Union, Dict, Any, Tuple,  Optional, Set, Pattern, cast
 from collections import OrderedDict, defaultdict
 from hashlib import sha256
 import json
@@ -8,6 +8,8 @@ import uapi._util_types as _types
 import uapi.types as types
 import re
 from msgpack import ExtType
+import importlib.resources
+import asyncio
 
 _ANY_NAME = "Any"
 _ARRAY_NAME = "Array"
@@ -24,21 +26,12 @@ _UNION_NAME = "Object"
 
 
 def get_internal_uapi_json() -> str:
-    import os
-    import json
-
-    internal_uapi_path = os.path.join(
-        os.path.dirname(__file__), "internal.uapi.json")
-    with open(internal_uapi_path, "r") as stream:
+    with importlib.resources.open_text("uapi", "internal.uapi.json") as stream:
         return "\n".join(stream.readlines())
 
 
 def get_mock_uapi_json() -> str:
-    import os
-
-    mock_internal_uapi_path = os.path.join(
-        os.path.dirname(__file__), "mock-internal.uapi.json")
-    with open(mock_internal_uapi_path, "r") as stream:
+    with importlib.resources.open_text("uapi", "mock-internal.uapi.json") as stream:
         return "\n".join(stream.readlines())
 
 
@@ -262,26 +255,30 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
         type_parameter_count_string) if type_parameter_count_string else 0
 
     try:
+
         if custom_type_name.startswith("struct"):
             is_for_fn = False
-            return parse_struct_type([index], definition, custom_type_name, is_for_fn, type_parameter_count,
-                                     u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
-                                     all_parse_failures, failed_types)
+            t = parse_struct_type([index], definition, custom_type_name, is_for_fn, type_parameter_count,
+                                  u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
+                                  all_parse_failures, failed_types)
         elif custom_type_name.startswith("union"):
             is_for_fn = False
-            return parse_union_type([index], definition, custom_type_name, is_for_fn, type_parameter_count,
-                                    u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
-                                    all_parse_failures, failed_types)
+            t = parse_union_type([index], definition, custom_type_name, is_for_fn, type_parameter_count,
+                                 u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
+                                 all_parse_failures, failed_types)
         elif custom_type_name.startswith("fn"):
-            return parse_function_type([index], definition, custom_type_name, u_api_schema_pseudo_json,
-                                       schema_keys_to_index, parsed_types, type_extensions, all_parse_failures,
-                                       failed_types)
+            t = parse_function_type([index], definition, custom_type_name, u_api_schema_pseudo_json,
+                                    schema_keys_to_index, parsed_types, type_extensions, all_parse_failures,
+                                    failed_types)
         else:
-            type_obj = type_extensions.get(custom_type_name)
-            if not type_obj:
+            t = type_extensions.get(custom_type_name)
+            if not t:
                 raise types.UApiSchemaParseError([_types._SchemaParseFailure([index], "TypeExtensionImplementationMissing",
                                                                              {"name": custom_type_name})])
-            return type_obj
+
+        parsed_types[custom_type_name] = t
+
+        return t
     except types.UApiSchemaParseError as e:
         all_parse_failures.extend(e.schema_parse_failures)
         failed_types.add(custom_type_name)
@@ -1146,7 +1143,7 @@ def deserialize(message_bytes: bytes, serializer: 'types.SerializationImpl', bin
     except Exception:
         raise _types._InvalidMessageBody()
 
-    return types.Message(headers, payload)
+    return types.Message(headers, body)
 
 
 def get_type(value: Any) -> str:
@@ -1555,7 +1552,7 @@ def construct_random_struct(reference_struct: Dict[str, _types._UFieldDeclaratio
     return obj
 
 
-def union_entry(union: Dict[str, Any]) -> Optional[Tuple[str, Any]]:
+def union_entry(union: Dict[str, Any]) -> Tuple[str, Any]:
     return next(iter(union.items()), None)
 
 
@@ -1898,16 +1895,20 @@ def validate_result(result_union_type: _types._UUnion, error_result: Any) -> Non
                               str(map_validation_failures_to_invalid_field_cases(new_error_result_validation_failures)))
 
 
-def handle_message(request_message: 'types.Message', u_api_schema: 'types.UApiSchema', handler: Callable[['types.Message'], 'types.Message'],
-                   on_error: Callable[[Exception], None]) -> 'types.Message':
+async def handle_message(request_message: 'types.Message', u_api_schema: 'types.UApiSchema', handler: Callable[['types.Message'], Coroutine[Any, Any, 'types.Message']],
+                         on_error: Callable[[Exception], None]) -> 'types.Message':
     response_headers: Dict[str, Any] = {}
     request_headers: Dict[str, Any] = request_message.header
     request_body: Dict[str, Any] = request_message.body
     parsed_u_api_schema: Dict[str, _types._UType] = u_api_schema.parsed
     request_entry: Tuple[str, Any] = union_entry(request_body)
 
+    print(f'request_entry: {request_entry}')
+
     request_target_init: str = request_entry[0]
     request_payload: Dict[str, Any] = request_entry[1]
+
+    print(f'request_target_init: {request_target_init}')
 
     unknown_target: str
     request_target: str
@@ -1918,7 +1919,9 @@ def handle_message(request_message: 'types.Message', u_api_schema: 'types.UApiSc
         unknown_target = ""
         request_target = request_target_init
 
+    print(f'parsed_u_api_schema: {parsed_u_api_schema}')
     function_type: _types._UFn = parsed_u_api_schema.get(request_target)
+    print(f'function_type: {function_type}')
     result_union_type: _types._UUnion = function_type.result
 
     call_id = request_headers.get("_id")
@@ -1969,7 +1972,7 @@ def handle_message(request_message: 'types.Message', u_api_schema: 'types.UApiSc
         result_message = types.Message("Ok", {"api": u_api_schema.original})
     else:
         try:
-            result_message = handler(call_message)
+            result_message = await handler(call_message)
         except Exception as e:
             try:
                 on_error(e)
@@ -2012,9 +2015,9 @@ def parse_request_message(request_message_bytes: bytes, serializer: 'types.Seria
         return types.Message({"_parseFailures": [{error_reason: {}}]}, {"_unknown": {}})
 
 
-def process_bytes(request_message_bytes: bytes, serializer: 'types.Serializer', uapi_schema: 'types.UApiSchema',
-                  on_error: Callable[[Exception], None], on_request: Callable[['types.Message'], None],
-                  on_response: Callable[['types.Message'], None], handler: Callable[['types.Message'], 'types.Message']) -> bytes:
+async def process_bytes(request_message_bytes: bytes, serializer: 'types.Serializer', uapi_schema: 'types.UApiSchema',
+                        on_error: Callable[[Exception], None], on_request: Callable[['types.Message'], None],
+                        on_response: Callable[['types.Message'], None], handler: Callable[['types.Message'], Coroutine[Any, Any, 'types.Message']]) -> bytes:
     try:
         request_message = parse_request_message(
             request_message_bytes, serializer, uapi_schema, on_error)
@@ -2024,7 +2027,7 @@ def process_bytes(request_message_bytes: bytes, serializer: 'types.Serializer', 
         except Exception:
             pass
 
-        response_message = handle_message(
+        response_message = await handle_message(
             request_message, uapi_schema, handler, on_error)
 
         try:
@@ -2248,9 +2251,9 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
                 "Unexpected unknown function: %s" % function_name)
 
 
-def process_request_object(request_message: 'types.Message',
-                           adapter: Callable[['types.Message', 'types.Serializer'], Future['types.Message']], serializer: 'types.Serializer',
-                           timeout_ms_default: int, use_binary_default: bool) -> 'types.Message':
+async def process_request_object(request_message: 'types.Message',
+                                 adapter: Callable[['types.Message', 'types.Serializer'], Coroutine[Any, Any, 'types.Message']], serializer: 'types.Serializer',
+                                 timeout_ms_default: int, use_binary_default: bool) -> 'types.Message':
     header: Dict[str, Any] = request_message.header
 
     try:
@@ -2262,14 +2265,15 @@ def process_request_object(request_message: 'types.Message',
 
         timeout_ms: int = header.get("_tim")
 
-        response_message = adapter(
-            request_message, serializer).result(timeout_ms / 1000)
+        async with asyncio.timeout(timeout_ms / 1000):
+            response_message = await adapter(request_message, serializer)
 
         if response_message.body == {"_ErrorParseFailure": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
             header["_binary"] = True
             header["_forceSendJson"] = True
 
-            return adapter(request_message, serializer).result(timeout_ms / 1000)
+            async with asyncio.timeout(timeout_ms / 1000):
+                return await adapter(request_message, serializer).result(timeout_ms / 1000)
 
         return response_message
     except Exception as e:
