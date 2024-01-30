@@ -310,6 +310,9 @@ class _UError:
         self.name = name
         self.errors = errors
 
+    def __str__(self):
+        return f'_UError(name: {self.name}, errors: {self.errors})'
+
 
 class _DeserializationError(RuntimeError):
     def __init__(self, cause: Exception = None, message: str = None):

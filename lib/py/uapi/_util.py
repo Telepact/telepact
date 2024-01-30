@@ -474,17 +474,22 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
 
 def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _types._UType],
                                 schema_keys_to_index: Dict[str, int]) -> None:
+    import pprint
+    pprint.pprint(f'Applying errors: {error}')
+    pprint.pprint(f'parsed_types: {parsed_types}')
     error_name = error.name
     error_index = schema_keys_to_index.get(error_name)
 
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
-        try:
-            f = _types._UFn(parsed_type)
-        except TypeError:
+        if not isinstance(parsed_type, _types._UFn):
+            print(f'type_error for: {parsed_type_name}')
             continue
 
+        f: _types._UFn = parsed_type
         fn_name = f.name
+
+        print(f'fn_regex: {f.errors_regex}')
 
         regex = re.compile(f.errors_regex)
         matcher = regex.search(error_name)
@@ -722,9 +727,6 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         offset_parse_failures = offset_schema_index(
             parse_failures, path_offset)
         raise types.UApiSchemaParseError(offset_parse_failures)
-
-    print(f'error_keys: {error_keys}')
-    print(f'parsed_types: {parsed_types}')
 
     for error_key in error_keys:
         this_index = schema_keys_to_index[error_key]
