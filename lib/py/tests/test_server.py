@@ -195,7 +195,6 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
-    print(f'u_api: {u_api.parsed}')
     alternate_u_api = types.UApiSchema.extend(u_api, """
             [
                 {

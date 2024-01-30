@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import uapi
 import uapi._util
 from typing import List, Dict
@@ -224,6 +225,9 @@ class _UStruct(_UType):
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
         return uapi._util._STRUCT_NAME
 
+    def __str__(self):
+        return f'_UStruct(name: {self.name}, fields: {self.fields}, type_parameter_count: {self.type_parameter_count})'
+
 
 class _UUnion(_UType):
     def __init__(self, name: str, cases: Dict[str, _UStruct], type_parameter_count: int):
@@ -242,6 +246,9 @@ class _UUnion(_UType):
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
         return uapi._util._UNION_NAME
+
+    def __str__(self):
+        return f'_UUnion(name: {self.name}, cases: {self.cases}, type_parameter_count: {self.type_parameter_count})'
 
 
 class _UFn(_UType):

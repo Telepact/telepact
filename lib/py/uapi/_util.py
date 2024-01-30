@@ -502,6 +502,8 @@ def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _
                 other_path_index = schema_keys_to_index.get(fn_name)
                 parse_failures.append(_types._SchemaParseFailure([error_index, error_name, "->", new_key],
                                                                  "PathCollision", {"other": [other_path_index, "->", new_key]}))
+
+            print(f'APPENDING ERROR: {error_result_struct}')
             fn_result_cases[new_key] = error_result_struct
 
     if parse_failures:
@@ -720,6 +722,9 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         offset_parse_failures = offset_schema_index(
             parse_failures, path_offset)
         raise types.UApiSchemaParseError(offset_parse_failures)
+
+    print(f'error_keys: {error_keys}')
+    print(f'parsed_types: {parsed_types}')
 
     for error_key in error_keys:
         this_index = schema_keys_to_index[error_key]
@@ -1888,6 +1893,8 @@ def map_validation_failures_to_invalid_field_cases(argument_validation_failures:
 
 
 def validate_result(result_union_type: _types._UUnion, error_result: Any) -> None:
+    import pprint
+    pprint.pprint(f'result_union_type: {result_union_type}')
     new_error_result_validation_failures = result_union_type.validate(
         error_result, [], [])
     if new_error_result_validation_failures:
