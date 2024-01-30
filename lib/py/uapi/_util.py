@@ -1319,14 +1319,6 @@ def generate_random_boolean(blueprint_value: Any, use_blueprint_value: bool, ran
         return random_generator.next_boolean()
 
 
-_INTEGER_NAME = "Integer"
-_NUMBER_NAME = "Number"
-_STRING_NAME = "String"
-_ARRAY_NAME = "Array"
-_OBJECT_NAME = "Object"
-_STRUCT_NAME = "Struct"
-
-
 def validate_integer(value: Any) -> List[_types._ValidationFailure]:
     if isinstance(value, (int)) and not isinstance(value, (bool, float)):
         if (value > 2**63-1 or value < -(2**63)):
@@ -1474,7 +1466,7 @@ def validate_struct(value: Any, type_parameters: List[_types._UTypeDeclaration],
     if isinstance(value, dict):
         return validate_struct_fields(fields, value, type_parameters)
     else:
-        return get_type_unexpected_validation_failure([], value, _STRUCT_NAME)
+        return get_type_unexpected_validation_failure([], value, 'Object')
 
 
 def validate_struct_fields(fields: Dict[str, _types._UFieldDeclaration],
