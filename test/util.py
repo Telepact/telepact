@@ -52,7 +52,7 @@ def handler(request):
     elif 'throw' in header:
         return None
     else:
-        return [response_header, {}]
+        return [response_header, {'Ok': {}}]
 
 
 async def backdoor_handler(nats_client, backdoor_topic):
