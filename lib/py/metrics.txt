@@ -1,7 +1,7 @@
 # HELP py_server_frontdoor 
 # TYPE py_server_frontdoor summary
-py_server_frontdoor_count 2.0
-py_server_frontdoor_sum 5.624955520033836e-06
+py_server_frontdoor_count 3415.0
+py_server_frontdoor_sum 0.007999769179150462
 # HELP py_server_frontdoor_created 
 # TYPE py_server_frontdoor_created gauge
-py_server_frontdoor_created 1.706633916501355e+09
+py_server_frontdoor_created 1.706635108937349e+09

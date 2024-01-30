@@ -1199,10 +1199,10 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', f
 
 
 def validate_select_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', function_type: _types._UFn) -> List[_types._ValidationFailure]:
-    try:
-        select_struct_fields_header = dict(headers["_sel"])
-    except TypeError:
+    if not isinstance(headers['_sel'], dict):
         return get_type_unexpected_validation_failure(["_sel"], headers["_sel"], "Object")
+
+    select_struct_fields_header = headers["_sel"]
 
     validation_failures: List[_types._ValidationFailure] = []
 
@@ -1216,12 +1216,12 @@ def validate_select_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSch
             continue
 
         if isinstance(type_reference, _types._UUnion):
-            try:
-                union_cases = dict(select_value)
-            except TypeError:
+            if not isinstance(select_value, dict):
                 validation_failures.extend(get_type_unexpected_validation_failure(
                     ["_sel", type_name], select_value, "Object"))
                 continue
+
+            union_cases = select_value
 
             for union_case, selected_case_struct_fields in union_cases.items():
                 struct_ref = type_reference.cases.get(union_case)
@@ -1255,19 +1255,18 @@ def validate_select_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSch
 def validate_select_struct(struct_reference: _types._UStruct, base_path: List[Any], selected_fields: Any) -> List[_types._ValidationFailure]:
     validation_failures: List[_types._ValidationFailure] = []
 
-    try:
-        fields = list(selected_fields)
-    except TypeError:
+    if not isinstance(selected_fields, list):
         return get_type_unexpected_validation_failure(base_path, selected_fields, "Array")
 
+    fields = selected_fields
+
     for i, field in enumerate(fields):
-        try:
-            string_field = str(field)
-        except ValueError:
+        if not isinstance(field, str):
             this_path = base_path + [i]
             validation_failures.extend(
                 get_type_unexpected_validation_failure(this_path, field, "String"))
             continue
+        string_field = field
         if string_field not in struct_reference.fields:
             this_path = base_path + [i]
             validation_failures.append(_types._ValidationFailure(
@@ -1782,9 +1781,9 @@ def select_struct_fields(type_declaration: '_types._UTypeDeclaration', value: An
 
     elif isinstance(type_declaration_type, _types._UFn):
         value_as_map = value
-        union_entry = union_entry(value_as_map)
-        union_case = union_entry[0]
-        union_data = union_entry[1]
+        u_entry = union_entry(value_as_map)
+        union_case = u_entry[0]
+        union_data = u_entry[1]
 
         fn_name = type_declaration_type.name
         fn_call = type_declaration_type.call
@@ -1806,9 +1805,9 @@ def select_struct_fields(type_declaration: '_types._UTypeDeclaration', value: An
 
     elif isinstance(type_declaration_type, _types._UUnion):
         value_as_map = value
-        union_entry = union_entry(value_as_map)
-        union_case = union_entry[0]
-        union_data = union_entry[1]
+        u_entry = union_entry(value_as_map)
+        union_case = u_entry[0]
+        union_data = u_entry[1]
 
         union_cases = type_declaration_type.cases
         union_struct_reference = union_cases[union_case]
@@ -1993,8 +1992,8 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     final_result_union: Dict[str, Any]
     if '_sel' in request_headers:
         select_struct_fields_header: Dict[str, Any] = request_headers['_sel']
-        final_result_union = select_struct_fields({'type': result_union_type, 'is_union': False, 'generics': [
-        ]}, result_union, select_struct_fields_header)
+        final_result_union = select_struct_fields(_types._UTypeDeclaration(
+            result_union_type, False, []), result_union, select_struct_fields_header)
     else:
         final_result_union = result_union
 

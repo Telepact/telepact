@@ -2256,9 +2256,9 @@ class _Util {
             return finalMap;
         } else if (typeDeclarationType instanceof final _UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
-            final Map.Entry<String, Object> unionEntry = unionEntry(valueAsMap);
-            final var unionCase = unionEntry.getKey();
-            final var unionData = (Map<String, Object>) unionEntry.getValue();
+            final Map.Entry<String, Object> uEntry = unionEntry(valueAsMap);
+            final var unionCase = uEntry.getKey();
+            final var unionData = (Map<String, Object>) uEntry.getValue();
 
             final String fnName = f.name;
             final _UUnion fnCall = f.call;
@@ -2279,12 +2279,12 @@ class _Util {
                 }
             }
 
-            return Map.of(unionEntry.getKey(), finalMap);
+            return Map.of(uEntry.getKey(), finalMap);
         } else if (typeDeclarationType instanceof final _UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
-            final var unionEntry = unionEntry(valueAsMap);
-            final var unionCase = unionEntry.getKey();
-            final var unionData = (Map<String, Object>) unionEntry.getValue();
+            final var uEntry = unionEntry(valueAsMap);
+            final var unionCase = uEntry.getKey();
+            final var unionData = (Map<String, Object>) uEntry.getValue();
 
             final Map<String, _UStruct> unionCases = u.cases;
             final var unionStructReference = unionCases.get(unionCase);
@@ -2315,7 +2315,7 @@ class _Util {
                 }
             }
 
-            return Map.of(unionEntry.getKey(), finalMap);
+            return Map.of(uEntry.getKey(), finalMap);
         } else if (typeDeclarationType instanceof final _UObject o) {
             final var nestedTypeDeclaration = typeDeclarationTypeParams.get(0);
             final var valueAsMap = (Map<String, Object>) value;
