@@ -15,18 +15,14 @@ class _DefaultSerializer(types.SerializationImpl):
     class MessagePackUntypedObjectDeserializer(msgpack.Unpacker):
         pass
 
-    def __init__(self):
-        self.json_mapper = json
-        self.binary_mapper = msgpack
-
     def to_json(self, uapi_message: Any) -> bytes:
-        return self.json_mapper.dumps(uapi_message).encode()
+        return json.dumps(uapi_message).encode()
 
     def to_msgpack(self, uapi_message: Any) -> bytes:
-        return self.binary_mapper.dumps(uapi_message)
+        return msgpack.dumps(uapi_message)
 
     def from_json(self, bytes_: bytes) -> Any:
-        return self.json_mapper.loads(bytes_)
+        return json.loads(bytes_)
 
     def from_msgpack(self, bytes_: bytes) -> Any:
-        return self.binary_mapper.loads(bytes_)
+        return msgpack.loads(bytes_, strict_map_key=False)

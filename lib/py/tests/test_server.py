@@ -203,7 +203,8 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             ]
             """)
 
-    timers = Summary(frontdoor_topic.replace('.', '_'), '', registry=metrics)
+    timers = Summary(frontdoor_topic.replace(
+        '.', '_').replace('-', '_'), '', registry=metrics)
 
     serve_alternate_server = False
 
