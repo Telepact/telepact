@@ -1103,12 +1103,13 @@ def construct_binary_encoding(u_api_schema: 'types.UApiSchema') -> _types._Binar
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
+    print(f'checksum: {checksum}')
     return _types._BinaryEncoding(binary_encoding, checksum)
 
 
 def create_checksum(value: str) -> int:
-    crc32_hash = binascii.crc32(value.encode('utf-8')) & 0xffffffff
-    return crc32_hash
+    crc32_hash = int(binascii.crc32(value.encode('utf-8')) & 0xffffffff)
+    return (crc32_hash ^ 0x80000000) - 0x80000000
 
 
 def serialize(message: 'types.Message', binary_encoder: _types._BinaryEncoder, serializer: 'types.SerializationImpl') -> bytes:
@@ -1121,7 +1122,7 @@ def serialize(message: 'types.Message', binary_encoder: _types._BinaryEncoder, s
         if serialize_as_binary:
             try:
                 encoded_message = binary_encoder.encode(message_as_pseudo_json)
-                return serializer.to_msg_pack(encoded_message)
+                return serializer.to_msgpack(encoded_message)
             except _types._BinaryEncoderUnavailableError:
                 return serializer.to_json(message_as_pseudo_json)
         else:

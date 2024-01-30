@@ -1361,8 +1361,9 @@ class _Util {
             i += 1;
         }
         final var finalString = String.join("\n", allKeys);
-        System.out.println("finalString: " + finalString);
+
         final int checksum = createChecksum(finalString);
+        System.out.println("checksum: " + checksum);
         return new _BinaryEncoding(binaryEncoding, checksum);
     }
 
