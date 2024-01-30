@@ -281,7 +281,7 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
 
 
-async def send_case(nats_client, request, expected_response, request_topic):
+async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic):
 
     print('T->     {}'.format(request), flush=True)
 
