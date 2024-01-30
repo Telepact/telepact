@@ -1346,10 +1346,14 @@ def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,
 
 
 def validate_number(value: Any) -> List[_types._ValidationFailure]:
-    if isinstance(value, (float, int)):
-        return []
-    elif isinstance(value, (int, float)):
-        return [_types._ValidationFailure([], "NumberOutOfRange", {})]
+    if isinstance(value, (int, float)) and not isinstance(value, (bool, str)):
+        if isinstance(value, (int)):
+            if (value > 2**63-1 or value < -(2**63)):
+                return [_types._ValidationFailure([], "NumberOutOfRange", {})]
+            else:
+                return []
+        else:
+            return []
     else:
         return get_type_unexpected_validation_failure([], value, _NUMBER_NAME)
 
