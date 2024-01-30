@@ -1024,7 +1024,7 @@ def encode_body(message_body: Dict[str, Any], binary_encoder: _types._BinaryEnco
 
 
 def decode_body(encoded_message_body: Dict[Any, Any], binary_encoder: _types._BinaryEncoding) -> Dict[str, Any]:
-    return {k if isinstance(k, str) else encode_or_decode(k, binary_encoder.decodeMap): decode_keys(v, binary_encoder) for k, v in encoded_message_body.items()}
+    return {k if isinstance(k, str) else encode_or_decode(k, binary_encoder.decode_map): decode_keys(v, binary_encoder) for k, v in encoded_message_body.items()}
 
 
 def encode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
@@ -1146,8 +1146,11 @@ def deserialize(message_bytes: bytes, serializer: 'types.SerializationImpl', bin
     headers = final_message_as_pseudo_json_list[0]
     body = final_message_as_pseudo_json_list[1]
 
-    if not isinstance(headers, dict) or not isinstance(body, dict) or len(body) != 1:
+    if not isinstance(headers, dict) or not isinstance(body, dict):
         raise _types._InvalidMessage()
+
+    if len(body) != 1:
+        raise _types._InvalidMessageBody()
 
     try:
         payload = list(body.values())[0]
