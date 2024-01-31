@@ -1632,7 +1632,6 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
                            type_parameters: List[Any],
                            random_generator: _types._RandomGenerator) -> Dict[str, Any]:
     if starting_union:
-        print("UNION BLUEPRINT")
         union_case, union_starting_struct = union_entry(starting_union)
         union_struct_type: _types._UStruct = union_cases_reference[union_case]
         return {union_case: construct_random_struct(union_struct_type.fields, union_starting_struct,
