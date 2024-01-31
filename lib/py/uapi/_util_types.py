@@ -130,7 +130,7 @@ class _UBoolean(_UType):
     def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_boolean(value)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, random_generator: _RandomGenerator) -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> object:
         return uapi._util.generate_random_boolean(blueprint_value, use_blueprint_value, random_generator)
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
@@ -144,7 +144,7 @@ class _UInteger(_UType):
     def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_integer(value)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, random_generator: _RandomGenerator) -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> object:
         return uapi._util.generate_random_integer(blueprint_value, use_blueprint_value, random_generator)
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
@@ -158,7 +158,7 @@ class _UNumber(_UType):
     def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_number(value)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, random_generator: _RandomGenerator) -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> object:
         return uapi._util.generate_random_number(blueprint_value, use_blueprint_value, random_generator)
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
@@ -172,7 +172,7 @@ class _UString(_UType):
     def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_string(value)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, random_generator: _RandomGenerator) -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> object:
         return uapi._util.generate_random_string(blueprint_value, use_blueprint_value, random_generator)
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
@@ -219,8 +219,8 @@ class _UStruct(_UType):
     def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_struct(value, type_parameters, generics, self.fields)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random: _RandomGenerator) -> object:
-        return uapi._util.generate_random_struct(blueprint_value, use_blueprint_value, include_random_optional_fields, type_parameters, generics, random, self.fields)
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> object:
+        return uapi._util.generate_random_struct(blueprint_value, use_blueprint_value, include_random_optional_fields, type_parameters, generics, random_generator, self.fields)
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
         return uapi._util._STRUCT_NAME
@@ -241,8 +241,8 @@ class _UUnion(_UType):
     def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_union(value, type_parameters, generics, self.cases)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random: _RandomGenerator) -> object:
-        return uapi._util.generate_random_union(blueprint_value, use_blueprint_value, include_random_optional_fields, type_parameters, generics, random, self.cases)
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_random_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _RandomGenerator) -> object:
+        return uapi._util.generate_random_union(blueprint_value, use_blueprint_value, include_random_optional_fields, type_parameters, generics, random_generator, self.cases)
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
         return uapi._util._UNION_NAME
