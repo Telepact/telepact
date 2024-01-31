@@ -38,27 +38,27 @@ def get_mock_uapi_json() -> str:
 
 
 def as_int(obj: Any) -> int:
-    if obj is None:
+    if obj is None or not isinstance(obj, int) or isinstance(obj, bool):
         raise TypeError
-    return int(obj)
+    return obj
 
 
 def as_string(obj: Any) -> str:
-    if obj is None:
+    if obj is None or not isinstance(obj, str):
         raise TypeError
-    return str(obj)
+    return obj
 
 
 def as_list(obj: Any) -> List[Any]:
-    if obj is None:
+    if obj is None or not isinstance(obj, list):
         raise TypeError
-    return list(obj)
+    return obj
 
 
 def as_map(obj: Any) -> Dict[str, Any]:
-    if obj is None:
+    if obj is None or not isinstance(obj, dict):
         raise TypeError
-    return dict(obj)
+    return obj
 
 
 def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int) -> List[_types._SchemaParseFailure]:
