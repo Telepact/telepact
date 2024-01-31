@@ -100,11 +100,6 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
     api_schema_content = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(api_schema_content)
 
-    options = {
-        "on_error": on_err,
-        "enable_message_response_generation": False
-    }
-
     options = types.MockServer.Options()
     options.on_error = on_err
     options.enable_message_response_generation = False
@@ -125,16 +120,16 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
         request_bytes = msg.data
 
-        print(f"    ->S {request_bytes.decode()}")
+        print(f"    ->S {request_bytes}")
         await connection.flush()
 
         @timers.time()
-        def s():
-            return server.process(request_bytes)
+        async def s():
+            return await server.process(request_bytes)
 
         response_bytes = await s()
 
-        print(f"    <-S {response_bytes.decode()}")
+        print(f"    <-S {response_bytes}")
         await connection.publish(msg.reply, response_bytes)
 
     return await connection.subscribe(frontdoor_topic, cb=message_handler)

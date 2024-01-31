@@ -1610,6 +1610,7 @@ def validate_union_struct(union_struct: _types._UStruct,
 def generate_random_union(blueprint_value: Any, use_blueprint_value: bool,
                           include_random_optional_fields: bool,
                           type_parameters: List[Any],
+                          generics: List[_types._UTypeDeclaration],
                           random_generator: _types._RandomGenerator,
                           cases: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     if use_blueprint_value:
@@ -1627,10 +1628,9 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
                            type_parameters: List[Any],
                            random_generator: _types._RandomGenerator) -> Dict[str, Any]:
     if starting_union:
-        union_case, union_starting_struct = union_entry(
-            starting_union, random_generator)
-        union_struct_type = union_cases_reference[union_case]
-        return {union_case: construct_random_struct(union_struct_type['fields'], union_starting_struct,
+        union_case, union_starting_struct = union_entry(starting_union)
+        union_struct_type: _types._UStruct = union_cases_reference[union_case]
+        return {union_case: construct_random_struct(union_struct_type.fields, union_starting_struct,
                                                     include_random_optional_fields, type_parameters,
                                                     random_generator)}
     else:
@@ -1639,7 +1639,7 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
         random_index = random_generator.randint(
             0, len(sorted_union_cases_reference) - 1)
         union_case, union_data = sorted_union_cases_reference[random_index]
-        return {union_case: construct_random_struct(union_data['fields'], {},
+        return {union_case: construct_random_struct(union_data.fields, {},
                                                     include_random_optional_fields, type_parameters,
                                                     random_generator)}
 
@@ -2152,8 +2152,8 @@ def verify_no_more_interactions(invocations: List[_types._MockInvocation]) -> Di
     return {"Ok": {}}
 
 
-def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub], invocations: List[_types._MockInvocation],
-                random: _types._RandomGenerator, u_api_schema: 'types.UApiSchema', enable_generated_default_stub: bool) -> 'types.Message':
+async def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub], invocations: List[_types._MockInvocation],
+                      random: _types._RandomGenerator, u_api_schema: 'types.UApiSchema', enable_generated_default_stub: bool) -> 'types.Message':
     header: Dict[str, Any] = request_message.header
 
     enable_generation_stub: bool = header.get(
@@ -2177,7 +2177,7 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
                                 allow_argument_partial_match, stub_count)
 
         stubs.insert(0, stub)
-        return types.Message({"Ok": {}})
+        return types.Message({}, {"Ok": {}})
 
     elif function_name == "fn._verify":
         given_call: Dict[str, Any] = argument["call"]
@@ -2193,25 +2193,25 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
         verification_result = verify(call_function_name, call_arg, strict_match,
                                      verify_times,
                                      invocations)
-        return types.Message(verification_result)
+        return types.Message({}, verification_result)
 
     elif function_name == "fn._verifyNoMoreInteractions":
         verification_result = verify_no_more_interactions(invocations)
-        return types.Message(verification_result)
+        return types.Message({}, verification_result)
 
     elif function_name == "fn._clearCalls":
         invocations.clear()
-        return types.Message({"Ok": {}})
+        return types.Message({}, {"Ok": {}})
 
     elif function_name == "fn._clearStubs":
         stubs.clear()
-        return types.Message({"Ok": {}})
+        return types.Message({}, {"Ok": {}})
 
     elif function_name == "fn._setRandomSeed":
         given_seed: int = argument["seed"]
 
         random.set_seed(given_seed)
-        return types.Message({"Ok": {}})
+        return types.Message({}, {"Ok": {}})
 
     else:
         invocations.append(_types._MockInvocation(
@@ -2233,7 +2233,7 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
                             include_random_optional_fields, [], [], random)
                         if stub.count > 0:
                             stub.count -= 1
-                        return types.Message(result)
+                        return types.Message({}, result)
                 else:
                     if stub.when_argument == argument:
                         use_blueprint_value = True
@@ -2243,10 +2243,10 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
                             include_random_optional_fields, [], [], random)
                         if stub.count > 0:
                             stub.count -= 1
-                        return types.Message(result)
+                        return types.Message({}, result)
 
         if not enable_generated_default_stub and not enable_generation_stub:
-            return types.Message({"_ErrorNoMatchingStub": {}})
+            return types.Message({}, {"_ErrorNoMatchingStub": {}})
 
         if definition is not None:
             result_union = definition.result
@@ -2255,7 +2255,7 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
             include_random_optional_fields = True
             random_ok_struct = ok_struct_ref.generate_random_value({}, use_blueprint_value,
                                                                    include_random_optional_fields, [], [], random)
-            return types.Message({"Ok": random_ok_struct})
+            return types.Message({}, {"Ok": random_ok_struct})
         else:
             raise types.UApiError(
                 "Unexpected unknown function: %s" % function_name)

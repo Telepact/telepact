@@ -152,31 +152,25 @@ class MockServer:
         server_options.on_error = options.on_error
 
         self.server: Server = Server(
-            combined_u_api_schema, self.handle, server_options)
+            combined_u_api_schema, self._handle, server_options)
 
         final_u_api_schema: UApiSchema = self.server.u_api_schema
         final_parsed_u_api_schema: Dict[str, type] = final_u_api_schema.parsed
 
         parsed_types.update(final_parsed_u_api_schema)
 
-    def process(self, message: bytes) -> bytes:
+    async def process(self, message: bytes) -> bytes:
         """
         Process a given uAPI Request Message into a uAPI Response Message.
 
         :param message: The uAPI request message.
         :return: The uAPI response message.
         """
-        return self.server.process(message)
+        return await self.server.process(message)
 
-    def handle(self, request_message: bytes) -> bytes:
-        """
-        Handle the uAPI request message.
-
-        :param request_message: The uAPI request message.
-        :return: The uAPI response message.
-        """
-        return _util.mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                 self.server.u_api_schema, self.enableGeneratedDefaultStub)
+    async def _handle(self, request_message: bytes) -> bytes:
+        return await _util.mock_handle(request_message, self.stubs, self.invocations, self.random,
+                                       self.server.u_api_schema, self.enableGeneratedDefaultStub)
 
 
 class SerializationError(Exception):
