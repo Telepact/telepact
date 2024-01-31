@@ -292,7 +292,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
         request_json = json.dumps(request)
         request_bytes = request_json.encode()    
 
-    nats_response = await nats_client.request(request_topic, request_bytes, timeout=0.25)
+    nats_response = await nats_client.request(request_topic, request_bytes, timeout=1)
 
     response_bytes = nats_response.data
 

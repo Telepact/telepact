@@ -1020,11 +1020,11 @@ def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, _
 
 
 def encode_body(message_body: Dict[str, Any], binary_encoder: _types._BinaryEncoding) -> Dict[Any, Any]:
-    return {encode_or_decode(k, binary_encoder.encode_map): encode_keys(v, binary_encoder) for k, v in message_body.items()}
+    return encode_keys(message_body, binary_encoder)
 
 
 def decode_body(encoded_message_body: Dict[Any, Any], binary_encoder: _types._BinaryEncoding) -> Dict[str, Any]:
-    return {k if isinstance(k, str) else encode_or_decode(k, binary_encoder.decode_map): decode_keys(v, binary_encoder) for k, v in encoded_message_body.items()}
+    return decode_keys(encoded_message_body, binary_encoder)
 
 
 def encode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
@@ -1033,13 +1033,12 @@ def encode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
     elif isinstance(given, dict):
         new_map = {}
         for key, value in given.items():
-            final_key = encode_or_decode(
-                key, binary_encoder.encode_map) if key in binary_encoder.encode_map else key
+            final_key = binary_encoder.encode_map.get(key, key)
             encoded_value = encode_keys(value, binary_encoder)
             new_map[final_key] = encoded_value
         return new_map
     elif isinstance(given, list):
-        return [encode_keys(item, binary_encoder) for item in given]
+        return [encode_keys(e, binary_encoder) for e in given]
     else:
         return given
 
@@ -1048,23 +1047,21 @@ def decode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
     if isinstance(given, dict):
         new_map = {}
         for key, value in given.items():
-            final_key = key if isinstance(key, str) else encode_or_decode(
-                key, binary_encoder.decode_map)
+            if isinstance(key, str):
+                decoded_key = key
+            else:
+                decoded_key = binary_encoder.decode_map.get(key, key)
             decoded_value = decode_keys(value, binary_encoder)
-            new_map[final_key] = decoded_value
+            new_map[decoded_key] = decoded_value
         return new_map
     elif isinstance(given, list):
-        return [decode_keys(item, binary_encoder) for item in given]
+        return [decode_keys(e, binary_encoder) for e in given]
     else:
         return given
 
 
 def encode_or_decode(key: Any, encoding_map: Dict[Any, Any]) -> Any:
-    return encoding_map[key] if key in encoding_map else key
-
-
-def encode_or_decode(key: Any, map: Dict[Any, Any]) -> Any:
-    value = map.get(key)
+    value = encoding_map.get(key)
     if value is None:
         raise _types._BinaryEncodingMissing(key)
     return value
