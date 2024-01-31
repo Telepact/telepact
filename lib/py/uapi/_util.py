@@ -224,8 +224,8 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
 
     matcher = regex.search(type_name)
     if not matcher:
-        raise Exception([{"path": path, "error_type": "StringRegexMatchFailed", "details": {
-                        "regex": regex_string}}])
+        raise types.UApiSchemaParseError([_types._SchemaParseFailure(path, "StringRegexMatchFailed", {
+            "regex": regex_string})])
 
     standard_type_name = matcher.group(1)
     if standard_type_name:
@@ -620,7 +620,8 @@ def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, Any]) -> '
     try:
         uapi_schema_pseudo_json_init = json.loads(uapi_schema_json)
     except json.JSONDecodeError as e:
-        raise types.UApiSchemaParseError([([], "JsonInvalid", {})], e)
+        raise types.UApiSchemaParseError(
+            [_types._SchemaParseFailure([], "JsonInvalid", {})], e)
 
     try:
         uapi_schema_pseudo_json = as_list(uapi_schema_pseudo_json_init)
