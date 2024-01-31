@@ -3,6 +3,7 @@ import uapi
 import uapi._util
 from typing import List, Dict
 import uapi.types as types
+import inspect
 
 
 class _SchemaParseFailure:
@@ -12,17 +13,31 @@ class _SchemaParseFailure:
         self.data = data
 
 
+def _find_stack() -> str:
+    i = 0
+    for stack in inspect.stack():
+        i += 1
+        if i == 1:
+            continue
+        stack_str = f'{stack}'
+        if not '_util_types.py' in stack_str:
+            return f'{stack.function}'
+
+
 class _RandomGenerator:
     def __init__(self, collection_length_min: int, collection_length_max: int):
         self.seed = 0
         self.collection_length_min = collection_length_min
         self.collection_length_max = collection_length_max
+        self.count = 0
 
     def set_seed(self, seed: int):
         self.seed = seed
 
     def next_int(self) -> int:
+        print(f'{self.count} {self.seed} {_find_stack()}')
         self.seed = (self.seed * 1_103_515_245 + 12_345) & 0x7fffffff
+        self.count += 1
         return self.seed
 
     def next_int_with_ceiling(self, ceiling: int) -> int:

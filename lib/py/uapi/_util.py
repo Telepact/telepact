@@ -1546,8 +1546,12 @@ def construct_random_struct(reference_struct: Dict[str, _types._UFieldDeclaratio
                                                                include_random_optional_fields, type_parameters,
                                                                random_generator)
             else:
-                if not include_random_optional_fields or random_generator.next_boolean():
+                if not include_random_optional_fields:
                     continue
+
+                if random_generator.next_boolean():
+                    continue
+
                 value = type_declaration.generate_random_value(None, False,
                                                                include_random_optional_fields, type_parameters,
                                                                random_generator)
@@ -1614,7 +1618,7 @@ def generate_random_union(blueprint_value: Any, use_blueprint_value: bool,
                           random_generator: _types._RandomGenerator,
                           cases: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     if use_blueprint_value:
-        starting_union_case = cast(dict[str, Any], blueprint_value)
+        starting_union_case = blueprint_value
         return construct_random_union(cases, starting_union_case, include_random_optional_fields,
                                       type_parameters, random_generator)
     else:
@@ -1628,6 +1632,7 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
                            type_parameters: List[Any],
                            random_generator: _types._RandomGenerator) -> Dict[str, Any]:
     if starting_union:
+        print("UNION BLUEPRINT")
         union_case, union_starting_struct = union_entry(starting_union)
         union_struct_type: _types._UStruct = union_cases_reference[union_case]
         return {union_case: construct_random_struct(union_struct_type.fields, union_starting_struct,
@@ -1637,7 +1642,7 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
         sorted_union_cases_reference = sorted(
             union_cases_reference.items(), key=lambda x: x[0])
         random_index = random_generator.next_int_with_ceiling(
-            len(sorted_union_cases_reference) - 1)
+            len(sorted_union_cases_reference))
         union_case, union_data = sorted_union_cases_reference[random_index]
         return {union_case: construct_random_struct(union_data.fields, {},
                                                     include_random_optional_fields, type_parameters,
