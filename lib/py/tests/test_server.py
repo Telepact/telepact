@@ -39,7 +39,13 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         '.', '_').replace('-', '_'), '', registry=metrics)
 
     async def adapter(m: types.Message, s: types.Serializer) -> types.Message:
-        request_bytes = s.serialize(m)
+        try:
+            request_bytes = s.serialize(m)
+        except types.SerializationError as e:
+            if isinstance(e.__context__, OverflowError):
+                return types.Message({"numberTooBig": True}, {"_ErrorUnknown": {}})
+            else:
+                raise
 
         print(f"   <-c  {request_bytes}")
         await connection.flush()
