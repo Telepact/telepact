@@ -638,7 +638,8 @@ def extend_uapi_schema(first: 'types.UApiSchema', second_uapi_schema_json: str, 
         second_uapi_schema_pseudo_json_init = json.loads(
             second_uapi_schema_json)
     except json.JSONDecodeError as e:
-        raise types.UApiSchemaParseError([([], "JsonInvalid", {})], e)
+        raise types.UApiSchemaParseError(
+            [_types._SchemaParseFailure([], "JsonInvalid", {})], e)
 
     try:
         second_uapi_schema_pseudo_json = as_list(
