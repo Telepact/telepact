@@ -120,22 +120,22 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
     server = types.MockServer(u_api, options)
 
     async def message_handler(msg: Msg) -> None:
-        try:
-            request_bytes = msg.data
+        nonlocal server
+        nonlocal connection
 
-            print(f"    ->S {request_bytes.decode()}")
-            await connection.flush()
+        request_bytes = msg.data
 
-            @timers.time()
-            def s():
-                return server.process(request_bytes)
+        print(f"    ->S {request_bytes.decode()}")
+        await connection.flush()
 
-            response_bytes = await s()
+        @timers.time()
+        def s():
+            return server.process(request_bytes)
 
-            print(f"    <-S {response_bytes.decode()}")
-            await connection.publish(msg.reply, response_bytes)
-        except Exception as e:
-            raise RuntimeError(e)
+        response_bytes = await s()
+
+        print(f"    <-S {response_bytes.decode()}")
+        await connection.publish(msg.reply, response_bytes)
 
     return await connection.subscribe(frontdoor_topic, cb=message_handler)
 
@@ -144,9 +144,10 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
 
-    timers = Summary(frontdoor_topic, registry=metrics)
+    timers = Summary(frontdoor_topic.replace(
+        '.', '_').replace('-', '_'), '', registry=metrics)
 
-    def handler(request_message: 'types.Message') -> 'types.Message':
+    async def handler(request_message: 'types.Message') -> 'types.Message':
         request_body = request_message.body
 
         arg = request_body.get("fn.validateSchema", {})
@@ -156,12 +157,10 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
         serialize_schema = request_message.header.get("_serializeSchema", True)
 
         if serialize_schema:
-            try:
-                schema_json_bytes = json.dumps(
-                    schema_pseudo_json).encode('utf-8')
-                schema_json = schema_json_bytes.decode('utf-8')
-            except Exception as e:
-                raise RuntimeError(e)
+
+            schema_json_bytes = json.dumps(
+                schema_pseudo_json).encode('utf-8')
+            schema_json = schema_json_bytes.decode('utf-8')
         else:
             schema_json = schema_pseudo_json
 
@@ -171,29 +170,30 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
                 types.UApiSchema.extend(schema, extend_schema_json)
             return types.Message({}, {"Ok": {}})
         except types.UApiSchemaParseError as e:
-            e.printStackTrace()
+            on_err(e)
             return types.Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
 
     options = types.Server.Options()
     options.on_error = on_err
     server = types.Server(u_api, handler, options)
 
-    def handle_message(msg: Msg, timers: Summary, server: 'types.Server', connection: NatsClient, frontdoor_topic: str) -> None:
+    async def handle_message(msg: Msg) -> None:
+        nonlocal server
+        nonlocal connection
         request_bytes = msg.data
 
         print(f"    ->S {request_bytes}")
 
         @timers.time()
-        def s():
-            return server.process(request_bytes)
+        async def s():
+            return await server.process(request_bytes)
 
-        response_bytes = s()
+        response_bytes = await s()
 
         print(f"    <-S {response_bytes}")
-        connection.publish(msg.reply, response_bytes)
+        await connection.publish(msg.reply, response_bytes)
 
-    dispatcher = await connection.subscribe(frontdoor_topic, lambda msg: handle_message(
-        msg, timers, server, connection, frontdoor_topic))
+    dispatcher = await connection.subscribe(frontdoor_topic, cb=handle_message)
 
     return dispatcher
 

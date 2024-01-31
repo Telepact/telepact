@@ -660,7 +660,7 @@ def extend_uapi_schema(first: 'types.UApiSchema', second_uapi_schema_json: str, 
 
 def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Dict[str, Any], path_offset: int) -> 'types.UApiSchema':
     parsed_types: Dict[str, Any] = {}
-    parse_failures: List[Tuple[List[object], str, Dict[str, object]]] = []
+    parse_failures: List[_types._SchemaParseFailure] = []
     failed_types: Set[str] = set()
     schema_keys_to_index: Dict[str, int] = {}
     schema_keys: Set[str] = set()
@@ -689,7 +689,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         if matching_schema_key:
             other_path_index = schema_keys_to_index[matching_schema_key]
             final_path = loop_path + [schema_key]
-            parse_failures.append((final_path, "PathCollision", {
+            parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision", {
                                   "other": [other_path_index, matching_schema_key]}))
             continue
 
