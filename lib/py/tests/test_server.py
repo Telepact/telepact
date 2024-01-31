@@ -25,6 +25,11 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 
 
+def on_err(e):
+    print("BOOM!")
+    print("".join(traceback.format_exception(e.__class__, e, e.__traceback__)))
+
+
 async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
                                    client_frontdoor_topic: str,
                                    client_backdoor_topic: str,
@@ -99,7 +104,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
     u_api = types.UApiSchema.from_json(api_schema_content)
 
     options = {
-        "on_error": lambda e: print(e),
+        "on_error": on_err,
         "enable_message_response_generation": False
     }
 
@@ -169,7 +174,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
             return types.Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
 
     options = types.Server.Options()
-    options.onError = lambda e: print(e)  # Error handling
+    options.on_error = on_err
     server = types.Server(u_api, handler, options)
 
     def handle_message(msg: Msg, timers: Summary, server: 'types.Server', connection: NatsClient, frontdoor_topic: str) -> None:
@@ -247,11 +252,6 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         return types.Message(response_headers, response_body)
 
     options = types.Server.Options()
-
-    def on_err(e):
-        print("BOOM!")
-        print(e)
-        traceback.print_tb(e.__traceback__)
 
     options.on_error = on_err
     options.on_request = lambda m: None  # onRequest handling

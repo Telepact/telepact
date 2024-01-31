@@ -928,7 +928,7 @@ def unpack_map(row: List[Any], header: List[Any]) -> Dict[int, Any]:
 def server_binary_encode(message: List[Any], binary_encoder: _types._BinaryEncoding) -> List[Any]:
     headers: dict[str, Any] = message[0]
     message_body = message[1]
-    client_known_binary_checksums = headers.pop(
+    client_known_binary_checksums: list[int] = headers.pop(
         "_clientKnownBinaryChecksums", None)
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
@@ -1128,7 +1128,7 @@ def serialize(message: 'types.Message', binary_encoder: _types._BinaryEncoder, s
         else:
             return serializer.to_json(message_as_pseudo_json)
     except Exception as e:
-        raise types.SerializationError(e)
+        raise types.SerializationError() from e
 
 
 def deserialize(message_bytes: bytes, serializer: 'types.SerializationImpl', binary_encoder: _types._BinaryEncoder) -> 'types.Message':
@@ -1191,15 +1191,13 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', f
     validation_failures: List[_types._ValidationFailure] = []
 
     if "_bin" in headers:
-        try:
-            binary_checksums = list(headers["_bin"])
+        if isinstance(headers['_bin'], list):
+            binary_checksums = headers["_bin"]
             for i, binary_checksum in enumerate(binary_checksums):
-                try:
-                    integer_element = int(binary_checksum)
-                except ValueError:
+                if not isinstance(binary_checksum, int) or isinstance(binary_checksum, bool):
                     validation_failures.extend(get_type_unexpected_validation_failure([
                                                "_bin", i], binary_checksum, "Integer"))
-        except TypeError:
+        else:
             validation_failures.extend(get_type_unexpected_validation_failure([
                                        "_bin"], headers["_bin"], "Array"))
 

@@ -183,15 +183,7 @@ class SerializationError(Exception):
     """
     Indicates failure to serialize a uAPI Message.
     """
-
-    def __init__(self, cause: Exception) -> None:
-        """
-        Initialize SerializationError with the given cause.
-
-        Args:
-            cause (Throwable): The cause of the serialization error.
-        """
-        super().__init__(cause)
+    pass
 
 
 class SerializationImpl:
