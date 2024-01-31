@@ -1,7 +1,14 @@
-# HELP py_binary_server_frontdoor 
-# TYPE py_binary_server_frontdoor summary
-py_binary_server_frontdoor_count 31.0
-py_binary_server_frontdoor_sum 7.12038017809391e-05
-# HELP py_binary_server_frontdoor_created 
-# TYPE py_binary_server_frontdoor_created gauge
-py_binary_server_frontdoor_created 1.70665911312148e+09
+# HELP py_binary_client_server_frontdoor 
+# TYPE py_binary_client_server_frontdoor summary
+py_binary_client_server_frontdoor_count 3.0
+py_binary_client_server_frontdoor_sum 6.659072823822498e-06
+# HELP py_binary_client_server_frontdoor_created 
+# TYPE py_binary_client_server_frontdoor_created gauge
+py_binary_client_server_frontdoor_created 1.7066732355980248e+09
+# HELP py_binary_client_server_client_frontdoor 
+# TYPE py_binary_client_server_client_frontdoor summary
+py_binary_client_server_client_frontdoor_count 3.0
+py_binary_client_server_client_frontdoor_sum 7.811002433300018e-06
+# HELP py_binary_client_server_client_frontdoor_created 
+# TYPE py_binary_client_server_client_frontdoor_created gauge
+py_binary_client_server_client_frontdoor_created 1.706673235712838e+09

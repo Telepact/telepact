@@ -55,8 +55,8 @@ class Client:
         :param request_message: The uAPI Request Message.
         :return: The uAPI Response Message.
         """
-        return _util.process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default,
-                                            self.use_binary_default)
+        return await _util.process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default,
+                                                  self.use_binary_default)
 
 
 class ClientBinaryStrategy:

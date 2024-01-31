@@ -35,65 +35,56 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
                                    client_backdoor_topic: str,
                                    default_binary: bool) -> Subscription:
 
-    timers = Summary(client_frontdoor_topic, registry=metrics)
+    timers = Summary(client_frontdoor_topic.replace(
+        '.', '_').replace('-', '_'), '', registry=metrics)
 
-    def adapter(m: Msg, s: types.Serializer) -> Union[Dict[str, bool], Dict[str, Dict[str, Any]]]:
-        async def async_task() -> Union[Dict[str, bool], Dict[str, Dict[str, Any]]]:
-            try:
-                request_bytes = await s.serialize(m)
+    async def adapter(m: types.Message, s: types.Serializer) -> types.Message:
+        request_bytes = s.serialize(m)
 
-                print(f"   <-c  {request_bytes.decode()}")
-                await connection.flush()
+        print(f"   <-c  {request_bytes}")
+        await connection.flush()
 
-                try:
-                    nats_response_message = await connection.request(client_backdoor_topic, request_bytes, 5)
-                except asyncio.TimeoutError:
-                    raise RuntimeError(
-                        "Timeout occurred while waiting for NATS response.")
+        try:
+            nats_response_message = await connection.request(client_backdoor_topic, request_bytes, 5)
+        except asyncio.TimeoutError:
+            raise RuntimeError(
+                "Timeout occurred while waiting for NATS response.")
 
-                response_bytes = nats_response_message.data
+        response_bytes = nats_response_message.data
 
-                print(f"   ->c  {response_bytes.decode()}")
-                await connection.flush()
+        print(f"   ->c  {response_bytes}")
+        await connection.flush()
 
-                response_message = await s.deserialize(response_bytes)
-                return response_message
-            except Exception as e:
-                raise RuntimeError(e)
+        response_message = s.deserialize(response_bytes)
+        return response_message
 
-        return async_task
-
-    options = {
-        "use_binary": default_binary
-    }
-    client = types.Client(adapter, **options)
+    options = types.Client.Options()
+    options.use_binary = default_binary
+    client = types.Client(adapter, options)
 
     async def message_handler(msg: Msg) -> None:
-        try:
-            request_bytes = msg.data
+        request_bytes = msg.data
 
-            print(f"   ->C  {request_bytes.decode()}")
-            await connection.flush()
+        print(f"   ->C  {request_bytes}")
+        await connection.flush()
 
-            request_pseudo_json = json.loads(request_bytes)
-            request_headers, request_body = request_pseudo_json
+        request_pseudo_json = json.loads(request_bytes)
+        request_headers, request_body = request_pseudo_json
 
-            @timers.time()
-            async def c() -> 'types.Message':
-                return await client.request(request_headers, request_body)
+        @timers.time()
+        async def c() -> 'types.Message':
+            return await client.request(types.Message(request_headers, request_body))
 
-            response = await c()
+        response = await c()
 
-            response_pseudo_json = [response.header, response.body]
+        response_pseudo_json = [response.header, response.body]
 
-            print(response_pseudo_json)
+        print(response_pseudo_json)
 
-            response_bytes = json.dumps(response_pseudo_json).encode()
+        response_bytes = json.dumps(response_pseudo_json).encode()
 
-            print(f"   <-C  {response_bytes.decode()}")
-            await connection.publish(msg.reply_to, response_bytes)
-        except Exception as e:
-            raise RuntimeError(e)
+        print(f"   <-C  {response_bytes}")
+        await connection.publish(msg.reply, response_bytes)
 
     return await connection.subscribe(client_frontdoor_topic, cb=message_handler)
 
