@@ -38,7 +38,7 @@ class _RandomGenerator {
         return seed;
     }
 
-    public int nextInt(int ceiling) {
+    public int nextIntWithCeiling(int ceiling) {
         if (ceiling == 0) {
             return 0;
         }
@@ -46,7 +46,7 @@ class _RandomGenerator {
     }
 
     public boolean nextBoolean() {
-        return nextInt(31) > 15;
+        return nextIntWithCeiling(31) > 15;
     }
 
     public String nextString() {
@@ -56,13 +56,13 @@ class _RandomGenerator {
     }
 
     public double nextDouble() {
-        var x = (double) (nextInt(Integer.MAX_VALUE / 2) + (Integer.MAX_VALUE / 4));
+        var x = (double) (nextIntWithCeiling(Integer.MAX_VALUE / 2) + (Integer.MAX_VALUE / 4));
         var y = Integer.MAX_VALUE;
         return x / (x + y);
     }
 
     public int nextCollectionLength() {
-        return nextInt(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
+        return nextIntWithCeiling(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
     }
 }
 

@@ -1679,7 +1679,7 @@ class _Util {
     }
 
     static Object generateRandomAny(_RandomGenerator randomGenerator) {
-        final var selectType = randomGenerator.nextInt(3);
+        final var selectType = randomGenerator.nextIntWithCeiling(3);
         if (selectType == 0) {
             return randomGenerator.nextBoolean();
         } else if (selectType == 1) {
@@ -2092,7 +2092,7 @@ class _Util {
 
             Collections.sort(sortedUnionCasesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            final var randomIndex = randomGenerator.nextInt(sortedUnionCasesReference.size());
+            final var randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.size());
             final var unionEntry = sortedUnionCasesReference.get(randomIndex);
             final var unionCase = unionEntry.getKey();
             final var unionData = unionEntry.getValue();

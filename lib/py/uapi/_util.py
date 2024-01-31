@@ -1302,7 +1302,7 @@ def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: boo
 
 
 def generate_random_any(random_generator: _types._RandomGenerator) -> Any:
-    select_type = random_generator.next_int_ceiling(3)
+    select_type = random_generator.next_int_with_ceiling(3)
     if select_type == 0:
         return random_generator.next_boolean()
     elif select_type == 1:
@@ -1636,7 +1636,7 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
     else:
         sorted_union_cases_reference = sorted(
             union_cases_reference.items(), key=lambda x: x[0])
-        random_index = random_generator.next_int_ceiling(
+        random_index = random_generator.next_int_with_ceiling(
             len(sorted_union_cases_reference) - 1)
         union_case, union_data = sorted_union_cases_reference[random_index]
         return {union_case: construct_random_struct(union_data.fields, {},

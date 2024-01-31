@@ -25,13 +25,13 @@ class _RandomGenerator:
         self.seed = (self.seed * 1_103_515_245 + 12_345) & 0x7fffffff
         return self.seed
 
-    def next_int_ceiling(self, ceiling: int) -> int:
+    def next_int_with_ceiling(self, ceiling: int) -> int:
         if ceiling == 0:
             return 0
         return self.next_int() % ceiling
 
     def next_boolean(self) -> bool:
-        return self.next_int_ceiling(31) > 15
+        return self.next_int_with_ceiling(31) > 15
 
     def next_string(self) -> str:
         import base64
@@ -40,12 +40,12 @@ class _RandomGenerator:
         return base64.b64encode(bytes_data).decode().rstrip("=")
 
     def next_double(self) -> float:
-        x = float(self.next_int_ceiling(int(2e9)) + int(1e9))
+        x = float(self.next_int_with_ceiling(int(2e9)) + int(1e9))
         y = int(2e9)
         return x / (x + y)
 
     def next_collection_length(self) -> int:
-        return self.next_int_ceiling(self.collection_length_max - self.collection_length_min) + self.collection_length_min
+        return self.next_int_with_ceiling(self.collection_length_max - self.collection_length_min) + self.collection_length_min
 
 
 class _ValidationFailure:
