@@ -1302,7 +1302,7 @@ def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: boo
 
 
 def generate_random_any(random_generator: _types._RandomGenerator) -> Any:
-    select_type = random_generator.next_int(3)
+    select_type = random_generator.next_int_ceiling(3)
     if select_type == 0:
         return random_generator.next_boolean()
     elif select_type == 1:
@@ -1340,7 +1340,7 @@ def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,
     if use_blueprint_value:
         return blueprint_value
     else:
-        return random_generator.randint()
+        return random_generator.next_int()
 
 
 def validate_number(value: Any) -> List[_types._ValidationFailure]:
@@ -1361,7 +1361,7 @@ def generate_random_number(blueprint_value: Any, use_blueprint_value: bool,
     if use_blueprint_value:
         return blueprint_value
     else:
-        return random_generator.uniform()
+        return random_generator.next_double()
 
 
 def validate_string(value: Any) -> List[_types._ValidationFailure]:
@@ -1376,7 +1376,7 @@ def generate_random_string(blueprint_value: Any, use_blueprint_value: bool,
     if use_blueprint_value:
         return blueprint_value
     else:
-        return random_generator.random_string()
+        return random_generator.next_string()
 
 
 def validate_array(value: Any, type_parameters: List[_types._UTypeDeclaration],
@@ -1636,8 +1636,8 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
     else:
         sorted_union_cases_reference = sorted(
             union_cases_reference.items(), key=lambda x: x[0])
-        random_index = random_generator.randint(
-            0, len(sorted_union_cases_reference) - 1)
+        random_index = random_generator.next_int_ceiling(
+            len(sorted_union_cases_reference) - 1)
         union_case, union_data = sorted_union_cases_reference[random_index]
         return {union_case: construct_random_struct(union_data.fields, {},
                                                     include_random_optional_fields, type_parameters,
@@ -1660,6 +1660,7 @@ def generate_random_fn(blueprint_value: Any,
                                  use_blueprint_value,
                                  include_random_optional_fields,
                                  type_parameters,
+                                 generics,
                                  random,
                                  call_cases)
 

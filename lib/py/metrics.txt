@@ -1,7 +1,7 @@
 # HELP py_mock_frontdoor 
 # TYPE py_mock_frontdoor summary
-py_mock_frontdoor_count 318.0
-py_mock_frontdoor_sum 0.000656928401440382
+py_mock_frontdoor_count 5.0
+py_mock_frontdoor_sum 1.4065997675061226e-05
 # HELP py_mock_frontdoor_created 
 # TYPE py_mock_frontdoor_created gauge
-py_mock_frontdoor_created 1.7067166232751281e+09
+py_mock_frontdoor_created 1.706717188559034e+09
