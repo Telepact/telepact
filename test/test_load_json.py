@@ -17,7 +17,7 @@ def load_json_server_proc(loop, nats_client, dispatcher_server):
     server_id = '{}.{}'.format(lib_name, 'load-json-server')
 
     async def t():
-        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config': {'minLength': 500, 'maxLength': 500, 'enableGen': True}}}])
+        req = json.dumps([{}, {'StartMockServer': {'id': server_id, 'apiSchemaPath': c.load_api_path, 'frontdoorTopic': topics[1], 'config!': {'minLength': 500, 'maxLength': 500, 'enableGen': True}}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)    
         req2 = json.dumps([{}, {'StartClientServer': {'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useBinary': False}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)

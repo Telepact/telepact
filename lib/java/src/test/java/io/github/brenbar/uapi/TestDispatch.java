@@ -425,7 +425,7 @@ public class TestDispatch {
                             var id = (String) payload.get("id");
                             var apiSchemaPath = (String) payload.get("apiSchemaPath");
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
-                            var config = (Map<String, Object>) payload.get("config");
+                            var config = (Map<String, Object>) payload.get("config!");
                             var d = startMockTestServer(connection, metrics, apiSchemaPath,
                                     frontdoorTopic, config);
 

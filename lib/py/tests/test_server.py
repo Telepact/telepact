@@ -105,15 +105,19 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
         "enable_message_response_generation": False
     }
 
-    if config is not None:
-        options.update({
-            "generated_collection_length_min": config.get("minLength"),
-            "generated_collection_length_max": config.get("maxLength"),
-            "enable_message_response_generation": config.get("enableGen", False)
-        })
+    options = types.MockServer.Options()
+    options.on_error = on_err
+    options.enable_message_response_generation = False
 
-    timers = Summary(frontdoor_topic, registry=metrics)
-    server = types.MockServer(u_api, **options)
+    if config is not None:
+        options.generated_collection_length_min = config.get("minLength")
+        options.generated_collection_length_max = config.get("maxLength")
+        options.enable_message_response_generation = config.get(
+            "enableGen", False)
+
+    timers = Summary(frontdoor_topic.replace(
+        '.', '_').replace('-', '_'), '', registry=metrics)
+    server = types.MockServer(u_api, options)
 
     async def message_handler(msg: Msg) -> None:
         try:
@@ -129,7 +133,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
             response_bytes = await s()
 
             print(f"    <-S {response_bytes.decode()}")
-            await connection.publish(msg.reply_to, response_bytes)
+            await connection.publish(msg.reply, response_bytes)
         except Exception as e:
             raise RuntimeError(e)
 
@@ -353,7 +357,7 @@ async def run_dispatcher_server():
                 server_id = payload["id"]
                 api_schema_path = payload["apiSchemaPath"]
                 frontdoor_topic = payload["frontdoorTopic"]
-                config = payload["config"]
+                config = payload.get('config!', None)
                 server = await start_mock_test_server(
                     connection, metrics, api_schema_path, frontdoor_topic, config)
                 servers[server_id] = server

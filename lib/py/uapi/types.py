@@ -145,8 +145,8 @@ class MockServer:
         type_extensions["_ext._Call"] = _types._UMockCall(parsed_types)
         type_extensions["_ext._Stub"] = _types._UMockStub(parsed_types)
 
-        combined_u_api_schema: UApiSchema = UApiSchema.extendWithExtensions(
-            u_api_schema, _util.getMockUApiJson(), type_extensions)
+        combined_u_api_schema: UApiSchema = UApiSchema.extend_with_extensions(
+            u_api_schema, _util.get_mock_uapi_json(), type_extensions)
 
         server_options: Server.Options = Server.Options()
         server_options.on_error = options.on_error
