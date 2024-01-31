@@ -312,7 +312,7 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
     def_init = struct_definition_as_pseudo_json.get(schema_key)
 
     try:
-        definition = dict(def_init)
+        definition = as_map(def_init)
     except TypeError:
         branch_parse_failures = get_type_unexpected_parse_failure(
             this_path, def_init, "Object")
@@ -349,7 +349,7 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
     def_init = union_definition_as_pseudo_json.get(schema_key)
 
     try:
-        definition = dict(def_init)
+        definition = as_map(def_init)
     except TypeError:
         final_parse_failures = get_type_unexpected_parse_failure(
             this_path, def_init, "Object")
@@ -378,7 +378,7 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
             continue
 
         try:
-            union_case_struct = dict(entry_value)
+            union_case_struct = as_map(entry_value)
         except TypeError:
             this_parse_failures = get_type_unexpected_parse_failure(
                 union_key_path, entry_value, "Object")
@@ -462,7 +462,7 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
     this_path = path + [field_name]
 
     try:
-        type_declaration_array = list(type_declaration_value)
+        type_declaration_array = as_list(type_declaration_value)
     except TypeError:
         raise types.UApiSchemaParseError(get_type_unexpected_parse_failure(
             this_path, type_declaration_value, "Array"))
@@ -534,7 +534,7 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
     this_path = base_path + [schema_key]
 
     try:
-        def_dict = dict(def_init)
+        def_dict = as_map(def_init)
     except TypeError:
         this_parse_failures = get_type_unexpected_parse_failure(
             this_path, def_init, "Object")
@@ -604,7 +604,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
         errors_regex_init = function_definition_as_parsed_json.get(
             errors_regex_key, "^error\\..*$")
         try:
-            errors_regex = str(errors_regex_init)
+            errors_regex = as_string(errors_regex_init)
         except TypeError:
             this_parse_failures = get_type_unexpected_parse_failure(
                 regex_path, errors_regex_init, "String")
@@ -623,7 +623,7 @@ def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, Any]) -> '
         raise types.UApiSchemaParseError([([], "JsonInvalid", {})], e)
 
     try:
-        uapi_schema_pseudo_json = list(uapi_schema_pseudo_json_init)
+        uapi_schema_pseudo_json = as_list(uapi_schema_pseudo_json_init)
     except TypeError as e:
         this_parse_failures = get_type_unexpected_parse_failure(
             [], uapi_schema_pseudo_json_init, "Array")
@@ -640,7 +640,7 @@ def extend_uapi_schema(first: 'types.UApiSchema', second_uapi_schema_json: str, 
         raise types.UApiSchemaParseError([([], "JsonInvalid", {})], e)
 
     try:
-        second_uapi_schema_pseudo_json = list(
+        second_uapi_schema_pseudo_json = as_list(
             second_uapi_schema_pseudo_json_init)
     except TypeError as e:
         this_parse_failure = get_type_unexpected_parse_failure(
@@ -672,7 +672,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         loop_path = [index]
 
         try:
-            def_dict = dict(definition)
+            def_dict = as_map(definition)
         except TypeError as e:
             this_parse_failures = get_type_unexpected_parse_failure(
                 loop_path, definition, "Object")
@@ -1151,7 +1151,8 @@ def deserialize(message_bytes: bytes, serializer: 'types.SerializationImpl', bin
 
     try:
         payload = list(body.values())[0]
-        payload = dict(payload)
+        if not isinstance(payload, dict):
+            raise _types._InvalidMessageBody()
     except Exception:
         raise _types._InvalidMessageBody()
 
@@ -2174,7 +2175,7 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
             "strictMatch!", False)
         stub_count: int = argument.get("count!", -1)
 
-        stub = _types._MockStub(stub_function_name, dict(stub_arg), stub_result,
+        stub = _types._MockStub(stub_function_name, stub_arg, stub_result,
                                 allow_argument_partial_match, stub_count)
 
         stubs.insert(0, stub)
@@ -2216,7 +2217,7 @@ def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub],
 
     else:
         invocations.append(_types._MockInvocation(
-            function_name, dict(argument)))
+            function_name, argument))
 
         definition: _types._UFn = u_api_schema.parsed.get(function_name)
 
