@@ -1026,6 +1026,7 @@ class _Util {
                 try {
                     nestedHeader = (List<Object>) header.get(keyIndexValue + 1);
                 } catch (ClassCastException e) {
+                    // No nesting available, so the data structure is inconsistent
                     throw new CannotPack();
                 }
 

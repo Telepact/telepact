@@ -836,9 +836,9 @@ def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, _Bin
         key_index_nested = final_key_index.nested
 
         if isinstance(value, dict):
-            try:
-                nested_header = header[key_index_value + 1]
-            except IndexError:
+            nested_header = header[key_index_value + 1]
+            if nested_header == None or not isinstance(nested_header, list):
+                # No nesting available, so the data structure is inconsistent
                 raise CannotPack()
 
             packed_value = pack_map(value, nested_header, key_index_nested)
