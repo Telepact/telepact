@@ -1052,7 +1052,10 @@ def decode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
             if isinstance(key, str):
                 decoded_key = key
             else:
-                decoded_key = binary_encoder.decode_map.get(key, key)
+                if key not in binary_encoder.decode_map:
+                    raise _types._BinaryEncodingMissing(key)
+
+                decoded_key = binary_encoder.decode_map[key]
             decoded_value = decode_keys(value, binary_encoder)
             new_map[decoded_key] = decoded_value
         return new_map
@@ -1060,13 +1063,6 @@ def decode_keys(given: Any, binary_encoder: _types._BinaryEncoding) -> Any:
         return [decode_keys(e, binary_encoder) for e in given]
     else:
         return given
-
-
-def encode_or_decode(key: Any, encoding_map: Dict[Any, Any]) -> Any:
-    value = encoding_map.get(key)
-    if value is None:
-        raise _types._BinaryEncodingMissing(key)
-    return value
 
 
 def construct_binary_encoding(u_api_schema: 'types.UApiSchema') -> _types._BinaryEncoding:

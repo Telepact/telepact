@@ -1265,7 +1265,7 @@ class _Util {
 
                 final Object finalKey;
                 if (binaryEncoder.encodeMap.containsKey(key)) {
-                    finalKey = encodeOrDecode(key, binaryEncoder.encodeMap);
+                    finalKey = binaryEncoder.encodeMap.get(key);
                 } else {
                     finalKey = key;
                 }
@@ -1292,7 +1292,11 @@ class _Util {
                 if (e.getKey() instanceof final String s) {
                     key = s;
                 } else {
-                    key = (String) encodeOrDecode(e.getKey(), binaryEncoder.decodeMap);
+                    key = (String) binaryEncoder.decodeMap.get(e.getKey());
+
+                    if (key == null) {
+                        throw new _BinaryEncodingMissing(key);
+                    }
                 }
                 final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);
 
@@ -1305,16 +1309,6 @@ class _Util {
         } else {
             return given;
         }
-    }
-
-    private static Object encodeOrDecode(Object key, Map<?, ?> map) {
-        final var value = map.get(key);
-
-        if (value == null) {
-            throw new _BinaryEncodingMissing(key);
-        }
-
-        return value;
     }
 
     static _BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {
