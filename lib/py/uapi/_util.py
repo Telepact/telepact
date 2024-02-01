@@ -2288,7 +2288,7 @@ async def process_request_object(request_message: 'types.Message',
             header["_forceSendJson"] = True
 
             async with asyncio.timeout(timeout_ms / 1000):
-                return await adapter(request_message, serializer).result(timeout_ms / 1000)
+                return await adapter(request_message, serializer)
 
         return response_message
     except Exception as e:

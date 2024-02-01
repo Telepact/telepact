@@ -1,70 +1,70 @@
 # HELP py_binary_server_frontdoor 
 # TYPE py_binary_server_frontdoor summary
 py_binary_server_frontdoor_count 31.0
-py_binary_server_frontdoor_sum 8.398108184337616e-05
+py_binary_server_frontdoor_sum 7.635517977178097e-05
 # HELP py_binary_server_frontdoor_created 
 # TYPE py_binary_server_frontdoor_created gauge
-py_binary_server_frontdoor_created 1.706789446983208e+09
+py_binary_server_frontdoor_created 1.7067898861843698e+09
 # HELP py_binary_client_server_frontdoor 
 # TYPE py_binary_client_server_frontdoor summary
 py_binary_client_server_frontdoor_count 6702.0
-py_binary_client_server_frontdoor_sum 0.015618477133102715
+py_binary_client_server_frontdoor_sum 0.0156668204581365
 # HELP py_binary_client_server_frontdoor_created 
 # TYPE py_binary_client_server_frontdoor_created gauge
-py_binary_client_server_frontdoor_created 1.70678944722777e+09
+py_binary_client_server_frontdoor_created 1.706789886432502e+09
 # HELP py_binary_client_server_client_frontdoor 
 # TYPE py_binary_client_server_client_frontdoor summary
 py_binary_client_server_client_frontdoor_count 6830.0
-py_binary_client_server_client_frontdoor_sum 0.017621512757614255
+py_binary_client_server_client_frontdoor_sum 0.017007741145789623
 # HELP py_binary_client_server_client_frontdoor_created 
 # TYPE py_binary_client_server_client_frontdoor_created gauge
-py_binary_client_server_client_frontdoor_created 1.7067894473366652e+09
+py_binary_client_server_client_frontdoor_created 1.706789886540719e+09
 # HELP py_client_server_frontdoor 
 # TYPE py_client_server_frontdoor summary
 py_client_server_frontdoor_count 3415.0
-py_client_server_frontdoor_sum 0.008080781670287251
+py_client_server_frontdoor_sum 0.008133417461067438
 # HELP py_client_server_frontdoor_created 
 # TYPE py_client_server_frontdoor_created gauge
-py_client_server_frontdoor_created 1.7067894987646e+09
+py_client_server_frontdoor_created 1.706789938959313e+09
 # HELP py_client_server_client_frontdoor 
 # TYPE py_client_server_client_frontdoor summary
 py_client_server_client_frontdoor_count 3415.0
-py_client_server_client_frontdoor_sum 0.00884609017521143
+py_client_server_client_frontdoor_sum 0.008468716638162732
 # HELP py_client_server_client_frontdoor_created 
 # TYPE py_client_server_client_frontdoor_created gauge
-py_client_server_client_frontdoor_created 1.706789498884817e+09
+py_client_server_client_frontdoor_created 1.7067899390794969e+09
 # HELP py_cold_binary_client_server_frontdoor 
 # TYPE py_cold_binary_client_server_frontdoor summary
-py_cold_binary_client_server_frontdoor_count 3.0
-py_cold_binary_client_server_frontdoor_sum 5.810055881738663e-06
+py_cold_binary_client_server_frontdoor_count 10.0
+py_cold_binary_client_server_frontdoor_sum 2.233672421425581e-05
 # HELP py_cold_binary_client_server_frontdoor_created 
 # TYPE py_cold_binary_client_server_frontdoor_created gauge
-py_cold_binary_client_server_frontdoor_created 1.706789524301557e+09
+py_cold_binary_client_server_frontdoor_created 1.706789965179374e+09
 # HELP py_cold_binary_client_server_client_frontdoor 
 # TYPE py_cold_binary_client_server_client_frontdoor summary
-py_cold_binary_client_server_client_frontdoor_count 3.0
-py_cold_binary_client_server_client_frontdoor_sum 7.597031071782112e-06
+py_cold_binary_client_server_client_frontdoor_count 9.0
+py_cold_binary_client_server_client_frontdoor_sum 2.2573047317564487e-05
 # HELP py_cold_binary_client_server_client_frontdoor_created 
 # TYPE py_cold_binary_client_server_client_frontdoor_created gauge
-py_cold_binary_client_server_client_frontdoor_created 1.706789524414518e+09
+py_cold_binary_client_server_client_frontdoor_created 1.706789965293681e+09
 # HELP py_mock_frontdoor 
 # TYPE py_mock_frontdoor summary
 py_mock_frontdoor_count 2871.0
-py_mock_frontdoor_sum 0.006961553008295596
+py_mock_frontdoor_sum 0.006983297993429005
 # HELP py_mock_frontdoor_created 
 # TYPE py_mock_frontdoor_created gauge
-py_mock_frontdoor_created 1.706789525600966e+09
+py_mock_frontdoor_created 1.706789965416818e+09
 # HELP py_schema_frontdoor 
 # TYPE py_schema_frontdoor summary
 py_schema_frontdoor_count 114.0
-py_schema_frontdoor_sum 0.00028695620130747557
+py_schema_frontdoor_sum 0.000288679962977767
 # HELP py_schema_frontdoor_created 
 # TYPE py_schema_frontdoor_created gauge
-py_schema_frontdoor_created 1.706789535062369e+09
+py_schema_frontdoor_created 1.706789975132395e+09
 # HELP py_server_frontdoor 
 # TYPE py_server_frontdoor summary
 py_server_frontdoor_count 3415.0
-py_server_frontdoor_sum 0.008205362944863737
+py_server_frontdoor_sum 0.008816425106488168
 # HELP py_server_frontdoor_created 
 # TYPE py_server_frontdoor_created gauge
-py_server_frontdoor_created 1.706789535752243e+09
+py_server_frontdoor_created 1.706789975837296e+09
