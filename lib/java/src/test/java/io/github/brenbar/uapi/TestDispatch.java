@@ -99,8 +99,6 @@ public class TestDispatch {
 
                 var responsePseudoJson = List.of(response.header, response.body);
 
-                System.out.println(responsePseudoJson);
-
                 var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
                 System.out.println("   <-C  %s".formatted(new String(responseBytes)));

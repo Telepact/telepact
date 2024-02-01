@@ -35,7 +35,6 @@ class _RandomGenerator:
         self.seed = seed
 
     def next_int(self) -> int:
-        # print(f'{self.count} {self.seed} {_find_stack()}')
         self.seed = (self.seed * 1_103_515_245 + 12_345) & 0x7fffffff
         self.count += 1
         return self.seed

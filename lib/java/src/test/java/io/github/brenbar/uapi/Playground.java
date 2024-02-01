@@ -11,33 +11,31 @@ import java.util.function.Function;
 
 public class Playground {
     public static void main(String[] args) throws IOException {
-        // var json = Files.readString(FileSystems.getDefault().getPath("../../test",
-        // "example.uapi.json"));
-        // var uApi = UApiSchema.fromJson(json);
+        var json = Files.readString(FileSystems.getDefault().getPath("../../test",
+                "example.uapi.json"));
+        var uApi = UApiSchema.fromJson(json);
 
-        // Function<Message, Message> handler = (requestMessage) -> {
-        // return new Message(Map.of("Ok", Map.of()));
-        // };
+        Function<Message, Message> handler = (requestMessage) -> {
+            return new Message(Map.of("Ok", Map.of()));
+        };
 
-        // var server = new Server(uApi, handler, new Server.Options());
+        var server = new Server(uApi, handler, new Server.Options());
 
-        // BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
-        // return CompletableFuture.supplyAsync(() -> {
-        // var requestBytes = s.serialize(m);
-        // var responseBytes = server.process(requestBytes);
-        // return s.deserialize(responseBytes);
-        // });
-        // };
+        BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
+            return CompletableFuture.supplyAsync(() -> {
+                var requestBytes = s.serialize(m);
+                var responseBytes = server.process(requestBytes);
+                return s.deserialize(responseBytes);
+            });
+        };
 
-        // var clientOptions = new Client.Options();
-        // clientOptions.useBinary = true;
-        // clientOptions.timeoutMsDefault = 100000000000L;
-        // var client = new Client(adapter, clientOptions);
-        // var result = client
-        // .request(new Message(Map.of("fn.test", Map.of("value!", Map.of("pStrBool!",
-        // Map.of("wrap", 0))))));
-        // System.out.println(result.body);
-
-        System.out.println((((float) 0x0FFFFFFF / (float) 0x7FFFFFFF)));
+        var clientOptions = new Client.Options();
+        clientOptions.useBinary = true;
+        clientOptions.timeoutMsDefault = 100000000000L;
+        var client = new Client(adapter, clientOptions);
+        var result = client
+                .request(new Message(Map.of("fn.test", Map.of("value!", Map.of("pStrBool!",
+                        Map.of("wrap", 0))))));
+        System.out.println(result.body);
     }
 }

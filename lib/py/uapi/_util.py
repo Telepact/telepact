@@ -951,9 +951,6 @@ def server_binary_decode(message: List[Any], binary_encoder: _types._BinaryEncod
     client_known_binary_checksums = headers["_bin"]
     binary_checksum_used_by_client_on_this_message = client_known_binary_checksums[0]
 
-    print(
-        f'binary_checksum_used_by_client_on_this_message: {binary_checksum_used_by_client_on_this_message}')
-
     if binary_checksum_used_by_client_on_this_message != binary_encoder.checksum:
         raise _types._BinaryEncoderUnavailableError()
 
@@ -1098,7 +1095,6 @@ def construct_binary_encoding(u_api_schema: 'types.UApiSchema') -> _types._Binar
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
     final_string = "\n".join(sorted_all_keys)
     checksum = create_checksum(final_string)
-    print(f'checksum: {checksum}')
     return _types._BinaryEncoding(binary_encoding, checksum)
 
 
@@ -2225,7 +2221,6 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
         definition: _types._UFn = u_api_schema.parsed.get(function_name)
 
         for stub in stubs:
-            print(stub.when_argument, stub.count)
             if stub.count == 0:
                 continue
             if stub.when_function == function_name:

@@ -50,7 +50,6 @@ class _RandomGenerator {
     }
 
     public int nextInt() {
-        // System.out.println("%d %d %s".formatted(this.count, this.seed, findStack()));
         this.seed = (this.seed * 1_103_515_245 + 12_345) & 0x7fffffff;
         this.count += 1;
         return seed;

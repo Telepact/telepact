@@ -26,7 +26,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 def on_err(e):
-    print("BOOM!")
     print("".join(traceback.format_exception(e.__class__, e, e.__traceback__)))
 
 
@@ -84,8 +83,6 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         response = await c()
 
         response_pseudo_json = [response.header, response.body]
-
-        print(response_pseudo_json)
 
         response_bytes = json.dumps(response_pseudo_json).encode()
 
@@ -369,13 +366,12 @@ async def run_dispatcher_server():
             response_bytes = json.dumps([{}, {"Ok": {}}]).encode("utf-8")
 
         except Exception as e:
-            print(e)
-            traceback.print_exc(file=sys.stdout)
+            on_err(e)
             try:
                 response_bytes = json.dumps(
                     [{}, {"ErrorUnknown": {}}]).encode("utf-8")
-            except json.JSONDecodeError as e1:
-                raise RuntimeError()
+            except json.JSONDecodeError:
+                raise
 
         print(f"    <-S {response_bytes.decode('utf-8')}")
         await connection.publish(msg.reply, response_bytes)

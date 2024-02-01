@@ -1358,7 +1358,6 @@ class _Util {
         final var finalString = String.join("\n", allKeys);
 
         final int checksum = createChecksum(finalString);
-        System.out.println("checksum: " + checksum);
         return new _BinaryEncoding(binaryEncoding, checksum);
     }
 
@@ -1366,15 +1365,6 @@ class _Util {
         var c = new CRC32();
         c.update(value.getBytes(StandardCharsets.UTF_8));
         return (int) c.getValue();
-        // try {
-        // final var hash =
-        // MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
-        // final var buffer = ByteBuffer.wrap(hash);
-        // System.out.println("b: " + buffer);
-        // return buffer.getInt();
-        // } catch (NoSuchAlgorithmException e) {
-        // throw new RuntimeException(e);
-        // }
     }
 
     static byte[] serialize(Message message, _BinaryEncoder binaryEncoder,
@@ -2761,7 +2751,6 @@ class _Util {
                 final var definition = (_UFn) uApiSchema.parsed.get(functionName);
 
                 for (final var stub : stubs) {
-                    System.out.println(stub.whenArgument + " " + stub.count);
                     if (stub.count == 0) {
                         continue;
                     }
