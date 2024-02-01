@@ -9,6 +9,13 @@
       "name": "Playground",
       "request": "launch",
       "mainClass": "io.github.brenbar.uapi.Playground",
+      "projectName": "japi"
+    },
+    {
+      "type": "java",
+      "name": "Playground",
+      "request": "launch",
+      "mainClass": "io.github.brenbar.uapi.Playground",
       "projectName": "uapi"
     },
     {

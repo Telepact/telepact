@@ -50,7 +50,7 @@ class _RandomGenerator {
     }
 
     public int nextInt() {
-        System.out.println("%d %d %s".formatted(this.count, this.seed, findStack()));
+        // System.out.println("%d %d %s".formatted(this.count, this.seed, findStack()));
         this.seed = (this.seed * 1_103_515_245 + 12_345) & 0x7fffffff;
         this.count += 1;
         return seed;
@@ -74,9 +74,12 @@ class _RandomGenerator {
     }
 
     public double nextDouble() {
-        var x = (double) (nextIntWithCeiling(Integer.MAX_VALUE / 2) + (Integer.MAX_VALUE / 4));
-        var y = Integer.MAX_VALUE;
-        return x / (x + y);
+        // var max = 2 << 31 - 1;
+        // var half = 2 << 30;
+        // var quarter = 2 << 29;
+        // var x = (double) (nextIntWithCeiling(half) + (quarter));
+        // var y = (double) max;
+        return ((double) (nextInt() & 0x7fffffff) / ((double) 0x7fffffff));
     }
 
     public int nextCollectionLength() {

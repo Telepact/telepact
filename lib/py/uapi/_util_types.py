@@ -55,9 +55,12 @@ class _RandomGenerator:
         return base64.b64encode(bytes_data).decode().rstrip("=")
 
     def next_double(self) -> float:
-        x = float(self.next_int_with_ceiling(int(2e9)) + int(1e9))
-        y = int(2e9)
-        return x / (x + y)
+        # max = (2 << 31) - 1
+        # half = (2 << 30)
+        # quarter = (2 << 29)
+        # x = float((self.next_int_with_ceiling(half) + quarter) & 0xFFFFFFFF)
+        # y = float(max)
+        return float(self.next_int() & 0x7fffffff) / float(0x7fffffff)
 
     def next_collection_length(self) -> int:
         return self.next_int_with_ceiling(self.collection_length_max - self.collection_length_min) + self.collection_length_min
