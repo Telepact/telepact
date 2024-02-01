@@ -16,7 +16,7 @@ public class Playground {
         var uApi = UApiSchema.fromJson(json);
 
         Function<Message, Message> handler = (requestMessage) -> {
-            return new Message(Map.of("Ok", Map.of()));
+            return new Message(Map.of(), Map.of("Ok", Map.of()));
         };
 
         var server = new Server(uApi, handler, new Server.Options());
@@ -34,7 +34,7 @@ public class Playground {
         clientOptions.timeoutMsDefault = 100000000000L;
         var client = new Client(adapter, clientOptions);
         var result = client
-                .request(new Message(Map.of("fn.test", Map.of("value!", Map.of("pStrBool!",
+                .request(new Message(Map.of(), Map.of("fn.test", Map.of("value!", Map.of("pStrBool!",
                         Map.of("wrap", 0))))));
         System.out.println(result.body);
     }

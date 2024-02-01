@@ -15,16 +15,6 @@ public class Message {
         this.body = body;
     }
 
-    public Message(Map<String, Object> body) {
-        this.header = new HashMap<>();
-        this.body = body;
-    }
-
-    public Message(String target, Map<String, Object> payload) {
-        this.header = new HashMap<>();
-        this.body = Map.of(target, payload);
-    }
-
     public String getBodyTarget() {
         var entry = _Util.unionEntry(body);
         return entry.getKey();

@@ -2454,9 +2454,9 @@ class _Util {
 
         final Message resultMessage;
         if (requestTarget.equals("fn._ping")) {
-            resultMessage = new Message("Ok", Map.of());
+            resultMessage = new Message(Map.of(), Map.of("Ok", Map.of()));
         } else if (requestTarget.equals("fn._api")) {
-            resultMessage = new Message("Ok", Map.of("api", uApiSchema.original));
+            resultMessage = new Message(Map.of(), Map.of("Ok", Map.of("api", uApiSchema.original)));
         } else {
             try {
                 resultMessage = handler.apply(callMessage);
@@ -2709,7 +2709,7 @@ class _Util {
                         allowArgumentPartialMatch, stubCount);
 
                 stubs.add(0, stub);
-                return new Message(Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
             case "fn._verify" -> {
                 final var givenCall = (Map<String, Object>) argument.get("call");
@@ -2725,25 +2725,25 @@ class _Util {
                 final var verificationResult = verify(callFunctionName, callArg, strictMatch,
                         verifyTimes,
                         invocations);
-                return new Message(verificationResult);
+                return new Message(Map.of(), verificationResult);
             }
             case "fn._verifyNoMoreInteractions" -> {
                 final var verificationResult = verifyNoMoreInteractions(invocations);
-                return new Message(verificationResult);
+                return new Message(Map.of(), verificationResult);
             }
             case "fn._clearCalls" -> {
                 invocations.clear();
-                return new Message(Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
             case "fn._clearStubs" -> {
                 stubs.clear();
-                return new Message(Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
             case "fn._setRandomSeed" -> {
                 final var givenSeed = (Integer) argument.get("seed");
 
                 random.setSeed(givenSeed);
-                return new Message(Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
             default -> {
                 invocations.add(new _MockInvocation(functionName, new TreeMap<>(argument)));
@@ -2765,7 +2765,7 @@ class _Util {
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
-                                return new Message(result);
+                                return new Message(Map.of(), result);
                             }
                         } else {
                             if (Objects.equals(stub.whenArgument, argument)) {
@@ -2777,14 +2777,14 @@ class _Util {
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
-                                return new Message(result);
+                                return new Message(Map.of(), result);
                             }
                         }
                     }
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return new Message(Map.of("_ErrorNoMatchingStub", Map.of()));
+                    return new Message(Map.of(), Map.of("_ErrorNoMatchingStub", Map.of()));
                 }
 
                 if (definition != null) {
@@ -2794,7 +2794,7 @@ class _Util {
                     final var includeRandomOptionalFields = true;
                     final var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
                             includeRandomOptionalFields, List.of(), List.of(), random);
-                    return new Message(Map.of("Ok", randomOkStruct));
+                    return new Message(Map.of(), Map.of("Ok", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));
                 }
