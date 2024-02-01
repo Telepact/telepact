@@ -7,11 +7,16 @@ from test.binary_cases import binary_client_rotation_cases
 from test.mock_cases import cases as mock_cases
 from test.mock_cases import invalid_cases as mock_invalid_cases
 from test.parse_cases import cases as parse_cases
-from copy import deepcopy as dc
-from test.util import increment, get_lib_modules, ping, startup_check
+from test.util import increment, ping, startup_check
 import json
 import importlib
 import nats
+import os
+
+def get_lib_modules():
+    result = [f for f in os.listdir('../lib')
+                 if os.path.isdir('../lib/{}'.format(f))]    
+    return result
 
 def pytest_addoption(parser):
     parser.addoption('--remotenats', action='store', default=None)
@@ -108,21 +113,21 @@ def loop():
 
 def pytest_generate_tests(metafunc: pytest.Metafunc):
     if 'test_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]])
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]])
     elif 'test_binary_client_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
     elif 'test_pbinary_client_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
     elif 'test_client_server_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in basic_cases for rq, rs in basic_cases[k]], ids=increment())
     elif 'test_binary_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in binary_cases for rq, rs in binary_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in binary_cases for rq, rs in binary_cases[k]], ids=increment())
     elif 'test_mock_multi_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,statements', [(k, [[dc(rq), dc(rs)] for rq, rs in mock_cases[k]]) for k in mock_cases])
+        metafunc.parametrize('name,statements', [(k, [[rq, rs] for rq, rs in mock_cases[k]]) for k in mock_cases])
     elif 'test_mock_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in mock_invalid_cases for rq, rs in mock_invalid_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in mock_invalid_cases for rq, rs in mock_invalid_cases[k]], ids=increment())
     elif 'test_schema_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,req,res', [(k, dc(rq), dc(rs)) for k in parse_cases for rq, rs in parse_cases[k]], ids=increment())
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in parse_cases for rq, rs in parse_cases[k]], ids=increment())
     elif 'test_cold_binary_client_server_multi_case' == metafunc.function.__name__:
-        metafunc.parametrize('name,statements', [(k, [[dc(rq), dc(rs)] for rq, rs in binary_client_rotation_cases[k]]) for k in binary_client_rotation_cases], ids=increment())
+        metafunc.parametrize('name,statements', [(k, [[rq, rs] for rq, rs in binary_client_rotation_cases[k]]) for k in binary_client_rotation_cases], ids=increment())
 

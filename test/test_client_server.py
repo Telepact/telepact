@@ -4,6 +4,7 @@ import pytest
 import time
 import importlib
 import json
+from copy import deepcopy as dc
 
 @pytest.fixture(scope="module")
 def client_server_proc(loop, nats_client, dispatcher_server):
@@ -44,6 +45,6 @@ def test_client_server_case(loop, client_server_proc, nats_client, name, req, re
     topics = client_server_proc
 
     async def t():
-        await verify_client_case(nats_client, req, res, *topics)
+        await verify_client_case(nats_client, dc(req), dc(res), *topics)
                                              
     loop.run_until_complete(t())

@@ -5,6 +5,7 @@ import time
 import os
 import importlib
 import json
+from copy import deepcopy as dc
 
 
 @pytest.fixture(scope="module")
@@ -41,6 +42,6 @@ def test_server_case(loop, server_proc, nats_client, name, req, res):
     topics = server_proc
     
     async def t():
-        await verify_server_case(nats_client, req, res, *topics)
+        await verify_server_case(nats_client, dc(req), dc(res), *topics)
     
     loop.run_until_complete(t())

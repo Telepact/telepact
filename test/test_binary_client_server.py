@@ -5,6 +5,7 @@ import time
 import os
 import importlib
 import json
+from copy import deepcopy as dc
 
 @pytest.fixture(scope="module")
 def binary_client_server_proc(loop, nats_client, dispatcher_server):
@@ -54,7 +55,7 @@ def test_binary_client_server_case(loop, binary_client_server_proc, nats_client,
     topics = binary_client_server_proc
 
     async def t():
-        await verify_client_case(nats_client, req, res, *topics, assert_binary=True)
+        await verify_client_case(nats_client, dc(req), dc(res), *topics, assert_binary=True)
                                                  
     loop.run_until_complete(t())
 
@@ -65,6 +66,6 @@ def test_pbinary_client_server_case(loop, binary_client_server_proc, nats_client
     req[0]['_pac'] = True
 
     async def t():
-        await verify_client_case(nats_client, req, res, *topics, assert_binary=True)
+        await verify_client_case(nats_client, dc(req), dc(res), *topics, assert_binary=True)
                                                  
     loop.run_until_complete(t())

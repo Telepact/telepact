@@ -5,6 +5,7 @@ import time
 import os
 import importlib
 import json
+from copy import deepcopy as dc
 
 @pytest.fixture(scope="module")
 def load_json_server_proc(loop, nats_client, dispatcher_server):

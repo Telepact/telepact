@@ -4,6 +4,7 @@ import pytest
 import time
 import importlib
 import json
+from copy import deepcopy as dc
 
 
 @pytest.fixture(scope="module")
@@ -41,7 +42,7 @@ def test_mock_multi_case(loop, mock_server_proc, nats_client, name, statements):
 
     async def t():
         for request, expected_response in statements:
-            await verify_flat_case(nats_client, request, expected_response, *topics)
+            await verify_flat_case(nats_client, dc(request), dc(expected_response), *topics)
 
     loop.run_until_complete(t())
 
@@ -50,6 +51,6 @@ def test_mock_case(loop, mock_server_proc, nats_client, name, req, res):
     topics = mock_server_proc
 
     async def t():
-        await verify_flat_case(nats_client, req, res, *topics)
+        await verify_flat_case(nats_client, dc(req), dc(res), *topics)
     
     loop.run_until_complete(t())

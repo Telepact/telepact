@@ -4,6 +4,7 @@ import pytest
 import time
 import importlib
 import json
+from copy import deepcopy as dc
 
 
 @pytest.fixture(scope="module")
@@ -46,6 +47,6 @@ def test_cold_binary_client_server_multi_case(loop, cold_binary_client_server_pr
 
     async def t():
         for request, expected_response in statements:
-            await verify_client_case(nats_client, request, expected_response, *topics, assert_binary=True)
+            await verify_client_case(nats_client, dc(request), dc(expected_response), *topics, assert_binary=True)
 
     loop.run_until_complete(t())
