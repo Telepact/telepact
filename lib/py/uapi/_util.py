@@ -2158,7 +2158,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
     header: Dict[str, Any] = request_message.header
 
     enable_generation_stub: bool = header.get(
-        "_mockEnableGeneratedStub", False)
+        "_gen", False)
     function_name: str = request_message.get_body_target()
     argument: Dict[str, Any] = request_message.get_body_payload()
 

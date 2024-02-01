@@ -2689,7 +2689,7 @@ class _Util {
             _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub) {
         final Map<String, Object> header = requestMessage.header;
 
-        final var enableGenerationStub = (Boolean) header.getOrDefault("_mockEnableGeneratedStub", false);
+        final var enableGenerationStub = (Boolean) header.getOrDefault("_gen", false);
         final String functionName = requestMessage.getBodyTarget();
         final Map<String, Object> argument = requestMessage.getBodyPayload();
 
