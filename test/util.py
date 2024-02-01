@@ -30,11 +30,6 @@ def increment():
         yield count
         count += 1
 
-def get_lib_modules():
-    result = [f for f in os.listdir('../lib')
-                 if os.path.isdir('../lib/{}'.format(f))]    
-    return result
-
 def handler(request):
     header = request[0]
     body = request[1]
