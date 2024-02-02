@@ -51,6 +51,38 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>unpack-jacoco</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jacoco</groupId>
+                  <artifactId>jacoco</artifactId>
+                  <version>0.8.11</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.2.1</version>
@@ -71,6 +103,34 @@
               </arguments>
             </configuration>
           </execution>
+          <execution>
+            <id>codecoverage</id>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <executable>java</executable>
+              <arguments>
+                <argument>-jar</argument>
+                <argument
+                  >${project.build.directory}/dependency/lib/jacococli.jar</argument
+                >
+                <argument>report</argument>
+                <argument>${project.build.directory}/jacoco.exec</argument>
+                <argument>--classfiles</argument>
+                <argument
+                  >${project.build.directory}/dependency/uapi-1.0-SNAPSHOT.jar</argument
+                >
+                <argument>--sourcefiles</argument>
+                <argument
+                  >${project.basedir}/../../../lib/java/src/main/java</argument
+                >
+                <argument>--html</argument>
+                <argument>${project.build.directory}/codecoverage</argument>
+              </arguments>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -82,12 +142,6 @@
             <id>default-prepare-agent</id>
             <goals>
               <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-report</id>
-            <goals>
-              <goal>report</goal>
             </goals>
           </execution>
         </executions>
