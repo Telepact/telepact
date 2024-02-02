@@ -1,22 +1,22 @@
 import subprocess
 import pytest
 import asyncio
-from test.cases import cases as basic_cases
-from test.binary_cases import cases as binary_cases
-from test.binary_cases import binary_client_rotation_cases
-from test.mock_cases import cases as mock_cases
-from test.mock_cases import invalid_cases as mock_invalid_cases
-from test.parse_cases import cases as parse_cases
-from test.garbage_cases import cases as garbage_cases
-from test.util import increment, ping, startup_check
+from qa.test.cases import cases as basic_cases
+from qa.test.binary_cases import cases as binary_cases
+from qa.test.binary_cases import binary_client_rotation_cases
+from qa.test.mock_cases import cases as mock_cases
+from qa.test.mock_cases import invalid_cases as mock_invalid_cases
+from qa.test.parse_cases import cases as parse_cases
+from qa.test.garbage_cases import cases as garbage_cases
+from qa.test.util import increment, ping, startup_check
 import json
 import importlib
 import nats
 import os
 
 def get_lib_modules():
-    result = [f for f in os.listdir('../lib')
-                 if os.path.isdir('../lib/{}'.format(f))]    
+    result = [f for f in os.listdir('../../lib')
+                 if os.path.isdir('../../lib/{}'.format(f))]    
     return result
 
 def pytest_addoption(parser):
@@ -69,7 +69,7 @@ def nats_client(loop, nats_server):
 def dispatcher_server(loop, nats_server, request, nats_client):
     nats_url = nats_server
     lib_name = request.param
-    test_module_name = 'lib.{}.build_test'.format(lib_name)
+    test_module_name = 'qa.lib.{}.build_test'.format(lib_name)
     l = importlib.import_module(test_module_name, package="..")
 
     s: subprocess.Popen = l.start(nats_url)
@@ -93,17 +93,6 @@ def dispatcher_server(loop, nats_server, request, nats_client):
         s.terminate()
         s.wait()
 
-
-
-# @pytest.fixture(scope='session', autouse=True)
-# def event_loop():
-#     print('Overriding event loop')
-#     try:
-#         loop = asyncio.get_running_loop()
-#     except RuntimeError:
-#         loop = asyncio.new_event_loop()
-#     yield loop
-#     loop.close()
     
 @pytest.fixture(scope='session')
 def loop():

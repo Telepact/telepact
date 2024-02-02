@@ -11,6 +11,6 @@ def start(nats_url):
     this_env['PYTHONTRACEMALLOC'] = '1'
 
     p = subprocess.Popen(['pipenv', 'run', 'python',
-                         '-m', 'tests'], cwd=this_path, env=this_env)
+                         '-m', 'uapitest'], cwd=this_path, env=this_env)
 
     return p

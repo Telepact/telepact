@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "09e9067e43cd17adc1aa4183386d0762a632d3aee54ede02f8588edef09b2ba8"
+            "sha256": "e0258d27c171c317b1ec90cd08d229cebc0a3c7d1eddd7a6da9540bcf2479083"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -17,30 +17,39 @@
         ]
     },
     "default": {
-        "certifi": {
+        "build": {
             "hashes": [
-                "sha256:9b469f3a900bf28dc19b8cfbf8019bf47f7fdd1a65a1d4ffb98fc14166beb4d1",
-                "sha256:e036ab49d5b79556f99cfc2d9320b34cfbe5be05c5871b51de9329f0603b0474"
+                "sha256:538aab1b64f9828977f84bc63ae570b060a8ed1be419e7870b8b4fc5e6ea553b",
+                "sha256:589bf99a67df7c9cf07ec0ac0e5e2ea5d4b37ac63301c4986d1acb126aa83f8f"
             ],
             "index": "pypi",
-            "version": "==2023.11.17"
+            "version": "==1.0.3"
+        },
+        "packaging": {
+            "hashes": [
+                "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5",
+                "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==23.2"
+        },
+        "pyproject-hooks": {
+            "hashes": [
+                "sha256:283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8",
+                "sha256:f271b298b97f5955d53fb12b72c1fb1948c22c1a6b70b315c54cedaca0264ef5"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==1.0.0"
+        },
+        "uapi": {
+            "hashes": [
+                "sha256:83221bdd0c6e33a0bf0c59e6be9e0c749f5e96c3e1785f9757987e3219bc060c"
+            ],
+            "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
+            "version": "==0.0.1"
         }
     },
     "develop": {
-        "ed25519": {
-            "hashes": [
-                "sha256:02053ee019ceef0df97294be2d4d5a8fc120fc86e81e08bec1245fc0f9403358"
-            ],
-            "version": "==1.5"
-        },
-        "iniconfig": {
-            "hashes": [
-                "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3",
-                "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==2.0.0"
-        },
         "msgpack": {
             "hashes": [
                 "sha256:04ad6069c86e531682f9e1e71b71c1c3937d6014a7c3e9edd2aa81ad58842862",
@@ -110,36 +119,13 @@
             "index": "pypi",
             "version": "==2.6.0"
         },
-        "nkeys": {
+        "prometheus-client": {
             "hashes": [
-                "sha256:93482ab08ff9625882b988c3ea58fd1a6ef0061b60f95946742cc1394578760a"
+                "sha256:4585b0d1223148c27a225b10dbec5ae9bc4c81a99a3fa80774fa6209935324e1",
+                "sha256:c88b1e6ecf6b41cd8fb5731c7ae919bf66df6ec6fafa555cd6c0e16ca169ae92"
             ],
             "index": "pypi",
-            "version": "==0.1.0"
-        },
-        "packaging": {
-            "hashes": [
-                "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5",
-                "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==23.2"
-        },
-        "pluggy": {
-            "hashes": [
-                "sha256:7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981",
-                "sha256:8c85c2876142a764e5b7548e7d9a0e0ddb46f5185161049a79b7e974454223be"
-            ],
-            "markers": "python_version >= '3.8'",
-            "version": "==1.4.0"
-        },
-        "pytest": {
-            "hashes": [
-                "sha256:249b1b0864530ba251b7438274c4d251c58d868edaaec8762893ad4a0d71c36c",
-                "sha256:50fb9cbe836c3f20f0dfa99c565201fb75dc54c8d76373cd1bde06b06657bdb6"
-            ],
-            "index": "pypi",
-            "version": "==8.0.0"
+            "version": "==0.19.0"
         }
     }
 }

@@ -1,4 +1,4 @@
-from test.util import verify_client_case, ping_req, startup_check, Constants as c
+from qa.test.util import verify_client_case, ping_req, startup_check, Constants as c
 import pytest
 import json
 from copy import deepcopy as dc

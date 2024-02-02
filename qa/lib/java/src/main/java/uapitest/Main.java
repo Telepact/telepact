@@ -1,4 +1,4 @@
-package io.github.brenbar.uapi;
+package uapitest;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,20 +16,25 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.junit.jupiter.api.Test;
-
 import com.codahale.metrics.CsvReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.github.brenbar.uapi.Client;
+import io.github.brenbar.uapi.Message;
+import io.github.brenbar.uapi.MockServer;
+import io.github.brenbar.uapi.SerializationError;
+import io.github.brenbar.uapi.Serializer;
+import io.github.brenbar.uapi.Server;
+import io.github.brenbar.uapi.UApiSchema;
+import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 
-public class TestDispatch {
-
+public class Main {
     public static Dispatcher startClientTestServer(Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary)
@@ -470,8 +475,7 @@ public class TestDispatch {
         }
     }
 
-    @Test
-    public void test() throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         runDispatcherServer();
     }
 }

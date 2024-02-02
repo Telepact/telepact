@@ -4,9 +4,8 @@ python_full_version = "3.11.0"
 
 [dev-packages]
 msgpack = "*"
-pytest = "*"
 nats-py = "*"
-nkeys = "*"
 
 [packages]
-certifi = "*"
+pytest = "*"
+
