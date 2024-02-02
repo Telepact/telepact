@@ -281,8 +281,10 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
 
     print('T->     {}'.format(request), flush=True)
 
-    if type(request) == bytes:
-        request_bytes = request
+    request_is_msgpack = request[0].get('msgpack', False)
+
+    if request_is_msgpack:
+        request_bytes = msgpack.dumps(request)
     else:
         request_json = json.dumps(request)
         request_bytes = request_json.encode()    
