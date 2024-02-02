@@ -58,11 +58,17 @@
           <execution>
             <id>run</id>
             <goals>
-              <goal>java</goal>
+              <goal>exec</goal>
             </goals>
             <phase>test</phase>
             <configuration>
-              <mainClass>uapitest.Main</mainClass>
+              <executable>java</executable>
+              <arguments>
+                <argument>${argLine}</argument>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>uapitest.Main</argument>
+              </arguments>
             </configuration>
           </execution>
         </executions>
