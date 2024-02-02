@@ -230,6 +230,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         print(f"    ->s {response_bytes}")
 
         response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
+
         response_headers = response_pseudo_json[0]
         response_body = response_pseudo_json[1]
 

@@ -1,11 +1,16 @@
 [
   {
-    "fn.example": {
-      "one": ["boolean"],
-      "two": ["boolean"]
-    },
+    "struct.Data": {
+      "id": ["integer"],
+      "name": ["string"]
+    }
+  },
+  {
+    "fn.example": {},
     "->": {
-      "Ok": {}
+      "Ok": {
+        "data": ["array", ["struct.Data"]]
+      }
     }
   }
 ]

@@ -291,19 +291,19 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
 
     response_bytes = nats_response.data
 
+    try:
+        response_json = response_bytes.decode()
+        response = json.loads(response_json)
+        print('T<-     {}'.format(response), flush=True)
+    except:
+        response = msgpack.loads(response_bytes, strict_map_key=False)
+        print('T<-     {}'.format(response), flush=True)
+
+    if 'numberTooBig' in response[0]:
+        pytest.skip('Cannot use big numbers with msgpack')
+
     if type(expected_response) == bytes:
         response = response_bytes
-    else:
-        try:        
-            response_json = response_bytes.decode()
-            response = json.loads(response_json)
-            print('T<-     {}'.format(response), flush=True)
-        except:
-            response = msgpack.loads(response_bytes, strict_map_key=False)
-            print('T<-     {}'.format(response_bytes), flush=True)
-
-        if 'numberTooBig' in response[0]:
-            pytest.skip('Cannot use big numbers with msgpack')
 
     return response
 
