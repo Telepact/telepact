@@ -1,0 +1,15 @@
+public class {{name}} {
+    {{#fields}}
+        public final {{type}} {{name}};
+    {{/fields}}
+
+    public {{name}}(
+        {{#fields}}
+            {{type}} {{name}}{{#comma}},{{/comma}}
+        {{/fields}}
+    ) {
+        {{#fields}}
+            this.{{name}} = {{name}};
+        {{/fields}}
+    }
+}

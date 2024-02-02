@@ -3,5 +3,5 @@
 To build:
 
 ```
-pipenv run python build.py
+pipenv run python prepare.py
 ```
