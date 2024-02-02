@@ -5,4 +5,3 @@ src/test/java/io/github/brenbar/uapi/GeneratedMockInvalidStubTests.java
 target/
 src/main/resources/internal.uapi.json
 src/main/resources/mock-internal.uapi.json
-metrics/
