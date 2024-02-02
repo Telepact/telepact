@@ -7,6 +7,7 @@ from test.binary_cases import binary_client_rotation_cases
 from test.mock_cases import cases as mock_cases
 from test.mock_cases import invalid_cases as mock_invalid_cases
 from test.parse_cases import cases as parse_cases
+from test.garbage_cases import cases as garbage_cases
 from test.util import increment, ping, startup_check
 import json
 import importlib
@@ -130,4 +131,6 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
         metafunc.parametrize('name,req,res', [(k, rq, rs) for k in parse_cases for rq, rs in parse_cases[k]], ids=increment())
     elif 'test_cold_binary_client_server_multi_case' == metafunc.function.__name__:
         metafunc.parametrize('name,statements', [(k, [[rq, rs] for rq, rs in binary_client_rotation_cases[k]]) for k in binary_client_rotation_cases], ids=increment())
+    elif 'test_garbage_case' == metafunc.function.__name__:
+        metafunc.parametrize('name,req,res', [(k, rq, rs) for k in garbage_cases for rq, rs in garbage_cases[k]], ids=increment())
 

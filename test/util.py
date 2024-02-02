@@ -201,13 +201,13 @@ def convert_lists_to_sets(a):
         return a
 
 
-async def verify_server_case(nats_client, request, expected_response, frontdoor_topic, backdoor_topic):
+async def verify_server_case(nats_client, request, expected_response, frontdoor_topic, backdoor_topic, just_send=False):
     assert_rules = {} if not expected_response or type(expected_response) == bytes else expected_response[0].pop('_assert', {})
 
     backdoor_handling_task = asyncio.create_task(backdoor_handler(nats_client, backdoor_topic))
 
     try:
-        response = await send_case(nats_client, request, expected_response, frontdoor_topic)
+        response = await send_case(nats_client, request, expected_response, frontdoor_topic, just_send=just_send)
     finally:
         backdoor_handling_task.cancel()
         await backdoor_handling_task
@@ -277,17 +277,22 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
 
 
-async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic):
+async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic, just_send=False):
 
     print('T->     {}'.format(request), flush=True)
 
-    request_is_msgpack = request[0].get('msgpack', False)
+    request_is_msgpack = False
+    if not just_send:
+        request_is_msgpack = request[0].get('msgpack', False)
 
     if request_is_msgpack:
         request_bytes = msgpack.dumps(request)
     else:
-        request_json = json.dumps(request)
-        request_bytes = request_json.encode()    
+        if not isinstance(request, bytes):
+            request_json = json.dumps(request)
+            request_bytes = request_json.encode()    
+        else:
+            request_bytes = request
 
     nats_response = await nats_client.request(request_topic, request_bytes, timeout=1)
 
