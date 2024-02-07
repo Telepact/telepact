@@ -23,7 +23,6 @@ class _RandomGenerator {
     private int seed = 0;
     private int collectionLengthMin;
     private int collectionLengthMax;
-    private int count = 0;
 
     public _RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
         this.collectionLengthMin = collectionLengthMin;
@@ -34,24 +33,8 @@ class _RandomGenerator {
         this.seed = seed;
     }
 
-    private static String findStack() {
-        var i = 0;
-        for (var stack : Thread.currentThread().getStackTrace()) {
-            i += 1;
-            if (i == 1) {
-                continue;
-            }
-            var stackStr = String.valueOf(stack);
-            if (!stackStr.contains("_RandomGenerator")) {
-                return stackStr;
-            }
-        }
-        throw new RuntimeException();
-    }
-
     public int nextInt() {
         this.seed = (this.seed * 1_103_515_245 + 12_345) & 0x7fffffff;
-        this.count += 1;
         return seed;
     }
 
@@ -73,11 +56,6 @@ class _RandomGenerator {
     }
 
     public double nextDouble() {
-        // var max = 2 << 31 - 1;
-        // var half = 2 << 30;
-        // var quarter = 2 << 29;
-        // var x = (double) (nextIntWithCeiling(half) + (quarter));
-        // var y = (double) max;
         return ((double) (nextInt() & 0x7fffffff) / ((double) 0x7fffffff));
     }
 

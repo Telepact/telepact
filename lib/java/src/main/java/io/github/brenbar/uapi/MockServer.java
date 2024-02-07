@@ -69,7 +69,7 @@ public class MockServer {
 
         this.server = new Server(combinedUApiSchema, this::handle, serverOptions);
 
-        final UApiSchema finalUApiSchema = server.uApiSchema;
+        final UApiSchema finalUApiSchema = this.server.uApiSchema;
         final Map<String, _UType> finalParsedUApiSchema = finalUApiSchema.parsed;
 
         parsedTypes.putAll(finalParsedUApiSchema);
