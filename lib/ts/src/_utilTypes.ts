@@ -493,11 +493,11 @@ export class _InvalidMessage extends Error {
 export class _InvalidMessageBody extends Error {}
 
 export class _BinaryEncoding {
-    public readonly encodeMap: { [key: string]: number };
-    public readonly decodeMap: { [key: number]: string };
-    public readonly checksum: number | undefined;
+    public readonly encodeMap: { [key: string]: string };
+    public readonly decodeMap: { [key: string]: string };
+    public readonly checksum: number;
 
-    constructor(binaryEncoding: { [key: string]: number }, checksum: number | undefined) {
+    constructor(binaryEncoding: { [key: string]: string }, checksum: number) {
         this.encodeMap = binaryEncoding;
         this.decodeMap = Object.fromEntries(Object.entries(binaryEncoding).map(([key, value]) => [value, key]));
         this.checksum = checksum;

@@ -1,5 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { _BinaryEncoding, _BinaryEncodingMissing, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion } from './_utilTypes';
+import { UApiSchemaParseError } from './UApiSchemaParseError';
+import { UApiSchema } from './UApiSchema';
 
 export const _ANY_NAME: Readonly<string> = "Any";
 export const _ARRAY_NAME: Readonly<string> = "Array";
@@ -170,8 +173,7 @@ export function parseTypeDeclaration(
 
     const type = getOrParseType(
         basePath,
-        // @ts-ignore
-        typeName,
+        typeName!,
         thisTypeParameterCount,
         uApiSchemaPseudoJson,
         schemaKeysToIndex,
@@ -320,8 +322,7 @@ export function getOrParseType(
         }
     }
 
-    // @ts-ignore
-    const customTypeName: string = matcher[2];
+    const customTypeName: string = matcher[2]!;
 
     const index = schemaKeysToIndex[customTypeName];
     if (index === undefined) {
@@ -709,7 +710,7 @@ export function parseFunctionType(
     const typeParameterCount = 0;
     const isForFn = true;
 
-    let callType = null;
+    let callType: _UUnion | null = null;
     try {
         const argType = parseStructType(
             path,
@@ -724,7 +725,7 @@ export function parseFunctionType(
             allParseFailures,
             failedTypes
         );
-        callType = { [schemaKey]: argType };
+        callType = new _UUnion(schemaKey, {schemaKey: argType}, typeParameterCount);
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
@@ -780,7 +781,7 @@ export function parseFunctionType(
         throw new UApiSchemaParseError(parseFailures);
     }
 
-    return { name: schemaKey, callType, resultType, errorsRegex };
+    return new _UFn(schemaKey, callType!, resultType!, errorsRegex);
 }
 
 
@@ -788,14 +789,14 @@ export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<str
     let uApiSchemaPseudoJsonInit: any;
     try {
         uApiSchemaPseudoJsonInit = JSON.parse(uApiSchemaJson);
-    } catch (e) {
+    } catch (e: Error) {
         throw new UApiSchemaParseError([new _SchemaParseFailure([], "JsonInvalid", {})], e);
     }
 
     let uApiSchemaPseudoJson: Array<Object>;
     try {
         uApiSchemaPseudoJson = Array.from(uApiSchemaPseudoJsonInit);
-    } catch (e) {
+    } catch (e: Error) {
         const thisParseFailures = getTypeUnexpectedParseFailure([], uApiSchemaPseudoJsonInit, "Array");
         throw new UApiSchemaParseError(thisParseFailures, e);
     }
@@ -807,123 +808,157 @@ export function extendUApiSchema(first: UApiSchema, secondUApiSchemaJson: string
     let secondUApiSchemaPseudoJsonInit: any;
     try {
         secondUApiSchemaPseudoJsonInit = JSON.parse(secondUApiSchemaJson);
-    } catch (e) {
-        throw new UApiSchemaParseError([new _SchemaParseFailure([], "JsonInvalid", {})], e);
+    } catch (e: Error) {
+        throw new UApiSchemaParseError(
+            [new _SchemaParseFailure([], "JsonInvalid", {})],
+            e
+        );
     }
 
-    let secondUApiSchemaPseudoJson: Array<Object>;
+    let secondUApiSchemaPseudoJson: any[];
     try {
-        secondUApiSchemaPseudoJson = Array.from(secondUApiSchemaPseudoJsonInit);
-    } catch (e) {
-        const thisParseFailure = getTypeUnexpectedParseFailure([], secondUApiSchemaPseudoJsonInit, "Array");
+        secondUApiSchemaPseudoJson = Array.isArray(secondUApiSchemaPseudoJsonInit) ? secondUApiSchemaPseudoJsonInit : [];
+    } catch (e: Error) {
+        const thisParseFailure: _SchemaParseFailure[] = getTypeUnexpectedParseFailure([], secondUApiSchemaPseudoJsonInit, "Array");
         throw new UApiSchemaParseError(thisParseFailure, e);
     }
 
-    const firstOriginal = first.original;
-    const firstTypeExtensions = first.typeExtensions;
+    const firstOriginal: any[] = first.original;
+    const firstTypeExtensions: Record<string, _UType> = first.typeExtensions;
 
-    const original = [...firstOriginal, ...secondUApiSchemaPseudoJson];
+    const original: any[] = [...firstOriginal, ...secondUApiSchemaPseudoJson];
 
-    const typeExtensions = new Record<string, _UType>();
-    typeExtensions.set(...firstTypeExtensions);
-    typeExtensions.set(...secondTypeExtensions);
+    const typeExtensions: Record<string, _UType> = { ...firstTypeExtensions, ...secondTypeExtensions };
 
     return parseUApiSchema(original, typeExtensions, firstOriginal.length);
 }
 
-export function parseUApiSchema(uApiSchemaPseudoJson: Array<Object>, typeExtensions: Record<string, _UType>, pathOffset: number): UApiSchema {
-    const parsedTypes = new Record<string, _UType>();
-    const parseFailures = new Array<_SchemaParseFailure>();
-    const failedTypes = new Set<string>();
-    const schemaKeysToIndex = new Record<string, number>();
-    const schemaKeys = new Set<string>();
-
+export function parseUApiSchema(
+    uApiSchemaPseudoJson: object[],
+    typeExtensions: Record<string, _UType>,
+    pathOffset: number
+  ): UApiSchema {
+    const parsedTypes: Record<string, _UType> = {};
+    const parseFailures: _SchemaParseFailure[] = [];
+    const failedTypes: Set<string> = new Set();
+    const schemaKeysToIndex: Record<string, number> = {};
+    const schemaKeys: Set<string> = new Set();
+  
     let index = -1;
     for (const definition of uApiSchemaPseudoJson) {
-        index += 1;
-
-        const loopPath = [index];
-
-        let def: Record<string, Object>;
-        try {
-            def = Object.assign({}, definition);
-        } catch (e) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, definition, "Object");
-            parseFailures.push(...thisParseFailures);
-            continue;
-        }
-
-        let schemaKey: string;
-        try {
-            schemaKey = findSchemaKey(def, index);
-        } catch (e) {
+      index += 1;
+  
+      const loopPath = [index];
+  
+      let def: Record<string, any>;
+      try {
+        def = definition as Record<string, any>;
+      } catch (e) {
+        const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, definition, "Object");
+        parseFailures.push(...thisParseFailures);
+        continue;
+      }
+  
+      let schemaKey: string;
+      try {
+        schemaKey = findSchemaKey(def, index);
+      } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
-            continue;
         }
-
-        const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
-        if (matchingSchemaKey !== null) {
-            const otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
-            const finalPath = append(loopPath, schemaKey);
-            console.log(otherPathIndex);
-
-            parseFailures.push(new _SchemaParseFailure(finalPath, "PathCollision", { other: [otherPathIndex, matchingSchemaKey] }));
-            continue;
-        }
-
-        schemaKeys.add(schemaKey);
-        schemaKeysToIndex.set(schemaKey, index);
+        continue;
+      }
+  
+      const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
+      if (matchingSchemaKey) {
+        const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
+        const finalPath = append(loopPath, schemaKey);
+        console.log(otherPathIndex);
+  
+        parseFailures.push(new _SchemaParseFailure(
+          finalPath,
+          "PathCollision",
+          { other: [otherPathIndex, matchingSchemaKey] },
+        ));
+        continue;
+      }
+  
+      schemaKeys.add(schemaKey);
+      schemaKeysToIndex[schemaKey] = index;
     }
-
-    if (parseFailures.length !== 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
-        throw new UApiSchemaParseError(offsetParseFailures);
+  
+    if (parseFailures.length > 0) {
+      const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+      throw new UApiSchemaParseError(offsetParseFailures);
     }
-
-    const errorKeys = new Set<string>();
+  
+    const errorKeys: Set<string> = new Set();
     const rootTypeParameterCount = 0;
-
+  
     for (const schemaKey of schemaKeys) {
-        if (schemaKey.startsWith("info.")) {
-            continue;
-        } else if (schemaKey.startsWith("error.")) {
-            errorKeys.add(schemaKey);
-            continue;
-        }
-
-        const thisIndex = schemaKeysToIndex.get(schemaKey);
-
-        try {
-            getOrParseType([thisIndex], schemaKey, rootTypeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-        } catch (e) {
+      if (schemaKey.startsWith("info.")) {
+        continue;
+      } else if (schemaKey.startsWith("error.")) {
+        errorKeys.add(schemaKey);
+        continue;
+      }
+  
+      const thisIndex = schemaKeysToIndex[schemaKey];
+  
+      try {
+        getOrParseType(
+          [thisIndex],
+          schemaKey,
+          rootTypeParameterCount,
+          uApiSchemaPseudoJson,
+          schemaKeysToIndex,
+          parsedTypes,
+          typeExtensions,
+          parseFailures,
+          failedTypes
+        );
+      } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
         }
+      }
     }
-
-    if (parseFailures.length !== 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
-        throw new UApiSchemaParseError(offsetParseFailures);
+  
+    if (parseFailures.length > 0) {
+      const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+      throw new UApiSchemaParseError(offsetParseFailures);
     }
-
+  
     for (const errorKey of errorKeys) {
-        const thisIndex = schemaKeysToIndex.get(errorKey);
-        const def = uApiSchemaPseudoJson[thisIndex] as Record<string, Object>;
-
-        try {
-            const error = parseErrorType(def, errorKey, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-            applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
-        } catch (e) {
+      const thisIndex: number = schemaKeysToIndex[errorKey]!;
+      const def = uApiSchemaPseudoJson[thisIndex] as Record<string, any>;
+  
+      try {
+        const error = parseErrorType(
+          def,
+          errorKey,
+          uApiSchemaPseudoJson,
+          schemaKeysToIndex,
+          parsedTypes,
+          typeExtensions,
+          parseFailures,
+          failedTypes
+        );
+        applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
+      } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
         }
+      }
     }
-
-    if (parseFailures.length !== 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
-        throw new UApiSchemaParseError(offsetParseFailures);
+  
+    if (parseFailures.length > 0) {
+      const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+      throw new UApiSchemaParseError(offsetParseFailures);
     }
-
-    return { original: uApiSchemaPseudoJson, typeExtensions: parsedTypes };
-}
+  
+    return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, typeExtensions);
+  }
 
 
 const PACKED_BYTE: number = 17;
@@ -982,7 +1017,7 @@ export function packList(list: any[]): any[] {
 
     packedList.push(header);
 
-    const keyIndexMap: Record<number, _BinaryPackNode> = new Map();
+    const keyIndexMap: Record<number, _BinaryPackNode> = {};
     try {
         for (const e of list) {
             if (Array.isArray(e)) {
@@ -1011,11 +1046,11 @@ export function packMap(m: Record<any, any>, header: any[], keyIndexMap: Record<
             throw new CannotPack();
         }
 
-        const keyIndex = keyIndexMap.get(key);
+        const keyIndex = keyIndexMap[key];
 
         let finalKeyIndex: _BinaryPackNode;
         if (keyIndex === undefined) {
-            finalKeyIndex = new _BinaryPackNode(header.length - 1, new Map());
+            finalKeyIndex = new _BinaryPackNode(header.length - 1, []);
 
             if (typeof value === 'object') {
                 header.push([...[key]]);
@@ -1023,7 +1058,7 @@ export function packMap(m: Record<any, any>, header: any[], keyIndexMap: Record<
                 header.push(key);
             }
 
-            keyIndexMap.set(key, finalKeyIndex);
+            keyIndexMap[key] = finalKeyIndex;
         } else {
             finalKeyIndex = keyIndex;
         }
@@ -1109,13 +1144,6 @@ export function unpackList(list: any[]): any[] {
     }
 }
 
-import { MessagePackExtensionType } from './messagePackExtensionType'; // Import your MessagePackExtensionType class
-import { UApiSchema } from './UApiSchema';
-import { Serializer } from './Serializer';
-import { Message } from './Message';
-import { _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion } from './_utilTypes';
-import { UApiSchemaParseError } from './UApiSchemaParseError';
-
 class _BinaryEncoderUnavailableError extends Error {}
 
 class ClientBinaryStrategy {
@@ -1129,7 +1157,7 @@ class ClientBinaryStrategy {
 }
 
 export function unpackMap(row: Object[], header: Object[]): Record<number, Object> {
-    const finalMap = new Record<number, Object>();
+    const finalMap: {[key: string | number]: any} = {};
 
     for (let j = 0; j < row.length; j += 1) {
         const key = header[j + 1];
@@ -1139,9 +1167,9 @@ export function unpackMap(row: Object[], header: Object[]): Record<number, Objec
             continue;
         }
 
-        if (typeof key === 'number') {
+        if (typeof key === 'string') {
             const unpackedValue = unpack(value);
-            finalMap.set(key, unpackedValue);
+            finalMap[key] = unpackedValue;
         } else {
             const nestedHeader = key as Object[];
             const nestedRow = value as Object[];
@@ -1157,17 +1185,17 @@ export function unpackMap(row: Object[], header: Object[]): Record<number, Objec
 export function serverBinaryEncode(message: Object[], binaryEncoder: _BinaryEncoding): Object[] {
     const headers = message[0] as Record<string, Object>;
     const messageBody = message[1] as Record<string, Object>;
-    const clientKnownBinaryChecksums = headers.get("_clientKnownBinaryChecksums") as number[];
+    const clientKnownBinaryChecksums = headers["_clientKnownBinaryChecksums"] as number[];
 
     if (!clientKnownBinaryChecksums || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
-        headers.set("_enc", binaryEncoder.encodeMap);
+        headers["_enc"] = binaryEncoder.encodeMap;
     }
 
-    headers.set("_bin", [binaryEncoder.checksum]);
+    headers["_bin"] = [binaryEncoder.checksum];
     let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
-    let finalEncodedMessageBody: Record<Object, Object>;
-    if (headers.get("_pac") === true) {
+    let finalEncodedMessageBody: Record<string, Object>;
+    if (headers["_pac"] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
@@ -1176,17 +1204,17 @@ export function serverBinaryEncode(message: Object[], binaryEncoder: _BinaryEnco
     return [headers, finalEncodedMessageBody];
 }
 
-export function serverBinaryDecode(message: Object[], binaryEncoder: _BinaryEncoding): Object[] {
-    const headers = message[0] as Record<string, Object>;
-    const encodedMessageBody = message[1] as Record<Object, Object>;
-    const clientKnownBinaryChecksums = headers.get("_bin") as number[];
+export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncoding): any[] {
+    const headers = message[0] as Record<string, any>;
+    const encodedMessageBody = message[1] as Record<string, any>;
+    const clientKnownBinaryChecksums = headers["_bin"] as number[];
     const binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums[0];
 
     if (binaryChecksumUsedByClientOnThisMessage !== binaryEncoder.checksum) {
         throw new _BinaryEncoderUnavailableError();
     }
 
-    let finalEncodedMessageBody: Record<Object, Object>;
+    let finalEncodedMessageBody: Record<string, any>;
     if (headers.get("_pac") === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
@@ -1197,23 +1225,22 @@ export function serverBinaryDecode(message: Object[], binaryEncoder: _BinaryEnco
     return [headers, messageBody];
 }
 
-export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Record<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): Object[] {
+export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Record<string, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): Object[] {
     const headers = message[0] as Record<string, Object>;
     const messageBody = message[1] as Record<string, Object>;
-    const forceSendJson = headers.get("_forceSendJson");
+    const forceSendJson = headers["_forceSendJson"];
 
-    headers.set("_bin", binaryChecksumStrategy.getCurrentChecksums());
+    headers["_bin"] = binaryChecksumStrategy.getCurrentChecksums();
 
     if (forceSendJson === true) {
         throw new _BinaryEncoderUnavailableError();
     }
 
-    if (recentBinaryEncoders.size > 1) {
+    if (Object.keys(recentBinaryEncoders).length > 1) {
         throw new _BinaryEncoderUnavailableError();
     }
 
-    const checksums = Array.from(recentBinaryEncoders.keys());
-    const binaryEncoder = recentBinaryEncoders.get(checksums[0]);
+    const binaryEncoder = recentBinaryEncoders.first;
 
     if (!binaryEncoder) {
         throw new _BinaryEncoderUnavailableError();
@@ -1221,8 +1248,8 @@ export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Reco
 
     let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
-    let finalEncodedMessageBody: Record<Object, Object>;
-    if (headers.get("_pac") === true) {
+    let finalEncodedMessageBody: Record<string, any>;
+    if (headers["_pac"] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
@@ -1231,30 +1258,31 @@ export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Reco
     return [headers, finalEncodedMessageBody];
 }
 
-export function clientBinaryDecode(message: Object[], recentBinaryEncoders: Record<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): Object[] {
-    const headers = message[0] as Record<string, Object>;
-    const encodedMessageBody = message[1] as Record<Object, Object>;
-    const binaryChecksums = headers.get("_bin") as number[];
-    const binaryChecksum = binaryChecksums[0];
+export function clientBinaryDecode(message: any[], recentBinaryEncoders: Record<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): any[] {
+    const headers = message[0] as Record<string, any>;
+    const encodedMessageBody = message[1] as Record<string, any>;
+    const binaryChecksums: number[] = headers.get("_bin");
+    const binaryChecksum = binaryChecksums[0]!;
 
     if (headers.has("_enc")) {
         const binaryEncoding = headers.get("_enc") as Record<string, number>;
         const newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
-        recentBinaryEncoders.set(binaryChecksum, newBinaryEncoder);
+        recentBinaryEncoders[binaryChecksum] = newBinaryEncoder;
     }
 
     binaryChecksumStrategy.update(binaryChecksum);
     const newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
-    for (const [key, value] of recentBinaryEncoders) {
-        if (!newCurrentChecksumStrategy.includes(key)) {
-            recentBinaryEncoders.delete(key);
+    for (const key in recentBinaryEncoders) {
+        const value = recentBinaryEncoders[key];
+        if (!newCurrentChecksumStrategy.includes(parseInt(key))) {
+            delete recentBinaryEncoders[key];
         }
     }
 
-    const binaryEncoder = recentBinaryEncoders.get(binaryChecksum);
+    const binaryEncoder = recentBinaryEncoders[binaryChecksum]!;
 
-    let finalEncodedMessageBody: Record<Object, Object>;
+    let finalEncodedMessageBody: Record<string, any>;
     if (headers.get("_pac") === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
@@ -1265,11 +1293,11 @@ export function clientBinaryDecode(message: Object[], recentBinaryEncoders: Reco
     return [headers, messageBody];
 }
 
-export function encodeBody(messageBody: Record<string, Object>, binaryEncoder: _BinaryEncoding): Record<Object, Object> {
+export function encodeBody(messageBody: Record<string, any>, binaryEncoder: _BinaryEncoding): Record<string, any> {
     return encodeKeys(messageBody, binaryEncoder);
 }
 
-export function decodeBody(encodedMessageBody: Record<Object, Object>, binaryEncoder: _BinaryEncoding): Record<string, Object> {
+export function decodeBody(encodedMessageBody: Record<string, any>, binaryEncoder: _BinaryEncoding): Record<string, any> {
     return decodeKeys(encodedMessageBody, binaryEncoder);
 }
 
@@ -1277,13 +1305,13 @@ export function encodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
     if (given === null || given === undefined) {
         return given;
     } else if (typeof given === 'object' && !Array.isArray(given)) {
-        const newMap = new Record<Object, Object>();
+        const newMap: {[key: string]: any} = {};
 
         for (const [key, value] of Object.entries(given)) {
-            const finalKey = binaryEncoder.encodeMap.has(key) ? binaryEncoder.encodeMap.get(key) : key;
+            const finalKey: string = binaryEncoder.encodeMap[key] ?? key;
             const encodedValue = encodeKeys(value, binaryEncoder);
 
-            newMap.set(finalKey, encodedValue);
+            newMap[finalKey] = encodedValue;
         }
 
         return newMap;
@@ -1296,10 +1324,10 @@ export function encodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
 
 export function decodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
     if (typeof given === 'object' && !Array.isArray(given)) {
-        const newMap = new Record<string, Object>();
+        const newMap: {[key: string]: any} = {};
 
         for (const [key, value] of Object.entries(given)) {
-            const finalKey = typeof key === 'string' ? key : binaryEncoder.decodeMap.get(key);
+            const finalKey = binaryEncoder.decodeMap[key] ?? key;
             
             if (finalKey === undefined) {
                 throw new _BinaryEncodingMissing(key);
