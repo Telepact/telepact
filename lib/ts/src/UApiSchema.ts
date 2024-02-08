@@ -5,11 +5,11 @@ import { _UType } from "./_utilTypes";
  * A parsed uAPI schema.
  */
 export class UApiSchema {
-    original: Array<object>;
-    parsed: Record<string, _UType>;
-    typeExtensions: Record<string, _UType>;
+    original: any[];
+    parsed: Map<string, _UType>;
+    typeExtensions: Map<string, _UType>;
 
-    constructor(original: Array<object>, parsed: Record<string, _UType>, typeExtensions: Record<string, _UType>) {
+    constructor(original: any[], parsed: Map<string, _UType>, typeExtensions: Map<string, _UType>) {
         this.original = original;
         this.parsed = parsed;
         this.typeExtensions = typeExtensions;
@@ -21,7 +21,7 @@ export class UApiSchema {
      * @returns A UApiSchema instance.
      */
     static fromJson(json: string): UApiSchema {
-        return newUApiSchema(json, {});
+        return newUApiSchema(json, new Map());
     }
 
     /**
@@ -31,7 +31,7 @@ export class UApiSchema {
      * @returns An extended UApiSchema instance.
      */
     static extend(base: UApiSchema, json: string): UApiSchema {
-        return extendUApiSchema(base, json, {});
+        return extendUApiSchema(base, json, new Map());
     }
 
     /**
@@ -40,7 +40,7 @@ export class UApiSchema {
      * @param typeExtensions Map of type extensions.
      * @returns A UApiSchema instance with type extensions.
      */
-    static fromJsonWithExtensions(json: string, typeExtensions: Record<string, _UType>): UApiSchema {
+    static fromJsonWithExtensions(json: string, typeExtensions: Map<string, _UType>): UApiSchema {
         return newUApiSchema(json, typeExtensions);
     }
 
@@ -51,7 +51,7 @@ export class UApiSchema {
      * @param typeExtensions Map of type extensions.
      * @returns An extended UApiSchema instance with type extensions.
      */
-    static extendWithExtensions(base: UApiSchema, json: string, typeExtensions: Record<string, _UType>): UApiSchema {
+    static extendWithExtensions(base: UApiSchema, json: string, typeExtensions: Map<string, _UType>): UApiSchema {
         return extendUApiSchema(base, json, typeExtensions);
     }
 }

@@ -4,7 +4,7 @@ export class _SchemaParseFailure {
     constructor(
         public readonly path: any[],
         public readonly reason: string,
-        public readonly data: Record<string, any>
+        public readonly data: Map<string, any>
     ) {}
 }
 
@@ -105,10 +105,10 @@ export interface _UFieldDeclaration {
     readonly optional: boolean;
 }
 
-export interface _ValidationFailure {
-    readonly path: any[];
-    readonly reason: string;
-    readonly data: Record<string, any>;
+export class _ValidationFailure {
+    constructor(public readonly path: any[],
+    public readonly reason: string,
+    public readonly data: Map<string, any>) {}
 }
 
 export class _UGeneric implements _UType {
@@ -281,7 +281,7 @@ export class _UObject implements _UType {
 }
 
 export class _UStruct implements _UType {
-    constructor(public readonly name: string, public readonly fields: Record<string, _UFieldDeclaration>, public readonly typeParameterCount: number) {}
+    constructor(public readonly name: string, public readonly fields: Map<string, _UFieldDeclaration>, public readonly typeParameterCount: number) {}
 
     getTypeParameterCount(): number {
         return this.typeParameterCount;
@@ -302,10 +302,10 @@ export class _UStruct implements _UType {
 
 export class _UUnion implements _UType {
     public readonly name: string;
-    public readonly cases: { [key: string]: _UStruct };
+    public readonly cases: Map<string, _UStruct>;
     public readonly typeParameterCount: number;
 
-    constructor(name: string, cases: { [key: string]: _UStruct }, typeParameterCount: number) {
+    constructor(name: string, cases: Map<string, _UStruct>, typeParameterCount: number) {
         this.name = name;
         this.cases = cases;
         this.typeParameterCount = typeParameterCount;
@@ -493,13 +493,14 @@ export class _InvalidMessage extends Error {
 export class _InvalidMessageBody extends Error {}
 
 export class _BinaryEncoding {
-    public readonly encodeMap: { [key: string]: string };
-    public readonly decodeMap: { [key: string]: string };
+    public readonly encodeMap: Map<string, number>;
+    public readonly decodeMap: Map<number,string>;
     public readonly checksum: number;
 
-    constructor(binaryEncoding: { [key: string]: string }, checksum: number) {
-        this.encodeMap = binaryEncoding;
-        this.decodeMap = Object.fromEntries(Object.entries(binaryEncoding).map(([key, value]) => [value, key]));
+    constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
+        this.encodeMap = binaryEncodingMap;
+        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [e[1], e[0]]);
+        this.decodeMap = new Map(decodeList)
         this.checksum = checksum;
     }
 }

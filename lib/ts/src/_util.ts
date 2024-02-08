@@ -1,8 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { _BinaryEncoding, _BinaryEncodingMissing, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion } from './_utilTypes';
+import { _BinaryEncoder, _BinaryEncoding, _BinaryEncodingMissing, _InvalidMessage, _InvalidMessageBody, _RandomGenerator, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion, _ValidationFailure } from './_utilTypes';
 import { UApiSchemaParseError } from './UApiSchemaParseError';
 import { UApiSchema } from './UApiSchema';
+import crc32 from 'crc-32';
+import { Message } from './Message';
+import { SerializationImpl } from './SerializationImpl';
+import { SerializationError } from './SerializationError';
+
 
 export const _ANY_NAME: Readonly<string> = "Any";
 export const _ARRAY_NAME: Readonly<string> = "Array";
@@ -48,11 +53,11 @@ export function asList(object: any): any[] {
     return object as any[];
 }
 
-export function asMap(object: any): Record<string, any> {
+export function asMap(object: any): Map<string, any> {
     if (object == null) {
         throw new Error("ClassCastException");
     }
-    return object as Record<string, any>;
+    return object as Map<string, any>;
 }
 
 export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset: number): _SchemaParseFailure[] {
@@ -65,11 +70,11 @@ export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset
         const newPath = [...path];
         (newPath[0] as number) -= offset;
 
-        let finalData: Record<string, any>;
+        let finalData: Map<string, any>;
         if (reason === "PathCollision") {
-            const otherNewPath = [...data.other];
+            const otherNewPath = [...data.get("other")];
             (otherNewPath[0] as number) -= offset;
-            finalData = {"other": otherNewPath};
+            finalData = new Map([["other", otherNewPath]]);
         } else {
             finalData = data;
         }
@@ -80,7 +85,7 @@ export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset
     return finalList;
 }
 
-export function findSchemaKey(definition: Record<string, any>, index: number): string {
+export function findSchemaKey(definition: Map<string, any>, index: number): string {
     const regex = /^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\..*/;
     const matches: string[] = [];
 
@@ -112,10 +117,10 @@ export function findMatchingSchemaKey(schemaKeys: Set<string>, schemaKey: string
 
 export function getTypeUnexpectedParseFailure(path: any[], value: any, expectedType: string): _SchemaParseFailure[] {
     const actualType = getType(value);
-    const data = {
-        actual: { actualType: {} },
-        expected: { expectedType: {} }
-    };
+    const data = new Map([
+        ["actual", new Map([[ "actualType", new Map()]] )],
+        ["expected", new Map([[ "expectedType", new Map()]])]
+    ]);
     return [{ path, reason: "TypeUnexpected", data }];
 }
 
@@ -137,14 +142,14 @@ export function parseTypeDeclaration(
     typeDeclarationArray: any[],
     thisTypeParameterCount: number,
     uApiSchemaPseudoJson: any[],
-    schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, _UType>,
-    typeExtensions: Record<string, _UType>,
+    schemaKeysToIndex: Map<string, number>,
+    parsedTypes: Map<string, _UType>,
+    typeExtensions: Map<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UTypeDeclaration {
     if (typeDeclarationArray.length === 0) {
-        throw new UApiSchemaParseError([new _SchemaParseFailure(path, "EmptyArrayDisallowed", {})]);
+        throw new UApiSchemaParseError([new _SchemaParseFailure(path, "EmptyArrayDisallowed", new Map())]);
     }
 
     const basePath = path.concat([0]);
@@ -256,9 +261,9 @@ export function getOrParseType(
     typeName: string,
     thisTypeParameterCount: number,
     uApiSchemaPseudoJson: any[],
-    schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, _UType>,
-    typeExtensions: Record<string, _UType>,
+    schemaKeysToIndex: Map<string, number>,
+    parsedTypes: Map<string, _UType>,
+    typeExtensions: Map<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UType {
@@ -266,7 +271,7 @@ export function getOrParseType(
         throw new UApiSchemaParseError([]);
     }
 
-    const existingType = parsedTypes[typeName]
+    const existingType = parsedTypes.get(typeName)
     if (existingType !== undefined) {
         return existingType;
     }
@@ -324,7 +329,7 @@ export function getOrParseType(
 
     const customTypeName: string = matcher[2]!;
 
-    const index = schemaKeysToIndex[customTypeName];
+    const index = schemaKeysToIndex.get(customTypeName);
     if (index === undefined) {
         throw new UApiSchemaParseError([
             new _SchemaParseFailure(path, "TypeUnknown", new Map([["name", customTypeName]]))
@@ -380,7 +385,7 @@ export function getOrParseType(
                 failedTypes
             );
         } else {
-            type = typeExtensions[customTypeName];
+            type = typeExtensions.get(customTypeName);
             if (type === undefined) {
                 throw new UApiSchemaParseError([
                     new _SchemaParseFailure([index], "TypeExtensionImplementationMissing", new Map([["name", customTypeName]]))
@@ -388,7 +393,7 @@ export function getOrParseType(
             }
         }
 
-        parsedTypes[customTypeName] = type;
+        parsedTypes.set(customTypeName, type);
 
         return type;
     } catch (e) {
@@ -400,7 +405,7 @@ export function getOrParseType(
     }
 }
 
-export function parseStructType(path: any[], structDefinitionAsPseudoJson: Record<string, any>, schemaKey: string, isForFn: boolean, typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Record<string, number>, parsedTypes: Record<string, _UType>, typeExtensions: Record<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): _UStruct {
+export function parseStructType(path: any[], structDefinitionAsPseudoJson: Map<string, any>, schemaKey: string, isForFn: boolean, typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Map<string, number>, parsedTypes: Map<string, _UType>, typeExtensions: Map<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): _UStruct {
     const parseFailures: _SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
     otherKeys.delete(schemaKey);
@@ -412,12 +417,12 @@ export function parseStructType(path: any[], structDefinitionAsPseudoJson: Recor
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
             const loopPath = append(path, k);
-            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", {}));
+            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new Map()));
         }
     }
     const thisPath = append(path, schemaKey);
     const defInit = structDefinitionAsPseudoJson.get(schemaKey);
-    let definition: Record<string, any> | undefined = undefined;
+    let definition: Map<string, any> | undefined = undefined;
     try {
         definition = asMap(defInit);
     } catch (e) {
@@ -431,7 +436,7 @@ export function parseStructType(path: any[], structDefinitionAsPseudoJson: Recor
     return new _UStruct(schemaKey, fields, typeParameterCount);
 }
 
-export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<string, any>, schemaKey: string, isForFn: boolean, typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Record<string, number>, parsedTypes: Record<string, _UType>, typeExtensions: Record<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): _UUnion {
+export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Map<string, any>, schemaKey: string, isForFn: boolean, typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Map<string, number>, parsedTypes: Map<string, _UType>, typeExtensions: Map<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): _UUnion {
     const parseFailures: _SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(unionDefinitionAsPseudoJson));
     otherKeys.delete(schemaKey);
@@ -440,13 +445,13 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
         if (otherKeys.size > 0) {
             for (const k of otherKeys) {
                 const loopPath = append(path, k);
-                parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", {}));
+                parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new Map()));
             }
         }
     }
     const thisPath = append(path, schemaKey);
     const defInit = unionDefinitionAsPseudoJson.get(schemaKey);
-    let definition: Record<string, any>;
+    let definition: Map<string, any>;
     try {
         definition = asMap(defInit);
     } catch (e) {
@@ -454,13 +459,13 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
         parseFailures.push(...finalParseFailures);
         throw new UApiSchemaParseError(parseFailures);
     }
-    const cases: Record<string, _UStruct> = {};
+    const cases: Map<string, _UStruct> = new Map();
     if (definition.size === 0 && !isForFn) {
-        parseFailures.push(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", {}));
+        parseFailures.push(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", new Map()));
     } else if (isForFn) {
         if (!definition.has("Ok")) {
             const branchPath = append(thisPath, "Ok");
-            parseFailures.push(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", {}));
+            parseFailures.push(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", new Map()));
         }
     }
     for (const [unionCase, value] of definition.entries()) {
@@ -468,10 +473,10 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
         const regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
         const regex = new RegExp(regexString);
         if (!regex.test(unionCase)) {
-            parseFailures.push(new _SchemaParseFailure(unionKeyPath, "KeyRegexMatchFailed", {regex: regexString}));
+            parseFailures.push(new _SchemaParseFailure(unionKeyPath, "KeyRegexMatchFailed", new Map([["regex", regexString]])));
             continue;
         }
-        let unionCaseStruct: Record<string, any>;
+        let unionCaseStruct: Map<string, any>;
         try {
             unionCaseStruct = asMap(value);
         } catch (e) {
@@ -479,7 +484,7 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
             parseFailures.push(...thisParseFailures);
             continue;
         }
-        let fields: Record<string, _UFieldDeclaration>;
+        let fields: Map<string, _UFieldDeclaration>;
         try {
             fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
         } catch (e) {
@@ -489,7 +494,7 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
             continue;
         }
         const unionStruct = new _UStruct(`${schemaKey}.${unionCase}`, fields, typeParameterCount);
-        cases[unionCase] = unionStruct;
+        cases.set(unionCase, unionStruct);
     }
     if (parseFailures.length > 0) {
         throw new UApiSchemaParseError(parseFailures);
@@ -497,9 +502,9 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
     return new _UUnion(schemaKey, cases, typeParameterCount);
 }
 
-export function parseStructFields(referenceStruct: Record<string, any>, path: any[], typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Record<string, number>, parsedTypes: Record<string, _UType>, typeExtensions: Record<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): Record<string, _UFieldDeclaration> {
+export function parseStructFields(referenceStruct: Map<string, any>, path: any[], typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Map<string, number>, parsedTypes: Map<string, _UType>, typeExtensions: Map<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): Map<string, _UFieldDeclaration> {
     const parseFailures: _SchemaParseFailure[] = [];
-    const fields: Record<string, _UFieldDeclaration> = {};
+    const fields: Map<string, _UFieldDeclaration> = new Map();
     for (const [structEntryKey, structEntryValue] of referenceStruct.entries()) {
         const fieldDeclaration = structEntryKey;
         for (const existingField in fields) {
@@ -508,7 +513,7 @@ export function parseStructFields(referenceStruct: Record<string, any>, path: an
             if (fieldNoOpt === existingFieldNoOpt) {
                 const finalPath = append(path, fieldDeclaration);
                 const finalOtherPath = append(path, existingField);
-                parseFailures.push(new _SchemaParseFailure(finalPath, "PathCollision", {other: finalOtherPath}));
+                parseFailures.push(new _SchemaParseFailure(finalPath, "PathCollision", new Map([["other", finalOtherPath]])));
             }
         }
         const typeDeclarationValue = structEntryValue;
@@ -516,7 +521,7 @@ export function parseStructFields(referenceStruct: Record<string, any>, path: an
         try {
             parsedField = parseField(path, fieldDeclaration, typeDeclarationValue, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
             const fieldName = parsedField.fieldName;
-            fields[fieldName] = parsedField;
+            fields.set(fieldName, parsedField);
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
@@ -535,9 +540,9 @@ export function parseField(
     typeDeclarationValue: any, // Replace 'any' with appropriate type
     typeParameterCount: number,
     uApiSchemaPseudoJson: any[],
-    schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    schemaKeysToIndex: Map<string, number>,
+    parsedTypes: Map<string, any>, // Replace 'any' with appropriate type
+    typeExtensions: Map<string, any>, // Replace 'any' with appropriate type
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UFieldDeclaration {
@@ -547,7 +552,7 @@ export function parseField(
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
         const finalPath = append(path, fieldDeclaration);
-        throw new UApiSchemaParseError([new _SchemaParseFailure(finalPath, "KeyRegexMatchFailed", { regex: regexString })]);
+        throw new UApiSchemaParseError([new _SchemaParseFailure(finalPath, "KeyRegexMatchFailed", new Map([["regex", regexString]]))]);
     }
 
     const fieldName = matcher[0];
@@ -578,11 +583,11 @@ export function parseField(
 
 export function applyErrorToParsedTypes(
     error: _UError,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    schemaKeysToIndex: Record<string, number>
+    parsedTypes: Map<string, any>, // Replace 'any' with appropriate type
+    schemaKeysToIndex: Map<string, number>
 ): void {
     const errorName = error.name;
-    const errorIndex = schemaKeysToIndex[errorName];
+    const errorIndex = schemaKeysToIndex.get(errorName);
 
     const parseFailures: _SchemaParseFailure[] = [];
     for (const [key, parsedType] of parsedTypes.entries()) {
@@ -607,16 +612,16 @@ export function applyErrorToParsedTypes(
         for (const [errorResultKey, errorResultField] of Object.entries(errorFnResultCases)) {
             const newKey = errorResultKey;
             if (fnResultCases.hasOwnProperty(newKey)) {
-                const otherPathIndex = schemaKeysToIndex[fnName];
+                const otherPathIndex = schemaKeysToIndex.get(fnName);
                 parseFailures.push(
                     new _SchemaParseFailure(
                         [errorIndex, errorName, "->", newKey],
                         "PathCollision",
-                        { other: [otherPathIndex, "->", newKey] }
+                        new Map([[ "other", [otherPathIndex, "->", newKey] ]])
                     )
                 );
             }
-            fnResultCases[newKey] = errorResultField;
+            fnResultCases.set(newKey, errorResultField);
         }
     }
 
@@ -626,16 +631,16 @@ export function applyErrorToParsedTypes(
 }
 
 export function parseErrorType(
-    errorDefinitionAsParsedJson: Record<string, any>, // Replace 'any' with appropriate type
+    errorDefinitionAsParsedJson: Map<string, any>, // Replace 'any' with appropriate type
     schemaKey: string,
     uApiSchemaPseudoJson: any[],
-    schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    schemaKeysToIndex: Map<string, number>,
+    parsedTypes: Map<string, any>, // Replace 'any' with appropriate type
+    typeExtensions: Map<string, any>, // Replace 'any' with appropriate type
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UError {
-    const index = schemaKeysToIndex[schemaKey];
+    const index = schemaKeysToIndex.get(schemaKey);
     const basePath = [index];
 
     const parseFailures: _SchemaParseFailure[] = [];
@@ -649,7 +654,7 @@ export function parseErrorType(
         for (const k of otherKeys) {
             const loopPath = append(basePath, k);
 
-            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", {}));
+            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new Map()));
         }
     }
 
@@ -658,7 +663,7 @@ export function parseErrorType(
 
     let def;
     try {
-        def = Array.from(defInit);
+        def = asMap(defInit);
     } catch (e) {
         const thisParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit, "Object");
 
@@ -671,7 +676,7 @@ export function parseErrorType(
     const errorPath = append(thisPath, resultSchemaKey);
 
     if (!def.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", {}));
+        parseFailures.push(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", new Map()));
     }
 
     if (parseFailures.length > 0) {
@@ -697,12 +702,12 @@ export function parseErrorType(
 
 export function parseFunctionType(
     path: any[],
-    functionDefinitionAsParsedJson: Record<string, any>, // Replace 'any' with appropriate type
+    functionDefinitionAsParsedJson: Map<string, any>, // Replace 'any' with appropriate type
     schemaKey: string,
     uApiSchemaPseudoJson: any[],
-    schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    schemaKeysToIndex: Map<string, number>,
+    parsedTypes: Map<string, any>, // Replace 'any' with appropriate type
+    typeExtensions: Map<string, any>, // Replace 'any' with appropriate type
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UFn {
@@ -725,7 +730,7 @@ export function parseFunctionType(
             allParseFailures,
             failedTypes
         );
-        callType = new _UUnion(schemaKey, {schemaKey: argType}, typeParameterCount);
+        callType = new _UUnion(schemaKey, new Map([["schemaKey", argType]]), typeParameterCount);
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
@@ -737,7 +742,7 @@ export function parseFunctionType(
 
     let resultType = null;
     if (!functionDefinitionAsParsedJson.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", {}));
+        parseFailures.push(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", new Map()));
     } else {
         try {
             resultType = parseUnionType(
@@ -765,7 +770,7 @@ export function parseFunctionType(
 
     let errorsRegex = null;
     if (functionDefinitionAsParsedJson.hasOwnProperty(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
-        parseFailures.push(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", {}));
+        parseFailures.push(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", new Map()));
     } else {
         const errorsRegexInit = functionDefinitionAsParsedJson.get(errorsRegexKey) ?? "^error\\..*$";
         try {
@@ -785,15 +790,15 @@ export function parseFunctionType(
 }
 
 
-export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<string, _UType>): UApiSchema {
+export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Map<string, _UType>): UApiSchema {
     let uApiSchemaPseudoJsonInit: any;
     try {
         uApiSchemaPseudoJsonInit = JSON.parse(uApiSchemaJson);
     } catch (e: Error) {
-        throw new UApiSchemaParseError([new _SchemaParseFailure([], "JsonInvalid", {})], e);
+        throw new UApiSchemaParseError([new _SchemaParseFailure([], "JsonInvalid", new Map())], e);
     }
 
-    let uApiSchemaPseudoJson: Array<Object>;
+    let uApiSchemaPseudoJson: Array<any>;
     try {
         uApiSchemaPseudoJson = Array.from(uApiSchemaPseudoJsonInit);
     } catch (e: Error) {
@@ -804,13 +809,13 @@ export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<str
     return parseUApiSchema(uApiSchemaPseudoJson, typeExtensions, 0);
 }
 
-export function extendUApiSchema(first: UApiSchema, secondUApiSchemaJson: string, secondTypeExtensions: Record<string, _UType>): UApiSchema {
+export function extendUApiSchema(first: UApiSchema, secondUApiSchemaJson: string, secondTypeExtensions: Map<string, _UType>): UApiSchema {
     let secondUApiSchemaPseudoJsonInit: any;
     try {
         secondUApiSchemaPseudoJsonInit = JSON.parse(secondUApiSchemaJson);
     } catch (e: Error) {
         throw new UApiSchemaParseError(
-            [new _SchemaParseFailure([], "JsonInvalid", {})],
+            [new _SchemaParseFailure([], "JsonInvalid", new Map())],
             e
         );
     }
@@ -824,24 +829,24 @@ export function extendUApiSchema(first: UApiSchema, secondUApiSchemaJson: string
     }
 
     const firstOriginal: any[] = first.original;
-    const firstTypeExtensions: Record<string, _UType> = first.typeExtensions;
+    const firstTypeExtensions: Map<string, _UType> = first.typeExtensions;
 
     const original: any[] = [...firstOriginal, ...secondUApiSchemaPseudoJson];
 
-    const typeExtensions: Record<string, _UType> = { ...firstTypeExtensions, ...secondTypeExtensions };
+    const typeExtensions: Map<string, _UType> = { ...firstTypeExtensions, ...secondTypeExtensions };
 
     return parseUApiSchema(original, typeExtensions, firstOriginal.length);
 }
 
 export function parseUApiSchema(
-    uApiSchemaPseudoJson: object[],
-    typeExtensions: Record<string, _UType>,
+    uApiSchemaPseudoJson: any[],
+    typeExtensions: Map<string, _UType>,
     pathOffset: number
   ): UApiSchema {
-    const parsedTypes: Record<string, _UType> = {};
+    const parsedTypes: Map<string, _UType> = new Map();
     const parseFailures: _SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
-    const schemaKeysToIndex: Record<string, number> = {};
+    const schemaKeysToIndex: Map<string, number> = new Map();
     const schemaKeys: Set<string> = new Set();
   
     let index = -1;
@@ -850,11 +855,11 @@ export function parseUApiSchema(
   
       const loopPath = [index];
   
-      let def: Record<string, any>;
+      let def: Map<string, any>;
       try {
-        def = definition as Record<string, any>;
+        def = definition as Map<string, any>;
       } catch (e) {
-        const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, definition, "Object");
+        const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, definition, "any");
         parseFailures.push(...thisParseFailures);
         continue;
       }
@@ -871,20 +876,20 @@ export function parseUApiSchema(
   
       const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
       if (matchingSchemaKey) {
-        const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
+        const otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
         const finalPath = append(loopPath, schemaKey);
         console.log(otherPathIndex);
   
         parseFailures.push(new _SchemaParseFailure(
           finalPath,
           "PathCollision",
-          { other: [otherPathIndex, matchingSchemaKey] },
+          new Map([[ "other", [otherPathIndex, matchingSchemaKey] ]]),
         ));
         continue;
       }
   
       schemaKeys.add(schemaKey);
-      schemaKeysToIndex[schemaKey] = index;
+      schemaKeysToIndex.set(schemaKey, index);
     }
   
     if (parseFailures.length > 0) {
@@ -903,7 +908,7 @@ export function parseUApiSchema(
         continue;
       }
   
-      const thisIndex = schemaKeysToIndex[schemaKey];
+      const thisIndex = schemaKeysToIndex.get(schemaKey);
   
       try {
         getOrParseType(
@@ -930,8 +935,8 @@ export function parseUApiSchema(
     }
   
     for (const errorKey of errorKeys) {
-      const thisIndex: number = schemaKeysToIndex[errorKey]!;
-      const def = uApiSchemaPseudoJson[thisIndex] as Record<string, any>;
+      const thisIndex: number = schemaKeysToIndex.get(errorKey)!;
+      const def = uApiSchemaPseudoJson[thisIndex] as Map<string, any>;
   
       try {
         const error = parseErrorType(
@@ -966,16 +971,16 @@ const UNDEFINED_BYTE: number = 18;
 
 class _BinaryPackNode {
     public value: number;
-    public nested: Record<number, _BinaryPackNode>;
+    public nested: Map<number, _BinaryPackNode>;
 
-    constructor(value: number, nested: Record<number, _BinaryPackNode>) {
+    constructor(value: number, nested: Map<number, _BinaryPackNode>) {
         this.value = value;
         this.nested = nested;
     }
 }
 
-export function packBody(body: Record<any, any>): Record<any, any> {
-    const result: Record<any, any> = new Map();
+export function packBody(body: Map<any, any>): Map<any, any> {
+    const result: Map<any, any> = new Map();
 
     for (const [key, value] of body.entries()) {
         const packedValue = pack(value);
@@ -989,7 +994,7 @@ export function pack(value: any): any {
     if (Array.isArray(value)) {
         return packList(value);
     } else if (typeof value === 'object' && value !== null) {
-        const newMap: Record<any, any> = new Map();
+        const newMap: Map<any, any> = new Map();
 
         for (const [key, val] of Object.entries(value)) {
             newMap.set(key, pack(val));
@@ -1017,7 +1022,7 @@ export function packList(list: any[]): any[] {
 
     packedList.push(header);
 
-    const keyIndexMap: Record<number, _BinaryPackNode> = {};
+    const keyIndexMap: Map<number, _BinaryPackNode> = new Map();
     try {
         for (const e of list) {
             if (Array.isArray(e)) {
@@ -1039,18 +1044,18 @@ export function packList(list: any[]): any[] {
     }
 }
 
-export function packMap(m: Record<any, any>, header: any[], keyIndexMap: Record<number, _BinaryPackNode>): any[] {
+export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number, _BinaryPackNode>): any[] {
     const row: any[] = [];
     for (const [key, value] of m.entries()) {
         if (typeof key === 'string') {
             throw new CannotPack();
         }
 
-        const keyIndex = keyIndexMap[key];
+        const keyIndex = keyIndexMap.get(key);
 
         let finalKeyIndex: _BinaryPackNode;
         if (keyIndex === undefined) {
-            finalKeyIndex = new _BinaryPackNode(header.length - 1, []);
+            finalKeyIndex = new _BinaryPackNode(header.length - 1, new Map());
 
             if (typeof value === 'object') {
                 header.push([...[key]]);
@@ -1058,13 +1063,13 @@ export function packMap(m: Record<any, any>, header: any[], keyIndexMap: Record<
                 header.push(key);
             }
 
-            keyIndexMap[key] = finalKeyIndex;
+            keyIndexMap.set(key, finalKeyIndex);
         } else {
             finalKeyIndex = keyIndex;
         }
 
         const keyIndexValue: number = finalKeyIndex.value;
-        const keyIndexNested: Record<number, _BinaryPackNode> = finalKeyIndex.nested;
+        const keyIndexNested: Map<number, _BinaryPackNode> = finalKeyIndex.nested;
 
         let packedValue: any;
         if (typeof value === 'object' && value !== null) {
@@ -1091,8 +1096,8 @@ export function packMap(m: Record<any, any>, header: any[], keyIndexMap: Record<
     return row;
 }
 
-export function unpackBody(body: Record<any, any>): Record<any, any> {
-    const result: Record<any, any> = new Map();
+export function unpackBody(body: Map<any, any>): Map<any, any> {
+    const result: Map<any, any> = new Map();
 
     for (const [key, value] of body.entries()) {
         const unpackedValue = unpack(value);
@@ -1106,7 +1111,7 @@ export function unpack(value: any): any {
     if (Array.isArray(value)) {
         return unpackList(value);
     } else if (typeof value === 'object' && value !== null) {
-        const newMap: Record<any, any> = new Map();
+        const newMap: Map<any, any> = new Map();
 
         for (const [key, val] of Object.entries(value)) {
             newMap.set(key, unpack(val));
@@ -1156,8 +1161,8 @@ class ClientBinaryStrategy {
     }
 }
 
-export function unpackMap(row: Object[], header: Object[]): Record<number, Object> {
-    const finalMap: {[key: string | number]: any} = {};
+export function unpackMap(row: any[], header: any[]): Map<any, any> {
+    const finalMap = new Map<any, any>();
 
     for (let j = 0; j < row.length; j += 1) {
         const key = header[j + 1];
@@ -1169,10 +1174,10 @@ export function unpackMap(row: Object[], header: Object[]): Record<number, Objec
 
         if (typeof key === 'string') {
             const unpackedValue = unpack(value);
-            finalMap[key] = unpackedValue;
+            finalMap.set(key, unpackedValue);
         } else {
-            const nestedHeader = key as Object[];
-            const nestedRow = value as Object[];
+            const nestedHeader = key as any[];
+            const nestedRow = value as any[];
             const m = unpackMap(nestedRow, nestedHeader);
             const i = nestedHeader[0] as number;
             finalMap.set(i, m);
@@ -1182,20 +1187,20 @@ export function unpackMap(row: Object[], header: Object[]): Record<number, Objec
     return finalMap;
 }
 
-export function serverBinaryEncode(message: Object[], binaryEncoder: _BinaryEncoding): Object[] {
-    const headers = message[0] as Record<string, Object>;
-    const messageBody = message[1] as Record<string, Object>;
-    const clientKnownBinaryChecksums = headers["_clientKnownBinaryChecksums"] as number[];
+export function serverBinaryEncode(message: any[], binaryEncoder: _BinaryEncoding): any[] {
+    const headers = message[0] as Map<string, any>;
+    const messageBody = message[1] as Map<string, any>;
+    const clientKnownBinaryChecksums = headers.get("_clientKnownBinaryChecksums") as number[];
 
     if (!clientKnownBinaryChecksums || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
-        headers["_enc"] = binaryEncoder.encodeMap;
+        headers.set("_enc", binaryEncoder.encodeMap);
     }
 
-    headers["_bin"] = [binaryEncoder.checksum];
+    headers.set("_bin", [binaryEncoder.checksum]);
     let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
-    let finalEncodedMessageBody: Record<string, Object>;
-    if (headers["_pac"] === true) {
+    let finalEncodedMessageBody: Map<string, any>;
+    if (headers.get("_pac") === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
@@ -1205,16 +1210,16 @@ export function serverBinaryEncode(message: Object[], binaryEncoder: _BinaryEnco
 }
 
 export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncoding): any[] {
-    const headers = message[0] as Record<string, any>;
-    const encodedMessageBody = message[1] as Record<string, any>;
-    const clientKnownBinaryChecksums = headers["_bin"] as number[];
+    const headers = message[0] as Map<string, any>;
+    const encodedMessageBody = message[1] as Map<any, any>;
+    const clientKnownBinaryChecksums = headers.get("_bin") as number[];
     const binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums[0];
 
     if (binaryChecksumUsedByClientOnThisMessage !== binaryEncoder.checksum) {
         throw new _BinaryEncoderUnavailableError();
     }
 
-    let finalEncodedMessageBody: Record<string, any>;
+    let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("_pac") === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
@@ -1225,22 +1230,22 @@ export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncodin
     return [headers, messageBody];
 }
 
-export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Record<string, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): Object[] {
-    const headers = message[0] as Record<string, Object>;
-    const messageBody = message[1] as Record<string, Object>;
-    const forceSendJson = headers["_forceSendJson"];
+export function clientBinaryEncode(message: any[], recentBinaryEncoders: Map<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): any[] {
+    const headers = message[0] as Map<string, any>;
+    const messageBody = message[1] as Map<string, any>;
+    const forceSendJson = headers.get("_forceSendJson");
 
-    headers["_bin"] = binaryChecksumStrategy.getCurrentChecksums();
+    headers.set("_bin", binaryChecksumStrategy.getCurrentChecksums());
 
     if (forceSendJson === true) {
         throw new _BinaryEncoderUnavailableError();
     }
 
-    if (Object.keys(recentBinaryEncoders).length > 1) {
+    if (recentBinaryEncoders.size > 1) {
         throw new _BinaryEncoderUnavailableError();
     }
 
-    const binaryEncoder = recentBinaryEncoders.first;
+    const binaryEncoder = [...recentBinaryEncoders.values()][0]
 
     if (!binaryEncoder) {
         throw new _BinaryEncoderUnavailableError();
@@ -1248,8 +1253,8 @@ export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Reco
 
     let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
-    let finalEncodedMessageBody: Record<string, any>;
-    if (headers["_pac"] === true) {
+    let finalEncodedMessageBody: Map<any, any>;
+    if (headers.get("_pac") === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
@@ -1258,31 +1263,30 @@ export function clientBinaryEncode(message: Object[], recentBinaryEncoders: Reco
     return [headers, finalEncodedMessageBody];
 }
 
-export function clientBinaryDecode(message: any[], recentBinaryEncoders: Record<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): any[] {
-    const headers = message[0] as Record<string, any>;
-    const encodedMessageBody = message[1] as Record<string, any>;
-    const binaryChecksums: number[] = headers.get("_bin");
+export function clientBinaryDecode(message: any[], recentBinaryEncoders: Map<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): any[] {
+    const headers = message[0] as Map<string, any>;
+    const encodedMessageBody = message[1] as Map<any, any>;
+    const binaryChecksums = headers.get("_bin") as number[];
     const binaryChecksum = binaryChecksums[0]!;
 
     if (headers.has("_enc")) {
-        const binaryEncoding = headers.get("_enc") as Record<string, number>;
+        const binaryEncoding = headers.get("_enc") as Map<string, number>;
         const newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
-        recentBinaryEncoders[binaryChecksum] = newBinaryEncoder;
+        recentBinaryEncoders.set(binaryChecksum, newBinaryEncoder);
     }
 
     binaryChecksumStrategy.update(binaryChecksum);
     const newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
-    for (const key in recentBinaryEncoders) {
-        const value = recentBinaryEncoders[key];
-        if (!newCurrentChecksumStrategy.includes(parseInt(key))) {
-            delete recentBinaryEncoders[key];
+    for (const [key, value] of recentBinaryEncoders) {
+        if (!newCurrentChecksumStrategy.includes(key)) {
+            recentBinaryEncoders.delete(key);
         }
     }
 
-    const binaryEncoder = recentBinaryEncoders[binaryChecksum]!;
+    const binaryEncoder = recentBinaryEncoders.get(binaryChecksum)!;
 
-    let finalEncodedMessageBody: Record<string, any>;
+    let finalEncodedMessageBody: Map<any, any>;
     if (headers.get("_pac") === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
@@ -1293,11 +1297,11 @@ export function clientBinaryDecode(message: any[], recentBinaryEncoders: Record<
     return [headers, messageBody];
 }
 
-export function encodeBody(messageBody: Record<string, any>, binaryEncoder: _BinaryEncoding): Record<string, any> {
+export function encodeBody(messageBody: Map<string, any>, binaryEncoder: _BinaryEncoding): Map<any, any> {
     return encodeKeys(messageBody, binaryEncoder);
 }
 
-export function decodeBody(encodedMessageBody: Record<string, any>, binaryEncoder: _BinaryEncoding): Record<string, any> {
+export function decodeBody(encodedMessageBody: Map<any, any>, binaryEncoder: _BinaryEncoding): Map<string, any> {
     return decodeKeys(encodedMessageBody, binaryEncoder);
 }
 
@@ -1305,13 +1309,13 @@ export function encodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
     if (given === null || given === undefined) {
         return given;
     } else if (typeof given === 'object' && !Array.isArray(given)) {
-        const newMap: {[key: string]: any} = {};
+        const newMap = new Map<any, any>();
 
         for (const [key, value] of Object.entries(given)) {
-            const finalKey: string = binaryEncoder.encodeMap[key] ?? key;
+            const finalKey = binaryEncoder.encodeMap.has(key) ? binaryEncoder.encodeMap.get(key) : key;
             const encodedValue = encodeKeys(value, binaryEncoder);
 
-            newMap[finalKey] = encodedValue;
+            newMap.set(finalKey, encodedValue);
         }
 
         return newMap;
@@ -1324,10 +1328,10 @@ export function encodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
 
 export function decodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
     if (typeof given === 'object' && !Array.isArray(given)) {
-        const newMap: {[key: string]: any} = {};
+        const newMap = new Map<string, any>();
 
         for (const [key, value] of Object.entries(given)) {
-            const finalKey = binaryEncoder.decodeMap[key] ?? key;
+            const finalKey = typeof key === 'string' ? key : binaryEncoder.decodeMap.get(key);
             
             if (finalKey === undefined) {
                 throw new _BinaryEncodingMissing(key);
@@ -1373,22 +1377,23 @@ export function constructBinaryEncoding(uApiSchema: UApiSchema): _BinaryEncoding
     }
 
     let i = 0;
-    const binaryEncoding: { [key: string]: number } = {};
+    const binaryEncodingMap = new Map<string, number>()
     allKeys.forEach(key => {
-        binaryEncoding[key] = i;
+        binaryEncodingMap.set(key, i);
         i += 1;
     });
     const finalString = Array.from(allKeys).join("\n");
 
     const checksum = createChecksum(finalString);
-    return new _BinaryEncoding(binaryEncoding, checksum);
+    return new _BinaryEncoding(binaryEncodingMap, checksum);
 }
 
 export function createChecksum(value: string): number {
-    const c = new CRC32();
-    c.update(Buffer.from(value, 'utf-8'));
-    return c.getValue();
+    const checksum = crc32.str(value);
+    // Convert the checksum to a signed 32-bit integer
+    return checksum >>> 0; // Using zero-fill right shift to convert to unsigned
 }
+
 
 export function serialize(message: Message, binaryEncoder: _BinaryEncoder, serializer: SerializationImpl): Uint8Array {
     const headers = message.header;
@@ -1447,8 +1452,8 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
     }
 
-    let headers: { [key: string]: any } | null = null;
-    let body: { [key: string]: any } | null = null;
+    let headers: Map<string, any>;
+    let body: Map<string, any>;
 
     try {
         headers = finalMessageAsPseudoJsonList[0];
@@ -1461,9 +1466,8 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         if (Object.keys(body).length !== 1) {
             throw new _InvalidMessageBody();
         } else {
-            try {
-                const givenPayload = body[Object.keys(body)[0]];
-            } catch (e) {
+            const givenPayload = [...body.values()][0]
+            if (givenPayload === undefined) {
                 throw new _InvalidMessageBody();
             }
         }
@@ -1494,21 +1498,21 @@ export function getType(value: any): string {
 
 export function getTypeUnexpectedValidationFailure(path: any[], value: any, expectedType: string): _ValidationFailure[] {
     const actualType = getType(value);
-    const data = {
-        "actual": { [actualType]: {} },
-        "expected": { [expectedType]: {} }
-    };
+    const data = new Map([
+        ["actual", new Map([[ actualType, new Map() ]])],
+        ["expected", new Map([[ expectedType, new Map() ]])]
+    ]);
     return [
         new _ValidationFailure(path, "TypeUnexpected", data)
     ];
 }
 
-export function validateHeaders(headers: { [key: string]: any }, uApiSchema: UApiSchema, functionType: _UFn): _ValidationFailure[] {
+export function validateHeaders(headers: Map<string, any>, uApiSchema: UApiSchema, functionType: _UFn): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
-    if (headers["_bin"]) {
+    if (headers.get("_bin")) {
         try {
-            const binaryChecksums = headers["_bin"];
+            const binaryChecksums = headers.get("_bin");
             for (let i = 0; i < binaryChecksums.length; i++) {
                 try {
                     const integerElement = Number(binaryChecksums[i]);
@@ -1520,11 +1524,11 @@ export function validateHeaders(headers: { [key: string]: any }, uApiSchema: UAp
                 }
             }
         } catch (e) {
-            validationFailures.push(...getTypeUnexpectedValidationFailure(["_bin"], headers["_bin"], "Array"));
+            validationFailures.push(...getTypeUnexpectedValidationFailure(["_bin"], headers.get("_bin"), "Array"));
         }
     }
 
-    if (headers["_sel"]) {
+    if (headers.get("_sel")) {
         const thisValidationFailures = validateSelectHeaders(headers, uApiSchema, functionType);
         validationFailures.push(...thisValidationFailures);
     }
@@ -1533,11 +1537,11 @@ export function validateHeaders(headers: { [key: string]: any }, uApiSchema: UAp
 }
 
 export function validateSelectHeaders(
-    headers: Record<string, any>,
+    headers: Map<string, any>,
     uApiSchema: UApiSchema,
     functionType: _UFn
 ): _ValidationFailure[] {
-    let selectStructFieldsHeader: Record<string, any>;
+    let selectStructFieldsHeader: Map<string, any>;
     try {
         selectStructFieldsHeader = asMap(headers.get("_sel"));
     } catch (e) {
@@ -1547,7 +1551,7 @@ export function validateSelectHeaders(
     const validationFailures: _ValidationFailure[] = [];
 
     for (const [typeName, selectValue] of selectStructFieldsHeader.entries()) {
-        let typeReference: _UType;
+        let typeReference: _UType | undefined;
         if (typeName === "->") {
             typeReference = functionType.result;
         } else {
@@ -1556,11 +1560,11 @@ export function validateSelectHeaders(
         }
 
         if (!typeReference) {
-            validationFailures.push({
-                path: ["_sel", typeName],
-                errorCode: "TypeUnknown",
-                details: {},
-            });
+            validationFailures.push(new _ValidationFailure(
+                ["_sel", typeName],
+                "TypeUnknown",
+                new Map(),
+            ));
             continue;
         }
 
@@ -1569,11 +1573,11 @@ export function validateSelectHeaders(
             for (const [unionCase, selectedCaseStructFields] of unionCases.entries()) {
                 const structRef = typeReference.cases.get(unionCase);
                 if (!structRef) {
-                    validationFailures.push({
-                        path: ["_sel", typeName, unionCase],
-                        errorCode: "UnionCaseUnknown",
-                        details: {},
-                    });
+                    validationFailures.push(new _ValidationFailure(
+                        ["_sel", typeName, unionCase],
+                        "UnionCaseUnknown",
+                        new Map(),
+                    ));
                     continue;
                 }
 
@@ -1588,7 +1592,7 @@ export function validateSelectHeaders(
             const fnCall = typeReference.call;
             const fnCallCases = fnCall.cases;
             const fnName = typeReference.name;
-            const argStruct = fnCallCases.get(fnName);
+            const argStruct = fnCallCases.get(fnName)!;
             const nestedValidationFailures = validateSelectStruct(
                 argStruct,
                 ["_sel", typeName],
@@ -1631,11 +1635,11 @@ export function validateSelectStruct(
         }
         if (!structReference.fields.has(stringField)) {
             const thisPath = append(basePath, i);
-            validationFailures.push({
-                path: thisPath,
-                errorCode: "ObjectKeyDisallowed",
-                details: {},
-            });
+            validationFailures.push(new _ValidationFailure(
+                thisPath,
+                "ObjectKeyDisallowed",
+                new Map(),
+            ));
         }
     }
 
@@ -1650,7 +1654,7 @@ export function validateValueOfType(
     typeParameters: _UTypeDeclaration[]
 ): _ValidationFailure[] {
     if (value === null || value === undefined) {
-        const isNullable = thisType instanceof _UGeneric ? generics[thisType.index].nullable : nullable;
+        const isNullable = thisType instanceof _UGeneric ? generics[thisType.index]!.nullable : nullable;
         if (!isNullable) {
             return getTypeUnexpectedValidationFailure([], value, thisType.getName(generics));
         } else {
@@ -1719,13 +1723,13 @@ export function generateRandomBoolean(
 export function validateInteger(value: any): _ValidationFailure[] {
     if (typeof value === "number" && Number.isInteger(value)) {
         return [];
-    } else if (typeof value === "bigint" || value instanceof BigDecimal) {
+    } else if (typeof value === "bigint") {
         return [
-            {
-                path: [],
-                errorCode: "NumberOutOfRange",
-                details: {},
-            },
+            new _ValidationFailure(
+                [],
+                "NumberOutOfRange",
+                new Map(),
+            ),
         ];
     } else {
         return getTypeUnexpectedValidationFailure([], value, _INTEGER_NAME);
@@ -1745,12 +1749,12 @@ export function generateRandomInteger(
 }
 
 export function validateNumber(value: any): Array<_ValidationFailure> {
-    if (value instanceof BigInteger || value instanceof BigDecimal) {
-        return [{
-            path: [],
-            reason: "NumberOutOfRange",
-            data: {}
-        }];
+    if (typeof value === "bigint") {
+        return [new _ValidationFailure(
+            [],
+            "NumberOutOfRange",
+            new Map()
+        )];
     } else if (typeof value === 'number') {
         return [];
     } else {
@@ -1784,7 +1788,7 @@ export function generateRandomString(blueprintValue: any, useBlueprintValue: boo
 
 export function validateArray(value: any, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>): Array<_ValidationFailure> {
     if (Array.isArray(value)) {
-        const nestedTypeDeclaration = typeParameters[0];
+        const nestedTypeDeclaration = typeParameters[0]!;
         const validationFailures: Array<_ValidationFailure> = [];
         for (let i = 0; i < value.length; i++) {
             const element = value[i];
@@ -1807,7 +1811,7 @@ export function validateArray(value: any, typeParameters: Array<_UTypeDeclaratio
 }
 
 export function generateRandomArray(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>, randomGenerator: _RandomGenerator): any {
-    const nestedTypeDeclaration = typeParameters[0];
+    const nestedTypeDeclaration = typeParameters[0]!;
     if (useBlueprintValue) {
         const startingArray = blueprintValue as Array<any>;
         const array: Array<any> = [];
@@ -1829,7 +1833,7 @@ export function generateRandomArray(blueprintValue: any, useBlueprintValue: bool
 
 export function validateObject(value: any, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>): Array<_ValidationFailure> {
     if (typeof value === 'object' && value !== null) {
-        const nestedTypeDeclaration = typeParameters[0];
+        const nestedTypeDeclaration = typeParameters[0]!;
         const validationFailures: Array<_ValidationFailure> = [];
         for (const key in value) {
             if (Object.prototype.hasOwnProperty.call(value, key)) {
@@ -1852,10 +1856,10 @@ export function validateObject(value: any, typeParameters: Array<_UTypeDeclarati
 }
 
 export function generateRandomObject(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>, randomGenerator: _RandomGenerator): any {
-    const nestedTypeDeclaration = typeParameters[0];
+    const nestedTypeDeclaration = typeParameters[0]!;
     if (useBlueprintValue) {
-        const startingObj = blueprintValue as Record<string, any>;
-        const obj = new Record<string, any>();
+        const startingObj = blueprintValue as Map<string, any>;
+        const obj = new Map<string, any>();
         for (const [key, startingObjValue] of Object.entries(startingObj)) {
             const value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true, includeRandomOptionalFields, generics, randomGenerator);
             obj.set(key, value);
@@ -1863,7 +1867,7 @@ export function generateRandomObject(blueprintValue: any, useBlueprintValue: boo
         return obj;
     } else {
         const length = randomGenerator.nextCollectionLength();
-        const obj = new Record<string, any>();
+        const obj = new Map<string, any>();
         for (let i = 0; i < length; i++) {
             const key = randomGenerator.nextString();
             const value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields, generics, randomGenerator);
@@ -1873,15 +1877,15 @@ export function generateRandomObject(blueprintValue: any, useBlueprintValue: boo
     }
 }
 
-export function validateStruct(value: any, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>, fields: Record<string, _UFieldDeclaration>): Array<_ValidationFailure> {
+export function validateStruct(value: any, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>, fields: Map<string, _UFieldDeclaration>): Array<_ValidationFailure> {
     if (typeof value === 'object' && value !== null) {
-        return validateStructFields(fields, value as Record<string, any>, typeParameters);
+        return validateStructFields(fields, value as Map<string, any>, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _STRUCT_NAME);
     }
 }
 
-export function validateStructFields(fields: Record<string, _UFieldDeclaration>, actualStruct: Record<string, any>, typeParameters: Array<_UTypeDeclaration>): Array<_ValidationFailure> {
+export function validateStructFields(fields: Map<string, _UFieldDeclaration>, actualStruct: Map<string, any>, typeParameters: Array<_UTypeDeclaration>): Array<_ValidationFailure> {
     const validationFailures: Array<_ValidationFailure> = [];
     const missingFields: Array<string> = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
@@ -1891,27 +1895,27 @@ export function validateStructFields(fields: Record<string, _UFieldDeclaration>,
         }
     }
     for (const missingField of missingFields) {
-        const validationFailure: _ValidationFailure = {
-            path: [missingField],
-            reason: "RequiredObjectKeyMissing",
-            data: {}
-        };
+        const validationFailure: _ValidationFailure = new _ValidationFailure(
+            [missingField],
+            "RequiredObjectKeyMissing",
+            new Map()
+        );
         validationFailures.push(validationFailure);
     }
     for (const [fieldName, fieldValue] of Object.entries(actualStruct)) {
         const referenceField = fields.get(fieldName);
         if (!referenceField) {
-            const validationFailure: _ValidationFailure = {
-                path: [fieldName],
-                reason: "ObjectKeyDisallowed",
-                data: {}
-            };
+            const validationFailure: _ValidationFailure = new _ValidationFailure(
+                [fieldName],
+                "ObjectKeyDisallowed",
+                new Map()
+            );
             validationFailures.push(validationFailure);
             continue;
         }
         const refFieldTypeDeclaration = referenceField.typeDeclaration;
         const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, typeParameters);
-        const nestedValidationFailuresWithPath: Array<_ValidationFailure> = nestedValidationFailures.map(f => {
+        const nestedValidationFailuresWithPath: _ValidationFailure[] = nestedValidationFailures.map(f => {
             const thisPath = prepend(fieldName, f.path);
             return {
                 path: thisPath,
@@ -1928,13 +1932,13 @@ export function generateRandomStruct(
     blueprintValue: any,
     useBlueprintValue: boolean,
     includeRandomOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
-    randomGenerator: RandomGenerator,
-    fields: Record<string, UFieldDeclaration>
+    typeParameters: _UTypeDeclaration[],
+    generics: _UTypeDeclaration[],
+    randomGenerator: _RandomGenerator,
+    fields: Map<string, _UFieldDeclaration>
 ): any {
     if (useBlueprintValue) {
-        const startingStructValue = blueprintValue as Record<string, any>;
+        const startingStructValue = blueprintValue as Map<string, any>;
         return constructRandomStruct(fields, startingStructValue, includeRandomOptionalFields, typeParameters, randomGenerator);
     } else {
         return constructRandomStruct(fields, new Map(), includeRandomOptionalFields, typeParameters, randomGenerator);
@@ -1942,14 +1946,14 @@ export function generateRandomStruct(
 }
 
 export function constructRandomStruct(
-    referenceStruct: Record<string, UFieldDeclaration>,
-    startingStruct: Record<string, any>,
+    referenceStruct: Map<string, _UFieldDeclaration>,
+    startingStruct: Map<string, any>,
     includeRandomOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    randomGenerator: RandomGenerator
-): Record<string, any> {
+    typeParameters: _UTypeDeclaration[],
+    randomGenerator: _RandomGenerator
+): Map<string, any> {
     const sortedReferenceStruct = Array.from(referenceStruct.entries()).sort((e1, e2) => e1[0].localeCompare(e2[0]));
-    const obj = new Record<string, any>();
+    const obj = new Map<string, any>();
 
     for (const [fieldName, fieldDeclaration] of sortedReferenceStruct) {
         const blueprintValue = startingStruct.get(fieldName);
@@ -1976,7 +1980,7 @@ export function constructRandomStruct(
     return obj;
 }
 
-export function unionEntry(union: Record<string, any>): [string, any] {
+export function unionEntry(union: Map<string, any>): [string, any] {
     const result =  Array.from(union.entries())[0];
     if (result == undefined) {
         throw new Error('Invalid union');
@@ -1986,10 +1990,10 @@ export function unionEntry(union: Record<string, any>): [string, any] {
 
 export function validateUnion(
     value: any,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
-    cases: Record<string, UStruct>
-): ValidationFailure[] {
+    typeParameters: _UTypeDeclaration[],
+    generics: _UTypeDeclaration[],
+    cases: Map<string, _UStruct>
+): _ValidationFailure[] {
     if (value instanceof Map) {
         return validateUnionCases(cases, value, typeParameters);
     } else {
@@ -1998,23 +2002,23 @@ export function validateUnion(
 }
 
 export function validateUnionCases(
-    referenceCases: Record<string, UStruct>,
-    actual: Record<string, any>,
-    typeParameters: UTypeDeclaration[]
-): ValidationFailure[] {
+    referenceCases: Map<string, _UStruct>,
+    actual: Map<string, any>,
+    typeParameters: _UTypeDeclaration[]
+): _ValidationFailure[] {
     if (actual.size !== 1) {
         return [
             {
                 path: [],
                 reason: "ObjectSizeUnexpected",
-                data: { actual: actual.size, expected: 1 }
+                data: new Map([["actual", actual.size], ["expected", 1]])
             }
         ];
     }
 
     const entry = unionEntry(actual);
-    const unionTarget = entry ? entry[0] : null;
-    const unionPayload = entry ? entry[1] : null;
+    const unionTarget = entry[0];
+    const unionPayload = entry[1];
 
     const referenceStruct = referenceCases.get(unionTarget);
     if (!referenceStruct) {
@@ -2022,7 +2026,7 @@ export function validateUnionCases(
             {
                 path: [unionTarget],
                 reason: "ObjectKeyDisallowed",
-                data: {}
+                data: new Map()
             }
         ];
     }
@@ -2041,11 +2045,11 @@ export function validateUnionCases(
 }
 
 export function validateUnionStruct(
-    unionStruct: UStruct,
+    unionStruct: _UStruct,
     unionCase: string,
-    actual: Record<string, any>,
-    typeParameters: UTypeDeclaration[]
-): ValidationFailure[] {
+    actual: Map<string, any>,
+    typeParameters: _UTypeDeclaration[]
+): _ValidationFailure[] {
     return validateStructFields(unionStruct.fields, actual, typeParameters);
 }
 
@@ -2053,13 +2057,13 @@ export function generateRandomUnion(
     blueprintValue: any,
     useBlueprintValue: boolean,
     includeRandomOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
-    randomGenerator: RandomGenerator,
-    cases: Record<string, UStruct>
+    typeParameters: _UTypeDeclaration[],
+    generics: _UTypeDeclaration[],
+    randomGenerator: _RandomGenerator,
+    cases: Map<string, _UStruct>
 ): any {
     if (useBlueprintValue) {
-        const startingUnionCase = blueprintValue as Record<string, any>;
+        const startingUnionCase = blueprintValue as Map<string, any>;
         return constructRandomUnion(cases, startingUnionCase, includeRandomOptionalFields, typeParameters, randomGenerator);
     } else {
         return constructRandomUnion(cases, new Map(), includeRandomOptionalFields, typeParameters, randomGenerator);
@@ -2067,17 +2071,17 @@ export function generateRandomUnion(
 }
 
 export function constructRandomUnion(
-    unionCasesReference: Record<string, UStruct>,
-    startingUnion: Record<string, any>,
+    unionCasesReference: Map<string, _UStruct>,
+    startingUnion: Map<string, any>,
     includeRandomOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    randomGenerator: RandomGenerator
-): Record<string, any> {
+    typeParameters: _UTypeDeclaration[],
+    randomGenerator: _RandomGenerator
+): Map<string, any> {
     if (startingUnion.size !== 0) {
-        const unionEntry = unionEntry(startingUnion);
-        const unionCase = unionEntry ? unionEntry[0] : null;
+        const entry = unionEntry(startingUnion);
+        const unionCase = entry[0];
         const unionStructType = unionCase ? unionCasesReference.get(unionCase) : null;
-        const unionStartingStruct = unionEntry ? unionEntry[1] : null;
+        const unionStartingStruct: Map<string, any> = startingUnion.get(unionCase)
 
         if (unionCase && unionStructType && unionStartingStruct) {
             return new Map([
@@ -2111,13 +2115,13 @@ export function generateRandomFn(
     blueprintValue: any,
     useBlueprintValue: boolean,
     includeRandomOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
-    randomGenerator: RandomGenerator,
-    callCases: Record<string, UStruct>
+    typeParameters: _UTypeDeclaration[],
+    generics: _UTypeDeclaration[],
+    randomGenerator: _RandomGenerator,
+    callCases: Map<string, _UStruct>
 ): any {
     if (useBlueprintValue) {
-        const startingFnValue = blueprintValue as Record<string, any>;
+        const startingFnValue = blueprintValue as Map<string, any>;
         return constructRandomUnion(callCases, startingFnValue, includeRandomOptionalFields, [], randomGenerator);
     } else {
         return constructRandomUnion(callCases, new Map(), includeRandomOptionalFields, [], randomGenerator);
@@ -2126,11 +2130,11 @@ export function generateRandomFn(
 
 export function validateMockCall(
     givenObj: any,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
-    types: Record<string, UType>
-): ValidationFailure[] {
-    let givenMap: Record<string, any>;
+    typeParameters: _UTypeDeclaration[],
+    generics: _UTypeDeclaration[],
+    types: Map<string, _UType>
+): _ValidationFailure[] {
+    let givenMap: Map<string, any>;
     try {
         givenMap = asMap(givenObj);
     } catch (e) {
@@ -2145,13 +2149,13 @@ export function validateMockCall(
             {
                 path: [],
                 reason: "ObjectKeyRegexMatchCountUnexpected",
-                data: { regex: regexString, actual: matches.length, expected: 1 }
+                data: new Map<string, any>([[ "regex", regexString], ["actual", matches.length], ["expected", 1]])
             }
         ];
     }
 
-    const functionName = matches[0];
-    const functionDef = types.get(functionName);
+    const functionName = matches[0]!;
+    const functionDef: _UFn = types.get(functionName)! as _UFn;
     const input = givenMap.get(functionName);
 
     const functionDefCall = functionDef?.call;
@@ -2172,14 +2176,14 @@ export function validateMockCall(
 }
 
 
-export function validateMockStub(givenObj: any, typeParameters: UTypeDeclaration[], generics: UTypeDeclaration[], types: Record<string, UType>): ValidationFailure[] {
-    const validationFailures: ValidationFailure[] = [];
+export function validateMockStub(givenObj: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], types: Map<string, _UType>): _ValidationFailure[] {
+    const validationFailures: _ValidationFailure[] = [];
 
-    let givenMap: Record<string, any>;
+    let givenMap: Map<string, any>;
     try {
         givenMap = asMap(givenObj);
     } catch (e) {
-        return getTypeUnexpectedValidationFailure(givenObj, "Object");
+        return getTypeUnexpectedValidationFailure([], givenObj, "Object");
     }
 
     const regexString = "^fn\\..*$";
@@ -2189,20 +2193,20 @@ export function validateMockStub(givenObj: any, typeParameters: UTypeDeclaration
         return [{
             path: [],
             reason: "ObjectKeyRegexMatchCountUnexpected",
-            data: { regex: regexString, actual: matches.length, expected: 1 }
+            data: new Map<string, any>([["regex", regexString], ["actual", matches.length], ["expected", 1]])
         }];
     }
 
-    const functionName = matches[0];
-    const functionDef = types[functionName] as UFn;
-    const input = givenMap[functionName];
+    const functionName = matches[0]!;
+    const functionDef = types.get(functionName) as _UFn;
+    const input = givenMap.get(functionName);
 
     const functionDefCall = functionDef.call;
     const functionDefName = functionDef.name;
     const functionDefCallCases = functionDefCall.cases;
-    const inputFailures = functionDefCallCases[functionDefName].validate(input, [], []);
+    const inputFailures = functionDefCallCases.get(functionDefName)!.validate(input, [], []);
 
-    const inputFailuresWithPath: ValidationFailure[] = [];
+    const inputFailuresWithPath: _ValidationFailure[] = [];
     for (const f of inputFailures) {
         const thisPath = [functionName, ...f.path];
         inputFailuresWithPath.push({ path: thisPath, reason: f.reason, data: f.data });
@@ -2218,13 +2222,13 @@ export function validateMockStub(givenObj: any, typeParameters: UTypeDeclaration
         validationFailures.push({
             path: [resultDefKey],
             reason: "RequiredObjectKeyMissing",
-            data: {}
+            data: new Map()
         });
     } else {
-        const output = givenMap[resultDefKey];
+        const output = givenMap.get(resultDefKey);
         const outputFailures = functionDef.result.validate(output, [], []);
 
-        const outputFailuresWithPath: ValidationFailure[] = [];
+        const outputFailuresWithPath: _ValidationFailure[] = [];
         for (const f of outputFailures) {
             const thisPath = [resultDefKey, ...f.path];
             outputFailuresWithPath.push({ path: thisPath, reason: f.reason, data: f.data });
@@ -2247,33 +2251,33 @@ export function validateMockStub(givenObj: any, typeParameters: UTypeDeclaration
     return validationFailures;
 }
 
-export function selectStructFields(typeDeclaration: UTypeDeclaration, value: any, selectedStructFields: Record<string, any>): any {
+export function selectStructFields(typeDeclaration: _UTypeDeclaration, value: any, selectedStructFields: Map<string, any>): any {
     const typeDeclarationType = typeDeclaration.type;
     const typeDeclarationTypeParams = typeDeclaration.typeParameters;
 
-    if (typeDeclarationType instanceof UStruct) {
+    if (typeDeclarationType instanceof _UStruct) {
         const fields = typeDeclarationType.fields;
         const structName = typeDeclarationType.name;
-        const selectedFields = selectedStructFields[structName] as string[];
-        const valueAsMap = value as Record<string, any>;
-        const finalMap: Record<string, any> = {};
+        const selectedFields = selectedStructFields.get(structName) as string[];
+        const valueAsMap = value as Map<string, any>;
+        const finalMap: Map<string, any> = new Map();
 
         for (const [fieldName, fieldValue] of Object.entries(valueAsMap)) {
             if (!selectedFields || selectedFields.includes(fieldName)) {
-                const field = fields[fieldName];
+                const field: _UFieldDeclaration = fields.get(fieldName)!;
                 const fieldTypeDeclaration = field.typeDeclaration;
                 const valueWithSelectedFields = selectStructFields(fieldTypeDeclaration, fieldValue, selectedStructFields);
 
-                finalMap[fieldName] = valueWithSelectedFields;
+                finalMap.set(fieldName, valueWithSelectedFields);
             }
         }
 
         return finalMap;
-    } else if (typeDeclarationType instanceof UFn) {
-        const valueAsMap = value as Record<string, any>;
+    } else if (typeDeclarationType instanceof _UFn) {
+        const valueAsMap = value as Map<string, any>;
         const uEntry = unionEntry(valueAsMap);
         const unionCase = uEntry[0];
-        const unionData = uEntry[1] as Record<string, any>;
+        const unionData = uEntry[1] as Map<string, any>;
 
         const fnName = typeDeclarationType.name;
         const fnCall = typeDeclarationType.call;
@@ -2281,7 +2285,7 @@ export function selectStructFields(typeDeclaration: UTypeDeclaration, value: any
 
         const argStructReference = fnCallCases[unionCase];
         const selectedFields = selectedStructFields[fnName] as string[];
-        const finalMap: Record<string, any> = {};
+        const finalMap: Map<string, any> = {};
 
         for (const [fieldName, fieldValue] of Object.entries(unionData)) {
             if (!selectedFields || selectedFields.includes(fieldName)) {
@@ -2294,26 +2298,26 @@ export function selectStructFields(typeDeclaration: UTypeDeclaration, value: any
 
         return { [unionCase]: finalMap };
     } else if (typeDeclarationType instanceof UUnion) {
-        const valueAsMap = value as Record<string, any>;
+        const valueAsMap = value as Map<string, any>;
         const uEntry = unionEntry(valueAsMap);
         const unionCase = uEntry[0];
-        const unionData = uEntry[1] as Record<string, any>;
+        const unionData = uEntry[1] as Map<string, any>;
 
         const unionCases = typeDeclarationType.cases;
         const unionStructReference = unionCases[unionCase];
         const unionStructRefFields = unionStructReference.fields;
-        const defaultCasesToFields: Record<string, string[]> = {};
+        const defaultCasesToFields: Map<string, string[]> = {};
 
         for (const [caseName, unionStruct] of Object.entries(unionCases)) {
             const unionStructFields = Object.keys(unionStruct.fields);
             defaultCasesToFields[caseName] = unionStructFields;
         }
 
-        const unionSelectedFields = selectedStructFields[typeDeclarationType.name] as Record<string, string[]>;
+        const unionSelectedFields = selectedStructFields[typeDeclarationType.name] as Map<string, string[]>;
         const thisUnionCaseSelectedFieldsDefault = defaultCasesToFields[unionCase];
         const selectedFields = unionSelectedFields[unionCase] ?? thisUnionCaseSelectedFieldsDefault;
 
-        const finalMap: Record<string, any> = {};
+        const finalMap: Map<string, any> = {};
         for (const [fieldName, fieldValue] of Object.entries(unionData)) {
             if (!selectedFields || selectedFields.includes(fieldName)) {
                 const field = unionStructRefFields[fieldName];
@@ -2325,9 +2329,9 @@ export function selectStructFields(typeDeclaration: UTypeDeclaration, value: any
         return { [unionCase]: finalMap };
     } else if (typeDeclarationType instanceof UObject) {
         const nestedTypeDeclaration = typeDeclarationTypeParams[0];
-        const valueAsMap = value as Record<string, any>;
+        const valueAsMap = value as Map<string, any>;
 
-        const finalMap: Record<string, any> = {};
+        const finalMap: Map<string, any> = {};
         for (const [key, nestedValue] of Object.entries(valueAsMap)) {
             const valueWithSelectedFields = selectStructFields(nestedTypeDeclaration, nestedValue, selectedStructFields);
             finalMap[key] = valueWithSelectedFields;
@@ -2350,7 +2354,7 @@ export function selectStructFields(typeDeclaration: UTypeDeclaration, value: any
     }
 }
 
-export function getInvalidErrorMessage(error: string, validationFailures: ValidationFailure[], resultUnionType: UUnion, responseHeaders: Record<string, any>): Message {
+export function getInvalidErrorMessage(error: string, validationFailures: ValidationFailure[], resultUnionType: UUnion, responseHeaders: Map<string, any>): Message {
     const validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
     const newErrorResult = { [error]: { cases: validationFailureCases } };
 
@@ -2358,8 +2362,8 @@ export function getInvalidErrorMessage(error: string, validationFailures: Valida
     return { headers: responseHeaders, result: newErrorResult };
 }
 
-export function mapValidationFailuresToInvalidFieldCases(argumentValidationFailures: ValidationFailure[]): Record<string, any>[] {
-    const validationFailureCases: Record<string, any>[] = [];
+export function mapValidationFailuresToInvalidFieldCases(argumentValidationFailures: ValidationFailure[]): Map<string, any>[] {
+    const validationFailureCases: Map<string, any>[] = [];
     for (const validationFailure of argumentValidationFailures) {
         const validationFailureCase = {
             path: validationFailure.path,
@@ -2371,7 +2375,7 @@ export function mapValidationFailuresToInvalidFieldCases(argumentValidationFailu
     return validationFailureCases;
 }
 
-export function validateResult(resultUnionType: UUnion, errorResult: Record<string, any>): void {
+export function validateResult(resultUnionType: UUnion, errorResult: Map<string, any>): void {
     const newErrorResultValidationFailures = resultUnionType.validate(errorResult, [], []);
     if (newErrorResultValidationFailures.length !== 0) {
         throw new UApiError(
@@ -2386,14 +2390,14 @@ export function handleMessage(
     handler: (message: Message) => Message,
     onError: (error: Error) => void
 ): Message {
-    const responseHeaders: Record<string, any> = {};
+    const responseHeaders: Map<string, any> = {};
     const requestHeaders = requestMessage.header;
     const requestBody = requestMessage.body;
     const parsedUApiSchema = uApiSchema.parsed;
     const requestEntry = unionEntry(requestBody);
 
     const requestTargetInit = requestEntry.key;
-    const requestPayload: Record<string, any> = requestEntry.value;
+    const requestPayload: Map<string, any> = requestEntry.value;
 
     let unknownTarget: string | null;
     let requestTarget: string;
@@ -2503,7 +2507,7 @@ export function handleMessage(
 
     let finalResultUnion;
     if (requestHeaders.hasOwnProperty("_sel")) {
-        const selectStructFieldsHeader = requestHeaders["_sel"] as unknown as Record<string, any>;
+        const selectStructFieldsHeader = requestHeaders["_sel"] as unknown as Map<string, any>;
         finalResultUnion = selectStructFields(new _UTypeDeclaration(resultUnionType, false, []), resultUnion, selectStructFieldsHeader);
     } else {
         finalResultUnion = resultUnion;
@@ -2562,7 +2566,7 @@ export function processBytes(requestMessageBytes: Uint8Array, serializer: Serial
     }
 }
 
-export function isSubMap(part: Record<string, Object>, whole: Record<string, Object>): boolean {
+export function isSubMap(part: Map<string, any>, whole: Map<string, any>): boolean {
     for (const partKey of part.keys()) {
         const wholeValue = whole.get(partKey);
         const partValue = part.get(partKey);
@@ -2602,7 +2606,7 @@ export function partiallyMatches(wholeList: any[], partElement: any): boolean {
     return false;
 }
 
-export function verify(functionName: string, argument: Record<string, Object>, exactMatch: boolean, verificationTimes: Record<string, Object>, invocations: MockInvocation[]): Record<string, Object> {
+export function verify(functionName: string, argument: Map<string, any>, exactMatch: boolean, verificationTimes: Map<string, any>, invocations: MockInvocation[]): Map<string, any> {
     let matchesFound = 0;
     for (const invocation of invocations) {
         if (invocation.functionName === functionName) {
@@ -2621,13 +2625,13 @@ export function verify(functionName: string, argument: Record<string, Object>, e
         }
     }
 
-    const allCallsPseudoJson: Record<string, Object>[] = invocations.map(invocation => Map.of(invocation.functionName, invocation.functionArgument));
+    const allCallsPseudoJson: Map<string, any>[] = invocations.map(invocation => Map.of(invocation.functionName, invocation.functionArgument));
 
     const verifyTimesEntry = unionEntry(verificationTimes);
     const verifyKey = verifyTimesEntry[0];
-    const verifyTimesStruct: Record<string, Object> = verifyTimesEntry[1];
+    const verifyTimesStruct: Map<string, any> = verifyTimesEntry[1];
 
-    let verificationFailurePseudoJson: Record<string, Object> | null = null;
+    let verificationFailurePseudoJson: Map<string, any> | null = null;
     if (verifyKey === "Exact") {
         const times = verifyTimesStruct.get("times");
         if (matchesFound > times) {
@@ -2675,11 +2679,11 @@ export function verify(functionName: string, argument: Record<string, Object>, e
     return Map.of("ErrorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
 }
 
-export function verifyNoMoreInteractions(invocations: MockInvocation[]): Record<string, Object> {
+export function verifyNoMoreInteractions(invocations: MockInvocation[]): Map<string, any> {
     const invocationsNotVerified = invocations.filter(i => !i.verified);
 
     if (invocationsNotVerified.length > 0) {
-        const unverifiedCallsPseudoJson: Record<string, Object>[] = invocationsNotVerified.map(invocation => Map.of(invocation.functionName, invocation.functionArgument));
+        const unverifiedCallsPseudoJson: Map<string, any>[] = invocationsNotVerified.map(invocation => Map.of(invocation.functionName, invocation.functionArgument));
         return Map.of("ErrorVerificationFailure",
             Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
     }

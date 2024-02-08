@@ -1,21 +1,21 @@
-import { encode, decode } from '@msgpack/msgpack';
+import { decode, encode } from 'msgpackr';
 
-export class _DefaultSerializer implements SerializationImpl {
-    async toJson(uapiMessage: any): Promise<Buffer> {
-        const jsonString = JSON.stringify(uapiMessage);
-        return Buffer.from(jsonString);
+class _DefaultSerializationImpl {
+    public toJson(uapiMessage: any): Uint8Array {
+        const jsonStr = JSON.stringify(uapiMessage);
+        return new TextEncoder().encode(jsonStr);
     }
 
-    async fromJson(bytes: Buffer): Promise<any> {
-        const jsonString = bytes.toString('utf-8');
-        return JSON.parse(jsonString);
+    public toMsgPack(uapiMessage: any): Uint8Array {
+        return encode(uapiMessage);
     }
 
-    async toMsgPack(uapiMessage: any): Promise<Buffer> {
-        return Buffer.from(encode(uapiMessage));
+    public fromJson(bytes: Uint8Array): any {
+        const jsonStr = new TextDecoder().decode(bytes);
+        return JSON.parse(jsonStr);
     }
 
-    async fromMsgPack(bytes: Buffer): Promise<any> {
+    public fromMsgPack(bytes: Uint8Array): any {
         return decode(bytes);
     }
 }

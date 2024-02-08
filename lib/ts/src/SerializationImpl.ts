@@ -6,8 +6,9 @@
  * objects as Maps and JSON arrays as Lists.
  */
 export interface SerializationImpl {
-    toJson(message: any): Promise<Uint8Array>;
-    toMsgPack(message: any): Promise<Uint8Array>;
-    fromJson(bytes: Uint8Array): Promise<any>;
-    fromMsgPack(bytes: Uint8Array): Promise<any>;
+    toJson(uapiMessage: any): Uint8Array;
+    toMsgPack(uapiMessage: any): Uint8Array;
+    fromJson(bytes: Uint8Array): any;
+    fromMsgPack(bytes: Uint8Array): any;
 }
+

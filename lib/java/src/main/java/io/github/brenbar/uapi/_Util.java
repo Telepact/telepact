@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -1193,14 +1194,11 @@ class _Util {
             throw new _BinaryEncoderUnavailableError();
         }
 
-        final var checksums = recentBinaryEncoders.keySet().stream().toList();
-
-        final _BinaryEncoding binaryEncoder;
-        try {
-            binaryEncoder = recentBinaryEncoders.get(checksums.get(0));
-        } catch (ArrayIndexOutOfBoundsException e) {
+        final Optional<_BinaryEncoding> binaryEncoderOptional = recentBinaryEncoders.values().stream().findAny();
+        if (!binaryEncoderOptional.isPresent()) {
             throw new _BinaryEncoderUnavailableError();
         }
+        final _BinaryEncoding binaryEncoder = binaryEncoderOptional.get();
 
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
@@ -1350,15 +1348,15 @@ class _Util {
             }
         }
         var i = 0;
-        final var binaryEncoding = new HashMap<String, Integer>();
+        final var binaryEncodingMap = new HashMap<String, Integer>();
         for (final var key : allKeys) {
-            binaryEncoding.put(key, i);
+            binaryEncodingMap.put(key, i);
             i += 1;
         }
         final var finalString = String.join("\n", allKeys);
 
         final int checksum = createChecksum(finalString);
-        return new _BinaryEncoding(binaryEncoding, checksum);
+        return new _BinaryEncoding(binaryEncodingMap, checksum);
     }
 
     static int createChecksum(String value) {
@@ -2070,8 +2068,8 @@ class _Util {
             List<_UTypeDeclaration> typeParameters,
             _RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
-            final var unionEntry = unionEntry(startingUnion);
-            final var unionCase = unionEntry.getKey();
+            final var entry = unionEntry(startingUnion);
+            final var unionCase = entry.getKey();
             final var unionStructType = unionCasesReference.get(unionCase);
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
