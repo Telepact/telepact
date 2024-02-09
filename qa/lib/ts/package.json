@@ -8,7 +8,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "private": true,
   "dependencies": {
     "uapi": "file:../../../lib/ts"
   },

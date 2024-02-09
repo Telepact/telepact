@@ -1,4 +1,4 @@
-import { ClientBinaryStrategy } from "./ClientBinarySrategy";
+import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 
 class Checksum {
     value: number;

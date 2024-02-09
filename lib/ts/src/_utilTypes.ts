@@ -1,3 +1,4 @@
+import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 import { _ANY_NAME, _ARRAY_NAME, _BOOLEAN_NAME, _FN_NAME, _INTEGER_NAME, _MOCK_CALL_NAME, _MOCK_STUB_NAME, _OBJECT_NAME, _STRING_NAME, _STRUCT_NAME, _UNION_NAME, clientBinaryDecode, clientBinaryEncode, generateRandomAny, generateRandomArray, generateRandomBoolean, generateRandomFn, generateRandomInteger, generateRandomNumber, generateRandomObject, generateRandomString, generateRandomStruct, generateRandomUnion, generateRandomValueOfType, serverBinaryDecode, serverBinaryEncode, validateArray, validateBoolean, validateInteger, validateMockCall, validateMockStub, validateNumber, validateObject, validateString, validateStruct, validateUnion, validateValueOfType } from "./_util";
 
 export class _SchemaParseFailure {

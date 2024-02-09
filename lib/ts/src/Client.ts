@@ -5,6 +5,7 @@ import { Message } from './Message';
 import { Serializer } from './Serializer';
 import { _ClientBinaryEncoder } from './_utilTypes';
 import { processRequestObject } from './_util';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 
 
 /**

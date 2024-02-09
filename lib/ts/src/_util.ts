@@ -8,6 +8,7 @@ import { Message } from './Message';
 import { SerializationImpl } from './SerializationImpl';
 import { SerializationError } from './SerializationError';
 import { Serializer } from './Serializer';
+import { UApiError } from './UApiError';
 
 
 export const _ANY_NAME: Readonly<string> = "Any";
