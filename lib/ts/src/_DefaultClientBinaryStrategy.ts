@@ -1,3 +1,5 @@
+import { ClientBinaryStrategy } from "./ClientBinarySrategy";
+
 class Checksum {
     value: number;
     expiration: number;

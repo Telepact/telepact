@@ -2,7 +2,7 @@
  * The strategy used by the client to maintain binary encodings compatible with
  * the server.
  */
-interface ClientBinaryStrategy {
+export interface ClientBinaryStrategy {
     /**
      * Update the strategy according to a recent binary encoding checksum returned
      * by the server.

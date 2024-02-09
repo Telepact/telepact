@@ -1,7 +1,7 @@
 /**
  * Indicates critical failure in uAPI processing logic.
  */
-class UApiError extends Error {
+export class UApiError extends Error {
     constructor(message: string);
     constructor(cause: Error);
     constructor(arg: string | Error) {
