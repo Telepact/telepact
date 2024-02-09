@@ -6,10 +6,10 @@ import { _UType } from "./_utilTypes";
  */
 export class UApiSchema {
     original: any[];
-    parsed: Map<string, _UType>;
-    typeExtensions: Map<string, _UType>;
+    parsed: Record<string, _UType>;
+    typeExtensions: Record<string, _UType>;
 
-    constructor(original: any[], parsed: Map<string, _UType>, typeExtensions: Map<string, _UType>) {
+    constructor(original: any[], parsed: Record<string, _UType>, typeExtensions: Record<string, _UType>) {
         this.original = original;
         this.parsed = parsed;
         this.typeExtensions = typeExtensions;

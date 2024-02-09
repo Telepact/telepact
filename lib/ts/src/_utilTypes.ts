@@ -1,10 +1,10 @@
-import { _STRUCT_NAME, clientBinaryDecode, clientBinaryEncode, generateRandomStruct, serverBinaryDecode, serverBinaryEncode, validateStruct, validateValueOfType } from "./_util";
+import { _STRUCT_NAME, clientBinaryDecode, clientBinaryEncode, generateRandomStruct, serverBinaryDecode, serverBinaryEncode, validateStruct, validateUnion, validateValueOfType } from "./_util";
 
 export class _SchemaParseFailure {
     constructor(
         public readonly path: any[],
         public readonly reason: string,
-        public readonly data: Map<string, any>
+        public readonly data: Record<string, any>
     ) {}
 }
 
@@ -108,7 +108,7 @@ export interface _UFieldDeclaration {
 export class _ValidationFailure {
     constructor(public readonly path: any[],
     public readonly reason: string,
-    public readonly data: Map<string, any>) {}
+    public readonly data: Record<string, any>) {}
 }
 
 export class _UGeneric implements _UType {
@@ -281,7 +281,7 @@ export class _UObject implements _UType {
 }
 
 export class _UStruct implements _UType {
-    constructor(public readonly name: string, public readonly fields: Map<string, _UFieldDeclaration>, public readonly typeParameterCount: number) {}
+    constructor(public readonly name: string, public readonly fields: Record<string, _UFieldDeclaration>, public readonly typeParameterCount: number) {}
 
     getTypeParameterCount(): number {
         return this.typeParameterCount;
@@ -301,22 +301,14 @@ export class _UStruct implements _UType {
 }
 
 export class _UUnion implements _UType {
-    public readonly name: string;
-    public readonly cases: Map<string, _UStruct>;
-    public readonly typeParameterCount: number;
-
-    constructor(name: string, cases: Map<string, _UStruct>, typeParameterCount: number) {
-        this.name = name;
-        this.cases = cases;
-        this.typeParameterCount = typeParameterCount;
-    }
+    constructor(public readonly name: string, public readonly cases: Record<string, _UStruct>, public readonly typeParameterCount: number) {}
 
     getTypeParameterCount(): number {
         return this.typeParameterCount;
     }
 
     validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return _Util.validateUnion(value, typeParameters, generics, this.cases);
+        return validateUnion(value, typeParameters, generics, this.cases);
     }
 
     generateRandomValue(
@@ -545,28 +537,16 @@ export class _ClientBinaryEncoder implements _BinaryEncoder {
 }
 
 export class _MockStub {
-    readonly whenFunction: string;
-    readonly whenArgument: Map<string, any>;
-    readonly thenResult: Map<string, any>;
-    readonly allowArgumentPartialMatch: boolean;
-    count: number;
-
-    constructor(whenFunction: string, whenArgument: Map<string, any>, thenResult: Map<string, any>,
-                allowArgumentPartialMatch: boolean, count: number) {
-        this.whenFunction = whenFunction;
-        this.whenArgument = whenArgument;
-        this.thenResult = thenResult;
-        this.allowArgumentPartialMatch = allowArgumentPartialMatch;
-        this.count = count;
-    }
+    constructor(public readonly whenFunction: string, public readonly whenArgument: Record<string, any>, public readonly thenResult: Record<string, any>,
+                public readonly allowArgumentPartialMatch: boolean, public count: number) {}
 }
 
 export class _MockInvocation {
     readonly functionName: string;
-    readonly functionArgument: Map<string, any>;
+    readonly functionArgument: Record<string, any>;
     verified: boolean;
 
-    constructor(functionName: string, functionArgument: Map<string, any>) {
+    constructor(functionName: string, functionArgument: Record<string, any>) {
         this.functionName = functionName;
         this.functionArgument = functionArgument;
         this.verified = false;
