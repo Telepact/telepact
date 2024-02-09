@@ -8,7 +8,7 @@ class Checksum {
     }
 }
 
-class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
+export class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
 
 
     private primary: Checksum | null = null;

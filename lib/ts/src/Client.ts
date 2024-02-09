@@ -1,5 +1,10 @@
-import { Future } from 'java.util.concurrent';
-import { BiFunction } from 'java.util.function';
+import { SerializationImpl } from './SerializationImpl';
+import { _DefaultSerializationImpl } from './_DefaultSerializationImpl';
+import { _DefaultClientBinaryStrategy } from './_DefaultClientBinaryStrategy';
+import { Message } from './Message';
+import { Serializer } from './Serializer';
+import { _ClientBinaryEncoder } from './_utilTypes';
+import { processRequestObject } from './_util';
 
 
 /**
@@ -22,7 +27,7 @@ export class Options {
      * The serialization implementation that should be used to serialize and
      * deserialize messages.
      */
-    public serializationImpl: SerializationImpl = new _DefaultSerializer();
+    public serializationImpl: SerializationImpl = new _DefaultSerializationImpl();
 
     /**
      * The client binary strategy that should be used to maintain binary
@@ -37,7 +42,7 @@ export class Options {
  */
 export class Client {
 
-    private readonly adapter: BiFunction<Message, Serializer, Future<Message>>;
+    private readonly adapter: (m: Message, s: Serializer) => Promise<Message>;
     private readonly serializer: Serializer;
     private readonly useBinaryDefault: boolean;
     private readonly timeoutMsDefault: number;
@@ -60,7 +65,7 @@ export class Client {
      * 
      * @param adapter
      */
-    constructor(adapter: BiFunction<Message, Serializer, Future<Message>>, options: Options) {
+    constructor(adapter: (m: Message, s: Serializer) => Promise<Message>, options: Options) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;
@@ -74,8 +79,8 @@ export class Client {
      * @param request
      * @return
      */
-    public request(requestMessage: Message): Message {
-        return _Util.processRequestObject(requestMessage, this.adapter, this.serializer,
+    public async request(requestMessage: Message): Promise<Message> {
+        return processRequestObject(requestMessage, this.adapter, this.serializer,
             this.timeoutMsDefault, this.useBinaryDefault);
     }
 }

@@ -1,6 +1,6 @@
 import { decode, encode } from 'msgpackr';
 
-class _DefaultSerializationImpl {
+export class _DefaultSerializationImpl {
     public toJson(uapiMessage: any): Uint8Array {
         const jsonStr = JSON.stringify(uapiMessage);
         return new TextEncoder().encode(jsonStr);

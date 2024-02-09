@@ -21,7 +21,7 @@ export class UApiSchema {
      * @returns A UApiSchema instance.
      */
     static fromJson(json: string): UApiSchema {
-        return newUApiSchema(json, new Map());
+        return newUApiSchema(json, {});
     }
 
     /**
@@ -31,7 +31,7 @@ export class UApiSchema {
      * @returns An extended UApiSchema instance.
      */
     static extend(base: UApiSchema, json: string): UApiSchema {
-        return extendUApiSchema(base, json, new Map());
+        return extendUApiSchema(base, json, {});
     }
 
     /**
@@ -40,7 +40,7 @@ export class UApiSchema {
      * @param typeExtensions Map of type extensions.
      * @returns A UApiSchema instance with type extensions.
      */
-    static fromJsonWithExtensions(json: string, typeExtensions: Map<string, _UType>): UApiSchema {
+    static fromJsonWithExtensions(json: string, typeExtensions: Record<string, _UType>): UApiSchema {
         return newUApiSchema(json, typeExtensions);
     }
 
@@ -51,7 +51,7 @@ export class UApiSchema {
      * @param typeExtensions Map of type extensions.
      * @returns An extended UApiSchema instance with type extensions.
      */
-    static extendWithExtensions(base: UApiSchema, json: string, typeExtensions: Map<string, _UType>): UApiSchema {
+    static extendWithExtensions(base: UApiSchema, json: string, typeExtensions: Record<string, _UType>): UApiSchema {
         return extendUApiSchema(base, json, typeExtensions);
     }
 }

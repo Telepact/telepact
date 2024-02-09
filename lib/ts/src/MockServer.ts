@@ -1,6 +1,7 @@
+import { Message } from "./Message";
 import { Server, Options as ServerOptions } from "./Server";
 import { UApiSchema } from "./UApiSchema";
-import { getMockUApiJson } from "./_util";
+import { getMockUApiJson, mockHandle } from "./_util";
 import { _MockInvocation, _MockStub, _RandomGenerator, _UMockCall, _UMockStub } from "./_utilTypes";
 
 
@@ -74,6 +75,6 @@ export class MockServer {
     }
 
     private handle(requestMessage: Message): Message {
-        return Util.mockHandle(requestMessage, this.stubs, this.invocations, this.random, this.server.uApiSchema, this.enableGeneratedDefaultStub);
+        return mockHandle(requestMessage, this.stubs, this.invocations, this.random, this.server.uApiSchema, this.enableGeneratedDefaultStub);
     }
 }

@@ -2201,7 +2201,7 @@ export function validateMockCall(
 }
 
 
-export function validateMockStub(givenObj: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], types: Map<string, _UType>): _ValidationFailure[] {
+export function validateMockStub(givenObj: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], types: Record<string, _UType>): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
     let givenMap: Record<string, any>;
@@ -2223,7 +2223,7 @@ export function validateMockStub(givenObj: any, typeParameters: _UTypeDeclaratio
     }
 
     const functionName = matches[0]!;
-    const functionDef = types.get(functionName) as _UFn;
+    const functionDef = types[functionName] as _UFn;
     const input = givenMap.get(functionName);
 
     const functionDefCall = functionDef.call;
@@ -2895,9 +2895,9 @@ export function mockHandle(
     }
 }
 
-async function processRequestObject(
+export async function processRequestObject(
     requestMessage: Message,
-    adapter: (request: Message, serializer: Serializer) => Promise<Message>,
+    adapter: (requestMessage: Message, serializer: Serializer) => Promise<Message>,
     serializer: Serializer,
     timeoutMsDefault: number,
     useBinaryDefault: boolean
@@ -2915,26 +2915,42 @@ async function processRequestObject(
 
         const timeoutMs = header["_tim"] as number;
 
-        const responseMessage = await adapter(requestMessage, serializer);
+        const responseMessage = await Promise.race([
+            adapter(requestMessage, serializer),
+            timeoutPromise(timeoutMs)
+        ]);
 
         if (
-            responseMessage.body &&
-            responseMessage.body["_ErrorParseFailure"] &&
-            responseMessage.body["_ErrorParseFailure"]["reasons"] &&
-            responseMessage.body["_ErrorParseFailure"]["reasons"].length > 0 &&
-            responseMessage.body["_ErrorParseFailure"]["reasons"][0]["IncompatibleBinaryEncoding"]
+            objectsAreEqual(responseMessage.body, {
+                "_ErrorParseFailure": {
+                    "reasons": [
+                        { "IncompatibleBinaryEncoding": {} }
+                    ]
+                }
+            })
         ) {
             // Try again, but as json
             header["_binary"] = true;
             header["_forceSendJson"] = true;
 
-            return await adapter(requestMessage, serializer);
+            return await Promise.race([
+                adapter(requestMessage, serializer),
+                timeoutPromise(timeoutMs)
+            ]);
         }
 
         return responseMessage;
     } catch (e) {
         throw new UApiError(e as Error);
     }
+}
+
+function timeoutPromise(timeoutMs: number): Promise<never> {
+    return new Promise((_resolve, reject) => {
+        setTimeout(() => {
+            reject(new Error('Promise timed out'));
+        }, timeoutMs);
+    });
 }
 
 export function mapSchemaParseFailuresToPseudoJson(schemaParseFailures: any[]): any[] {

@@ -2,7 +2,7 @@ import { Message } from "./Message";
 import { SerializationImpl } from "./SerializationImpl";
 import { Serializer } from "./Serializer";
 import { UApiSchema } from "./UApiSchema";
-import { _DefaultSerializer } from "./_DefaultSerializationImpl";
+import { _DefaultSerializationImpl } from "./_DefaultSerializationImpl";
 import { constructBinaryEncoding, getInternalUApiJson, processBytes } from "./_util";
 import { _ServerBinaryEncoder } from "./_utilTypes";
 
@@ -29,7 +29,7 @@ export class Options {
      * The serialization implementation that should be used to serialize and
      * deserialize messages.
      */
-    serializer: SerializationImpl = new _DefaultSerializer();
+    serializer: SerializationImpl = new _DefaultSerializationImpl();
 }
 
 /**
