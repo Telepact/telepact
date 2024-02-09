@@ -69,7 +69,7 @@ export class Server {
      * @param requestMessageBytes 
      * @returns 
      */
-    process(requestMessageBytes: Uint8Array): Uint8Array {
+    public process(requestMessageBytes: Uint8Array): Uint8Array {
         return processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
             this.onRequest, this.onResponse, this.handler);
     }
