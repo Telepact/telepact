@@ -9,7 +9,7 @@ import { _ServerBinaryEncoder } from "./_utilTypes";
 /**
  * Options for the Server.
  */
-export class Options {
+export class ServerOptions {
     /**
      * Handler for errors thrown during message processing.
      */
@@ -51,7 +51,7 @@ export class Server {
      * @param handler 
      * @param options 
      */
-    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: Options) {
+    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
         this.uApiSchema = UApiSchema.extend(uApiSchema, getInternalUApiJson());
         this.handler = handler;
         this.onError = options.onError;

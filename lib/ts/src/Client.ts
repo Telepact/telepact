@@ -11,7 +11,7 @@ import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 /**
  * Options for the Client.
  */
-export class Options {
+export class ClientOptions {
 
     /**
      * Indicates if the client should use binary payloads instead of JSON.
@@ -66,7 +66,7 @@ export class Client {
      * 
      * @param adapter
      */
-    constructor(adapter: (m: Message, s: Serializer) => Promise<Message>, options: Options) {
+    constructor(adapter: (m: Message, s: Serializer) => Promise<Message>, options: ClientOptions) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;

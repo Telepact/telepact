@@ -149,7 +149,7 @@ function startMockTestServer(connection: NatsConnection, registry: Registry, api
             let responseBytes: Uint8Array;
             const time = timer.startTimer();
             try {
-                responseBytes = server.process(requestBytes);
+                responseBytes = await server.process(requestBytes);
             } finally {
                 time();
             }
@@ -448,5 +448,8 @@ async function runDispatcherServer(): Promise<void> {
     console.log("Dispatcher exiting");
 }
 
-await runDispatcherServer();
+export default async function main() {
+    await runDispatcherServer();
+}
+
 

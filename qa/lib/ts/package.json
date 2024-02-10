@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "node index.ts"
+    "build": "tsc",
+    "run": "node index.js"
   },
   "type": "module",
   "keywords": [],
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }

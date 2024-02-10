@@ -1,5 +1,5 @@
 import { Message } from "./Message";
-import { Server, Options as ServerOptions } from "./Server";
+import { Server, ServerOptions } from "./Server";
 import { UApiSchema } from "./UApiSchema";
 import { getMockUApiJson, mockHandle } from "./_util";
 import { _MockInvocation, _MockStub, _RandomGenerator, _UMockCall, _UMockStub } from "./_utilTypes";
@@ -8,7 +8,7 @@ import { _MockInvocation, _MockStub, _RandomGenerator, _UMockCall, _UMockStub } 
 /**
  * Options for the MockServer.
  */
-export class Options {
+export class MockServerOptions {
     /**
      * Handler for errors thrown during message processing.
      */
@@ -43,7 +43,7 @@ export class MockServer {
     private stubs: _MockStub[] = [];
     private invocations: _MockInvocation[] = [];
 
-    constructor(uApiSchema: UApiSchema, options: Options) {
+    constructor(uApiSchema: UApiSchema, options: MockServerOptions) {
         this.random = new _RandomGenerator(options.generatedCollectionLengthMin || 0, options.generatedCollectionLengthMax || 3);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration !== undefined ? options.enableMessageResponseGeneration : true;
 
@@ -70,11 +70,11 @@ export class MockServer {
      * @param message 
      * @returns 
      */
-    process(message: Uint8Array): Uint8Array {
+    public async process(message: Uint8Array): Promise<Uint8Array> {
         return this.server.process(message);
     }
 
-    private handle(requestMessage: Message): Message {
+    private async handle(requestMessage: Message): Promise<Message> {
         return mockHandle(requestMessage, this.stubs, this.invocations, this.random, this.server.uApiSchema, this.enableGeneratedDefaultStub);
     }
 }
