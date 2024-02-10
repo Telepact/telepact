@@ -266,7 +266,7 @@ async function runDispatcherServer() {
         throw new Error("NATS_URL env var not set");
     }
     const registry = new Registry();
-    const servers = new Map();
+    const servers = {};
     const connection = await connect({ servers: natsUrl });
     let finish;
     const done = new Promise((resolve) => {
@@ -282,7 +282,7 @@ async function runDispatcherServer() {
             try {
                 const request = JSON.parse(requestJson);
                 const body = request[1];
-                const entry = body.entries().next().value;
+                const entry = Object.entries(body)[0];
                 const target = entry[0];
                 const payload = entry[1];
                 switch (target) {
@@ -294,46 +294,46 @@ async function runDispatcherServer() {
                         break;
                     }
                     case "Stop": {
-                        const id = payload.get("id");
-                        const s = servers.get(id);
+                        const id = payload["id"];
+                        const s = servers[id];
                         if (s != null) {
                             s.drain();
                         }
                         break;
                     }
                     case "StartServer": {
-                        const id = payload.get("id");
-                        const apiSchemaPath = payload.get("apiSchemaPath");
-                        const frontdoorTopic = payload.get("frontdoorTopic");
-                        const backdoorTopic = payload.get("backdoorTopic");
+                        const id = payload["id"];
+                        const apiSchemaPath = payload["apiSchemaPath"];
+                        const frontdoorTopic = payload["frontdoorTopic"];
+                        const backdoorTopic = payload["backdoorTopic"];
                         const d = startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic);
-                        servers.set(id, d);
+                        servers[id] = d;
                         break;
                     }
                     case "StartClientServer": {
-                        const id = payload.get("id");
-                        const clientFrontdoorTopic = payload.get("clientFrontdoorTopic");
-                        const clientBackdoorTopic = payload.get("clientBackdoorTopic");
-                        const useBinary = payload.get("useBinary") ?? false;
+                        const id = payload["id"];
+                        const clientFrontdoorTopic = payload["clientFrontdoorTopic"];
+                        const clientBackdoorTopic = payload["clientBackdoorTopic"];
+                        const useBinary = payload["useBinary"] ?? false;
                         const d = startClientTestServer(connection, registry, clientFrontdoorTopic, clientBackdoorTopic, useBinary);
-                        servers.set(id, d);
+                        servers[id] = d;
                         break;
                     }
                     case "StartMockServer": {
-                        const id = payload.get("id");
-                        const apiSchemaPath = payload.get("apiSchemaPath");
-                        const frontdoorTopic = payload.get("frontdoorTopic");
-                        const config = payload.get("config");
+                        const id = payload["id"];
+                        const apiSchemaPath = payload["apiSchemaPath"];
+                        const frontdoorTopic = payload["frontdoorTopic"];
+                        const config = payload["config"];
                         const d = startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic, config);
-                        servers.set(id, d);
+                        servers[id] = d;
                         break;
                     }
                     case "StartSchemaServer": {
-                        const id = payload.get("id");
-                        const apiSchemaPath = payload.get("apiSchemaPath");
-                        const frontdoorTopic = payload.get("frontdoorTopic");
+                        const id = payload["id"];
+                        const apiSchemaPath = payload["apiSchemaPath"];
+                        const frontdoorTopic = payload["frontdoorTopic"];
                         const d = startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTopic);
-                        servers.set(id, d);
+                        servers[id] = d;
                         break;
                     }
                     default: {
