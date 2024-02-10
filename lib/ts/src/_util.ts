@@ -2410,12 +2410,12 @@ export function validateResult(resultUnionType: _UUnion, errorResult: {[key: str
     }
 }
 
-export function handleMessage(
+export async function handleMessage(
     requestMessage: Message,
     uApiSchema: UApiSchema,
-    handler: (message: Message) => Message,
+    handler: (message: Message) => Promise<Message>,
     onError: (error: Error) => void
-): Message {
+): Promise<Message> {
     const responseHeaders: {[key: string]: any} = {};
     const requestHeaders = requestMessage.header;
     const requestBody = requestMessage.body;
@@ -2508,7 +2508,7 @@ export function handleMessage(
         resultMessage = new Message({}, { "Ok": { "api": uApiSchema.original } });
     } else {
         try {
-            resultMessage = handler(callMessage);
+            resultMessage = await handler(callMessage);
         } catch (e) {
             try {
                 onError(e as Error);
@@ -2565,7 +2565,7 @@ export function parseRequestMessage(requestMessageBytes: Uint8Array, serializer:
     }
 }
 
-export function processBytes(requestMessageBytes: Uint8Array, serializer: Serializer, uApiSchema: UApiSchema, onError: (e: Error) => void, onRequest: (m: Message) => void, onResponse: (m: Message) => void, handler: (m: Message) => Message): Uint8Array {
+export async function processBytes(requestMessageBytes: Uint8Array, serializer: Serializer, uApiSchema: UApiSchema, onError: (e: Error) => void, onRequest: (m: Message) => void, onResponse: (m: Message) => void, handler: (m: Message) => Promise<Message>): Promise<Uint8Array> {
     try {
         const requestMessage = parseRequestMessage(requestMessageBytes, serializer, uApiSchema, onError);
 
@@ -2574,7 +2574,7 @@ export function processBytes(requestMessageBytes: Uint8Array, serializer: Serial
         } catch (ignored) {
         }
 
-        const responseMessage = handleMessage(requestMessage, uApiSchema, handler, onError);
+        const responseMessage = await handleMessage(requestMessage, uApiSchema, handler, onError);
 
         try {
             onResponse(responseMessage);

@@ -29,13 +29,12 @@ import io.github.brenbar.uapi.Serializer;
 import io.github.brenbar.uapi.Server;
 import io.github.brenbar.uapi.UApiSchema;
 import io.github.brenbar.uapi.UApiSchemaParseError;
-import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 
 public class Main {
-    public static Dispatcher startClientTestServer(Connection connection, MetricRegistry metrics,
+    public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
             String clientBackdoorTopic, boolean defaultBinary)
             throws IOException, InterruptedException {
@@ -120,7 +119,8 @@ public class Main {
         return dispatcher;
     }
 
-    public static Dispatcher startMockTestServer(Connection connection, MetricRegistry metrics, String apiSchemaPath,
+    public static Dispatcher startMockTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+            String apiSchemaPath,
             String frontdoorTopic,
             Map<String, Object> config)
             throws IOException, InterruptedException {
@@ -162,7 +162,8 @@ public class Main {
         return dispatcher;
     }
 
-    public static Dispatcher startSchemaTestServer(Connection connection, MetricRegistry metrics, String apiSchemaPath,
+    public static Dispatcher startSchemaTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+            String apiSchemaPath,
             String frontdoorTopic)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
@@ -234,7 +235,8 @@ public class Main {
         return dispatcher;
     }
 
-    public static Dispatcher startTestServer(Connection connection, MetricRegistry metrics, String apiSchemaPath,
+    public static Dispatcher startTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
+            String apiSchemaPath,
             String frontdoorTopic,
             String backdoorTopic)
             throws IOException, InterruptedException {

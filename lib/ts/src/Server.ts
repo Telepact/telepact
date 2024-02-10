@@ -37,7 +37,7 @@ export class Options {
  */
 export class Server {
     readonly uApiSchema: UApiSchema;
-    private readonly handler: (message: Message) => Message;
+    private readonly handler: (message: Message) => Promise<Message>;
     private readonly onError: (error: Error) => void;
     private readonly onRequest: (message: Message) => void;
     private readonly onResponse: (message: Message) => void;
@@ -51,7 +51,7 @@ export class Server {
      * @param handler 
      * @param options 
      */
-    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Message, options: Options) {
+    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: Options) {
         this.uApiSchema = UApiSchema.extend(uApiSchema, getInternalUApiJson());
         this.handler = handler;
         this.onError = options.onError;
@@ -69,7 +69,7 @@ export class Server {
      * @param requestMessageBytes 
      * @returns 
      */
-    public process(requestMessageBytes: Uint8Array): Uint8Array {
+    public async process(requestMessageBytes: Uint8Array): Promise<Uint8Array> {
         return processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
             this.onRequest, this.onResponse, this.handler);
     }

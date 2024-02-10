@@ -1,6 +1,6 @@
 export { Client, Options as ClientOptions } from "./Client";
 export { Server, Options as ServerOptions } from "./Server";
-export { MockServer } from "./MockServer"
+export { MockServer, Options as MockServerOptions } from "./MockServer"
 export { Message } from "./Message"
 export { Serializer } from "./Serializer";
 export { _DefaultClientBinaryStrategy } from "./_DefaultClientBinaryStrategy";
