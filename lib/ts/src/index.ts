@@ -8,3 +8,4 @@ export { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 export { SerializationError } from "./SerializationError";
 export { SerializationImpl } from "./SerializationImpl";
 export { UApiSchema } from "./UApiSchema";
+export { UApiSchemaParseError } from "./UApiSchemaParseError";

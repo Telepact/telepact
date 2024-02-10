@@ -1,8 +1,7 @@
-import { Client, ClientOptions, Server, ServerOptions, Message, SerializationError, Serializer, MockServer, MockServerOptions, UApiSchema } from 'uapi'
+import { UApiSchemaParseError, Client, ClientOptions, Server, ServerOptions, Message, SerializationError, Serializer, MockServer, MockServerOptions, UApiSchema } from 'uapi'
 import { NatsConnection, connect, Subscription } from 'nats'
 import fs from 'fs'
 import { min, max, mean, median, quantile } from 'simple-statistics'
-import { UApiSchemaParseError } from 'uapi/src/UApiSchemaParseError';
 
 class Timer {
     public values: number[] = [];
@@ -276,18 +275,18 @@ function startTestServer(connection: NatsConnection, registry: Registry, apiSche
     };
 
     const options: ServerOptions = new ServerOptions();
-    options.onError = (e) => {
+    options.onError = (e: Error) => {
             console.error(e);
             if (e instanceof ThisError) {
                 throw new Error();
             }
         };
-    options.onRequest = (m) => {
+    options.onRequest = (m: Message) => {
             if (m.header['_onRequestError'] === true) {
                 throw new Error();
             }
         };
-    options.onResponse = (m) => {
+    options.onResponse = (m: Message) => {
         if (m.header['_onResponseError'] === true) {
             throw new Error();
         }
@@ -449,4 +448,5 @@ async function runDispatcherServer(): Promise<void> {
     console.log("Dispatcher exiting");
 }
 
-runDispatcherServer();
+await runDispatcherServer();
+
