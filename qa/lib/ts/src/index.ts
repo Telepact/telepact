@@ -38,7 +38,7 @@ class Registry {
             const v = timer.values;
             const row = `${v.length},${min(v)},${max(v)},${mean(v)},${median(v)},${quantile(v, 0.75)},${quantile(v, 0.95)},${quantile(v, 0.99)}\n`
             
-            fs.writeFileSync(fileName, row);
+            fs.appendFileSync(fileName, row);
         }
     }
 }
