@@ -1,9 +1,8 @@
 import { Client, ClientOptions, Server, ServerOptions, Message, SerializationError, Serializer, MockServer, MockServerOptions, UApiSchema } from 'uapi'
-import { NatsConnection, connect, StringCodec, Msg, Subscription, ConnectionOptions } from 'nats'
+import { NatsConnection, connect, Subscription } from 'nats'
 import fs from 'fs'
 import { min, max, mean, median, quantile } from 'simple-statistics'
 import { UApiSchemaParseError } from 'uapi/src/UApiSchemaParseError';
-import { groupEnd } from 'console';
 
 class Timer {
     public values: number[] = [];
