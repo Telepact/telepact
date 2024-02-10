@@ -9,6 +9,8 @@ import { SerializationImpl } from './SerializationImpl';
 import { SerializationError } from './SerializationError';
 import { Serializer } from './Serializer';
 import { UApiError } from './UApiError';
+import internalUApi from '../inc/internal.uapi.json';
+import mockInternalUApi from '../inc/mock-internal.uapi.json';
 
 
 export const _ANY_NAME: Readonly<string> = "Any";
@@ -25,13 +27,11 @@ export const _STRUCT_NAME: Readonly<string> = "Object";
 export const _UNION_NAME: Readonly<string> = "Object";
 
 export function getInternalUApiJson(): string {
-    const stream = fs.readFileSync(path.join(__dirname, "internal.uapi.json"), "utf-8");
-    return stream.toString();
+    return JSON.stringify(internalUApi);
 }
 
 export function getMockUApiJson(): string {
-    const stream = fs.readFileSync(path.join(__dirname, "mock-internal.uapi.json"), "utf-8");
-    return stream.toString();
+    return JSON.stringify(mockInternalUApi);
 }
 
 export function asInt(object: any): number {

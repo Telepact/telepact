@@ -5,6 +5,7 @@
   "main": "index.js",
   "types": "lib/src/mod.d.ts",
   "scripts": {
+    "prepare": "mkdir -p inc && cp ../../common/* ./inc/",
     "build": "tsc"
   },
   "files": [
