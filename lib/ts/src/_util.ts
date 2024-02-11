@@ -1484,8 +1484,6 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         throw new _InvalidMessage(e as Error);
     }
 
-    console.log(`messageAsPseudoJson: ${JSON.stringify(messageAsPseudoJson)}`);
-
     let messageAsPseudoJsonList: any[];
     try {
         messageAsPseudoJsonList = asList(messageAsPseudoJson);
