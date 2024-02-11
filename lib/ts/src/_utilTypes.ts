@@ -475,11 +475,7 @@ export class _BinaryEncodingMissing extends Error {
 
 export class _InvalidMessage extends Error {
     constructor(cause?: Error) {
-        super(cause ? cause.message : undefined);
-        if (cause) {
-            this.name = cause.name;
-            this.stack = cause.stack;
-        }
+        super("Invalid Message", {cause: cause})
     }
 }
 

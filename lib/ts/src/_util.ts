@@ -119,10 +119,10 @@ export function findMatchingSchemaKey(schemaKeys: Set<string>, schemaKey: string
 
 export function getTypeUnexpectedParseFailure(path: any[], value: any, expectedType: string): _SchemaParseFailure[] {
     const actualType = getType(value);
-    const data = new Map([
-        ["actual", new Map([[ "actualType", new Map()]] )],
-        ["expected", new Map([[ "expectedType", new Map()]])]
-    ]);
+    const data = {
+        "actual": {[actualType]: {}},
+        "expected": {[expectedType]: {}}
+    };
     return [{ path, reason: "TypeUnexpected", data }];
 }
 
@@ -424,7 +424,7 @@ export function parseStructType(path: any[], structDefinitionAsPseudoJson: {[key
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
             const loopPath = append(path, k);
-            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new Map()));
+            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", {}));
         }
     }
     const thisPath = append(path, schemaKey);
@@ -452,7 +452,7 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
         if (otherKeys.size > 0) {
             for (const k of otherKeys) {
                 const loopPath = append(path, k);
-                parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new Map()));
+                parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", {}));
             }
         }
     }
@@ -468,11 +468,11 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
     }
     const cases: Record<string, _UStruct> = {};
     if (definition.size === 0 && !isForFn) {
-        parseFailures.push(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", new Map()));
+        parseFailures.push(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", {}));
     } else if (isForFn) {
         if (!definition.hasOwnProperty("Ok")) {
             const branchPath = append(thisPath, "Ok");
-            parseFailures.push(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", new Map()));
+            parseFailures.push(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", {}));
         }
     }
     for (const [unionCase, value] of Object.entries(definition)) {
@@ -656,7 +656,7 @@ export function parseErrorType(
 
     const parseFailures: _SchemaParseFailure[] = [];
 
-    const otherKeys = new Set(errorDefinitionAsParsedJson.keys());
+    const otherKeys = new Set(Object.keys(errorDefinitionAsParsedJson));
 
     otherKeys.delete(schemaKey);
     otherKeys.delete("///");
@@ -665,7 +665,7 @@ export function parseErrorType(
         for (const k of otherKeys) {
             const loopPath = append(basePath, k);
 
-            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new Map()));
+            parseFailures.push(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", {}));
         }
     }
 
@@ -687,7 +687,7 @@ export function parseErrorType(
     const errorPath = append(thisPath, resultSchemaKey);
 
     if (!def.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", new Map()));
+        parseFailures.push(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", {}));
     }
 
     if (parseFailures.length > 0) {
@@ -972,6 +972,8 @@ export function parseUApiSchema(
       } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
       }
     }
@@ -1482,10 +1484,17 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         throw new _InvalidMessage(e as Error);
     }
 
-    const messageAsPseudoJsonList: any[] = Array.isArray(messageAsPseudoJson) ? messageAsPseudoJson : [];
+    console.log(`messageAsPseudoJson: ${JSON.stringify(messageAsPseudoJson)}`);
+
+    let messageAsPseudoJsonList: any[];
+    try {
+        messageAsPseudoJsonList = asList(messageAsPseudoJson);
+    } catch (e) {
+        throw new _InvalidMessage(e);
+    }
 
     if (messageAsPseudoJsonList.length !== 2) {
-        throw new _InvalidMessage();
+        throw new _InvalidMessage(new Error(`Expected size of 2 but was ${messageAsPseudoJsonList.length}`));
     }
 
     let finalMessageAsPseudoJsonList: any[];
@@ -1501,7 +1510,7 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
     try {
         headers = finalMessageAsPseudoJsonList[0];
     } catch (e) {
-        throw new _InvalidMessage();
+        throw new _InvalidMessage(e);
     }
 
     try {
@@ -1509,13 +1518,13 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         if (Object.keys(body).length !== 1) {
             throw new _InvalidMessageBody();
         } else {
-            const givenPayload = [...body.values()][0]
+            const givenPayload = [...Object.values(body)][0]
             if (givenPayload === undefined) {
                 throw new _InvalidMessageBody();
             }
         }
     } catch (e) {
-        throw new _InvalidMessage();
+        throw new _InvalidMessage(e);
     }
 
     return new Message(headers, body);
@@ -1849,6 +1858,7 @@ export function validateArray(value: any, typeParameters: Array<_UTypeDeclaratio
         }
         return validationFailures;
     } else {
+        console.log(`value: ${JSON.stringify(value)}`);
         return getTypeUnexpectedValidationFailure([], value, _ARRAY_NAME);
     }
 }
@@ -1984,7 +1994,7 @@ export function generateRandomStruct(
         const startingStructValue = blueprintValue as Record<string, any>;
         return constructRandomStruct(fields, startingStructValue, includeRandomOptionalFields, typeParameters, randomGenerator);
     } else {
-        return constructRandomStruct(fields, new Map(), includeRandomOptionalFields, typeParameters, randomGenerator);
+        return constructRandomStruct(fields, {}, includeRandomOptionalFields, typeParameters, randomGenerator);
     }
 }
 
@@ -2075,7 +2085,9 @@ export function validateUnionCases(
         ];
     }
 
-    if (unionPayload instanceof Map) {
+    if (typeof unionPayload === 'object' && !Array.isArray(unionPayload)) {
+        console.log(`validateUnionCases unionPayload: ${JSON.stringify(unionPayload)}`);
+        console.log(`validateUnionCases reference: ${JSON.stringify(referenceStruct)}`);
         const nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget, unionPayload, typeParameters);
 
         return nestedValidationFailures.map(f => ({
@@ -2139,14 +2151,10 @@ export function constructRandomUnion(
         const unionCase = unionEntry ? unionEntry[0] : null;
         const unionData = unionEntry ? unionEntry[1] : null;
 
-        if (unionCase && unionData) {
-            return {
-                    [unionCase]: constructRandomStruct(unionData.fields, {}, includeRandomOptionalFields, typeParameters, randomGenerator)
-            };
-        }
+        return {
+                [unionCase]: constructRandomStruct(unionData.fields, {}, includeRandomOptionalFields, typeParameters, randomGenerator)
+        };
     }
-
-    return new Map();
 }
 
 export function generateRandomFn(
@@ -2573,7 +2581,7 @@ export function parseRequestMessage(requestMessageBytes: Uint8Array, serializer:
             reason = "ExpectedJsonArrayOfTwoObjects";
         }
 
-        return new Message({ "_parseFailures": {reason: {}}}, {"_unknown": {} });
+        return new Message({ "_parseFailures": [{[reason]: {}}]}, {"_unknown": {} });
     }
 }
 
