@@ -741,7 +741,7 @@ export function parseFunctionType(
             allParseFailures,
             failedTypes
         );
-        callType = new _UUnion(schemaKey, {"schemaKey": argType}, typeParameterCount);
+        callType = new _UUnion(schemaKey, {[schemaKey]: argType}, typeParameterCount);
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
@@ -2076,6 +2076,8 @@ export function validateUnionCases(
 
     const referenceStruct = referenceCases[unionTarget];
     if (!referenceStruct) {
+        console.log(`referenceCases: ${JSON.stringify(referenceCases, null, 2)}`);
+        console.log(`unionTarget: ${unionTarget}`);
         return [
             {
                 path: [unionTarget],
@@ -2086,8 +2088,6 @@ export function validateUnionCases(
     }
 
     if (typeof unionPayload === 'object' && !Array.isArray(unionPayload)) {
-        console.log(`validateUnionCases unionPayload: ${JSON.stringify(unionPayload)}`);
-        console.log(`validateUnionCases reference: ${JSON.stringify(referenceStruct)}`);
         const nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget, unionPayload, typeParameters);
 
         return nestedValidationFailures.map(f => ({

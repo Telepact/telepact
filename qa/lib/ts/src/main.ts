@@ -271,7 +271,7 @@ function startTestServer(connection: NatsConnection, registry: Registry, apiSche
             throw new ThisError();
         }
 
-        return new Message(responseBody, responseHeaders);
+        return new Message(responseHeaders, responseBody);
     };
 
     const options: ServerOptions = new ServerOptions();

@@ -212,7 +212,7 @@ function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, ba
         if (requestHeaders['_throwError'] === true) {
             throw new ThisError();
         }
-        return new Message(responseBody, responseHeaders);
+        return new Message(responseHeaders, responseBody);
     };
     const options = new ServerOptions();
     options.onError = (e) => {
