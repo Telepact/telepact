@@ -176,7 +176,7 @@ export function parseTypeDeclaration(
     }
 
     const typeName = matcher[1];
-    const nullable = matcher[2] !== null;
+    const nullable = matcher[2] !== undefined;
 
     const type = getOrParseType(
         basePath,
@@ -271,7 +271,6 @@ export function getOrParseType(
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UType {
-    console.log(`getOrParseType ${typeName}`);
 
     if (failedTypes.has(typeName)) {
         throw new UApiSchemaParseError([]);
@@ -306,7 +305,6 @@ export function getOrParseType(
     }
 
     const standardTypeName = matcher[1];
-    console.log(`standardTypeName: ${standardTypeName}`);
     if (standardTypeName !== undefined) {
         switch (standardTypeName) {
             case "boolean":
@@ -335,7 +333,6 @@ export function getOrParseType(
     }
 
     const customTypeName: string = matcher[2]!;
-    console.log(`customTypeName: ${customTypeName}`);
 
     const index = schemaKeysToIndex[customTypeName];
     if (index === undefined) {
@@ -473,12 +470,12 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
     if (definition.size === 0 && !isForFn) {
         parseFailures.push(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", new Map()));
     } else if (isForFn) {
-        if (!definition.has("Ok")) {
+        if (!definition.hasOwnProperty("Ok")) {
             const branchPath = append(thisPath, "Ok");
             parseFailures.push(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", new Map()));
         }
     }
-    for (const [unionCase, value] of definition.entries()) {
+    for (const [unionCase, value] of Object.entries(definition)) {
         const unionKeyPath = append(thisPath, unionCase);
         const regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
         const regex = new RegExp(regexString);
@@ -517,7 +514,7 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
 export function parseStructFields(referenceStruct: Record<string, any>, path: any[], typeParameterCount: number, uApiSchemaPseudoJson: any[], schemaKeysToIndex: Record<string, number>, parsedTypes: Record<string, _UType>, typeExtensions: Record<string, _UType>, allParseFailures: _SchemaParseFailure[], failedTypes: Set<string>): Record<string, _UFieldDeclaration> {
     const parseFailures: _SchemaParseFailure[] = [];
     const fields: Record<string, _UFieldDeclaration> = {};
-    for (const [structEntryKey, structEntryValue] of referenceStruct.entries()) {
+    for (const [structEntryKey, structEntryValue] of Object.entries(referenceStruct)) {
         const fieldDeclaration = structEntryKey;
         for (const existingField in fields) {
             const existingFieldNoOpt = existingField.split("!")[0];
@@ -604,7 +601,7 @@ export function applyErrorToParsedTypes(
     const errorIndex = schemaKeysToIndex[errorName];
 
     const parseFailures: _SchemaParseFailure[] = [];
-    for (const [key, parsedType] of parsedTypes.entries()) {
+    for (const [key, parsedType] of Object.entries(parsedTypes)) {
         if (!(parsedType instanceof _UFn)) {
             continue;
         }
@@ -1442,7 +1439,7 @@ export function createChecksum(value: string): number {
 
 
 export function serialize(message: Message, binaryEncoder: _BinaryEncoder, serializer: SerializationImpl): Uint8Array {
-    const headers = message.header;
+    const headers: Record<string, any> = message.header;
 
     let serializeAsBinary = false;
     if (headers.hasOwnProperty("_binary")) {
@@ -1596,7 +1593,7 @@ export function validateSelectHeaders(
 
     const validationFailures: _ValidationFailure[] = [];
 
-    for (const [typeName, selectValue] of selectStructFieldsHeader.entries()) {
+    for (const [typeName, selectValue] of Object.entries(selectStructFieldsHeader)) {
         let typeReference: _UType | undefined;
         if (typeName === "->") {
             typeReference = functionType.result;
@@ -1616,7 +1613,7 @@ export function validateSelectHeaders(
 
         if (typeReference instanceof _UUnion) {
             const unionCases = asMap(selectValue);
-            for (const [unionCase, selectedCaseStructFields] of unionCases.entries()) {
+            for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
                 const structRef = typeReference.cases[unionCase];
                 if (!structRef) {
                     validationFailures.push(new _ValidationFailure(
@@ -1936,7 +1933,7 @@ export function validateStructFields(fields: Record<string, _UFieldDeclaration>,
     const missingFields: Array<string> = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
         const isOptional = fieldDeclaration.optional;
-        if (!actualStruct.has(fieldName) && !isOptional) {
+        if (!actualStruct.hasOwnProperty(fieldName) && !isOptional) {
             missingFields.push(fieldName);
         }
     }
@@ -2052,12 +2049,13 @@ export function validateUnionCases(
     actual: Record<string, any>,
     typeParameters: _UTypeDeclaration[]
 ): _ValidationFailure[] {
-    if (actual.size !== 1) {
+    const size = Object.keys(actual).length;
+    if (size !== 1) {
         return [
             {
                 path: [],
                 reason: "ObjectSizeUnexpected",
-                data: new Map([["actual", actual.size], ["expected", 1]])
+                data: {"actual": size, "expected": 1}
             }
         ];
     }
@@ -2419,7 +2417,7 @@ export function validateResult(resultUnionType: _UUnion, errorResult: {[key: str
     const newErrorResultValidationFailures = resultUnionType.validate(errorResult, [], []);
     if (newErrorResultValidationFailures.length !== 0) {
         throw new UApiError(
-            "Failed internal uAPI validation: " + mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures)
+            "Failed internal uAPI validation: " + JSON.stringify(mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures), null, 2)
         );
     }
 }
@@ -2448,8 +2446,6 @@ export async function handleMessage(
         unknownTarget = null;
         requestTarget = requestTargetInit;
     }
-
-    console.log(`parsedUApiSchema: ${JSON.stringify(parsedUApiSchema)}`);
 
     const functionType = parsedUApiSchema[requestTarget] as _UFn;
     const resultUnionType = functionType.result;

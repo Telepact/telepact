@@ -14,7 +14,7 @@ export class UApiSchemaParseError extends Error {
      * @param {Error} cause The cause of the error.
      */
     constructor(schemaParseFailures: _SchemaParseFailure[], cause: Error | undefined = undefined) {
-        super(String(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)));
+        super(JSON.stringify(mapSchemaParseFailuresToPseudoJson(schemaParseFailures), null, 2));
         this.name = this.constructor.name;
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
