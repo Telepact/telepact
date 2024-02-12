@@ -23,7 +23,11 @@ class Registry {
         for (const [name, timer] of Object.entries(this.timers)) {
             const fileName = `./metrics/${name}.csv`;
             if (!fs.existsSync(fileName)) {
-                fs.mkdirSync('./metrics');
+                try {
+                    fs.mkdirSync('./metrics');
+                }
+                catch (e) {
+                }
                 const header = 'count,min,max,mean,median,p75,p95,p99\n';
                 fs.writeFileSync(fileName, header);
             }

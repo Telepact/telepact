@@ -304,6 +304,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
     nats_response = await nats_client.request(request_topic, request_bytes, timeout=1)
 
     response_bytes = nats_response.data
+    print('T<-     {}'.format(response_bytes), flush=True)
 
     try:
         response_json = response_bytes.decode()
