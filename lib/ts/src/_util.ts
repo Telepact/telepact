@@ -1278,7 +1278,7 @@ export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncodin
 export function clientBinaryEncode(message: any[], recentBinaryEncoders: Map<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): any[] {
     const headers = message[0] as Record<string, any>;
     const messageBody = message[1] as Record<string, any>;
-    const forceSendJson = headers.get("_forceSendJson");
+    const forceSendJson = headers["_forceSendJson"];
 
     headers["_bin"] = binaryChecksumStrategy.getCurrentChecksums();
 
@@ -1299,7 +1299,7 @@ export function clientBinaryEncode(message: any[], recentBinaryEncoders: Map<num
     let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: Map<any, any>;
-    if (headers.get("_pac") === true) {
+    if (headers["_pac"] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
@@ -1457,6 +1457,7 @@ export function serialize(message: Message, binaryEncoder: _BinaryEncoder, seria
                 const encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
                 return serializer.toMsgPack(encodedMessage);
             } catch (e) {
+                console.log(e);
                 // We can still submit as json
                 return serializer.toJson(messageAsPseudoJson);
             }

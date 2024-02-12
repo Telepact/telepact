@@ -1,13 +1,16 @@
-import { decode, encode } from 'msgpackr';
+import { Packr, Unpackr, decode, encode } from 'msgpackr';
 
 export class _DefaultSerializationImpl {
+    private packr = new Packr({mapsAsObjects: false});
+    private unpackr = new Unpackr({mapsAsObjects: false});
+
     public toJson(uapiMessage: any): Uint8Array {
         const jsonStr = JSON.stringify(uapiMessage);
         return new TextEncoder().encode(jsonStr);
     }
 
     public toMsgPack(uapiMessage: any): Uint8Array {
-        return encode(uapiMessage);
+        return this.packr.encode(uapiMessage);
     }
 
     public fromJson(bytes: Uint8Array): any {
@@ -16,6 +19,6 @@ export class _DefaultSerializationImpl {
     }
 
     public fromMsgPack(bytes: Uint8Array): any {
-        return decode(bytes);
+        return this.unpackr.decode(bytes);
     }
 }

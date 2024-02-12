@@ -62,6 +62,7 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
         }
     };
     const options = new ClientOptions();
+    console.log(`useBinary: ${defaultBinary}`);
     options.useBinary = defaultBinary;
     const client = new Client(adapter, options);
     const sub = connection.subscribe(clientFrontdoorTopic);
