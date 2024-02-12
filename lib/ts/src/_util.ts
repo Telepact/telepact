@@ -567,7 +567,7 @@ export function parseField(
     }
 
     const fieldName = matcher[0];
-    const optional = matcher[2] !== null;
+    const optional = matcher[2] !== undefined;
     const thisPath = append(path, fieldName);
 
     let typeDeclarationArray;
@@ -1935,7 +1935,7 @@ export function generateRandomObject(blueprintValue: any, useBlueprintValue: boo
 }
 
 export function validateStruct(value: any, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>, fields: Record<string, _UFieldDeclaration>): Array<_ValidationFailure> {
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
         return validateStructFields(fields, value, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _STRUCT_NAME);
@@ -1947,6 +1947,8 @@ export function validateStructFields(fields: Record<string, _UFieldDeclaration>,
     const missingFields: Array<string> = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
         const isOptional = fieldDeclaration.optional;
+        console.log(`fieldName: ${fieldName}`);
+        console.log(`isOptional: ${isOptional}`);
         if (!actualStruct.hasOwnProperty(fieldName) && !isOptional) {
             missingFields.push(fieldName);
         }
