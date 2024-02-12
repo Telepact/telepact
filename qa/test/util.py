@@ -139,11 +139,18 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
 
             frontdoor_response_bytes = nats_response.data
 
+            print('  i<-   {}'.format(frontdoor_response_bytes), flush=True)
+
             try:
                 frontdoor_response_json = frontdoor_response_bytes.decode()
                 frontdoor_response = json.loads(frontdoor_response_json)
             except Exception:
-                frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
+                try:
+                    frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
+                except Exception as e:
+                    print(e)
+                    raise
+
                 response_was_binary = True
                 try:
                     (int_keys, str_keys) = count_int_keys(frontdoor_response[1])
