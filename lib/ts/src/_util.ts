@@ -1770,17 +1770,21 @@ export function generateRandomBoolean(
     }
 }
 
+const NUMBER_TRUNCATED = "NumberTruncated";
+
 export function validateInteger(value: any): _ValidationFailure[] {
     if (typeof value === "number" && Number.isInteger(value)) {
+        if (value === 9223372036854776000 || value === -9223372036854776000) {
+            return [
+                new _ValidationFailure(
+                    [],
+                    "NumberOutOfRange",
+                    {}
+                ), 
+                new _ValidationFailure([], NUMBER_TRUNCATED, {})
+            ]
+        }
         return [];
-    } else if (typeof value === "bigint") {
-        return [
-            new _ValidationFailure(
-                [],
-                "NumberOutOfRange",
-                {}
-            ),
-        ];
     } else {
         return getTypeUnexpectedValidationFailure([], value, _INTEGER_NAME);
     }
@@ -2074,8 +2078,6 @@ export function validateUnionCases(
 
     const referenceStruct = referenceCases[unionTarget];
     if (!referenceStruct) {
-        console.log(`referenceCases: ${JSON.stringify(referenceCases, null, 2)}`);
-        console.log(`unionTarget: ${unionTarget}`);
         return [
             {
                 path: [unionTarget],
@@ -2510,8 +2512,22 @@ export async function handleMessage(
 
     const functionTypeCall = functionType.call as _UUnion;
 
-    const callValidationFailures = functionTypeCall.validate(requestBody, [], []);
+    const warnings: _ValidationFailure[] = [];
+    const filterOutWarnings = (e: _ValidationFailure) => {
+        const r = e.reason == NUMBER_TRUNCATED;
+        if (r) {
+            warnings.push(e);
+        }
+        return !r;
+    }
+
+    const callValidationFailures: _ValidationFailure[] = functionTypeCall.validate(requestBody, [], []).filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
+
+        if (warnings.length > 0) {
+            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
+        }    
+        
         return getInvalidErrorMessage("_ErrorInvalidRequestBody", callValidationFailures, resultUnionType, responseHeaders);
     }
 
@@ -2538,7 +2554,12 @@ export async function handleMessage(
 
     const skipResultValidation = unsafeResponseEnabled;
     if (!skipResultValidation) {
-        const resultValidationFailures = resultUnionType.validate(resultMessage.body, [], []);
+        const resultValidationFailures = resultUnionType.validate(resultMessage.body, [], []).filter(filterOutWarnings);
+
+        if (warnings.length > 0) {
+            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
+        }
+
         if (resultValidationFailures.length > 0) {
             return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType, responseHeaders);
         }

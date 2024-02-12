@@ -309,6 +309,12 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
     if 'numberTooBig' in response[0]:
         pytest.skip('Cannot use big numbers with msgpack')
 
+    warnings = response[0].pop('_warnings', [])
+    if warnings:
+        warning_reasons = [next(iter(e['reason'])) for e in warnings]
+        if 'NumberTruncated' in warning_reasons:
+            pytest.skip('Target cannot handle large integers')
+
     if type(expected_response) == bytes:
         response = response_bytes
 
