@@ -35,28 +35,28 @@ export function getMockUApiJson(): string {
 }
 
 export function asInt(object: any): number {
-    if (object == null || !Number.isInteger(object)) {
+    if (object === null || object === undefined || !Number.isInteger(object)) {
         throw new Error("ClassCastException");
     }
     return object as number;
 }
 
 export function asString(object: any): string {
-    if (object == null || typeof object !== 'string') {
+    if (object === null || object === undefined || typeof object !== 'string') {
         throw new Error("ClassCastException");
     }
     return object as string;
 }
 
 export function asList(object: any): any[] {
-    if (object == null || !Array.isArray(object)) {
+    if (object === null || object === undefined || !Array.isArray(object)) {
         throw new Error("ClassCastException");
     }
     return object as any[];
 }
 
 export function asMap(object: any): Record<string, any> {
-    if (object == null || typeof object !== 'object') {
+    if (object === null || object === undefined || typeof object !== 'object' || Array.isArray(object)) {
         throw new Error("ClassCastException");
     }
     return object as Record<string, any>;
@@ -1560,7 +1560,7 @@ export function getTypeUnexpectedValidationFailure(path: any[], value: any, expe
 export function validateHeaders(headers: {[key: string]: any}, uApiSchema: UApiSchema, functionType: _UFn): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
-    if (headers["_bin"]) {
+    if (headers.hasOwnProperty("_bin")) {
         try {
             const binaryChecksums = headers["_bin"];
             for (let i = 0; i < binaryChecksums.length; i++) {
@@ -1578,7 +1578,7 @@ export function validateHeaders(headers: {[key: string]: any}, uApiSchema: UApiS
         }
     }
 
-    if (headers["_sel"]) {
+    if (headers.hasOwnProperty("_sel")) {
         const thisValidationFailures = validateSelectHeaders(headers, uApiSchema, functionType);
         validationFailures.push(...thisValidationFailures);
     }
@@ -1619,7 +1619,14 @@ export function validateSelectHeaders(
         }
 
         if (typeReference instanceof _UUnion) {
-            const unionCases = asMap(selectValue);
+            let unionCases: Record<string, any>;
+            try {
+                unionCases = asMap(selectValue);
+            } catch (e) {
+                validationFailures.push(...getTypeUnexpectedValidationFailure(["_sel", typeName], selectValue, "Object"));
+                continue;
+            }
+
             for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
                 const structRef = typeReference.cases[unionCase];
                 if (!structRef) {
@@ -1670,7 +1677,13 @@ export function validateSelectStruct(
 ): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
-    const fields = asList(selectedFields);
+    let fields: string[];
+    try {
+        fields = asList(selectedFields);
+    } catch (e) {
+        return getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
+    }
+
     for (let i = 0; i < fields.length; i++) {
         const field = fields[i];
         let stringField: string;
@@ -2361,7 +2374,7 @@ export function selectStructFields(typeDeclaration: _UTypeDeclaration, value: an
             defaultCasesToFields[caseName] = unionStructFields;
         }
 
-        const unionSelectedFields = selectedStructFields[typeDeclarationType.name] as Record<string, string[]>;
+        const unionSelectedFields: Record<string, string[]> = selectedStructFields[typeDeclarationType.name] ?? defaultCasesToFields;
         const thisUnionCaseSelectedFieldsDefault = defaultCasesToFields[unionCase];
         const selectedFields = unionSelectedFields[unionCase] ?? thisUnionCaseSelectedFieldsDefault;
 
