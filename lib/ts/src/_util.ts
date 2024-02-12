@@ -1891,22 +1891,20 @@ export function generateRandomArray(blueprintValue: any, useBlueprintValue: bool
 }
 
 export function validateObject(value: any, typeParameters: Array<_UTypeDeclaration>, generics: Array<_UTypeDeclaration>): Array<_ValidationFailure> {
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0]!;
         const validationFailures: Array<_ValidationFailure> = [];
         for (const key in value) {
-            if (Object.prototype.hasOwnProperty.call(value, key)) {
-                const nestedValidationFailures = nestedTypeDeclaration.validate(value[key], generics);
-                const nestedValidationFailuresWithPath: Array<_ValidationFailure> = nestedValidationFailures.map(f => {
-                    const thisPath = prepend(key, f.path);
-                    return {
-                        path: thisPath,
-                        reason: f.reason,
-                        data: f.data
-                    };
-                });
-                validationFailures.push(...nestedValidationFailuresWithPath);
-            }
+            const nestedValidationFailures = nestedTypeDeclaration.validate(value[key], generics);
+            const nestedValidationFailuresWithPath: Array<_ValidationFailure> = nestedValidationFailures.map(f => {
+                const thisPath = prepend(key, f.path);
+                return {
+                    path: thisPath,
+                    reason: f.reason,
+                    data: f.data
+                };
+            });
+            validationFailures.push(...nestedValidationFailuresWithPath);
         }
         return validationFailures;
     } else {
