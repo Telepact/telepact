@@ -1947,8 +1947,6 @@ export function validateStructFields(fields: Record<string, _UFieldDeclaration>,
     const missingFields: Array<string> = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
         const isOptional = fieldDeclaration.optional;
-        console.log(`fieldName: ${fieldName}`);
-        console.log(`isOptional: ${isOptional}`);
         if (!actualStruct.hasOwnProperty(fieldName) && !isOptional) {
             missingFields.push(fieldName);
         }
@@ -2056,7 +2054,7 @@ export function validateUnion(
     if (typeof value == 'object' && !Array.isArray(value)) {
         return validateUnionCases(cases, value, typeParameters);
     } else {
-        return getTypeUnexpectedValidationFailure([], value, "_UNION_NAME");
+        return getTypeUnexpectedValidationFailure([], value, _UNION_NAME);
     }
 }
 
