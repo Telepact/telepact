@@ -1803,13 +1803,17 @@ export function generateRandomInteger(
 }
 
 export function validateNumber(value: any): Array<_ValidationFailure> {
-    if (typeof value === "bigint") {
-        return [new _ValidationFailure(
-            [],
-            "NumberOutOfRange",
-            {}
-        )];
-    } else if (typeof value === 'number') {
+    if (typeof value === "number") {
+        if (Number.isInteger(value) && value === 9223372036854776000 || value === -9223372036854776000) {
+            return [
+                new _ValidationFailure(
+                    [],
+                    "NumberOutOfRange",
+                    {}
+                ), 
+                new _ValidationFailure([], NUMBER_TRUNCATED, {})
+            ]
+        }
         return [];
     } else {
         return getTypeUnexpectedValidationFailure([], value, _NUMBER_NAME);
