@@ -1232,6 +1232,30 @@ export function unpackMap(row: any[], header: any[]): Map<any, any> {
     return finalMap;
 }
 
+function convertMapsToObjects(value: any): any {
+    if (value instanceof Map) {
+        const newObj: Record<string, any> = {};
+        for (const [key, val] of value.entries()) {
+            newObj[key] = convertMapsToObjects(val);
+        }
+        return newObj;
+    } else if (Array.isArray(value)) {
+        const newList: any[] = [];
+        for (const val of value) {
+            const newVal = convertMapsToObjects(val);
+            newList.push(newVal);
+        }
+        return newList;
+    } else if (typeof value == 'object') {
+        const newObj: Record<string, any> = {};
+        for (const [key, val] of Object.entries(value)) {
+            newObj[key] = convertMapsToObjects(val);
+        }
+    } else {
+        return value;
+    }
+}
+
 export function serverBinaryEncode(message: any[], binaryEncoder: _BinaryEncoding): any[] {
     const headers: Record<string, any> = message[0]
     const messageBody: Record<string, any> = message[1]
@@ -1272,8 +1296,9 @@ export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncodin
         finalEncodedMessageBody = encodedMessageBody;
     }
 
+    const messageHeader = convertMapsToObjects(headers);
     const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
-    return [headers, messageBody];
+    return [messageHeader, messageBody];
 }
 
 export function clientBinaryEncode(message: any[], recentBinaryEncoders: Map<number, _BinaryEncoding>, binaryChecksumStrategy: ClientBinaryStrategy): any[] {
@@ -1339,8 +1364,9 @@ export function clientBinaryDecode(message: any[], recentBinaryEncoders: Map<num
         finalEncodedMessageBody = encodedMessageBody;
     }
 
+    const messageHeader = convertMapsToObjects(headers);
     const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
-    return [headers, messageBody];
+    return [messageHeader, messageBody];
 }
 
 export function encodeBody(messageBody: Record<string, any>, binaryEncoder: _BinaryEncoding): Map<any, any> {
@@ -1533,7 +1559,7 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         throw new _InvalidMessage(e);
     }
 
-    console.log(`headers: ${typeof headers}`)
+    console.log(`headers: ${headers}`)
 
     try {
         body = finalMessageAsPseudoJsonList[1];
@@ -1548,6 +1574,8 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
     } catch (e) {
         throw new _InvalidMessage(e);
     }
+
+    console.log(`body: ${body}`)
 
     return new Message(headers, body);
 }
