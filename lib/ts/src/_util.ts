@@ -1028,7 +1028,6 @@ class _BinaryPackNode {
 }
 
 export function packBody(body: Map<any, any>): Map<any, any> {
-    console.log("Trying to pack...")
     const result: Map<any, any> = new Map();
 
     for (const [key, value] of body.entries()) {
@@ -1065,7 +1064,6 @@ export function packList(list: any[]): any[] {
     const packedList: any[] = [];
     const header: any[] = [];
 
-    console.log("Packing!...")
     packedList.push(new MsgpackPacked());
 
     header.push(null);
