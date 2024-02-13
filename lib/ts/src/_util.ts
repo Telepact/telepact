@@ -1236,6 +1236,7 @@ export function serverBinaryEncode(message: any[], binaryEncoder: _BinaryEncodin
     const headers: Record<string, any> = message[0]
     const messageBody: Record<string, any> = message[1]
     const clientKnownBinaryChecksums = headers["_clientKnownBinaryChecksums"] as number[];
+    delete headers["_clientKnownBinaryChecksums"];
 
     if (!clientKnownBinaryChecksums || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
         headers["_enc"] = binaryEncoder.encodeMap;
@@ -1395,39 +1396,57 @@ export function decodeKeys(given: any, binaryEncoder: _BinaryEncoding): any {
 }
 
 export function constructBinaryEncoding(uApiSchema: UApiSchema): _BinaryEncoding {
-    const allKeys = new Set<string>();
+    const allKeys: Set<string> = new Set<string>();
     for (const [key, value] of Object.entries(uApiSchema.parsed)) {
         allKeys.add(key);
-
+    
         if (value instanceof _UStruct) {
-            const structFields = value.fields;
-            Object.keys(structFields).forEach(key => allKeys.add(key));
+            const structFields: Record<string, _UFieldDeclaration> = value.fields;
+            Object.keys(structFields).forEach((structFieldKey) => {
+                allKeys.add(structFieldKey);
+            });
         } else if (value instanceof _UUnion) {
-            const unionCases = value.cases;
-            for (const [_, struct] of Object.entries(unionCases)) {
-                Object.keys(struct.fields).forEach(key => allKeys.add(key));
+            const unionCases: Record<string, _UStruct> = value.cases;
+            for (const [caseKey, struct] of Object.entries(unionCases)) {
+                allKeys.add(caseKey);
+                const structFields: Record<string, _UFieldDeclaration> = struct.fields;
+                Object.keys(structFields).forEach((structFieldKey) => {
+                    allKeys.add(structFieldKey);
+                });
             }
         } else if (value instanceof _UFn) {
-            const fnCallCases = value.call.cases;
-            const fnResultCases = value.result.cases;
-
-            for (const [_, struct] of Object.entries(fnCallCases)) {
-                Object.keys(struct.fields).forEach(key => allKeys.add(key));
+            const fnCall: _UUnion = value.call;
+            const fnCallCases: Record<string, _UStruct> = fnCall.cases;
+            const fnResult: _UUnion = value.result;
+            const fnResultCases: Record<string, _UStruct> = fnResult.cases;
+    
+            for (const [callKey, callStruct] of Object.entries(fnCallCases)) {
+                allKeys.add(callKey);
+                const structFields: Record<string, _UFieldDeclaration> = callStruct.fields;
+                Object.keys(structFields).forEach((structFieldKey) => {
+                    allKeys.add(structFieldKey);
+                });
             }
-
-            for (const [_, struct] of Object.entries(fnResultCases)) {
-                Object.keys(struct.fields).forEach(key => allKeys.add(key));
+    
+            for (const [resultKey, resultStruct] of Object.entries(fnResultCases)) {
+                allKeys.add(resultKey);
+                const structFields: Record<string, _UFieldDeclaration> = resultStruct.fields;
+                Object.keys(structFields).forEach((structFieldKey) => {
+                    allKeys.add(structFieldKey);
+                });
             }
         }
     }
 
+    const sortedAllKeys = Array.from(allKeys).sort();
+
     let i = 0;
     const binaryEncodingMap = new Map<string, number>()
-    allKeys.forEach(key => {
+    sortedAllKeys.forEach(key => {
         binaryEncodingMap.set(key, i);
         i += 1;
     });
-    const finalString = Array.from(allKeys).join("\n");
+    const finalString = Array.from(sortedAllKeys).join("\n");
 
     const checksum = createChecksum(finalString);
     return new _BinaryEncoding(binaryEncodingMap, checksum);
