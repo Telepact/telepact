@@ -1462,6 +1462,7 @@ export function createChecksum(value: string): number {
 export function serialize(message: Message, binaryEncoder: _BinaryEncoder, serializer: SerializationImpl): Uint8Array {
     const headers: Record<string, any> = message.header;
 
+    console.log(`headers: ${JSON.stringify(headers)}`);
     let serializeAsBinary = false;
     if (headers.hasOwnProperty("_binary")) {
         serializeAsBinary = headers["_binary"] === true;
@@ -1471,6 +1472,7 @@ export function serialize(message: Message, binaryEncoder: _BinaryEncoder, seria
     const messageAsPseudoJson: any[] = [message.header, message.body];
 
     try {
+        console.log(`serializeAsBinary: ${serializeAsBinary}`);
         if (serializeAsBinary) {
             try {
                 const encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
@@ -1530,6 +1532,8 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
     } catch (e) {
         throw new _InvalidMessage(e);
     }
+
+    console.log(`headers: ${typeof headers}`)
 
     try {
         body = finalMessageAsPseudoJsonList[1];
@@ -2516,7 +2520,9 @@ export async function handleMessage(
         return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType, responseHeaders);
     }
 
+    console.log(`requestHeaders: ${JSON.stringify(requestHeaders)}`);
     if (requestHeaders.hasOwnProperty("_bin")) {
+        console.log("Including binary...");
         const clientKnownBinaryChecksums = requestHeaders["_bin"] as unknown as Array<any>;
 
         responseHeaders["_binary"] = true;
