@@ -11,6 +11,7 @@ import { Serializer } from './Serializer';
 import { UApiError } from './UApiError';
 import internalUApi from '../inc/internal.uapi.json';
 import mockInternalUApi from '../inc/mock-internal.uapi.json';
+import { addExtension } from 'msgpackr';
 
 
 export const _ANY_NAME: Readonly<string> = "Any";
@@ -1001,6 +1002,7 @@ const MSGPACK_PACKED_EXT = {
         return new MsgpackPacked()
     }
 }
+addExtension(MSGPACK_PACKED_EXT);
 
 class MsgpackUndefined {}
 const MSGPACK_UNDEFINED_EXT = {
@@ -1013,6 +1015,7 @@ const MSGPACK_UNDEFINED_EXT = {
         return new MsgpackUndefined()
     }
 }
+addExtension(MSGPACK_UNDEFINED_EXT);
 
 class _BinaryPackNode {
     public value: number;
@@ -1025,6 +1028,7 @@ class _BinaryPackNode {
 }
 
 export function packBody(body: Map<any, any>): Map<any, any> {
+    console.log("Trying to pack...")
     const result: Map<any, any> = new Map();
 
     for (const [key, value] of body.entries()) {
@@ -1038,10 +1042,10 @@ export function packBody(body: Map<any, any>): Map<any, any> {
 export function pack(value: any): any {
     if (Array.isArray(value)) {
         return packList(value);
-    } else if (typeof value === 'object' && value !== null) {
+    } else if (value instanceof Map) {
         const newMap: Map<any, any> = new Map();
 
-        for (const [key, val] of Object.entries(value)) {
+        for (const [key, val] of value.entries()) {
             newMap.set(key, pack(val));
         }
 
@@ -1061,6 +1065,7 @@ export function packList(list: any[]): any[] {
     const packedList: any[] = [];
     const header: any[] = [];
 
+    console.log("Packing!...")
     packedList.push(new MsgpackPacked());
 
     header.push(null);
