@@ -1614,13 +1614,10 @@ export function validateHeaders(headers: {[key: string]: any}, uApiSchema: UApiS
 
     if (headers.hasOwnProperty("_bin")) {
         try {
-            const binaryChecksums = headers["_bin"];
+            const binaryChecksums = asList(headers["_bin"]);
             for (let i = 0; i < binaryChecksums.length; i++) {
                 try {
-                    const integerElement = Number(binaryChecksums[i]);
-                    if (isNaN(integerElement)) {
-                        throw new Error("Not an integer");
-                    }
+                    const integerElement = asInt(binaryChecksums[i]);
                 } catch (e) {
                     validationFailures.push(...getTypeUnexpectedValidationFailure(["_bin", i], binaryChecksums[i], "Integer"));
                 }
