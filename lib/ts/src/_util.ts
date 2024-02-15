@@ -574,7 +574,7 @@ export function parseField(
 
     let typeDeclarationArray;
     try {
-        typeDeclarationArray = Array.from(typeDeclarationValue);
+        typeDeclarationArray = asList(typeDeclarationValue);
     } catch (e) {
         throw new UApiSchemaParseError(getTypeUnexpectedParseFailure(thisPath, typeDeclarationValue, "Array"));
     }
