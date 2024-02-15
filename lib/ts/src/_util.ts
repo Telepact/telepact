@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { _BinaryEncoder, _BinaryEncoding, _BinaryEncodingMissing, _InvalidMessage, _InvalidMessageBody, _MockInvocation, _MockStub, _RandomGenerator, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion, _ValidationFailure } from './_utilTypes';
+import { _BinaryEncoder, _BinaryEncoderUnavailableError, _BinaryEncoding, _BinaryEncodingMissing, _InvalidMessage, _InvalidMessageBody, _MockInvocation, _MockStub, _RandomGenerator, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion, _ValidationFailure } from './_utilTypes';
 import { UApiSchemaParseError } from './UApiSchemaParseError';
 import { UApiSchema } from './UApiSchema';
 import crc32 from 'crc-32';
@@ -12,6 +12,7 @@ import { UApiError } from './UApiError';
 import internalUApi from '../inc/internal.uapi.json';
 import mockInternalUApi from '../inc/mock-internal.uapi.json';
 import { addExtension } from 'msgpackr';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 
 
 export const _ANY_NAME: Readonly<string> = "Any";
@@ -991,7 +992,11 @@ export function parseUApiSchema(
 const PACKED_BYTE: number = 17;
 const UNDEFINED_BYTE: number = 18;
 
-class MsgpackPacked {}
+class MsgpackPacked {
+    toString() {
+        return "PACKED"
+    }
+}
 const MSGPACK_PACKED_EXT = {
     Class: MsgpackPacked,
     type: PACKED_BYTE,
@@ -1004,7 +1009,11 @@ const MSGPACK_PACKED_EXT = {
 }
 addExtension(MSGPACK_PACKED_EXT);
 
-class MsgpackUndefined {}
+class MsgpackUndefined {
+    toString() {
+        return "UNDEFINED"
+    }
+}
 const MSGPACK_UNDEFINED_EXT = {
     Class: MsgpackUndefined,
     type: UNDEFINED_BYTE,
@@ -1074,6 +1083,7 @@ export function packList(list: any[]): any[] {
     try {
         for (const e of list) {
             if (e instanceof Map) {
+                console.log(`e: ${JSON.stringify([...e.entries()])}`);
                 const row = packMap(e, header, keyIndexMap);
 
                 packedList.push(row);
@@ -1120,7 +1130,7 @@ export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number
         const keyIndexNested: Map<number, _BinaryPackNode> = finalKeyIndex.nested;
 
         let packedValue: any;
-        if (typeof value === 'object' && value !== null) {
+        if (value instanceof Map && value !== null) {
             const nestedHeader: any[] = header[keyIndexValue + 1];
             packedValue = packMap(value, nestedHeader, keyIndexNested);
         } else {
@@ -1176,37 +1186,30 @@ export function unpackList(list: any[]): any[] {
         return list;
     }
 
-    if (list[0] instanceof MsgpackPacked) {
-        const unpackedList: any[] = [];
-        const headers: any[] = list[1];
+    console.log(`unpackList: ${JSON.stringify(list)}`)
+    console.log(`list[0]: ${list[0]}`);
 
-        for (let i = 2; i < list.length; i += 1) {
-            const row: any[] = list[i];
-            const m = unpackMap(row, headers);
-
-            unpackedList.push(m);
-        }
-
-        return unpackedList;
-    } else {
+    if (!(list[0] instanceof MsgpackPacked)) {
+        console.log("Not instance of packed list")
         const newList: any[] = [];
         for (const e of list) {
             newList.push(unpack(e));
         }
         return newList;
-    }
-}
 
-class _BinaryEncoderUnavailableError extends Error {}
+    }
 
-class ClientBinaryStrategy {
-    getCurrentChecksums(): number[] {
-        // Implement your logic here
-        return [];
+    const unpackedList: any[] = [];
+    const headers: any[] = list[1];
+
+    for (let i = 2; i < list.length; i += 1) {
+        const row: any[] = list[i];
+        const m = unpackMap(row, headers);
+
+        unpackedList.push(m);
     }
-    update(checksum: number): void {
-        // Implement your logic here
-    }
+
+    return unpackedList;
 }
 
 export function unpackMap(row: any[], header: any[]): Map<any, any> {
@@ -1215,20 +1218,22 @@ export function unpackMap(row: any[], header: any[]): Map<any, any> {
     for (let j = 0; j < row.length; j += 1) {
         const key = header[j + 1];
         const value = row[j];
+        console.log(`key: ${JSON.stringify(key)}`);
+        console.log(`value: ${JSON.stringify(value)}`);
 
         if (value instanceof MsgpackUndefined) {
             continue;
         }
 
-        if (typeof key === 'string') {
-            const unpackedValue = unpack(value);
-            finalMap.set(key, unpackedValue);
-        } else {
+        if (Array.isArray(key)) {
             const nestedHeader = key as any[];
             const nestedRow = value as any[];
             const m = unpackMap(nestedRow, nestedHeader);
             const i = nestedHeader[0] as number;
             finalMap.set(i, m);
+        } else {
+            const unpackedValue = unpack(value);
+            finalMap.set(key, unpackedValue);
         }
     }
 
@@ -1491,7 +1496,6 @@ export function createChecksum(value: string): number {
 export function serialize(message: Message, binaryEncoder: _BinaryEncoder, serializer: SerializationImpl): Uint8Array {
     const headers: Record<string, any> = message.header;
 
-    console.log(`headers: ${JSON.stringify(headers)}`);
     let serializeAsBinary = false;
     if (headers.hasOwnProperty("_binary")) {
         serializeAsBinary = headers["_binary"] === true;
@@ -1527,6 +1531,7 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         if (messageBytes[0] === 0x92) { // MsgPack
             isMsgPack = true;
             messageAsPseudoJson = serializer.fromMsgPack(messageBytes);
+            console.log(`messageAsPseudoJson: ${messageAsPseudoJson}`)
         } else {
             isMsgPack = false;
             messageAsPseudoJson = serializer.fromJson(messageBytes);

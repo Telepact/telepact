@@ -1117,17 +1117,18 @@ class _Util {
                 continue;
             }
 
-            if (key instanceof final Integer i) {
-                final var unpackedValue = unpack(value);
-
-                finalMap.put(i, unpackedValue);
-            } else {
-                final var nestedHeader = (List<Object>) key;
+            if (key instanceof final List l) {
+                final var nestedHeader = (List<Object>) l;
                 final var nestedRow = (List<Object>) value;
                 final var m = unpackMap(nestedRow, nestedHeader);
                 final var i = (Integer) nestedHeader.get(0);
 
                 finalMap.put(i, m);
+            } else {
+                final Integer i = (Integer) key;
+                final var unpackedValue = unpack(value);
+
+                finalMap.put(i, unpackedValue);
             }
         }
 
