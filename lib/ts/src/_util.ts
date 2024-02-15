@@ -469,7 +469,7 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
         throw new UApiSchemaParseError(parseFailures);
     }
     const cases: Record<string, _UStruct> = {};
-    if (definition.size === 0 && !isForFn) {
+    if (Object.keys(definition).length === 0 && !isForFn) {
         parseFailures.push(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", {}));
     } else if (isForFn) {
         if (!definition.hasOwnProperty("Ok")) {
