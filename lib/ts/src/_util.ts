@@ -817,7 +817,7 @@ export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<str
 
     let uApiSchemaPseudoJson: Array<any>;
     try {
-        uApiSchemaPseudoJson = Array.from(uApiSchemaPseudoJsonInit);
+        uApiSchemaPseudoJson = asList(uApiSchemaPseudoJsonInit);
     } catch (e) {
         const thisParseFailures = getTypeUnexpectedParseFailure([], uApiSchemaPseudoJsonInit, "Array");
         throw new UApiSchemaParseError(thisParseFailures, e as Error);
