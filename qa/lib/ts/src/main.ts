@@ -85,7 +85,6 @@ function startClientTestServer(
 
     const options = new ClientOptions();
 
-    console.log(`useBinary: ${defaultBinary}`);
     options.useBinary = defaultBinary;
     const client = new Client(adapter, options);
 

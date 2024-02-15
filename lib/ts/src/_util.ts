@@ -1158,10 +1158,10 @@ export function unpackBody(body: Map<any, any>): Map<any, any> {
 export function unpack(value: any): any {
     if (Array.isArray(value)) {
         return unpackList(value);
-    } else if (typeof value === 'object' && value !== null) {
+    } else if (value instanceof Map) {
         const newMap: Map<any, any> = new Map();
 
-        for (const [key, val] of Object.entries(value)) {
+        for (const [key, val] of value.entries()) {
             newMap.set(key, unpack(val));
         }
 
