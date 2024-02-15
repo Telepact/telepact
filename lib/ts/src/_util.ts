@@ -789,9 +789,12 @@ export function parseFunctionType(
     if (functionDefinitionAsParsedJson.hasOwnProperty(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
         parseFailures.push(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", {}));
     } else {
-        const errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey] ?? "^error\\..*$";
+        let errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey];
+        if (errorsRegexInit === undefined) {
+            errorsRegexInit = "^error\\..*$";
+        }
         try {
-            errorsRegex = errorsRegexInit;
+            errorsRegex = asString(errorsRegexInit);
         } catch (e) {
             const thisParseFailures = getTypeUnexpectedParseFailure(regexPath, errorsRegexInit, "String");
 
