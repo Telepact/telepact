@@ -66,7 +66,6 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
         }
     };
     const options = new ClientOptions();
-    console.log(`useBinary: ${defaultBinary}`);
     options.useBinary = defaultBinary;
     const client = new Client(adapter, options);
     const sub = connection.subscribe(clientFrontdoorTopic);
@@ -98,7 +97,7 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
 }
 function startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic, config) {
     const json = fs.readFileSync(apiSchemaPath, 'utf-8');
-    const uApi = JSON.parse(json);
+    const uApi = UApiSchema.fromJson(json);
     const options = new MockServerOptions();
     options.onError = (e) => console.error(e);
     options.enableMessageResponseGeneration = false;

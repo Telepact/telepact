@@ -2316,7 +2316,7 @@ export function validateMockStub(givenObj: any, typeParameters: _UTypeDeclaratio
         return [{
             path: [],
             reason: "ObjectKeyRegexMatchCountUnexpected",
-            data: new Map<string, any>([["regex", regexString], ["actual", matches.length], ["expected", 1]])
+            data: {"regex": regexString, "actual": matches.length, "expected": 1}
         }];
     }
 

@@ -128,7 +128,7 @@ function startClientTestServer(
 
 function startMockTestServer(connection: NatsConnection, registry: Registry, apiSchemaPath: string, frontdoorTopic: string, config: Record<string, any>): Subscription {
     const json = fs.readFileSync(apiSchemaPath, 'utf-8');
-    const uApi: UApiSchema = JSON.parse(json);
+    const uApi: UApiSchema = UApiSchema.fromJson(json);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);
