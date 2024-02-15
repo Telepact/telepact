@@ -90,11 +90,11 @@ export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset
 }
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
-    const regex = /^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\..*/;
+    const regex = "^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
     const matches: string[] = [];
 
     for (const e of Object.keys(definition)) {
-        if (regex.test(e)) {
+        if (e.match(regex)) {
             matches.push(e);
         }
     }
@@ -104,7 +104,7 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
     if (matches.length === 1 && result != undefined) {
         return result;
     } else {
-        throw new Error(JSON.stringify({ reason: "ObjectKeyRegexMatchCountUnexpected", data: { regex, actual: matches.length, expected: 1 } }));
+        throw new UApiSchemaParseError([new _SchemaParseFailure([index], "ObjectKeyRegexMatchCountUnexpected", { regex: regex, actual: matches.length, expected: 1 })]);
     }
 }
 
