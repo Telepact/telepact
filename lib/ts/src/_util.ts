@@ -839,7 +839,7 @@ export function extendUApiSchema(first: UApiSchema, secondUApiSchemaJson: string
 
     let secondUApiSchemaPseudoJson: any[];
     try {
-        secondUApiSchemaPseudoJson = Array.isArray(secondUApiSchemaPseudoJsonInit) ? secondUApiSchemaPseudoJsonInit : [];
+        secondUApiSchemaPseudoJson = asList(secondUApiSchemaPseudoJsonInit);
     } catch (e) {
         const thisParseFailure: _SchemaParseFailure[] = getTypeUnexpectedParseFailure([], secondUApiSchemaPseudoJsonInit, "Array");
         throw new UApiSchemaParseError(thisParseFailure, e as Error);
