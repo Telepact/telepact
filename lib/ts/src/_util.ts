@@ -204,10 +204,10 @@ export function parseTypeDeclaration(
             new _SchemaParseFailure(
                 path,
                 "ArrayLengthUnexpected",
-                new Map([
-                    ["actual", typeDeclarationArray.length],
-                    ["expected", type.getTypeParameterCount() + 1]
-                ])
+                {
+                    "actual": typeDeclarationArray.length,
+                    "expected": type.getTypeParameterCount() + 1
+                }
             )
         ]);
     }
@@ -302,7 +302,7 @@ export function getOrParseType(
     const matcher = typeName.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(path, "StringRegexMatchFailed", new Map([["regex", regexString]]))
+            new _SchemaParseFailure(path, "StringRegexMatchFailed", {"regex": regexString})
         ]);
     }
 
@@ -339,7 +339,7 @@ export function getOrParseType(
     const index = schemaKeysToIndex[customTypeName];
     if (index === undefined) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(path, "TypeUnknown", new Map([["name", customTypeName]]))
+            new _SchemaParseFailure(path, "TypeUnknown", {"name": customTypeName})
         ]);
     }
     const definition = uApiSchemaPseudoJson[index];
@@ -395,7 +395,7 @@ export function getOrParseType(
             type = typeExtensions[customTypeName];
             if (type === undefined) {
                 throw new UApiSchemaParseError([
-                    new _SchemaParseFailure([index], "TypeExtensionImplementationMissing", new Map([["name", customTypeName]]))
+                    new _SchemaParseFailure([index], "TypeExtensionImplementationMissing", {"name": customTypeName})
                 ]);
             }
         }
@@ -482,7 +482,7 @@ export function parseUnionType(path: any[], unionDefinitionAsPseudoJson: Record<
         const regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
         const regex = new RegExp(regexString);
         if (!regex.test(unionCase)) {
-            parseFailures.push(new _SchemaParseFailure(unionKeyPath, "KeyRegexMatchFailed", new Map([["regex", regexString]])));
+            parseFailures.push(new _SchemaParseFailure(unionKeyPath, "KeyRegexMatchFailed", {"regex": regexString}));
             continue;
         }
         let unionCaseStruct: Record<string, any>;
@@ -565,7 +565,7 @@ export function parseField(
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
         const finalPath = append(path, fieldDeclaration);
-        throw new UApiSchemaParseError([new _SchemaParseFailure(finalPath, "KeyRegexMatchFailed", new Map([["regex", regexString]]))]);
+        throw new UApiSchemaParseError([new _SchemaParseFailure(finalPath, "KeyRegexMatchFailed", {"regex": regexString})]);
     }
 
     const fieldName = matcher[0];
