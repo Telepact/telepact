@@ -1567,7 +1567,7 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
     let body: Record<string, any>;
 
     try {
-        headers = finalMessageAsPseudoJsonList[0];
+        headers = asMap(finalMessageAsPseudoJsonList[0]);
     } catch (e) {
         throw new _InvalidMessage(e);
     }
@@ -1575,16 +1575,19 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
     console.log(`headers: ${headers}`)
 
     try {
-        body = finalMessageAsPseudoJsonList[1];
+        body = asMap(finalMessageAsPseudoJsonList[1]);
         if (Object.keys(body).length !== 1) {
             throw new _InvalidMessageBody();
         } else {
-            const givenPayload = [...Object.values(body)][0]
-            if (givenPayload === undefined) {
+            const givenPayload = [...Object.values(body)][0];
+            if (givenPayload === undefined || typeof givenPayload !== 'object' || Array.isArray(givenPayload)) {
                 throw new _InvalidMessageBody();
             }
         }
     } catch (e) {
+        if (e instanceof _InvalidMessageBody) {
+            throw e;
+        }
         throw new _InvalidMessage(e);
     }
 
