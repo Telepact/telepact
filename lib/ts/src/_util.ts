@@ -1048,6 +1048,7 @@ export function packBody(body: Map<any, any>): Map<any, any> {
 }
 
 export function pack(value: any): any {
+    console.log(`pack: ${value}`);
     if (Array.isArray(value)) {
         return packList(value);
     } else if (value instanceof Map) {
@@ -1115,8 +1116,8 @@ export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number
         if (keyIndex === undefined) {
             finalKeyIndex = new _BinaryPackNode(header.length - 1, new Map());
 
-            if (typeof value === 'object') {
-                header.push([...[key]]);
+            if (value instanceof Map) {
+                header.push([key]);
             } else {
                 header.push(key);
             }
@@ -1131,7 +1132,11 @@ export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number
 
         let packedValue: any;
         if (value instanceof Map && value !== null) {
-            const nestedHeader: any[] = header[keyIndexValue + 1];
+            let nestedHeader: any[] = header[keyIndexValue + 1];
+            if (!Array.isArray(nestedHeader)) {
+                // No nesting available, so the data structure is inconsistent
+                throw new CannotPack();
+            }
             packedValue = packMap(value, nestedHeader, keyIndexNested);
         } else {
             if (Array.isArray(header[keyIndexValue + 1])) {
