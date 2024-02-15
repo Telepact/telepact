@@ -1249,7 +1249,7 @@ function convertMapsToObjects(value: any): any {
             newList.push(newVal);
         }
         return newList;
-    } else if (typeof value == 'object') {
+    } else if (typeof value == 'object' && value !== null) {
         const newObj: Record<string, any> = {};
         for (const [key, val] of Object.entries(value)) {
             newObj[key] = convertMapsToObjects(val);
