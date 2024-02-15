@@ -161,7 +161,7 @@ export function parseTypeDeclaration(
 
     let rootTypeString: string;
     try {
-        rootTypeString = String(baseType);
+        rootTypeString = asString(baseType);
     } catch (e) {
         const thisParseFailures = getTypeUnexpectedParseFailure(basePath, baseType, "String");
         throw new UApiSchemaParseError(thisParseFailures);
@@ -219,11 +219,11 @@ export function parseTypeDeclaration(
     let index = 0;
     for (const e of givenTypeParameters) {
         index += 1;
-        const loopPath = basePath.concat([index]);
+        const loopPath = append(path, index);
 
         let l;
         try {
-            l = e as any[];
+            l = asList(e);
         } catch (e1) {
             const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e, "Array");
 
