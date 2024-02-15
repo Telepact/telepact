@@ -2886,8 +2886,8 @@ export function mockHandle(
     const header = requestMessage.header;
 
     const enableGenerationStub = header['_gen'] || false;
-    const functionName = requestMessage.body['getBodyTarget']();
-    const argument: Record<string, any> = requestMessage.body['getBodyPayload']();
+    const functionName = requestMessage.getBodyTarget();
+    const argument: Record<string, any> = requestMessage.getBodyPayload();
 
     switch (functionName) {
         case 'fn._createStub': {
