@@ -2741,30 +2741,31 @@ export function isSubMapEntryEqual(partValue: any, wholeValue: any): boolean {
 }
 
 function objectsAreEqual(obj1: any, obj2: any): boolean {
-    // If the objects are strictly equal, return true
-    if (obj1 === obj2) {
-        return true;
-    }
-
-    // Check if both objects are null or undefined
-    if (obj1 == null || obj2 == null) {
+    // Check if both objects are the same type
+    if (typeof obj1 !== typeof obj2) {
         return false;
     }
 
-    // Check if the objects have the same number of properties
-    const obj1Keys = Object.keys(obj1);
-    const obj2Keys = Object.keys(obj2);
-    if (obj1Keys.length !== obj2Keys.length) {
+    // If objects are primitive types, compare directly
+    if (typeof obj1 !== 'object' || obj1 === null || obj2 === null) {
+        return obj1 === obj2;
+    }
+
+    // Check if both objects have the same keys
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length || !keys1.every(key => keys2.includes(key))) {
         return false;
     }
 
-    // Check if each property value of obj1 matches the corresponding property value of obj2
-    for (const key of obj1Keys) {
-        if (!obj2.hasOwnProperty(key) || !objectsAreEqual(obj1[key], obj2[key])) {
+    // Recursively compare nested objects and arrays
+    for (const key of keys1) {
+        if (!objectsAreEqual(obj1[key], obj2[key])) {
             return false;
         }
     }
 
+    // If all checks pass, objects are considered equal
     return true;
 }
 
