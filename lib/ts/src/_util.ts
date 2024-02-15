@@ -524,7 +524,7 @@ export function parseStructFields(referenceStruct: Record<string, any>, path: an
             if (fieldNoOpt === existingFieldNoOpt) {
                 const finalPath = append(path, fieldDeclaration);
                 const finalOtherPath = append(path, existingField);
-                parseFailures.push(new _SchemaParseFailure(finalPath, "PathCollision", new Map([["other", finalOtherPath]])));
+                parseFailures.push(new _SchemaParseFailure(finalPath, "PathCollision", {"other": finalOtherPath}));
             }
         }
         const typeDeclarationValue = structEntryValue;
@@ -630,7 +630,7 @@ export function applyErrorToParsedTypes(
                     new _SchemaParseFailure(
                         [errorIndex, errorName, "->", newKey],
                         "PathCollision",
-                        new Map([[ "other", [otherPathIndex, "->", newKey] ]])
+                        {"other": [otherPathIndex, "->", newKey]}
                     )
                 );
             }
@@ -902,7 +902,7 @@ export function parseUApiSchema(
         parseFailures.push(new _SchemaParseFailure(
           finalPath,
           "PathCollision",
-          new Map([[ "other", [otherPathIndex, matchingSchemaKey] ]]),
+          {"other": [otherPathIndex, matchingSchemaKey]},
         ));
         continue;
       }
