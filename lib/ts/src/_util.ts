@@ -2210,7 +2210,7 @@ export function constructRandomUnion(
     typeParameters: _UTypeDeclaration[],
     randomGenerator: _RandomGenerator
 ): Record<string, any> {
-    if (startingUnion.size !== 0) {
+    if (Object.keys(startingUnion).length !== 0) {
         const entry = unionEntry(startingUnion);
         const unionCase = entry[0];
         const unionStructType = unionCase ? unionCasesReference[unionCase] : null;
@@ -2266,7 +2266,7 @@ export function validateMockCall(
 
     const regexString = "^fn\\..*$";
 
-    const matches = [...givenMap.keys()].filter((k: string) => k.match(regexString));
+    const matches = [...Object.keys(givenMap)].filter((k: string) => k.match(regexString));
     if (matches.length !== 1) {
         return [
             {
