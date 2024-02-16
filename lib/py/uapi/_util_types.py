@@ -17,19 +17,19 @@ class _SchemaParseFailure:
 
 class _RandomGenerator:
     def __init__(self, collection_length_min: int, collection_length_max: int):
-        self.seed = c_int32(1)
+        self.set_seed(0)
         self.collection_length_min = collection_length_min
         self.collection_length_max = collection_length_max
 
     def set_seed(self, seed: int):
-        self.seed = (c_int32(math.floor(seed)) & 0x7fffffff) + 1
+        self.seed = c_int32((seed & 0x7ffffffe) + 1)
 
     def next_int(self) -> int:
         x: c_int32 = c_int32(self.seed.value)
         x = c_int32(x.value ^ (x.value << 13))
         x = c_int32(x.value ^ (x.value >> 17))
         x = c_int32(x.value ^ (x.value << 5))
-        self.seed = c_int32((x.value & 0x7fffffff) + 1)
+        self.seed = c_int32((x.value & 0x7ffffffe) + 1)
         return self.seed.value
 
     def next_int_with_ceiling(self, ceiling: int) -> int:

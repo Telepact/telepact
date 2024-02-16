@@ -20,17 +20,18 @@ class _SchemaParseFailure {
 }
 
 class _RandomGenerator {
-    int seed = 1;
+    int seed = 0;
     private int collectionLengthMin;
     private int collectionLengthMax;
 
     public _RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
+        this.setSeed(0);
         this.collectionLengthMin = collectionLengthMin;
         this.collectionLengthMax = collectionLengthMax;
     }
 
     public void setSeed(int seed) {
-        this.seed = (seed & 0x7fffffff) + 1;
+        this.seed = (seed & 0x7ffffffe) + 1;
     }
 
     public int nextInt() {
@@ -38,7 +39,7 @@ class _RandomGenerator {
         x ^= x << 13;
         x ^= x >> 17;
         x ^= x << 5;
-        this.seed = (x & 0x7fffffff) + 1;
+        this.seed = (x & 0x7ffffffe) + 1;
         return this.seed;
     }
 
