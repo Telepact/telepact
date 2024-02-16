@@ -9,10 +9,27 @@ export class _SchemaParseFailure {
     ) {}
 }
 
+function findStack() {
+    const e = new Error();
+    const stack = e.stack.split('\n');
+    let i = 0;
+    for (const line of stack) {
+        i += 1;
+        if (i < 3) {
+            continue;
+        }
+        if (!line.includes('_RandomGenerator')) {
+            return line;
+        }
+    }
+    throw new Error();
+}
+
 export class _RandomGenerator {
     seed: number;
     private collectionLengthMin: number;
     private collectionLengthMax: number;
+    private count: number = 0;
 
     constructor(collectionLengthMin: number, collectionLengthMax: number) {
         this.setSeed(0)
@@ -30,7 +47,10 @@ export class _RandomGenerator {
         x ^= x >> 17;
         x ^= x << 5;
         this.seed = (x & 0x7ffffffe) + 1;
-        return this.seed;
+        this.count += 1;
+        const result = this.seed;
+        console.log(`${this.count} ${result} ${findStack()}`);
+        return result;
     }
 
     nextIntWithCeiling(ceiling: number): number {

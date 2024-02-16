@@ -2090,10 +2090,25 @@ export function constructRandomStruct(
     typeParameters: _UTypeDeclaration[],
     randomGenerator: _RandomGenerator
 ): Record<string, any> {
-    const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => e1[0].localeCompare(e2[0]));
+    const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => {
+        let a = e1[0];
+        let b = e2[0];
+        for (var i = 0; i < Math.min(a.length, b.length); i++) {
+            var charCodeA = a.charCodeAt(i);
+            var charCodeB = b.charCodeAt(i);
+            if (charCodeA !== charCodeB) {
+              // If the characters are different, return the comparison result
+              // where lowercase letters are considered greater than uppercase letters
+              return charCodeA - charCodeB;
+            }
+          }
+          // If one string is a prefix of the other, the shorter string comes first
+          return a.length - b.length;
+    });
     const obj: Record<string, any> = {};
 
     for (const [fieldName, fieldDeclaration] of sortedReferenceStruct) {
+        console.log(`Generating for ${fieldName}`);
         const blueprintValue = startingStruct[fieldName];
         const useBlueprintValue = startingStruct.hasOwnProperty(fieldName)
         const typeDeclaration = fieldDeclaration.typeDeclaration;
