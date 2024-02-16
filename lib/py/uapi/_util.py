@@ -1637,7 +1637,7 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
         sorted_union_cases_reference = sorted(
             union_cases_reference.items(), key=lambda x: x[0])
         random_index = random_generator.next_int_with_ceiling(
-            len(sorted_union_cases_reference))
+            len(sorted_union_cases_reference) - 1)
         union_case, union_data = sorted_union_cases_reference[random_index]
         return {union_case: construct_random_struct(union_data.fields, {},
                                                     include_random_optional_fields, type_parameters,

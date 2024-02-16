@@ -2229,7 +2229,7 @@ export function constructRandomUnion(
         }
     } else {
         const sortedUnionCasesReference = Array.from(Object.entries(unionCasesReference)).sort((e1, e2) => e1[0].localeCompare(e2[0]));
-        const randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.length);
+        const randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.length - 1);
         const unionEntry = sortedUnionCasesReference[randomIndex];
         const unionCase = unionEntry ? unionEntry[0] : null;
         const unionData = unionEntry ? unionEntry[1] : null;

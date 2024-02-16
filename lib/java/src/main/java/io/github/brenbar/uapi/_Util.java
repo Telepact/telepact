@@ -2081,7 +2081,7 @@ class _Util {
 
             Collections.sort(sortedUnionCasesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            final var randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.size());
+            final var randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.size() - 1);
             final var unionEntry = sortedUnionCasesReference.get(randomIndex);
             final var unionCase = unionEntry.getKey();
             final var unionData = unionEntry.getValue();

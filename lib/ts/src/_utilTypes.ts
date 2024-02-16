@@ -10,7 +10,7 @@ export class _SchemaParseFailure {
 }
 
 export class _RandomGenerator {
-    private seed: number = 0;
+    seed: number = 1;
     private collectionLengthMin: number;
     private collectionLengthMax: number;
 
@@ -20,11 +20,15 @@ export class _RandomGenerator {
     }
 
     setSeed(seed: number): void {
-        this.seed = seed;
+        this.seed = (Math.floor(seed) & 0x7fffffff) + 1;
     }
 
     nextInt(): number {
-        this.seed = (this.seed * 1_103_515_245 + 12_345) & 0x7fffffff;
+        let x = this.seed;
+        x ^= x << 13;
+        x ^= x >> 17;
+        x ^= x << 5;
+        this.seed = x;
         return this.seed;
     }
 
