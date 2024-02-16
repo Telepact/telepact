@@ -14,11 +14,14 @@ def start(nats_url):
     s0 = subprocess.Popen(['pipenv', 'uninstall', 'uapi'], cwd=this_path)
     s0.wait()
 
+    s1 = subprocess.Popen(['pipenv', '--clear'], cwd=this_path)
+    s1.wait()
+
     s = subprocess.Popen(['pipenv', 'run', 'python',
                          '-m', 'build'], cwd=target_path)
     s.wait()
 
-    s2 = subprocess.Popen(['pipenv', 'install', './../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl', '--clear'], cwd=this_path)
+    s2 = subprocess.Popen(['pipenv', 'install', './../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl', '--skip-lock'], cwd=this_path)
     s2.wait()
     
     p = subprocess.Popen(['pipenv', 'run', 'python',
