@@ -1961,7 +1961,6 @@ class _Util {
         final var obj = new TreeMap<String, Object>();
         for (final var field : sortedReferenceStruct) {
             final var fieldName = field.getKey();
-            System.out.println("Generating for " + fieldName);
             final var fieldDeclaration = field.getValue();
             final var blueprintValue = startingStruct.get(fieldName);
             final var useBlueprintValue = startingStruct.containsKey(fieldName);

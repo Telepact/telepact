@@ -2108,7 +2108,6 @@ export function constructRandomStruct(
     const obj: Record<string, any> = {};
 
     for (const [fieldName, fieldDeclaration] of sortedReferenceStruct) {
-        console.log(`Generating for ${fieldName}`);
         const blueprintValue = startingStruct[fieldName];
         const useBlueprintValue = startingStruct.hasOwnProperty(fieldName)
         const typeDeclaration = fieldDeclaration.typeDeclaration;

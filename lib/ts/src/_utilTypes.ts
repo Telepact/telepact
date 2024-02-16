@@ -49,7 +49,7 @@ export class _RandomGenerator {
         this.seed = (x & 0x7ffffffe) + 1;
         this.count += 1;
         const result = this.seed;
-        console.log(`${this.count} ${result} ${findStack()}`);
+        // console.log(`${this.count} ${result} ${findStack()}`);
         return result;
     }
 
@@ -66,7 +66,7 @@ export class _RandomGenerator {
 
     nextString(): string {
         const bytes = Buffer.alloc(4);
-        bytes.writeInt32LE(this.nextInt(), 0);
+        bytes.writeInt32BE(this.nextInt());
         return bytes.toString('base64').replace(/=/g, '');
     }
 
