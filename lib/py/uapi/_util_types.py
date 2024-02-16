@@ -44,7 +44,7 @@ class _RandomGenerator:
         self.seed = c_int32((x.value & 0x7ffffffe) + 1)
         self.count += 1
         result = self.seed.value
-        print(f'{self.count} {result} {_find_stack()}')
+        # print(f'{self.count} {result} {_find_stack()}')
         return result
 
     def next_int_with_ceiling(self, ceiling: int) -> int:

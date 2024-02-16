@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9f9e5f59c26280111ac38583c691bdad483d70e1eb33b3ec06eb2af5ce19f626"
+            "sha256": "e0258d27c171c317b1ec90cd08d229cebc0a3c7d1eddd7a6da9540bcf2479083"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -40,6 +40,13 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.0.0"
+        },
+        "uapi": {
+            "hashes": [
+                "sha256:4e8f9ad45e39026334c5c32b2a919fa7de2d86270958fe7eb88cd021f878d3d0"
+            ],
+            "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
+            "version": "==0.0.1"
         }
     },
     "develop": {

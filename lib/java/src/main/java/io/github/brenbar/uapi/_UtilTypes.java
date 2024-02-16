@@ -58,7 +58,7 @@ class _RandomGenerator {
         this.seed = (x & 0x7ffffffe) + 1;
         this.count += 1;
         var result = this.seed;
-        System.out.println("%d %d %s".formatted(count, result, findStack()));
+        // System.out.println("%d %d %s".formatted(count, result, findStack()));
         return result;
     }
 

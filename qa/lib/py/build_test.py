@@ -21,7 +21,7 @@ def start(nats_url):
                          '-m', 'build'], cwd=target_path)
     s.wait()
 
-    s2 = subprocess.Popen(['pipenv', 'install', './../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl', '--skip-lock'], cwd=this_path)
+    s2 = subprocess.Popen(['pipenv', 'install', './../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl', '--clear'], cwd=this_path)
     s2.wait()
     
     p = subprocess.Popen(['pipenv', 'run', 'python',
