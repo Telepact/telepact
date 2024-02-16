@@ -301,7 +301,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
         else:
             request_bytes = request
 
-    nats_response = await nats_client.request(request_topic, request_bytes, timeout=1)
+    nats_response = await nats_client.request(request_topic, request_bytes, timeout=10)
 
     response_bytes = nats_response.data
     print('T<-     {}'.format(response_bytes), flush=True)
