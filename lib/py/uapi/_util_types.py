@@ -15,11 +15,23 @@ class _SchemaParseFailure:
         self.data = data
 
 
+def _find_stack() -> str:
+    i = 0
+    for stack in inspect.stack():
+        i += 1
+        if i == 1:
+            continue
+        stack_str = f'{stack}'
+        if not '_util_types.py' in stack_str:
+            return f'{stack.function}'
+
+
 class _RandomGenerator:
     def __init__(self, collection_length_min: int, collection_length_max: int):
         self.set_seed(0)
         self.collection_length_min = collection_length_min
         self.collection_length_max = collection_length_max
+        self.count = 0
 
     def set_seed(self, seed: int):
         self.seed = c_int32((seed & 0x7ffffffe) + 1)
@@ -30,7 +42,10 @@ class _RandomGenerator:
         x = c_int32(x.value ^ (x.value >> 17))
         x = c_int32(x.value ^ (x.value << 5))
         self.seed = c_int32((x.value & 0x7ffffffe) + 1)
-        return self.seed.value
+        self.count += 1
+        result = self.seed.value
+        print(f'{self.count} {result} {_find_stack()}')
+        return result
 
     def next_int_with_ceiling(self, ceiling: int) -> int:
         if ceiling == 0:

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e0258d27c171c317b1ec90cd08d229cebc0a3c7d1eddd7a6da9540bcf2479083"
+            "sha256": "9f9e5f59c26280111ac38583c691bdad483d70e1eb33b3ec06eb2af5ce19f626"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -40,13 +40,6 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.0.0"
-        },
-        "uapi": {
-            "hashes": [
-                "sha256:83221bdd0c6e33a0bf0c59e6be9e0c749f5e96c3e1785f9757987e3219bc060c"
-            ],
-            "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
-            "version": "==0.0.1"
         }
     },
     "develop": {
@@ -114,18 +107,18 @@
         },
         "nats-py": {
             "hashes": [
-                "sha256:7c535fb62d8dc9c743b4afb42775d9f36924f6a1ca1486efdd2e29f1e4ee30b8"
+                "sha256:d435bf36a76f8ad00fc63de9d4148c18f187bb45a9a8bcba7f487c12f9c96fcd"
             ],
             "index": "pypi",
-            "version": "==2.6.0"
+            "version": "==2.7.0"
         },
         "prometheus-client": {
             "hashes": [
-                "sha256:4585b0d1223148c27a225b10dbec5ae9bc4c81a99a3fa80774fa6209935324e1",
-                "sha256:c88b1e6ecf6b41cd8fb5731c7ae919bf66df6ec6fafa555cd6c0e16ca169ae92"
+                "sha256:287629d00b147a32dcb2be0b9df905da599b2d82f80377083ec8463309a4bb89",
+                "sha256:cde524a85bce83ca359cc837f28b8c0db5cac7aa653a588fd7e84ba061c329e7"
             ],
             "index": "pypi",
-            "version": "==0.19.0"
+            "version": "==0.20.0"
         }
     }
 }
