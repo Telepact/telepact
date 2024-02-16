@@ -879,7 +879,7 @@ export function parseUApiSchema(
       try {
         def = asMap(definition);
       } catch (e) {
-        const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, definition, "any");
+        const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, definition, "Object");
         parseFailures.push(...thisParseFailures);
         continue;
       }
