@@ -29,7 +29,7 @@ class _RandomGenerator:
         x = c_int32(x.value ^ (x.value << 13))
         x = c_int32(x.value ^ (x.value >> 17))
         x = c_int32(x.value ^ (x.value << 5))
-        self.seed = x
+        self.seed = c_int32((x.value & 0x7fffffff) + 1)
         return self.seed.value
 
     def next_int_with_ceiling(self, ceiling: int) -> int:

@@ -38,7 +38,7 @@ class _RandomGenerator {
         x ^= x << 13;
         x ^= x >> 17;
         x ^= x << 5;
-        this.seed = x;
+        this.seed = (x & 0x7fffffff) + 1;
         return this.seed;
     }
 
