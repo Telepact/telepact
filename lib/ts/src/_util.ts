@@ -900,7 +900,6 @@ export function parseUApiSchema(
       if (matchingSchemaKey) {
         const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
         const finalPath = append(loopPath, schemaKey);
-        console.log(otherPathIndex);
   
         parseFailures.push(new _SchemaParseFailure(
           finalPath,
@@ -1051,7 +1050,6 @@ export function packBody(body: Map<any, any>): Map<any, any> {
 }
 
 export function pack(value: any): any {
-    console.log(`pack: ${value}`);
     if (Array.isArray(value)) {
         return packList(value);
     } else if (value instanceof Map) {
@@ -1087,7 +1085,6 @@ export function packList(list: any[]): any[] {
     try {
         for (const e of list) {
             if (e instanceof Map) {
-                console.log(`e: ${JSON.stringify([...e.entries()])}`);
                 const row = packMap(e, header, keyIndexMap);
 
                 packedList.push(row);
@@ -1194,11 +1191,7 @@ export function unpackList(list: any[]): any[] {
         return list;
     }
 
-    console.log(`unpackList: ${JSON.stringify(list)}`)
-    console.log(`list[0]: ${list[0]}`);
-
     if (!(list[0] instanceof MsgpackPacked)) {
-        console.log("Not instance of packed list")
         const newList: any[] = [];
         for (const e of list) {
             newList.push(unpack(e));
@@ -1226,8 +1219,6 @@ export function unpackMap(row: any[], header: any[]): Map<any, any> {
     for (let j = 0; j < row.length; j += 1) {
         const key = header[j + 1];
         const value = row[j];
-        console.log(`key: ${JSON.stringify(key)}`);
-        console.log(`value: ${JSON.stringify(value)}`);
 
         if (value instanceof MsgpackUndefined) {
             continue;
@@ -1513,7 +1504,6 @@ export function serialize(message: Message, binaryEncoder: _BinaryEncoder, seria
     const messageAsPseudoJson: any[] = [message.header, message.body];
 
     try {
-        console.log(`serializeAsBinary: ${serializeAsBinary}`);
         if (serializeAsBinary) {
             try {
                 const encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
@@ -1539,7 +1529,6 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         if (messageBytes[0] === 0x92) { // MsgPack
             isMsgPack = true;
             messageAsPseudoJson = serializer.fromMsgPack(messageBytes);
-            console.log(`messageAsPseudoJson: ${messageAsPseudoJson}`)
         } else {
             isMsgPack = false;
             messageAsPseudoJson = serializer.fromJson(messageBytes);
@@ -1575,8 +1564,6 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         throw new _InvalidMessage(e);
     }
 
-    console.log(`headers: ${headers}`)
-
     try {
         body = asMap(finalMessageAsPseudoJsonList[1]);
         if (Object.keys(body).length !== 1) {
@@ -1593,8 +1580,6 @@ export function deserialize(messageBytes: Uint8Array, serializer: SerializationI
         }
         throw new _InvalidMessage(e);
     }
-
-    console.log(`body: ${body}`)
 
     return new Message(headers, body);
 }
@@ -1945,7 +1930,6 @@ export function validateArray(value: any, typeParameters: Array<_UTypeDeclaratio
         }
         return validationFailures;
     } else {
-        console.log(`value: ${JSON.stringify(value)}`);
         return getTypeUnexpectedValidationFailure([], value, _ARRAY_NAME);
     }
 }
@@ -2578,9 +2562,7 @@ export async function handleMessage(
         return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType, responseHeaders);
     }
 
-    console.log(`requestHeaders: ${JSON.stringify(requestHeaders)}`);
     if (requestHeaders.hasOwnProperty("_bin")) {
-        console.log("Including binary...");
         const clientKnownBinaryChecksums = requestHeaders["_bin"] as unknown as Array<any>;
 
         responseHeaders["_binary"] = true;
