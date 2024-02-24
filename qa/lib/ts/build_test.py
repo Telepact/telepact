@@ -11,8 +11,15 @@ this_env = os.environ.copy()
 def start(nats_url):
     this_env['NATS_URL'] = nats_url
 
+    s1 = subprocess.Popen(['npm', 'uninstall', 'uapi'], cwd=this_path)
+    s1.wait()
+
     s = subprocess.Popen(['npm', 'run', 'build'], cwd=target_path)
     s.wait()
+
+    s2 = subprocess.Popen(['npm', 'install', '--no-save', './../../../lib/ts/uapi-1.0.0.tgz'], cwd=this_path)
+    s2.wait()
+
     p = subprocess.Popen(['npm', 'start'], cwd=this_path, env=this_env)
 
     return p
