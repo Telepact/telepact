@@ -2,7 +2,15 @@
   "name": "uapi",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.js",
+      "default": "./index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "types": "lib/src/mod.d.ts",
   "scripts": {
     "prepare": "mkdir -p inc && cp ../../common/* ./inc/",
