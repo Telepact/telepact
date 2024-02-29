@@ -9,3 +9,4 @@ export * from "./SerializationError";
 export * from "./SerializationImpl";
 export * from "./UApiSchema";
 export * from "./UApiSchemaParseError";
+export {default as jsonSchema} from "../inc/json-schema.json";
