@@ -54,9 +54,13 @@ export class _RandomGenerator {
     }
 
     nextString(): string {
-        const bytes = Buffer.alloc(4);
-        bytes.writeInt32BE(this.nextInt());
-        return bytes.toString('base64').replace(/=/g, '');
+        const buffer = new ArrayBuffer(4);
+        const view = new DataView(buffer);
+        view.setInt32(0, this.nextInt());
+        
+        const byteArray = new Uint8Array(buffer);
+        const base64String = btoa(String.fromCharCode.apply(null, byteArray));
+        return base64String.replace(/=/g, '');
     }
 
     nextDouble(): number {
