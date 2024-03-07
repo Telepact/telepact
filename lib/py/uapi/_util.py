@@ -5,6 +5,7 @@ from collections import OrderedDict, defaultdict
 from hashlib import sha256
 import json
 import uapi
+import uapi._random_generator as _rg
 import uapi._util_types as _types
 import uapi.types as types
 import re
@@ -1290,14 +1291,14 @@ def validate_value_of_type(value: Any, generics: List[_types._UTypeDeclaration],
         return this_type.validate(value, type_parameters, generics)
 
 
-def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: bool, include_random_optional_fields: bool, generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator, this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> Any:
+def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, generics: List[_types._UTypeDeclaration], random_generator: _rg._RandomGenerator, this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> Any:
     if nullable and not use_blueprint_value and random_generator.next_boolean():
         return None
     else:
-        return this_type.generate_random_value(blueprint_value, use_blueprint_value, include_random_optional_fields, type_parameters, generics, random_generator)
+        return this_type.generate_random_value(blueprint_value, use_blueprint_value, include_optional_fields, randomize_optional_fields, type_parameters, generics, random_generator)
 
 
-def generate_random_any(random_generator: _types._RandomGenerator) -> Any:
+def generate_random_any(random_generator: _rg._RandomGenerator) -> Any:
     select_type = random_generator.next_int_with_ceiling(3)
     if select_type == 0:
         return random_generator.next_boolean()
@@ -1314,7 +1315,7 @@ def validate_boolean(value: Any) -> List[_types._ValidationFailure]:
         return get_type_unexpected_validation_failure([], value, _BOOLEAN_NAME)
 
 
-def generate_random_boolean(blueprint_value: Any, use_blueprint_value: bool, random_generator: _types._RandomGenerator) -> Any:
+def generate_random_boolean(blueprint_value: Any, use_blueprint_value: bool, random_generator: _rg._RandomGenerator) -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
@@ -1332,7 +1333,7 @@ def validate_integer(value: Any) -> List[_types._ValidationFailure]:
 
 
 def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,
-                            random_generator: _types._RandomGenerator) -> Any:
+                            random_generator: _rg._RandomGenerator) -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
@@ -1353,7 +1354,7 @@ def validate_number(value: Any) -> List[_types._ValidationFailure]:
 
 
 def generate_random_number(blueprint_value: Any, use_blueprint_value: bool,
-                           random_generator: _types._RandomGenerator) -> Any:
+                           random_generator: _rg._RandomGenerator) -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
@@ -1368,7 +1369,7 @@ def validate_string(value: Any) -> List[_types._ValidationFailure]:
 
 
 def generate_random_string(blueprint_value: Any, use_blueprint_value: bool,
-                           random_generator: _types._RandomGenerator) -> str:
+                           random_generator: _rg._RandomGenerator) -> str:
     if use_blueprint_value:
         return blueprint_value
     else:
@@ -1400,20 +1401,20 @@ def validate_array(value: Any, type_parameters: List[_types._UTypeDeclaration],
 
 
 def generate_random_array(blueprint_value: Any, use_blueprint_value: bool,
-                          include_random_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
-                          generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator) -> List[Any]:
+                          include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
+                          generics: List[_types._UTypeDeclaration], random_generator: _rg._RandomGenerator) -> List[Any]:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:
         starting_array = blueprint_value
         array = [nested_type_declaration.generate_random_value(starting_array_value, True,
-                                                               include_random_optional_fields, generics,
+                                                               include_optional_fields, randomize_optional_fields, generics,
                                                                random_generator)
                  for starting_array_value in starting_array]
         return array
     else:
         length = random_generator.next_collection_length()
-        array = [nested_type_declaration.generate_random_value(None, False, include_random_optional_fields,
+        array = [nested_type_declaration.generate_random_value(None, False, include_optional_fields, randomize_optional_fields,
                                                                generics, random_generator)
                  for _ in range(length)]
         return array
@@ -1443,21 +1444,21 @@ def validate_object(value: Any, type_parameters: List[_types._UTypeDeclaration],
 
 
 def generate_random_object(blueprint_value: Any, use_blueprint_value: bool,
-                           include_random_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
-                           generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator) -> Dict[str, Any]:
+                           include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
+                           generics: List[_types._UTypeDeclaration], random_generator: _rg._RandomGenerator) -> Dict[str, Any]:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:
         starting_obj = blueprint_value
         obj = {key: nested_type_declaration.generate_random_value(starting_obj_value, True,
-                                                                  include_random_optional_fields, generics,
+                                                                  include_optional_fields, randomize_optional_fields, generics,
                                                                   random_generator)
                for key, starting_obj_value in starting_obj.items()}
         return obj
     else:
         length = random_generator.next_collection_length()
         obj = {random_generator.next_string(): nested_type_declaration.generate_random_value(None, False,
-                                                                                             include_random_optional_fields,
+                                                                                             include_optional_fields, randomize_optional_fields,
                                                                                              generics, random_generator)
                for _ in range(length)}
         return obj
@@ -1508,21 +1509,21 @@ def validate_struct_fields(fields: Dict[str, _types._UFieldDeclaration],
 
 
 def generate_random_struct(blueprint_value: Any, use_blueprint_value: bool,
-                           include_random_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
-                           generics: List[_types._UTypeDeclaration], random_generator: _types._RandomGenerator,
+                           include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
+                           generics: List[_types._UTypeDeclaration], random_generator: _rg._RandomGenerator,
                            fields: Dict[str, _types._UFieldDeclaration]) -> Dict[str, Any]:
     if use_blueprint_value:
         starting_struct_value = blueprint_value
-        return construct_random_struct(fields, starting_struct_value, include_random_optional_fields,
+        return construct_random_struct(fields, starting_struct_value, include_optional_fields, randomize_optional_fields,
                                        type_parameters, random_generator)
     else:
-        return construct_random_struct(fields, {}, include_random_optional_fields,
+        return construct_random_struct(fields, {}, include_optional_fields, randomize_optional_fields,
                                        type_parameters, random_generator)
 
 
 def construct_random_struct(reference_struct: Dict[str, _types._UFieldDeclaration], starting_struct: Dict[str, Any],
-                            include_random_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
-                            random_generator: _types._RandomGenerator) -> Dict[str, Any]:
+                            include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_types._UTypeDeclaration],
+                            random_generator: _rg._RandomGenerator) -> Dict[str, Any]:
     sorted_reference_struct = sorted(
         reference_struct.items(), key=lambda x: x[0])
 
@@ -1534,22 +1535,19 @@ def construct_random_struct(reference_struct: Dict[str, _types._UFieldDeclaratio
 
         if use_blueprint_value:
             value = type_declaration.generate_random_value(blueprint_value, use_blueprint_value,
-                                                           include_random_optional_fields, type_parameters,
+                                                           include_optional_fields, randomize_optional_fields, type_parameters,
                                                            random_generator)
         else:
             if not field_declaration.optional:
                 value = type_declaration.generate_random_value(None, False,
-                                                               include_random_optional_fields, type_parameters,
+                                                               include_optional_fields, randomize_optional_fields, type_parameters,
                                                                random_generator)
             else:
-                if not include_random_optional_fields:
-                    continue
-
-                if random_generator.next_boolean():
+                if not include_optional_fields or (randomize_optional_fields and random_generator.next_boolean()):
                     continue
 
                 value = type_declaration.generate_random_value(None, False,
-                                                               include_random_optional_fields, type_parameters,
+                                                               include_optional_fields, randomize_optional_fields, type_parameters,
                                                                random_generator)
 
         obj[field_name] = value
@@ -1608,30 +1606,30 @@ def validate_union_struct(union_struct: _types._UStruct,
 
 
 def generate_random_union(blueprint_value: Any, use_blueprint_value: bool,
-                          include_random_optional_fields: bool,
+                          include_optional_fields: bool, randomize_optional_fields: bool,
                           type_parameters: List[Any],
                           generics: List[_types._UTypeDeclaration],
-                          random_generator: _types._RandomGenerator,
+                          random_generator: _rg._RandomGenerator,
                           cases: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
     if use_blueprint_value:
         starting_union_case = blueprint_value
-        return construct_random_union(cases, starting_union_case, include_random_optional_fields,
+        return construct_random_union(cases, starting_union_case, include_optional_fields, randomize_optional_fields,
                                       type_parameters, random_generator)
     else:
-        return construct_random_union(cases, {}, include_random_optional_fields,
+        return construct_random_union(cases, {}, include_optional_fields, randomize_optional_fields,
                                       type_parameters, random_generator)
 
 
 def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
                            starting_union: Dict[str, Any],
-                           include_random_optional_fields: bool,
+                           include_optional_fields: bool, randomize_optional_fields: bool,
                            type_parameters: List[Any],
-                           random_generator: _types._RandomGenerator) -> Dict[str, Any]:
+                           random_generator: _rg._RandomGenerator) -> Dict[str, Any]:
     if starting_union:
         union_case, union_starting_struct = union_entry(starting_union)
         union_struct_type: _types._UStruct = union_cases_reference[union_case]
         return {union_case: construct_random_struct(union_struct_type.fields, union_starting_struct,
-                                                    include_random_optional_fields, type_parameters,
+                                                    include_optional_fields, randomize_optional_fields, type_parameters,
                                                     random_generator)}
     else:
         sorted_union_cases_reference = sorted(
@@ -1640,16 +1638,16 @@ def construct_random_union(union_cases_reference: Dict[str, Dict[str, Any]],
             len(sorted_union_cases_reference) - 1)
         union_case, union_data = sorted_union_cases_reference[random_index]
         return {union_case: construct_random_struct(union_data.fields, {},
-                                                    include_random_optional_fields, type_parameters,
+                                                    include_optional_fields, randomize_optional_fields, type_parameters,
                                                     random_generator)}
 
 
 def generate_random_fn(blueprint_value: Any,
                        use_blueprint_value: bool,
-                       include_random_optional_fields: bool,
+                       include_optional_fields: bool, randomize_optional_fields: bool,
                        type_parameters: List[_types._UTypeDeclaration],
                        generics: List[_types._UTypeDeclaration],
-                       random: _types._RandomGenerator,
+                       random: _rg._RandomGenerator,
                        call_cases: Dict[str, _types._UStruct]) -> Dict[str, Any]:
     if use_blueprint_value:
         starting_fn_value = blueprint_value
@@ -1658,7 +1656,7 @@ def generate_random_fn(blueprint_value: Any,
 
     return generate_random_union(starting_fn_value,
                                  use_blueprint_value,
-                                 include_random_optional_fields,
+                                 include_optional_fields, randomize_optional_fields,
                                  type_parameters,
                                  generics,
                                  random,
@@ -2154,7 +2152,8 @@ def verify_no_more_interactions(invocations: List[_types._MockInvocation]) -> Di
 
 
 async def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub], invocations: List[_types._MockInvocation],
-                      random: _types._RandomGenerator, u_api_schema: 'types.UApiSchema', enable_generated_default_stub: bool) -> 'types.Message':
+                      random: _rg._RandomGenerator, u_api_schema: 'types.UApiSchema', enable_generated_default_stub: bool, 
+                      enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'types.Message':
     header: Dict[str, Any] = request_message.header
 
     enable_generation_stub: bool = header.get(
@@ -2227,20 +2226,20 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
                 if stub.allow_argument_partial_match:
                     if is_sub_map(stub.when_argument, argument):
                         use_blueprint_value = True
-                        include_random_optional_fields = False
+                        include_optional_fields = False
                         result = definition.result.generate_random_value(
                             stub.then_result, use_blueprint_value,
-                            include_random_optional_fields, [], [], random)
+                            include_optional_fields, randomize_optional_field_generation, [], [], random)
                         if stub.count > 0:
                             stub.count -= 1
                         return types.Message({}, result)
                 else:
                     if stub.when_argument == argument:
                         use_blueprint_value = True
-                        include_random_optional_fields = False
+                        include_optional_fields = False
                         result = definition.result.generate_random_value(
                             stub.then_result, use_blueprint_value,
-                            include_random_optional_fields, [], [], random)
+                            include_optional_fields, randomize_optional_field_generation, [], [], random)
                         if stub.count > 0:
                             stub.count -= 1
                         return types.Message({}, result)
@@ -2252,9 +2251,10 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
             result_union = definition.result
             ok_struct_ref = result_union.cases["Ok"]
             use_blueprint_value = True
-            include_random_optional_fields = True
+            include_optional_fields = True
             random_ok_struct = ok_struct_ref.generate_random_value({}, use_blueprint_value,
-                                                                   include_random_optional_fields, [], [], random)
+                                                                   include_optional_fields, randomize_optional_field_generation, 
+                                                                   [], [], random)
             return types.Message({}, {"Ok": random_ok_struct})
         else:
             raise types.UApiError(

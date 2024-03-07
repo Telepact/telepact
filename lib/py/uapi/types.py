@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uapi
+import uapi._random_generator as _rg
 import uapi._util as _util
 import uapi._util_types as _types
 from typing import Coroutine, List, Dict, Any, Callable, Optional, Union, Tuple, Type
@@ -128,13 +129,17 @@ class MockServer:
         def __init__(self) -> None:
             self.on_error: Callable[[Exception], None] = lambda e: None
             self.enable_message_response_generation: bool = True
+            self.enable_optional_field_generation: bool = True
+            self.randomize_optional_field_generation: bool = True
             self.generated_collection_length_min: int = 0
             self.generated_collection_length_max: int = 3
 
     def __init__(self, u_api_schema: UApiSchema, options: Options) -> None:
-        self.random: _types._RandomGenerator = _types._RandomGenerator(
+        self.random: _rg._RandomGenerator = _rg._RandomGenerator(
             options.generated_collection_length_min, options.generated_collection_length_max)
         self.enableGeneratedDefaultStub: bool = options.enable_message_response_generation
+        self.enable_optional_field_generation: bool = options.enable_optional_field_generation
+        self.randomize_optional_field_generation: bool = options.randomize_optional_field_generation
 
         self.stubs: List[_types._MockStub] = []
         self.invocations: List[str] = []
@@ -170,7 +175,8 @@ class MockServer:
 
     async def _handle(self, request_message: bytes) -> bytes:
         return await _util.mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                       self.server.u_api_schema, self.enableGeneratedDefaultStub)
+                                       self.server.u_api_schema, self.enableGeneratedDefaultStub, 
+                                       self.enable_optional_field_generation, self.randomize_optional_field_generation)
 
 
 class SerializationError(Exception):
