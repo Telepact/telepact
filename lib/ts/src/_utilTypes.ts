@@ -1,3 +1,4 @@
+import { _RandomGenerator } from "./_RandomGenerator";
 import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
 import { _ANY_NAME, _ARRAY_NAME, _BOOLEAN_NAME, _FN_NAME, _INTEGER_NAME, _MOCK_CALL_NAME, _MOCK_STUB_NAME, _OBJECT_NAME, _STRING_NAME, _STRUCT_NAME, _UNION_NAME, clientBinaryDecode, clientBinaryEncode, generateRandomAny, generateRandomArray, generateRandomBoolean, generateRandomFn, generateRandomInteger, generateRandomNumber, generateRandomObject, generateRandomString, generateRandomStruct, generateRandomUnion, generateRandomValueOfType, serverBinaryDecode, serverBinaryEncode, validateArray, validateBoolean, validateInteger, validateMockCall, validateMockStub, validateNumber, validateObject, validateString, validateStruct, validateUnion, validateValueOfType } from "./_util";
 
@@ -7,76 +8,6 @@ export class _SchemaParseFailure {
         public readonly reason: string,
         public readonly data: Record<string, any>
     ) {}
-}
-
-function findStack() {
-    const e = new Error();
-    const stack = e.stack.split('\n');
-    let i = 0;
-    for (const line of stack) {
-        i += 1;
-        if (i < 3) {
-            continue;
-        }
-        if (!line.includes('_RandomGenerator')) {
-            return line;
-        }
-    }
-    throw new Error();
-}
-
-export class _RandomGenerator {
-    seed: number;
-    private collectionLengthMin: number;
-    private collectionLengthMax: number;
-    private count: number = 0;
-
-    constructor(collectionLengthMin: number, collectionLengthMax: number) {
-        this.setSeed(0)
-        this.collectionLengthMin = collectionLengthMin;
-        this.collectionLengthMax = collectionLengthMax;
-    }
-
-    setSeed(seed: number): void {
-        this.seed = (seed & 0x7ffffffe) + 1;
-    }
-
-    nextInt(): number {
-        let x = this.seed;
-        x ^= x << 13;
-        x ^= x >> 17;
-        x ^= x << 5;
-        this.seed = (x & 0x7ffffffe) + 1;
-        this.count += 1;
-        const result = this.seed;
-        // console.log(`${this.count} ${result} ${findStack()}`);
-        return result;
-    }
-
-    nextIntWithCeiling(ceiling: number): number {
-        if (ceiling === 0) {
-            return 0;
-        }
-        return this.nextInt() % ceiling;
-    }
-
-    nextBoolean(): boolean {
-        return this.nextIntWithCeiling(31) > 15;
-    }
-
-    nextString(): string {
-        const bytes = Buffer.alloc(4);
-        bytes.writeInt32BE(this.nextInt());
-        return bytes.toString('base64').replace(/=/g, '');
-    }
-
-    nextDouble(): number {
-        return (this.nextInt() & 0x7fffffff) / 0x7fffffff;
-    }
-
-    nextCollectionLength(): number {
-        return this.nextIntWithCeiling(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
-    }
 }
 
 export interface _UType {

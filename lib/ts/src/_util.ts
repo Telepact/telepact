@@ -1,6 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { _BinaryEncoder, _BinaryEncoderUnavailableError, _BinaryEncoding, _BinaryEncodingMissing, _InvalidMessage, _InvalidMessageBody, _MockInvocation, _MockStub, _RandomGenerator, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion, _ValidationFailure } from './_utilTypes';
+import { _RandomGenerator } from './_RandomGenerator';
+import { _BinaryEncoder, _BinaryEncoderUnavailableError, _BinaryEncoding, _BinaryEncodingMissing, _InvalidMessage, _InvalidMessageBody, _MockInvocation, _MockStub, _SchemaParseFailure, _UAny, _UArray, _UBoolean, _UError, _UFieldDeclaration, _UFn, _UGeneric, _UInteger, _UNumber, _UObject, _UString, _UStruct, _UType, _UTypeDeclaration, _UUnion, _ValidationFailure } from './_utilTypes';
 import { UApiSchemaParseError } from './UApiSchemaParseError';
 import { UApiSchema } from './UApiSchema';
 import crc32 from 'crc-32';
