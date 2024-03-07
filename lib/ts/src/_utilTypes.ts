@@ -1,6 +1,44 @@
 import { _RandomGenerator } from "./_RandomGenerator";
 import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
-import { _ANY_NAME, _ARRAY_NAME, _BOOLEAN_NAME, _FN_NAME, _INTEGER_NAME, _MOCK_CALL_NAME, _MOCK_STUB_NAME, _OBJECT_NAME, _STRING_NAME, _STRUCT_NAME, _UNION_NAME, clientBinaryDecode, clientBinaryEncode, generateRandomAny, generateRandomArray, generateRandomBoolean, generateRandomFn, generateRandomInteger, generateRandomNumber, generateRandomObject, generateRandomString, generateRandomStruct, generateRandomUnion, generateRandomValueOfType, serverBinaryDecode, serverBinaryEncode, validateArray, validateBoolean, validateInteger, validateMockCall, validateMockStub, validateNumber, validateObject, validateString, validateStruct, validateUnion, validateValueOfType } from "./_util";
+import {
+    _ANY_NAME,
+    _ARRAY_NAME,
+    _BOOLEAN_NAME,
+    _FN_NAME,
+    _INTEGER_NAME,
+    _MOCK_CALL_NAME,
+    _MOCK_STUB_NAME,
+    _OBJECT_NAME,
+    _STRING_NAME,
+    _STRUCT_NAME,
+    _UNION_NAME,
+    clientBinaryDecode,
+    clientBinaryEncode,
+    generateRandomAny,
+    generateRandomArray,
+    generateRandomBoolean,
+    generateRandomFn,
+    generateRandomInteger,
+    generateRandomNumber,
+    generateRandomObject,
+    generateRandomString,
+    generateRandomStruct,
+    generateRandomUnion,
+    generateRandomValueOfType,
+    serverBinaryDecode,
+    serverBinaryEncode,
+    validateArray,
+    validateBoolean,
+    validateInteger,
+    validateMockCall,
+    validateMockStub,
+    validateNumber,
+    validateObject,
+    validateString,
+    validateStruct,
+    validateUnion,
+    validateValueOfType,
+} from "./_util";
 
 export class _SchemaParseFailure {
     constructor(
@@ -12,11 +50,16 @@ export class _SchemaParseFailure {
 
 export interface _UType {
     getTypeParameterCount(): number;
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[];
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[];
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
@@ -38,14 +81,16 @@ export class _UTypeDeclaration {
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
     ): any {
         return generateRandomValueOfType(
             blueprintValue,
             useBlueprintValue,
-            includeRandomOptionalFields,
+            includeOptionalFields,
+            randomizeOptionalFields,
             generics,
             randomGenerator,
             this.type,
@@ -55,7 +100,6 @@ export class _UTypeDeclaration {
     }
 }
 
-
 export interface _UFieldDeclaration {
     readonly fieldName: string;
     readonly typeDeclaration: _UTypeDeclaration;
@@ -63,9 +107,11 @@ export interface _UFieldDeclaration {
 }
 
 export class _ValidationFailure {
-    constructor(public readonly path: any[],
-    public readonly reason: string,
-    public readonly data: Record<string, any>) {}
+    constructor(
+        public readonly path: any[],
+        public readonly reason: string,
+        public readonly data: Record<string, any>
+    ) {}
 }
 
 export class _UGeneric implements _UType {
@@ -75,7 +121,11 @@ export class _UGeneric implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         const typeDeclaration = generics[this.index]!;
         return typeDeclaration.validate(value, []);
     }
@@ -83,7 +133,8 @@ export class _UGeneric implements _UType {
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
@@ -92,7 +143,8 @@ export class _UGeneric implements _UType {
         return genericTypeDeclaration.generateRandomValue(
             blueprintValue,
             useBlueprintValue,
-            includeRandomOptionalFields,
+            includeOptionalFields,
+            randomizeOptionalFields,
             [],
             randomGenerator
         );
@@ -109,14 +161,19 @@ export class _UAny implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return [];
     }
 
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
@@ -134,11 +191,23 @@ export class _UBoolean implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateBoolean(value);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], randomGenerator: _RandomGenerator): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
         return generateRandomBoolean(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
@@ -152,11 +221,23 @@ export class _UInteger implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateInteger(value);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], randomGenerator: _RandomGenerator): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
         return generateRandomInteger(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
@@ -170,11 +251,23 @@ export class _UNumber implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateNumber(value);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], randomGenerator: _RandomGenerator): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
         return generateRandomNumber(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
@@ -188,11 +281,23 @@ export class _UString implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateString(value);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], randomGenerator: _RandomGenerator): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
         return generateRandomString(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
@@ -206,12 +311,32 @@ export class _UArray implements _UType {
         return 1;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateArray(value, typeParameters, generics);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], randomGenerator: _RandomGenerator): any {
-        return generateRandomArray(blueprintValue, useBlueprintValue, includeRandomOptionalFields, typeParameters, generics, randomGenerator);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
+        return generateRandomArray(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
+            typeParameters,
+            generics,
+            randomGenerator
+        );
     }
 
     getName(generics: _UTypeDeclaration[]): string {
@@ -224,12 +349,32 @@ export class _UObject implements _UType {
         return 1;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateObject(value, typeParameters, generics);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], randomGenerator: _RandomGenerator): any {
-        return generateRandomObject(blueprintValue, useBlueprintValue, includeRandomOptionalFields, typeParameters, generics, randomGenerator);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
+        return generateRandomObject(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
+            typeParameters,
+            generics,
+            randomGenerator
+        );
     }
 
     getName(generics: _UTypeDeclaration[]): string {
@@ -238,18 +383,43 @@ export class _UObject implements _UType {
 }
 
 export class _UStruct implements _UType {
-    constructor(public readonly name: string, public readonly fields: Record<string, _UFieldDeclaration>, public readonly typeParameterCount: number) {}
+    constructor(
+        public readonly name: string,
+        public readonly fields: Record<string, _UFieldDeclaration>,
+        public readonly typeParameterCount: number
+    ) {}
 
     getTypeParameterCount(): number {
         return this.typeParameterCount;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateStruct(value, typeParameters, generics, this.fields);
     }
 
-    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, includeRandomOptionalFields: boolean, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[], random: _RandomGenerator): any {
-        return generateRandomStruct(blueprintValue, useBlueprintValue, includeRandomOptionalFields, typeParameters, generics, random, this.fields);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        random: _RandomGenerator
+    ): any {
+        return generateRandomStruct(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
+            typeParameters,
+            generics,
+            random,
+            this.fields
+        );
     }
 
     getName(generics: _UTypeDeclaration[]): string {
@@ -258,20 +428,29 @@ export class _UStruct implements _UType {
 }
 
 export class _UUnion implements _UType {
-    constructor(public readonly name: string, public readonly cases: Record<string, _UStruct>, public readonly typeParameterCount: number) {}
+    constructor(
+        public readonly name: string,
+        public readonly cases: Record<string, _UStruct>,
+        public readonly typeParameterCount: number
+    ) {}
 
     getTypeParameterCount(): number {
         return this.typeParameterCount;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateUnion(value, typeParameters, generics, this.cases);
     }
 
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         random: _RandomGenerator
@@ -279,7 +458,8 @@ export class _UUnion implements _UType {
         return generateRandomUnion(
             blueprintValue,
             useBlueprintValue,
-            includeRandomOptionalFields,
+            includeOptionalFields,
+            randomizeOptionalFields,
             typeParameters,
             generics,
             random,
@@ -309,14 +489,19 @@ export class _UFn implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return this.call.validate(value, typeParameters, generics);
     }
 
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
@@ -324,7 +509,8 @@ export class _UFn implements _UType {
         return generateRandomFn(
             blueprintValue,
             useBlueprintValue,
-            includeRandomOptionalFields,
+            includeOptionalFields,
+            randomizeOptionalFields,
             typeParameters,
             generics,
             randomGenerator,
@@ -348,14 +534,19 @@ export class _UMockCall implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateMockCall(value, typeParameters, generics, this.types);
     }
 
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
@@ -379,14 +570,19 @@ export class _UMockStub implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateMockStub(value, typeParameters, generics, this.types);
     }
 
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
-        includeRandomOptionalFields: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
@@ -431,7 +627,7 @@ export class _BinaryEncodingMissing extends Error {
 
 export class _InvalidMessage extends Error {
     constructor(cause?: Error) {
-        super("Invalid Message", {cause: cause})
+        super("Invalid Message", { cause: cause });
     }
 }
 
@@ -439,13 +635,15 @@ export class _InvalidMessageBody extends Error {}
 
 export class _BinaryEncoding {
     public readonly encodeMap: Map<string, number>;
-    public readonly decodeMap: Map<number,string>;
+    public readonly decodeMap: Map<number, string>;
     public readonly checksum: number;
 
     constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
         this.encodeMap = binaryEncodingMap;
-        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [e[1], e[0]]);
-        this.decodeMap = new Map(decodeList)
+        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map(
+            (e: [string, number]) => [e[1], e[0]]
+        );
+        this.decodeMap = new Map(decodeList);
         this.checksum = checksum;
     }
 }
@@ -490,8 +688,13 @@ export class _ClientBinaryEncoder implements _BinaryEncoder {
 }
 
 export class _MockStub {
-    constructor(public readonly whenFunction: string, public readonly whenArgument: Record<string, any>, public readonly thenResult: Record<string, any>,
-                public readonly allowArgumentPartialMatch: boolean, public count: number) {}
+    constructor(
+        public readonly whenFunction: string,
+        public readonly whenArgument: Record<string, any>,
+        public readonly thenResult: Record<string, any>,
+        public readonly allowArgumentPartialMatch: boolean,
+        public count: number
+    ) {}
 }
 
 export class _MockInvocation {
