@@ -29,6 +29,16 @@ public class MockServer {
         public boolean enableMessageResponseGeneration = true;
 
         /**
+         * Flag to indicate if optional fields should be included in generated responses.
+         */
+        public boolean enableOptionalFieldGeneration = true;
+
+        /**
+         * Flag to indicate if optional fields, if enabled for generation, should be randomly generated rather than always.
+         */
+        public boolean randomizeOptionalFieldGeneration = true;
+
+        /**
          * Minimum length for randomly generated arrays and objects.
          */
         public int generatedCollectionLengthMin = 0;
@@ -42,6 +52,8 @@ public class MockServer {
     private final Server server;
     private final _RandomGenerator random;
     private final boolean enableGeneratedDefaultStub;
+    private final boolean enableOptionalFieldGeneration;
+    private final boolean randomizeOptionalFieldGeneration;
 
     private final List<_MockStub> stubs = new ArrayList<>();
     private final List<_MockInvocation> invocations = new ArrayList<>();
@@ -54,6 +66,8 @@ public class MockServer {
     public MockServer(UApiSchema uApiSchema, Options options) {
         this.random = new _RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
+        this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
+        this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
         final var parsedTypes = new HashMap<String, _UType>();
         final var typeExtensions = new HashMap<String, _UType>();
@@ -87,6 +101,6 @@ public class MockServer {
 
     private Message handle(Message requestMessage) {
         return _Util.mockHandle(requestMessage, this.stubs, this.invocations, this.random,
-                this.server.uApiSchema, this.enableGeneratedDefaultStub);
+                this.server.uApiSchema, this.enableGeneratedDefaultStub, this.enableOptionalFieldGeneration, this.randomizeOptionalFieldGeneration);
     }
 }

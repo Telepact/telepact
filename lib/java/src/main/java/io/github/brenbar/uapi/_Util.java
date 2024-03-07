@@ -1656,13 +1656,13 @@ class _Util {
     }
 
     static Object generateRandomValueOfType(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
             List<_UTypeDeclaration> typeParameters) {
         if (nullable && !useBlueprintValue && randomGenerator.nextBoolean()) {
             return null;
         } else {
-            return thisType.generateRandomValue(blueprintValue, useBlueprintValue, includeRandomOptionalFields,
+            return thisType.generateRandomValue(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
                     typeParameters, generics, randomGenerator);
         }
     }
@@ -1781,7 +1781,7 @@ class _Util {
     }
 
     static Object generateRandomArray(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
@@ -1792,7 +1792,7 @@ class _Util {
             final var array = new ArrayList<Object>();
             for (final var startingArrayValue : startingArray) {
                 final var value = nestedTypeDeclaration.generateRandomValue(startingArrayValue, true,
-                        includeRandomOptionalFields, generics, randomGenerator);
+                        includeOptionalFields, randomizeOptionalFields, generics, randomGenerator);
 
                 array.add(value);
             }
@@ -1804,7 +1804,7 @@ class _Util {
             final var array = new ArrayList<Object>();
             for (int i = 0; i < length; i += 1) {
                 final var value = nestedTypeDeclaration.generateRandomValue(null, false,
-                        includeRandomOptionalFields,
+                        includeOptionalFields, randomizeOptionalFields,
                         generics, randomGenerator);
 
                 array.add(value);
@@ -1842,7 +1842,7 @@ class _Util {
     }
 
     static Object generateRandomObject(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
 
@@ -1854,7 +1854,7 @@ class _Util {
                 final var key = startingObjEntry.getKey();
                 final var startingObjValue = startingObjEntry.getValue();
                 final var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
-                        includeRandomOptionalFields, generics, randomGenerator);
+                        includeOptionalFields, randomizeOptionalFields, generics, randomGenerator);
                 obj.put(key, value);
             }
 
@@ -1865,7 +1865,7 @@ class _Util {
             final var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
                 final var key = randomGenerator.nextString();
-                final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeRandomOptionalFields,
+                final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeOptionalFields, randomizeOptionalFields,
                         generics, randomGenerator);
                 obj.put(key, value);
             }
@@ -1937,22 +1937,22 @@ class _Util {
     }
 
     static Object generateRandomStruct(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator,
             Map<String, _UFieldDeclaration> fields) {
         if (useBlueprintValue) {
             final var startingStructValue = (Map<String, Object>) blueprintValue;
-            return constructRandomStruct(fields, startingStructValue, includeRandomOptionalFields,
+            return constructRandomStruct(fields, startingStructValue, includeOptionalFields, randomizeOptionalFields,
                     typeParameters, randomGenerator);
         } else {
-            return constructRandomStruct(fields, new HashMap<>(), includeRandomOptionalFields,
+            return constructRandomStruct(fields, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
                     typeParameters, randomGenerator);
         }
     }
 
     static Map<String, Object> constructRandomStruct(
             Map<String, _UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             _RandomGenerator randomGenerator) {
 
         final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
@@ -1969,20 +1969,20 @@ class _Util {
             final Object value;
             if (useBlueprintValue) {
                 value = typeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
-                        includeRandomOptionalFields, typeParameters, randomGenerator);
+                        includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
             } else {
                 if (!fieldDeclaration.optional) {
                     value = typeDeclaration.generateRandomValue(null, false,
-                            includeRandomOptionalFields, typeParameters, randomGenerator);
+                            includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
                 } else {
-                    if (!includeRandomOptionalFields) {
+                    if (!includeOptionalFields) {
                         continue;
                     }
                     if (randomGenerator.nextBoolean()) {
                         continue;
                     }
                     value = typeDeclaration.generateRandomValue(null, false,
-                            includeRandomOptionalFields, typeParameters, randomGenerator);
+                            includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
                 }
             }
 
@@ -2050,22 +2050,22 @@ class _Util {
     }
 
     static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator, Map<String, _UStruct> cases) {
         if (useBlueprintValue) {
             final var startingUnionCase = (Map<String, Object>) blueprintValue;
-            return constructRandomUnion(cases, startingUnionCase, includeRandomOptionalFields,
+            return constructRandomUnion(cases, startingUnionCase, includeOptionalFields, randomizeOptionalFields,
                     typeParameters, randomGenerator);
         } else {
-            return constructRandomUnion(cases, new HashMap<>(), includeRandomOptionalFields,
+            return constructRandomUnion(cases, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
                     typeParameters, randomGenerator);
         }
     }
 
     static Map<String, Object> constructRandomUnion(Map<String, _UStruct> unionCasesReference,
             Map<String, Object> startingUnion,
-            boolean includeRandomOptionalFields,
+            boolean includeOptionalFields, boolean randomizeOptionalFields,
             List<_UTypeDeclaration> typeParameters,
             _RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
@@ -2075,7 +2075,7 @@ class _Util {
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
             return Map.of(unionCase, constructRandomStruct(unionStructType.fields, unionStartingStruct,
-                    includeRandomOptionalFields, typeParameters, randomGenerator));
+                    includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator));
         } else {
             final var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
 
@@ -2087,20 +2087,20 @@ class _Util {
             final var unionData = unionEntry.getValue();
 
             return Map.of(unionCase,
-                    constructRandomStruct(unionData.fields, new HashMap<>(), includeRandomOptionalFields,
+                    constructRandomStruct(unionData.fields, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
                             typeParameters, randomGenerator));
         }
     }
 
     static Object generateRandomFn(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator, Map<String, _UStruct> callCases) {
         if (useBlueprintValue) {
             final var startingFnValue = (Map<String, Object>) blueprintValue;
-            return constructRandomUnion(callCases, startingFnValue, includeRandomOptionalFields,
+            return constructRandomUnion(callCases, startingFnValue, includeOptionalFields, randomizeOptionalFields,
                     List.of(), randomGenerator);
         } else {
-            return constructRandomUnion(callCases, new HashMap<>(), includeRandomOptionalFields,
+            return constructRandomUnion(callCases, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
                     List.of(), randomGenerator);
         }
     }
@@ -2685,7 +2685,7 @@ class _Util {
     }
 
     static Message mockHandle(Message requestMessage, List<_MockStub> stubs, List<_MockInvocation> invocations,
-            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub) {
+            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub, boolean enableOptionalFieldGeneration, boolean randomizeOptionalFieldGeneration) {
         final Map<String, Object> header = requestMessage.header;
 
         final var enableGenerationStub = (Boolean) header.getOrDefault("_gen", false);
@@ -2757,10 +2757,10 @@ class _Util {
                         if (stub.allowArgumentPartialMatch) {
                             if (isSubMap(stub.whenArgument, argument)) {
                                 final var useBlueprintValue = true;
-                                final var includeRandomOptionalFields = false;
+                                final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
-                                        includeRandomOptionalFields, List.of(), List.of(), random);
+                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
@@ -2769,10 +2769,10 @@ class _Util {
                         } else {
                             if (Objects.equals(stub.whenArgument, argument)) {
                                 final var useBlueprintValue = true;
-                                final var includeRandomOptionalFields = false;
+                                final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
-                                        includeRandomOptionalFields, List.of(), List.of(), random);
+                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
@@ -2790,9 +2790,9 @@ class _Util {
                     final var resultUnion = (_UUnion) definition.result;
                     final var okStructRef = resultUnion.cases.get("Ok");
                     final var useBlueprintValue = true;
-                    final var includeRandomOptionalFields = true;
+                    final var includeOptionalFields = true;
                     final var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
-                            includeRandomOptionalFields, List.of(), List.of(), random);
+                            includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
                     return new Message(Map.of(), Map.of("Ok", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));

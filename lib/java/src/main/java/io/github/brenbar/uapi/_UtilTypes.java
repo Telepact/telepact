@@ -1,7 +1,5 @@
 package io.github.brenbar.uapi;
 
-import java.nio.ByteBuffer;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,75 +17,6 @@ class _SchemaParseFailure {
     }
 }
 
-class _RandomGenerator {
-    int seed = 0;
-    private int collectionLengthMin;
-    private int collectionLengthMax;
-    private int count = 0;
-
-    public _RandomGenerator(int collectionLengthMin, int collectionLengthMax) {
-        this.setSeed(0);
-        this.collectionLengthMin = collectionLengthMin;
-        this.collectionLengthMax = collectionLengthMax;
-    }
-
-    public void setSeed(int seed) {
-        this.seed = (seed & 0x7ffffffe) + 1;
-    }
-
-    private static String findStack() {
-        var i = 0;
-        for (var stack : Thread.currentThread().getStackTrace()) {
-            i += 1;
-            if (i == 1) {
-                continue;
-            }
-            var stackStr = String.valueOf(stack);
-            if (!stackStr.contains("_RandomGenerator")) {
-                return stackStr;
-            }
-        }
-        throw new RuntimeException();
-    }
-
-    public int nextInt() {
-        var x = this.seed;
-        x ^= x << 13;
-        x ^= x >> 17;
-        x ^= x << 5;
-        this.seed = (x & 0x7ffffffe) + 1;
-        this.count += 1;
-        var result = this.seed;
-        // System.out.println("%d %d %s".formatted(count, result, findStack()));
-        return result;
-    }
-
-    public int nextIntWithCeiling(int ceiling) {
-        if (ceiling == 0) {
-            return 0;
-        }
-        return (int) nextInt() % ceiling;
-    }
-
-    public boolean nextBoolean() {
-        return nextIntWithCeiling(31) > 15;
-    }
-
-    public String nextString() {
-        var bytes = ByteBuffer.allocate(Integer.BYTES);
-        bytes.putInt(nextInt());
-        return Base64.getEncoder().withoutPadding().encodeToString(bytes.array());
-    }
-
-    public double nextDouble() {
-        return ((double) (nextInt() & 0x7fffffff) / ((double) 0x7fffffff));
-    }
-
-    public int nextCollectionLength() {
-        return nextIntWithCeiling(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
-    }
-}
-
 interface _UType {
 
     public int getTypeParameterCount();
@@ -96,7 +25,7 @@ interface _UType {
             List<_UTypeDeclaration> generics);
 
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator);
 
@@ -121,10 +50,10 @@ class _UTypeDeclaration {
     }
 
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> generics,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         return _Util.generateRandomValueOfType(blueprintValue, useBlueprintValue,
-                includeRandomOptionalFields,
+                includeOptionalFields, randomizeOptionalFields,
                 generics, randomGenerator, this.type, this.nullable, this.typeParameters);
     }
 }
@@ -177,12 +106,12 @@ class _UGeneric implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         final var genericTypeDeclaration = generics.get(this.index);
         return genericTypeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
-                includeRandomOptionalFields, List.of(), randomGenerator);
+                includeOptionalFields, randomizeOptionalFields, List.of(), randomGenerator);
     }
 
     @Override
@@ -207,7 +136,7 @@ class _UAny implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         return _Util.generateRandomAny(randomGenerator);
@@ -234,7 +163,7 @@ class _UBoolean implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         return _Util.generateRandomBoolean(blueprintValue, useBlueprintValue, randomGenerator);
@@ -261,7 +190,7 @@ class _UInteger implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         return _Util.generateRandomInteger(blueprintValue, useBlueprintValue, randomGenerator);
     }
@@ -286,7 +215,7 @@ class _UNumber implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         return _Util.generateRandomNumber(blueprintValue, useBlueprintValue, randomGenerator);
@@ -312,7 +241,7 @@ class _UString implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         return _Util.generateRandomString(blueprintValue, useBlueprintValue, randomGenerator);
@@ -339,10 +268,10 @@ class _UArray implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util.generateRandomArray(blueprintValue, useBlueprintValue, includeRandomOptionalFields,
+        return _Util.generateRandomArray(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
                 typeParameters, generics, randomGenerator);
     }
 
@@ -367,9 +296,9 @@ class _UObject implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        return _Util.generateRandomObject(blueprintValue, useBlueprintValue, includeRandomOptionalFields,
+        return _Util.generateRandomObject(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
                 typeParameters, generics, randomGenerator);
     }
 
@@ -405,10 +334,10 @@ class _UStruct implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random) {
-        return _Util.generateRandomStruct(blueprintValue, useBlueprintValue, includeRandomOptionalFields,
+        return _Util.generateRandomStruct(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
                 typeParameters, generics, random, this.fields);
     }
 
@@ -443,10 +372,10 @@ class _UUnion implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random) {
-        return _Util.generateRandomUnion(blueprintValue, useBlueprintValue, includeRandomOptionalFields,
+        return _Util.generateRandomUnion(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
                 typeParameters, generics, random, this.cases);
     }
 
@@ -483,9 +412,9 @@ class _UFn implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        return _Util.generateRandomFn(blueprintValue, useBlueprintValue, includeRandomOptionalFields,
+        return _Util.generateRandomFn(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
                 typeParameters, generics, randomGenerator, this.call.cases);
     }
 
@@ -516,7 +445,7 @@ class _UMockCall implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
         throw new UnsupportedOperationException("Not implemented");
@@ -550,7 +479,7 @@ class _UMockStub implements _UType {
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeRandomOptionalFields, List<_UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
         throw new UnsupportedOperationException("Not implemented");
     }
