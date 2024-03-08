@@ -1975,10 +1975,7 @@ class _Util {
                     value = typeDeclaration.generateRandomValue(null, false,
                             includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
                 } else {
-                    if (!includeOptionalFields) {
-                        continue;
-                    }
-                    if (randomGenerator.nextBoolean()) {
+                    if (!includeOptionalFields || (randomizeOptionalFields && randomGenerator.nextBoolean())) {
                         continue;
                     }
                     value = typeDeclaration.generateRandomValue(null, false,
