@@ -2313,6 +2313,10 @@ export function constructRandomStruct(
                     randomGenerator
                 );
             } else {
+                console.log(
+                    `includeOptionalFields: ${includeOptionalFields} randomizeOptionalFields: ${randomizeOptionalFields}`
+                );
+                console.log(`stack: ${new Error().stack})}`);
                 if (!includeOptionalFields || (randomizeOptionalFields && randomGenerator.nextBoolean())) {
                     continue;
                 }
@@ -3247,6 +3251,7 @@ export function mockHandle(
     enableOptionalFieldGeneration: boolean,
     randomizeOptionalFieldGeneration: boolean
 ): Message {
+    console.log(`enableOptionalFieldGeneration: ${enableOptionalFieldGeneration}`);
     const header = requestMessage.header;
 
     const enableGenerationStub = header["_gen"] || false;
@@ -3318,11 +3323,11 @@ export function mockHandle(
                     if (stub.allowArgumentPartialMatch) {
                         if (isSubMap(stub.whenArgument, argument)) {
                             const useBlueprintValue = true;
-                            const thisEnableOptionalFieldGeneration = false;
+                            const includeOptionalFields = false;
                             const result = definition.result.generateRandomValue(
                                 stub.thenResult,
                                 useBlueprintValue,
-                                thisEnableOptionalFieldGeneration,
+                                includeOptionalFields,
                                 randomizeOptionalFieldGeneration,
                                 [],
                                 [],
@@ -3336,11 +3341,11 @@ export function mockHandle(
                     } else {
                         if (objectsAreEqual(stub.whenArgument, argument)) {
                             const useBlueprintValue = true;
-                            const thisEnableOptionalFieldGeneration = false;
+                            const includeOptionalFields = false;
                             const result = definition.result.generateRandomValue(
                                 stub.thenResult,
                                 useBlueprintValue,
-                                thisEnableOptionalFieldGeneration,
+                                includeOptionalFields,
                                 randomizeOptionalFieldGeneration,
                                 [],
                                 [],

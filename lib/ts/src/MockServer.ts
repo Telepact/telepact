@@ -56,12 +56,9 @@ export class MockServer {
     private invocations: _MockInvocation[] = [];
 
     constructor(uApiSchema: UApiSchema, options: MockServerOptions) {
-        this.random = new _RandomGenerator(
-            options.generatedCollectionLengthMin,
-            options.generatedCollectionLengthMax
-        );
+        this.random = new _RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
-        this.enableOptionalFieldGeneration = options.enableMessageResponseGeneration;
+        this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
         this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
         const parsedTypes: Record<string, any> = {};
@@ -70,11 +67,7 @@ export class MockServer {
         typeExtensions["_ext._Call"] = new _UMockCall(parsedTypes);
         typeExtensions["_ext._Stub"] = new _UMockStub(parsedTypes);
 
-        const combinedUApiSchema = UApiSchema.extendWithExtensions(
-            uApiSchema,
-            getMockUApiJson(),
-            typeExtensions
-        );
+        const combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, getMockUApiJson(), typeExtensions);
 
         const serverOptions: ServerOptions = new ServerOptions();
         serverOptions.onError = options.onError;
