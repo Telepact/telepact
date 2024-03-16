@@ -1,5 +1,5 @@
-import { _RandomGenerator } from "./_RandomGenerator";
-import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
+import { _RandomGenerator } from './_RandomGenerator';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 import {
     _ANY_NAME,
     _ARRAY_NAME,
@@ -38,7 +38,7 @@ import {
     validateStruct,
     validateUnion,
     validateValueOfType,
-} from "./_util";
+} from './_util';
 
 export class _SchemaParseFailure {
     constructor(
@@ -50,11 +50,7 @@ export class _SchemaParseFailure {
 
 export interface _UType {
     getTypeParameterCount(): number;
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[];
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[];
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
@@ -121,11 +117,7 @@ export class _UGeneric implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         const typeDeclaration = generics[this.index]!;
         return typeDeclaration.validate(value, []);
     }
@@ -161,11 +153,7 @@ export class _UAny implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return [];
     }
 
@@ -191,11 +179,7 @@ export class _UBoolean implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateBoolean(value);
     }
 
@@ -221,11 +205,7 @@ export class _UInteger implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateInteger(value);
     }
 
@@ -251,11 +231,7 @@ export class _UNumber implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateNumber(value);
     }
 
@@ -272,7 +248,7 @@ export class _UNumber implements _UType {
     }
 
     getName(generics: _UTypeDeclaration[]): string {
-        return "Number";
+        return 'Number';
     }
 }
 
@@ -281,11 +257,7 @@ export class _UString implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateString(value);
     }
 
@@ -311,11 +283,7 @@ export class _UArray implements _UType {
         return 1;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateArray(value, typeParameters, generics);
     }
 
@@ -349,11 +317,7 @@ export class _UObject implements _UType {
         return 1;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateObject(value, typeParameters, generics);
     }
 
@@ -393,11 +357,7 @@ export class _UStruct implements _UType {
         return this.typeParameterCount;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateStruct(value, typeParameters, generics, this.fields);
     }
 
@@ -438,11 +398,7 @@ export class _UUnion implements _UType {
         return this.typeParameterCount;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateUnion(value, typeParameters, generics, this.cases);
     }
 
@@ -489,11 +445,7 @@ export class _UFn implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return this.call.validate(value, typeParameters, generics);
     }
 
@@ -534,11 +486,7 @@ export class _UMockCall implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateMockCall(value, typeParameters, generics, this.types);
     }
 
@@ -551,7 +499,7 @@ export class _UMockCall implements _UType {
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
     ): any {
-        throw new Error("Not implemented");
+        throw new Error('Not implemented');
     }
 
     getName(generics: _UTypeDeclaration[]): string {
@@ -570,11 +518,7 @@ export class _UMockStub implements _UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        typeParameters: _UTypeDeclaration[],
-        generics: _UTypeDeclaration[]
-    ): _ValidationFailure[] {
+    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
         return validateMockStub(value, typeParameters, generics, this.types);
     }
 
@@ -587,7 +531,7 @@ export class _UMockStub implements _UType {
         generics: _UTypeDeclaration[],
         randomGenerator: _RandomGenerator
     ): any {
-        throw new Error("Not implemented");
+        throw new Error('Not implemented');
     }
 
     getName(generics: _UTypeDeclaration[]): string {
@@ -602,6 +546,22 @@ export class _UError {
     constructor(name: string, errors: _UUnion) {
         this.name = name;
         this.errors = errors;
+    }
+}
+
+export class _UHeaders {
+    public readonly name: string;
+    public readonly requestHeaders: Record<string, _UFieldDeclaration>;
+    public readonly responseHeaders: Record<string, _UFieldDeclaration>;
+
+    public constructor(
+        name: string,
+        requestHeaders: Record<string, _UFieldDeclaration>,
+        responseHeaders: Record<string, _UFieldDeclaration>
+    ) {
+        this.name = name;
+        this.requestHeaders = requestHeaders;
+        this.responseHeaders = responseHeaders;
     }
 }
 
@@ -627,7 +587,7 @@ export class _BinaryEncodingMissing extends Error {
 
 export class _InvalidMessage extends Error {
     constructor(cause?: Error) {
-        super("Invalid Message", { cause: cause });
+        super('Invalid Message', { cause: cause });
     }
 }
 
@@ -640,9 +600,10 @@ export class _BinaryEncoding {
 
     constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
         this.encodeMap = binaryEncodingMap;
-        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map(
-            (e: [string, number]) => [e[1], e[0]]
-        );
+        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [
+            e[1],
+            e[0],
+        ]);
         this.decodeMap = new Map(decodeList);
         this.checksum = checksum;
     }

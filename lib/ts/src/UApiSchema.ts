@@ -1,5 +1,5 @@
-import { extendUApiSchema, newUApiSchema } from "./_util";
-import { _UType } from "./_utilTypes";
+import { extendUApiSchema, newUApiSchema } from './_util';
+import { _UFieldDeclaration, _UHeaders, _UType, _UTypeDeclaration } from './_utilTypes';
 
 /**
  * A parsed uAPI schema.
@@ -7,11 +7,21 @@ import { _UType } from "./_utilTypes";
 export class UApiSchema {
     original: any[];
     parsed: Record<string, _UType>;
+    parsedRequestHeaders: Record<string, _UFieldDeclaration>;
+    parsedResponseHeaders: Record<string, _UFieldDeclaration>;
     typeExtensions: Record<string, _UType>;
 
-    constructor(original: any[], parsed: Record<string, _UType>, typeExtensions: Record<string, _UType>) {
+    constructor(
+        original: any[],
+        parsed: Record<string, _UType>,
+        parsedRequestHeaders: Record<string, _UFieldDeclaration>,
+        parsedResponseHeaders: Record<string, _UFieldDeclaration>,
+        typeExtensions: Record<string, _UType>
+    ) {
         this.original = original;
         this.parsed = parsed;
+        this.parsedRequestHeaders = parsedRequestHeaders;
+        this.parsedResponseHeaders = parsedResponseHeaders;
         this.typeExtensions = typeExtensions;
     }
 
