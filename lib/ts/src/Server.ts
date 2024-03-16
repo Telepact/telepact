@@ -4,7 +4,7 @@ import { Serializer } from "./Serializer";
 import { UApiSchema } from "./UApiSchema";
 import { _DefaultSerializationImpl } from "./_DefaultSerializationImpl";
 import { constructBinaryEncoding, getInternalUApiJson, processBytes } from "./_util";
-import { _ServerBinaryEncoder } from "./_utilTypes";
+import { _ServerBinaryEncoder, _UStruct } from "./_utilTypes";
 
 /**
  * Options for the Server.
@@ -26,6 +26,11 @@ export class ServerOptions {
     onResponse: (message: Message) => void = (m: Message) => {};
 
     /**
+     * Flag to indicate if authentication via the _auth header is required.
+     */
+    authRequired: boolean = true;
+
+    /**
      * The serialization implementation that should be used to serialize and
      * deserialize messages.
      */
@@ -43,13 +48,12 @@ export class Server {
     private readonly onResponse: (message: Message) => void;
     private readonly serializer: Serializer;
 
-
     /**
      * Create a server with the given uAPI schema and handler.
-     * 
-     * @param uApiSchema 
-     * @param handler 
-     * @param options 
+     *
+     * @param uApiSchema
+     * @param handler
+     * @param options
      */
     constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
         this.uApiSchema = UApiSchema.extend(uApiSchema, getInternalUApiJson());
@@ -61,16 +65,32 @@ export class Server {
         const binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         const binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
+
+        if (
+            Object.keys((this.uApiSchema.parsed["struct._Auth"] as _UStruct).fields).length === 0 &&
+            options.authRequired
+        ) {
+            throw Error(
+                "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`."
+            );
+        }
     }
 
     /**
      * Process a given uAPI Request Message into a uAPI Response Message.
-     * 
-     * @param requestMessageBytes 
-     * @returns 
+     *
+     * @param requestMessageBytes
+     * @returns
      */
     public async process(requestMessageBytes: Uint8Array): Promise<Uint8Array> {
-        return processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
-            this.onRequest, this.onResponse, this.handler);
+        return processBytes(
+            requestMessageBytes,
+            this.serializer,
+            this.uApiSchema,
+            this.onError,
+            this.onRequest,
+            this.onResponse,
+            this.handler
+        );
     }
 }

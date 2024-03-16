@@ -20,13 +20,36 @@
   },
 
   {
-    "///": " A placeholder function when the requested function is unknown. ",
+    "///": [
+      " A placeholder function when the requested function is unknown. "
+    ],
     "fn._unknown": {},
     "->": {
       "Ok": {}
     },
     "errors": "^error\\._Validated$"
   },
+
+  {
+    "struct._Auth": {},
+    "ignoreDuplicate": true
+  },
+
+  {
+    "headers.Std": {
+      "_id": ["any"],
+      "_unsafe": ["boolean"],
+      "_select": ["object", ["array", ["string"]]],
+      "_auth": ["struct._Auth"],
+      "_t": ["integer"],
+      "_b": ["array", ["integer"]]
+    },
+    "->": {
+      "_id": ["any"],
+      "_b": ["array", ["integer"]],
+      "_e": ["object", ["integer"]]
+    }
+  },  
 
   {
     "///": " A type. ",
