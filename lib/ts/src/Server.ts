@@ -1,10 +1,10 @@
-import { Message } from "./Message";
-import { SerializationImpl } from "./SerializationImpl";
-import { Serializer } from "./Serializer";
-import { UApiSchema } from "./UApiSchema";
-import { _DefaultSerializationImpl } from "./_DefaultSerializationImpl";
-import { constructBinaryEncoding, getInternalUApiJson, processBytes } from "./_util";
-import { _ServerBinaryEncoder, _UStruct } from "./_utilTypes";
+import { Message } from './Message';
+import { SerializationImpl } from './SerializationImpl';
+import { Serializer } from './Serializer';
+import { UApiSchema } from './UApiSchema';
+import { _DefaultSerializationImpl } from './_DefaultSerializationImpl';
+import { constructBinaryEncoding, getInternalUApiJson, processBytes } from './_util';
+import { _ServerBinaryEncoder, _UHeaders, _USelect, _UStruct } from './_utilTypes';
 
 /**
  * Options for the Server.
@@ -56,22 +56,30 @@ export class Server {
      * @param options
      */
     constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
-        this.uApiSchema = UApiSchema.extend(uApiSchema, getInternalUApiJson());
         this.handler = handler;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
+
+        const parsedTypes: Record<string, any> = {};
+        const typeExtensions: Record<string, any> = {};
+
+        typeExtensions['_ext._Select'] = new _USelect(parsedTypes);
+
+        this.uApiSchema = UApiSchema.extendWithExtensions(uApiSchema, getInternalUApiJson(), typeExtensions);
+
+        Object.assign(parsedTypes, uApiSchema.parsed);
 
         const binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         const binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
 
         if (
-            Object.keys((this.uApiSchema.parsed["struct._Auth"] as _UStruct).fields).length === 0 &&
+            Object.keys((this.uApiSchema.parsed['struct._Auth'] as _UStruct).fields).length === 0 &&
             options.authRequired
         ) {
             throw Error(
-                "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`."
+                'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.'
             );
         }
     }

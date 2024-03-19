@@ -50,7 +50,13 @@ export class _SchemaParseFailure {
 
 export interface _UType {
     getTypeParameterCount(): number;
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[];
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[];
     generateRandomValue(
         blueprintValue: any,
         useBlueprintValue: boolean,
@@ -70,8 +76,13 @@ export class _UTypeDeclaration {
         public readonly typeParameters: _UTypeDeclaration[]
     ) {}
 
-    validate(value: any, generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateValueOfType(value, generics, this.type, this.nullable, this.typeParameters);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateValueOfType(value, select, fn, generics, this.type, this.nullable, this.typeParameters);
     }
 
     generateRandomValue(
@@ -117,9 +128,15 @@ export class _UGeneric implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         const typeDeclaration = generics[this.index]!;
-        return typeDeclaration.validate(value, []);
+        return typeDeclaration.validate(value, select, fn, []);
     }
 
     generateRandomValue(
@@ -153,7 +170,13 @@ export class _UAny implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return [];
     }
 
@@ -179,7 +202,13 @@ export class _UBoolean implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateBoolean(value);
     }
 
@@ -205,7 +234,13 @@ export class _UInteger implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateInteger(value);
     }
 
@@ -231,7 +266,13 @@ export class _UNumber implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateNumber(value);
     }
 
@@ -257,7 +298,13 @@ export class _UString implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
         return validateString(value);
     }
 
@@ -283,8 +330,14 @@ export class _UArray implements _UType {
         return 1;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateArray(value, typeParameters, generics);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateArray(value, select, fn, typeParameters, generics);
     }
 
     generateRandomValue(
@@ -317,8 +370,14 @@ export class _UObject implements _UType {
         return 1;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateObject(value, typeParameters, generics);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateObject(value, select, fn, typeParameters, generics);
     }
 
     generateRandomValue(
@@ -357,8 +416,14 @@ export class _UStruct implements _UType {
         return this.typeParameterCount;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateStruct(value, typeParameters, generics, this.fields);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateStruct(value, select, fn, typeParameters, generics, this.fields);
     }
 
     generateRandomValue(
@@ -398,8 +463,14 @@ export class _UUnion implements _UType {
         return this.typeParameterCount;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateUnion(value, typeParameters, generics, this.cases);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateUnion(value, select, fn, typeParameters, generics, this.cases);
     }
 
     generateRandomValue(
@@ -445,8 +516,14 @@ export class _UFn implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return this.call.validate(value, typeParameters, generics);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return this.call.validate(value, select, fn, typeParameters, generics);
     }
 
     generateRandomValue(
@@ -475,6 +552,44 @@ export class _UFn implements _UType {
     }
 }
 
+export class _USelect implements _UType {
+    public readonly types: { [key: string]: _UType };
+
+    constructor(types: { [key: string]: _UType }) {
+        this.types = types;
+    }
+
+    getTypeParameterCount(): number {
+        return 0;
+    }
+
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateMockCall(value, select, fn, typeParameters, generics, this.types);
+    }
+
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[],
+        randomGenerator: _RandomGenerator
+    ): any {
+        throw new Error('Not implemented');
+    }
+
+    getName(generics: _UTypeDeclaration[]): string {
+        return _MOCK_CALL_NAME;
+    }
+}
+
 export class _UMockCall implements _UType {
     public readonly types: { [key: string]: _UType };
 
@@ -486,8 +601,14 @@ export class _UMockCall implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateMockCall(value, typeParameters, generics, this.types);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateMockCall(value, select, fn, typeParameters, generics, this.types);
     }
 
     generateRandomValue(
@@ -518,8 +639,14 @@ export class _UMockStub implements _UType {
         return 0;
     }
 
-    validate(value: any, typeParameters: _UTypeDeclaration[], generics: _UTypeDeclaration[]): _ValidationFailure[] {
-        return validateMockStub(value, typeParameters, generics, this.types);
+    validate(
+        value: any,
+        select: Record<string, any> | undefined,
+        fn: string | undefined,
+        typeParameters: _UTypeDeclaration[],
+        generics: _UTypeDeclaration[]
+    ): _ValidationFailure[] {
+        return validateMockStub(value, select, fn, typeParameters, generics, this.types);
     }
 
     generateRandomValue(

@@ -116,7 +116,7 @@ export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset
 }
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
-    const regex = '^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\\..*';
+    const regex = '^((fn|error|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*';
     const matches: string[] = [];
 
     for (const e of Object.keys(definition)) {
@@ -1888,14 +1888,14 @@ export function validateHeaders(
         const field = uApiSchema.parsedRequestHeaders[header];
         if (field) {
             const headerValue = headers[header];
-            const thisValidationFailures = field.typeDeclaration.validate(headerValue, []);
+            const thisValidationFailures = field.typeDeclaration.validate(
+                headerValue,
+                undefined,
+                functionType.name,
+                []
+            );
             validationFailures.push(...thisValidationFailures);
         }
-    }
-
-    if (headers.hasOwnProperty('_sel')) {
-        const thisValidationFailures = validateSelectHeaders(headers, uApiSchema, functionType);
-        validationFailures.push(...thisValidationFailures);
     }
 
     return validationFailures;
@@ -1973,41 +1973,10 @@ export function validateSelectHeaders(
     return validationFailures;
 }
 
-export function validateSelectStruct(
-    structReference: _UStruct,
-    basePath: Array<string | number>,
-    selectedFields: any
-): _ValidationFailure[] {
-    const validationFailures: _ValidationFailure[] = [];
-
-    let fields: string[];
-    try {
-        fields = asList(selectedFields);
-    } catch (e) {
-        return getTypeUnexpectedValidationFailure(basePath, selectedFields, 'Array');
-    }
-
-    for (let i = 0; i < fields.length; i++) {
-        const field = fields[i];
-        let stringField: string;
-        try {
-            stringField = asString(field);
-        } catch (e) {
-            const thisPath = append(basePath, i);
-            validationFailures.push(...getTypeUnexpectedValidationFailure(thisPath, field, 'String'));
-            continue;
-        }
-        if (!(stringField in structReference.fields)) {
-            const thisPath = append(basePath, i);
-            validationFailures.push(new _ValidationFailure(thisPath, 'ObjectKeyDisallowed', {}));
-        }
-    }
-
-    return validationFailures;
-}
-
 export function validateValueOfType(
     value: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     generics: _UTypeDeclaration[],
     thisType: _UType,
     nullable: boolean,
@@ -2021,7 +1990,7 @@ export function validateValueOfType(
             return [];
         }
     } else {
-        return thisType.validate(value, typeParameters, generics);
+        return thisType.validate(value, select, fn, typeParameters, generics);
     }
 }
 
@@ -2158,6 +2127,8 @@ export function generateRandomString(
 
 export function validateArray(
     value: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>
 ): Array<_ValidationFailure> {
@@ -2166,7 +2137,7 @@ export function validateArray(
         const validationFailures: Array<_ValidationFailure> = [];
         for (let i = 0; i < value.length; i++) {
             const element = value[i];
-            const nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
+            const nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn, generics);
             const index = i;
             const nestedValidationFailuresWithPath: Array<_ValidationFailure> = nestedValidationFailures.map((f) => {
                 const finalPath = prepend(index, f.path);
@@ -2229,6 +2200,8 @@ export function generateRandomArray(
 
 export function validateObject(
     value: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>
 ): Array<_ValidationFailure> {
@@ -2236,7 +2209,7 @@ export function validateObject(
         const nestedTypeDeclaration = typeParameters[0]!;
         const validationFailures: Array<_ValidationFailure> = [];
         for (const key in value) {
-            const nestedValidationFailures = nestedTypeDeclaration.validate(value[key], generics);
+            const nestedValidationFailures = nestedTypeDeclaration.validate(value[key], select, fn, generics);
             const nestedValidationFailuresWithPath: Array<_ValidationFailure> = nestedValidationFailures.map((f) => {
                 const thisPath = prepend(key, f.path);
                 return {
@@ -2299,12 +2272,14 @@ export function generateRandomObject(
 
 export function validateStruct(
     value: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>,
     fields: Record<string, _UFieldDeclaration>
 ): Array<_ValidationFailure> {
     if (typeof value === 'object' && !Array.isArray(value)) {
-        return validateStructFields(fields, value, typeParameters);
+        return validateStructFields(fields, value, select, fn, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _STRUCT_NAME);
     }
@@ -2313,6 +2288,8 @@ export function validateStruct(
 export function validateStructFields(
     fields: Record<string, _UFieldDeclaration>,
     actualStruct: Record<string, any>,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>
 ): Array<_ValidationFailure> {
     const validationFailures: Array<_ValidationFailure> = [];
@@ -2343,7 +2320,7 @@ export function validateStructFields(
             continue;
         }
         const refFieldTypeDeclaration = referenceField.typeDeclaration;
-        const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, typeParameters);
+        const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn, typeParameters);
         const nestedValidationFailuresWithPath: _ValidationFailure[] = nestedValidationFailures.map((f) => {
             const thisPath = prepend(fieldName, f.path);
             return {
@@ -2474,12 +2451,14 @@ export function unionEntry(union: Record<string, any>): [string, any] {
 
 export function validateUnion(
     value: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     cases: Record<string, _UStruct>
 ): _ValidationFailure[] {
     if (typeof value == 'object' && !Array.isArray(value)) {
-        return validateUnionCases(cases, value, typeParameters);
+        return validateUnionCases(cases, value, select, fn, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _UNION_NAME);
     }
@@ -2488,6 +2467,8 @@ export function validateUnion(
 export function validateUnionCases(
     referenceCases: Record<string, _UStruct>,
     actual: Record<string, any>,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: _UTypeDeclaration[]
 ): _ValidationFailure[] {
     const size = Object.keys(actual).length;
@@ -2521,6 +2502,8 @@ export function validateUnionCases(
             referenceStruct,
             unionTarget,
             unionPayload,
+            select,
+            fn,
             typeParameters
         );
 
@@ -2538,9 +2521,11 @@ export function validateUnionStruct(
     unionStruct: _UStruct,
     unionCase: string,
     actual: Record<string, any>,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: _UTypeDeclaration[]
 ): _ValidationFailure[] {
-    return validateStructFields(unionStruct.fields, actual, typeParameters);
+    return validateStructFields(unionStruct.fields, actual, select, fn, typeParameters);
 }
 
 export function generateRandomUnion(
@@ -2648,8 +2633,118 @@ export function generateRandomFn(
     }
 }
 
+export function validateSelect(
+    givenObj: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
+    typeParameters: _UTypeDeclaration[],
+    generics: _UTypeDeclaration[],
+    types: Record<string, _UType>
+): _ValidationFailure[] {
+    let selectStructFieldsHeader: Record<string, any>;
+    try {
+        selectStructFieldsHeader = asMap(givenObj);
+    } catch (e) {
+        return getTypeUnexpectedValidationFailure(['_sel'], givenObj, 'Object');
+    }
+
+    const validationFailures: _ValidationFailure[] = [];
+    const functionType: _UFn = types[fn] as _UFn;
+
+    for (const [typeName, selectValue] of Object.entries(selectStructFieldsHeader)) {
+        let typeReference: _UType | undefined;
+        if (typeName === '->') {
+            typeReference = functionType.result;
+        } else {
+            typeReference = types[typeName];
+        }
+
+        if (!typeReference) {
+            validationFailures.push(new _ValidationFailure(['_sel', typeName], 'TypeUnknown', {}));
+            continue;
+        }
+
+        if (typeReference instanceof _UUnion) {
+            let unionCases: Record<string, any>;
+            try {
+                unionCases = asMap(selectValue);
+            } catch (e) {
+                validationFailures.push(
+                    ...getTypeUnexpectedValidationFailure(['_sel', typeName], selectValue, 'Object')
+                );
+                continue;
+            }
+
+            for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
+                const structRef = typeReference.cases[unionCase];
+                if (!structRef) {
+                    validationFailures.push(
+                        new _ValidationFailure(['_sel', typeName, unionCase], 'UnionCaseUnknown', {})
+                    );
+                    continue;
+                }
+
+                const nestedValidationFailures = validateSelectStruct(
+                    structRef,
+                    ['_sel', typeName, unionCase],
+                    selectedCaseStructFields
+                );
+                validationFailures.push(...nestedValidationFailures);
+            }
+        } else if (typeReference instanceof _UFn) {
+            const fnCall = typeReference.call;
+            const fnCallCases = fnCall.cases;
+            const fnName = typeReference.name;
+            const argStruct = fnCallCases[fnName]!;
+            const nestedValidationFailures = validateSelectStruct(argStruct, ['_sel', typeName], selectValue);
+            validationFailures.push(...nestedValidationFailures);
+        } else {
+            const structRef = typeReference as _UStruct;
+            const nestedValidationFailures = validateSelectStruct(structRef, ['_sel', typeName], selectValue);
+            validationFailures.push(...nestedValidationFailures);
+        }
+    }
+
+    return validationFailures;
+}
+
+export function validateSelectStruct(
+    structReference: _UStruct,
+    basePath: Array<string | number>,
+    selectedFields: any
+): _ValidationFailure[] {
+    const validationFailures: _ValidationFailure[] = [];
+
+    let fields: string[];
+    try {
+        fields = asList(selectedFields);
+    } catch (e) {
+        return getTypeUnexpectedValidationFailure(basePath, selectedFields, 'Array');
+    }
+
+    for (let i = 0; i < fields.length; i++) {
+        const field = fields[i];
+        let stringField: string;
+        try {
+            stringField = asString(field);
+        } catch (e) {
+            const thisPath = append(basePath, i);
+            validationFailures.push(...getTypeUnexpectedValidationFailure(thisPath, field, 'String'));
+            continue;
+        }
+        if (!(stringField in structReference.fields)) {
+            const thisPath = append(basePath, i);
+            validationFailures.push(new _ValidationFailure(thisPath, 'ObjectKeyDisallowed', {}));
+        }
+    }
+
+    return validationFailures;
+}
+
 export function validateMockCall(
     givenObj: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     types: Record<string, _UType>
@@ -2686,7 +2781,13 @@ export function validateMockCall(
     const functionDefName = functionDef?.name;
     const functionDefCallCases = functionDefCall?.cases;
 
-    const inputFailures = functionDefCallCases?.[functionDefName]?.validate(input, [], []);
+    const inputFailures = functionDefCallCases?.[functionDefName]?.validate(
+        input,
+        select,
+        fn,
+        typeParameters,
+        generics
+    );
 
     if (!inputFailures) return [];
 
@@ -2701,6 +2802,8 @@ export function validateMockCall(
 
 export function validateMockStub(
     givenObj: any,
+    select: Record<string, any> | undefined,
+    fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     types: Record<string, _UType>
@@ -2738,7 +2841,7 @@ export function validateMockStub(
     const functionDefCall = functionDef.call;
     const functionDefName = functionDef.name;
     const functionDefCallCases = functionDefCall.cases;
-    const inputFailures = functionDefCallCases[functionDefName]!.validate(input, [], []);
+    const inputFailures = functionDefCallCases[functionDefName]!.validate(input, select, fn, typeParameters, generics);
 
     const inputFailuresWithPath: _ValidationFailure[] = [];
     for (const f of inputFailures) {
@@ -2766,7 +2869,7 @@ export function validateMockStub(
         });
     } else {
         const output = givenMap[resultDefKey];
-        const outputFailures = functionDef.result.validate(output, [], []);
+        const outputFailures = functionDef.result.validate(output, select, fn, [], []);
 
         const outputFailuresWithPath: _ValidationFailure[] = [];
         for (const f of outputFailures) {
@@ -2950,7 +3053,7 @@ export function mapValidationFailuresToInvalidFieldCases(
 }
 
 export function validateResult(resultUnionType: _UUnion, errorResult: { [key: string]: any }): void {
-    const newErrorResultValidationFailures = resultUnionType.validate(errorResult, [], []);
+    const newErrorResultValidationFailures = resultUnionType.validate(errorResult, undefined, undefined, [], []);
     if (newErrorResultValidationFailures.length !== 0) {
         throw new UApiError(
             'Failed internal uAPI validation: ' +
@@ -3026,6 +3129,8 @@ export async function handleMessage(
         }
     }
 
+    const selectStructFieldsHeader: Record<string, any> | undefined = requestHeaders['_sel'] as Record<string, any>;
+
     if (unknownTarget !== null) {
         const newErrorResult = {
             _ErrorInvalidRequestBody: {
@@ -3056,7 +3161,7 @@ export async function handleMessage(
     };
 
     const callValidationFailures: _ValidationFailure[] = functionTypeCall
-        .validate(requestBody, [], [])
+        .validate(requestBody, undefined, undefined, [], [])
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
@@ -3096,7 +3201,9 @@ export async function handleMessage(
 
     const skipResultValidation = unsafeResponseEnabled;
     if (!skipResultValidation) {
-        const resultValidationFailures = resultUnionType.validate(resultMessage.body, [], []).filter(filterOutWarnings);
+        const resultValidationFailures = resultUnionType
+            .validate(resultMessage.body, selectStructFieldsHeader, undefined, [], [])
+            .filter(filterOutWarnings);
 
         if (warnings.length > 0) {
             responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
@@ -3118,8 +3225,7 @@ export async function handleMessage(
     const finalResponseHeaders = resultMessage.header;
 
     let finalResultUnion;
-    if (requestHeaders.hasOwnProperty('_sel')) {
-        const selectStructFieldsHeader = requestHeaders['_sel'] as unknown as Map<string, any>;
+    if (selectStructFieldsHeader) {
         finalResultUnion = selectStructFields(
             new _UTypeDeclaration(resultUnionType, false, []),
             resultUnion,

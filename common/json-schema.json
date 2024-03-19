@@ -237,26 +237,6 @@
             ]
           }
         }
-      },
-      {
-        "type": "object",
-        "additionalProperties": false,
-        "minProperties": 1,
-        "patternProperties": {
-          "^_ext(<[1-3]>)?\\.[a-zA-Z_]\\w*": {
-            "type": "object",
-            "description": "A type extension.",
-            "additionalProperties": false
-          }
-        },
-        "properties": {
-          "///": {
-            "anyOf": [
-              { "type": "string" },
-              { "type": "array", "items": { "type": "string" } }
-            ]
-          }
-        }
       }
     ]
   },

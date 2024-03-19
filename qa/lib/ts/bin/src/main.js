@@ -1,7 +1,7 @@
-import { Client, ClientOptions, Server, ServerOptions, Message, SerializationError, MockServer, MockServerOptions, UApiSchema } from 'uapi';
-import { connect } from 'nats';
-import fs from 'fs';
-import { min, max, mean, median, quantile } from 'simple-statistics';
+import { Client, ClientOptions, Server, ServerOptions, Message, SerializationError, MockServer, MockServerOptions, UApiSchema, } from "uapi";
+import { connect } from "nats";
+import fs from "fs";
+import { min, max, mean, median, quantile } from "simple-statistics";
 class Timer {
     values = [];
     startTimer() {
@@ -24,11 +24,10 @@ class Registry {
             const fileName = `./metrics/${name}.csv`;
             if (!fs.existsSync(fileName)) {
                 try {
-                    fs.mkdirSync('./metrics');
+                    fs.mkdirSync("./metrics");
                 }
-                catch (e) {
-                }
-                const header = 'count,min,max,mean,median,p75,p95,p99\n';
+                catch (e) { }
+                const header = "count,min,max,mean,median,p75,p95,p99\n";
                 fs.writeFileSync(fileName, header);
             }
             const v = timer.values;
@@ -47,7 +46,7 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
             }
             catch (e) {
                 if (e instanceof SerializationError) {
-                    return new Message({ "numberTooBig": true }, { "_ErrorUnknown": {} });
+                    return new Message({ numberTooBig: true }, { _ErrorUnknown: {} });
                 }
                 else {
                     throw e;
@@ -96,7 +95,7 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
     return sub;
 }
 function startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic, config) {
-    const json = fs.readFileSync(apiSchemaPath, 'utf-8');
+    const json = fs.readFileSync(apiSchemaPath, "utf-8");
     const uApi = UApiSchema.fromJson(json);
     const options = new MockServerOptions();
     options.onError = (e) => console.error(e);
@@ -128,15 +127,15 @@ function startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic
     return subscription;
 }
 function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTopic, config) {
-    const json = fs.readFileSync(apiSchemaPath, 'utf-8');
+    const json = fs.readFileSync(apiSchemaPath, "utf-8");
     const uApi = UApiSchema.fromJson(json);
     const timer = registry.createTimer(frontdoorTopic);
     const handler = async (requestMessage) => {
         const requestBody = requestMessage.body;
-        const arg = requestBody['fn.validateSchema'];
-        const schemaPseudoJson = arg['schema'];
-        const extendSchemaJson = arg['extend!'];
-        const serializeSchema = requestMessage.header['_serializeSchema'] !== false;
+        const arg = requestBody["fn.validateSchema"];
+        const schemaPseudoJson = arg["schema"];
+        const extendSchemaJson = arg["extend!"];
+        const serializeSchema = requestMessage.header["_serializeSchema"] !== false;
         let schemaJson;
         if (serializeSchema) {
             try {
@@ -154,15 +153,20 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
             if (extendSchemaJson != null) {
                 UApiSchema.extend(schema, extendSchemaJson);
             }
-            return new Message({}, { 'Ok': {} });
+            return new Message({}, { Ok: {} });
         }
         catch (e) {
             console.error(e);
-            return new Message({}, { 'ErrorValidationFailure': { 'cases': e.schemaParseFailuresPseudoJson } });
+            return new Message({}, {
+                ErrorValidationFailure: {
+                    cases: e.schemaParseFailuresPseudoJson,
+                },
+            });
         }
     };
     const options = new ServerOptions();
     options.onError = (e) => console.error(e);
+    options.authRequired = false;
     const server = new Server(uApi, handler, options);
     const sub = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -184,7 +188,7 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
     return sub;
 }
 function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic) {
-    const json = fs.readFileSync(apiSchemaPath, 'utf-8');
+    const json = fs.readFileSync(apiSchemaPath, "utf-8");
     let uApi = UApiSchema.fromJson(json);
     const alternateUApi = UApiSchema.extend(uApi, `
         [
@@ -210,10 +214,10 @@ function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, ba
         const responsePseudoJson = JSON.parse(responseJson);
         const responseHeaders = responsePseudoJson[0];
         const responseBody = responsePseudoJson[1];
-        if (requestHeaders['_toggleAlternateServer'] === true) {
+        if (requestHeaders["_toggleAlternateServer"] === true) {
             serveAlternateServer.value = !serveAlternateServer.value;
         }
-        if (requestHeaders['_throwError'] === true) {
+        if (requestHeaders["_throwError"] === true) {
             throw new ThisError();
         }
         return new Message(responseHeaders, responseBody);
@@ -226,18 +230,20 @@ function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, ba
         }
     };
     options.onRequest = (m) => {
-        if (m.header['_onRequestError'] === true) {
+        if (m.header["_onRequestError"] === true) {
             throw new Error();
         }
     };
     options.onResponse = (m) => {
-        if (m.header['_onResponseError'] === true) {
+        if (m.header["_onResponseError"] === true) {
             throw new Error();
         }
     };
+    options.authRequired = false;
     const server = new Server(uApi, handler, options);
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
+    alternateOptions.authRequired = false;
     const alternateServer = new Server(alternateUApi, handler, alternateOptions);
     const subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -276,7 +282,7 @@ async function runDispatcherServer() {
     const done = new Promise((resolve) => {
         finish = resolve;
     });
-    const subscription = connection.subscribe('ts');
+    const subscription = connection.subscribe("ts");
     (async () => {
         for await (const msg of subscription) {
             const requestBytes = msg.data;
@@ -344,13 +350,19 @@ async function runDispatcherServer() {
                         throw new Error("no matching server");
                     }
                 }
-                const responseJson = JSON.stringify([new Map(), new Map([["Ok", new Map()]])]);
+                const responseJson = JSON.stringify([
+                    new Map(),
+                    new Map([["Ok", new Map()]]),
+                ]);
                 responseBytes = new TextEncoder().encode(responseJson);
             }
             catch (e) {
                 console.error(e);
                 try {
-                    const responseJson = JSON.stringify([new Map(), new Map([["ErrorUnknown", new Map()]])]);
+                    const responseJson = JSON.stringify([
+                        new Map(),
+                        new Map([["ErrorUnknown", new Map()]]),
+                    ]);
                     responseBytes = new TextEncoder().encode(responseJson);
                 }
                 catch (e1) {

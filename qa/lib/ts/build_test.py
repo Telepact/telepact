@@ -20,6 +20,9 @@ def start(nats_url):
     s2 = subprocess.Popen(['npm', 'install', '--no-save', './../../../lib/ts/uapi-1.0.0.tgz'], cwd=this_path)
     s2.wait()
 
+    s3 = subprocess.Popen(['npm', 'run', 'build'], cwd=this_path)
+    s3.wait()
+
     p = subprocess.Popen(['npm', 'start'], cwd=this_path, env=this_env)
 
     return p

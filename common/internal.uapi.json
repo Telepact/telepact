@@ -34,6 +34,10 @@
   },
 
   {
+    "_ext._Select": {}
+  },
+
+  {
     "///": [
       " uAPI standard headers.                                                                   ",
       "                                                                                          ",
@@ -60,7 +64,7 @@
     "headers._Standard": {
       "_id": ["any"],
       "_unsafe": ["boolean"],
-      "_sel": ["object", ["array", ["string"]]],
+      "_sel": ["_ext._Select"],
       "_auth": ["struct._Auth"],
       "_tim": ["integer"],
       "_bin": ["array", ["integer"]]
