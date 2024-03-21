@@ -53,6 +53,7 @@ export const _OBJECT_NAME: Readonly<string> = 'Object';
 export const _STRING_NAME: Readonly<string> = 'String';
 export const _STRUCT_NAME: Readonly<string> = 'Object';
 export const _UNION_NAME: Readonly<string> = 'Object';
+export const _SELCT_NAME: Readonly<string> = 'Object';
 
 export function getInternalUApiJson(): string {
     return JSON.stringify(internalUApi);
@@ -1894,79 +1895,14 @@ export function validateHeaders(
                 functionType.name,
                 []
             );
-            validationFailures.push(...thisValidationFailures);
-        }
-    }
-
-    return validationFailures;
-}
-
-export function validateSelectHeaders(
-    headers: { [key: string]: any },
-    uApiSchema: UApiSchema,
-    functionType: _UFn
-): _ValidationFailure[] {
-    let selectStructFieldsHeader: Record<string, any>;
-    try {
-        selectStructFieldsHeader = asMap(headers['_sel']);
-    } catch (e) {
-        return getTypeUnexpectedValidationFailure(['_sel'], headers['_sel'], 'Object');
-    }
-
-    const validationFailures: _ValidationFailure[] = [];
-
-    for (const [typeName, selectValue] of Object.entries(selectStructFieldsHeader)) {
-        let typeReference: _UType | undefined;
-        if (typeName === '->') {
-            typeReference = functionType.result;
-        } else {
-            const parsedTypes = uApiSchema.parsed;
-            typeReference = parsedTypes[typeName];
-        }
-
-        if (!typeReference) {
-            validationFailures.push(new _ValidationFailure(['_sel', typeName], 'TypeUnknown', {}));
-            continue;
-        }
-
-        if (typeReference instanceof _UUnion) {
-            let unionCases: Record<string, any>;
-            try {
-                unionCases = asMap(selectValue);
-            } catch (e) {
-                validationFailures.push(
-                    ...getTypeUnexpectedValidationFailure(['_sel', typeName], selectValue, 'Object')
-                );
-                continue;
-            }
-
-            for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
-                const structRef = typeReference.cases[unionCase];
-                if (!structRef) {
-                    validationFailures.push(
-                        new _ValidationFailure(['_sel', typeName, unionCase], 'UnionCaseUnknown', {})
-                    );
-                    continue;
-                }
-
-                const nestedValidationFailures = validateSelectStruct(
-                    structRef,
-                    ['_sel', typeName, unionCase],
-                    selectedCaseStructFields
-                );
-                validationFailures.push(...nestedValidationFailures);
-            }
-        } else if (typeReference instanceof _UFn) {
-            const fnCall = typeReference.call;
-            const fnCallCases = fnCall.cases;
-            const fnName = typeReference.name;
-            const argStruct = fnCallCases[fnName]!;
-            const nestedValidationFailures = validateSelectStruct(argStruct, ['_sel', typeName], selectValue);
-            validationFailures.push(...nestedValidationFailures);
-        } else {
-            const structRef = typeReference as _UStruct;
-            const nestedValidationFailures = validateSelectStruct(structRef, ['_sel', typeName], selectValue);
-            validationFailures.push(...nestedValidationFailures);
+            const thisValidationFailuresPath: _ValidationFailure[] = thisValidationFailures.map((e) => {
+                return {
+                    path: prepend(header, e.path),
+                    reason: e.reason,
+                    data: e.data,
+                };
+            });
+            validationFailures.push(...thisValidationFailuresPath);
         }
     }
 
@@ -2645,7 +2581,7 @@ export function validateSelect(
     try {
         selectStructFieldsHeader = asMap(givenObj);
     } catch (e) {
-        return getTypeUnexpectedValidationFailure(['_sel'], givenObj, 'Object');
+        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
     const validationFailures: _ValidationFailure[] = [];
@@ -2660,7 +2596,7 @@ export function validateSelect(
         }
 
         if (!typeReference) {
-            validationFailures.push(new _ValidationFailure(['_sel', typeName], 'TypeUnknown', {}));
+            validationFailures.push(new _ValidationFailure([typeName], 'TypeUnknown', {}));
             continue;
         }
 
@@ -2669,24 +2605,20 @@ export function validateSelect(
             try {
                 unionCases = asMap(selectValue);
             } catch (e) {
-                validationFailures.push(
-                    ...getTypeUnexpectedValidationFailure(['_sel', typeName], selectValue, 'Object')
-                );
+                validationFailures.push(...getTypeUnexpectedValidationFailure([typeName], selectValue, 'Object'));
                 continue;
             }
 
             for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
                 const structRef = typeReference.cases[unionCase];
                 if (!structRef) {
-                    validationFailures.push(
-                        new _ValidationFailure(['_sel', typeName, unionCase], 'ObjectKeyDisallowed', {})
-                    );
+                    validationFailures.push(new _ValidationFailure([typeName, unionCase], 'ObjectKeyDisallowed', {}));
                     continue;
                 }
 
                 const nestedValidationFailures = validateSelectStruct(
                     structRef,
-                    ['_sel', typeName, unionCase],
+                    [typeName, unionCase],
                     selectedCaseStructFields
                 );
                 validationFailures.push(...nestedValidationFailures);
@@ -2696,11 +2628,11 @@ export function validateSelect(
             const fnCallCases = fnCall.cases;
             const fnName = typeReference.name;
             const argStruct = fnCallCases[fnName]!;
-            const nestedValidationFailures = validateSelectStruct(argStruct, ['_sel', typeName], selectValue);
+            const nestedValidationFailures = validateSelectStruct(argStruct, [typeName], selectValue);
             validationFailures.push(...nestedValidationFailures);
         } else {
             const structRef = typeReference as _UStruct;
-            const nestedValidationFailures = validateSelectStruct(structRef, ['_sel', typeName], selectValue);
+            const nestedValidationFailures = validateSelectStruct(structRef, [typeName], selectValue);
             validationFailures.push(...nestedValidationFailures);
         }
     }
@@ -3055,6 +2987,7 @@ export function mapValidationFailuresToInvalidFieldCases(
 export function validateResult(resultUnionType: _UUnion, errorResult: { [key: string]: any }): void {
     const newErrorResultValidationFailures = resultUnionType.validate(errorResult, undefined, undefined, [], []);
     if (newErrorResultValidationFailures.length !== 0) {
+        console.log(`original error: ${JSON.stringify(errorResult)}`);
         throw new UApiError(
             'Failed internal uAPI validation: ' +
                 JSON.stringify(mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures), null, 2)

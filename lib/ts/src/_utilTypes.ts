@@ -9,6 +9,7 @@ import {
     _MOCK_CALL_NAME,
     _MOCK_STUB_NAME,
     _OBJECT_NAME,
+    _SELCT_NAME as _SELECT_NAME,
     _STRING_NAME,
     _STRUCT_NAME,
     _UNION_NAME,
@@ -587,7 +588,7 @@ export class _USelect implements _UType {
     }
 
     getName(generics: _UTypeDeclaration[]): string {
-        return _MOCK_CALL_NAME;
+        return _SELECT_NAME;
     }
 }
 
