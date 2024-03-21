@@ -2679,7 +2679,7 @@ export function validateSelect(
                 const structRef = typeReference.cases[unionCase];
                 if (!structRef) {
                     validationFailures.push(
-                        new _ValidationFailure(['_sel', typeName, unionCase], 'UnionCaseUnknown', {})
+                        new _ValidationFailure(['_sel', typeName, unionCase], 'ObjectKeyDisallowed', {})
                     );
                     continue;
                 }

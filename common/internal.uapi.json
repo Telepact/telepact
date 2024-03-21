@@ -93,7 +93,7 @@
 
   {
     "///": " A reason for the validation failure in the body. ",
-    "union._BodyValidationFailureReason": {
+    "union._ValidationFailureReason": {
       "TypeUnexpected": {
         "expected": ["union._Type"],
         "actual": ["union._Type"]
@@ -120,19 +120,6 @@
   },
 
   {
-    "///": " A reason for the validation failure in the header. ",
-    "union._HeaderValidationFailureReason": {
-      "TypeUnexpected": {
-        "expected": ["union._Type"],
-        "actual": ["union._Type"]
-      },
-      "TypeUnknown": {},
-      "ObjectKeyDisallowed": {},
-      "UnionCaseUnknown": {}
-    }
-  },
-
-  {
     "///": " A parse failure. ",
     "union._ParseFailure": {
       "IncompatibleBinaryEncoding": {},
@@ -145,17 +132,9 @@
 
   {
     "///": " A validation failure located at a `path` explained by a `reason`. ",
-    "struct._BodyValidationFailure": {
+    "struct._ValidationFailure": {
       "path": ["array", ["any"]],
-      "reason": ["union._BodyValidationFailureReason"]
-    }
-  },
-
-  {
-    "///": " A validation failure located at a `path` explained by a `reason`. ",
-    "struct._HeaderValidationFailure": {
-      "path": ["array", ["any"]],
-      "reason": ["union._HeaderValidationFailureReason"]
+      "reason": ["union._ValidationFailureReason"]
     }
   },
 
@@ -172,13 +151,13 @@
       "->": {
         "_ErrorUnknown": {},
         "_ErrorInvalidRequestHeaders": {
-          "cases": ["array", ["struct._HeaderValidationFailure"]]
+          "cases": ["array", ["struct._ValidationFailure"]]
         },
         "_ErrorInvalidRequestBody": {
-          "cases": ["array", ["struct._BodyValidationFailure"]]
+          "cases": ["array", ["struct._ValidationFailure"]]
         },
         "_ErrorInvalidResponseBody": {
-          "cases": ["array", ["struct._BodyValidationFailure"]]
+          "cases": ["array", ["struct._ValidationFailure"]]
         },
         "_ErrorParseFailure": {
           "reasons": ["array", ["union._ParseFailure"]]

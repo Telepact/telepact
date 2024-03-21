@@ -34,6 +34,7 @@ import {
     validateMockStub,
     validateNumber,
     validateObject,
+    validateSelect,
     validateString,
     validateStruct,
     validateUnion,
@@ -570,7 +571,7 @@ export class _USelect implements _UType {
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[]
     ): _ValidationFailure[] {
-        return validateMockCall(value, select, fn, typeParameters, generics, this.types);
+        return validateSelect(value, select, fn, typeParameters, generics, this.types);
     }
 
     generateRandomValue(
