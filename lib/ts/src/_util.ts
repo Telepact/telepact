@@ -2596,7 +2596,7 @@ export function validateSelect(
         }
 
         if (!typeReference) {
-            validationFailures.push(new _ValidationFailure([typeName], 'TypeUnknown', {}));
+            validationFailures.push(new _ValidationFailure([typeName], 'ObjectKeyDisallowed', {}));
             continue;
         }
 
