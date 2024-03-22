@@ -1,9 +1,9 @@
-import { _RandomGenerator } from "./_RandomGenerator";
-import { Message } from "./Message";
-import { Server, ServerOptions } from "./Server";
-import { UApiSchema } from "./UApiSchema";
-import { getMockUApiJson, mockHandle } from "./_util";
-import { _MockInvocation, _MockStub, _UMockCall, _UMockStub } from "./_utilTypes";
+import { _RandomGenerator } from './_RandomGenerator';
+import { Message } from './Message';
+import { Server, ServerOptions } from './Server';
+import { UApiSchema } from './UApiSchema';
+import { getMockUApiJson, mockHandle } from './_util';
+import { _MockInvocation, _MockStub, _UMockCall, _UMockStub } from './_utilTypes';
 
 /**
  * Options for the MockServer.
@@ -13,6 +13,11 @@ export class MockServerOptions {
      * Handler for errors thrown during message processing.
      */
     onError: (error: Error) => void = (e) => {};
+
+    /**
+     * Flag to indicate if authentication is required on this server.
+     */
+    authRequired: boolean = true;
 
     /**
      * Flag to indicate if message responses should be randomly generated when no stub is available.
@@ -64,13 +69,14 @@ export class MockServer {
         const parsedTypes: Record<string, any> = {};
         const typeExtensions: Record<string, any> = {};
 
-        typeExtensions["_ext._Call"] = new _UMockCall(parsedTypes);
-        typeExtensions["_ext._Stub"] = new _UMockStub(parsedTypes);
+        typeExtensions['_ext._Call'] = new _UMockCall(parsedTypes);
+        typeExtensions['_ext._Stub'] = new _UMockStub(parsedTypes);
 
         const combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, getMockUApiJson(), typeExtensions);
 
         const serverOptions: ServerOptions = new ServerOptions();
         serverOptions.onError = options.onError;
+        serverOptions.authRequired = options.authRequired;
 
         this.server = new Server(combinedUApiSchema, this.handle.bind(this), serverOptions);
 

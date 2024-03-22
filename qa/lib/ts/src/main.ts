@@ -157,6 +157,7 @@ function startMockTestServer(
   const options: MockServerOptions = new MockServerOptions();
   options.onError = (e: Error) => console.error(e);
   options.enableMessageResponseGeneration = false;
+  options.authRequired = false;
 
   if (config) {
     options.generatedCollectionLengthMin = config.minLength;

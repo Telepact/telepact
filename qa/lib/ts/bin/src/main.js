@@ -100,6 +100,7 @@ function startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic
     const options = new MockServerOptions();
     options.onError = (e) => console.error(e);
     options.enableMessageResponseGeneration = false;
+    options.authRequired = false;
     if (config) {
         options.generatedCollectionLengthMin = config.minLength;
         options.generatedCollectionLengthMax = config.maxLength;
