@@ -11,13 +11,19 @@ public class UApiSchema {
 
     final List<Object> original;
     final Map<String, _UType> parsed;
+    final Map<String, _UFieldDeclaration> parsedRequestHeaders;
+    final Map<String, _UFieldDeclaration> parsedResponseHeaders;
     final Map<String, _UType> typeExtensions;
 
     public UApiSchema(List<Object> original,
-            Map<String, _UType> parsed,
-            Map<String, _UType> typeExtensions) {
+    Map<String, _UType> parsed,
+    Map<String, _UFieldDeclaration> parsedRequestHeaders,
+    Map<String, _UFieldDeclaration> parsedResponseHeaders,
+    Map<String, _UType> typeExtensions) {
         this.original = original;
         this.parsed = parsed;
+        this.parsedRequestHeaders = parsedRequestHeaders;
+        this.parsedResponseHeaders = parsedResponseHeaders;
         this.typeExtensions = typeExtensions;
     }
 

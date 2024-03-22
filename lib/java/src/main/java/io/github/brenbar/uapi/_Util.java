@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +45,7 @@ class _Util {
     static final String _STRING_NAME = "String";
     static final String _STRUCT_NAME = "Object";
     static final String _UNION_NAME = "Object";
+    static final String _SELECT = "Object";
 
     public static String getInternalUApiJson() {
         final var stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("internal.uapi.json");
@@ -332,8 +330,7 @@ class _Util {
         try {
             final _UType type;
             if (customTypeName.startsWith("struct")) {
-                final var isForFn = false;
-                type = parseStructType(List.of(index), definition, customTypeName, isForFn,
+                type = parseStructType(List.of(index), definition, customTypeName, List.of(),
                         typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
@@ -364,7 +361,7 @@ class _Util {
     }
 
     static _UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
-            String schemaKey, boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
+            String schemaKey, List<String> ignoreKeys, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -373,9 +370,9 @@ class _Util {
 
         otherKeys.remove(schemaKey);
         otherKeys.remove("///");
-        if (isForFn) {
-            otherKeys.remove("->");
-            otherKeys.remove("errors");
+        otherKeys.remove("ignoreIfDuplicate");
+        for (final var ignoreKey : ignoreKeys) {
+            otherKeys.remove(ignoreKey);
         }
 
         if (otherKeys.size() > 0) {
@@ -686,6 +683,69 @@ class _Util {
         return new _UError(schemaKey, error);
     }
 
+    static _UHeaders parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson,
+            String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
+            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var index = schemaKeysToIndex.get(schemaKey);
+        final List<Object> path = List.of(index);
+
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+        final var typeParameterCount = 0;
+
+        _UStruct requestHeadersStruct = null;
+        try {
+            requestHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
+                    schemaKey, List.of("->"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                    typeExtensions,
+                    allParseFailures, failedTypes);
+            for (final var e : requestHeadersStruct.fields.entrySet()) {
+                final var key = e.getKey();
+                final var field = e.getValue();
+                if (field.optional) {
+                    final var thisPath = append(append(path, schemaKey), key);
+                    final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
+                    parseFailures.add(new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                }
+            }
+            
+        } catch (UApiSchemaParseError e) {
+            parseFailures.addAll(e.schemaParseFailures);
+        }
+
+        final var resultSchemaKey = "->";
+        final List<Object> resPath = append(path, resultSchemaKey);
+
+        _UStruct responseHeadersStruct = null;
+        if (!headersDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
+            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
+        } else {
+            try {
+                responseHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
+                    schemaKey, List.of(), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                    typeExtensions,
+                    allParseFailures, failedTypes);
+                for (final var e : responseHeadersStruct.fields.entrySet()) {
+                    final var key = e.getKey();
+                    final var field = e.getValue();
+                    if (field.optional) {
+                        final var thisPath = append(append(path, schemaKey), key);
+                        final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
+                        parseFailures.add(new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                    }
+                }
+            } catch (UApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
+
+        return new _UHeaders(schemaKey, requestHeadersStruct.fields, responseHeadersStruct.fields);
+    }
+
     static _UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
@@ -697,7 +757,7 @@ class _Util {
         _UUnion callType = null;
         try {
             final _UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, isForFn, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                    schemaKey, List.of("->", "errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                     typeExtensions,
                     allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
@@ -866,6 +926,7 @@ class _Util {
         }
 
         final var errorKeys = new HashSet<String>();
+        final var headerKeys = new HashSet<String>();
         final var rootTypeParameterCount = 0;
 
         for (final var schemaKey : schemaKeys) {
@@ -873,6 +934,9 @@ class _Util {
                 continue;
             } else if (schemaKey.startsWith("error.")) {
                 errorKeys.add(schemaKey);
+                continue;
+            } else if (schemaKey.startsWith("headers.")) {
+                headerKeys.add(schemaKey);
                 continue;
             }
 
@@ -905,12 +969,29 @@ class _Util {
             }
         }
 
+        final Map<String, _UFieldDeclaration> requestHeaders = new HashMap<>();
+        final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();        
+
+        for (final var headerKey : headerKeys) {
+            final var thisIndex = schemaKeysToIndex.get(headerKey);
+            final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+
+            try {
+                final var headersType = parseHeadersType(def, headerKey, uApiSchemaPseudoJson,
+                        schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
+                requestHeaders.putAll(headersType.requestHeaders);
+                responseHeaders.putAll(headersType.responseHeaders);
+            } catch (UApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
+        }        
+
         if (!parseFailures.isEmpty()) {
             final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, typeExtensions);
+        return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, requestHeaders, responseHeaders, typeExtensions);
     }
 
     public static final byte PACKED_BYTE = (byte) 17;
@@ -1489,150 +1570,21 @@ class _Util {
             Map<String, Object> headers, UApiSchema uApiSchema, _UFn functionType) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
 
-        if (headers.containsKey("_bin")) {
-            final List<Object> binaryChecksums;
-            try {
-                binaryChecksums = asList(headers.get("_bin"));
-                var i = 0;
-                for (final var binaryChecksum : binaryChecksums) {
-                    try {
-                        var integerElement = asInt(binaryChecksum);
-                    } catch (ClassCastException e) {
-                        validationFailures
-                                .addAll(getTypeUnexpectedValidationFailure(List.of("_bin", i),
-                                        binaryChecksum,
-                                        "Integer"));
-                    }
-                    i += 1;
-                }
-            } catch (ClassCastException e) {
-                validationFailures
-                        .addAll(getTypeUnexpectedValidationFailure(List.of("_bin"), headers.get("_bin"),
-                                "Array"));
-            }
-        }
-
-        if (headers.containsKey("_sel")) {
-            final var thisValidationFailures = validateSelectHeaders(headers, uApiSchema, functionType);
-            validationFailures.addAll(thisValidationFailures);
-        }
-
-        return validationFailures;
-    }
-
-    private static List<_ValidationFailure> validateSelectHeaders(Map<String, Object> headers,
-            UApiSchema uApiSchema, _UFn functionType) {
-        Map<String, Object> selectStructFieldsHeader;
-        try {
-            selectStructFieldsHeader = asMap(headers.get("_sel"));
-        } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(List.of("_sel"),
-                    headers.get("_sel"), "Object");
-        }
-
-        final var validationFailures = new ArrayList<_ValidationFailure>();
-
-        for (final var entry : selectStructFieldsHeader.entrySet()) {
-            final var typeName = entry.getKey();
-            final var selectValue = entry.getValue();
-
-            final _UType typeReference;
-            if (typeName.equals("->")) {
-                typeReference = functionType.result;
-            } else {
-                final Map<String, _UType> parsedTypes = uApiSchema.parsed;
-                typeReference = parsedTypes.get(typeName);
-            }
-
-            if (typeReference == null) {
-                validationFailures.add(new _ValidationFailure(List.of("_sel", typeName),
-                        "TypeUnknown", Map.of()));
-                continue;
-            }
-
-            if (typeReference instanceof final _UUnion u) {
-                final Map<String, Object> unionCases;
-                try {
-                    unionCases = asMap(selectValue);
-                } catch (ClassCastException e) {
-                    validationFailures.addAll(
-                            getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
-                    continue;
-                }
-
-                for (final var unionCaseEntry : unionCases.entrySet()) {
-                    final var unionCase = unionCaseEntry.getKey();
-                    final var selectedCaseStructFields = unionCaseEntry.getValue();
-                    final var structRef = u.cases.get(unionCase);
-
-                    final List<Object> loopPath = List.of("_sel", typeName, unionCase);
-
-                    if (structRef == null) {
-                        validationFailures.add(new _ValidationFailure(
-                                loopPath,
-                                "UnionCaseUnknown", Map.of()));
-                        continue;
-                    }
-
-                    final var nestedValidationFailures = validateSelectStruct(structRef, loopPath,
-                            selectedCaseStructFields);
-
-                    validationFailures.addAll(nestedValidationFailures);
-                }
-            } else if (typeReference instanceof final _UFn f) {
-                final _UUnion fnCall = f.call;
-                final Map<String, _UStruct> fnCallCases = fnCall.cases;
-                final String fnName = f.name;
-                final var argStruct = fnCallCases.get(fnName);
-                final var nestedValidationFailures = validateSelectStruct(argStruct, List.of("_sel", typeName),
-                        selectValue);
-
-                validationFailures.addAll(nestedValidationFailures);
-            } else {
-                final var structRef = (_UStruct) typeReference;
-                final var nestedValidationFailures = validateSelectStruct(structRef, List.of("_sel", typeName),
-                        selectValue);
-
-                validationFailures.addAll(nestedValidationFailures);
+        for (final var entry : headers.entrySet()) {
+            final var header = entry.getKey();
+            final var headerValue = entry.getValue();
+            final var field = uApiSchema.parsedRequestHeaders.get(header);
+            if (field != null) {
+                final var thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name, List.of());
+                final var thisValidationFailuresPath = thisValidationFailures.stream().map(e -> new _ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
+                validationFailures.addAll(thisValidationFailuresPath);
             }
         }
 
         return validationFailures;
     }
 
-    private static List<_ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
-            Object selectedFields) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
-
-        final List<Object> fields;
-        try {
-            fields = asList(selectedFields);
-        } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
-        }
-
-        for (int i = 0; i < fields.size(); i += 1) {
-            var field = fields.get(i);
-            String stringField;
-            try {
-                stringField = asString(field);
-            } catch (ClassCastException e) {
-                final List<Object> thisPath = append(basePath, i);
-
-                validationFailures.addAll(getTypeUnexpectedValidationFailure(thisPath, field, "String"));
-                continue;
-            }
-            if (!structReference.fields.containsKey(stringField)) {
-                final List<Object> thisPath = append(basePath, i);
-
-                validationFailures.add(new _ValidationFailure(thisPath, "ObjectKeyDisallowed", Map.of()));
-            }
-        }
-
-        return validationFailures;
-    }
-
-    static List<_ValidationFailure> validateValueOfType(Object value, List<_UTypeDeclaration> generics,
+    static List<_ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> generics,
             _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
         if (value == null) {
             final boolean isNullable;
@@ -1651,7 +1603,7 @@ class _Util {
                 return List.of();
             }
         } else {
-            return thisType.validate(value, typeParameters, generics);
+            return thisType.validate(value, select, fn, typeParameters, generics);
         }
     }
 
@@ -1752,7 +1704,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateArray(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateArray(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -1760,7 +1712,7 @@ class _Util {
             final var validationFailures = new ArrayList<_ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
-                final var nestedValidationFailures = nestedTypeDeclaration.validate(element, generics);
+                final var nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn, generics);
                 final var index = i;
 
                 final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
@@ -1814,7 +1766,7 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateObject(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateObject(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -1823,7 +1775,7 @@ class _Util {
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 final var k = (String) entry.getKey();
                 final var v = entry.getValue();
-                final var nestedValidationFailures = nestedTypeDeclaration.validate(v, generics);
+                final var nestedValidationFailures = nestedTypeDeclaration.validate(v, select, fn, generics);
 
                 final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
                 for (var f : nestedValidationFailures) {
@@ -1874,10 +1826,10 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateStruct(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateStruct(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UFieldDeclaration> fields) {
         if (value instanceof Map<?, ?> m) {
-            return validateStructFields(fields, (Map<String, Object>) m, typeParameters);
+            return validateStructFields(fields, (Map<String, Object>) m, select, fn, typeParameters);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _STRUCT_NAME);
         }
@@ -1885,7 +1837,7 @@ class _Util {
 
     static List<_ValidationFailure> validateStructFields(
             Map<String, _UFieldDeclaration> fields,
-            Map<String, Object> actualStruct, List<_UTypeDeclaration> typeParameters) {
+            Map<String, Object> actualStruct, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
 
         final var missingFields = new ArrayList<String>();
@@ -1921,7 +1873,7 @@ class _Util {
 
             final _UTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
 
-            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, typeParameters);
+            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn, typeParameters);
 
             final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : nestedValidationFailures) {
@@ -1992,10 +1944,10 @@ class _Util {
         return union.entrySet().stream().findAny().orElse(null);
     }
 
-    static List<_ValidationFailure> validateUnion(Object value, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
-            return validateUnionCases(cases, m, typeParameters);
+            return validateUnionCases(cases, m, select, fn, typeParameters);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _UNION_NAME);
         }
@@ -2003,7 +1955,7 @@ class _Util {
 
     private static List<_ValidationFailure> validateUnionCases(
             Map<String, _UStruct> referenceCases,
-            Map<?, ?> actual, List<_UTypeDeclaration> typeParameters) {
+            Map<?, ?> actual, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return List.of(
                     new _ValidationFailure(new ArrayList<Object>(),
@@ -2023,7 +1975,7 @@ class _Util {
 
         if (unionPayload instanceof Map<?, ?> m2) {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
-                    (Map<String, Object>) m2, typeParameters);
+                    (Map<String, Object>) m2, select, fn, typeParameters);
 
             final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : nestedValidationFailures) {
@@ -2042,8 +1994,8 @@ class _Util {
     private static List<_ValidationFailure> validateUnionStruct(
             _UStruct unionStruct,
             String unionCase,
-            Map<String, Object> actual, List<_UTypeDeclaration> typeParameters) {
-        return validateStructFields(unionStruct.fields, actual, typeParameters);
+            Map<String, Object> actual, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
+        return validateStructFields(unionStruct.fields, actual, select, fn, typeParameters);
     }
 
     static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
@@ -2102,7 +2054,120 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateMockCall(Object givenObj,
+    static List<_ValidationFailure> validateSelect(Object givenObj, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
+            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
+        Map<String, Object> selectStructFieldsHeader;
+        try {
+            selectStructFieldsHeader = asMap(givenObj);
+        } catch (ClassCastException e) {
+            return getTypeUnexpectedValidationFailure(List.of("_sel"),
+                givenObj, "Object");
+        }
+
+        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var functionType = (_UFn) types.get(fn);
+
+        for (final var entry : selectStructFieldsHeader.entrySet()) {
+            final var typeName = entry.getKey();
+            final var selectValue = entry.getValue();
+
+            final _UType typeReference;
+            if (typeName.equals("->")) {
+                typeReference = functionType.result;
+            } else {
+                typeReference = types.get(typeName);
+            }
+
+            if (typeReference == null) {
+                validationFailures.add(new _ValidationFailure(List.of("_sel", typeName),
+                        "TypeUnknown", Map.of()));
+                continue;
+            }
+
+            if (typeReference instanceof final _UUnion u) {
+                final Map<String, Object> unionCases;
+                try {
+                    unionCases = asMap(selectValue);
+                } catch (ClassCastException e) {
+                    validationFailures.addAll(
+                            getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
+                    continue;
+                }
+
+                for (final var unionCaseEntry : unionCases.entrySet()) {
+                    final var unionCase = unionCaseEntry.getKey();
+                    final var selectedCaseStructFields = unionCaseEntry.getValue();
+                    final var structRef = u.cases.get(unionCase);
+
+                    final List<Object> loopPath = List.of("_sel", typeName, unionCase);
+
+                    if (structRef == null) {
+                        validationFailures.add(new _ValidationFailure(
+                                loopPath,
+                                "UnionCaseUnknown", Map.of()));
+                        continue;
+                    }
+
+                    final var nestedValidationFailures = validateSelectStruct(structRef, loopPath,
+                            selectedCaseStructFields);
+
+                    validationFailures.addAll(nestedValidationFailures);
+                }
+            } else if (typeReference instanceof final _UFn f) {
+                final _UUnion fnCall = f.call;
+                final Map<String, _UStruct> fnCallCases = fnCall.cases;
+                final String fnName = f.name;
+                final var argStruct = fnCallCases.get(fnName);
+                final var nestedValidationFailures = validateSelectStruct(argStruct, List.of("_sel", typeName),
+                        selectValue);
+
+                validationFailures.addAll(nestedValidationFailures);
+            } else {
+                final var structRef = (_UStruct) typeReference;
+                final var nestedValidationFailures = validateSelectStruct(structRef, List.of("_sel", typeName),
+                        selectValue);
+
+                validationFailures.addAll(nestedValidationFailures);
+            }
+        }
+
+        return validationFailures;
+    }
+
+    private static List<_ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
+            Object selectedFields) {
+        final var validationFailures = new ArrayList<_ValidationFailure>();
+
+        final List<Object> fields;
+        try {
+            fields = asList(selectedFields);
+        } catch (ClassCastException e) {
+            return getTypeUnexpectedValidationFailure(basePath, selectedFields, "Array");
+        }
+
+        for (int i = 0; i < fields.size(); i += 1) {
+            var field = fields.get(i);
+            String stringField;
+            try {
+                stringField = asString(field);
+            } catch (ClassCastException e) {
+                final List<Object> thisPath = append(basePath, i);
+
+                validationFailures.addAll(getTypeUnexpectedValidationFailure(thisPath, field, "String"));
+                continue;
+            }
+            if (!structReference.fields.containsKey(stringField)) {
+                final List<Object> thisPath = append(basePath, i);
+
+                validationFailures.add(new _ValidationFailure(thisPath, "ObjectKeyDisallowed", Map.of()));
+            }
+        }
+
+        return validationFailures;
+    }    
+
+    static List<_ValidationFailure> validateMockCall(Object givenObj, Map<String, Object> select, String fn,
             List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final Map<String, Object> givenMap;
@@ -2128,7 +2193,7 @@ class _Util {
         final String functionDefName = functionDef.name;
         final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
 
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(), List.of());
 
         final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
         for (var f : inputFailures) {
@@ -2141,7 +2206,7 @@ class _Util {
                 .filter(f -> !f.reason.equals("RequiredObjectKeyMissing")).toList();
     }
 
-    static List<_ValidationFailure> validateMockStub(Object givenObj,
+    static List<_ValidationFailure> validateMockStub(Object givenObj, Map<String, Object> select, String fn,
             List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, Map<String, _UType> types) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
@@ -2172,7 +2237,7 @@ class _Util {
         final _UUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
         final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), List.of());
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(), List.of());
 
         final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
         for (final var f : inputFailures) {
@@ -2194,7 +2259,7 @@ class _Util {
                     Map.of()));
         } else {
             final var output = givenMap.get(resultDefKey);
-            final var outputFailures = functionDef.result.validate(output, List.of(), List.of());
+            final var outputFailures = functionDef.result.validate(output, select, fn, List.of(), List.of());
 
             final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : outputFailures) {
@@ -2361,7 +2426,7 @@ class _Util {
 
     private static void validateResult(_UUnion resultUnionType, Object errorResult) {
         final var newErrorResultValidationFailures = resultUnionType.validate(
-                errorResult, List.of(), List.of());
+                errorResult, null, null, List.of(), List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
             throw new UApiError(
                     "Failed internal uAPI validation: "
@@ -2425,6 +2490,8 @@ class _Util {
                 responseHeaders.put("_pac", requestHeaders.get("_pac"));
             }
         }
+        
+        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("_sel");
 
         if (unknownTarget != null) {
             final Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
@@ -2438,7 +2505,7 @@ class _Util {
 
         final _UUnion functionTypeCall = functionType.call;
 
-        final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(), List.of());
+        final var callValidationFailures = functionTypeCall.validate(requestBody, null, null, List.of(), List.of());
         if (!callValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("_ErrorInvalidRequestBody", callValidationFailures, resultUnionType,
                     responseHeaders);
@@ -2469,7 +2536,7 @@ class _Util {
         final var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
             final var resultValidationFailures = resultUnionType.validate(
-                    resultMessage.body, List.of(), List.of());
+                    resultMessage.body, selectStructFieldsHeader, null, List.of(), List.of());
             if (!resultValidationFailures.isEmpty()) {
                 return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType,
                         responseHeaders);
@@ -2482,9 +2549,7 @@ class _Util {
         final Map<String, Object> finalResponseHeaders = resultMessage.header;
 
         final Map<String, Object> finalResultUnion;
-        if (requestHeaders.containsKey("_sel")) {
-            Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders
-                    .get("_sel");
+        if (selectStructFieldsHeader != null) {
             finalResultUnion = (Map<String, Object>) selectStructFields(
                     new _UTypeDeclaration(resultUnionType, false, List.of()),
                     resultUnion,

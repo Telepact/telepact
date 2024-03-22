@@ -32,6 +32,11 @@ public class Server {
         };
 
         /**
+         * Flag to indicate if authentication via the _auth header is required.
+         */
+        public boolean authRequired = true;
+
+        /**
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
@@ -61,6 +66,10 @@ public class Server {
         final var binaryEncoding = _Util.constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
+
+        if (((_UStruct) this.uApiSchema.parsed.get("struct._Auth")).fields.size() == 0 && options.authRequired) {
+            throw new RuntimeException("Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.");
+        }
     }
 
     /**

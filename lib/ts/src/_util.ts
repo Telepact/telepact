@@ -840,7 +840,6 @@ export function parseHeadersType(
 
     const parseFailures: _SchemaParseFailure[] = [];
     const typeParameterCount = 0;
-    const isForFn = true;
 
     let requestHeadersStruct: _UStruct | null = null;
     try {
@@ -888,8 +887,8 @@ export function parseHeadersType(
             responseHeadersStruct = parseStructType(
                 path,
                 headersDefinitionAsParsedJson,
-                schemaKey,
-                ['->'],
+                resultSchemaKey,
+                [],
                 typeParameterCount,
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
@@ -898,8 +897,8 @@ export function parseHeadersType(
                 allParseFailures,
                 failedTypes
             );
-            for (const key in requestHeadersStruct.fields) {
-                const field = requestHeadersStruct.fields[key];
+            for (const key in responseHeadersStruct.fields) {
+                const field = responseHeadersStruct.fields[key];
                 if (field.optional) {
                     const thisPath = append(append(path, '->'), key);
                     const regexString = '^(_?[a-z][a-zA-Z0-9_]*)$';
@@ -1885,10 +1884,9 @@ export function validateHeaders(
 ): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
-    for (const header in headers) {
+    for (const [header, headerValue] of Object.entries(headers)) {
         const field = uApiSchema.parsedRequestHeaders[header];
         if (field) {
-            const headerValue = headers[header];
             const thisValidationFailures = field.typeDeclaration.validate(
                 headerValue,
                 undefined,
@@ -2713,13 +2711,7 @@ export function validateMockCall(
     const functionDefName = functionDef?.name;
     const functionDefCallCases = functionDefCall?.cases;
 
-    const inputFailures = functionDefCallCases?.[functionDefName]?.validate(
-        input,
-        select,
-        fn,
-        typeParameters,
-        generics
-    );
+    const inputFailures = functionDefCallCases?.[functionDefName]?.validate(input, select, fn, [], []);
 
     if (!inputFailures) return [];
 
@@ -2773,7 +2765,7 @@ export function validateMockStub(
     const functionDefCall = functionDef.call;
     const functionDefName = functionDef.name;
     const functionDefCallCases = functionDefCall.cases;
-    const inputFailures = functionDefCallCases[functionDefName]!.validate(input, select, fn, typeParameters, generics);
+    const inputFailures = functionDefCallCases[functionDefName]!.validate(input, select, fn, [], []);
 
     const inputFailuresWithPath: _ValidationFailure[] = [];
     for (const f of inputFailures) {
