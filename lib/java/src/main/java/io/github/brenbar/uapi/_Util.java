@@ -118,7 +118,7 @@ class _Util {
     }
 
     public static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\\..*";
+        final var regex = "^((fn|error|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*";
         final var matches = new ArrayList<String>();
 
         for (final var e : definition.keySet()) {

@@ -4,7 +4,7 @@ import { Serializer } from './Serializer';
 import { UApiSchema } from './UApiSchema';
 import { _DefaultSerializationImpl } from './_DefaultSerializationImpl';
 import { constructBinaryEncoding, getInternalUApiJson, processBytes } from './_util';
-import { _ServerBinaryEncoder, _UHeaders, _USelect, _UStruct } from './_utilTypes';
+import { _ServerBinaryEncoder, _UHeaders, _USelect, _UStruct, _UType } from './_utilTypes';
 
 /**
  * Options for the Server.
@@ -61,8 +61,8 @@ export class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        const parsedTypes: Record<string, any> = {};
-        const typeExtensions: Record<string, any> = {};
+        const parsedTypes: Record<string, _UType> = {};
+        const typeExtensions: Record<string, _UType> = {};
 
         typeExtensions['_ext._Select'] = new _USelect(parsedTypes);
 

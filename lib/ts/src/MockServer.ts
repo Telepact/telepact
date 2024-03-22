@@ -3,7 +3,7 @@ import { Message } from './Message';
 import { Server, ServerOptions } from './Server';
 import { UApiSchema } from './UApiSchema';
 import { getMockUApiJson, mockHandle } from './_util';
-import { _MockInvocation, _MockStub, _UMockCall, _UMockStub } from './_utilTypes';
+import { _MockInvocation, _MockStub, _UMockCall, _UMockStub, _UType } from './_utilTypes';
 
 /**
  * Options for the MockServer.
@@ -61,8 +61,8 @@ export class MockServer {
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
         this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
-        const parsedTypes: Record<string, any> = {};
-        const typeExtensions: Record<string, any> = {};
+        const parsedTypes: Record<string, _UType> = {};
+        const typeExtensions: Record<string, _UType> = {};
 
         typeExtensions['_ext._Call'] = new _UMockCall(parsedTypes);
         typeExtensions['_ext._Stub'] = new _UMockStub(parsedTypes);

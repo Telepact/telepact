@@ -1,5 +1,7 @@
 package io.github.brenbar.uapi;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -57,11 +59,19 @@ public class Server {
      * @param handler
      */
     public Server(UApiSchema uApiSchema, Function<Message, Message> handler, Options options) {
-        this.uApiSchema = UApiSchema.extend(uApiSchema, _Util.getInternalUApiJson());
         this.handler = handler;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
+
+        final Map<String, _UType> parsedTypes = new HashMap<>();
+        final Map<String, _UType> typeExtensions = new HashMap<>();
+
+        typeExtensions.put("_ext._Select" , new _USelect(parsedTypes));
+
+        this.uApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _Util.getInternalUApiJson(), typeExtensions);
+
+        parsedTypes.putAll(uApiSchema.parsed);
 
         final var binaryEncoding = _Util.constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
