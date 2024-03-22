@@ -15,11 +15,6 @@ export class MockServerOptions {
     onError: (error: Error) => void = (e) => {};
 
     /**
-     * Flag to indicate if authentication is required on this server.
-     */
-    authRequired: boolean = true;
-
-    /**
      * Flag to indicate if message responses should be randomly generated when no stub is available.
      */
     enableMessageResponseGeneration: boolean = true;
@@ -76,7 +71,7 @@ export class MockServer {
 
         const serverOptions: ServerOptions = new ServerOptions();
         serverOptions.onError = options.onError;
-        serverOptions.authRequired = options.authRequired;
+        serverOptions.authRequired = false;
 
         this.server = new Server(combinedUApiSchema, this.handle.bind(this), serverOptions);
 

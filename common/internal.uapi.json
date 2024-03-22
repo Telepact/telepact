@@ -164,5 +164,23 @@
         }
       }
     }
+  },
+
+  {
+    "///": [
+      " When the `struct._Auth` struct is defined, all functions may return one of the following errors:         ",
+      " 1. `_ErrorUnauthenticated` indicating that the credentials in the `_auth` header were missing or invalid ",
+      " 2. `_ErrorUnauthorized` indicating that the credentials in the `_auth` header were insufficient to run the function    "
+    ],
+    "error._Authenticated": {
+      "->": {
+        "_ErrorUnauthenticated": {
+          "message!": ["string"]
+        },
+        "_ErrorUnauthorized": {
+          "message!": ["string"]
+        }
+      }
+    }
   }
 ]

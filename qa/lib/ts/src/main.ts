@@ -157,7 +157,6 @@ function startMockTestServer(
   const options: MockServerOptions = new MockServerOptions();
   options.onError = (e: Error) => console.error(e);
   options.enableMessageResponseGeneration = false;
-  options.authRequired = false;
 
   if (config) {
     options.generatedCollectionLengthMin = config.minLength;
@@ -279,7 +278,8 @@ function startTestServer(
   registry: Registry,
   apiSchemaPath: string,
   frontdoorTopic: string,
-  backdoorTopic: string
+  backdoorTopic: string,
+  authRequired: boolean
 ): Subscription {
   const json = fs.readFileSync(apiSchemaPath, "utf-8");
   let uApi: UApiSchema = UApiSchema.fromJson(json);
@@ -350,13 +350,13 @@ function startTestServer(
       throw new Error();
     }
   };
-  options.authRequired = false;
+  options.authRequired = authRequired;
 
   const server: Server = new Server(uApi, handler, options);
 
   const alternateOptions = new ServerOptions();
   alternateOptions.onError = (e) => console.error(e);
-  alternateOptions.authRequired = false;
+  alternateOptions.authRequired = authRequired;
   const alternateServer: Server = new Server(
     alternateUApi,
     handler,
@@ -447,13 +447,15 @@ async function runDispatcherServer(): Promise<void> {
             const apiSchemaPath = payload["apiSchemaPath"] as string;
             const frontdoorTopic = payload["frontdoorTopic"] as string;
             const backdoorTopic = payload["backdoorTopic"] as string;
+            const authRequired: boolean = payload["authRequired!"] ?? false
 
             const d = startTestServer(
               connection,
               registry,
               apiSchemaPath,
               frontdoorTopic,
-              backdoorTopic
+              backdoorTopic,
+              authRequired
             );
 
             servers[id] = d;

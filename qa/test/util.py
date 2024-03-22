@@ -18,6 +18,7 @@ class Constants:
     binary_api_path = '../../test/binary.uapi.json'
     schema_api_path = '../../test/schema.uapi.json'
     load_api_path = '../../test/load.uapi.json'
+    auth_api_path = '../../test/auth.uapi.json'
     calculator_api_path = '../../test/calculator.uapi.json'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'

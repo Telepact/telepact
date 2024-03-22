@@ -100,7 +100,6 @@ function startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic
     const options = new MockServerOptions();
     options.onError = (e) => console.error(e);
     options.enableMessageResponseGeneration = false;
-    options.authRequired = false;
     if (config) {
         options.generatedCollectionLengthMin = config.minLength;
         options.generatedCollectionLengthMax = config.maxLength;
@@ -188,7 +187,7 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
     })();
     return sub;
 }
-function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic) {
+function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic, authRequired) {
     const json = fs.readFileSync(apiSchemaPath, "utf-8");
     let uApi = UApiSchema.fromJson(json);
     const alternateUApi = UApiSchema.extend(uApi, `
@@ -240,11 +239,11 @@ function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, ba
             throw new Error();
         }
     };
-    options.authRequired = false;
+    options.authRequired = authRequired;
     const server = new Server(uApi, handler, options);
     const alternateOptions = new ServerOptions();
     alternateOptions.onError = (e) => console.error(e);
-    alternateOptions.authRequired = false;
+    alternateOptions.authRequired = authRequired;
     const alternateServer = new Server(alternateUApi, handler, alternateOptions);
     const subscription = connection.subscribe(frontdoorTopic);
     (async () => {
@@ -317,7 +316,8 @@ async function runDispatcherServer() {
                         const apiSchemaPath = payload["apiSchemaPath"];
                         const frontdoorTopic = payload["frontdoorTopic"];
                         const backdoorTopic = payload["backdoorTopic"];
-                        const d = startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic);
+                        const authRequired = payload["authRequired!"] ?? false;
+                        const d = startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic, authRequired);
                         servers[id] = d;
                         break;
                     }
