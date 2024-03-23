@@ -743,10 +743,11 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
         ignore_if_duplicate: bool = def_dict.get('ignoreIfDuplicate', False)
         matching_schema_key = find_matching_schema_key(schema_keys, schema_key)
-        if matching_schema_key and not ignore_if_duplicate:
-            other_path_index = schema_keys_to_index[matching_schema_key]
-            final_path = loop_path + [schema_key]
-            parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision", {
+        if matching_schema_key:
+            if not ignore_if_duplicate:
+                other_path_index = schema_keys_to_index[matching_schema_key]
+                final_path = loop_path + [schema_key]
+                parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision", {
                                   "other": [other_path_index, matching_schema_key]}))
             continue
 

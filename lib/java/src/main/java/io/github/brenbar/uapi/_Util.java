@@ -907,13 +907,15 @@ class _Util {
 
             final var ignoreIfDuplicate = (Boolean) def.getOrDefault("ignoreIfDuplicate", false);
             final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
-            if (matchingSchemaKey != null && !ignoreIfDuplicate) {
-                final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
-                final List<Object> finalPath = append(loopPath, schemaKey);
-                System.out.print(otherPathIndex);
+            if (matchingSchemaKey != null) {
+                if (!ignoreIfDuplicate) {
+                    final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
+                    final List<Object> finalPath = append(loopPath, schemaKey);
+                    System.out.print(otherPathIndex);
 
-                parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",
-                        Map.of("other", List.of(otherPathIndex, matchingSchemaKey))));
+                    parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",
+                            Map.of("other", List.of(otherPathIndex, matchingSchemaKey))));
+                }
                 continue;
             }
 

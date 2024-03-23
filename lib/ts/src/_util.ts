@@ -1117,15 +1117,17 @@ export function parseUApiSchema(
 
         const ignoreIfDuplicate: boolean = def['ignoreIfDuplicate'] ?? false;
         const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
-        if (matchingSchemaKey && !ignoreIfDuplicate) {
-            const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
-            const finalPath = append(loopPath, schemaKey);
+        if (matchingSchemaKey) {
+            if (!ignoreIfDuplicate) {
+                const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
+                const finalPath = append(loopPath, schemaKey);
 
-            parseFailures.push(
-                new _SchemaParseFailure(finalPath, 'PathCollision', {
-                    other: [otherPathIndex, matchingSchemaKey],
-                })
-            );
+                parseFailures.push(
+                    new _SchemaParseFailure(finalPath, 'PathCollision', {
+                        other: [otherPathIndex, matchingSchemaKey],
+                    })
+                );
+            }
             continue;
         }
 
