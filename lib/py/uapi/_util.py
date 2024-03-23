@@ -799,7 +799,9 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     request_headers: Dict[str, _types._UFieldDeclaration] = {}
     response_headers: Dict[str, _types._UFieldDeclaration] = {}
-    
+
+    print(f'header_keys {header_keys}')
+
     for header_key in header_keys:
         this_index = schema_keys_to_index[error_key]
         def_dict = uapi_schema_pseudo_json[this_index]
@@ -807,6 +809,8 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         try:
             headers_type = parse_headers_type(def_dict, header_key, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
                                      type_extensions, parse_failures, failed_types)
+            
+            print(f'headers_type {headers_type}')
             
             request_headers.update(headers_type.request_headers)
             response_headers.update(headers_type.response_headers)
@@ -1259,7 +1263,9 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', f
     validation_failures: List[_types._ValidationFailure] = []
 
     for header, header_value in headers.items():
+        print(f'validating {header} {header_value}')
         field = uapi_schema.parsed_request_headers.get(header, None)
+        print(f'field {field}')
         if field:
             this_validation_failures = field.type_declaration.validate(
                 header_value,
@@ -1268,7 +1274,7 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', f
                 []
             )
             this_validation_failures_path = []
-            for this_validation_failure in this_validation_failures:
+            for x in this_validation_failures:
                 this_validation_failures_path.append(
                     _types._ValidationFailure(prepend(header, x.path), x.reason, x.data)
                 )
