@@ -89,7 +89,7 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
 def find_schema_key(definition: dict[str, Any], index: int) -> str:
     import re
 
-    regex = "^((fn|error|info)|((struct|union|_ext)(<[0-2]>)?))\\..*"
+    regex = "^((fn|error|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*"
     matches = []
 
     for e in definition.keys():
@@ -784,7 +784,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         offset_parse_failures = offset_schema_index(
             parse_failures, path_offset)
         raise types.UApiSchemaParseError(offset_parse_failures)
-
+    
     for error_key in error_keys:
         this_index = schema_keys_to_index[error_key]
         def_dict = uapi_schema_pseudo_json[this_index]
@@ -800,10 +800,8 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
     request_headers: Dict[str, _types._UFieldDeclaration] = {}
     response_headers: Dict[str, _types._UFieldDeclaration] = {}
 
-    print(f'header_keys {header_keys}')
-
     for header_key in header_keys:
-        this_index = schema_keys_to_index[error_key]
+        this_index = schema_keys_to_index[header_key]
         def_dict = uapi_schema_pseudo_json[this_index]
 
         try:
@@ -1263,9 +1261,7 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', f
     validation_failures: List[_types._ValidationFailure] = []
 
     for header, header_value in headers.items():
-        print(f'validating {header} {header_value}')
         field = uapi_schema.parsed_request_headers.get(header, None)
-        print(f'field {field}')
         if field:
             this_validation_failures = field.type_declaration.validate(
                 header_value,
@@ -1976,9 +1972,8 @@ def map_validation_failures_to_invalid_field_cases(argument_validation_failures:
 
 
 def validate_result(result_union_type: _types._UUnion, error_result: Any) -> None:
-    import pprint
     new_error_result_validation_failures = result_union_type.validate(
-        error_result, [], [])
+        error_result, None, None, [], [])
     if new_error_result_validation_failures:
         raise types.UApiError("Failed internal uAPI validation: " +
                               str(map_validation_failures_to_invalid_field_cases(new_error_result_validation_failures)))

@@ -2,13 +2,11 @@
 python_version = "3.11"
 python_full_version = "3.11.0"
 
-[dev-packages]
+[packages]
+build = "*"
 msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
-
-[packages]
-build = "*"
 uapi = {path = "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl"}
 
 [pipenv]

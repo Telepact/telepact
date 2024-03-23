@@ -12,6 +12,9 @@ class _SchemaParseFailure:
         self.path = path
         self.reason = reason
         self.data = data
+    
+    def __repr__(self):
+        return f'(path: {self.path}, reason: {self.reason}, data: {self.data})'
 
 class _ValidationFailure:
     def __init__(self, path: List[object], reason: str, data: Dict[str, object]):
