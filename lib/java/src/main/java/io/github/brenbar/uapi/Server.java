@@ -71,7 +71,7 @@ public class Server {
 
         this.uApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _Util.getInternalUApiJson(), typeExtensions);
 
-        parsedTypes.putAll(uApiSchema.parsed);
+        parsedTypes.putAll(this.uApiSchema.parsed);
 
         final var binaryEncoding = _Util.constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);

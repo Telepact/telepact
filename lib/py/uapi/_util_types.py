@@ -24,7 +24,7 @@ class _UType:
     def get_type_parameter_count(self) -> int:
         raise NotImplementedError
 
-    def validate(self, value: object, type_parameters: List['_UTypeDeclaration'], generics: List['_UTypeDeclaration']) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List['_UTypeDeclaration'], generics: List['_UTypeDeclaration']) -> List[_ValidationFailure]:
         raise NotImplementedError
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List['_UTypeDeclaration'], generics: List['_UTypeDeclaration'], random_generator: _rg._RandomGenerator) -> object:
@@ -40,7 +40,7 @@ class _UTypeDeclaration:
         self.nullable = nullable
         self.type_parameters = type_parameters
 
-    def validate(self, value: object, generics: List['_UTypeDeclaration']) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, generics: List['_UTypeDeclaration']) -> List[_ValidationFailure]:
         return uapi._util.validate_value_of_type(value, generics, self.type, self.nullable, self.type_parameters)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, generics: List['_UTypeDeclaration'], random_generator: _rg._RandomGenerator) -> object:
@@ -61,7 +61,7 @@ class _UGeneric(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         type_declaration = generics[self.index]
         return type_declaration.validate(value, [])
 
@@ -78,7 +78,7 @@ class _UAny(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return []
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -92,7 +92,7 @@ class _UBoolean(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_boolean(value)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -106,7 +106,7 @@ class _UInteger(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_integer(value)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -120,7 +120,7 @@ class _UNumber(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_number(value)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -134,7 +134,7 @@ class _UString(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_string(value)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -148,7 +148,7 @@ class _UArray(_UType):
     def get_type_parameter_count(self) -> int:
         return 1
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_array(value, type_parameters, generics)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -162,7 +162,7 @@ class _UObject(_UType):
     def get_type_parameter_count(self) -> int:
         return 1
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_object(value, type_parameters, generics)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -181,7 +181,7 @@ class _UStruct(_UType):
     def get_type_parameter_count(self) -> int:
         return self.type_parameter_count
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_struct(value, type_parameters, generics, self.fields)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -203,7 +203,7 @@ class _UUnion(_UType):
     def get_type_parameter_count(self) -> int:
         return self.type_parameter_count
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_union(value, type_parameters, generics, self.cases)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -226,7 +226,7 @@ class _UFn(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return self.call.validate(value, type_parameters, generics)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -234,7 +234,7 @@ class _UFn(_UType):
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
         return uapi._util._FN_NAME
-
+    
 
 class _UMockCall(_UType):
     def __init__(self, types: Dict[str, _UType]):
@@ -243,7 +243,7 @@ class _UMockCall(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, given_obj: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, given_obj: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_mock_call(given_obj, type_parameters, generics, self.types)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -253,6 +253,23 @@ class _UMockCall(_UType):
         return uapi._util._MOCK_CALL_NAME
 
 
+class _USelect(_UType):
+    def __init__(self, types: Dict[str, _UType]):
+        self.types = types
+
+    def get_type_parameter_count(self) -> int:
+        return 0
+
+    def validate(self, given_obj: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+        return uapi._util.validate_select(given_obj, type_parameters, generics, self.types)
+
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
+        raise NotImplementedError("Not implemented")
+
+    def get_name(self, generics: List[_UTypeDeclaration]) -> str:
+        return uapi._util._SELECT_NAME
+
+
 class _UMockStub(_UType):
     def __init__(self, types: Dict[str, _UType]):
         self.types = types
@@ -260,7 +277,7 @@ class _UMockStub(_UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, given_obj: object, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
+    def validate(self, given_obj: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
         return uapi._util.validate_mock_stub(given_obj, type_parameters, generics, self.types)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
@@ -277,6 +294,13 @@ class _UError:
 
     def __str__(self):
         return f'_UError(name: {self.name}, errors: {self.errors})'
+    
+
+class _UHeaders:
+    def __init__(self, name: str, request_headers: Dict[str, _UFieldDeclaration], response_headers: Dict[str, _UFieldDeclaration]):
+        self.name = name
+        self.request_headers = request_headers
+        self.response_headers = response_headers
 
 
 class _DeserializationError(RuntimeError):

@@ -26,6 +26,7 @@ _OBJECT_NAME = "Object"
 _STRING_NAME = "String"
 _STRUCT_NAME = "Object"
 _UNION_NAME = "Object"
+_SELECT_NAME = "Object"
 
 
 def get_internal_uapi_json() -> str:
@@ -260,8 +261,7 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
     try:
 
         if custom_type_name.startswith("struct"):
-            is_for_fn = False
-            t = parse_struct_type([index], definition, custom_type_name, is_for_fn, type_parameter_count,
+            t = parse_struct_type([index], definition, custom_type_name, [], type_parameter_count,
                                   u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
                                   all_parse_failures, failed_types)
         elif custom_type_name.startswith("union"):
@@ -289,7 +289,7 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
 
 
 def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict[str, object],
-                      schema_key: str, is_for_fn: bool, type_parameter_count: int,
+                      schema_key: str, ignore_keys: List[str], type_parameter_count: int,
                       uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
                       parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
                       all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UStruct:
@@ -298,10 +298,10 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
     other_keys = set(struct_definition_as_pseudo_json.keys())
     other_keys.discard(schema_key)
     other_keys.discard("///")
+    other_keys.discard("ignoreIfDuplicate")
 
-    if is_for_fn:
-        other_keys.discard("->")
-        other_keys.discard("errors")
+    for ignore_key in ignore_keys:
+        other_keys.discard(ignore_key)
 
     if other_keys:
         for k in other_keys:
@@ -561,6 +561,59 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
     return _types._UError(schema_key, error)
 
 
+def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
+                        schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
+                        parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                        all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UHeaders:
+    index = schema_keys_to_index.get(schema_key)
+    path = [index]
+
+    parse_failures = []
+    type_parameter_count = 0
+
+    request_headers_struct = None
+    try:
+        request_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, schema_key, ['->'],
+                                     type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
+                                     parsed_types, type_extensions, all_parse_failures, failed_types)
+        
+        for key, field in request_headers_struct.fields.items():
+            if field.optional:
+                this_path = append(append(path, schema_key), key)
+                regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
+                parse_failures.append(_types._SchemaParseFailure(this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
+
+    except types.UApiSchemaParseError as e:
+        parse_failures.extend(e.schema_parse_failures)
+
+    result_schema_key = "->"
+    res_path = path + [result_schema_key]
+
+    response_headers_struct = None
+    if result_schema_key not in headers_definition_as_parsed_json:
+        parse_failures.append(_types._SchemaParseFailure(
+            res_path, "RequiredObjectKeyMissing", {}))
+    else:
+        try:
+            response_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, result_schema_key, [schema_key],
+                                        type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
+                                        parsed_types, type_extensions, all_parse_failures, failed_types)
+            
+            for key, field in response_headers_struct.fields.items():
+                if field.optional:
+                    this_path = append(append(path, schema_key), key)
+                    regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
+                    parse_failures.append(_types._SchemaParseFailure(this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
+
+        except types.UApiSchemaParseError as e:
+            parse_failures.extend(e.schema_parse_failures)
+
+    if parse_failures:
+        raise types.UApiSchemaParseError(parse_failures)
+
+    return _types._UHeaders(schema_key, request_headers_struct.fields, response_headers_struct.fields)
+
+
 def parse_function_type(path: List[object], function_definition_as_parsed_json: Dict[str, object],
                         schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
                         parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
@@ -571,7 +624,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
 
     call_type = None
     try:
-        arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, is_for_fn,
+        arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, ['->', 'errors'],
                                      type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
                                      parsed_types, type_extensions, all_parse_failures, failed_types)
         call_type = _types._UUnion(
@@ -705,6 +758,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     error_keys = set()
+    header_keys = set()
     root_type_parameter_count = 0
 
     for schema_key in schema_keys:
@@ -712,6 +766,9 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
             continue
         elif schema_key.startswith("error."):
             error_keys.add(schema_key)
+            continue
+        elif schema_key.startswith("headers."):
+            header_keys.add(schema_key)
             continue
 
         this_index = schema_keys_to_index[schema_key]
@@ -739,12 +796,29 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
+    request_headers: Dict[str, _types._UFieldDeclaration] = {}
+    response_headers: Dict[str, _types._UFieldDeclaration] = {}
+    
+    for header_key in header_keys:
+        this_index = schema_keys_to_index[error_key]
+        def_dict = uapi_schema_pseudo_json[this_index]
+
+        try:
+            headers_type = parse_headers_type(def_dict, header_key, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
+                                     type_extensions, parse_failures, failed_types)
+            
+            request_headers.update(headers_type.request_headers)
+            response_headers.update(headers_type.response_headers)
+
+        except types.UApiSchemaParseError as e:
+            parse_failures.extend(e.schema_parse_failures)
+
     if parse_failures:
         offset_parse_failures = offset_schema_index(
             parse_failures, path_offset)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
-    return types.UApiSchema(uapi_schema_pseudo_json, parsed_types, type_extensions)
+    return types.UApiSchema(uapi_schema_pseudo_json, parsed_types, request_headers, response_headers, type_extensions)
 
 
 class _BinaryPackNode:
@@ -1183,103 +1257,27 @@ def get_type_unexpected_validation_failure(path: List[Any], value: Any, expected
 def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', function_type: _types._UFn) -> List[_types._ValidationFailure]:
     validation_failures: List[_types._ValidationFailure] = []
 
-    if "_bin" in headers:
-        if isinstance(headers['_bin'], list):
-            binary_checksums = headers["_bin"]
-            for i, binary_checksum in enumerate(binary_checksums):
-                if not isinstance(binary_checksum, int) or isinstance(binary_checksum, bool):
-                    validation_failures.extend(get_type_unexpected_validation_failure([
-                                               "_bin", i], binary_checksum, "Integer"))
-        else:
-            validation_failures.extend(get_type_unexpected_validation_failure([
-                                       "_bin"], headers["_bin"], "Array"))
-
-    if "_sel" in headers:
-        this_validation_failures = validate_select_headers(
-            headers, uapi_schema, function_type)
-        validation_failures.extend(this_validation_failures)
-
-    return validation_failures
-
-
-def validate_select_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', function_type: _types._UFn) -> List[_types._ValidationFailure]:
-    if not isinstance(headers['_sel'], dict):
-        return get_type_unexpected_validation_failure(["_sel"], headers["_sel"], "Object")
-
-    select_struct_fields_header = headers["_sel"]
-
-    validation_failures: List[_types._ValidationFailure] = []
-
-    for type_name, select_value in select_struct_fields_header.items():
-        type_reference = function_type.result if type_name == "->" else uapi_schema.parsed.get(
-            type_name)
-
-        if type_reference is None:
-            validation_failures.append(_types._ValidationFailure(
-                ["_sel", type_name], "TypeUnknown", {}))
-            continue
-
-        if isinstance(type_reference, _types._UUnion):
-            if not isinstance(select_value, dict):
-                validation_failures.extend(get_type_unexpected_validation_failure(
-                    ["_sel", type_name], select_value, "Object"))
-                continue
-
-            union_cases = select_value
-
-            for union_case, selected_case_struct_fields in union_cases.items():
-                struct_ref = type_reference.cases.get(union_case)
-                loop_path = ["_sel", type_name, union_case]
-
-                if struct_ref is None:
-                    validation_failures.append(_types._ValidationFailure(
-                        loop_path, "UnionCaseUnknown", {}))
-                    continue
-
-                nested_validation_failures = validate_select_struct(
-                    struct_ref, loop_path, selected_case_struct_fields)
-                validation_failures.extend(nested_validation_failures)
-        elif isinstance(type_reference, _types._UFn):
-            fn_call = type_reference.call
-            fn_call_cases = fn_call.cases
-            fn_name = type_reference.name
-            arg_struct = fn_call_cases.get(fn_name)
-            nested_validation_failures = validate_select_struct(
-                arg_struct, ["_sel", type_name], select_value)
-            validation_failures.extend(nested_validation_failures)
-        else:
-            struct_ref = type_reference
-            nested_validation_failures = validate_select_struct(
-                struct_ref, ["_sel", type_name], select_value)
-            validation_failures.extend(nested_validation_failures)
+    for header, header_value in headers.items():
+        field = uapi_schema.parsed_request_headers[header]
+        if field:
+            this_validation_failures = field.type_declaration.validate(
+                header_value,
+                None,
+                function_type.name,
+                []
+            )
+            this_validation_failures_path = []
+            for this_validation_failure in this_validation_failures:
+                this_validation_failures_path.append(
+                    _types._ValidationFailure(prepend(header, x.path), x.reason, x.data)
+                )
+            
+            validation_failures.extend(this_validation_failures_path)
 
     return validation_failures
 
 
-def validate_select_struct(struct_reference: _types._UStruct, base_path: List[Any], selected_fields: Any) -> List[_types._ValidationFailure]:
-    validation_failures: List[_types._ValidationFailure] = []
-
-    if not isinstance(selected_fields, list):
-        return get_type_unexpected_validation_failure(base_path, selected_fields, "Array")
-
-    fields = selected_fields
-
-    for i, field in enumerate(fields):
-        if not isinstance(field, str):
-            this_path = base_path + [i]
-            validation_failures.extend(
-                get_type_unexpected_validation_failure(this_path, field, "String"))
-            continue
-        string_field = field
-        if string_field not in struct_reference.fields:
-            this_path = base_path + [i]
-            validation_failures.append(_types._ValidationFailure(
-                this_path, "ObjectKeyDisallowed", {}))
-
-    return validation_failures
-
-
-def validate_value_of_type(value: Any, generics: List[_types._UTypeDeclaration], this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
+def validate_value_of_type(value: Any, select: Dict[str, object], fn: str, generics: List[_types._UTypeDeclaration], this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if value is None:
         is_nullable = generics[this_type.index].nullable if isinstance(
             this_type, _types._UGeneric) else nullable
@@ -1288,7 +1286,7 @@ def validate_value_of_type(value: Any, generics: List[_types._UTypeDeclaration],
         else:
             return []
     else:
-        return this_type.validate(value, type_parameters, generics)
+        return this_type.validate(value, select, fn, type_parameters, generics)
 
 
 def generate_random_value_of_type(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, generics: List[_types._UTypeDeclaration], random_generator: _rg._RandomGenerator, this_type: _types._UType, nullable: bool, type_parameters: List[_types._UTypeDeclaration]) -> Any:
@@ -1376,7 +1374,7 @@ def generate_random_string(blueprint_value: Any, use_blueprint_value: bool,
         return random_generator.next_string()
 
 
-def validate_array(value: Any, type_parameters: List[_types._UTypeDeclaration],
+def validate_array(value: Any, select: Dict[str, object], fn: str, type_parameters: List[_types._UTypeDeclaration],
                    generics: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, list):
         nested_type_declaration = type_parameters[0]
@@ -1384,7 +1382,7 @@ def validate_array(value: Any, type_parameters: List[_types._UTypeDeclaration],
 
         for i, element in enumerate(value):
             nested_validation_failures = nested_type_declaration.validate(
-                element, generics)
+                element, select, fn, generics)
             index = i
 
             nested_validation_failures_with_path = [
@@ -1420,7 +1418,7 @@ def generate_random_array(blueprint_value: Any, use_blueprint_value: bool,
         return array
 
 
-def validate_object(value: Any, type_parameters: List[_types._UTypeDeclaration],
+def validate_object(value: Any, select: Dict[str, object], fn: str, type_parameters: List[_types._UTypeDeclaration],
                     generics: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
         nested_type_declaration = type_parameters[0]
@@ -1428,7 +1426,7 @@ def validate_object(value: Any, type_parameters: List[_types._UTypeDeclaration],
         validation_failures = []
         for k, v in value.items():
             nested_validation_failures = nested_type_declaration.validate(
-                v, generics)
+                v, select, fn, generics)
 
             nested_validation_failures_with_path = []
             for f in nested_validation_failures:
@@ -1464,16 +1462,16 @@ def generate_random_object(blueprint_value: Any, use_blueprint_value: bool,
         return obj
 
 
-def validate_struct(value: Any, type_parameters: List[_types._UTypeDeclaration],
+def validate_struct(value: Any, select: Dict[str, object], fn: str, type_parameters: List[_types._UTypeDeclaration],
                     generics: List[_types._UTypeDeclaration], fields: Dict[str, _types._UFieldDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
-        return validate_struct_fields(fields, value, type_parameters)
+        return validate_struct_fields(fields, value, select, fn, type_parameters)
     else:
         return get_type_unexpected_validation_failure([], value, 'Object')
 
 
 def validate_struct_fields(fields: Dict[str, _types._UFieldDeclaration],
-                           actual_struct: Dict[str, Any],
+                           actual_struct: Dict[str, Any], select: Dict[str, object], fn: str,
                            type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     validation_failures: List[_types._ValidationFailure] = []
 
@@ -1497,7 +1495,7 @@ def validate_struct_fields(fields: Dict[str, _types._UFieldDeclaration],
         ref_field_type_declaration = reference_field.type_declaration
 
         nested_validation_failures = ref_field_type_declaration.validate(
-            field_value, type_parameters)
+            field_value, select, fn, type_parameters)
 
         for failure in nested_validation_failures:
             this_path = [field_name] + failure.path
@@ -1559,18 +1557,18 @@ def union_entry(union: Dict[str, Any]) -> Tuple[str, Any]:
     return next(iter(union.items()), None)
 
 
-def validate_union(value: Any,
+def validate_union(value: Any, select: Dict[str, object], fn: str,
                    type_parameters: List[_types._UTypeDeclaration],
                    generics: List[_types._UTypeDeclaration],
                    cases: Dict[str, _types._UStruct]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
-        return validate_union_cases(cases, value, type_parameters)
+        return validate_union_cases(cases, value, select, fn, type_parameters)
     else:
         return get_type_unexpected_validation_failure([], value, _UNION_NAME)
 
 
 def validate_union_cases(reference_cases: Dict[str, _types._UStruct],
-                         actual: Dict[str, Any],
+                         actual: Dict[str, Any], select: Dict[str, object], fn: str,
                          type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
     if len(actual) != 1:
         return [_types._ValidationFailure([],
@@ -1585,7 +1583,7 @@ def validate_union_cases(reference_cases: Dict[str, _types._UStruct],
 
     if isinstance(union_payload, dict):
         nested_validation_failures = validate_union_struct(
-            reference_struct, union_target, union_payload, type_parameters)
+            reference_struct, union_target, union_payload, select, fn, type_parameters)
 
         nested_validation_failures_with_path = []
         for failure in nested_validation_failures:
@@ -1600,9 +1598,9 @@ def validate_union_cases(reference_cases: Dict[str, _types._UStruct],
 
 def validate_union_struct(union_struct: _types._UStruct,
                           union_case: str,
-                          actual: Dict[str, Any],
+                          actual: Dict[str, Any], select: Dict[str, object], fn: str,
                           type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
-    return validate_struct_fields(union_struct.fields, actual, type_parameters)
+    return validate_struct_fields(union_struct.fields, actual, select, fn, type_parameters)
 
 
 def generate_random_union(blueprint_value: Any, use_blueprint_value: bool,
@@ -1663,7 +1661,86 @@ def generate_random_fn(blueprint_value: Any,
                                  call_cases)
 
 
-def validate_mock_call(given_obj: Any, type_parameters: List['_types._UTypeDeclaration'],
+def validate_select(given_obj: Any, select: Dict[str, object], fn: str, type_parameters: List['_types._UTypeDeclaration'],
+                       generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
+    if not isinstance(given_obj, dict):
+        return get_type_unexpected_validation_failure(["_sel"], given_obj, "Object")
+
+    select_struct_fields_header = given_obj
+
+    validation_failures: List[_types._ValidationFailure] = []
+    function_type: _types._UFn = types[fn]
+
+    for type_name, select_value in select_struct_fields_header.items():
+        type_reference = function_type.result if type_name == "->" else uapi_schema.parsed.get(
+            type_name)
+
+        if type_reference is None:
+            validation_failures.append(_types._ValidationFailure(
+                ["_sel", type_name], "ObjectKeyDisallowed", {}))
+            continue
+
+        if isinstance(type_reference, _types._UUnion):
+            if not isinstance(select_value, dict):
+                validation_failures.extend(get_type_unexpected_validation_failure(
+                    ["_sel", type_name], select_value, "Object"))
+                continue
+
+            union_cases = select_value
+
+            for union_case, selected_case_struct_fields in union_cases.items():
+                struct_ref = type_reference.cases.get(union_case)
+                loop_path = ["_sel", type_name, union_case]
+
+                if struct_ref is None:
+                    validation_failures.append(_types._ValidationFailure(
+                        loop_path, "ObjectKeyDisallowed", {}))
+                    continue
+
+                nested_validation_failures = validate_select_struct(
+                    struct_ref, loop_path, selected_case_struct_fields)
+                validation_failures.extend(nested_validation_failures)
+        elif isinstance(type_reference, _types._UFn):
+            fn_call = type_reference.call
+            fn_call_cases = fn_call.cases
+            fn_name = type_reference.name
+            arg_struct = fn_call_cases.get(fn_name)
+            nested_validation_failures = validate_select_struct(
+                arg_struct, ["_sel", type_name], select_value)
+            validation_failures.extend(nested_validation_failures)
+        else:
+            struct_ref = type_reference
+            nested_validation_failures = validate_select_struct(
+                struct_ref, ["_sel", type_name], select_value)
+            validation_failures.extend(nested_validation_failures)
+
+    return validation_failures
+
+
+def validate_select_struct(struct_reference: _types._UStruct, base_path: List[Any], selected_fields: Any) -> List[_types._ValidationFailure]:
+    validation_failures: List[_types._ValidationFailure] = []
+
+    if not isinstance(selected_fields, list):
+        return get_type_unexpected_validation_failure(base_path, selected_fields, "Array")
+
+    fields = selected_fields
+
+    for i, field in enumerate(fields):
+        if not isinstance(field, str):
+            this_path = base_path + [i]
+            validation_failures.extend(
+                get_type_unexpected_validation_failure(this_path, field, "String"))
+            continue
+        string_field = field
+        if string_field not in struct_reference.fields:
+            this_path = base_path + [i]
+            validation_failures.append(_types._ValidationFailure(
+                this_path, "ObjectKeyDisallowed", {}))
+
+    return validation_failures
+
+
+def validate_mock_call(given_obj: Any, select: Dict[str, object], fn: str, type_parameters: List['_types._UTypeDeclaration'],
                        generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
     try:
         given_map = as_map(given_obj)
@@ -1686,7 +1763,7 @@ def validate_mock_call(given_obj: Any, type_parameters: List['_types._UTypeDecla
     function_def_call_cases = function_def_call.cases
 
     input_failures = function_def_call_cases[function_def_name].validate(
-        input_value, [], [])
+        input_value, select, fn, [], [])
 
     input_failures_with_path = []
     for f in input_failures:
@@ -1697,7 +1774,7 @@ def validate_mock_call(given_obj: Any, type_parameters: List['_types._UTypeDecla
     return [f for f in input_failures_with_path if f.reason != "RequiredObjectKeyMissing"]
 
 
-def validate_mock_stub(given_obj: Any, type_parameters: List['_types._UTypeDeclaration'],
+def validate_mock_stub(given_obj: Any, select: Dict[str, object], fn: str, type_parameters: List['_types._UTypeDeclaration'],
                        generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
     validation_failures = []
 
@@ -1722,7 +1799,7 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_types._UTypeDecla
     function_def_call_cases = function_def_call.cases
 
     input_failures = function_def_call_cases[function_def_name].validate(
-        input_value, [], [])
+        input_value, select, fn, [], [])
 
     input_failures_with_path = []
     for f in input_failures:
@@ -1741,7 +1818,7 @@ def validate_mock_stub(given_obj: Any, type_parameters: List['_types._UTypeDecla
             [result_def_key], "RequiredObjectKeyMissing", {}))
     else:
         output = given_map[result_def_key]
-        output_failures = function_def.result.validate(output, [], [])
+        output_failures = function_def.result.validate(output, select, fn, [], [])
 
         output_failures_with_path = []
         for f in output_failures:

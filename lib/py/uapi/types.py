@@ -155,6 +155,7 @@ class MockServer:
 
         server_options: Server.Options = Server.Options()
         server_options.on_error = options.on_error
+        server_options.auth_required = False
 
         self.server: Server = Server(
             combined_u_api_schema, self._handle, server_options)
@@ -308,21 +309,32 @@ class Server:
             self.on_error: Callable[[Exception], None] = lambda e: None
             self.on_request: Callable[[Message], None] = lambda m: None
             self.on_response: Callable[[Message], None] = lambda m: None
+            self.auth_required: bool = True
             self.serializer: 'SerializationImpl' = def_ser._DefaultSerializer()
 
-    def __init__(self, u_api_schema: UApiSchema, handler: Callable[[Message], Coroutine[Any, Any, Message]], options: Optional[Options] = None) -> None:
-        if options is None:
-            options = Server.Options()
-        self.u_api_schema: UApiSchema = UApiSchema.extend(
-            u_api_schema, _util.get_internal_uapi_json())
+    def __init__(self, u_api_schema: UApiSchema, handler: Callable[[Message], Coroutine[Any, Any, Message]], options: Options) -> None:
         self.handler: Callable[[Message], Message] = handler
         self.on_error: Callable[[Exception], None] = options.on_error
         self.on_request: Callable[[Message], None] = options.on_request
         self.on_response: Callable[[Message], None] = options.on_response
+
+        parsed_types: Dict[str, _types._UType] = {}
+        type_extensions: Dict[str, _types._UType] = {}
+
+        type_extensions['_ext._Select'] = _types._USelect(parsed_types)
+
+        self.u_api_schema: UApiSchema = UApiSchema.extend_with_extensions(
+            u_api_schema, _util.get_internal_uapi_json(), type_extensions)
+        
+        parsed_types.update(self.u_api_schema.parsed)
+
         binary_encoding = _util.construct_binary_encoding(self.u_api_schema)
         binary_encoder = _types._ServerBinaryEncoder(binary_encoding)
         self.serializer: 'SerializationImpl' = Serializer(
             options.serializer, binary_encoder)
+        
+        if len(self.u_api_schema.parsed['struct._Auth'].fields) == 0 and options.auth_required:
+            raise Exception('Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `False`.')
 
     async def process(self, request_message_bytes: bytes) -> bytes:
         """
@@ -358,9 +370,11 @@ class UApiSchema:
     A parsed uAPI schema.
     """
 
-    def __init__(self, original: List[object], parsed: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType]):
+    def __init__(self, original: List[object], parsed: Dict[str, _types._UType], parsed_request_headers: Dict[str, _types._UFieldDeclaration], parsed_response_headers: Dict[str, _types._UFieldDeclaration], type_extensions: Dict[str, _types._UType]):
         self.original = original
         self.parsed = parsed
+        self.parsed_request_headers = parsed_request_headers
+        self.parsed_response_headers = parsed_response_headers
         self.type_extensions = type_extensions
 
     @staticmethod
