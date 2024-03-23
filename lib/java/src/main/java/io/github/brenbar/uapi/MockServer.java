@@ -80,6 +80,7 @@ public class MockServer {
 
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
+        serverOptions.authRequired = false;
 
         this.server = new Server(combinedUApiSchema, this::handle, serverOptions);
 
