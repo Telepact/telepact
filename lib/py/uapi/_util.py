@@ -1675,7 +1675,7 @@ def validate_select(given_obj: Any, select: Dict[str, object], fn: str, type_par
     function_type: _types._UFn = types[fn]
 
     for type_name, select_value in select_struct_fields_header.items():
-        type_reference = function_type.result if type_name == "->" else uapi_schema.parsed.get(
+        type_reference = function_type.result if type_name == "->" else types.get(
             type_name)
 
         if type_reference is None:
