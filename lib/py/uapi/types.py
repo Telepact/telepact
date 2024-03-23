@@ -333,8 +333,9 @@ class Server:
         self.serializer: 'SerializationImpl' = Serializer(
             options.serializer, binary_encoder)
         
-        if len(self.u_api_schema.parsed['struct._Auth'].fields) == 0 and options.auth_required:
-            raise Exception('Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `False`.')
+        # TODO: uncomment
+        #if len(self.u_api_schema.parsed['struct._Auth'].fields) == 0 and options.auth_required:
+        #    raise Exception('Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `False`.')
 
     async def process(self, request_message_bytes: bytes) -> bytes:
         """

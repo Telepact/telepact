@@ -1259,7 +1259,7 @@ def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', f
     validation_failures: List[_types._ValidationFailure] = []
 
     for header, header_value in headers.items():
-        field = uapi_schema.parsed_request_headers[header]
+        field = uapi_schema.parsed_request_headers.get(header, None)
         if field:
             this_validation_failures = field.type_declaration.validate(
                 header_value,
@@ -2029,6 +2029,8 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
         if '_pac' in request_headers:
             response_headers['_pac'] = request_headers['_pac']
 
+    select_struct_fields_header: Dict[str, object] = request_headers.get('_sel', None)
+
     if unknown_target:
         new_error_result: Dict[str, Any] = {'_ErrorInvalidRequestBody': {
             'cases': [{'path': [unknown_target], 'reason': {'FunctionUnknown': {}}}]}}
@@ -2038,7 +2040,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     function_type_call: _types._UUnion = function_type.call
 
     call_validation_failures: List[Any] = function_type_call.validate(
-        request_body, [], [])
+        request_body, None, None, [], [])
     if call_validation_failures:
         return get_invalid_error_message('_ErrorInvalidRequestBody', call_validation_failures, result_union_type, response_headers)
 
@@ -2065,7 +2067,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:
         result_validation_failures: List[Any] = result_union_type.validate(
-            result_message.body, [], [])
+            result_message.body, select_struct_fields_header, None, [], [])
         if result_validation_failures:
             return get_invalid_error_message('_ErrorInvalidResponseBody', result_validation_failures, result_union_type, response_headers)
 
@@ -2075,7 +2077,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     final_response_headers: Dict[str, Any] = result_message.header
 
     final_result_union: Dict[str, Any]
-    if '_sel' in request_headers:
+    if select_struct_fields_header:
         select_struct_fields_header: Dict[str, Any] = request_headers['_sel']
         final_result_union = select_struct_fields(_types._UTypeDeclaration(
             result_union_type, False, []), result_union, select_struct_fields_header)
