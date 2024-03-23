@@ -212,6 +212,7 @@ public class Main {
             e.printStackTrace();
             System.err.flush();
         };
+        options.authRequired = false;
         var server = new Server(uApi, handler, options);
 
         var dispatcher = connection.createDispatcher((msg) -> {
@@ -238,7 +239,7 @@ public class Main {
     public static Dispatcher startTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String apiSchemaPath,
             String frontdoorTopic,
-            String backdoorTopic)
+            String backdoorTopic, boolean authRequired)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var uApi = UApiSchema.fromJson(json);
@@ -317,11 +318,13 @@ public class Main {
                 throw new RuntimeException();
             }
         };
+        options.authRequired = authRequired;
 
         var server = new Server(uApi, handler, options);
 
         var alternateOptions = new Server.Options();
         alternateOptions.onError = (e) -> e.printStackTrace();
+        alternateOptions.authRequired = authRequired;
 
         var alternateServer = new Server(alternateUApi, handler, alternateOptions);
 
@@ -408,9 +411,10 @@ public class Main {
                             var apiSchemaPath = (String) payload.get("apiSchemaPath");
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
                             var backdoorTopic = (String) payload.get("backdoorTopic");
+                            var authRequired = (Boolean) payload.getOrDefault("authRequired!", false);
 
                             var d = startTestServer(connection, metrics, apiSchemaPath, frontdoorTopic,
-                                    backdoorTopic);
+                                    backdoorTopic, authRequired);
 
                             servers.put(id, d);
                         }

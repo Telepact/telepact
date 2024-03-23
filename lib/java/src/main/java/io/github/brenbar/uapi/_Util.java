@@ -722,7 +722,7 @@ class _Util {
         } else {
             try {
                 responseHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
-                    schemaKey, List.of(), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                    resultSchemaKey, List.of(schemaKey), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                     typeExtensions,
                     allParseFailures, failedTypes);
                 for (final var e : responseHeadersStruct.fields.entrySet()) {
