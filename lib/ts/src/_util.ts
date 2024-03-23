@@ -1115,8 +1115,9 @@ export function parseUApiSchema(
             continue;
         }
 
+        const ignoreIfDuplicate: boolean = def['ignoreIfDuplicate'] ?? false;
         const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
-        if (matchingSchemaKey && !def['ignoreIfDuplicate']) {
+        if (matchingSchemaKey && !ignoreIfDuplicate) {
             const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
             const finalPath = append(loopPath, schemaKey);
 

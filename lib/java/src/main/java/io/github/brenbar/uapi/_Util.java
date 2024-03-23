@@ -905,8 +905,9 @@ class _Util {
                 continue;
             }
 
+            final var ignoreIfDuplicate = (Boolean) def.getOrDefault("ignoreIfDuplicate", false);
             final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
-            if (matchingSchemaKey != null) {
+            if (matchingSchemaKey != null && !ignoreIfDuplicate) {
                 final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
                 final List<Object> finalPath = append(loopPath, schemaKey);
                 System.out.print(otherPathIndex);
