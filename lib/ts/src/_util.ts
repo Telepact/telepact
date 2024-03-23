@@ -888,7 +888,7 @@ export function parseHeadersType(
                 path,
                 headersDefinitionAsParsedJson,
                 resultSchemaKey,
-                [],
+                [schemaKey],
                 typeParameterCount,
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,

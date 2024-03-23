@@ -68,7 +68,7 @@ export class Server {
 
         this.uApiSchema = UApiSchema.extendWithExtensions(uApiSchema, getInternalUApiJson(), typeExtensions);
 
-        Object.assign(parsedTypes, uApiSchema.parsed);
+        Object.assign(parsedTypes, this.uApiSchema.parsed);
 
         const binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         const binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
