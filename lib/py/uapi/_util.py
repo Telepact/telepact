@@ -1667,7 +1667,7 @@ def generate_random_fn(blueprint_value: Any,
 def validate_select(given_obj: Any, select: Dict[str, object], fn: str, type_parameters: List['_types._UTypeDeclaration'],
                        generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
     if not isinstance(given_obj, dict):
-        return get_type_unexpected_validation_failure(["_sel"], given_obj, "Object")
+        return get_type_unexpected_validation_failure([], given_obj, "Object")
 
     select_struct_fields_header = given_obj
 
@@ -1680,20 +1680,20 @@ def validate_select(given_obj: Any, select: Dict[str, object], fn: str, type_par
 
         if type_reference is None:
             validation_failures.append(_types._ValidationFailure(
-                ["_sel", type_name], "ObjectKeyDisallowed", {}))
+                [type_name], "ObjectKeyDisallowed", {}))
             continue
 
         if isinstance(type_reference, _types._UUnion):
             if not isinstance(select_value, dict):
                 validation_failures.extend(get_type_unexpected_validation_failure(
-                    ["_sel", type_name], select_value, "Object"))
+                    [type_name], select_value, "Object"))
                 continue
 
             union_cases = select_value
 
             for union_case, selected_case_struct_fields in union_cases.items():
                 struct_ref = type_reference.cases.get(union_case)
-                loop_path = ["_sel", type_name, union_case]
+                loop_path = [type_name, union_case]
 
                 if struct_ref is None:
                     validation_failures.append(_types._ValidationFailure(
@@ -1709,12 +1709,12 @@ def validate_select(given_obj: Any, select: Dict[str, object], fn: str, type_par
             fn_name = type_reference.name
             arg_struct = fn_call_cases.get(fn_name)
             nested_validation_failures = validate_select_struct(
-                arg_struct, ["_sel", type_name], select_value)
+                arg_struct, [type_name], select_value)
             validation_failures.extend(nested_validation_failures)
         else:
             struct_ref = type_reference
             nested_validation_failures = validate_select_struct(
-                struct_ref, ["_sel", type_name], select_value)
+                struct_ref, [type_name], select_value)
             validation_failures.extend(nested_validation_failures)
 
     return validation_failures
