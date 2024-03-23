@@ -167,6 +167,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
     options = types.Server.Options()
     options.on_error = on_err
+    options.auth_required = False
     server = types.Server(u_api, handler, options)
 
     async def handle_message(msg: Msg) -> None:
@@ -190,7 +191,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     return dispatcher
 
 
-async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str) -> Subscription:
+async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool) -> Subscription:
     json_data = Path(api_schema_path).read_text()
     u_api = types.UApiSchema.from_json(json_data)
     alternate_u_api = types.UApiSchema.extend(u_api, """
@@ -250,10 +251,12 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options.on_error = on_err
     options.on_request = lambda m: None  # onRequest handling
     options.on_response = lambda m: None  # onResponse handling
+    options.auth_required = auth_required
 
     server = types.Server(u_api, handler, options)
     alternate_options = types.Server.Options()
     alternate_options.on_error = on_err
+    alternate_options.auth_required = auth_required
     alternate_server = types.Server(
         alternate_u_api, handler, alternate_options)
 
@@ -335,6 +338,7 @@ async def run_dispatcher_server():
                 api_schema_path = payload["apiSchemaPath"]
                 frontdoor_topic = payload["frontdoorTopic"]
                 backdoor_topic = payload["backdoorTopic"]
+                auth_required = payload.get('authRequired', False)
                 server = await start_test_server(
                     connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic)
                 servers[server_id] = server
