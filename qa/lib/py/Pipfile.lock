@@ -27,11 +27,11 @@
         },
         "packaging": {
             "hashes": [
-                "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5",
-                "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"
+                "sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5",
+                "sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==23.2"
+            "version": "==24.0"
         },
         "pyproject-hooks": {
             "hashes": [
@@ -43,7 +43,7 @@
         },
         "uapi": {
             "hashes": [
-                "sha256:f6af5aebd2a0a719d181c9efa4a534e9f7d8e3ab16b97893b19c00d65a4da518"
+                "sha256:b0e3a9b797a0b9b30d7eba0aec0b65d2594ffddfec12e6df8d6f5d97ae84df23"
             ],
             "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
             "version": "==0.0.1"

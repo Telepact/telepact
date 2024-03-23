@@ -340,7 +340,7 @@ async def run_dispatcher_server():
                 backdoor_topic = payload["backdoorTopic"]
                 auth_required = payload.get('authRequired', False)
                 server = await start_test_server(
-                    connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic)
+                    connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic, auth_required)
                 servers[server_id] = server
             elif target == "StartClientServer":
                 server_id = payload["id"]
