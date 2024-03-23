@@ -2061,7 +2061,7 @@ class _Util {
         try {
             selectStructFieldsHeader = asMap(givenObj);
         } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(List.of("_sel"),
+            return getTypeUnexpectedValidationFailure(List.of(),
                 givenObj, "Object");
         }
 
@@ -2080,8 +2080,8 @@ class _Util {
             }
 
             if (typeReference == null) {
-                validationFailures.add(new _ValidationFailure(List.of("_sel", typeName),
-                        "TypeUnknown", Map.of()));
+                validationFailures.add(new _ValidationFailure(List.of(typeName),
+                        "ObjectKeyDisallowed", Map.of()));
                 continue;
             }
 
@@ -2091,7 +2091,7 @@ class _Util {
                     unionCases = asMap(selectValue);
                 } catch (ClassCastException e) {
                     validationFailures.addAll(
-                            getTypeUnexpectedValidationFailure(List.of("_sel", typeName), selectValue, "Object"));
+                            getTypeUnexpectedValidationFailure(List.of(typeName), selectValue, "Object"));
                     continue;
                 }
 
@@ -2100,12 +2100,12 @@ class _Util {
                     final var selectedCaseStructFields = unionCaseEntry.getValue();
                     final var structRef = u.cases.get(unionCase);
 
-                    final List<Object> loopPath = List.of("_sel", typeName, unionCase);
+                    final List<Object> loopPath = List.of(typeName, unionCase);
 
                     if (structRef == null) {
                         validationFailures.add(new _ValidationFailure(
                                 loopPath,
-                                "UnionCaseUnknown", Map.of()));
+                                "ObjectKeyDisallowed", Map.of()));
                         continue;
                     }
 
@@ -2119,13 +2119,13 @@ class _Util {
                 final Map<String, _UStruct> fnCallCases = fnCall.cases;
                 final String fnName = f.name;
                 final var argStruct = fnCallCases.get(fnName);
-                final var nestedValidationFailures = validateSelectStruct(argStruct, List.of("_sel", typeName),
+                final var nestedValidationFailures = validateSelectStruct(argStruct, List.of(typeName),
                         selectValue);
 
                 validationFailures.addAll(nestedValidationFailures);
             } else {
                 final var structRef = (_UStruct) typeReference;
-                final var nestedValidationFailures = validateSelectStruct(structRef, List.of("_sel", typeName),
+                final var nestedValidationFailures = validateSelectStruct(structRef, List.of(typeName),
                         selectValue);
 
                 validationFailures.addAll(nestedValidationFailures);
