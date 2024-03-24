@@ -2218,10 +2218,6 @@ export function validateStruct(
 ): Array<_ValidationFailure> {
     if (typeof value === 'object' && !Array.isArray(value)) {
         const selectedFields = select?.[name];
-        console.log(`name: ${name}`);
-        console.log(`value: ${JSON.stringify(value)}`);
-        console.log(`select: ${JSON.stringify(select)}`);
-        console.log(`selectedFields: ${JSON.stringify(selectedFields)}`);
         return validateStructFields(fields, selectedFields, value, select, fn, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _STRUCT_NAME);
@@ -2242,7 +2238,6 @@ export function validateStructFields(
         const isOptional = fieldDeclaration.optional;
         const isOmittedViaSelect = selectedFields && !selectedFields.includes(fieldName);
         if (!actualStruct.hasOwnProperty(fieldName) && !isOptional && !isOmittedViaSelect) {
-            console.log(`missingField: ${fieldName}`);
             missingFields.push(fieldName);
         }
     }
