@@ -1830,9 +1830,10 @@ class _Util {
     }
 
     static List<_ValidationFailure> validateStruct(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, Map<String, _UFieldDeclaration> fields) {
+            List<_UTypeDeclaration> generics, String name, Map<String, _UFieldDeclaration> fields) {
         if (value instanceof Map<?, ?> m) {
-            return validateStructFields(fields, (Map<String, Object>) m, select, fn, typeParameters);
+            final var selectedFields = select == null ? null : (List<String>) select.get(name);
+            return validateStructFields(fields, selectedFields, (Map<String, Object>) m, select, fn, typeParameters);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _STRUCT_NAME);
         }
@@ -1840,6 +1841,7 @@ class _Util {
 
     static List<_ValidationFailure> validateStructFields(
             Map<String, _UFieldDeclaration> fields,
+            List<String> selectedFields,
             Map<String, Object> actualStruct, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
 
@@ -1848,7 +1850,8 @@ class _Util {
             final var fieldName = entry.getKey();
             final var fieldDeclaration = entry.getValue();
             final boolean isOptional = fieldDeclaration.optional;
-            if (!actualStruct.containsKey(fieldName) && !isOptional) {
+            final boolean isOmittedBySelect = selectedFields != null && !selectedFields.contains(fieldName);
+            if (!actualStruct.containsKey(fieldName) && !isOptional && !isOmittedBySelect) {
                 missingFields.add(fieldName);
             }
         }
@@ -1948,16 +1951,23 @@ class _Util {
     }
 
     static List<_ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, Map<String, _UStruct> cases) {
+            List<_UTypeDeclaration> generics, String name, Map<String, _UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
-            return validateUnionCases(cases, m, select, fn, typeParameters);
+            Map<String, Object> selectedCases;
+            if (name.startsWith("fn.")) {
+                selectedCases = new HashMap<>();
+                selectedCases.put(name, select == null ? null : select.get(name));
+            } else {
+                selectedCases = select == null ? null : (Map<String, Object>) select.get(name);
+            }
+            return validateUnionCases(cases, selectedCases, m, select, fn, typeParameters);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _UNION_NAME);
         }
     }
 
     private static List<_ValidationFailure> validateUnionCases(
-            Map<String, _UStruct> referenceCases,
+            Map<String, _UStruct> referenceCases, Map<String, Object> selectedCases,
             Map<?, ?> actual, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
         if (actual.size() != 1) {
             return List.of(
@@ -1978,7 +1988,7 @@ class _Util {
 
         if (unionPayload instanceof Map<?, ?> m2) {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
-                    (Map<String, Object>) m2, select, fn, typeParameters);
+                    (Map<String, Object>) m2, selectedCases, select, fn, typeParameters);
 
             final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : nestedValidationFailures) {
@@ -1997,8 +2007,9 @@ class _Util {
     private static List<_ValidationFailure> validateUnionStruct(
             _UStruct unionStruct,
             String unionCase,
-            Map<String, Object> actual, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
-        return validateStructFields(unionStruct.fields, actual, select, fn, typeParameters);
+            Map<String, Object> actual, Map<String, Object> selectedCases, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
+        final var selectedFields = selectedCases == null ? null : (List<String>) selectedCases.get(unionCase);
+        return validateStructFields(unionStruct.fields, selectedFields, actual, select, fn, typeParameters);
     }
 
     static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,

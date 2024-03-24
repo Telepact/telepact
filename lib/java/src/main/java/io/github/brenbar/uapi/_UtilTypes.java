@@ -329,7 +329,7 @@ class _UStruct implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.validateStruct(value, select, fn, typeParameters, generics, this.fields);
+        return _Util.validateStruct(value, select, fn, typeParameters, generics, this.name, this.fields);
     }
 
     @Override
@@ -367,7 +367,7 @@ class _UUnion implements _UType {
     @Override
     public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
-        return _Util.validateUnion(value, select, fn, typeParameters, generics, this.cases);
+        return _Util.validateUnion(value, select, fn, typeParameters, generics, this.name, this.cases);
     }
 
     @Override
