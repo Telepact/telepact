@@ -1469,7 +1469,7 @@ def generate_random_object(blueprint_value: Any, use_blueprint_value: bool,
 def validate_struct(value: Any, select: Dict[str, object], fn: str, type_parameters: List[_types._UTypeDeclaration],
                     generics: List[_types._UTypeDeclaration], name: str, fields: Dict[str, _types._UFieldDeclaration]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
-        selected_fields = select[name] if select else None
+        selected_fields = select.get(name, None) if select else None
         return validate_struct_fields(fields, selected_fields, value, select, fn, type_parameters)
     else:
         return get_type_unexpected_validation_failure([], value, 'Object')
@@ -1481,7 +1481,7 @@ def validate_struct_fields(fields: Dict[str, _types._UFieldDeclaration], selecte
     validation_failures: List[_types._ValidationFailure] = []
 
     missing_fields = [field_name for field_name, field_declaration in fields.items()
-                      if field_name not in actual_struct and not field_declaration.optional and not (selected_fields and field_name in selected_fields)]
+                      if field_name not in actual_struct and not field_declaration.optional and not (selected_fields and field_name not in selected_fields)]
 
     for missing_field in missing_fields:
         validation_failure = _types._ValidationFailure([missing_field],
@@ -1568,9 +1568,9 @@ def validate_union(value: Any, select: Dict[str, object], fn: str,
                    name: str, cases: Dict[str, _types._UStruct]) -> List[_types._ValidationFailure]:
     if isinstance(value, dict):
         if name.startswith('fn.'):
-            selected_cases = {name: select[name] if select else None}
+            selected_cases = {name: select.get(name, None) if select else None}
         else:
-            selected_cases = select[name] if select else None
+            selected_cases = select.get(name, None) if select else None
 
         return validate_union_cases(cases, selected_cases, value, select, fn, type_parameters)
     else:
@@ -1610,7 +1610,7 @@ def validate_union_struct(union_struct: _types._UStruct,
                           union_case: str,
                           actual: Dict[str, Any], selected_cases: Dict[str, object], select: Dict[str, object], fn: str,
                           type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
-    selected_fields = selected_cases[union_case] if selected_cases else None
+    selected_fields = selected_cases.get(union_case, None) if selected_cases else None
     return validate_struct_fields(union_struct.fields, selected_fields, actual, select, fn, type_parameters)
 
 
