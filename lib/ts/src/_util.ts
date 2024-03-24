@@ -2213,10 +2213,16 @@ export function validateStruct(
     fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>,
+    name: string,
     fields: Record<string, _UFieldDeclaration>
 ): Array<_ValidationFailure> {
     if (typeof value === 'object' && !Array.isArray(value)) {
-        return validateStructFields(fields, value, select, fn, typeParameters);
+        const selectedFields = select?.[name];
+        console.log(`name: ${name}`);
+        console.log(`value: ${JSON.stringify(value)}`);
+        console.log(`select: ${JSON.stringify(select)}`);
+        console.log(`selectedFields: ${JSON.stringify(selectedFields)}`);
+        return validateStructFields(fields, selectedFields, value, select, fn, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _STRUCT_NAME);
     }
@@ -2224,6 +2230,7 @@ export function validateStruct(
 
 export function validateStructFields(
     fields: Record<string, _UFieldDeclaration>,
+    selectedFields: string[] | undefined,
     actualStruct: Record<string, any>,
     select: Record<string, any> | undefined,
     fn: string | undefined,
@@ -2233,7 +2240,9 @@ export function validateStructFields(
     const missingFields: Array<string> = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
         const isOptional = fieldDeclaration.optional;
-        if (!actualStruct.hasOwnProperty(fieldName) && !isOptional) {
+        const isOmittedViaSelect = selectedFields && !selectedFields.includes(fieldName);
+        if (!actualStruct.hasOwnProperty(fieldName) && !isOptional && !isOmittedViaSelect) {
+            console.log(`missingField: ${fieldName}`);
             missingFields.push(fieldName);
         }
     }
@@ -2392,10 +2401,17 @@ export function validateUnion(
     fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
+    name: string,
     cases: Record<string, _UStruct>
 ): _ValidationFailure[] {
     if (typeof value == 'object' && !Array.isArray(value)) {
-        return validateUnionCases(cases, value, select, fn, typeParameters);
+        let selectedCases: Record<string, any> | undefined;
+        if (name.startsWith('fn.')) {
+            selectedCases = { [name]: select?.[name] };
+        } else {
+            selectedCases = select?.[name];
+        }
+        return validateUnionCases(cases, selectedCases, value, select, fn, typeParameters);
     } else {
         return getTypeUnexpectedValidationFailure([], value, _UNION_NAME);
     }
@@ -2403,6 +2419,7 @@ export function validateUnion(
 
 export function validateUnionCases(
     referenceCases: Record<string, _UStruct>,
+    selectedCases: Record<string, any> | undefined,
     actual: Record<string, any>,
     select: Record<string, any> | undefined,
     fn: string | undefined,
@@ -2439,6 +2456,7 @@ export function validateUnionCases(
             referenceStruct,
             unionTarget,
             unionPayload,
+            selectedCases,
             select,
             fn,
             typeParameters
@@ -2458,11 +2476,13 @@ export function validateUnionStruct(
     unionStruct: _UStruct,
     unionCase: string,
     actual: Record<string, any>,
+    selectedCases: Record<string, any> | undefined,
     select: Record<string, any> | undefined,
     fn: string | undefined,
     typeParameters: _UTypeDeclaration[]
 ): _ValidationFailure[] {
-    return validateStructFields(unionStruct.fields, actual, select, fn, typeParameters);
+    const selectedFields = selectedCases?.[unionCase];
+    return validateStructFields(unionStruct.fields, selectedFields, actual, select, fn, typeParameters);
 }
 
 export function generateRandomUnion(

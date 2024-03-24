@@ -425,7 +425,7 @@ export class _UStruct implements _UType {
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[]
     ): _ValidationFailure[] {
-        return validateStruct(value, select, fn, typeParameters, generics, this.fields);
+        return validateStruct(value, select, fn, typeParameters, generics, this.name, this.fields);
     }
 
     generateRandomValue(
@@ -472,7 +472,7 @@ export class _UUnion implements _UType {
         typeParameters: _UTypeDeclaration[],
         generics: _UTypeDeclaration[]
     ): _ValidationFailure[] {
-        return validateUnion(value, select, fn, typeParameters, generics, this.cases);
+        return validateUnion(value, select, fn, typeParameters, generics, this.name, this.cases);
     }
 
     generateRandomValue(
