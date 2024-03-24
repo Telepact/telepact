@@ -2236,8 +2236,8 @@ export function validateStructFields(
     const missingFields: Array<string> = [];
     for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
         const isOptional = fieldDeclaration.optional;
-        const isOmittedViaSelect = selectedFields && !selectedFields.includes(fieldName);
-        if (!actualStruct.hasOwnProperty(fieldName) && !isOptional && !isOmittedViaSelect) {
+        const isOmittedBySelect = selectedFields && !selectedFields.includes(fieldName);
+        if (!actualStruct.hasOwnProperty(fieldName) && !isOptional && !isOmittedBySelect) {
             missingFields.push(fieldName);
         }
     }

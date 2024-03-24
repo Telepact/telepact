@@ -185,7 +185,7 @@ class _UStruct(_UType):
         return self.type_parameter_count
 
     def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
-        return uapi._util.validate_struct(value, select, fn, type_parameters, generics, self.fields)
+        return uapi._util.validate_struct(value, select, fn, type_parameters, generics, self.name, self.fields)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
         return uapi._util.generate_random_struct(blueprint_value, use_blueprint_value, include_optional_fields, randomize_optional_fields, type_parameters, generics, random_generator, self.fields)
@@ -207,7 +207,7 @@ class _UUnion(_UType):
         return self.type_parameter_count
 
     def validate(self, value: object, select: Dict[str, object], fn: str, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration]) -> List[_ValidationFailure]:
-        return uapi._util.validate_union(value, select, fn, type_parameters, generics, self.cases)
+        return uapi._util.validate_union(value, select, fn, type_parameters, generics, self.name, self.cases)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List[_UTypeDeclaration], generics: List[_UTypeDeclaration], random_generator: _rg._RandomGenerator) -> object:
         return uapi._util.generate_random_union(blueprint_value, use_blueprint_value, include_optional_fields, randomize_optional_fields, type_parameters, generics, random_generator, self.cases)
