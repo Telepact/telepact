@@ -1882,13 +1882,13 @@ export function getTypeUnexpectedValidationFailure(
 
 export function validateHeaders(
     headers: { [key: string]: any },
-    uApiSchema: UApiSchema,
+    parsedRequestHeaders: Record<string, _UFieldDeclaration>,
     functionType: _UFn
 ): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
     for (const [header, headerValue] of Object.entries(headers)) {
-        const field = uApiSchema.parsedRequestHeaders[header];
+        const field = parsedRequestHeaders[header];
         if (field) {
             const thisValidationFailures = field.typeDeclaration.validate(
                 headerValue,
@@ -3051,11 +3051,15 @@ export async function handleMessage(
         return new Message(responseHeaders, newErrorResult);
     }
 
-    const headerValidationFailures = validateHeaders(requestHeaders, uApiSchema, functionType);
-    if (headerValidationFailures.length > 0) {
+    const requestHeaderValidationFailures = validateHeaders(
+        requestHeaders,
+        uApiSchema.parsedRequestHeaders,
+        functionType
+    );
+    if (requestHeaderValidationFailures.length > 0) {
         return getInvalidErrorMessage(
             '_ErrorInvalidRequestHeaders',
-            headerValidationFailures,
+            requestHeaderValidationFailures,
             resultUnionType,
             responseHeaders
         );
@@ -3142,10 +3146,15 @@ export async function handleMessage(
         }
     }
 
+    const resultUnion = resultMessage.body;
+
+    Object.assign(resultMessage.header, responseHeaders);
+    const finalResponseHeaders = resultMessage.header;
+
     const skipResultValidation = unsafeResponseEnabled;
     if (!skipResultValidation) {
         const resultValidationFailures = resultUnionType
-            .validate(resultMessage.body, selectStructFieldsHeader, undefined, [], [])
+            .validate(resultUnion, selectStructFieldsHeader, undefined, [], [])
             .filter(filterOutWarnings);
 
         if (warnings.length > 0) {
@@ -3160,12 +3169,21 @@ export async function handleMessage(
                 responseHeaders
             );
         }
+
+        const responseHeaderValidationFailures = validateHeaders(
+            finalResponseHeaders,
+            uApiSchema.parsedResponseHeaders,
+            functionType
+        );
+        if (responseHeaderValidationFailures.length > 0) {
+            return getInvalidErrorMessage(
+                '_ErrorInvalidResponseHeaders',
+                responseHeaderValidationFailures,
+                resultUnionType,
+                responseHeaders
+            );
+        }
     }
-
-    const resultUnion = resultMessage.body;
-
-    Object.assign(resultMessage.header, responseHeaders);
-    const finalResponseHeaders = resultMessage.header;
 
     let finalResultUnion;
     if (selectStructFieldsHeader) {
