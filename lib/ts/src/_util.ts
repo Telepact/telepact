@@ -660,12 +660,12 @@ export function parseStructFields(
 export function parseField(
     path: any[],
     fieldDeclaration: string,
-    typeDeclarationValue: any, // Replace 'any' with appropriate type
+    typeDeclarationValue: any,
     typeParameterCount: number,
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    parsedTypes: Record<string, _UType>,
+    typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UFieldDeclaration {
@@ -710,7 +710,7 @@ export function parseField(
 
 export function applyErrorToParsedTypes(
     error: _UError,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
+    parsedTypes: Record<string, _UType>,
     schemaKeysToIndex: Record<string, number>
 ): void {
     const errorName = error.name;
