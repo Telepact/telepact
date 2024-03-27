@@ -705,10 +705,11 @@ class _Util {
                 if (field.optional) {
                     final var thisPath = append(append(path, schemaKey), key);
                     final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
-                    parseFailures.add(new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                    parseFailures.add(
+                            new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
                 }
             }
-            
+
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
@@ -722,16 +723,16 @@ class _Util {
         } else {
             try {
                 responseHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
-                    resultSchemaKey, List.of(schemaKey), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
-                    typeExtensions,
-                    allParseFailures, failedTypes);
+                        resultSchemaKey, List.of(schemaKey), typeParameterCount, uApiSchemaPseudoJson,
+                        schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
                 for (final var e : responseHeadersStruct.fields.entrySet()) {
                     final var key = e.getKey();
                     final var field = e.getValue();
                     if (field.optional) {
                         final var thisPath = append(append(path, schemaKey), key);
                         final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
-                        parseFailures.add(new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                        parseFailures.add(
+                                new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
                     }
                 }
             } catch (UApiSchemaParseError e) {
@@ -757,7 +758,8 @@ class _Util {
         _UUnion callType = null;
         try {
             final _UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, List.of("->", "errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                    schemaKey, List.of("->", "errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
+                    parsedTypes,
                     typeExtensions,
                     allParseFailures, failedTypes);
             callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
@@ -973,7 +975,7 @@ class _Util {
         }
 
         final Map<String, _UFieldDeclaration> requestHeaders = new HashMap<>();
-        final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();        
+        final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();
 
         for (final var headerKey : headerKeys) {
             final var thisIndex = schemaKeysToIndex.get(headerKey);
@@ -987,7 +989,7 @@ class _Util {
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
-        }        
+        }
 
         if (!parseFailures.isEmpty()) {
             final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
@@ -1578,8 +1580,10 @@ class _Util {
             final var headerValue = entry.getValue();
             final var field = parsedRequestHeaders.get(header);
             if (field != null) {
-                final var thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name, List.of());
-                final var thisValidationFailuresPath = thisValidationFailures.stream().map(e -> new _ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
+                final var thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name,
+                        List.of());
+                final var thisValidationFailuresPath = thisValidationFailures.stream()
+                        .map(e -> new _ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
                 validationFailures.addAll(thisValidationFailuresPath);
             }
         }
@@ -1587,7 +1591,8 @@ class _Util {
         return validationFailures;
     }
 
-    static List<_ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> generics,
+    static List<_ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> generics,
             _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
         if (value == null) {
             final boolean isNullable;
@@ -1617,7 +1622,8 @@ class _Util {
         if (nullable && !useBlueprintValue && randomGenerator.nextBoolean()) {
             return null;
         } else {
-            return thisType.generateRandomValue(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
+            return thisType.generateRandomValue(blueprintValue, useBlueprintValue, includeOptionalFields,
+                    randomizeOptionalFields,
                     typeParameters, generics, randomGenerator);
         }
     }
@@ -1707,7 +1713,8 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateArray(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateArray(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -1769,7 +1776,8 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateObject(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateObject(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
@@ -1820,7 +1828,8 @@ class _Util {
             final var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
                 final var key = randomGenerator.nextString();
-                final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeOptionalFields, randomizeOptionalFields,
+                final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeOptionalFields,
+                        randomizeOptionalFields,
                         generics, randomGenerator);
                 obj.put(key, value);
             }
@@ -1829,7 +1838,8 @@ class _Util {
         }
     }
 
-    static List<_ValidationFailure> validateStruct(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateStruct(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, String name, Map<String, _UFieldDeclaration> fields) {
         if (value instanceof Map<?, ?> m) {
             final var selectedFields = select == null ? null : (List<String>) select.get(name);
@@ -1842,7 +1852,8 @@ class _Util {
     static List<_ValidationFailure> validateStructFields(
             Map<String, _UFieldDeclaration> fields,
             List<String> selectedFields,
-            Map<String, Object> actualStruct, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
+            Map<String, Object> actualStruct, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
 
         final var missingFields = new ArrayList<String>();
@@ -1879,7 +1890,8 @@ class _Util {
 
             final _UTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
 
-            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn, typeParameters);
+            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn,
+                    typeParameters);
 
             final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
             for (final var f : nestedValidationFailures) {
@@ -1950,7 +1962,8 @@ class _Util {
         return union.entrySet().stream().findAny().orElse(null);
     }
 
-    static List<_ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    static List<_ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, String name, Map<String, _UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
             Map<String, Object> selectedCases;
@@ -2007,7 +2020,8 @@ class _Util {
     private static List<_ValidationFailure> validateUnionStruct(
             _UStruct unionStruct,
             String unionCase,
-            Map<String, Object> actual, Map<String, Object> selectedCases, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters) {
+            Map<String, Object> actual, Map<String, Object> selectedCases, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters) {
         final var selectedFields = selectedCases == null ? null : (List<String>) selectedCases.get(unionCase);
         return validateStructFields(unionStruct.fields, selectedFields, actual, select, fn, typeParameters);
     }
@@ -2050,7 +2064,8 @@ class _Util {
             final var unionData = unionEntry.getValue();
 
             return Map.of(unionCase,
-                    constructRandomStruct(unionData.fields, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
+                    constructRandomStruct(unionData.fields, new HashMap<>(), includeOptionalFields,
+                            randomizeOptionalFields,
                             typeParameters, randomGenerator));
         }
     }
@@ -2076,7 +2091,7 @@ class _Util {
             selectStructFieldsHeader = asMap(givenObj);
         } catch (ClassCastException e) {
             return getTypeUnexpectedValidationFailure(List.of(),
-                givenObj, "Object");
+                    givenObj, "Object");
         }
 
         final var validationFailures = new ArrayList<_ValidationFailure>();
@@ -2179,7 +2194,7 @@ class _Util {
         }
 
         return validationFailures;
-    }    
+    }
 
     static List<_ValidationFailure> validateMockCall(Object givenObj, Map<String, Object> select, String fn,
             List<_UTypeDeclaration> typeParameters,
@@ -2207,7 +2222,8 @@ class _Util {
         final String functionDefName = functionDef.name;
         final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
 
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(), List.of());
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(),
+                List.of());
 
         final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
         for (var f : inputFailures) {
@@ -2251,7 +2267,8 @@ class _Util {
         final _UUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
         final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(), List.of());
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(),
+                List.of());
 
         final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
         for (final var f : inputFailures) {
@@ -2490,7 +2507,8 @@ class _Util {
         final List<_ValidationFailure> requestHeaderValidationFailures = validateHeaders(requestHeaders,
                 uApiSchema.parsedRequestHeaders, functionType);
         if (!requestHeaderValidationFailures.isEmpty()) {
-            return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", requestHeaderValidationFailures, resultUnionType,
+            return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", requestHeaderValidationFailures,
+                    resultUnionType,
                     responseHeaders);
         }
 
@@ -2504,7 +2522,7 @@ class _Util {
                 responseHeaders.put("_pac", requestHeaders.get("_pac"));
             }
         }
-        
+
         final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("_sel");
 
         if (unknownTarget != null) {
@@ -2561,11 +2579,12 @@ class _Util {
                         responseHeaders);
             }
             final List<_ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
-                uApiSchema.parsedResponseHeaders, functionType);
+                    uApiSchema.parsedResponseHeaders, functionType);
             if (!responseHeaderValidationFailures.isEmpty()) {
-                return getInvalidErrorMessage("_ErrorInvalidResponseHeaders", responseHeaderValidationFailures, resultUnionType,
-                    responseHeaders);
-            }    
+                return getInvalidErrorMessage("_ErrorInvalidResponseHeaders", responseHeaderValidationFailures,
+                        resultUnionType,
+                        responseHeaders);
+            }
         }
 
         final Map<String, Object> finalResultUnion;
@@ -2767,7 +2786,8 @@ class _Util {
     }
 
     static Message mockHandle(Message requestMessage, List<_MockStub> stubs, List<_MockInvocation> invocations,
-            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub, boolean enableOptionalFieldGeneration, boolean randomizeOptionalFieldGeneration) {
+            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub,
+            boolean enableOptionalFieldGeneration, boolean randomizeOptionalFieldGeneration) {
         final Map<String, Object> header = requestMessage.header;
 
         final var enableGenerationStub = (Boolean) header.getOrDefault("_gen", false);
@@ -2842,7 +2862,8 @@ class _Util {
                                 final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
-                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
+                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(),
+                                        random);
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
@@ -2854,7 +2875,8 @@ class _Util {
                                 final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
-                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
+                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(),
+                                        random);
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }

@@ -13,6 +13,7 @@ from nats.aio.msg import Msg
 
 should_abort = False
 
+
 class Constants:
     example_api_path = '../../test/example.uapi.json'
     binary_api_path = '../../test/binary.uapi.json'
@@ -25,11 +26,13 @@ class Constants:
     intermediate_topic = 'intermediate'
     backdoor_topic = 'backdoor'
 
+
 def increment():
     count = 0
     while True:
         yield count
         count += 1
+
 
 def handler(request):
     header = request[0]
@@ -67,7 +70,7 @@ async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):
             print(' B->    {}'.format(backdoor_response), flush=True)
 
             backdoor_response_json = json.dumps(backdoor_response)
-            backdoor_response_bytes = backdoor_response_json.encode()        
+            backdoor_response_bytes = backdoor_response_json.encode()
             await nats_client.publish(msg.reply, backdoor_response_bytes)
 
             done.set_result(True)
@@ -78,13 +81,13 @@ async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):
         await done
     except asyncio.exceptions.CancelledError:
         if sub:
-            await sub.unsubscribe()        
+            await sub.unsubscribe()
 
 
 def count_int_keys(m: dict):
     int_keys = 0
     str_keys = 0
-    for k,v in m.items():
+    for k, v in m.items():
         if type(k) == int:
             int_keys += 1
         else:
@@ -98,7 +101,6 @@ def count_int_keys(m: dict):
 
 class NotEnoughIntegerKeys(Exception):
     pass
-
 
 
 async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=1):
@@ -122,12 +124,15 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
             client_backdoor_request_bytes = msg.data
             try:
                 client_backdoor_request_json = client_backdoor_request_bytes.decode()
-                client_backdoor_request = json.loads(client_backdoor_request_json)
+                client_backdoor_request = json.loads(
+                    client_backdoor_request_json)
             except Exception:
-                client_backdoor_request = msgpack.loads(client_backdoor_request_bytes, strict_map_key=False)
+                client_backdoor_request = msgpack.loads(
+                    client_backdoor_request_bytes, strict_map_key=False)
                 request_was_binary = True
                 try:
-                    (int_keys, str_keys) = count_int_keys(client_backdoor_request[1])
+                    (int_keys, str_keys) = count_int_keys(
+                        client_backdoor_request[1])
                     request_binary_had_enough_integer_keys = int_keys >= str_keys
                 except Exception as e:
                     print(e)
@@ -147,14 +152,16 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
                 frontdoor_response = json.loads(frontdoor_response_json)
             except Exception:
                 try:
-                    frontdoor_response = msgpack.loads(frontdoor_response_bytes, strict_map_key=False)
+                    frontdoor_response = msgpack.loads(
+                        frontdoor_response_bytes, strict_map_key=False)
                 except Exception as e:
                     print(e)
                     raise
 
                 response_was_binary = True
                 try:
-                    (int_keys, str_keys) = count_int_keys(frontdoor_response[1])
+                    (int_keys, str_keys) = count_int_keys(
+                        frontdoor_response[1])
                     response_binary_had_enough_integer_keys = int_keys >= str_keys
                 except Exception as e:
                     print(e)
@@ -170,7 +177,6 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
             if (received >= times):
                 done.set_result(True)
 
-
         sub = await nats_client.subscribe(client_backdoor_topic, cb=nats_handler)
 
         # TODO: This does not block until the subscription ends. Need to find another way to get the binary assertion results
@@ -182,22 +188,25 @@ async def client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_
         if sub:
             await sub.unsubscribe()
 
+
 def signal_handler(signum, frame):
     raise Exception("Timeout")
 
 
 class hashabledict(dict):
-  def __key(self):
-    return tuple(sorted(self.items()))
-  def __hash__(self):
-    return hash(self.__key())
-  def __eq__(self, other):
-    return self.__key() == other.__key()
-  
+    def __key(self):
+        return tuple(sorted(self.items()))
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return self.__key() == other.__key()
+
 
 def convert_lists_to_sets(a):
     if type(a) == dict:
-        for k,v in a.items():
+        for k, v in a.items():
             a[k] = convert_lists_to_sets(v)
         return hashabledict(a)
     elif type(a) == list:
@@ -210,9 +219,11 @@ def convert_lists_to_sets(a):
 
 
 async def verify_server_case(nats_client, request, expected_response, frontdoor_topic, backdoor_topic, just_send=False):
-    assert_rules = {} if not expected_response or type(expected_response) == bytes else expected_response[0].pop('_assert', {})
+    assert_rules = {} if not expected_response or type(
+        expected_response) == bytes else expected_response[0].pop('_assert', {})
 
-    backdoor_handling_task = asyncio.create_task(backdoor_handler(nats_client, backdoor_topic))
+    backdoor_handling_task = asyncio.create_task(
+        backdoor_handler(nats_client, backdoor_topic))
 
     try:
         response = await send_case(nats_client, request, expected_response, frontdoor_topic, just_send=just_send)
@@ -224,12 +235,13 @@ async def verify_server_case(nats_client, request, expected_response, frontdoor_
         if assert_rules.get('setCompare', False):
             expected_response = convert_lists_to_sets(expected_response)
             response = convert_lists_to_sets(response)
-            
+
         assert expected_response == response
 
 
 async def verify_flat_case(nats_client, request, expected_response, frontdoor_topic):
-    assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
+    assert_rules = {} if not expected_response else expected_response[0].pop(
+        '_assert', {})
 
     response = await send_case(nats_client, request, expected_response, frontdoor_topic)
 
@@ -238,15 +250,18 @@ async def verify_flat_case(nats_client, request, expected_response, frontdoor_to
 
 
 async def verify_client_case(nats_client, request, expected_response, client_frontdoor_topic, client_backdoor_topic, frontdoor_topic, backdoor_topic, assert_binary=False):
-    assert_rules = {} if not expected_response else expected_response[0].pop('_assert', {})
+    assert_rules = {} if not expected_response else expected_response[0].pop(
+        '_assert', {})
 
     client_times = 1
     if assert_rules.get('expectTwoRequests', False):
         client_times = 2
 
-    client_handling_task = None if not client_backdoor_topic else asyncio.create_task(client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=client_times))
+    client_handling_task = None if not client_backdoor_topic else asyncio.create_task(
+        client_backdoor_handler(nats_client, client_backdoor_topic, frontdoor_topic, times=client_times))
 
-    backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(backdoor_handler(nats_client, backdoor_topic))
+    backdoor_handling_task = None if not backdoor_topic else asyncio.create_task(
+        backdoor_handler(nats_client, backdoor_topic))
 
     try:
         response = await send_case(nats_client, request, expected_response, client_frontdoor_topic)
@@ -257,7 +272,8 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
         if client_handling_task:
             client_handling_task.cancel()
             await client_handling_task
-            (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys, response_binary_had_enough_integer_keys) = client_handling_task.result() or (False, False, False, False)
+            (request_was_binary, response_was_binary, request_binary_had_enough_integer_keys,
+             response_binary_had_enough_integer_keys) = client_handling_task.result() or (False, False, False, False)
 
     if assert_binary:
         if 'Error' not in next(iter(response[1])):
@@ -284,7 +300,6 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
             assert response_binary_had_enough_integer_keys == True
 
 
-
 async def send_case(nats_client: nats.aio.client.Client, request, expected_response, request_topic, just_send=False):
 
     print('T->     {}'.format(request), flush=True)
@@ -298,7 +313,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
     else:
         if not isinstance(request, bytes):
             request_json = json.dumps(request)
-            request_bytes = request_json.encode()    
+            request_bytes = request_json.encode()
         else:
             request_bytes = request
 
@@ -329,7 +344,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
 
     return response
 
-ping_req = [{},{'fn._ping': {}}]
+ping_req = [{}, {'fn._ping': {}}]
 
 
 async def ping(nats_client, topic):
@@ -350,9 +365,7 @@ def startup_check(loop: asyncio.AbstractEventLoop, verify, times=10):
                 print('Server not yet ready...')
                 print(e)
                 time.sleep(1)
-        
+
         raise Exception('Server did not startup correctly') from ex
-    
+
     loop.run_until_complete(check())
-
-

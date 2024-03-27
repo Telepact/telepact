@@ -3,7 +3,8 @@ import pathlib
 import os
 
 this_path = pathlib.Path(__file__).parent.resolve()
-target_path = os.path.join(pathlib.Path(__file__).parent.parent.parent.parent.resolve(), './lib/ts')
+target_path = os.path.join(pathlib.Path(
+    __file__).parent.parent.parent.parent.resolve(), './lib/ts')
 
 this_env = os.environ.copy()
 
@@ -17,7 +18,8 @@ def start(nats_url):
     s = subprocess.Popen(['npm', 'run', 'build'], cwd=target_path)
     s.wait()
 
-    s2 = subprocess.Popen(['npm', 'install', '--no-save', './../../../lib/ts/uapi-1.0.0.tgz'], cwd=this_path)
+    s2 = subprocess.Popen(['npm', 'install', '--no-save',
+                          './../../../lib/ts/uapi-1.0.0.tgz'], cwd=this_path)
     s2.wait()
 
     s3 = subprocess.Popen(['npm', 'run', 'build'], cwd=this_path)

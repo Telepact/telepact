@@ -3,7 +3,8 @@ import pathlib
 import os
 
 this_path = pathlib.Path(__file__).parent.resolve()
-target_path = os.path.join(pathlib.Path(__file__).parent.parent.parent.parent.resolve(), './lib/java')
+target_path = os.path.join(pathlib.Path(
+    __file__).parent.parent.parent.parent.resolve(), './lib/java')
 this_env = os.environ.copy()
 
 

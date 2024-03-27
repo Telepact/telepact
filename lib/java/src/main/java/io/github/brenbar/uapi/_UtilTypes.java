@@ -21,7 +21,8 @@ interface _UType {
 
     public int getTypeParameterCount();
 
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics);
 
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
@@ -45,7 +46,8 @@ class _UTypeDeclaration {
         this.typeParameters = typeParameters;
     }
 
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> generics) {
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> generics) {
         return _Util.validateValueOfType(value, select, fn, generics, this.type, this.nullable, this.typeParameters);
     }
 
@@ -98,7 +100,8 @@ class _UGeneric implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         final var typeDeclaration = generics.get(this.index);
         return typeDeclaration.validate(value, select, fn, List.of());
@@ -129,7 +132,8 @@ class _UAny implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return List.of();
     }
@@ -156,7 +160,8 @@ class _UBoolean implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateBoolean(value);
     }
@@ -183,7 +188,8 @@ class _UInteger implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateInteger(value);
     }
@@ -208,7 +214,8 @@ class _UNumber implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateNumber(value);
     }
@@ -234,7 +241,8 @@ class _UString implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateString(value);
     }
@@ -261,7 +269,8 @@ class _UArray implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateArray(value, select, fn, typeParameters, generics);
     }
@@ -271,7 +280,8 @@ class _UArray implements _UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator randomGenerator) {
-        return _Util.generateRandomArray(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
+        return _Util.generateRandomArray(blueprintValue, useBlueprintValue, includeOptionalFields,
+                randomizeOptionalFields,
                 typeParameters, generics, randomGenerator);
     }
 
@@ -289,7 +299,8 @@ class _UObject implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateObject(value, select, fn, typeParameters, generics);
     }
@@ -298,7 +309,8 @@ class _UObject implements _UType {
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator) {
-        return _Util.generateRandomObject(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
+        return _Util.generateRandomObject(blueprintValue, useBlueprintValue, includeOptionalFields,
+                randomizeOptionalFields,
                 typeParameters, generics, randomGenerator);
     }
 
@@ -327,7 +339,8 @@ class _UStruct implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateStruct(value, select, fn, typeParameters, generics, this.name, this.fields);
     }
@@ -337,7 +350,8 @@ class _UStruct implements _UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random) {
-        return _Util.generateRandomStruct(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
+        return _Util.generateRandomStruct(blueprintValue, useBlueprintValue, includeOptionalFields,
+                randomizeOptionalFields,
                 typeParameters, generics, random, this.fields);
     }
 
@@ -365,7 +379,8 @@ class _UUnion implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateUnion(value, select, fn, typeParameters, generics, this.name, this.cases);
     }
@@ -375,7 +390,8 @@ class _UUnion implements _UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics,
             _RandomGenerator random) {
-        return _Util.generateRandomUnion(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
+        return _Util.generateRandomUnion(blueprintValue, useBlueprintValue, includeOptionalFields,
+                randomizeOptionalFields,
                 typeParameters, generics, random, this.cases);
     }
 
@@ -405,7 +421,8 @@ class _UFn implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return this.call.validate(value, select, fn, typeParameters, generics);
     }
@@ -438,7 +455,8 @@ class _USelect implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateSelect(givenObj, select, fn, typeParameters, generics, this.types);
     }
@@ -472,7 +490,8 @@ class _UMockCall implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateMockCall(givenObj, select, fn, typeParameters, generics, this.types);
     }
@@ -506,7 +525,8 @@ class _UMockStub implements _UType {
     }
 
     @Override
-    public List<_ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn, List<_UTypeDeclaration> typeParameters,
+    public List<_ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
+            List<_UTypeDeclaration> typeParameters,
             List<_UTypeDeclaration> generics) {
         return _Util.validateMockStub(givenObj, select, fn, typeParameters, generics, this.types);
     }
@@ -541,10 +561,9 @@ class _UHeaders {
     public final Map<String, _UFieldDeclaration> responseHeaders;
 
     public _UHeaders(
-        final String name,
-        final Map<String, _UFieldDeclaration> requestHeaders,
-        final Map<String, _UFieldDeclaration> responseHeaders
-    ) {
+            final String name,
+            final Map<String, _UFieldDeclaration> requestHeaders,
+            final Map<String, _UFieldDeclaration> responseHeaders) {
         this.name = name;
         this.requestHeaders = requestHeaders;
         this.responseHeaders = responseHeaders;
