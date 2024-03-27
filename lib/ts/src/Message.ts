@@ -1,5 +1,4 @@
-import { unionEntry } from "./_util";
-
+import { unionEntry } from './_util';
 
 /**
  * A uAPI Message.

@@ -17,7 +17,7 @@ class Serializer {
 
     /**
      * Serialize a Message into a byte array.
-     * 
+     *
      * @param message
      * @return
      */
@@ -27,7 +27,7 @@ class Serializer {
 
     /**
      * Deserialize a Message from a byte array.
-     * 
+     *
      * @param messageBytes
      * @return
      */

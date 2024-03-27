@@ -29,12 +29,14 @@ public class MockServer {
         public boolean enableMessageResponseGeneration = true;
 
         /**
-         * Flag to indicate if optional fields should be included in generated responses.
+         * Flag to indicate if optional fields should be included in generated
+         * responses.
          */
         public boolean enableOptionalFieldGeneration = true;
 
         /**
-         * Flag to indicate if optional fields, if enabled for generation, should be randomly generated rather than always.
+         * Flag to indicate if optional fields, if enabled for generation, should be
+         * randomly generated rather than always.
          */
         public boolean randomizeOptionalFieldGeneration = true;
 
@@ -102,6 +104,7 @@ public class MockServer {
 
     private Message handle(Message requestMessage) {
         return _Util.mockHandle(requestMessage, this.stubs, this.invocations, this.random,
-                this.server.uApiSchema, this.enableGeneratedDefaultStub, this.enableOptionalFieldGeneration, this.randomizeOptionalFieldGeneration);
+                this.server.uApiSchema, this.enableGeneratedDefaultStub, this.enableOptionalFieldGeneration,
+                this.randomizeOptionalFieldGeneration);
     }
 }

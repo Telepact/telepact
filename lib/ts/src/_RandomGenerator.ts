@@ -21,7 +21,7 @@ export class _RandomGenerator {
     private count: number = 0;
 
     constructor(collectionLengthMin: number, collectionLengthMax: number) {
-        this.setSeed(0)
+        this.setSeed(0);
         this.collectionLengthMin = collectionLengthMin;
         this.collectionLengthMax = collectionLengthMax;
     }
@@ -57,7 +57,7 @@ export class _RandomGenerator {
         const buffer = new ArrayBuffer(4);
         const view = new DataView(buffer);
         view.setInt32(0, this.nextInt());
-        
+
         const byteArray = new Uint8Array(buffer);
         const base64String = btoa(String.fromCharCode.apply(null, byteArray));
         return base64String.replace(/=/g, '');

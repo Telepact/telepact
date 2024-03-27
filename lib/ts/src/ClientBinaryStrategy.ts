@@ -6,7 +6,7 @@ export interface ClientBinaryStrategy {
     /**
      * Update the strategy according to a recent binary encoding checksum returned
      * by the server.
-     * 
+     *
      * @param checksum
      */
     update(checksum: number): void;
@@ -14,7 +14,7 @@ export interface ClientBinaryStrategy {
     /**
      * Get the current binary encoding strategy as a list of binary encoding
      * checksums that should be sent to the server.
-     * 
+     *
      * @return
      */
     getCurrentChecksums(): number[];

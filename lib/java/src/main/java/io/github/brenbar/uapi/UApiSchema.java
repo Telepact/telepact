@@ -16,10 +16,10 @@ public class UApiSchema {
     final Map<String, _UType> typeExtensions;
 
     public UApiSchema(List<Object> original,
-    Map<String, _UType> parsed,
-    Map<String, _UFieldDeclaration> parsedRequestHeaders,
-    Map<String, _UFieldDeclaration> parsedResponseHeaders,
-    Map<String, _UType> typeExtensions) {
+            Map<String, _UType> parsed,
+            Map<String, _UFieldDeclaration> parsedRequestHeaders,
+            Map<String, _UFieldDeclaration> parsedResponseHeaders,
+            Map<String, _UType> typeExtensions) {
         this.original = original;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;

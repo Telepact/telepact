@@ -1,4 +1,4 @@
-import { ClientBinaryStrategy } from "./ClientBinaryStrategy";
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 
 class Checksum {
     value: number;
@@ -11,8 +11,6 @@ class Checksum {
 }
 
 export class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
-
-
     private primary: Checksum | null = null;
     private secondary: Checksum | null = null;
     private lastUpdate: Date = new Date();
@@ -41,8 +39,7 @@ export class _DefaultClientBinaryStrategy implements ClientBinaryStrategy {
         } else if (!this.secondary) {
             return [this.primary.value];
         } else {
-            const minutesSinceLastUpdate =
-                (Date.now() - this.lastUpdate.getTime()) / (1000 * 60);
+            const minutesSinceLastUpdate = (Date.now() - this.lastUpdate.getTime()) / (1000 * 60);
 
             // Every 10 minute interval of non-use is a penalty point
             const penalty = Math.floor(minutesSinceLastUpdate / 10) + 1;

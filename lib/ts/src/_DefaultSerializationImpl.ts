@@ -1,8 +1,8 @@
 import { Packr, Unpackr, decode, encode } from 'msgpackr';
 
 export class _DefaultSerializationImpl {
-    private packr = new Packr({mapsAsObjects: false, useRecords: false});
-    private unpackr = new Unpackr({mapsAsObjects: false, useRecords: false});
+    private packr = new Packr({ mapsAsObjects: false, useRecords: false });
+    private unpackr = new Unpackr({ mapsAsObjects: false, useRecords: false });
 
     public toJson(uapiMessage: any): Uint8Array {
         const jsonStr = JSON.stringify(uapiMessage);

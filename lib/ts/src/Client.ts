@@ -7,12 +7,10 @@ import { _ClientBinaryEncoder } from './_utilTypes';
 import { processRequestObject } from './_util';
 import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 
-
 /**
  * Options for the Client.
  */
 export class ClientOptions {
-
     /**
      * Indicates if the client should use binary payloads instead of JSON.
      */
@@ -37,12 +35,10 @@ export class ClientOptions {
     public binaryStrategy: ClientBinaryStrategy = new _DefaultClientBinaryStrategy();
 }
 
-
 /**
  * A uAPI client.
  */
 export class Client {
-
     private readonly adapter: (m: Message, s: Serializer) => Promise<Message>;
     private readonly serializer: Serializer;
     private readonly useBinaryDefault: boolean;
@@ -50,9 +46,9 @@ export class Client {
 
     /**
      * Create a client with the given transport adapter.
-     * 
+     *
      * Example transport adapter:
-     * 
+     *
      * <pre>
      * var adapter = (requestMessage, serializer) => {
      *     return CompletableFuture.supplyAsync(() => {
@@ -63,25 +59,29 @@ export class Client {
      *     });
      * };
      * </pre>
-     * 
+     *
      * @param adapter
      */
     constructor(adapter: (m: Message, s: Serializer) => Promise<Message>, options: ClientOptions) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;
-        this.serializer = new Serializer(options.serializationImpl,
-            new _ClientBinaryEncoder(options.binaryStrategy));
+        this.serializer = new Serializer(options.serializationImpl, new _ClientBinaryEncoder(options.binaryStrategy));
     }
 
     /**
      * Submit a uAPI Request Message. Returns a uAPI Response Message.
-     * 
+     *
      * @param request
      * @return
      */
     public async request(requestMessage: Message): Promise<Message> {
-        return processRequestObject(requestMessage, this.adapter, this.serializer,
-            this.timeoutMsDefault, this.useBinaryDefault);
+        return processRequestObject(
+            requestMessage,
+            this.adapter,
+            this.serializer,
+            this.timeoutMsDefault,
+            this.useBinaryDefault
+        );
     }
 }

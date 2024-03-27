@@ -1,5 +1,5 @@
-import { mapSchemaParseFailuresToPseudoJson } from "./_util";
-import { _SchemaParseFailure } from "./_utilTypes";
+import { mapSchemaParseFailuresToPseudoJson } from './_util';
+import { _SchemaParseFailure } from './_utilTypes';
 
 /**
  * Indicates failure to parse a uAPI Schema.
