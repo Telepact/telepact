@@ -1258,11 +1258,11 @@ def get_type_unexpected_validation_failure(path: List[Any], value: Any, expected
     return [_types._ValidationFailure(path, "TypeUnexpected", data)]
 
 
-def validate_headers(headers: Dict[str, Any], uapi_schema: 'types.UApiSchema', function_type: _types._UFn) -> List[_types._ValidationFailure]:
+def validate_headers(headers: Dict[str, Any], parsed_request_headers: Dict[str, _types._UFieldDeclaration], function_type: _types._UFn) -> List[_types._ValidationFailure]:
     validation_failures: List[_types._ValidationFailure] = []
 
     for header, header_value in headers.items():
-        field = uapi_schema.parsed_request_headers.get(header, None)
+        field = parsed_request_headers.get(header, None)
         if field:
             this_validation_failures = field.type_declaration.validate(
                 header_value,
@@ -2024,10 +2024,10 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
 
         return types.Message(response_headers, new_error_result)
 
-    header_validation_failures: List[Any] = validate_headers(
-        request_headers, u_api_schema, function_type)
-    if header_validation_failures:
-        return get_invalid_error_message('_ErrorInvalidRequestHeaders', header_validation_failures, result_union_type, response_headers)
+    request_header_validation_failures: List[Any] = validate_headers(
+        request_headers, u_api_schema.parsed_request_headers, function_type)
+    if request_header_validation_failures:
+        return get_invalid_error_message('_ErrorInvalidRequestHeaders', request_header_validation_failures, result_union_type, response_headers)
 
     if '_bin' in request_headers:
         client_known_binary_checksums: List[Any] = request_headers['_bin']
@@ -2073,17 +2073,22 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
                 pass
             return types.Message(response_headers, {'_ErrorUnknown': {}})
 
-    skip_result_validation: bool = unsafe_response_enabled
-    if not skip_result_validation:
-        result_validation_failures: List[Any] = result_union_type.validate(
-            result_message.body, select_struct_fields_header, None, [], [])
-        if result_validation_failures:
-            return get_invalid_error_message('_ErrorInvalidResponseBody', result_validation_failures, result_union_type, response_headers)
-
     result_union: Dict[str, Any] = result_message.body
 
     result_message.header.update(response_headers)
     final_response_headers: Dict[str, Any] = result_message.header
+
+    skip_result_validation: bool = unsafe_response_enabled
+    if not skip_result_validation:
+        result_validation_failures: List[Any] = result_union_type.validate(
+            result_union, select_struct_fields_header, None, [], [])
+        if result_validation_failures:
+            return get_invalid_error_message('_ErrorInvalidResponseBody', result_validation_failures, result_union_type, response_headers)
+        
+        response_header_validation_failures: List[Any] = validate_headers(
+            final_response_headers, u_api_schema.parsed_response_headers, function_type)
+        if response_header_validation_failures:
+            return get_invalid_error_message('_ErrorInvalidResponseHeaders', response_header_validation_failures, result_union_type, response_headers)
 
     final_result_union: Dict[str, Any]
     if select_struct_fields_header:
