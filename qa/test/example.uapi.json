@@ -349,5 +349,14 @@
         "items": ["array", ["struct.Big"]]
       }
     }
+  },
+
+  {
+    "headers.ExHeaders": {
+      "in": ["boolean"]
+    },
+    "->": {
+      "out": ["boolean"]
+    }
   }
 ]

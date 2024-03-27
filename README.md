@@ -167,22 +167,20 @@ This design maximizes backwards compatible change points in the API design, as
 adding an optional field to a struct is a legal backwards compatible change. The
 traditional union can be approximated by simply leaving all union structs blank.
 
-### Why force servers to perform result validation?
+### Why force servers to perform response validation?
 
-uAPI automatically performs validation of function results (as well as errors)
-against the uAPI schema, and there is no setting for servers to turn off this
-behavior.
+uAPI automatically performs validation of responses against the uAPI schema, and
+there is no setting for servers to turn off this behavior.
 
 This design decision is intentional. It helps maintain the high standard of type
-safety in the uAPI ecosystem by preventing API providers from indulging in the
-plausible deniability of claiming malformed data is just an inconvenience and
-are instead forced to deal with a hard failure through bug reports. Hard
-failures also help draw attention to type safety deficits early in the
-development phase.
+safety in the uAPI ecosystem by denying API providers the option to respond
+to malformed data as an inconvenience and are instead forced to deal with hard
+failures through bug reports. Hard failures also help draw attention to type
+safety deficits early in the development phase.
 
 Clients who are uniquely vulnerable to hard server failures and who find it
 advantageous to receive the malformed data anyway and adapt on-the-fly are able
-to turn off this result validation by submitting their requests with the
+to turn off this response validation by submitting their requests with the
 `{"_unsafe":true}` header.
 
 ### If all I want is compact binary serialization, why not just use gRPC?

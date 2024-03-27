@@ -37,7 +37,7 @@ def handler(request):
     target = next(iter(body))
     payload = body[target]
 
-    response_header = {}
+    response_header = header.get('responseHeader', {})
 
     if '_onResponseError' in header:
         response_header['_onResponseError'] = header['_onResponseError']

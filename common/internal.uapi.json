@@ -156,6 +156,9 @@
         "_ErrorInvalidRequestBody": {
           "cases": ["array", ["struct._ValidationFailure"]]
         },
+        "_ErrorInvalidResponseHeaders": {
+          "cases": ["array", ["struct._ValidationFailure"]]
+        },
         "_ErrorInvalidResponseBody": {
           "cases": ["array", ["struct._ValidationFailure"]]
         },

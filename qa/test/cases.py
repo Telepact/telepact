@@ -342,5 +342,16 @@ cases = {
     ],
     'big': [
         [[{'Ok': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}, {'fn.getBigList': {}}], [{}, {'Ok': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}]]
+    ],
+    'customHeaders': [
+        [[{'Ok': {}, 'in': False, 'responseHeader': {'out': False}}, {'fn.test': {}}], [{'out': False}, {'Ok': {}}]],
+        [[{'Ok': {}, 'in': 0}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['in'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'in': ''}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['in'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'in': []}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['in'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'in': {}}, {'fn.test': {}}], [{}, {'_ErrorInvalidRequestHeaders': {'cases': [{'path': ['in'], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'responseHeader': {'out': 0}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseHeaders': {'cases': [{'path': ['out'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'responseHeader': {'out': ''}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseHeaders': {'cases': [{'path': ['out'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'responseHeader': {'out': []}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseHeaders': {'cases': [{'path': ['out'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Boolean': {}}}}}]}}]],
+        [[{'Ok': {}, 'responseHeader': {'out': {}}}, {'fn.test': {}}], [{}, {'_ErrorInvalidResponseHeaders': {'cases': [{'path': ['out'], 'reason': {'TypeUnexpected': {'actual': {'Object': {}}, 'expected': {'Boolean': {}}}}}]}}]],
     ]
 }

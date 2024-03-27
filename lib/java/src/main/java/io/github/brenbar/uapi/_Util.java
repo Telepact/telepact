@@ -1570,13 +1570,13 @@ class _Util {
     }
 
     static List<_ValidationFailure> validateHeaders(
-            Map<String, Object> headers, UApiSchema uApiSchema, _UFn functionType) {
+            Map<String, Object> headers, Map<String, _UFieldDeclaration> parsedRequestHeaders, _UFn functionType) {
         final var validationFailures = new ArrayList<_ValidationFailure>();
 
         for (final var entry : headers.entrySet()) {
             final var header = entry.getKey();
             final var headerValue = entry.getValue();
-            final var field = uApiSchema.parsedRequestHeaders.get(header);
+            final var field = parsedRequestHeaders.get(header);
             if (field != null) {
                 final var thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name, List.of());
                 final var thisValidationFailuresPath = thisValidationFailures.stream().map(e -> new _ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
@@ -2487,10 +2487,10 @@ class _Util {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final List<_ValidationFailure> headerValidationFailures = validateHeaders(requestHeaders,
-                uApiSchema, functionType);
-        if (!headerValidationFailures.isEmpty()) {
-            return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", headerValidationFailures, resultUnionType,
+        final List<_ValidationFailure> requestHeaderValidationFailures = validateHeaders(requestHeaders,
+                uApiSchema.parsedRequestHeaders, functionType);
+        if (!requestHeaderValidationFailures.isEmpty()) {
+            return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", requestHeaderValidationFailures, resultUnionType,
                     responseHeaders);
         }
 
@@ -2547,20 +2547,26 @@ class _Util {
             }
         }
 
-        final var skipResultValidation = unsafeResponseEnabled;
-        if (!skipResultValidation) {
-            final var resultValidationFailures = resultUnionType.validate(
-                    resultMessage.body, selectStructFieldsHeader, null, List.of(), List.of());
-            if (!resultValidationFailures.isEmpty()) {
-                return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType,
-                        responseHeaders);
-            }
-        }
-
         final Map<String, Object> resultUnion = resultMessage.body;
 
         resultMessage.header.putAll(responseHeaders);
         final Map<String, Object> finalResponseHeaders = resultMessage.header;
+
+        final var skipResultValidation = unsafeResponseEnabled;
+        if (!skipResultValidation) {
+            final var resultValidationFailures = resultUnionType.validate(
+                    resultUnion, selectStructFieldsHeader, null, List.of(), List.of());
+            if (!resultValidationFailures.isEmpty()) {
+                return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType,
+                        responseHeaders);
+            }
+            final List<_ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
+                uApiSchema.parsedResponseHeaders, functionType);
+            if (!responseHeaderValidationFailures.isEmpty()) {
+                return getInvalidErrorMessage("_ErrorInvalidResponseHeaders", responseHeaderValidationFailures, resultUnionType,
+                    responseHeaders);
+            }    
+        }
 
         final Map<String, Object> finalResultUnion;
         if (selectStructFieldsHeader != null) {
