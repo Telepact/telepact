@@ -17,6 +17,10 @@ def start(nats_url):
     s1 = subprocess.Popen(['pipenv', '--clear'], cwd=this_path)
     s1.wait()
 
+    s3 = subprocess.Popen(['pipenv', 'run', 'python',
+                         'prepare.py'], cwd=target_path)
+    s3.wait()
+
     s = subprocess.Popen(['pipenv', 'run', 'python',
                          '-m', 'build'], cwd=target_path)
     s.wait()

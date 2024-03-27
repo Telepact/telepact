@@ -18,3 +18,14 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.sdist]
 ignore-vcs = true
+include = [
+  "uapi",
+  "*.json"
+]
+
+[tool.hatch.build.targets.wheel]
+ignore-vcs = true
+include = [
+  "uapi",
+  "*.json"
+]
