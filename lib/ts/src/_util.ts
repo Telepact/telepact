@@ -755,12 +755,12 @@ export function applyErrorToParsedTypes(
 }
 
 export function parseErrorType(
-    errorDefinitionAsParsedJson: Record<string, any>, // Replace 'any' with appropriate type
+    errorDefinitionAsParsedJson: Record<string, any>,
     schemaKey: string,
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    parsedTypes: Record<string, _UType>,
+    typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UError {
@@ -825,12 +825,12 @@ export function parseErrorType(
 }
 
 export function parseHeadersType(
-    headersDefinitionAsParsedJson: Record<string, any>, // Replace 'any' with appropriate type
+    headersDefinitionAsParsedJson: Record<string, any>,
     schemaKey: string,
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    parsedTypes: Record<string, _UType>,
+    typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UHeaders {
@@ -926,12 +926,12 @@ export function parseHeadersType(
 
 export function parseFunctionType(
     path: any[],
-    functionDefinitionAsParsedJson: Record<string, any>, // Replace 'any' with appropriate type
+    functionDefinitionAsParsedJson: Record<string, any>,
     schemaKey: string,
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: Record<string, number>,
-    parsedTypes: Record<string, any>, // Replace 'any' with appropriate type
-    typeExtensions: Record<string, any>, // Replace 'any' with appropriate type
+    parsedTypes: Record<string, _UType>,
+    typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UFn {
