@@ -1385,7 +1385,7 @@ export function packMap(m: Map<any, any>, header: any[], keyIndexMap: Map<number
 
         let packedValue: any;
         if (value instanceof Map && value !== null) {
-            let nestedHeader: any[] = header[keyIndexValue + 1];
+            const nestedHeader: any[] = header[keyIndexValue + 1];
             if (!Array.isArray(nestedHeader)) {
                 // No nesting available, so the data structure is inconsistent
                 throw new CannotPack();
@@ -1526,7 +1526,7 @@ export function serverBinaryEncode(message: any[], binaryEncoder: _BinaryEncodin
     }
 
     headers['_bin'] = [binaryEncoder.checksum];
-    let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+    const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: Map<string, any>;
     if (headers['_pac'] === true) {
@@ -1585,7 +1585,7 @@ export function clientBinaryEncode(
         throw new _BinaryEncoderUnavailableError();
     }
 
-    let encodedMessageBody = encodeBody(messageBody, binaryEncoder);
+    const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: Map<any, any>;
     if (headers['_pac'] === true) {
@@ -2315,11 +2315,11 @@ export function constructRandomStruct(
     randomGenerator: _RandomGenerator
 ): Record<string, any> {
     const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => {
-        let a = e1[0];
-        let b = e2[0];
-        for (var i = 0; i < Math.min(a.length, b.length); i++) {
-            var charCodeA = a.charCodeAt(i);
-            var charCodeB = b.charCodeAt(i);
+        const a = e1[0];
+        const b = e2[0];
+        for (let i = 0; i < Math.min(a.length, b.length); i++) {
+            const charCodeA = a.charCodeAt(i);
+            const charCodeB = b.charCodeAt(i);
             if (charCodeA !== charCodeB) {
                 // If the characters are different, return the comparison result
                 // where lowercase letters are considered greater than uppercase letters
