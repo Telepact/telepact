@@ -39,7 +39,6 @@ import internalUApi from '../inc/internal.uapi.json';
 import mockInternalUApi from '../inc/mock-internal.uapi.json';
 import { addExtension } from 'msgpackr';
 import { ClientBinaryStrategy } from './ClientBinaryStrategy';
-import { skip } from 'node:test';
 
 export const _ANY_NAME: Readonly<string> = 'Any';
 export const _ARRAY_NAME: Readonly<string> = 'Array';
