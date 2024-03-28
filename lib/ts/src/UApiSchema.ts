@@ -1,5 +1,5 @@
 import { extendUApiSchema, newUApiSchema } from './_util';
-import { _UFieldDeclaration, _UHeaders, _UType, _UTypeDeclaration } from './_utilTypes';
+import { _UFieldDeclaration, _UType } from './_utilTypes';
 
 /**
  * A parsed uAPI schema.

@@ -4,7 +4,7 @@ import { Serializer } from './Serializer';
 import { UApiSchema } from './UApiSchema';
 import { _DefaultSerializationImpl } from './_DefaultSerializationImpl';
 import { constructBinaryEncoding, getInternalUApiJson, processBytes } from './_util';
-import { _ServerBinaryEncoder, _UHeaders, _USelect, _UStruct, _UType } from './_utilTypes';
+import { _ServerBinaryEncoder, _USelect, _UStruct, _UType } from './_utilTypes';
 
 /**
  * Options for the Server.

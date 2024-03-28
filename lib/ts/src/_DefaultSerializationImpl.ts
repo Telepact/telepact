@@ -1,4 +1,4 @@
-import { Packr, Unpackr, decode, encode } from 'msgpackr';
+import { Packr, Unpackr } from 'msgpackr';
 
 export class _DefaultSerializationImpl {
     private packr = new Packr({ mapsAsObjects: false, useRecords: false });
