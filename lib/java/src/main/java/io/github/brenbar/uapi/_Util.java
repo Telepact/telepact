@@ -118,7 +118,7 @@ class _Util {
     }
 
     public static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^((fn|error|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*";
+        final var regex = "^((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*";
         final var matches = new ArrayList<String>();
 
         for (final var e : definition.keySet()) {
@@ -791,7 +791,7 @@ class _Util {
             parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
-                    "^error\\..*$");
+                    "^errors\\..*$");
             try {
                 errorsRegex = asString(errorsRegexInit);
             } catch (ClassCastException e) {
@@ -937,7 +937,7 @@ class _Util {
         for (final var schemaKey : schemaKeys) {
             if (schemaKey.startsWith("info.")) {
                 continue;
-            } else if (schemaKey.startsWith("error.")) {
+            } else if (schemaKey.startsWith("errors.")) {
                 errorKeys.add(schemaKey);
                 continue;
             } else if (schemaKey.startsWith("headers.")) {

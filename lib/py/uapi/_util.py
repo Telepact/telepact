@@ -89,7 +89,7 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
 def find_schema_key(definition: dict[str, Any], index: int) -> str:
     import re
 
-    regex = "^((fn|error|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*"
+    regex = "^((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*"
     matches = []
 
     for e in definition.keys():
@@ -562,9 +562,9 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
 
 
 def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
-                        schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                        parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
-                        all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UHeaders:
+                       schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
+                       parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+                       all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UHeaders:
     index = schema_keys_to_index.get(schema_key)
     path = [index]
 
@@ -574,14 +574,15 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
     request_headers_struct = None
     try:
         request_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, schema_key, ['->'],
-                                     type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
-                                     parsed_types, type_extensions, all_parse_failures, failed_types)
-        
+                                                   type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
+                                                   parsed_types, type_extensions, all_parse_failures, failed_types)
+
         for key, field in request_headers_struct.fields.items():
             if field.optional:
                 this_path = append(append(path, schema_key), key)
                 regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
-                parse_failures.append(_types._SchemaParseFailure(this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
+                parse_failures.append(_types._SchemaParseFailure(
+                    this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
 
     except types.UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
@@ -596,14 +597,15 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
     else:
         try:
             response_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, result_schema_key, [schema_key],
-                                        type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
-                                        parsed_types, type_extensions, all_parse_failures, failed_types)
-            
+                                                        type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
+                                                        parsed_types, type_extensions, all_parse_failures, failed_types)
+
             for key, field in response_headers_struct.fields.items():
                 if field.optional:
                     this_path = append(append(path, schema_key), key)
                     regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
-                    parse_failures.append(_types._SchemaParseFailure(this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
+                    parse_failures.append(_types._SchemaParseFailure(
+                        this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
 
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
@@ -656,7 +658,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
             regex_path, "ObjectKeyDisallowed", {}))
     else:
         errors_regex_init = function_definition_as_parsed_json.get(
-            errors_regex_key, "^error\\..*$")
+            errors_regex_key, "^errors\\..*$")
         try:
             errors_regex = as_string(errors_regex_init)
         except TypeError:
@@ -748,7 +750,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
                 other_path_index = schema_keys_to_index[matching_schema_key]
                 final_path = loop_path + [schema_key]
                 parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision", {
-                                  "other": [other_path_index, matching_schema_key]}))
+                    "other": [other_path_index, matching_schema_key]}))
             continue
 
         schema_keys.add(schema_key)
@@ -766,7 +768,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
     for schema_key in schema_keys:
         if schema_key.startswith("info."):
             continue
-        elif schema_key.startswith("error."):
+        elif schema_key.startswith("errors."):
             error_keys.add(schema_key)
             continue
         elif schema_key.startswith("headers."):
@@ -785,7 +787,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         offset_parse_failures = offset_schema_index(
             parse_failures, path_offset)
         raise types.UApiSchemaParseError(offset_parse_failures)
-    
+
     for error_key in error_keys:
         this_index = schema_keys_to_index[error_key]
         def_dict = uapi_schema_pseudo_json[this_index]
@@ -807,10 +809,10 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
         try:
             headers_type = parse_headers_type(def_dict, header_key, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
-                                     type_extensions, parse_failures, failed_types)
-            
+                                              type_extensions, parse_failures, failed_types)
+
             print(f'headers_type {headers_type}')
-            
+
             request_headers.update(headers_type.request_headers)
             response_headers.update(headers_type.response_headers)
 
@@ -1273,9 +1275,10 @@ def validate_headers(headers: Dict[str, Any], parsed_request_headers: Dict[str, 
             this_validation_failures_path = []
             for x in this_validation_failures:
                 this_validation_failures_path.append(
-                    _types._ValidationFailure(prepend(header, x.path), x.reason, x.data)
+                    _types._ValidationFailure(
+                        prepend(header, x.path), x.reason, x.data)
                 )
-            
+
             validation_failures.extend(this_validation_failures_path)
 
     return validation_failures
@@ -1610,7 +1613,8 @@ def validate_union_struct(union_struct: _types._UStruct,
                           union_case: str,
                           actual: Dict[str, Any], selected_cases: Dict[str, object], select: Dict[str, object], fn: str,
                           type_parameters: List[_types._UTypeDeclaration]) -> List[_types._ValidationFailure]:
-    selected_fields = selected_cases.get(union_case, None) if selected_cases else None
+    selected_fields = selected_cases.get(
+        union_case, None) if selected_cases else None
     return validate_struct_fields(union_struct.fields, selected_fields, actual, select, fn, type_parameters)
 
 
@@ -1673,7 +1677,7 @@ def generate_random_fn(blueprint_value: Any,
 
 
 def validate_select(given_obj: Any, select: Dict[str, object], fn: str, type_parameters: List['_types._UTypeDeclaration'],
-                       generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
+                    generics: List['_types._UTypeDeclaration'], types: Dict[str, '_types._UType']) -> List['_types._ValidationFailure']:
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
 
@@ -1829,7 +1833,8 @@ def validate_mock_stub(given_obj: Any, select: Dict[str, object], fn: str, type_
             [result_def_key], "RequiredObjectKeyMissing", {}))
     else:
         output = given_map[result_def_key]
-        output_failures = function_def.result.validate(output, select, fn, [], [])
+        output_failures = function_def.result.validate(
+            output, select, fn, [], [])
 
         output_failures_with_path = []
         for f in output_failures:
@@ -2038,7 +2043,8 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
         if '_pac' in request_headers:
             response_headers['_pac'] = request_headers['_pac']
 
-    select_struct_fields_header: Dict[str, object] = request_headers.get('_sel', None)
+    select_struct_fields_header: Dict[str,
+                                      object] = request_headers.get('_sel', None)
 
     if unknown_target:
         new_error_result: Dict[str, Any] = {'_ErrorInvalidRequestBody': {
@@ -2084,7 +2090,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
             result_union, select_struct_fields_header, None, [], [])
         if result_validation_failures:
             return get_invalid_error_message('_ErrorInvalidResponseBody', result_validation_failures, result_union_type, response_headers)
-        
+
         response_header_validation_failures: List[Any] = validate_headers(
             final_response_headers, u_api_schema.parsed_response_headers, function_type)
         if response_header_validation_failures:
@@ -2246,7 +2252,7 @@ def verify_no_more_interactions(invocations: List[_types._MockInvocation]) -> Di
 
 
 async def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub], invocations: List[_types._MockInvocation],
-                      random: _rg._RandomGenerator, u_api_schema: 'types.UApiSchema', enable_generated_default_stub: bool, 
+                      random: _rg._RandomGenerator, u_api_schema: 'types.UApiSchema', enable_generated_default_stub: bool,
                       enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'types.Message':
     header: Dict[str, Any] = request_message.header
 
@@ -2347,7 +2353,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
             use_blueprint_value = True
             include_optional_fields = True
             random_ok_struct = ok_struct_ref.generate_random_value({}, use_blueprint_value,
-                                                                   include_optional_fields, randomize_optional_field_generation, 
+                                                                   include_optional_fields, randomize_optional_field_generation,
                                                                    [], [], random)
             return types.Message({}, {"Ok": random_ok_struct})
         else:

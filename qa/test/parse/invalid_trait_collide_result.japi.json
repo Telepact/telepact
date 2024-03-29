@@ -1,20 +1,20 @@
 [
-  {
-    "fn.example": {},
-    "->": {
-      "Ok": {
-        "result1": ["boolean"]
-      }
-    }
-  },
-  {
-    "error.Collide": {
-      "fn.*": {},
-      "->": {
-        "Ok": {
-          "result1": ["boolean"]
+    {
+        "fn.example": {},
+        "->": {
+            "Ok": {
+                "result1": ["boolean"]
+            }
         }
-      }
+    },
+    {
+        "errors.Collide": {
+            "fn.*": {},
+            "->": {
+                "Ok": {
+                    "result1": ["boolean"]
+                }
+            }
+        }
     }
-  }
 ]

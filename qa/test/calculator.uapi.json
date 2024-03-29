@@ -1,102 +1,102 @@
 [
-  {
-    "///": "A calculator app that provides basic math computation capabilities.",
-    "info.Calculator": {}
-  },
-
-  {
-    "///": "A value for computation that can take either a constant or variable form.",
-    "union.Value": {
-      "Constant": {
-        "value": ["number"]
-      },
-      "Variable": {
-        "name": ["string"]
-      }
-    }
-  },
-
-  {
-    "///": "A basic mathematical operation.",
-    "union.Operation": {
-      "Add": {},
-      "Sub": {},
-      "Mul": {},
-      "Div": {}
-    }
-  },
-
-  {
-    "///": "A mathematical variable represented by a `name` that holds a certain `value`.",
-    "struct.Variable": {
-      "name": ["string"],
-      "value": ["number"]
-    }
-  },
-
-  {
-    "///": "Save a set of variables as a dynamic map of variable names to their value.",
-    "fn.saveVariables": {
-      "variables": ["object", ["number"]]
+    {
+        "///": "A calculator app that provides basic math computation capabilities.",
+        "info.Calculator": {}
     },
-    "->": {
-      "Ok": {}
-    }
-  },
 
-  {
-    "///": "Compute the `result` of the given `x` and `y` values.",
-    "fn.compute": {
-      "x": ["union.Value"],
-      "y": ["union.Value"],
-      "op": ["union.Operation"]
+    {
+        "///": "A value for computation that can take either a constant or variable form.",
+        "union.Value": {
+            "Constant": {
+                "value": ["number"]
+            },
+            "Variable": {
+                "name": ["string"]
+            }
+        }
     },
-    "->": {
-      "Ok": {
-        "result": ["number"]
-      },
-      "ErrorCannotDivideByZero": {}
-    }
-  },
 
-  {
-    "///": "Export all saved variables, up to an optional `limit`.",
-    "fn.exportVariables": {
-      "limit!": ["integer"]
+    {
+        "///": "A basic mathematical operation.",
+        "union.Operation": {
+            "Add": {},
+            "Sub": {},
+            "Mul": {},
+            "Div": {}
+        }
     },
-    "->": {
-      "Ok": {
-        "variables": ["array", ["struct.Variable"]]
-      }
-    }
-  },
 
-  {
-    "///": "A function template.",
-    "fn.getPaperTape": {},
-    "->": {
-      "Ok": {
-        "tape": ["array", ["struct.Computation"]]
-      }
-    }
-  },
+    {
+        "///": "A mathematical variable represented by a `name` that holds a certain `value`.",
+        "struct.Variable": {
+            "name": ["string"],
+            "value": ["number"]
+        }
+    },
 
-  {
-    "///": " A computation. ",
-    "struct.Computation": {
-      "firstOperand": ["union.Value"],
-      "secondOperand": ["union.Value"],
-      "operation": ["union.Operation"],
-      "timestamp": ["integer"],
-      "successful": ["boolean"]
-    }
-  },
+    {
+        "///": "Save a set of variables as a dynamic map of variable names to their value.",
+        "fn.saveVariables": {
+            "variables": ["object", ["number"]]
+        },
+        "->": {
+            "Ok": {}
+        }
+    },
 
-  {
-    "error.Authenticated": {
-      "->": {
-        "ErrorInvalidToken": {}
-      }
+    {
+        "///": "Compute the `result` of the given `x` and `y` values.",
+        "fn.compute": {
+            "x": ["union.Value"],
+            "y": ["union.Value"],
+            "op": ["union.Operation"]
+        },
+        "->": {
+            "Ok": {
+                "result": ["number"]
+            },
+            "ErrorCannotDivideByZero": {}
+        }
+    },
+
+    {
+        "///": "Export all saved variables, up to an optional `limit`.",
+        "fn.exportVariables": {
+            "limit!": ["integer"]
+        },
+        "->": {
+            "Ok": {
+                "variables": ["array", ["struct.Variable"]]
+            }
+        }
+    },
+
+    {
+        "///": "A function template.",
+        "fn.getPaperTape": {},
+        "->": {
+            "Ok": {
+                "tape": ["array", ["struct.Computation"]]
+            }
+        }
+    },
+
+    {
+        "///": " A computation. ",
+        "struct.Computation": {
+            "firstOperand": ["union.Value"],
+            "secondOperand": ["union.Value"],
+            "operation": ["union.Operation"],
+            "timestamp": ["integer"],
+            "successful": ["boolean"]
+        }
+    },
+
+    {
+        "errors.Authenticated": {
+            "->": {
+                "ErrorInvalidToken": {}
+            }
+        }
     }
-  }
 ]

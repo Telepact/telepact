@@ -1,5 +1,5 @@
 [
-  {
-    "error.Example": ["wrong"]
-  }
+    {
+        "errors.Example": ["wrong"]
+    }
 ]

@@ -1,18 +1,18 @@
 [
-  {
-    "fn.example": {
-      "arg1": ["boolean"]
+    {
+        "fn.example": {
+            "arg1": ["boolean"]
+        },
+        "->": {
+            "Ok": {}
+        }
     },
-    "->": {
-      "Ok": {}
+    {
+        "errors.Collide": {
+            "fn.*": {
+                "arg1": ["boolean"]
+            },
+            "->": {}
+        }
     }
-  },
-  {
-    "error.Collide": {
-      "fn.*": {
-        "arg1": ["boolean"]
-      },
-      "->": {}
-    }
-  }
 ]

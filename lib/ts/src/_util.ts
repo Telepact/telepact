@@ -116,7 +116,7 @@ export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset
 }
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
-    const regex = '^((fn|error|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*';
+    const regex = '^((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*';
     const matches: string[] = [];
 
     for (const e of Object.keys(definition)) {
@@ -1002,7 +1002,7 @@ export function parseFunctionType(
     } else {
         let errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey];
         if (errorsRegexInit === undefined) {
-            errorsRegexInit = '^error\\..*$';
+            errorsRegexInit = '^errors\\..*$';
         }
         try {
             errorsRegex = asString(errorsRegexInit);
@@ -1146,7 +1146,7 @@ export function parseUApiSchema(
     for (const schemaKey of schemaKeys) {
         if (schemaKey.startsWith('info.')) {
             continue;
-        } else if (schemaKey.startsWith('error.')) {
+        } else if (schemaKey.startsWith('errors.')) {
             errorKeys.add(schemaKey);
             continue;
         } else if (schemaKey.startsWith('headers.')) {
