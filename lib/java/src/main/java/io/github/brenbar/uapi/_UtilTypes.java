@@ -9,11 +9,13 @@ class _SchemaParseFailure {
     public final List<Object> path;
     public final String reason;
     public final Map<String, Object> data;
+    public final String key;
 
-    public _SchemaParseFailure(List<Object> path, String reason, Map<String, Object> data) {
+    public _SchemaParseFailure(List<Object> path, String reason, Map<String, Object> data, String key) {
         this.path = path;
         this.reason = reason;
         this.data = data;
+        this.key = key;
     }
 }
 

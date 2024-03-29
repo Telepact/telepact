@@ -90,7 +90,7 @@ class _Util {
         return (Map<String, Object>) object;
     }
 
-    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset) {
+    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset, Map<String, Integer> schemaKeysToIndex) {
         final var finalList = new ArrayList<_SchemaParseFailure>();
 
         for (final var f : initialFailures) {
@@ -111,7 +111,9 @@ class _Util {
                 finalData = data;
             }
 
-            finalList.add(new _SchemaParseFailure(newPath, reason, finalData));
+            final var schemeKey = schemaKeysToIndex.entrySet().stream().filter(e -> e.getValue() == newPath.get(0)).map(e -> e.getKey()).findAny().orElse("unknown");
+
+            finalList.add(new _SchemaParseFailure(newPath, reason, finalData, schemeKey));
         }
 
         return finalList;
@@ -133,7 +135,7 @@ class _Util {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
                     "ObjectKeyRegexMatchCountUnexpected",
                     new TreeMap<>(
-                            Map.of("regex", regex, "actual", matches.size(), "expected", 1)))));
+                            Map.of("regex", regex, "actual", matches.size(), "expected", 1)), null)));
         }
     }
 
@@ -154,7 +156,7 @@ class _Util {
         final Map<String, Object> data = new TreeMap<>(Map.ofEntries(Map.entry("actual", Map.of(actualType, Map.of())),
                 Map.entry("expected", Map.of(expectedType, Map.of()))));
         return List.of(
-                new _SchemaParseFailure(path, "TypeUnexpected", data));
+                new _SchemaParseFailure(path, "TypeUnexpected", data, null));
     }
 
     static List<Object> prepend(Object value, List<Object> original) {
@@ -177,7 +179,7 @@ class _Util {
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.isEmpty()) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
-                    "EmptyArrayDisallowed", Map.of())));
+                    "EmptyArrayDisallowed", Map.of(), null)));
         }
 
         final List<Object> basePath = append(path, 0);
@@ -198,7 +200,7 @@ class _Util {
         final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(basePath,
-                    "StringRegexMatchFailed", Map.of("regex", regexString))));
+                    "StringRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
         final var typeName = matcher.group(1);
@@ -209,14 +211,14 @@ class _Util {
 
         if (type instanceof _UGeneric && nullable) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(basePath,
-                    "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
+                    "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"), null)));
         }
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
-                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
+                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1), null)));
         }
 
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
@@ -287,7 +289,7 @@ class _Util {
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
-                    "StringRegexMatchFailed", Map.of("regex", regexString))));
+                    "StringRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
         final var standardTypeName = matcher.group(1);
@@ -315,7 +317,7 @@ class _Util {
         final var index = schemaKeysToIndex.get(customTypeName);
         if (index == null) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
-                    "TypeUnknown", Map.of("name", customTypeName))));
+                    "TypeUnknown", Map.of("name", customTypeName), null)));
         }
         final var definition = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
 
@@ -346,7 +348,7 @@ class _Util {
                 type = typeExtensions.get(customTypeName);
                 if (type == null) {
                     throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
-                            "TypeExtensionImplementationMissing", Map.of("name", customTypeName))));
+                            "TypeExtensionImplementationMissing", Map.of("name", customTypeName), null)));
                 }
             }
 
@@ -379,7 +381,7 @@ class _Util {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = append(path, k);
 
-                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
@@ -424,7 +426,7 @@ class _Util {
                 for (final var k : otherKeys) {
                     final List<Object> loopPath = append(path, k);
 
-                    parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                    parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
                 }
             }
         }
@@ -446,12 +448,12 @@ class _Util {
         final var cases = new HashMap<String, _UStruct>();
 
         if (definition.isEmpty() && !isForFn) {
-            parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of(), null));
         } else if (isForFn) {
             if (!definition.containsKey("Ok")) {
                 final List<Object> branchPath = append(thisPath, "Ok");
 
-                parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of()));
+                parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
             }
         }
 
@@ -464,7 +466,7 @@ class _Util {
             final var matcher = regex.matcher(unionCase);
             if (!matcher.find()) {
                 parseFailures.add(new _SchemaParseFailure(unionKeyPath,
-                        "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                        "KeyRegexMatchFailed", Map.of("regex", regexString), null));
                 continue;
             }
 
@@ -520,7 +522,7 @@ class _Util {
 
                     parseFailures
                             .add(new _SchemaParseFailure(finalPath, "PathCollision",
-                                    Map.of("other", finalOtherPath)));
+                                    Map.of("other", finalOtherPath), null));
                 }
             }
 
@@ -558,7 +560,7 @@ class _Util {
         if (!matcher.find()) {
             final List<Object> finalPath = append(path, fieldDeclaration);
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(finalPath,
-                    "KeyRegexMatchFailed", Map.of("regex", regexString))));
+                    "KeyRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
         final var fieldName = matcher.group(0);
@@ -615,7 +617,7 @@ class _Util {
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
                     parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, errorName, "->", newKey),
-                            "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey))));
+                            "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey)), null));
                 }
                 fnResultCases.put(newKey, errorResultField.getValue());
             }
@@ -645,7 +647,7 @@ class _Util {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = append(basePath, k);
 
-                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of()));
+                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
@@ -669,7 +671,7 @@ class _Util {
         final List<Object> errorPath = append(thisPath, resultSchemaKey);
 
         if (!def.containsKey(resultSchemaKey)) {
-            parseFailures.add(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of(), null));
         }
 
         if (parseFailures.size() > 0) {
@@ -706,7 +708,7 @@ class _Util {
                     final var thisPath = append(append(path, schemaKey), key);
                     final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
                     parseFailures.add(
-                            new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                            new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString), null));
                 }
             }
 
@@ -719,7 +721,7 @@ class _Util {
 
         _UStruct responseHeadersStruct = null;
         if (!headersDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of(), null));
         } else {
             try {
                 responseHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
@@ -732,7 +734,7 @@ class _Util {
                         final var thisPath = append(append(path, schemaKey), key);
                         final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
                         parseFailures.add(
-                                new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString)));
+                                new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString), null));
                     }
                 }
             } catch (UApiSchemaParseError e) {
@@ -772,7 +774,7 @@ class _Util {
 
         _UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of(), null));
         } else {
             try {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
@@ -788,7 +790,7 @@ class _Util {
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
-            parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of()));
+            parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^errors\\..*$");
@@ -819,7 +821,7 @@ class _Util {
             });
         } catch (IOException e) {
             throw new UApiSchemaParseError(
-                    List.of(new _SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
+                    List.of(new _SchemaParseFailure(List.of(), "JsonInvalid", Map.of(), null)),
                     e);
         }
 
@@ -845,7 +847,7 @@ class _Util {
             });
         } catch (IOException e) {
             throw new UApiSchemaParseError(
-                    List.of(new _SchemaParseFailure(List.of(), "JsonInvalid", Map.of())),
+                    List.of(new _SchemaParseFailure(List.of(), "JsonInvalid", Map.of(), null)),
                     e);
         }
 
@@ -916,7 +918,7 @@ class _Util {
                     System.out.print(otherPathIndex);
 
                     parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",
-                            Map.of("other", List.of(otherPathIndex, matchingSchemaKey))));
+                            Map.of("other", List.of(otherPathIndex, matchingSchemaKey)), schemaKey));
                 }
                 continue;
             }
@@ -926,7 +928,7 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -957,7 +959,7 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -992,7 +994,7 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -2943,7 +2945,7 @@ class _Util {
     static List<Object> mapSchemaParseFailuresToPseudoJson(
             List<_SchemaParseFailure> schemaParseFailures) {
         return (List<Object>) schemaParseFailures.stream()
-                .map(f -> (Object) new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data))))
+                .map(f -> (Object) new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data), "key", f.key)))
                 .toList();
     }
 }

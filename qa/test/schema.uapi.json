@@ -1,75 +1,76 @@
 [
-  {
-    "info.SchemaExample": {}
-  },
-  {
-    "///": " A type. ",
-    "union.Type": {
-      "Null": {},
-      "Boolean": {},
-      "Integer": {},
-      "Number": {},
-      "String": {},
-      "Array": {},
-      "Object": {},
-      "Any": {},
-      "Unknown": {}
-    }
-  },
-  {
-    "union.ValidationFailureReason": {
-      "TypeUnexpected": {
-        "expected": ["union.Type"],
-        "actual": ["union.Type"]
-      },
-      "ErrorDefinitionCannotTargetInternalFunctions": {},
-      "EmptyArrayDisallowed": {},
-      "EmptyObjectDisallowed": {},
-      "StringRegexMatchFailed": {
-        "regex": ["string"]
-      },
-      "KeyRegexMatchFailed": {
-        "regex": ["string"]
-      },
-      "ObjectKeyRegexMatchCountUnexpected": {
-        "regex": ["string"],
-        "expected": ["integer"],
-        "actual": ["integer"]
-      },
-      "ArrayLengthUnexpected": {
-        "actual": ["integer"],
-        "expected": ["integer"]
-      },
-      "TypeUnknown": {
-        "name": ["string"]
-      },
-      "TypeExtensionImplementationMissing": {
-        "name": ["string"]
-      },
-      "RequiredObjectKeyMissing": {},
-      "JsonInvalid": {},
-      "PathCollision": {
-        "other": ["array", ["any"]]
-      },
-      "ObjectKeyDisallowed": {}
-    }
-  },
-  {
-    "struct.ValidationFailure": {
-      "path": ["array", ["any"]],
-      "reason": ["union.ValidationFailureReason"]
-    }
-  },
-  {
-    "fn.validateSchema": {
-      "schema": ["any?"],
-      "extend!": ["any?"]
+    {
+        "info.SchemaExample": {}
     },
-    "->": {
-      "Ok": {},
-      "ErrorValidationFailure": {
-        "cases": ["array", ["struct.ValidationFailure"]]
-      }
+    {
+        "///": " A type. ",
+        "union.Type": {
+            "Null": {},
+            "Boolean": {},
+            "Integer": {},
+            "Number": {},
+            "String": {},
+            "Array": {},
+            "Object": {},
+            "Any": {},
+            "Unknown": {}
+        }
+    },
+    {
+        "union.ValidationFailureReason": {
+            "TypeUnexpected": {
+                "expected": ["union.Type"],
+                "actual": ["union.Type"]
+            },
+            "ErrorDefinitionCannotTargetInternalFunctions": {},
+            "EmptyArrayDisallowed": {},
+            "EmptyObjectDisallowed": {},
+            "StringRegexMatchFailed": {
+                "regex": ["string"]
+            },
+            "KeyRegexMatchFailed": {
+                "regex": ["string"]
+            },
+            "ObjectKeyRegexMatchCountUnexpected": {
+                "regex": ["string"],
+                "expected": ["integer"],
+                "actual": ["integer"]
+            },
+            "ArrayLengthUnexpected": {
+                "actual": ["integer"],
+                "expected": ["integer"]
+            },
+            "TypeUnknown": {
+                "name": ["string"]
+            },
+            "TypeExtensionImplementationMissing": {
+                "name": ["string"]
+            },
+            "RequiredObjectKeyMissing": {},
+            "JsonInvalid": {},
+            "PathCollision": {
+                "other": ["array", ["any"]]
+            },
+            "ObjectKeyDisallowed": {}
+        }
+    },
+    {
+        "struct.ValidationFailure": {
+            "path": ["array", ["any"]],
+            "reason": ["union.ValidationFailureReason"],
+            "key": ["string"]
+        }
+    },
+    {
+        "fn.validateSchema": {
+            "schema": ["any?"],
+            "extend!": ["any?"]
+        },
+        "->": {
+            "Ok": {},
+            "ErrorValidationFailure": {
+                "cases": ["array", ["struct.ValidationFailure"]]
+            }
+        }
     }
-  }
 ]
