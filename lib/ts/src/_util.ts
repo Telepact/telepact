@@ -90,8 +90,17 @@ export function asMap(object: any): Record<string, any> {
     return object as Record<string, any>;
 }
 
-export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset: number): _SchemaParseFailure[] {
+export function offsetSchemaIndex(
+    initialFailures: _SchemaParseFailure[],
+    offset: number,
+    schemaKeysToIndex: Record<string, number>
+): _SchemaParseFailure[] {
     const finalList: _SchemaParseFailure[] = [];
+
+    const indexToSchemaKey = Object.entries(schemaKeysToIndex).reduce(
+        (m, [k, v]) => m.set(v, k),
+        new Map<number, string>()
+    );
 
     for (const f of initialFailures) {
         const reason = f.reason;
@@ -109,7 +118,9 @@ export function offsetSchemaIndex(initialFailures: _SchemaParseFailure[], offset
             finalData = data;
         }
 
-        finalList.push({ path: newPath, reason, data: finalData });
+        const schemaKey = indexToSchemaKey.get(newPath[0]) ?? null;
+
+        finalList.push({ path: newPath, reason, data: finalData, key: schemaKey });
     }
 
     return finalList;
@@ -131,11 +142,16 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
         return result;
     } else {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure([index], 'ObjectKeyRegexMatchCountUnexpected', {
-                regex: regex,
-                actual: matches.length,
-                expected: 1,
-            }),
+            new _SchemaParseFailure(
+                [index],
+                'ObjectKeyRegexMatchCountUnexpected',
+                {
+                    regex: regex,
+                    actual: matches.length,
+                    expected: 1,
+                },
+                null
+            ),
         ]);
     }
 }
@@ -157,7 +173,7 @@ export function getTypeUnexpectedParseFailure(path: any[], value: any, expectedT
         actual: { [actualType]: {} },
         expected: { [expectedType]: {} },
     };
-    return [{ path, reason: 'TypeUnexpected', data }];
+    return [{ path, reason: 'TypeUnexpected', data, key: null }];
 }
 
 export function prepend(value: any, original: any[]): any[] {
@@ -184,7 +200,7 @@ export function parseTypeDeclaration(
     failedTypes: Set<string>
 ): _UTypeDeclaration {
     if (typeDeclarationArray.length === 0) {
-        throw new UApiSchemaParseError([new _SchemaParseFailure(path, 'EmptyArrayDisallowed', {})]);
+        throw new UApiSchemaParseError([new _SchemaParseFailure(path, 'EmptyArrayDisallowed', {}, null)]);
     }
 
     const basePath = path.concat([0]);
@@ -204,9 +220,14 @@ export function parseTypeDeclaration(
     const matcher = rootTypeString.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(basePath, 'StringRegexMatchFailed', {
-                regex: regexString,
-            }),
+            new _SchemaParseFailure(
+                basePath,
+                'StringRegexMatchFailed',
+                {
+                    regex: regexString,
+                },
+                null
+            ),
         ]);
     }
 
@@ -227,19 +248,29 @@ export function parseTypeDeclaration(
 
     if (type instanceof _UGeneric && nullable) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(basePath, 'StringRegexMatchFailed', {
-                regex: '^(.+?)[^\\?]$',
-            }),
+            new _SchemaParseFailure(
+                basePath,
+                'StringRegexMatchFailed',
+                {
+                    regex: '^(.+?)[^\\?]$',
+                },
+                null
+            ),
         ]);
     }
 
     const givenTypeParameterCount = typeDeclarationArray.length - 1;
     if (type.getTypeParameterCount() !== givenTypeParameterCount) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(path, 'ArrayLengthUnexpected', {
-                actual: typeDeclarationArray.length,
-                expected: type.getTypeParameterCount() + 1,
-            }),
+            new _SchemaParseFailure(
+                path,
+                'ArrayLengthUnexpected',
+                {
+                    actual: typeDeclarationArray.length,
+                    expected: type.getTypeParameterCount() + 1,
+                },
+                null
+            ),
         ]);
     }
 
@@ -333,9 +364,14 @@ export function getOrParseType(
     const matcher = typeName.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(path, 'StringRegexMatchFailed', {
-                regex: regexString,
-            }),
+            new _SchemaParseFailure(
+                path,
+                'StringRegexMatchFailed',
+                {
+                    regex: regexString,
+                },
+                null
+            ),
         ]);
     }
 
@@ -372,9 +408,14 @@ export function getOrParseType(
     const index = schemaKeysToIndex[customTypeName];
     if (index === undefined) {
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(path, 'TypeUnknown', {
-                name: customTypeName,
-            }),
+            new _SchemaParseFailure(
+                path,
+                'TypeUnknown',
+                {
+                    name: customTypeName,
+                },
+                null
+            ),
         ]);
     }
     const definition = uApiSchemaPseudoJson[index];
@@ -429,9 +470,14 @@ export function getOrParseType(
             type = typeExtensions[customTypeName];
             if (type === undefined) {
                 throw new UApiSchemaParseError([
-                    new _SchemaParseFailure([index], 'TypeExtensionImplementationMissing', {
-                        name: customTypeName,
-                    }),
+                    new _SchemaParseFailure(
+                        [index],
+                        'TypeExtensionImplementationMissing',
+                        {
+                            name: customTypeName,
+                        },
+                        null
+                    ),
                 ]);
             }
         }
@@ -474,7 +520,7 @@ export function parseStructType(
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
             const loopPath = append(path, k);
-            parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}));
+            parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
         }
     }
     const thisPath = append(path, schemaKey);
@@ -524,7 +570,7 @@ export function parseUnionType(
         if (otherKeys.size > 0) {
             for (const k of otherKeys) {
                 const loopPath = append(path, k);
-                parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}));
+                parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
             }
         }
     }
@@ -540,11 +586,11 @@ export function parseUnionType(
     }
     const cases: Record<string, _UStruct> = {};
     if (Object.keys(definition).length === 0 && !isForFn) {
-        parseFailures.push(new _SchemaParseFailure(thisPath, 'EmptyObjectDisallowed', {}));
+        parseFailures.push(new _SchemaParseFailure(thisPath, 'EmptyObjectDisallowed', {}, null));
     } else if (isForFn) {
         if (!definition.hasOwnProperty('Ok')) {
             const branchPath = append(thisPath, 'Ok');
-            parseFailures.push(new _SchemaParseFailure(branchPath, 'RequiredObjectKeyMissing', {}));
+            parseFailures.push(new _SchemaParseFailure(branchPath, 'RequiredObjectKeyMissing', {}, null));
         }
     }
     for (const [unionCase, value] of Object.entries(definition)) {
@@ -553,9 +599,14 @@ export function parseUnionType(
         const regex = new RegExp(regexString);
         if (!regex.test(unionCase)) {
             parseFailures.push(
-                new _SchemaParseFailure(unionKeyPath, 'KeyRegexMatchFailed', {
-                    regex: regexString,
-                })
+                new _SchemaParseFailure(
+                    unionKeyPath,
+                    'KeyRegexMatchFailed',
+                    {
+                        regex: regexString,
+                    },
+                    null
+                )
             );
             continue;
         }
@@ -619,9 +670,14 @@ export function parseStructFields(
                 const finalPath = append(path, fieldDeclaration);
                 const finalOtherPath = append(path, existingField);
                 parseFailures.push(
-                    new _SchemaParseFailure(finalPath, 'PathCollision', {
-                        other: finalOtherPath,
-                    })
+                    new _SchemaParseFailure(
+                        finalPath,
+                        'PathCollision',
+                        {
+                            other: finalOtherPath,
+                        },
+                        null
+                    )
                 );
             }
         }
@@ -675,9 +731,14 @@ export function parseField(
     if (!matcher) {
         const finalPath = append(path, fieldDeclaration);
         throw new UApiSchemaParseError([
-            new _SchemaParseFailure(finalPath, 'KeyRegexMatchFailed', {
-                regex: regexString,
-            }),
+            new _SchemaParseFailure(
+                finalPath,
+                'KeyRegexMatchFailed',
+                {
+                    regex: regexString,
+                },
+                null
+            ),
         ]);
     }
 
@@ -740,9 +801,14 @@ export function applyErrorToParsedTypes(
             if (fnResultCases.hasOwnProperty(newKey)) {
                 const otherPathIndex = schemaKeysToIndex[fnName];
                 parseFailures.push(
-                    new _SchemaParseFailure([errorIndex, errorName, '->', newKey], 'PathCollision', {
-                        other: [otherPathIndex, '->', newKey],
-                    })
+                    new _SchemaParseFailure(
+                        [errorIndex, errorName, '->', newKey],
+                        'PathCollision',
+                        {
+                            other: [otherPathIndex, '->', newKey],
+                        },
+                        null
+                    )
                 );
             }
             fnResultCases[newKey] = errorResultField;
@@ -778,7 +844,7 @@ export function parseErrorType(
         for (const k of otherKeys) {
             const loopPath = append(basePath, k);
 
-            parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}));
+            parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
         }
     }
 
@@ -800,7 +866,7 @@ export function parseErrorType(
     const errorPath = append(thisPath, resultSchemaKey);
 
     if (!def.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(errorPath, 'RequiredObjectKeyMissing', {}));
+        parseFailures.push(new _SchemaParseFailure(errorPath, 'RequiredObjectKeyMissing', {}, null));
     }
 
     if (parseFailures.length > 0) {
@@ -861,9 +927,14 @@ export function parseHeadersType(
                 const thisPath = append(append(path, schemaKey), key);
                 const regexString = '^(_?[a-z][a-zA-Z0-9_]*)$';
                 parseFailures.push(
-                    new _SchemaParseFailure(thisPath, 'KeyRegexMatchFailed', {
-                        regex: regexString,
-                    })
+                    new _SchemaParseFailure(
+                        thisPath,
+                        'KeyRegexMatchFailed',
+                        {
+                            regex: regexString,
+                        },
+                        null
+                    )
                 );
             }
         }
@@ -880,7 +951,7 @@ export function parseHeadersType(
 
     let responseHeadersStruct: _UStruct | null = null;
     if (!headersDefinitionAsParsedJson.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(resPath, 'RequiredObjectKeyMissing', {}));
+        parseFailures.push(new _SchemaParseFailure(resPath, 'RequiredObjectKeyMissing', {}, null));
     } else {
         try {
             responseHeadersStruct = parseStructType(
@@ -902,9 +973,14 @@ export function parseHeadersType(
                     const thisPath = append(append(path, '->'), key);
                     const regexString = '^(_?[a-z][a-zA-Z0-9_]*)$';
                     parseFailures.push(
-                        new _SchemaParseFailure(thisPath, 'KeyRegexMatchFailed', {
-                            regex: regexString,
-                        })
+                        new _SchemaParseFailure(
+                            thisPath,
+                            'KeyRegexMatchFailed',
+                            {
+                                regex: regexString,
+                            },
+                            null
+                        )
                     );
                 }
             }
@@ -968,7 +1044,7 @@ export function parseFunctionType(
 
     let resultType = null;
     if (!functionDefinitionAsParsedJson.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(resPath, 'RequiredObjectKeyMissing', {}));
+        parseFailures.push(new _SchemaParseFailure(resPath, 'RequiredObjectKeyMissing', {}, null));
     } else {
         try {
             resultType = parseUnionType(
@@ -998,7 +1074,7 @@ export function parseFunctionType(
 
     let errorsRegex = null;
     if (functionDefinitionAsParsedJson.hasOwnProperty(errorsRegexKey) && !schemaKey.startsWith('fn._')) {
-        parseFailures.push(new _SchemaParseFailure(regexPath, 'ObjectKeyDisallowed', {}));
+        parseFailures.push(new _SchemaParseFailure(regexPath, 'ObjectKeyDisallowed', {}, null));
     } else {
         let errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey];
         if (errorsRegexInit === undefined) {
@@ -1025,7 +1101,7 @@ export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<str
     try {
         uApiSchemaPseudoJsonInit = JSON.parse(uApiSchemaJson);
     } catch (e) {
-        throw new UApiSchemaParseError([new _SchemaParseFailure([], 'JsonInvalid', {})], e as Error);
+        throw new UApiSchemaParseError([new _SchemaParseFailure([], 'JsonInvalid', {}, null)], e as Error);
     }
 
     let uApiSchemaPseudoJson: Array<any>;
@@ -1048,7 +1124,7 @@ export function extendUApiSchema(
     try {
         secondUApiSchemaPseudoJsonInit = JSON.parse(secondUApiSchemaJson);
     } catch (e) {
-        throw new UApiSchemaParseError([new _SchemaParseFailure([], 'JsonInvalid', {})], e as Error);
+        throw new UApiSchemaParseError([new _SchemaParseFailure([], 'JsonInvalid', {}, null)], e as Error);
     }
 
     let secondUApiSchemaPseudoJson: any[];
@@ -1122,9 +1198,14 @@ export function parseUApiSchema(
                 const finalPath = append(loopPath, schemaKey);
 
                 parseFailures.push(
-                    new _SchemaParseFailure(finalPath, 'PathCollision', {
-                        other: [otherPathIndex, matchingSchemaKey],
-                    })
+                    new _SchemaParseFailure(
+                        finalPath,
+                        'PathCollision',
+                        {
+                            other: [otherPathIndex, matchingSchemaKey],
+                        },
+                        null
+                    )
                 );
             }
             continue;
@@ -1135,7 +1216,7 @@ export function parseUApiSchema(
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -1178,7 +1259,7 @@ export function parseUApiSchema(
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -1237,7 +1318,7 @@ export function parseUApiSchema(
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -3630,6 +3711,7 @@ function timeoutPromise(timeoutMs: number): Promise<never> {
 
 export function mapSchemaParseFailuresToPseudoJson(schemaParseFailures: any[]): any[] {
     return schemaParseFailures.map((f) => ({
+        ...(f.key === null ? {} : { 'key!': f.key }),
         path: f.path,
         reason: { [f.reason]: f.data },
     }));

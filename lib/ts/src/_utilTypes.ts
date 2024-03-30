@@ -46,7 +46,8 @@ export class _SchemaParseFailure {
     constructor(
         public readonly path: any[],
         public readonly reason: string,
-        public readonly data: Record<string, any>
+        public readonly data: Record<string, any>,
+        public readonly key: string | null
     ) {}
 }
 
