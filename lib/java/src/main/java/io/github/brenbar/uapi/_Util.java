@@ -93,6 +93,8 @@ class _Util {
     public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset, Map<String, Integer> schemaKeysToIndex) {
         final var finalList = new ArrayList<_SchemaParseFailure>();
 
+        final var indexToSchemaKey = schemaKeysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+
         for (final var f : initialFailures) {
             final String reason = f.reason;
             final List<Object> path = f.path;
@@ -111,7 +113,7 @@ class _Util {
                 finalData = data;
             }
 
-            final var schemeKey = schemaKeysToIndex.entrySet().stream().filter(e -> e.getValue() == newPath.get(0)).map(e -> e.getKey()).findAny().orElse("unknown");
+            final var schemeKey = indexToSchemaKey.get(newPath.get(0));
 
             finalList.add(new _SchemaParseFailure(newPath, reason, finalData, schemeKey));
         }
@@ -2945,7 +2947,13 @@ class _Util {
     static List<Object> mapSchemaParseFailuresToPseudoJson(
             List<_SchemaParseFailure> schemaParseFailures) {
         return (List<Object>) schemaParseFailures.stream()
-                .map(f -> (Object) new TreeMap<>(Map.of("path", f.path, "reason", Map.of(f.reason, f.data), "key", f.key)))
+                .map(f -> (Object) new TreeMap<>() {{
+                    put("path", f.path);
+                    put("reason", Map.of(f.reason, f.data));
+                    if (f.key != null) {
+                        put("key!", f.key);
+                    }
+                }})
                 .toList();
     }
 }

@@ -58,7 +58,7 @@
         "struct.ValidationFailure": {
             "path": ["array", ["any"]],
             "reason": ["union.ValidationFailureReason"],
-            "key": ["string"]
+            "key!": ["string"]
         }
     },
     {
