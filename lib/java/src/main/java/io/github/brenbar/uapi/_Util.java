@@ -338,8 +338,7 @@ class _Util {
                         typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
-                final var isForFn = false;
-                type = parseUnionType(List.of(index), definition, customTypeName, isForFn,
+                type = parseUnionType(List.of(index), definition, customTypeName, List.of(), List.of(),
                         typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                         typeExtensions, allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
@@ -412,7 +411,7 @@ class _Util {
     }
 
     static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
-            boolean isForFn, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
+            List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -422,14 +421,15 @@ class _Util {
 
         otherKeys.remove(schemaKey);
         otherKeys.remove("///");
+        for (final var ignoreKey : ignoreKeys) {
+            otherKeys.remove(ignoreKey);
+        }
 
-        if (!isForFn) {
-            if (otherKeys.size() > 0) {
-                for (final var k : otherKeys) {
-                    final List<Object> loopPath = append(path, k);
+        if (otherKeys.size() > 0) {
+            for (final var k : otherKeys) {
+                final List<Object> loopPath = append(path, k);
 
-                    parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
-                }
+                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
@@ -449,13 +449,15 @@ class _Util {
 
         final var cases = new HashMap<String, _UStruct>();
 
-        if (definition.isEmpty() && !isForFn) {
+        if (definition.isEmpty() && requiredKeys.isEmpty()) {
             parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of(), null));
-        } else if (isForFn) {
-            if (!definition.containsKey("Ok")) {
-                final List<Object> branchPath = append(thisPath, "Ok");
+        } else {
+            for (final var requiredKey : requiredKeys) {
+                if (!definition.containsKey(requiredKey)) {
+                    final List<Object> branchPath = append(thisPath, requiredKey);
 
-                parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
+                    parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
+                }
             }
         }
 
@@ -668,7 +670,6 @@ class _Util {
         }
 
         final var resultSchemaKey = "->";
-        final var okCaseRequired = false;
         final var typeParameterCount = 0;
         final List<Object> errorPath = append(thisPath, resultSchemaKey);
 
@@ -680,7 +681,7 @@ class _Util {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        final _UUnion error = parseUnionType(thisPath, def, resultSchemaKey, okCaseRequired,
+        final _UUnion error = parseUnionType(thisPath, def, resultSchemaKey, List.of(), List.of(),
                 typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                 allParseFailures, failedTypes);
 
@@ -757,7 +758,6 @@ class _Util {
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
         final var typeParameterCount = 0;
-        final var isForFn = true;
 
         _UUnion callType = null;
         try {
@@ -780,7 +780,7 @@ class _Util {
         } else {
             try {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
-                        resultSchemaKey, isForFn, typeParameterCount, uApiSchemaPseudoJson,
+                        resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok"), typeParameterCount, uApiSchemaPseudoJson,
                         schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
