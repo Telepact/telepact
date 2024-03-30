@@ -269,8 +269,7 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
                                   u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
                                   all_parse_failures, failed_types)
         elif custom_type_name.startswith("union"):
-            is_for_fn = False
-            t = parse_union_type([index], definition, custom_type_name, is_for_fn, type_parameter_count,
+            t = parse_union_type([index], definition, custom_type_name, [], [], type_parameter_count,
                                  u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
                                  all_parse_failures, failed_types)
         elif custom_type_name.startswith("fn"):
@@ -334,7 +333,7 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
 
 
 def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[str, object],
-                     schema_key: str, is_for_fn: bool, type_parameter_count: int,
+                     schema_key: str, ignore_keys: List[str], required_keys: List[str], type_parameter_count: int,
                      uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
                      parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
                      all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UUnion:
@@ -344,11 +343,13 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
     other_keys.discard(schema_key)
     other_keys.discard("///")
 
-    if not is_for_fn and other_keys:
-        for k in other_keys:
-            loop_path = path + [k]
-            parse_failures.append(_types._SchemaParseFailure(
-                loop_path, "ObjectKeyDisallowed", {}, None))
+    for ignore_key in ignore_keys:
+        other_keys.discard(ignore_key)
+
+    for k in other_keys:
+        loop_path = path + [k]
+        parse_failures.append(_types._SchemaParseFailure(
+            loop_path, "ObjectKeyDisallowed", {}, None))
 
     this_path = path + [schema_key]
     def_init = union_definition_as_pseudo_json.get(schema_key)
@@ -363,13 +364,15 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
 
     cases = {}
 
-    if not definition and not is_for_fn:
+    if not definition and len(required_keys) == 0:
         parse_failures.append(_types._SchemaParseFailure(
             this_path, "EmptyObjectDisallowed", {}, None))
-    elif is_for_fn and "Ok" not in definition:
-        branch_path = this_path + ["Ok"]
-        parse_failures.append(_types._SchemaParseFailure(
-            branch_path, "RequiredObjectKeyMissing", {}, None))
+    else:
+        for required_key in required_keys:
+            if required_key not in definition:
+                branch_path = this_path + [required_key]
+                parse_failures.append(_types._SchemaParseFailure(
+                    branch_path, "RequiredObjectKeyMissing", {}, None))
 
     for union_case, entry_value in definition.items():
         union_key_path = this_path + [union_case]
@@ -558,7 +561,7 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
 
-    error = parse_union_type(this_path, def_dict, result_schema_key, ok_case_required, type_parameter_count,
+    error = parse_union_type(this_path, def_dict, result_schema_key, [], [], type_parameter_count,
                              uapi_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
                              all_parse_failures, failed_types)
 
@@ -626,7 +629,6 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
                         all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UFn:
     parse_failures = []
     type_parameter_count = 0
-    is_for_fn = True
 
     call_type = None
     try:
@@ -647,7 +649,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
             res_path, "RequiredObjectKeyMissing", {}, None))
     else:
         try:
-            result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key, is_for_fn,
+            result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key, function_definition_as_parsed_json.keys(), ['Ok'],
                                            type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
                                            parsed_types, type_extensions, all_parse_failures, failed_types)
         except types.UApiSchemaParseError as e:
