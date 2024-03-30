@@ -6,15 +6,16 @@ from typing import List, Dict
 import uapi.types as types
 
 
-
 class _SchemaParseFailure:
-    def __init__(self, path: List[object], reason: str, data: Dict[str, object]):
+    def __init__(self, path: List[object], reason: str, data: Dict[str, object], key: str):
         self.path = path
         self.reason = reason
         self.data = data
-    
+        self.key = key
+
     def __repr__(self):
         return f'(path: {self.path}, reason: {self.reason}, data: {self.data})'
+
 
 class _ValidationFailure:
     def __init__(self, path: List[object], reason: str, data: Dict[str, object]):
@@ -237,7 +238,7 @@ class _UFn(_UType):
 
     def get_name(self, generics: List[_UTypeDeclaration]) -> str:
         return uapi._util._FN_NAME
-    
+
 
 class _USelect(_UType):
     def __init__(self, types: Dict[str, _UType]):
@@ -297,7 +298,7 @@ class _UError:
 
     def __str__(self):
         return f'_UError(name: {self.name}, errors: {self.errors})'
-    
+
 
 class _UHeaders:
     def __init__(self, name: str, request_headers: Dict[str, _UFieldDeclaration], response_headers: Dict[str, _UFieldDeclaration]):

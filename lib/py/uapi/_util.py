@@ -63,8 +63,10 @@ def as_map(obj: Any) -> Dict[str, Any]:
     return obj
 
 
-def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int) -> List[_types._SchemaParseFailure]:
+def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int, schema_keys_to_index: Dict[str, int]) -> List[_types._SchemaParseFailure]:
     final_list = []
+
+    index_to_schema_key = {v: k for k, v in schema_keys_to_index.items()}
 
     for f in initial_failures:
         reason = f.reason
@@ -80,8 +82,10 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
         else:
             final_data = data
 
+        schema_key = index_to_schema_key.get(new_path[0], None)
+
         final_list.append(_types._SchemaParseFailure(
-            new_path, reason, final_data))
+            new_path, reason, final_data, schema_key))
 
     return final_list
 
@@ -100,7 +104,7 @@ def find_schema_key(definition: dict[str, Any], index: int) -> str:
         return matches[0]
     else:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure([index], "ObjectKeyRegexMatchCountUnexpected",
-                                                                     {"regex": regex, "actual": len(matches), "expected": 1})])
+                                                                     {"regex": regex, "actual": len(matches), "expected": 1}, None)])
 
 
 def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[str, None]:
@@ -115,7 +119,7 @@ def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[st
 def get_type_unexpected_parse_failure(path: List[Any], value: Any, expected_type: str) -> List[_types._SchemaParseFailure]:
     actual_type = get_type(value)
     data = {"actual": {actual_type: {}}, "expected": {expected_type: {}}}
-    return [_types._SchemaParseFailure(path, "TypeUnexpected", data)]
+    return [_types._SchemaParseFailure(path, "TypeUnexpected", data, None)]
 
 
 def prepend(value: Any, original: List[Any]) -> List[Any]:
@@ -136,7 +140,7 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
                            all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UTypeDeclaration:
     if not type_declaration_array:
         raise types.UApiSchemaParseError(
-            [_types._SchemaParseFailure(path, "EmptyArrayDisallowed", {})])
+            [_types._SchemaParseFailure(path, "EmptyArrayDisallowed", {}, None)])
 
     base_path = append(path, 0)
     base_type = type_declaration_array[0]
@@ -154,7 +158,7 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
     matcher = regex.search(root_type_string)
     if not matcher:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(
-            base_path, "StringRegexMatchFailed", {"regex": regex_string})])
+            base_path, "StringRegexMatchFailed", {"regex": regex_string}, None)])
 
     type_name = matcher.group(1)
     nullable = matcher.group(2) is not None
@@ -164,13 +168,13 @@ def parse_type_declaration(path: List[Any], type_declaration_array: List[Any], t
 
     if isinstance(type_obj, _types._UGeneric) and nullable:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(
-            base_path, "StringRegexMatchFailed", {"regex": "^(.+?)[^\\?]$"})])
+            base_path, "StringRegexMatchFailed", {"regex": "^(.+?)[^\\?]$"}, None)])
 
     given_type_parameter_count = len(type_declaration_array) - 1
     if type_obj.get_type_parameter_count() != given_type_parameter_count:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(path, "ArrayLengthUnexpected",
                                                                      {"actual": len(type_declaration_array),
-                                                                      "expected": type_obj.get_type_parameter_count() + 1})])
+                                                                      "expected": type_obj.get_type_parameter_count() + 1}, None)])
 
     parse_failures = []
     type_parameters = []
@@ -227,7 +231,7 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
     matcher = regex.search(type_name)
     if not matcher:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(path, "StringRegexMatchFailed", {
-            "regex": regex_string})])
+            "regex": regex_string}, None)])
 
     standard_type_name = matcher.group(1)
     if standard_type_name:
@@ -250,7 +254,7 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
     index = schema_keys_to_index.get(custom_type_name)
     if index is None:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(
-            path, "TypeUnknown", {"name": custom_type_name})])
+            path, "TypeUnknown", {"name": custom_type_name}, None)])
 
     definition = u_api_schema_pseudo_json[index]
 
@@ -277,7 +281,7 @@ def get_or_parse_type(path: List[Any], type_name: str, this_type_parameter_count
             t = type_extensions.get(custom_type_name)
             if not t:
                 raise types.UApiSchemaParseError([_types._SchemaParseFailure([index], "TypeExtensionImplementationMissing",
-                                                                             {"name": custom_type_name})])
+                                                                             {"name": custom_type_name}, None)])
 
         parsed_types[custom_type_name] = t
 
@@ -307,7 +311,7 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
         for k in other_keys:
             loop_path = path + [k]
             parse_failures.append(_types._SchemaParseFailure(
-                loop_path, "ObjectKeyDisallowed", {}))
+                loop_path, "ObjectKeyDisallowed", {}, None))
 
     this_path = path + [schema_key]
     def_init = struct_definition_as_pseudo_json.get(schema_key)
@@ -344,7 +348,7 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
         for k in other_keys:
             loop_path = path + [k]
             parse_failures.append(_types._SchemaParseFailure(
-                loop_path, "ObjectKeyDisallowed", {}))
+                loop_path, "ObjectKeyDisallowed", {}, None))
 
     this_path = path + [schema_key]
     def_init = union_definition_as_pseudo_json.get(schema_key)
@@ -361,11 +365,11 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
 
     if not definition and not is_for_fn:
         parse_failures.append(_types._SchemaParseFailure(
-            this_path, "EmptyObjectDisallowed", {}))
+            this_path, "EmptyObjectDisallowed", {}, None))
     elif is_for_fn and "Ok" not in definition:
         branch_path = this_path + ["Ok"]
         parse_failures.append(_types._SchemaParseFailure(
-            branch_path, "RequiredObjectKeyMissing", {}))
+            branch_path, "RequiredObjectKeyMissing", {}, None))
 
     for union_case, entry_value in definition.items():
         union_key_path = this_path + [union_case]
@@ -375,7 +379,7 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
 
         if not matcher:
             parse_failures.append(_types._SchemaParseFailure(union_key_path, "KeyRegexMatchFailed",
-                                                             {"regex": regex_string}))
+                                                             {"regex": regex_string}, None))
             continue
 
         try:
@@ -423,7 +427,7 @@ def parse_struct_fields(reference_struct: Dict[str, object], path: List[object],
                 final_path = path + [field_declaration]
                 final_other_path = path + [existing_field]
                 parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision",
-                                                                 {"other": final_other_path}))
+                                                                 {"other": final_other_path}, None))
 
         type_declaration_value = struct_entry_value
 
@@ -456,7 +460,7 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
     if not matcher:
         final_path = path + [field_declaration]
         raise types.UApiSchemaParseError([_types._SchemaParseFailure(
-            final_path, "KeyRegexMatchFailed", {"regex": regex_string})])
+            final_path, "KeyRegexMatchFailed", {"regex": regex_string}, None)])
 
     field_name = matcher.group(0)
     optional = matcher.group(2) is not None
@@ -504,7 +508,7 @@ def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _
             if new_key in fn_result_cases:
                 other_path_index = schema_keys_to_index.get(fn_name)
                 parse_failures.append(_types._SchemaParseFailure([error_index, error_name, "->", new_key],
-                                                                 "PathCollision", {"other": [other_path_index, "->", new_key]}))
+                                                                 "PathCollision", {"other": [other_path_index, "->", new_key]}, None))
 
             fn_result_cases[new_key] = error_result_struct
 
@@ -529,7 +533,7 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
         for k in other_keys:
             loop_path = base_path + [k]
             parse_failures.append(_types._SchemaParseFailure(
-                loop_path, "ObjectKeyDisallowed", {}))
+                loop_path, "ObjectKeyDisallowed", {}, None))
 
     def_init = error_definition_as_parsed_json.get(schema_key)
     this_path = base_path + [schema_key]
@@ -549,7 +553,7 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
 
     if result_schema_key not in def_dict:
         parse_failures.append(_types._SchemaParseFailure(
-            error_path, "RequiredObjectKeyMissing", {}))
+            error_path, "RequiredObjectKeyMissing", {}, None))
 
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
@@ -582,7 +586,7 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
                 this_path = append(append(path, schema_key), key)
                 regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
                 parse_failures.append(_types._SchemaParseFailure(
-                    this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
+                    this_path, 'KeyRegexMatchFailed', {'regex': regex_string}, None))
 
     except types.UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
@@ -593,7 +597,7 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
     response_headers_struct = None
     if result_schema_key not in headers_definition_as_parsed_json:
         parse_failures.append(_types._SchemaParseFailure(
-            res_path, "RequiredObjectKeyMissing", {}))
+            res_path, "RequiredObjectKeyMissing", {}, None))
     else:
         try:
             response_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, result_schema_key, [schema_key],
@@ -605,7 +609,7 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
                     this_path = append(append(path, schema_key), key)
                     regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
                     parse_failures.append(_types._SchemaParseFailure(
-                        this_path, 'KeyRegexMatchFailed', {'regex': regex_string}))
+                        this_path, 'KeyRegexMatchFailed', {'regex': regex_string}, None))
 
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
@@ -640,7 +644,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
     result_type = None
     if result_schema_key not in function_definition_as_parsed_json:
         parse_failures.append(_types._SchemaParseFailure(
-            res_path, "RequiredObjectKeyMissing", {}))
+            res_path, "RequiredObjectKeyMissing", {}, None))
     else:
         try:
             result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key, is_for_fn,
@@ -655,7 +659,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
     errors_regex = None
     if errors_regex_key in function_definition_as_parsed_json and not schema_key.startswith("fn._"):
         parse_failures.append(_types._SchemaParseFailure(
-            regex_path, "ObjectKeyDisallowed", {}))
+            regex_path, "ObjectKeyDisallowed", {}, None))
     else:
         errors_regex_init = function_definition_as_parsed_json.get(
             errors_regex_key, "^errors\\..*$")
@@ -677,7 +681,7 @@ def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, Any]) -> '
         uapi_schema_pseudo_json_init = json.loads(uapi_schema_json)
     except json.JSONDecodeError as e:
         raise types.UApiSchemaParseError(
-            [_types._SchemaParseFailure([], "JsonInvalid", {})], e)
+            [_types._SchemaParseFailure([], "JsonInvalid", {}, None)], e)
 
     try:
         uapi_schema_pseudo_json = as_list(uapi_schema_pseudo_json_init)
@@ -695,7 +699,7 @@ def extend_uapi_schema(first: 'types.UApiSchema', second_uapi_schema_json: str, 
             second_uapi_schema_json)
     except json.JSONDecodeError as e:
         raise types.UApiSchemaParseError(
-            [_types._SchemaParseFailure([], "JsonInvalid", {})], e)
+            [_types._SchemaParseFailure([], "JsonInvalid", {}, None)], e)
 
     try:
         second_uapi_schema_pseudo_json = as_list(
@@ -750,7 +754,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
                 other_path_index = schema_keys_to_index[matching_schema_key]
                 final_path = loop_path + [schema_key]
                 parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision", {
-                    "other": [other_path_index, matching_schema_key]}))
+                    "other": [other_path_index, matching_schema_key]}, None))
             continue
 
         schema_keys.add(schema_key)
@@ -758,7 +762,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset)
+            parse_failures, path_offset, schema_keys_to_index)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     error_keys = set()
@@ -785,7 +789,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset)
+            parse_failures, path_offset, schema_keys_to_index)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     for error_key in error_keys:
@@ -821,7 +825,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset)
+            parse_failures, path_offset, schema_keys_to_index)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     return types.UApiSchema(uapi_schema_pseudo_json, parsed_types, request_headers, response_headers, type_extensions)
@@ -2394,4 +2398,4 @@ def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: List[_types.
     """
     Map schema parse failures to pseudo JSON format.
     """
-    return [{'path': f.path, 'reason': {f.reason: f.data}} for f in schema_parse_failures]
+    return [{**({'key!': f.key} if f.key else {}), 'path': f.path, 'reason': {f.reason: f.data}} for f in schema_parse_failures]
