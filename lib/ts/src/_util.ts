@@ -440,12 +440,12 @@ export function getOrParseType(
                 failedTypes
             );
         } else if (customTypeName.startsWith('union')) {
-            const isForFn = false;
             type = parseUnionType(
                 [index],
                 definition,
                 customTypeName,
-                isForFn,
+                [],
+                [],
                 typeParameterCount,
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
@@ -553,7 +553,8 @@ export function parseUnionType(
     path: any[],
     unionDefinitionAsPseudoJson: Record<string, any>,
     schemaKey: string,
-    isForFn: boolean,
+    ignoreKeys: string[],
+    requiredKeys: string[],
     typeParameterCount: number,
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: Record<string, number>,
@@ -566,12 +567,13 @@ export function parseUnionType(
     const otherKeys = new Set(Object.keys(unionDefinitionAsPseudoJson));
     otherKeys.delete(schemaKey);
     otherKeys.delete('///');
-    if (!isForFn) {
-        if (otherKeys.size > 0) {
-            for (const k of otherKeys) {
-                const loopPath = append(path, k);
-                parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
-            }
+    for (const ignoreKey of ignoreKeys) {
+        otherKeys.delete(ignoreKey);
+    }
+    if (otherKeys.size > 0) {
+        for (const k of otherKeys) {
+            const loopPath = append(path, k);
+            parseFailures.push(new _SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
         }
     }
     const thisPath = append(path, schemaKey);
@@ -584,15 +586,19 @@ export function parseUnionType(
         parseFailures.push(...finalParseFailures);
         throw new UApiSchemaParseError(parseFailures);
     }
-    const cases: Record<string, _UStruct> = {};
-    if (Object.keys(definition).length === 0 && !isForFn) {
+    if (Object.keys(definition).length === 0 && requiredKeys.length === 0) {
         parseFailures.push(new _SchemaParseFailure(thisPath, 'EmptyObjectDisallowed', {}, null));
-    } else if (isForFn) {
-        if (!definition.hasOwnProperty('Ok')) {
-            const branchPath = append(thisPath, 'Ok');
-            parseFailures.push(new _SchemaParseFailure(branchPath, 'RequiredObjectKeyMissing', {}, null));
+    } else {
+        for (const requiredKey of requiredKeys) {
+            if (!definition.hasOwnProperty(requiredKey)) {
+                const branchPath = append(thisPath, requiredKey);
+                parseFailures.push(new _SchemaParseFailure(branchPath, 'RequiredObjectKeyMissing', {}, null));
+            }
         }
     }
+
+    const cases: Record<string, _UStruct> = {};
+
     for (const [unionCase, value] of Object.entries(definition)) {
         const unionKeyPath = append(thisPath, unionCase);
         const regexString = '^(_?[A-Z][a-zA-Z0-9_]*)$';
@@ -862,7 +868,6 @@ export function parseErrorType(
     }
 
     const resultSchemaKey = '->';
-    const okCaseRequired = false;
     const errorPath = append(thisPath, resultSchemaKey);
 
     if (!def.hasOwnProperty(resultSchemaKey)) {
@@ -877,7 +882,8 @@ export function parseErrorType(
         thisPath,
         def,
         resultSchemaKey,
-        okCaseRequired,
+        [],
+        [],
         0,
         uApiSchemaPseudoJson,
         schemaKeysToIndex,
@@ -1013,7 +1019,6 @@ export function parseFunctionType(
 ): _UFn {
     const parseFailures: _SchemaParseFailure[] = [];
     const typeParameterCount = 0;
-    const isForFn = true;
 
     let callType: _UUnion | null = null;
     try {
@@ -1051,7 +1056,8 @@ export function parseFunctionType(
                 path,
                 functionDefinitionAsParsedJson,
                 resultSchemaKey,
-                isForFn,
+                Object.keys(functionDefinitionAsParsedJson),
+                ['Ok'],
                 typeParameterCount,
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
