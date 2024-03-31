@@ -2484,7 +2484,7 @@ class _Util {
         final String requestTarget;
         if (!parsedUApiSchema.containsKey(requestTargetInit)) {
             unknownTarget = requestTargetInit;
-            requestTarget = "fn._unknown";
+            requestTarget = "fn._ping";
         } else {
             unknownTarget = null;
             requestTarget = requestTargetInit;

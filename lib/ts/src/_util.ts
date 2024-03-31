@@ -3110,7 +3110,7 @@ export async function handleMessage(
     let requestTarget: string;
     if (!parsedUApiSchema.hasOwnProperty(requestTargetInit)) {
         unknownTarget = requestTargetInit;
-        requestTarget = 'fn._unknown';
+        requestTarget = 'fn._ping';
     } else {
         unknownTarget = null;
         requestTarget = requestTargetInit;

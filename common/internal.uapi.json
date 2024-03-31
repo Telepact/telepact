@@ -20,15 +20,6 @@
     },
 
     {
-        "///": [" A placeholder function when the requested function is unknown. "],
-        "fn._unknown": {},
-        "->": {
-            "Ok": {}
-        },
-        "errors": "^errors\\._Validated$"
-    },
-
-    {
         "struct._Auth": {},
         "ignoreIfDuplicate": true
     },

@@ -2014,7 +2014,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     request_target: str
     if request_target_init not in parsed_u_api_schema:
         unknown_target = request_target_init
-        request_target = "fn._unknown"
+        request_target = "fn._ping"
     else:
         unknown_target = None
         request_target = request_target_init
