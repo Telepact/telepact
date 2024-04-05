@@ -3162,7 +3162,7 @@ export async function handleMessage(
         }
     }
 
-    const selectStructFieldsHeader: Record<string, any> | undefined = requestHeaders['_sel'] as Record<string, any>;
+    const selectStructFieldsHeader: Record<string, any> | undefined = requestHeaders['_select'] as Record<string, any>;
 
     if (unknownTarget !== null) {
         const newErrorResult = {

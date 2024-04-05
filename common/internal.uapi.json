@@ -34,7 +34,7 @@
             "                                                                                          ",
             " A `_id` request header will be reflected as-is in the `_id` response header.             ",
             "                                                                                          ",
-            " The `_sel` header is used to select fields from structs. It is an object of string       ",
+            " The `_select` header is used to select fields from structs. It is an object of string       ",
             " arrays keyed by struct reference name pointing to field names of that struct that should ",
             " be selected. Field names not included in the array are omitted in the response wherever  ",
             " that field would have appeared.                                                          ",
@@ -55,7 +55,7 @@
         "headers._Standard": {
             "_id": ["any"],
             "_unsafe": ["boolean"],
-            "_sel": ["_ext._Select"],
+            "_select": ["_ext._Select"],
             "_auth": ["struct._Auth"],
             "_tim": ["integer"],
             "_bin": ["array", ["integer"]]

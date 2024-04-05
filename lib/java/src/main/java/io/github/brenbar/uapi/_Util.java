@@ -2527,7 +2527,7 @@ class _Util {
             }
         }
 
-        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("_sel");
+        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("_select");
 
         if (unknownTarget != null) {
             final Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",

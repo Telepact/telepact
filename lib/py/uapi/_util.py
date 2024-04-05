@@ -2050,7 +2050,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
             response_headers['_pac'] = request_headers['_pac']
 
     select_struct_fields_header: Dict[str,
-                                      object] = request_headers.get('_sel', None)
+                                      object] = request_headers.get('_select', None)
 
     if unknown_target:
         new_error_result: Dict[str, Any] = {'_ErrorInvalidRequestBody': {
@@ -2104,7 +2104,8 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
 
     final_result_union: Dict[str, Any]
     if select_struct_fields_header:
-        select_struct_fields_header: Dict[str, Any] = request_headers['_sel']
+        select_struct_fields_header: Dict[str,
+                                          Any] = request_headers['_select']
         final_result_union = select_struct_fields(_types._UTypeDeclaration(
             result_union_type, False, []), result_union, select_struct_fields_header)
     else:
