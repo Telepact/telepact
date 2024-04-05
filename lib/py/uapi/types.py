@@ -150,7 +150,7 @@ class MockServer:
         type_extensions["_ext._Call"] = _types._UMockCall(parsed_types)
         type_extensions["_ext._Stub"] = _types._UMockStub(parsed_types)
 
-        combined_u_api_schema: UApiSchema = UApiSchema.extend_with_extensions(
+        combined_u_api_schema: UApiSchema = _util.extend_uapi_schema(
             u_api_schema, _util.get_mock_uapi_json(), type_extensions)
 
         server_options: Server.Options = Server.Options()
@@ -176,7 +176,7 @@ class MockServer:
 
     async def _handle(self, request_message: bytes) -> bytes:
         return await _util.mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                       self.server.u_api_schema, self.enableGeneratedDefaultStub, 
+                                       self.server.u_api_schema, self.enableGeneratedDefaultStub,
                                        self.enable_optional_field_generation, self.randomize_optional_field_generation)
 
 
@@ -323,18 +323,19 @@ class Server:
 
         type_extensions['_ext._Select'] = _types._USelect(parsed_types)
 
-        self.u_api_schema: UApiSchema = UApiSchema.extend_with_extensions(
+        self.u_api_schema: UApiSchema = _util.extend_uapi_schema(
             u_api_schema, _util.get_internal_uapi_json(), type_extensions)
-        
+
         parsed_types.update(self.u_api_schema.parsed)
 
         binary_encoding = _util.construct_binary_encoding(self.u_api_schema)
         binary_encoder = _types._ServerBinaryEncoder(binary_encoding)
         self.serializer: 'SerializationImpl' = Serializer(
             options.serializer, binary_encoder)
-        
+
         if len(self.u_api_schema.parsed['struct._Auth'].fields) == 0 and options.auth_required:
-            raise Exception('Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `False`.')
+            raise Exception(
+                'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `False`.')
 
     async def process(self, request_message_bytes: bytes) -> bytes:
         """
@@ -390,20 +391,6 @@ class UApiSchema:
         Extend a UApiSchema object with JSON.
         """
         return _util.extend_uapi_schema(base, json, {})
-
-    @staticmethod
-    def from_json_with_extensions(json: str, type_extensions: Dict[str, _types._UType]) -> 'UApiSchema':
-        """
-        Create a UApiSchema object from JSON with type extensions.
-        """
-        return _util.new_uapi_schema(json, type_extensions)
-
-    @staticmethod
-    def extend_with_extensions(base: 'UApiSchema', json: str, type_extensions: Dict[str, _types._UType]) -> 'UApiSchema':
-        """
-        Extend a UApiSchema object with JSON and type extensions.
-        """
-        return _util.extend_uapi_schema(base, json, type_extensions)
 
 
 class UApiSchemaParseError(RuntimeError):

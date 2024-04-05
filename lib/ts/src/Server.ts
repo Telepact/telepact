@@ -3,7 +3,7 @@ import { SerializationImpl } from './SerializationImpl';
 import { Serializer } from './Serializer';
 import { UApiSchema } from './UApiSchema';
 import { _DefaultSerializationImpl } from './_DefaultSerializationImpl';
-import { constructBinaryEncoding, getInternalUApiJson, processBytes } from './_util';
+import { constructBinaryEncoding, extendUApiSchema, getInternalUApiJson, processBytes } from './_util';
 import { _ServerBinaryEncoder, _USelect, _UStruct, _UType } from './_utilTypes';
 
 /**
@@ -66,7 +66,7 @@ export class Server {
 
         typeExtensions['_ext._Select'] = new _USelect(parsedTypes);
 
-        this.uApiSchema = UApiSchema.extendWithExtensions(uApiSchema, getInternalUApiJson(), typeExtensions);
+        this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
 
         Object.assign(parsedTypes, this.uApiSchema.parsed);
 

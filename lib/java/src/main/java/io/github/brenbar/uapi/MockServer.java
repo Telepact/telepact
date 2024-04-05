@@ -77,7 +77,7 @@ public class MockServer {
         typeExtensions.put("_ext._Call", new _UMockCall(parsedTypes));
         typeExtensions.put("_ext._Stub", new _UMockStub(parsedTypes));
 
-        final var combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _Util.getMockUApiJson(),
+        final var combinedUApiSchema = _Util.extendUApiSchema(uApiSchema, _Util.getMockUApiJson(),
                 typeExtensions);
 
         final var serverOptions = new Server.Options();

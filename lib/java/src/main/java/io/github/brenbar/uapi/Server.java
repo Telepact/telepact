@@ -69,7 +69,7 @@ public class Server {
 
         typeExtensions.put("_ext._Select", new _USelect(parsedTypes));
 
-        this.uApiSchema = UApiSchema.extendWithExtensions(uApiSchema, _Util.getInternalUApiJson(), typeExtensions);
+        this.uApiSchema = _Util.extendUApiSchema(uApiSchema, _Util.getInternalUApiJson(), typeExtensions);
 
         parsedTypes.putAll(this.uApiSchema.parsed);
 

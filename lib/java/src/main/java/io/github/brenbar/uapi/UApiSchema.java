@@ -34,12 +34,4 @@ public class UApiSchema {
     public static UApiSchema extend(UApiSchema base, String json) {
         return _Util.extendUApiSchema(base, json, new HashMap<>());
     }
-
-    static UApiSchema fromJsonWithExtensions(String json, Map<String, _UType> typeExtensions) {
-        return _Util.newUApiSchema(json, typeExtensions);
-    }
-
-    static UApiSchema extendWithExtensions(UApiSchema base, String json, Map<String, _UType> typeExtensions) {
-        return _Util.extendUApiSchema(base, json, typeExtensions);
-    }
 }

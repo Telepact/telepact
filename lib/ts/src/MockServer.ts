@@ -2,7 +2,7 @@ import { _RandomGenerator } from './_RandomGenerator';
 import { Message } from './Message';
 import { Server, ServerOptions } from './Server';
 import { UApiSchema } from './UApiSchema';
-import { getMockUApiJson, mockHandle } from './_util';
+import { extendUApiSchema, getMockUApiJson, mockHandle } from './_util';
 import { _MockInvocation, _MockStub, _UMockCall, _UMockStub, _UType } from './_utilTypes';
 
 /**
@@ -67,7 +67,7 @@ export class MockServer {
         typeExtensions['_ext._Call'] = new _UMockCall(parsedTypes);
         typeExtensions['_ext._Stub'] = new _UMockStub(parsedTypes);
 
-        const combinedUApiSchema = UApiSchema.extendWithExtensions(uApiSchema, getMockUApiJson(), typeExtensions);
+        const combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(), typeExtensions);
 
         const serverOptions: ServerOptions = new ServerOptions();
         serverOptions.onError = options.onError;

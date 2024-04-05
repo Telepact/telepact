@@ -43,25 +43,4 @@ export class UApiSchema {
     static extend(base: UApiSchema, json: string): UApiSchema {
         return extendUApiSchema(base, json, {});
     }
-
-    /**
-     * Creates a UApiSchema instance from JSON string with type extensions.
-     * @param json The JSON string to parse.
-     * @param typeExtensions Map of type extensions.
-     * @returns A UApiSchema instance with type extensions.
-     */
-    static fromJsonWithExtensions(json: string, typeExtensions: Record<string, _UType>): UApiSchema {
-        return newUApiSchema(json, typeExtensions);
-    }
-
-    /**
-     * Extends an existing UApiSchema with additional JSON and type extensions.
-     * @param base The base UApiSchema to extend.
-     * @param json The JSON string to extend with.
-     * @param typeExtensions Map of type extensions.
-     * @returns An extended UApiSchema instance with type extensions.
-     */
-    static extendWithExtensions(base: UApiSchema, json: string, typeExtensions: Record<string, _UType>): UApiSchema {
-        return extendUApiSchema(base, json, typeExtensions);
-    }
 }
