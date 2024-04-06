@@ -78,7 +78,7 @@ function startClientTestServer(
         requestBytes = s.serialize(m);
       } catch (e) {
         if (e instanceof SerializationError) {
-          return new Message({ numberTooBig: true }, { _ErrorUnknown: {} });
+          return new Message({ numberTooBig: true }, { 'ErrorUnknown_': {} });
         } else {
           throw e;
         }

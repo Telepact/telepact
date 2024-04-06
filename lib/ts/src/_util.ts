@@ -3166,7 +3166,7 @@ export async function handleMessage(
 
     if (unknownTarget !== null) {
         const newErrorResult = {
-            _ErrorInvalidRequestBody: {
+            ErrorInvalidRequestBody_: {
                 cases: [
                     {
                         path: [unknownTarget],
@@ -3228,7 +3228,7 @@ export async function handleMessage(
                 onError(e as Error);
             } catch (ignored) {}
 
-            return new Message(responseHeaders, { _ErrorUnknown: {} });
+            return new Message(responseHeaders, { ErrorUnknown_: {} });
         }
     }
 
@@ -3341,7 +3341,7 @@ export async function processBytes(
             onError(e as Error);
         } catch (ignored) {}
 
-        return serializer.serialize(new Message({}, { _ErrorUnknown: {} }));
+        return serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
     }
 }
 
