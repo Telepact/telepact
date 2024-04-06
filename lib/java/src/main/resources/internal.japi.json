@@ -5,7 +5,7 @@
         "->": {
             "Ok": {}
         },
-        "errors": "^error\\._Validated$"
+        "_errors": "^error\\._Validated$"
     },
 
     {
@@ -16,7 +16,7 @@
                 "api": ["array", ["object", ["any"]]]
             }
         },
-        "errors": "^error\\._Validated$"
+        "_errors": "^error\\._Validated$"
     },
 
     {
@@ -25,7 +25,7 @@
         "->": {
             "Ok": {}
         },
-        "errors": "^error\\._Validated$"
+        "_errors": "^error\\._Validated$"
     },
 
     {

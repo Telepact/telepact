@@ -301,7 +301,7 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
     other_keys = set(struct_definition_as_pseudo_json.keys())
     other_keys.discard(schema_key)
     other_keys.discard("///")
-    other_keys.discard("ignoreIfDuplicate")
+    other_keys.discard("_ignoreIfDuplicate")
 
     for ignore_key in ignore_keys:
         other_keys.discard(ignore_key)
@@ -632,7 +632,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
 
     call_type = None
     try:
-        arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, ['->', 'errors'],
+        arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, ['->', '_errors'],
                                      type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
                                      parsed_types, type_extensions, all_parse_failures, failed_types)
         call_type = _types._UUnion(
@@ -655,7 +655,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
-    errors_regex_key = "errors"
+    errors_regex_key = "_errors"
     regex_path = path + [errors_regex_key]
 
     errors_regex = None
@@ -749,7 +749,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
             parse_failures.extend(e.schema_parse_failures)
             continue
 
-        ignore_if_duplicate: bool = def_dict.get('ignoreIfDuplicate', False)
+        ignore_if_duplicate: bool = def_dict.get('_ignoreIfDuplicate', False)
         matching_schema_key = find_matching_schema_key(schema_keys, schema_key)
         if matching_schema_key:
             if not ignore_if_duplicate:

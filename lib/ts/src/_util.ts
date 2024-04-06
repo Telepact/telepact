@@ -513,7 +513,7 @@ export function parseStructType(
     const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
     otherKeys.delete(schemaKey);
     otherKeys.delete('///');
-    otherKeys.delete('ignoreIfDuplicate');
+    otherKeys.delete('_ignoreIfDuplicate');
     for (const ignoreKey of ignoreKeys) {
         otherKeys.delete(ignoreKey);
     }
@@ -1026,7 +1026,7 @@ export function parseFunctionType(
             path,
             functionDefinitionAsParsedJson,
             schemaKey,
-            ['->', 'errors'],
+            ['->', '_errors'],
             typeParameterCount,
             uApiSchemaPseudoJson,
             schemaKeysToIndex,
@@ -1075,7 +1075,7 @@ export function parseFunctionType(
         }
     }
 
-    const errorsRegexKey = 'errors';
+    const errorsRegexKey = '_errors';
     const regexPath = append(path, errorsRegexKey);
 
     let errorsRegex = null;
@@ -1196,7 +1196,7 @@ export function parseUApiSchema(
             continue;
         }
 
-        const ignoreIfDuplicate: boolean = def['ignoreIfDuplicate'] ?? false;
+        const ignoreIfDuplicate: boolean = def['_ignoreIfDuplicate'] ?? false;
         const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
         if (matchingSchemaKey) {
             if (!ignoreIfDuplicate) {

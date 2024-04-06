@@ -373,7 +373,7 @@ class _Util {
 
         otherKeys.remove(schemaKey);
         otherKeys.remove("///");
-        otherKeys.remove("ignoreIfDuplicate");
+        otherKeys.remove("_ignoreIfDuplicate");
         for (final var ignoreKey : ignoreKeys) {
             otherKeys.remove(ignoreKey);
         }
@@ -762,7 +762,7 @@ class _Util {
         _UUnion callType = null;
         try {
             final _UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, List.of("->", "errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
+                    schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
                     parsedTypes,
                     typeExtensions,
                     allParseFailures, failedTypes);
@@ -787,7 +787,7 @@ class _Util {
             }
         }
 
-        final var errorsRegexKey = "errors";
+        final var errorsRegexKey = "_errors";
         final var regexPath = append(path, errorsRegexKey);
 
         String errorsRegex = null;
@@ -911,7 +911,7 @@ class _Util {
                 continue;
             }
 
-            final var ignoreIfDuplicate = (Boolean) def.getOrDefault("ignoreIfDuplicate", false);
+            final var ignoreIfDuplicate = (Boolean) def.getOrDefault("_ignoreIfDuplicate", false);
             final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
             if (matchingSchemaKey != null) {
                 if (!ignoreIfDuplicate) {
