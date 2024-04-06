@@ -64,7 +64,7 @@ export class Server {
         const parsedTypes: Record<string, _UType> = {};
         const typeExtensions: Record<string, _UType> = {};
 
-        typeExtensions['_ext._Select'] = new _USelect(parsedTypes);
+        typeExtensions['_ext.Select_'] = new _USelect(parsedTypes);
 
         this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
 
@@ -75,7 +75,7 @@ export class Server {
         this.serializer = new Serializer(options.serializer, binaryEncoder);
 
         if (
-            Object.keys((this.uApiSchema.parsed['struct._Auth'] as _UStruct).fields).length === 0 &&
+            Object.keys((this.uApiSchema.parsed['struct.Auth_'] as _UStruct).fields).length === 0 &&
             options.authRequired
         ) {
             throw Error(

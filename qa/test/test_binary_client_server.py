@@ -34,7 +34,7 @@ def binary_client_server_proc(loop, nats_client, dispatcher_server):
 
     try:
         async def warmup():
-            request = [{}, {'fn._ping': {}}]
+            request = [{}, {'fn.ping_': {}}]
             await verify_client_case(nats_client, request, None, *topics)
 
         loop.run_until_complete(warmup())

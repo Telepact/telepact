@@ -42,7 +42,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
             request_bytes = s.serialize(m)
         except types.SerializationError as e:
             if isinstance(e.__context__, OverflowError):
-                return types.Message({"numberTooBig": True}, {"_ErrorUnknown": {}})
+                return types.Message({"numberTooBig": True}, {"ErrorUnknown_": {}})
             else:
                 raise
 

@@ -50,7 +50,7 @@ public class Main {
                         requestBytes = s.serialize(m);
                     } catch (SerializationError e) {
                         if (e.getCause() instanceof IllegalArgumentException) {
-                            return new Message(Map.of("numberTooBig", true), Map.of("_ErrorUnknown", Map.of()));
+                            return new Message(Map.of("numberTooBig", true), Map.of("ErrorUnknown_", Map.of()));
                         } else {
                             throw e;
                         }

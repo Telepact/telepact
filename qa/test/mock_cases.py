@@ -11,13 +11,13 @@ def generate_mock_cases(given_field: str, the_type, correct_values, additional_i
             if not cases:
                 continue
 
-            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value!': {field: incorrect_value}}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
+            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {'value!': {field: incorrect_value}}, '->': {'Ok': {}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': cases}}]]
 
         for incorrect_value, errors in incorrect_values:
             cases = [{'path': ['fn._createStub', 'stub', '->', 'Ok', 'value!'] + base_path + path, 'reason': reason} for reason, path in errors if 'RequiredObjectKeyMissing' not in reason]
             if not cases:
                 continue
-            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'Ok': {'value!': {field: incorrect_value}}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': cases}}]]
+            yield [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {'Ok': {'value!': {field: incorrect_value}}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': cases}}]]
 
 
 
@@ -35,15 +35,15 @@ invalid_cases = {
     'p2Str': [v for v in generate_mock_cases('p2Str!', dict, [{'wrap': False, 'nest': [0]}, {'wrap': True, 'nest': [1]}], additional_p2Str_cases)],
     'p2Union': [v for v in generate_mock_cases('p2Union!', dict, [{'Two': {'ewrap': False, 'enest': [0]}}, {'Two': {'ewrap': True, 'enest': [1]}}], additional_p2Union_cases)],
     'stub': [
-        [[{}, {'fn._createStub': {'stub': False}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': 0}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': ''}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': []}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': {}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 0, 'expected': 1}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': {'fn.test': {}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'ObjectSizeUnexpected': {'actual': 0, 'expected': 1}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': {'fn.testAnother': {}, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 2, 'expected': 1}}}]}}]],
-        [[{}, {'fn._createStub': {'stub': {'wrong': True, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'_ErrorInvalidRequestBody': {'cases': [{'path': ['fn._createStub', 'stub', 'wrong'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': False}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': 0}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': ''}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': []}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 0, 'expected': 1}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'fn.test': {}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'fn.test': {}, '->': {}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub', '->'], 'reason': {'ObjectSizeUnexpected': {'actual': 0, 'expected': 1}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'fn.testAnother': {}, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 2, 'expected': 1}}}]}}]],
+        [[{}, {'fn._createStub': {'stub': {'wrong': True, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn._createStub', 'stub', 'wrong'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],
 }
 

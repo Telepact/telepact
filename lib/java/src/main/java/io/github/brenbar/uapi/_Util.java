@@ -791,7 +791,7 @@ class _Util {
         final var regexPath = append(path, errorsRegexKey);
 
         String errorsRegex = null;
-        if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.startsWith("fn._")) {
+        if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.endsWith("_")) {
             parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
@@ -1231,10 +1231,10 @@ class _Util {
         final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");
 
         if (clientKnownBinaryChecksums == null || !clientKnownBinaryChecksums.contains(binaryEncoder.checksum)) {
-            headers.put("_enc", binaryEncoder.encodeMap);
+            headers.put("enc_", binaryEncoder.encodeMap);
         }
 
-        headers.put("_bin", List.of(binaryEncoder.checksum));
+        headers.put("bin_", List.of(binaryEncoder.checksum));
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
         final Map<Object, Object> finalEncodedMessageBody;
@@ -1250,7 +1250,7 @@ class _Util {
     static List<Object> serverBinaryDecode(List<Object> message, _BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
-        final var clientKnownBinaryChecksums = (List<Integer>) headers.get("_bin");
+        final var clientKnownBinaryChecksums = (List<Integer>) headers.get("bin_");
         final var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
         if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
@@ -1275,7 +1275,7 @@ class _Util {
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
 
-        headers.put("_bin", binaryChecksumStrategy.getCurrentChecksums());
+        headers.put("bin_", binaryChecksumStrategy.getCurrentChecksums());
 
         if (Objects.equals(forceSendJson, true)) {
             throw new _BinaryEncoderUnavailableError();
@@ -1308,12 +1308,12 @@ class _Util {
             throws _BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
-        final var binaryChecksums = (List<Integer>) headers.get("_bin");
+        final var binaryChecksums = (List<Integer>) headers.get("bin_");
         final var binaryChecksum = binaryChecksums.get(0);
 
         // If there is a binary encoding included on this message, cache it
-        if (headers.containsKey("_enc")) {
-            final var binaryEncoding = (Map<String, Integer>) headers.get("_enc");
+        if (headers.containsKey("enc_")) {
+            final var binaryEncoding = (Map<String, Integer>) headers.get("enc_");
             final var newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
 
             recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
@@ -2484,7 +2484,7 @@ class _Util {
         final String requestTarget;
         if (!parsedUApiSchema.containsKey(requestTargetInit)) {
             unknownTarget = requestTargetInit;
-            requestTarget = "fn._ping";
+            requestTarget = "fn.ping_";
         } else {
             unknownTarget = null;
             requestTarget = requestTargetInit;
@@ -2493,14 +2493,14 @@ class _Util {
         final var functionType = (_UFn) parsedUApiSchema.get(requestTarget);
         final var resultUnionType = functionType.result;
 
-        final var callId = requestHeaders.get("_id");
+        final var callId = requestHeaders.get("id_");
         if (callId != null) {
-            responseHeaders.put("_id", callId);
+            responseHeaders.put("id_", callId);
         }
 
         if (requestHeaders.containsKey("_parseFailures")) {
             final var parseFailures = (List<Object>) requestHeaders.get("_parseFailures");
-            final Map<String, Object> newErrorResult = Map.of("_ErrorParseFailure",
+            final Map<String, Object> newErrorResult = Map.of("ErrorParseFailure_",
                     Map.of("reasons", parseFailures));
 
             validateResult(resultUnionType, newErrorResult);
@@ -2511,13 +2511,13 @@ class _Util {
         final List<_ValidationFailure> requestHeaderValidationFailures = validateHeaders(requestHeaders,
                 uApiSchema.parsedRequestHeaders, functionType);
         if (!requestHeaderValidationFailures.isEmpty()) {
-            return getInvalidErrorMessage("_ErrorInvalidRequestHeaders", requestHeaderValidationFailures,
+            return getInvalidErrorMessage("ErrorInvalidRequestHeaders_", requestHeaderValidationFailures,
                     resultUnionType,
                     responseHeaders);
         }
 
-        if (requestHeaders.containsKey("_bin")) {
-            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("_bin");
+        if (requestHeaders.containsKey("bin_")) {
+            final List<Object> clientKnownBinaryChecksums = (List<Object>) requestHeaders.get("bin_");
 
             responseHeaders.put("_binary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
@@ -2527,10 +2527,10 @@ class _Util {
             }
         }
 
-        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("_select");
+        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) requestHeaders.get("select_");
 
         if (unknownTarget != null) {
-            final Map<String, Object> newErrorResult = Map.of("_ErrorInvalidRequestBody",
+            final Map<String, Object> newErrorResult = Map.of("ErrorInvalidRequestBody_",
                     Map.of("cases",
                             List.of(Map.of("path", List.of(unknownTarget), "reason",
                                     Map.of("FunctionUnknown", Map.of())))));
@@ -2543,18 +2543,18 @@ class _Util {
 
         final var callValidationFailures = functionTypeCall.validate(requestBody, null, null, List.of(), List.of());
         if (!callValidationFailures.isEmpty()) {
-            return getInvalidErrorMessage("_ErrorInvalidRequestBody", callValidationFailures, resultUnionType,
+            return getInvalidErrorMessage("ErrorInvalidRequestBody_", callValidationFailures, resultUnionType,
                     responseHeaders);
         }
 
-        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("_unsafe"));
+        final var unsafeResponseEnabled = Objects.equals(true, requestHeaders.get("unsafe_"));
 
         final var callMessage = new Message(requestHeaders, Map.of(requestTarget, requestPayload));
 
         final Message resultMessage;
-        if (requestTarget.equals("fn._ping")) {
+        if (requestTarget.equals("fn.ping_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok", Map.of()));
-        } else if (requestTarget.equals("fn._api")) {
+        } else if (requestTarget.equals("fn.api_")) {
             resultMessage = new Message(Map.of(), Map.of("Ok", Map.of("api", uApiSchema.original)));
         } else {
             try {
@@ -2565,7 +2565,7 @@ class _Util {
                 } catch (Throwable ignored) {
 
                 }
-                return new Message(responseHeaders, Map.of("_ErrorUnknown", Map.of()));
+                return new Message(responseHeaders, Map.of("ErrorUnknown_", Map.of()));
             }
         }
 
@@ -2579,13 +2579,13 @@ class _Util {
             final var resultValidationFailures = resultUnionType.validate(
                     resultUnion, selectStructFieldsHeader, null, List.of(), List.of());
             if (!resultValidationFailures.isEmpty()) {
-                return getInvalidErrorMessage("_ErrorInvalidResponseBody", resultValidationFailures, resultUnionType,
+                return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
                         responseHeaders);
             }
             final List<_ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
                     uApiSchema.parsedResponseHeaders, functionType);
             if (!responseHeaderValidationFailures.isEmpty()) {
-                return getInvalidErrorMessage("_ErrorInvalidResponseHeaders", responseHeaderValidationFailures,
+                return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
                         resultUnionType,
                         responseHeaders);
             }
@@ -2657,7 +2657,7 @@ class _Util {
             }
 
             return serializer
-                    .serialize(new Message(new HashMap<>(), Map.of("_ErrorUnknown", Map.of())));
+                    .serialize(new Message(new HashMap<>(), Map.of("ErrorUnknown_", Map.of())));
         }
     }
 
@@ -2915,20 +2915,20 @@ class _Util {
         final Map<String, Object> header = requestMessage.header;
 
         try {
-            if (!header.containsKey("_tim")) {
-                header.put("_tim", timeoutMsDefault);
+            if (!header.containsKey("tim_")) {
+                header.put("tim_", timeoutMsDefault);
             }
 
             if (useBinaryDefault) {
                 header.put("_binary", true);
             }
 
-            final var timeoutMs = ((Number) header.get("_tim")).longValue();
+            final var timeoutMs = ((Number) header.get("tim_")).longValue();
 
             final var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
 
             if (Objects.equals(responseMessage.body,
-                    Map.of("_ErrorParseFailure",
+                    Map.of("ErrorParseFailure_",
                             Map.of("reasons", List.of(Map.of("IncompatibleBinaryEncoding", Map.of())))))) {
                 // Try again, but as json
                 header.put("_binary", true);

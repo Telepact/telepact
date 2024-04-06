@@ -321,7 +321,7 @@ class Server:
         parsed_types: Dict[str, _types._UType] = {}
         type_extensions: Dict[str, _types._UType] = {}
 
-        type_extensions['_ext._Select'] = _types._USelect(parsed_types)
+        type_extensions['_ext.Select_'] = _types._USelect(parsed_types)
 
         self.u_api_schema: UApiSchema = _util.extend_uapi_schema(
             u_api_schema, _util.get_internal_uapi_json(), type_extensions)
@@ -333,7 +333,7 @@ class Server:
         self.serializer: 'SerializationImpl' = Serializer(
             options.serializer, binary_encoder)
 
-        if len(self.u_api_schema.parsed['struct._Auth'].fields) == 0 and options.auth_required:
+        if len(self.u_api_schema.parsed['struct.Auth_'].fields) == 0 and options.auth_required:
             raise Exception(
                 'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `False`.')
 

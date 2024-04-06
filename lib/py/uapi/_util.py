@@ -659,7 +659,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
     regex_path = path + [errors_regex_key]
 
     errors_regex = None
-    if errors_regex_key in function_definition_as_parsed_json and not schema_key.startswith("fn._"):
+    if errors_regex_key in function_definition_as_parsed_json and not schema_key.endswith("_"):
         parse_failures.append(_types._SchemaParseFailure(
             regex_path, "ObjectKeyDisallowed", {}, None))
     else:
@@ -1021,9 +1021,9 @@ def server_binary_encode(message: List[Any], binary_encoder: _types._BinaryEncod
         "_clientKnownBinaryChecksums", None)
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
-        headers["_enc"] = binary_encoder.encode_map
+        headers["enc_"] = binary_encoder.encode_map
 
-    headers["_bin"] = [binary_encoder.checksum]
+    headers["bin_"] = [binary_encoder.checksum]
     encoded_message_body = encode_body(message_body, binary_encoder)
 
     final_encoded_message_body = pack_body(
@@ -1035,7 +1035,7 @@ def server_binary_encode(message: List[Any], binary_encoder: _types._BinaryEncod
 def server_binary_decode(message: List[Any], binary_encoder: _types._BinaryEncoding) -> List[Any]:
     headers = message[0]
     encoded_message_body = message[1]
-    client_known_binary_checksums = headers["_bin"]
+    client_known_binary_checksums = headers["bin_"]
     binary_checksum_used_by_client_on_this_message = client_known_binary_checksums[0]
 
     if binary_checksum_used_by_client_on_this_message != binary_encoder.checksum:
@@ -1054,7 +1054,7 @@ def client_binary_encode(message: List[Any], recent_binary_encoders: Dict[int, _
     message_body = message[1]
     force_send_json = headers.pop("_forceSendJson", None)
 
-    headers["_bin"] = binary_checksum_strategy.get_current_checksums()
+    headers["bin_"] = binary_checksum_strategy.get_current_checksums()
 
     if force_send_json:
         raise _types._BinaryEncoderUnavailableError()
@@ -1080,11 +1080,11 @@ def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, _
                          binary_checksum_strategy: 'types.ClientBinaryStrategy') -> List[Any]:
     headers = message[0]
     encoded_message_body = message[1]
-    binary_checksums = headers["_bin"]
+    binary_checksums = headers["bin_"]
     binary_checksum = binary_checksums[0]
 
-    if "_enc" in headers:
-        binary_encoding = headers["_enc"]
+    if "enc_" in headers:
+        binary_encoding = headers["enc_"]
         new_binary_encoder = _types._BinaryEncoding(
             binary_encoding, binary_checksum)
         recent_binary_encoders[binary_checksum] = new_binary_encoder
@@ -2014,7 +2014,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     request_target: str
     if request_target_init not in parsed_u_api_schema:
         unknown_target = request_target_init
-        request_target = "fn._ping"
+        request_target = "fn.ping_"
     else:
         unknown_target = None
         request_target = request_target_init
@@ -2022,14 +2022,14 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     function_type: _types._UFn = parsed_u_api_schema[request_target]
     result_union_type: _types._UUnion = function_type.result
 
-    call_id: Any = request_headers.get('_id')
+    call_id: Any = request_headers.get('id_')
     if call_id is not None:
-        response_headers['_id'] = call_id
+        response_headers['id_'] = call_id
 
     if '_parseFailures' in request_headers:
         parse_failures: List[Any] = request_headers['_parseFailures']
         new_error_result: Dict[str, Any] = {
-            '_ErrorParseFailure': {'reasons': parse_failures}}
+            'ErrorParseFailure_': {'reasons': parse_failures}}
 
         validate_result(result_union_type, new_error_result)
 
@@ -2038,10 +2038,10 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     request_header_validation_failures: List[Any] = validate_headers(
         request_headers, u_api_schema.parsed_request_headers, function_type)
     if request_header_validation_failures:
-        return get_invalid_error_message('_ErrorInvalidRequestHeaders', request_header_validation_failures, result_union_type, response_headers)
+        return get_invalid_error_message('ErrorInvalidRequestHeaders_', request_header_validation_failures, result_union_type, response_headers)
 
-    if '_bin' in request_headers:
-        client_known_binary_checksums: List[Any] = request_headers['_bin']
+    if 'bin_' in request_headers:
+        client_known_binary_checksums: List[Any] = request_headers['bin_']
 
         response_headers['_binary'] = True
         response_headers['_clientKnownBinaryChecksums'] = client_known_binary_checksums
@@ -2050,10 +2050,10 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
             response_headers['_pac'] = request_headers['_pac']
 
     select_struct_fields_header: Dict[str,
-                                      object] = request_headers.get('_select', None)
+                                      object] = request_headers.get('select_', None)
 
     if unknown_target:
-        new_error_result: Dict[str, Any] = {'_ErrorInvalidRequestBody': {
+        new_error_result: Dict[str, Any] = {'ErrorInvalidRequestBody_': {
             'cases': [{'path': [unknown_target], 'reason': {'FunctionUnknown': {}}}]}}
         validate_result(result_union_type, new_error_result)
         return types.Message(response_headers, new_error_result)
@@ -2063,16 +2063,16 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
     call_validation_failures: List[Any] = function_type_call.validate(
         request_body, None, None, [], [])
     if call_validation_failures:
-        return get_invalid_error_message('_ErrorInvalidRequestBody', call_validation_failures, result_union_type, response_headers)
+        return get_invalid_error_message('ErrorInvalidRequestBody_', call_validation_failures, result_union_type, response_headers)
 
-    unsafe_response_enabled: bool = request_headers.get('_unsafe') == True
+    unsafe_response_enabled: bool = request_headers.get('unsafe_') == True
 
     call_message: types.Message = types.Message(
         request_headers, {request_target: request_payload})
 
-    if request_target == 'fn._ping':
+    if request_target == 'fn.ping_':
         result_message: types.Message = types.Message({}, {'Ok': {}})
-    elif request_target == 'fn._api':
+    elif request_target == 'fn.api_':
         result_message = types.Message(
             {}, {'Ok': {'api': u_api_schema.original}})
     else:
@@ -2083,7 +2083,7 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
                 on_error(e)
             except Exception:
                 pass
-            return types.Message(response_headers, {'_ErrorUnknown': {}})
+            return types.Message(response_headers, {'ErrorUnknown_': {}})
 
     result_union: Dict[str, Any] = result_message.body
 
@@ -2095,17 +2095,17 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
         result_validation_failures: List[Any] = result_union_type.validate(
             result_union, select_struct_fields_header, None, [], [])
         if result_validation_failures:
-            return get_invalid_error_message('_ErrorInvalidResponseBody', result_validation_failures, result_union_type, response_headers)
+            return get_invalid_error_message('ErrorInvalidResponseBody_', result_validation_failures, result_union_type, response_headers)
 
         response_header_validation_failures: List[Any] = validate_headers(
             final_response_headers, u_api_schema.parsed_response_headers, function_type)
         if response_header_validation_failures:
-            return get_invalid_error_message('_ErrorInvalidResponseHeaders', response_header_validation_failures, result_union_type, response_headers)
+            return get_invalid_error_message('ErrorInvalidResponseHeaders_', response_header_validation_failures, result_union_type, response_headers)
 
     final_result_union: Dict[str, Any]
     if select_struct_fields_header:
         select_struct_fields_header: Dict[str,
-                                          Any] = request_headers['_select']
+                                          Any] = request_headers['select_']
         final_result_union = select_struct_fields(_types._UTypeDeclaration(
             result_union_type, False, []), result_union, select_struct_fields_header)
     else:
@@ -2158,7 +2158,7 @@ async def process_bytes(request_message_bytes: bytes, serializer: 'types.Seriali
         except Exception:
             pass
 
-        return serializer.serialize(types.Message({}, {"_ErrorUnknown": {}}))
+        return serializer.serialize(types.Message({}, {"ErrorUnknown_": {}}))
 
 
 def is_sub_map(part: Dict[str, Any], whole: Dict[str, Any]) -> bool:
@@ -2374,18 +2374,18 @@ async def process_request_object(request_message: 'types.Message',
     header: Dict[str, Any] = request_message.header
 
     try:
-        if "_tim" not in header:
-            header["_tim"] = timeout_ms_default
+        if "tim_" not in header:
+            header["tim_"] = timeout_ms_default
 
         if use_binary_default:
             header["_binary"] = True
 
-        timeout_ms: int = header.get("_tim")
+        timeout_ms: int = header.get("tim_")
 
         async with asyncio.timeout(timeout_ms / 1000):
             response_message = await adapter(request_message, serializer)
 
-        if response_message.body == {"_ErrorParseFailure": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
+        if response_message.body == {"ErrorParseFailure_": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
             header["_binary"] = True
             header["_forceSendJson"] = True
 

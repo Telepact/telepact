@@ -67,7 +67,7 @@ public class Server {
         final Map<String, _UType> parsedTypes = new HashMap<>();
         final Map<String, _UType> typeExtensions = new HashMap<>();
 
-        typeExtensions.put("_ext._Select", new _USelect(parsedTypes));
+        typeExtensions.put("_ext.Select_", new _USelect(parsedTypes));
 
         this.uApiSchema = _Util.extendUApiSchema(uApiSchema, _Util.getInternalUApiJson(), typeExtensions);
 
@@ -77,7 +77,7 @@ public class Server {
         final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
 
-        if (((_UStruct) this.uApiSchema.parsed.get("struct._Auth")).fields.size() == 0 && options.authRequired) {
+        if (((_UStruct) this.uApiSchema.parsed.get("struct.Auth_")).fields.size() == 0 && options.authRequired) {
             throw new RuntimeException(
                     "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.");
         }

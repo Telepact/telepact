@@ -112,10 +112,10 @@ programming data types. And then from that baseline, uAPI critically allows
 clients to upgrade their experience as deemed appropriate by the client,
 optionally using:
 
-- uAPI client libraries that help facilitate crafting of uAPI messages
-- Generated code for further increased type safety
-- A built-in binary serialization protocol for optimized efficiency
-- A built-in mechanism to omit fields from responses for optimized efficiency
+-   uAPI client libraries that help facilitate crafting of uAPI messages
+-   Generated code for further increased type safety
+-   A built-in binary serialization protocol for optimized efficiency
+-   A built-in mechanism to omit fields from responses for optimized efficiency
 
 These client features are built-in via the uAPI library used by the server, such
 that all of these features are available to the client automatically, without
@@ -181,7 +181,7 @@ safety deficits early in the development phase.
 Clients who are uniquely vulnerable to hard server failures and who find it
 advantageous to receive the malformed data anyway and adapt on-the-fly are able
 to turn off this response validation by submitting their requests with the
-`{"_unsafe":true}` header.
+`{"unsafe_":true}` header.
 
 ### If all I want is compact binary serialization, why not just use gRPC?
 
@@ -233,58 +233,58 @@ or `match` statement until that new value has a handling procedure implemented.
 uAPI takes the stance that adding a new union value to an existing union _is_ a
 backwards compatible change, on the basis of the following:
 
-- Unions are powerful typing constructs that replace otherwise type unsafe
-  patterns, and classifying evolution of an union as backwards incompatible
-  discourages use in favor of far more flimsy data types like strings, violating
-  uAPI's core principles of encouraging the strongest of type patterns.
-- uAPI does not run the risk of build-time failures with unions since uAPI
-  unions are represented as special objects in generated code rather than native
-  unions.
-- Clients are capable of implementing error-prone code regardless of how a
-  server evolves it's API, and uAPI cannot uphold its core principle of enabling
-  API evolution if it holds servers accountable for client-side design failures.
-  Clients can neglect proper handling of null, derive internal non-public
-  implementation details by parsing strings, or base critical computation on an
-  assumption that a boolean is always true. And a server would be able to break
-  such clients by suddenly returning null, changing the string to a different
-  pattern, or returning false, but this breakage would not be due to "backwards
-  incompatible" changes. The client made invalid assumptions, which may further
-  yet be a consequence of choosing a riskier type unsafe technology stack that
-  failed to highlight such invalid assumptions. And in the same way that a
-  client should not make assumptions about patterns in strings or neglect `else`
-  cases on its critical paths, a client should not make assumptions about
-  patterns in unions or neglect default branch logic in `switch` or `match`
-  statements.
+-   Unions are powerful typing constructs that replace otherwise type unsafe
+    patterns, and classifying evolution of an union as backwards incompatible
+    discourages use in favor of far more flimsy data types like strings, violating
+    uAPI's core principles of encouraging the strongest of type patterns.
+-   uAPI does not run the risk of build-time failures with unions since uAPI
+    unions are represented as special objects in generated code rather than native
+    unions.
+-   Clients are capable of implementing error-prone code regardless of how a
+    server evolves it's API, and uAPI cannot uphold its core principle of enabling
+    API evolution if it holds servers accountable for client-side design failures.
+    Clients can neglect proper handling of null, derive internal non-public
+    implementation details by parsing strings, or base critical computation on an
+    assumption that a boolean is always true. And a server would be able to break
+    such clients by suddenly returning null, changing the string to a different
+    pattern, or returning false, but this breakage would not be due to "backwards
+    incompatible" changes. The client made invalid assumptions, which may further
+    yet be a consequence of choosing a riskier type unsafe technology stack that
+    failed to highlight such invalid assumptions. And in the same way that a
+    client should not make assumptions about patterns in strings or neglect `else`
+    cases on its critical paths, a client should not make assumptions about
+    patterns in unions or neglect default branch logic in `switch` or `match`
+    statements.
 
 ## Glossary
 
-- **Body** - A structured JSON object containing the primary data payload of the
-  uAPI Message.
+-   **Body** - A structured JSON object containing the primary data payload of the
+    uAPI Message.
 
-- **Client** - An entity consuming a uAPI.
+-   **Client** - An entity consuming a uAPI.
 
-- **Argument** - The colloquial name for the body of a `function.*`-targeted
-  uAPI Message sent from the Client.
+-   **Argument** - The colloquial name for the body of a `function.*`-targeted
+    uAPI Message sent from the Client.
 
-- **Headers** - An unstructured JSON object consisting of metadata about a uAPI
-  Message.
+-   **Headers** - An unstructured JSON object consisting of metadata about a uAPI
+    Message.
 
-- **Message** - The JSON payload sent over the IPC boundary, comprised of a
-  single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
+-   **Message** - The JSON payload sent over the IPC boundary, comprised of a
+    single JSON array with 3 elements: (1) the target, (2) headers, (3) body.
 
-- **Result** - The colloquial name for the body of a `function.*`-targeted uAPI
-  Message sent from the Server.
+-   **Result** - The colloquial name for the body of a `function.*`-targeted uAPI
+    Message sent from the Server.
 
-- **Server** - An entity providing an implementation of a uAPI and adhering to
-  the uAPI specification.
+-   **Server** - An entity providing an implementation of a uAPI and adhering to
+    the uAPI specification.
 
-- **Target** - A reference to a top-level definition in the uAPI description of
-  the uAPI server.
+-   **Target** - A reference to a top-level definition in the uAPI description of
+    the uAPI server.
 
-- **uAPI Schema** - The JSON document describing the API. This document is
-  written in the JSON language following a uAPI-flavored JSON schema, but
-  conventionally, this document would be written using an IDL.
+-   **uAPI Schema** - The JSON document describing the API. This document is
+    written in the JSON language following a uAPI-flavored JSON schema, but
+    conventionally, this document would be written using an IDL.
 
 # Navigation
 
-- [Specification](SPECIFICATION.md)
+-   [Specification](SPECIFICATION.md)

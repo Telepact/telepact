@@ -1,16 +1,16 @@
 [
-  {
-    "info.AuthExample": {}
-  },
-  {
-    "struct._Auth": {
-      "token": ["string"]
+    {
+        "info.AuthExample": {}
+    },
+    {
+        "struct.Auth_": {
+            "token": ["string"]
+        }
+    },
+    {
+        "fn.test": {},
+        "->": {
+            "Ok": {}
+        }
     }
-  },
-  {
-    "fn.test": {},
-    "->": {
-      "Ok": {}
-    }
-  }
 ]

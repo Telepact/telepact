@@ -1079,7 +1079,7 @@ export function parseFunctionType(
     const regexPath = append(path, errorsRegexKey);
 
     let errorsRegex = null;
-    if (functionDefinitionAsParsedJson.hasOwnProperty(errorsRegexKey) && !schemaKey.startsWith('fn._')) {
+    if (functionDefinitionAsParsedJson.hasOwnProperty(errorsRegexKey) && !schemaKey.endsWith('_')) {
         parseFailures.push(new _SchemaParseFailure(regexPath, 'ObjectKeyDisallowed', {}, null));
     } else {
         let errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey];
@@ -1609,10 +1609,10 @@ export function serverBinaryEncode(message: any[], binaryEncoder: _BinaryEncodin
     delete headers['_clientKnownBinaryChecksums'];
 
     if (!clientKnownBinaryChecksums || !clientKnownBinaryChecksums.includes(binaryEncoder.checksum)) {
-        headers['_enc'] = binaryEncoder.encodeMap;
+        headers['enc_'] = binaryEncoder.encodeMap;
     }
 
-    headers['_bin'] = [binaryEncoder.checksum];
+    headers['bin_'] = [binaryEncoder.checksum];
     const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: Map<string, any>;
@@ -1628,7 +1628,7 @@ export function serverBinaryEncode(message: any[], binaryEncoder: _BinaryEncodin
 export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncoding): any[] {
     const headers = message[0] as Map<string, any>;
     const encodedMessageBody = message[1] as Map<any, any>;
-    const clientKnownBinaryChecksums = headers.get('_bin') as number[];
+    const clientKnownBinaryChecksums = headers.get('bin_') as number[];
     const binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums[0];
 
     if (binaryChecksumUsedByClientOnThisMessage !== binaryEncoder.checksum) {
@@ -1656,7 +1656,7 @@ export function clientBinaryEncode(
     const messageBody = message[1] as Record<string, any>;
     const forceSendJson = headers['_forceSendJson'];
 
-    headers['_bin'] = binaryChecksumStrategy.getCurrentChecksums();
+    headers['bin_'] = binaryChecksumStrategy.getCurrentChecksums();
 
     if (forceSendJson === true) {
         throw new _BinaryEncoderUnavailableError();
@@ -1691,11 +1691,11 @@ export function clientBinaryDecode(
 ): any[] {
     const headers = message[0] as Map<string, any>;
     const encodedMessageBody = message[1] as Map<any, any>;
-    const binaryChecksums = headers.get('_bin') as number[];
+    const binaryChecksums = headers.get('bin_') as number[];
     const binaryChecksum = binaryChecksums[0]!;
 
-    if (headers.has('_enc')) {
-        const binaryEncoding = headers.get('_enc') as Map<string, number>;
+    if (headers.has('enc_')) {
+        const binaryEncoding = headers.get('enc_') as Map<string, number>;
         const newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
         recentBinaryEncoders.set(binaryChecksum, newBinaryEncoder);
     }
@@ -3110,7 +3110,7 @@ export async function handleMessage(
     let requestTarget: string;
     if (!parsedUApiSchema.hasOwnProperty(requestTargetInit)) {
         unknownTarget = requestTargetInit;
-        requestTarget = 'fn._ping';
+        requestTarget = 'fn.ping_';
     } else {
         unknownTarget = null;
         requestTarget = requestTargetInit;
@@ -3119,9 +3119,9 @@ export async function handleMessage(
     const functionType = parsedUApiSchema[requestTarget] as _UFn;
     const resultUnionType = functionType.result;
 
-    const callId = requestHeaders['_id'];
+    const callId = requestHeaders['id_'];
     if (callId !== undefined) {
-        responseHeaders['_id'] = callId;
+        responseHeaders['id_'] = callId;
     }
 
     if (requestHeaders.hasOwnProperty('_parseFailures')) {
@@ -3144,15 +3144,15 @@ export async function handleMessage(
     );
     if (requestHeaderValidationFailures.length > 0) {
         return getInvalidErrorMessage(
-            '_ErrorInvalidRequestHeaders',
+            'ErrorInvalidRequestHeaders_',
             requestHeaderValidationFailures,
             resultUnionType,
             responseHeaders
         );
     }
 
-    if (requestHeaders.hasOwnProperty('_bin')) {
-        const clientKnownBinaryChecksums = requestHeaders['_bin'] as unknown as Array<any>;
+    if (requestHeaders.hasOwnProperty('bin_')) {
+        const clientKnownBinaryChecksums = requestHeaders['bin_'] as unknown as Array<any>;
 
         responseHeaders['_binary'] = true;
         responseHeaders['_clientKnownBinaryChecksums'] = clientKnownBinaryChecksums;
@@ -3162,7 +3162,7 @@ export async function handleMessage(
         }
     }
 
-    const selectStructFieldsHeader: Record<string, any> | undefined = requestHeaders['_select'] as Record<string, any>;
+    const selectStructFieldsHeader: Record<string, any> | undefined = requestHeaders['select_'] as Record<string, any>;
 
     if (unknownTarget !== null) {
         const newErrorResult = {
@@ -3202,23 +3202,23 @@ export async function handleMessage(
         }
 
         return getInvalidErrorMessage(
-            '_ErrorInvalidRequestBody',
+            'ErrorInvalidRequestBody_',
             callValidationFailures,
             resultUnionType,
             responseHeaders
         );
     }
 
-    const unsafeResponseEnabled = requestHeaders['_unsafe'] === true;
+    const unsafeResponseEnabled = requestHeaders['unsafe_'] === true;
 
     const callMessage = new Message(requestHeaders, {
         [requestTarget]: requestPayload,
     });
 
     let resultMessage: Message;
-    if (requestTarget === 'fn._ping') {
+    if (requestTarget === 'fn.ping_') {
         resultMessage = new Message({}, { Ok: {} });
-    } else if (requestTarget === 'fn._api') {
+    } else if (requestTarget === 'fn.api_') {
         resultMessage = new Message({}, { Ok: { api: uApiSchema.original } });
     } else {
         try {
@@ -3249,7 +3249,7 @@ export async function handleMessage(
 
         if (resultValidationFailures.length > 0) {
             return getInvalidErrorMessage(
-                '_ErrorInvalidResponseBody',
+                'ErrorInvalidResponseBody_',
                 resultValidationFailures,
                 resultUnionType,
                 responseHeaders
@@ -3263,7 +3263,7 @@ export async function handleMessage(
         );
         if (responseHeaderValidationFailures.length > 0) {
             return getInvalidErrorMessage(
-                '_ErrorInvalidResponseHeaders',
+                'ErrorInvalidResponseHeaders_',
                 responseHeaderValidationFailures,
                 resultUnionType,
                 responseHeaders
@@ -3675,15 +3675,15 @@ export async function processRequestObject(
     const header = requestMessage.header;
 
     try {
-        if (!header.hasOwnProperty('_tim')) {
-            header['_tim'] = timeoutMsDefault;
+        if (!header.hasOwnProperty('tim_')) {
+            header['tim_'] = timeoutMsDefault;
         }
 
         if (useBinaryDefault) {
             header['_binary'] = true;
         }
 
-        const timeoutMs = header['_tim'] as number;
+        const timeoutMs = header['tim_'] as number;
 
         const responseMessage = await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);
 

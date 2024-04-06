@@ -1,7 +1,7 @@
 [
     {
         "///": " Ping the server. ",
-        "fn._ping": {},
+        "fn.ping_": {},
         "->": {
             "Ok": {}
         },
@@ -10,7 +10,7 @@
 
     {
         "///": " Get the uAPI `schema` of this server. ",
-        "fn._api": {},
+        "fn.api_": {},
         "->": {
             "Ok": {
                 "api": ["array", ["object", ["any"]]]
@@ -30,7 +30,7 @@
 
     {
         "///": " A type. ",
-        "union._Type": {
+        "union.Type_": {
             "Null": {},
             "Boolean": {},
             "Integer": {},
@@ -47,8 +47,8 @@
         "///": " A reason for the validation failure in the body. ",
         "union._BodyValidationFailureReason": {
             "TypeUnexpected": {
-                "expected": ["union._Type"],
-                "actual": ["union._Type"]
+                "expected": ["union.Type_"],
+                "actual": ["union.Type_"]
             },
             "NullDisallowed": {},
             "ObjectKeyDisallowed": {},
@@ -74,8 +74,8 @@
         "///": " A reason for the validation failure in the header. ",
         "union._HeaderValidationFailureReason": {
             "TypeUnexpected": {
-                "expected": ["union._Type"],
-                "actual": ["union._Type"]
+                "expected": ["union.Type_"],
+                "actual": ["union.Type_"]
             },
             "TypeUnknown": {},
             "ObjectKeyDisallowed": {},
@@ -85,7 +85,7 @@
 
     {
         "///": " A parse failure. ",
-        "union._ParseFailure": {
+        "union.ParseFailure_": {
             "IncompatibleBinaryEncoding": {},
             "BinaryDecodeFailure": {},
             "JsonInvalid": {},
@@ -118,20 +118,20 @@
             "     outlined by a list of `cases.                                                                        ",
             " - `_ErrorParseFailure`: The Request could not be parsed as a uAPI Message.                               "
         ],
-        "errors._Validated": {
+        "errors.Validated_": {
             "->": {
-                "_ErrorUnknown": {},
-                "_ErrorInvalidRequestHeaders": {
+                "ErrorUnknown_": {},
+                "ErrorInvalidRequestHeaders_": {
                     "cases": ["array", ["struct._HeaderValidationFailure"]]
                 },
-                "_ErrorInvalidRequestBody": {
+                "ErrorInvalidRequestBody_": {
                     "cases": ["array", ["struct._BodyValidationFailure"]]
                 },
-                "_ErrorInvalidResponseBody": {
+                "ErrorInvalidResponseBody_": {
                     "cases": ["array", ["struct._BodyValidationFailure"]]
                 },
-                "_ErrorParseFailure": {
-                    "reasons": ["array", ["union._ParseFailure"]]
+                "ErrorParseFailure_": {
+                    "reasons": ["array", ["union.ParseFailure_"]]
                 }
             }
         }

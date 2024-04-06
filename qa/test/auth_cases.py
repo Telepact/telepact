@@ -1,7 +1,7 @@
 cases = {
     'auth': [
         [[{'Ok': {}}, {'fn.test': {}}], [{}, {'Ok': {}}]],
-        [[{'result': {'_ErrorUnauthenticated': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'_ErrorUnauthenticated': {'message!': 'a'}}]],
-        [[{'result': {'_ErrorUnauthorized': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'_ErrorUnauthorized': {'message!': 'a'}}]],
+        [[{'result': {'ErrorUnauthenticated_': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthenticated_': {'message!': 'a'}}]],
+        [[{'result': {'ErrorUnauthorized_': {'message!': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorUnauthorized_': {'message!': 'a'}}]],
    ]
 }

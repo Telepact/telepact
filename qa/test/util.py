@@ -277,10 +277,10 @@ async def verify_client_case(nats_client, request, expected_response, client_fro
 
     if assert_binary:
         if 'Error' not in next(iter(response[1])):
-            assert '_bin' in response[0]
+            assert 'bin_' in response[0]
 
-    response[0].pop('_bin', None)
-    response[0].pop('_enc', None)
+    response[0].pop('bin_', None)
+    response[0].pop('enc_', None)
     response[0].pop('_pac', None)
 
     if expected_response:
@@ -344,7 +344,7 @@ async def send_case(nats_client: nats.aio.client.Client, request, expected_respo
 
     return response
 
-ping_req = [{}, {'fn._ping': {}}]
+ping_req = [{}, {'fn.ping_': {}}]
 
 
 async def ping(nats_client, topic):

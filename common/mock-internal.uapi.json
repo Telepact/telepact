@@ -57,7 +57,7 @@
         "->": {
             "Ok": {}
         },
-        "errors": "^errors\\._Validated$"
+        "errors": "^errors\\.Validated_$"
     },
     {
         "///": [
@@ -76,7 +76,7 @@
                 "reason": ["union._VerificationFailure"]
             }
         },
-        "errors": "^errors\\._Validated$"
+        "errors": "^errors\\.Validated_$"
     },
     {
         "///": [
@@ -90,7 +90,7 @@
                 "additionalUnverifiedCalls": ["array", ["_ext._Call"]]
             }
         },
-        "errors": "^errors\\._Validated$"
+        "errors": "^errors\\.Validated_$"
     },
     {
         "///": " Clear all stub conditions. ",
@@ -105,7 +105,7 @@
         "->": {
             "Ok": {}
         },
-        "errors": "^errors\\._Validated$"
+        "errors": "^errors\\.Validated_$"
     },
     {
         "///": " Set the seed of the random generator. ",
@@ -115,7 +115,7 @@
         "->": {
             "Ok": {}
         },
-        "errors": "^errors\\._Validated$"
+        "errors": "^errors\\.Validated_$"
     },
     {
         "///": [
