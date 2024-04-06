@@ -808,7 +808,7 @@ export function applyErrorToParsedTypes(
                 const otherPathIndex = schemaKeysToIndex[fnName];
                 parseFailures.push(
                     new _SchemaParseFailure(
-                        [errorIndex, errorName, '->', newKey],
+                        [errorIndex, errorName, newKey],
                         'PathCollision',
                         {
                             other: [otherPathIndex, '->', newKey],
@@ -854,34 +854,14 @@ export function parseErrorType(
         }
     }
 
-    const defInit = errorDefinitionAsParsedJson[schemaKey];
-    const thisPath = append(basePath, schemaKey);
-
-    let def;
-    try {
-        def = asMap(defInit);
-    } catch (e) {
-        const thisParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit, 'Object');
-
-        parseFailures.push(...thisParseFailures);
-        throw new UApiSchemaParseError(parseFailures);
-    }
-
-    const resultSchemaKey = '->';
-    const errorPath = append(thisPath, resultSchemaKey);
-
-    if (!def.hasOwnProperty(resultSchemaKey)) {
-        parseFailures.push(new _SchemaParseFailure(errorPath, 'RequiredObjectKeyMissing', {}, null));
-    }
-
     if (parseFailures.length > 0) {
         throw new UApiSchemaParseError(parseFailures);
     }
 
     const error = parseUnionType(
-        thisPath,
-        def,
-        resultSchemaKey,
+        basePath,
+        errorDefinitionAsParsedJson,
+        schemaKey,
         [],
         [],
         0,

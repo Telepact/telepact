@@ -124,9 +124,7 @@
             " due to no matching stub being available.                                         "
         ],
         "errors.Mockable_": {
-            "->": {
-                "ErrorNoMatchingStub_": {}
-            }
+            "ErrorNoMatchingStub_": {}
         }
     }
 ]

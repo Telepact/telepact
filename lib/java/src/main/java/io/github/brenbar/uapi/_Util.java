@@ -620,7 +620,7 @@ class _Util {
                 var newKey = errorResultField.getKey();
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
-                    parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, errorName, "->", newKey),
+                    parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, errorName, newKey),
                             "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey)), null));
                 }
                 fnResultCases.put(newKey, errorResultField.getValue());
@@ -655,33 +655,13 @@ class _Util {
             }
         }
 
-        final var defInit = errorDefinitionAsParsedJson.get(schemaKey);
-        final List<Object> thisPath = append(basePath, schemaKey);
-
-        final Map<String, Object> def;
-        try {
-            def = asMap(defInit);
-        } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit,
-                    "Object");
-
-            parseFailures.addAll(thisParseFailures);
-            throw new UApiSchemaParseError(parseFailures);
-        }
-
-        final var resultSchemaKey = "->";
-        final var typeParameterCount = 0;
-        final List<Object> errorPath = append(thisPath, resultSchemaKey);
-
-        if (!def.containsKey(resultSchemaKey)) {
-            parseFailures.add(new _SchemaParseFailure(errorPath, "RequiredObjectKeyMissing", Map.of(), null));
-        }
-
         if (parseFailures.size() > 0) {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        final _UUnion error = parseUnionType(thisPath, def, resultSchemaKey, List.of(), List.of(),
+        final var typeParameterCount = 0;
+
+        final _UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey, List.of(), List.of(),
                 typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                 allParseFailures, failedTypes);
 

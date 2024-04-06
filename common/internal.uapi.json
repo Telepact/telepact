@@ -139,23 +139,21 @@
             " - `ErrorParseFailure_`: The Request could not be parsed as a uAPI Message.                               "
         ],
         "errors.Validated_": {
-            "->": {
-                "ErrorUnknown_": {},
-                "ErrorInvalidRequestHeaders_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
-                },
-                "ErrorInvalidRequestBody_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
-                },
-                "ErrorInvalidResponseHeaders_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
-                },
-                "ErrorInvalidResponseBody_": {
-                    "cases": ["array", ["struct.ValidationFailure_"]]
-                },
-                "ErrorParseFailure_": {
-                    "reasons": ["array", ["union.ParseFailure_"]]
-                }
+            "ErrorUnknown_": {},
+            "ErrorInvalidRequestHeaders_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            },
+            "ErrorInvalidRequestBody_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            },
+            "ErrorInvalidResponseHeaders_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            },
+            "ErrorInvalidResponseBody_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            },
+            "ErrorParseFailure_": {
+                "reasons": ["array", ["union.ParseFailure_"]]
             }
         }
     },
@@ -167,13 +165,11 @@
             " 2. `ErrorUnauthorized_` indicating that the credentials in the `_auth` header were insufficient to run the function    "
         ],
         "errors.Authenticated_": {
-            "->": {
-                "ErrorUnauthenticated_": {
-                    "message!": ["string"]
-                },
-                "ErrorUnauthorized_": {
-                    "message!": ["string"]
-                }
+            "ErrorUnauthenticated_": {
+                "message!": ["string"]
+            },
+            "ErrorUnauthorized_": {
+                "message!": ["string"]
             }
         }
     }

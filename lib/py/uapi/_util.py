@@ -510,7 +510,7 @@ def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _
             new_key = error_result_field
             if new_key in fn_result_cases:
                 other_path_index = schema_keys_to_index.get(fn_name)
-                parse_failures.append(_types._SchemaParseFailure([error_index, error_name, "->", new_key],
+                parse_failures.append(_types._SchemaParseFailure([error_index, error_name, new_key],
                                                                  "PathCollision", {"other": [other_path_index, "->", new_key]}, None))
 
             fn_result_cases[new_key] = error_result_struct
@@ -538,30 +538,12 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
             parse_failures.append(_types._SchemaParseFailure(
                 loop_path, "ObjectKeyDisallowed", {}, None))
 
-    def_init = error_definition_as_parsed_json.get(schema_key)
-    this_path = base_path + [schema_key]
-
-    try:
-        def_dict = as_map(def_init)
-    except TypeError:
-        this_parse_failures = get_type_unexpected_parse_failure(
-            this_path, def_init, "Object")
-        parse_failures.extend(this_parse_failures)
-        raise types.UApiSchemaParseError(parse_failures)
-
-    result_schema_key = "->"
-    ok_case_required = False
     type_parameter_count = 0
-    error_path = this_path + [result_schema_key]
-
-    if result_schema_key not in def_dict:
-        parse_failures.append(_types._SchemaParseFailure(
-            error_path, "RequiredObjectKeyMissing", {}, None))
 
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
 
-    error = parse_union_type(this_path, def_dict, result_schema_key, [], [], type_parameter_count,
+    error = parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [], type_parameter_count,
                              uapi_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
                              all_parse_failures, failed_types)
 
