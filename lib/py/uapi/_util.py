@@ -376,7 +376,7 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
 
     for union_case, entry_value in definition.items():
         union_key_path = this_path + [union_case]
-        regex_string = r"^(_?[A-Z][a-zA-Z0-9_]*)$"
+        regex_string = r"^([A-Z][a-zA-Z0-9_]*)$"
         regex = re.compile(regex_string)
         matcher = regex.search(union_case)
 
@@ -456,7 +456,7 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
                 schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, _types._UType],
                 type_extensions: Dict[str, _types._UType], all_parse_failures: List[_types._SchemaParseFailure],
                 failed_types: Set[str]) -> _types._UFieldDeclaration:
-    regex_string = r"^(_?[a-z][a-zA-Z0-9_]*)(!)?$"
+    regex_string = r"^([a-z][a-zA-Z0-9_]*)(!)?$"
     regex = re.compile(regex_string)
 
     matcher = regex.search(field_declaration)
@@ -569,7 +569,7 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
         for key, field in request_headers_struct.fields.items():
             if field.optional:
                 this_path = append(append(path, schema_key), key)
-                regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
+                regex_string = '^([a-z][a-zA-Z0-9_]*)$'
                 parse_failures.append(_types._SchemaParseFailure(
                     this_path, 'KeyRegexMatchFailed', {'regex': regex_string}, None))
 
@@ -592,7 +592,7 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
             for key, field in response_headers_struct.fields.items():
                 if field.optional:
                     this_path = append(append(path, schema_key), key)
-                    regex_string = '^(_?[a-z][a-zA-Z0-9_]*)$'
+                    regex_string = '^([a-z][a-zA-Z0-9_]*)$'
                     parse_failures.append(_types._SchemaParseFailure(
                         this_path, 'KeyRegexMatchFailed', {'regex': regex_string}, None))
 

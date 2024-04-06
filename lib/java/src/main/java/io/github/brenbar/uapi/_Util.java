@@ -464,7 +464,7 @@ class _Util {
         for (final var entry : definition.entrySet()) {
             final var unionCase = entry.getKey();
             final List<Object> unionKeyPath = append(thisPath, unionCase);
-            final var regexString = "^(_?[A-Z][a-zA-Z0-9_]*)$";
+            final var regexString = "^([A-Z][a-zA-Z0-9_]*)$";
             final var regex = Pattern.compile(regexString);
 
             final var matcher = regex.matcher(unionCase);
@@ -557,7 +557,7 @@ class _Util {
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)(!)?$";
+        final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
         final var regex = Pattern.compile(regexString);
 
         final var matcher = regex.matcher(fieldDeclaration);
@@ -689,7 +689,7 @@ class _Util {
                 final var field = e.getValue();
                 if (field.optional) {
                     final var thisPath = append(append(path, schemaKey), key);
-                    final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
+                    final var regexString = "^([a-z][a-zA-Z0-9_]*)$";
                     parseFailures.add(
                             new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString), null));
                 }
@@ -715,7 +715,7 @@ class _Util {
                     final var field = e.getValue();
                     if (field.optional) {
                         final var thisPath = append(append(path, schemaKey), key);
-                        final var regexString = "^(_?[a-z][a-zA-Z0-9_]*)$";
+                        final var regexString = "^([a-z][a-zA-Z0-9_]*)$";
                         parseFailures.add(
                                 new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString), null));
                     }

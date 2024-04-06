@@ -601,7 +601,7 @@ export function parseUnionType(
 
     for (const [unionCase, value] of Object.entries(definition)) {
         const unionKeyPath = append(thisPath, unionCase);
-        const regexString = '^(_?[A-Z][a-zA-Z0-9_]*)$';
+        const regexString = '^([A-Z][a-zA-Z0-9_]*)$';
         const regex = new RegExp(regexString);
         if (!regex.test(unionCase)) {
             parseFailures.push(
@@ -730,7 +730,7 @@ export function parseField(
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>
 ): _UFieldDeclaration {
-    const regexString = '^(_?[a-z][a-zA-Z0-9_]*)(!)?$';
+    const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regex = new RegExp(regexString);
 
     const matcher = fieldDeclaration.match(regex);
@@ -911,7 +911,7 @@ export function parseHeadersType(
             const field = requestHeadersStruct.fields[key];
             if (field.optional) {
                 const thisPath = append(append(path, schemaKey), key);
-                const regexString = '^(_?[a-z][a-zA-Z0-9_]*)$';
+                const regexString = '^([a-z][a-zA-Z0-9_]*)$';
                 parseFailures.push(
                     new _SchemaParseFailure(
                         thisPath,
@@ -957,7 +957,7 @@ export function parseHeadersType(
                 const field = responseHeadersStruct.fields[key];
                 if (field.optional) {
                     const thisPath = append(append(path, '->'), key);
-                    const regexString = '^(_?[a-z][a-zA-Z0-9_]*)$';
+                    const regexString = '^([a-z][a-zA-Z0-9_]*)$';
                     parseFailures.push(
                         new _SchemaParseFailure(
                             thisPath,
