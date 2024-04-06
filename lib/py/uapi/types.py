@@ -147,8 +147,8 @@ class MockServer:
         parsed_types: Dict[str, type] = {}
         type_extensions: Dict[str, type] = {}
 
-        type_extensions["_ext._Call"] = _types._UMockCall(parsed_types)
-        type_extensions["_ext._Stub"] = _types._UMockStub(parsed_types)
+        type_extensions["_ext.Call_"] = _types._UMockCall(parsed_types)
+        type_extensions["_ext.Stub_"] = _types._UMockStub(parsed_types)
 
         combined_u_api_schema: UApiSchema = _util.extend_uapi_schema(
             u_api_schema, _util.get_mock_uapi_json(), type_extensions)

@@ -45,8 +45,8 @@ export const _ARRAY_NAME: Readonly<string> = 'Array';
 export const _BOOLEAN_NAME: Readonly<string> = 'Boolean';
 export const _FN_NAME: Readonly<string> = 'Object';
 export const _INTEGER_NAME: Readonly<string> = 'Integer';
-export const _MOCK_CALL_NAME: Readonly<string> = '_ext._Call';
-export const _MOCK_STUB_NAME: Readonly<string> = '_ext._Stub';
+export const _MOCK_CALL_NAME: Readonly<string> = '_ext.Call_';
+export const _MOCK_STUB_NAME: Readonly<string> = '_ext.Stub_';
 export const _NUMBER_NAME: Readonly<string> = 'Number';
 export const _OBJECT_NAME: Readonly<string> = 'Object';
 export const _STRING_NAME: Readonly<string> = 'String';
@@ -2444,10 +2444,6 @@ export function constructRandomStruct(
                     randomGenerator
                 );
             } else {
-                console.log(
-                    `includeOptionalFields: ${includeOptionalFields} randomizeOptionalFields: ${randomizeOptionalFields}`
-                );
-                console.log(`stack: ${new Error().stack})}`);
                 if (!includeOptionalFields || (randomizeOptionalFields && randomGenerator.nextBoolean())) {
                     continue;
                 }
@@ -3127,7 +3123,7 @@ export async function handleMessage(
     if (requestHeaders.hasOwnProperty('_parseFailures')) {
         const parseFailures = requestHeaders['_parseFailures'] as unknown as Array<any>;
         const newErrorResult = {
-            _ErrorParseFailure: {
+            ErrorParseFailure_: {
                 reasons: parseFailures,
             },
         };
@@ -3539,7 +3535,7 @@ export function mockHandle(
     const argument: Record<string, any> = requestMessage.getBodyPayload();
 
     switch (functionName) {
-        case 'fn._createStub': {
+        case 'fn.createStub_': {
             const givenStub = argument['stub'];
 
             const stubCall = Object.entries(givenStub).find(([key]) => key.startsWith('fn.'))!;
@@ -3560,7 +3556,7 @@ export function mockHandle(
             stubs.unshift(stub);
             return new Message({}, { Ok: {} });
         }
-        case 'fn._verify': {
+        case 'fn.verify_': {
             const givenCall = argument['call'];
 
             const call = Object.entries(givenCall).find(([key]) => key.startsWith('fn.'))!;
@@ -3572,19 +3568,19 @@ export function mockHandle(
             const verificationResult = verify(callFunctionName, callArg, strictMatch, verifyTimes, invocations);
             return new Message({}, verificationResult);
         }
-        case 'fn._verifyNoMoreInteractions': {
+        case 'fn.verifyNoMoreInteractions_': {
             const verificationResult = verifyNoMoreInteractions(invocations);
             return new Message({}, verificationResult);
         }
-        case 'fn._clearCalls': {
+        case 'fn.clearCalls_': {
             invocations.length = 0;
             return new Message({}, { Ok: {} });
         }
-        case 'fn._clearStubs': {
+        case 'fn.clearStubs_': {
             stubs.length = 0;
             return new Message({}, { Ok: {} });
         }
-        case 'fn._setRandomSeed': {
+        case 'fn.setRandomSeed_': {
             const givenSeed = argument['seed'];
 
             random.setSeed(givenSeed);
@@ -3641,7 +3637,7 @@ export function mockHandle(
             }
 
             if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                return new Message({}, { _ErrorNoMatchingStub: {} });
+                return new Message({}, { ErrorNoMatchingStub_: {} });
             }
 
             if (definition) {
@@ -3689,7 +3685,7 @@ export async function processRequestObject(
 
         if (
             objectsAreEqual(responseMessage.body, {
-                _ErrorParseFailure: {
+                ErrorParseFailure_: {
                     reasons: [{ IncompatibleBinaryEncoding: {} }],
                 },
             })

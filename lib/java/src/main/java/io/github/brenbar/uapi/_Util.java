@@ -38,8 +38,8 @@ class _Util {
     static final String _BOOLEAN_NAME = "Boolean";
     static final String _FN_NAME = "Object";
     static final String _INTEGER_NAME = "Integer";
-    static final String _MOCK_CALL_NAME = "_ext._Call";
-    static final String _MOCK_STUB_NAME = "_ext._Stub";
+    static final String _MOCK_CALL_NAME = "_ext.Call_";
+    static final String _MOCK_STUB_NAME = "_ext.Stub_";
     static final String _NUMBER_NAME = "Number";
     static final String _OBJECT_NAME = "Object";
     static final String _STRING_NAME = "String";
@@ -2799,7 +2799,7 @@ class _Util {
         final Map<String, Object> argument = requestMessage.getBodyPayload();
 
         switch (functionName) {
-            case "fn._createStub" -> {
+            case "fn.createStub_" -> {
                 final var givenStub = (Map<String, Object>) argument.get("stub");
 
                 final var stubCall = givenStub.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
@@ -2816,7 +2816,7 @@ class _Util {
                 stubs.add(0, stub);
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
-            case "fn._verify" -> {
+            case "fn.verify_" -> {
                 final var givenCall = (Map<String, Object>) argument.get("call");
 
                 final var call = givenCall.entrySet().stream().filter(e -> e.getKey().startsWith("fn."))
@@ -2832,19 +2832,19 @@ class _Util {
                         invocations);
                 return new Message(Map.of(), verificationResult);
             }
-            case "fn._verifyNoMoreInteractions" -> {
+            case "fn.verifyNoMoreInteractions_" -> {
                 final var verificationResult = verifyNoMoreInteractions(invocations);
                 return new Message(Map.of(), verificationResult);
             }
-            case "fn._clearCalls" -> {
+            case "fn.clearCalls_" -> {
                 invocations.clear();
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
-            case "fn._clearStubs" -> {
+            case "fn.clearStubs_" -> {
                 stubs.clear();
                 return new Message(Map.of(), Map.of("Ok", Map.of()));
             }
-            case "fn._setRandomSeed" -> {
+            case "fn.setRandomSeed_" -> {
                 final var givenSeed = (Integer) argument.get("seed");
 
                 random.setSeed(givenSeed);
@@ -2891,7 +2891,7 @@ class _Util {
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return new Message(Map.of(), Map.of("_ErrorNoMatchingStub", Map.of()));
+                    return new Message(Map.of(), Map.of("ErrorNoMatchingStub_", Map.of()));
                 }
 
                 if (definition != null) {

@@ -19,8 +19,8 @@ _ARRAY_NAME = "Array"
 _BOOLEAN_NAME = "Boolean"
 _FN_NAME = "Object"
 _INTEGER_NAME = "Integer"
-_MOCK_CALL_NAME = "_ext._Call"
-_MOCK_STUB_NAME = "_ext._Stub"
+_MOCK_CALL_NAME = "_ext.Call_"
+_MOCK_STUB_NAME = "_ext.Stub_"
 _NUMBER_NAME = "Number"
 _OBJECT_NAME = "Object"
 _STRING_NAME = "String"
@@ -2268,7 +2268,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
     function_name: str = request_message.get_body_target()
     argument: Dict[str, Any] = request_message.get_body_payload()
 
-    if function_name == "fn._createStub":
+    if function_name == "fn.createStub_":
         given_stub: Dict[str, Any] = argument["stub"]
 
         stub_call_key, stub_call_value = next(
@@ -2286,7 +2286,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
         stubs.insert(0, stub)
         return types.Message({}, {"Ok": {}})
 
-    elif function_name == "fn._verify":
+    elif function_name == "fn.verify_":
         given_call: Dict[str, Any] = argument["call"]
 
         call_key, call_value = next(
@@ -2302,19 +2302,19 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
                                      invocations)
         return types.Message({}, verification_result)
 
-    elif function_name == "fn._verifyNoMoreInteractions":
+    elif function_name == "fn.verifyNoMoreInteractions_":
         verification_result = verify_no_more_interactions(invocations)
         return types.Message({}, verification_result)
 
-    elif function_name == "fn._clearCalls":
+    elif function_name == "fn.clearCalls_":
         invocations.clear()
         return types.Message({}, {"Ok": {}})
 
-    elif function_name == "fn._clearStubs":
+    elif function_name == "fn.clearStubs_":
         stubs.clear()
         return types.Message({}, {"Ok": {}})
 
-    elif function_name == "fn._setRandomSeed":
+    elif function_name == "fn.setRandomSeed_":
         given_seed: int = argument["seed"]
 
         random.set_seed(given_seed)
@@ -2352,7 +2352,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
                         return types.Message({}, result)
 
         if not enable_generated_default_stub and not enable_generation_stub:
-            return types.Message({}, {"_ErrorNoMatchingStub": {}})
+            return types.Message({}, {"ErrorNoMatchingStub_": {}})
 
         if definition is not None:
             result_union = definition.result

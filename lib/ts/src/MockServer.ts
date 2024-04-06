@@ -64,8 +64,8 @@ export class MockServer {
         const parsedTypes: Record<string, _UType> = {};
         const typeExtensions: Record<string, _UType> = {};
 
-        typeExtensions['_ext._Call'] = new _UMockCall(parsedTypes);
-        typeExtensions['_ext._Stub'] = new _UMockStub(parsedTypes);
+        typeExtensions['_ext.Call_'] = new _UMockCall(parsedTypes);
+        typeExtensions['_ext.Stub_'] = new _UMockStub(parsedTypes);
 
         const combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(), typeExtensions);
 

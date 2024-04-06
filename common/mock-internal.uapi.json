@@ -1,15 +1,15 @@
 [
     {
         "///": " A stubbed result for matching input. ",
-        "_ext._Stub": {}
+        "_ext.Stub_": {}
     },
     {
         "///": " A call of a function. ",
-        "_ext._Call": {}
+        "_ext.Call_": {}
     },
     {
         "///": " The number of times a function is allowed to be called. ",
-        "union._CallCountCriteria": {
+        "union.CallCountCriteria_": {
             "Exact": {
                 "times": ["integer"]
             },
@@ -22,17 +22,17 @@
         }
     },
     {
-        "///": " An unioneration of possible causes for a mock verification to fail. ",
-        "union._VerificationFailure": {
+        "///": " Possible causes for a mock verification to fail. ",
+        "union.VerificationFailure_": {
             "TooFewMatchingCalls": {
-                "wanted": ["union._CallCountCriteria"],
+                "wanted": ["union.CallCountCriteria_"],
                 "found": ["integer"],
-                "allCalls": ["array", ["_ext._Call"]]
+                "allCalls": ["array", ["_ext.Call_"]]
             },
             "TooManyMatchingCalls": {
-                "wanted": ["union._CallCountCriteria"],
+                "wanted": ["union.CallCountCriteria_"],
                 "found": ["integer"],
-                "allCalls": ["array", ["_ext._Call"]]
+                "allCalls": ["array", ["_ext.Call_"]]
             }
         }
     },
@@ -49,8 +49,8 @@
             " `stub` result, and the server will generate the necessary data required to make the `result` pass on     ",
             " response validation.                                                                                     "
         ],
-        "fn._createStub": {
-            "stub": ["_ext._Stub"],
+        "fn.createStub_": {
+            "stub": ["_ext.Stub_"],
             "strictMatch!": ["boolean"],
             "count!": ["integer"]
         },
@@ -65,15 +65,15 @@
             " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
             " match calls where the given `call` argument is Exactly a json sub-structure of the actual argument.    "
         ],
-        "fn._verify": {
-            "call": ["_ext._Call"],
+        "fn.verify_": {
+            "call": ["_ext.Call_"],
             "strictMatch!": ["boolean"],
-            "count!": ["union._CallCountCriteria"]
+            "count!": ["union.CallCountCriteria_"]
         },
         "->": {
             "Ok": {},
             "ErrorVerificationFailure": {
-                "reason": ["union._VerificationFailure"]
+                "reason": ["union.VerificationFailure_"]
             }
         },
         "errors": "^errors\\.Validated_$"
@@ -83,25 +83,25 @@
             " Verify that no interactions have occurred with this mock or that all ",
             " interactions have been verified.                                     "
         ],
-        "fn._verifyNoMoreInteractions": {},
+        "fn.verifyNoMoreInteractions_": {},
         "->": {
             "Ok": {},
             "ErrorVerificationFailure": {
-                "additionalUnverifiedCalls": ["array", ["_ext._Call"]]
+                "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
             }
         },
         "errors": "^errors\\.Validated_$"
     },
     {
         "///": " Clear all stub conditions. ",
-        "fn._clearStubs": {},
+        "fn.clearStubs_": {},
         "->": {
             "Ok": {}
         }
     },
     {
         "///": " Clear all call data. ",
-        "fn._clearCalls": {},
+        "fn.clearCalls_": {},
         "->": {
             "Ok": {}
         },
@@ -109,7 +109,7 @@
     },
     {
         "///": " Set the seed of the random generator. ",
-        "fn._setRandomSeed": {
+        "fn.setRandomSeed_": {
             "seed": ["integer"]
         },
         "->": {
@@ -119,13 +119,13 @@
     },
     {
         "///": [
-            " If random generation is disabled, functions may return a `_ErrorNoMatchingStub`  ",
+            " If random generation is disabled, functions may return a `ErrorNoMatchingStub_`  ",
             " error, indicating that the mock could not return a result for that function call ",
             " due to no matching stub being available.                                         "
         ],
-        "errors._Mockable": {
+        "errors.Mockable_": {
             "->": {
-                "_ErrorNoMatchingStub": {}
+                "ErrorNoMatchingStub_": {}
             }
         }
     }
