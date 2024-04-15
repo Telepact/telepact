@@ -93,13 +93,13 @@ export function asMap(object: any): Record<string, any> {
 export function offsetSchemaIndex(
     initialFailures: _SchemaParseFailure[],
     offset: number,
-    schemaKeysToIndex: Record<string, number>
+    schemaKeysToIndex: Record<string, number>,
 ): _SchemaParseFailure[] {
     const finalList: _SchemaParseFailure[] = [];
 
     const indexToSchemaKey = Object.entries(schemaKeysToIndex).reduce(
         (m, [k, v]) => m.set(v, k),
-        new Map<number, string>()
+        new Map<number, string>(),
     );
 
     for (const f of initialFailures) {
@@ -150,7 +150,7 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
                     actual: matches.length,
                     expected: 1,
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -158,9 +158,7 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
 
 export function findMatchingSchemaKey(schemaKeys: Set<string>, schemaKey: string): string | null {
     for (const k of schemaKeys) {
-        const splitK = k.split('.')[1];
-        const splitSchemaKey = schemaKey.split('.')[1];
-        if (splitK === splitSchemaKey) {
+        if (k === schemaKey) {
             return k;
         }
     }
@@ -197,7 +195,7 @@ export function parseTypeDeclaration(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UTypeDeclaration {
     if (typeDeclarationArray.length === 0) {
         throw new UApiSchemaParseError([new _SchemaParseFailure(path, 'EmptyArrayDisallowed', {}, null)]);
@@ -226,7 +224,7 @@ export function parseTypeDeclaration(
                 {
                     regex: regexString,
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -243,7 +241,7 @@ export function parseTypeDeclaration(
         parsedTypes,
         typeExtensions,
         allParseFailures,
-        failedTypes
+        failedTypes,
     );
 
     if (type instanceof _UGeneric && nullable) {
@@ -254,7 +252,7 @@ export function parseTypeDeclaration(
                 {
                     regex: '^(.+?)[^\\?]$',
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -269,7 +267,7 @@ export function parseTypeDeclaration(
                     actual: typeDeclarationArray.length,
                     expected: type.getTypeParameterCount() + 1,
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -304,7 +302,7 @@ export function parseTypeDeclaration(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
 
             typeParameters.push(typeParameterTypeDeclaration);
@@ -333,7 +331,7 @@ export function getOrParseType(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UType {
     if (failedTypes.has(typeName)) {
         throw new UApiSchemaParseError([]);
@@ -348,7 +346,7 @@ export function getOrParseType(
     if (thisTypeParameterCount > 0) {
         genericRegex = `|(T.([%s]))`.replace(
             '%s',
-            thisTypeParameterCount > 1 ? '0-%d'.replace('%d', String(thisTypeParameterCount - 1)) : '0'
+            thisTypeParameterCount > 1 ? '0-%d'.replace('%d', String(thisTypeParameterCount - 1)) : '0',
         );
     } else {
         genericRegex = '';
@@ -357,7 +355,7 @@ export function getOrParseType(
     const regexString =
         `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$`.replace(
             '%s',
-            genericRegex
+            genericRegex,
         );
     const regex = new RegExp(regexString);
 
@@ -370,7 +368,7 @@ export function getOrParseType(
                 {
                     regex: regexString,
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -414,7 +412,7 @@ export function getOrParseType(
                 {
                     name: customTypeName,
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -437,7 +435,7 @@ export function getOrParseType(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
         } else if (customTypeName.startsWith('union')) {
             type = parseUnionType(
@@ -452,7 +450,7 @@ export function getOrParseType(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
         } else if (customTypeName.startsWith('fn')) {
             type = parseFunctionType(
@@ -464,7 +462,7 @@ export function getOrParseType(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
         } else {
             type = typeExtensions[customTypeName];
@@ -476,7 +474,7 @@ export function getOrParseType(
                         {
                             name: customTypeName,
                         },
-                        null
+                        null,
                     ),
                 ]);
             }
@@ -507,7 +505,7 @@ export function parseStructType(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UStruct {
     const parseFailures: _SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
@@ -544,7 +542,7 @@ export function parseStructType(
         parsedTypes,
         typeExtensions,
         allParseFailures,
-        failedTypes
+        failedTypes,
     );
     return new _UStruct(schemaKey, fields, typeParameterCount);
 }
@@ -561,7 +559,7 @@ export function parseUnionType(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UUnion {
     const parseFailures: _SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(unionDefinitionAsPseudoJson));
@@ -611,8 +609,8 @@ export function parseUnionType(
                     {
                         regex: regexString,
                     },
-                    null
-                )
+                    null,
+                ),
             );
             continue;
         }
@@ -635,7 +633,7 @@ export function parseUnionType(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
@@ -663,7 +661,7 @@ export function parseStructFields(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): Record<string, _UFieldDeclaration> {
     const parseFailures: _SchemaParseFailure[] = [];
     const fields: Record<string, _UFieldDeclaration> = {};
@@ -682,8 +680,8 @@ export function parseStructFields(
                         {
                             other: finalOtherPath,
                         },
-                        null
-                    )
+                        null,
+                    ),
                 );
             }
         }
@@ -700,7 +698,7 @@ export function parseStructFields(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
             const fieldName = parsedField.fieldName;
             fields[fieldName] = parsedField;
@@ -728,7 +726,7 @@ export function parseField(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UFieldDeclaration {
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regex = new RegExp(regexString);
@@ -743,7 +741,7 @@ export function parseField(
                 {
                     regex: regexString,
                 },
-                null
+                null,
             ),
         ]);
     }
@@ -768,7 +766,7 @@ export function parseField(
         parsedTypes,
         typeExtensions,
         allParseFailures,
-        failedTypes
+        failedTypes,
     );
 
     return { fieldName, typeDeclaration, optional };
@@ -777,7 +775,7 @@ export function parseField(
 export function applyErrorToParsedTypes(
     error: _UError,
     parsedTypes: Record<string, _UType>,
-    schemaKeysToIndex: Record<string, number>
+    schemaKeysToIndex: Record<string, number>,
 ): void {
     const errorName = error.name;
     const errorIndex = schemaKeysToIndex[errorName];
@@ -813,8 +811,8 @@ export function applyErrorToParsedTypes(
                         {
                             other: [otherPathIndex, '->', newKey],
                         },
-                        null
-                    )
+                        null,
+                    ),
                 );
             }
             fnResultCases[newKey] = errorResultField;
@@ -834,7 +832,7 @@ export function parseErrorType(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UError {
     const index = schemaKeysToIndex[schemaKey];
     const basePath = [index];
@@ -870,7 +868,7 @@ export function parseErrorType(
         parsedTypes,
         typeExtensions,
         allParseFailures,
-        failedTypes
+        failedTypes,
     );
 
     return { name: schemaKey, errors: error };
@@ -884,7 +882,7 @@ export function parseHeadersType(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UHeaders {
     const index = schemaKeysToIndex[schemaKey];
     const path = [index];
@@ -905,7 +903,7 @@ export function parseHeadersType(
             parsedTypes,
             typeExtensions,
             allParseFailures,
-            failedTypes
+            failedTypes,
         );
         for (const key in requestHeadersStruct.fields) {
             const field = requestHeadersStruct.fields[key];
@@ -919,8 +917,8 @@ export function parseHeadersType(
                         {
                             regex: regexString,
                         },
-                        null
-                    )
+                        null,
+                    ),
                 );
             }
         }
@@ -951,7 +949,7 @@ export function parseHeadersType(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
             for (const key in responseHeadersStruct.fields) {
                 const field = responseHeadersStruct.fields[key];
@@ -965,8 +963,8 @@ export function parseHeadersType(
                             {
                                 regex: regexString,
                             },
-                            null
-                        )
+                            null,
+                        ),
                     );
                 }
             }
@@ -995,7 +993,7 @@ export function parseFunctionType(
     parsedTypes: Record<string, _UType>,
     typeExtensions: Record<string, _UType>,
     allParseFailures: _SchemaParseFailure[],
-    failedTypes: Set<string>
+    failedTypes: Set<string>,
 ): _UFn {
     const parseFailures: _SchemaParseFailure[] = [];
     const typeParameterCount = 0;
@@ -1013,7 +1011,7 @@ export function parseFunctionType(
             parsedTypes,
             typeExtensions,
             allParseFailures,
-            failedTypes
+            failedTypes,
         );
         callType = new _UUnion(schemaKey, { [schemaKey]: argType }, typeParameterCount);
     } catch (e) {
@@ -1044,7 +1042,7 @@ export function parseFunctionType(
                 parsedTypes,
                 typeExtensions,
                 allParseFailures,
-                failedTypes
+                failedTypes,
             );
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
@@ -1104,7 +1102,7 @@ export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<str
 export function extendUApiSchema(
     first: UApiSchema,
     secondUApiSchemaJson: string,
-    secondTypeExtensions: Record<string, _UType>
+    secondTypeExtensions: Record<string, _UType>,
 ): UApiSchema {
     let secondUApiSchemaPseudoJsonInit: any;
     try {
@@ -1120,7 +1118,7 @@ export function extendUApiSchema(
         const thisParseFailure: _SchemaParseFailure[] = getTypeUnexpectedParseFailure(
             [],
             secondUApiSchemaPseudoJsonInit,
-            'Array'
+            'Array',
         );
         throw new UApiSchemaParseError(thisParseFailure, e as Error);
     }
@@ -1141,7 +1139,7 @@ export function extendUApiSchema(
 export function parseUApiSchema(
     uApiSchemaPseudoJson: any[],
     typeExtensions: Record<string, _UType>,
-    pathOffset: number
+    pathOffset: number,
 ): UApiSchema {
     const parsedTypes: Record<string, _UType> = {};
     const parseFailures: _SchemaParseFailure[] = [];
@@ -1190,8 +1188,8 @@ export function parseUApiSchema(
                         {
                             other: [otherPathIndex, matchingSchemaKey],
                         },
-                        null
-                    )
+                        null,
+                    ),
                 );
             }
             continue;
@@ -1233,7 +1231,7 @@ export function parseUApiSchema(
                 parsedTypes,
                 typeExtensions,
                 parseFailures,
-                failedTypes
+                failedTypes,
             );
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
@@ -1262,7 +1260,7 @@ export function parseUApiSchema(
                 parsedTypes,
                 typeExtensions,
                 parseFailures,
-                failedTypes
+                failedTypes,
             );
             applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
         } catch (e) {
@@ -1290,7 +1288,7 @@ export function parseUApiSchema(
                 parsedTypes,
                 typeExtensions,
                 parseFailures,
-                failedTypes
+                failedTypes,
             );
             Object.assign(requestHeaders, headersType.requestHeaders);
             Object.assign(responseHeaders, headersType.responseHeaders);
@@ -1630,7 +1628,7 @@ export function serverBinaryDecode(message: any[], binaryEncoder: _BinaryEncodin
 export function clientBinaryEncode(
     message: any[],
     recentBinaryEncoders: Map<number, _BinaryEncoding>,
-    binaryChecksumStrategy: ClientBinaryStrategy
+    binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
     const headers = message[0] as Record<string, any>;
     const messageBody = message[1] as Record<string, any>;
@@ -1667,7 +1665,7 @@ export function clientBinaryEncode(
 export function clientBinaryDecode(
     message: any[],
     recentBinaryEncoders: Map<number, _BinaryEncoding>,
-    binaryChecksumStrategy: ClientBinaryStrategy
+    binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
     const headers = message[0] as Map<string, any>;
     const encodedMessageBody = message[1] as Map<any, any>;
@@ -1850,7 +1848,7 @@ export function serialize(message: Message, binaryEncoder: _BinaryEncoder, seria
 export function deserialize(
     messageBytes: Uint8Array,
     serializer: SerializationImpl,
-    binaryEncoder: _BinaryEncoder
+    binaryEncoder: _BinaryEncoder,
 ): Message {
     let messageAsPseudoJson: any;
     let isMsgPack: boolean;
@@ -1936,7 +1934,7 @@ export function getType(value: any): string {
 export function getTypeUnexpectedValidationFailure(
     path: any[],
     value: any,
-    expectedType: string
+    expectedType: string,
 ): _ValidationFailure[] {
     const actualType = getType(value);
     const data = {
@@ -1949,7 +1947,7 @@ export function getTypeUnexpectedValidationFailure(
 export function validateHeaders(
     headers: { [key: string]: any },
     parsedRequestHeaders: Record<string, _UFieldDeclaration>,
-    functionType: _UFn
+    functionType: _UFn,
 ): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
@@ -1960,7 +1958,7 @@ export function validateHeaders(
                 headerValue,
                 undefined,
                 functionType.name,
-                []
+                [],
             );
             const thisValidationFailuresPath: _ValidationFailure[] = thisValidationFailures.map((e) => {
                 return {
@@ -1983,7 +1981,7 @@ export function validateValueOfType(
     generics: _UTypeDeclaration[],
     thisType: _UType,
     nullable: boolean,
-    typeParameters: _UTypeDeclaration[]
+    typeParameters: _UTypeDeclaration[],
 ): _ValidationFailure[] {
     if (value === null || value === undefined) {
         const isNullable = thisType instanceof _UGeneric ? generics[thisType.index]!.nullable : nullable;
@@ -2006,7 +2004,7 @@ export function generateRandomValueOfType(
     randomGenerator: _RandomGenerator,
     thisType: _UType,
     nullable: boolean,
-    typeParameters: _UTypeDeclaration[]
+    typeParameters: _UTypeDeclaration[],
 ): any {
     if (nullable && !useBlueprintValue && randomGenerator.nextBoolean()) {
         return null;
@@ -2018,7 +2016,7 @@ export function generateRandomValueOfType(
             randomizeOptionalFields,
             typeParameters,
             generics,
-            randomGenerator
+            randomGenerator,
         );
     }
 }
@@ -2045,7 +2043,7 @@ export function validateBoolean(value: any): _ValidationFailure[] {
 export function generateRandomBoolean(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): any {
     if (useBlueprintValue) {
         return blueprintValue;
@@ -2073,7 +2071,7 @@ export function validateInteger(value: any): _ValidationFailure[] {
 export function generateRandomInteger(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): any {
     if (useBlueprintValue) {
         return blueprintValue;
@@ -2099,7 +2097,7 @@ export function validateNumber(value: any): Array<_ValidationFailure> {
 export function generateRandomNumber(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): any {
     if (useBlueprintValue) {
         return blueprintValue;
@@ -2119,7 +2117,7 @@ export function validateString(value: any): Array<_ValidationFailure> {
 export function generateRandomString(
     blueprintValue: any,
     useBlueprintValue: boolean,
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): any {
     if (useBlueprintValue) {
         return blueprintValue;
@@ -2133,7 +2131,7 @@ export function validateArray(
     select: Record<string, any> | undefined,
     fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>,
-    generics: Array<_UTypeDeclaration>
+    generics: Array<_UTypeDeclaration>,
 ): Array<_ValidationFailure> {
     if (Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0]!;
@@ -2165,7 +2163,7 @@ export function generateRandomArray(
     randomizeOptionalFields: boolean,
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>,
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): any {
     const nestedTypeDeclaration = typeParameters[0]!;
     if (useBlueprintValue) {
@@ -2178,7 +2176,7 @@ export function generateRandomArray(
                 includeOptionalFields,
                 randomizeOptionalFields,
                 generics,
-                randomGenerator
+                randomGenerator,
             );
             array.push(value);
         }
@@ -2193,7 +2191,7 @@ export function generateRandomArray(
                 includeOptionalFields,
                 randomizeOptionalFields,
                 generics,
-                randomGenerator
+                randomGenerator,
             );
             array.push(value);
         }
@@ -2206,7 +2204,7 @@ export function validateObject(
     select: Record<string, any> | undefined,
     fn: string | undefined,
     typeParameters: Array<_UTypeDeclaration>,
-    generics: Array<_UTypeDeclaration>
+    generics: Array<_UTypeDeclaration>,
 ): Array<_ValidationFailure> {
     if (typeof value === 'object' && !Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0]!;
@@ -2236,7 +2234,7 @@ export function generateRandomObject(
     randomizeOptionalFields: boolean,
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>,
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): any {
     const nestedTypeDeclaration = typeParameters[0]!;
     if (useBlueprintValue) {
@@ -2249,7 +2247,7 @@ export function generateRandomObject(
                 includeOptionalFields,
                 randomizeOptionalFields,
                 generics,
-                randomGenerator
+                randomGenerator,
             );
             obj[key] = value;
         }
@@ -2265,7 +2263,7 @@ export function generateRandomObject(
                 includeOptionalFields,
                 randomizeOptionalFields,
                 generics,
-                randomGenerator
+                randomGenerator,
             );
             obj[key] = value;
         }
@@ -2280,7 +2278,7 @@ export function validateStruct(
     typeParameters: Array<_UTypeDeclaration>,
     generics: Array<_UTypeDeclaration>,
     name: string,
-    fields: Record<string, _UFieldDeclaration>
+    fields: Record<string, _UFieldDeclaration>,
 ): Array<_ValidationFailure> {
     if (typeof value === 'object' && !Array.isArray(value)) {
         const selectedFields = select?.[name];
@@ -2296,7 +2294,7 @@ export function validateStructFields(
     actualStruct: Record<string, any>,
     select: Record<string, any> | undefined,
     fn: string | undefined,
-    typeParameters: Array<_UTypeDeclaration>
+    typeParameters: Array<_UTypeDeclaration>,
 ): Array<_ValidationFailure> {
     const validationFailures: Array<_ValidationFailure> = [];
     const missingFields: Array<string> = [];
@@ -2311,7 +2309,7 @@ export function validateStructFields(
         const validationFailure: _ValidationFailure = new _ValidationFailure(
             [missingField],
             'RequiredObjectKeyMissing',
-            {}
+            {},
         );
         validationFailures.push(validationFailure);
     }
@@ -2321,7 +2319,7 @@ export function validateStructFields(
             const validationFailure: _ValidationFailure = new _ValidationFailure(
                 [fieldName],
                 'ObjectKeyDisallowed',
-                {}
+                {},
             );
             validationFailures.push(validationFailure);
             continue;
@@ -2349,7 +2347,7 @@ export function generateRandomStruct(
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     randomGenerator: _RandomGenerator,
-    fields: Record<string, _UFieldDeclaration>
+    fields: Record<string, _UFieldDeclaration>,
 ): any {
     if (useBlueprintValue) {
         const startingStructValue = blueprintValue as Record<string, any>;
@@ -2359,7 +2357,7 @@ export function generateRandomStruct(
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            randomGenerator
+            randomGenerator,
         );
     } else {
         return constructRandomStruct(
@@ -2368,7 +2366,7 @@ export function generateRandomStruct(
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            randomGenerator
+            randomGenerator,
         );
     }
 }
@@ -2379,7 +2377,7 @@ export function constructRandomStruct(
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
     typeParameters: _UTypeDeclaration[],
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): Record<string, any> {
     const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => {
         const a = e1[0];
@@ -2411,7 +2409,7 @@ export function constructRandomStruct(
                 includeOptionalFields,
                 randomizeOptionalFields,
                 typeParameters,
-                randomGenerator
+                randomGenerator,
             );
         } else {
             if (!fieldDeclaration.optional) {
@@ -2421,7 +2419,7 @@ export function constructRandomStruct(
                     includeOptionalFields,
                     randomizeOptionalFields,
                     typeParameters,
-                    randomGenerator
+                    randomGenerator,
                 );
             } else {
                 if (!includeOptionalFields || (randomizeOptionalFields && randomGenerator.nextBoolean())) {
@@ -2433,7 +2431,7 @@ export function constructRandomStruct(
                     includeOptionalFields,
                     randomizeOptionalFields,
                     typeParameters,
-                    randomGenerator
+                    randomGenerator,
                 );
             }
         }
@@ -2459,7 +2457,7 @@ export function validateUnion(
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     name: string,
-    cases: Record<string, _UStruct>
+    cases: Record<string, _UStruct>,
 ): _ValidationFailure[] {
     if (typeof value == 'object' && !Array.isArray(value)) {
         let selectedCases: Record<string, any> | undefined;
@@ -2480,7 +2478,7 @@ export function validateUnionCases(
     actual: Record<string, any>,
     select: Record<string, any> | undefined,
     fn: string | undefined,
-    typeParameters: _UTypeDeclaration[]
+    typeParameters: _UTypeDeclaration[],
 ): _ValidationFailure[] {
     const size = Object.keys(actual).length;
     if (size !== 1) {
@@ -2516,7 +2514,7 @@ export function validateUnionCases(
             selectedCases,
             select,
             fn,
-            typeParameters
+            typeParameters,
         );
 
         return nestedValidationFailures.map((f) => ({
@@ -2536,7 +2534,7 @@ export function validateUnionStruct(
     selectedCases: Record<string, any> | undefined,
     select: Record<string, any> | undefined,
     fn: string | undefined,
-    typeParameters: _UTypeDeclaration[]
+    typeParameters: _UTypeDeclaration[],
 ): _ValidationFailure[] {
     const selectedFields = selectedCases?.[unionCase];
     return validateStructFields(unionStruct.fields, selectedFields, actual, select, fn, typeParameters);
@@ -2550,7 +2548,7 @@ export function generateRandomUnion(
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     randomGenerator: _RandomGenerator,
-    cases: Record<string, _UStruct>
+    cases: Record<string, _UStruct>,
 ): any {
     if (useBlueprintValue) {
         const startingUnionCase = blueprintValue as Map<string, any>;
@@ -2560,7 +2558,7 @@ export function generateRandomUnion(
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            randomGenerator
+            randomGenerator,
         );
     } else {
         return constructRandomUnion(
@@ -2569,7 +2567,7 @@ export function generateRandomUnion(
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            randomGenerator
+            randomGenerator,
         );
     }
 }
@@ -2580,7 +2578,7 @@ export function constructRandomUnion(
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
     typeParameters: _UTypeDeclaration[],
-    randomGenerator: _RandomGenerator
+    randomGenerator: _RandomGenerator,
 ): Record<string, any> {
     if (Object.keys(startingUnion).length !== 0) {
         const entry = unionEntry(startingUnion);
@@ -2596,13 +2594,13 @@ export function constructRandomUnion(
                     includeOptionalFields,
                     randomizeOptionalFields,
                     typeParameters,
-                    randomGenerator
+                    randomGenerator,
                 ),
             };
         }
     } else {
         const sortedUnionCasesReference = Array.from(Object.entries(unionCasesReference)).sort((e1, e2) =>
-            e1[0].localeCompare(e2[0])
+            e1[0].localeCompare(e2[0]),
         );
         const randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.length - 1);
         const unionEntry = sortedUnionCasesReference[randomIndex];
@@ -2616,7 +2614,7 @@ export function constructRandomUnion(
                 includeOptionalFields,
                 randomizeOptionalFields,
                 typeParameters,
-                randomGenerator
+                randomGenerator,
             ),
         };
     }
@@ -2630,7 +2628,7 @@ export function generateRandomFn(
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
     randomGenerator: _RandomGenerator,
-    callCases: Record<string, _UStruct>
+    callCases: Record<string, _UStruct>,
 ): any {
     if (useBlueprintValue) {
         const startingFnValue = blueprintValue as Record<string, any>;
@@ -2640,7 +2638,7 @@ export function generateRandomFn(
             includeOptionalFields,
             randomizeOptionalFields,
             [],
-            randomGenerator
+            randomGenerator,
         );
     } else {
         return constructRandomUnion(callCases, {}, includeOptionalFields, randomizeOptionalFields, [], randomGenerator);
@@ -2653,7 +2651,7 @@ export function validateSelect(
     fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
-    types: Record<string, _UType>
+    types: Record<string, _UType>,
 ): _ValidationFailure[] {
     let selectStructFieldsHeader: Record<string, any>;
     try {
@@ -2697,7 +2695,7 @@ export function validateSelect(
                 const nestedValidationFailures = validateSelectStruct(
                     structRef,
                     [typeName, unionCase],
-                    selectedCaseStructFields
+                    selectedCaseStructFields,
                 );
                 validationFailures.push(...nestedValidationFailures);
             }
@@ -2721,7 +2719,7 @@ export function validateSelect(
 export function validateSelectStruct(
     structReference: _UStruct,
     basePath: Array<string | number>,
-    selectedFields: any
+    selectedFields: any,
 ): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
@@ -2757,7 +2755,7 @@ export function validateMockCall(
     fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
-    types: Record<string, _UType>
+    types: Record<string, _UType>,
 ): _ValidationFailure[] {
     let givenMap: Record<string, any>;
     try {
@@ -2810,7 +2808,7 @@ export function validateMockStub(
     fn: string | undefined,
     typeParameters: _UTypeDeclaration[],
     generics: _UTypeDeclaration[],
-    types: Record<string, _UType>
+    types: Record<string, _UType>,
 ): _ValidationFailure[] {
     const validationFailures: _ValidationFailure[] = [];
 
@@ -2858,7 +2856,7 @@ export function validateMockStub(
     }
 
     const inputFailuresWithoutMissingRequired = inputFailuresWithPath.filter(
-        (f) => f.reason !== 'RequiredObjectKeyMissing'
+        (f) => f.reason !== 'RequiredObjectKeyMissing',
     );
 
     validationFailures.push(...inputFailuresWithoutMissingRequired);
@@ -2886,7 +2884,7 @@ export function validateMockStub(
         }
 
         const failuresWithoutMissingRequired = outputFailuresWithPath.filter(
-            (f) => f.reason !== 'RequiredObjectKeyMissing'
+            (f) => f.reason !== 'RequiredObjectKeyMissing',
         );
 
         validationFailures.push(...failuresWithoutMissingRequired);
@@ -2907,7 +2905,7 @@ export function validateMockStub(
 export function selectStructFields(
     typeDeclaration: _UTypeDeclaration,
     value: any,
-    selectedStructFields: Record<string, any>
+    selectedStructFields: Record<string, any>,
 ): any {
     const typeDeclarationType = typeDeclaration.type;
     const typeDeclarationTypeParams = typeDeclaration.typeParameters;
@@ -2926,7 +2924,7 @@ export function selectStructFields(
                 const valueWithSelectedFields = selectStructFields(
                     fieldTypeDeclaration,
                     fieldValue,
-                    selectedStructFields
+                    selectedStructFields,
                 );
 
                 finalMap[fieldName] = valueWithSelectedFields;
@@ -2954,7 +2952,7 @@ export function selectStructFields(
                 const valueWithSelectedFields = selectStructFields(
                     field.typeDeclaration,
                     fieldValue,
-                    selectedStructFields
+                    selectedStructFields,
                 );
 
                 finalMap[fieldName] = valueWithSelectedFields;
@@ -2990,7 +2988,7 @@ export function selectStructFields(
                 const valueWithSelectedFields = selectStructFields(
                     field.typeDeclaration,
                     fieldValue,
-                    selectedStructFields
+                    selectedStructFields,
                 );
                 finalMap[fieldName] = valueWithSelectedFields;
             }
@@ -3006,7 +3004,7 @@ export function selectStructFields(
             const valueWithSelectedFields = selectStructFields(
                 nestedTypeDeclaration,
                 nestedValue,
-                selectedStructFields
+                selectedStructFields,
             );
             finalMap[key] = valueWithSelectedFields;
         }
@@ -3032,7 +3030,7 @@ export function getInvalidErrorMessage(
     error: string,
     validationFailures: _ValidationFailure[],
     resultUnionType: _UUnion,
-    responseHeaders: { [key: string]: any }
+    responseHeaders: { [key: string]: any },
 ): Message {
     const validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
     const newErrorResult = { [error]: { cases: validationFailureCases } };
@@ -3042,7 +3040,7 @@ export function getInvalidErrorMessage(
 }
 
 export function mapValidationFailuresToInvalidFieldCases(
-    argumentValidationFailures: _ValidationFailure[]
+    argumentValidationFailures: _ValidationFailure[],
 ): Record<string, any>[] {
     const validationFailureCases: Record<string, any>[] = [];
     for (const validationFailure of argumentValidationFailures) {
@@ -3062,7 +3060,7 @@ export function validateResult(resultUnionType: _UUnion, errorResult: { [key: st
         console.log(`original error: ${JSON.stringify(errorResult)}`);
         throw new UApiError(
             'Failed internal uAPI validation: ' +
-                JSON.stringify(mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures), null, 2)
+                JSON.stringify(mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures), null, 2),
         );
     }
 }
@@ -3071,7 +3069,7 @@ export async function handleMessage(
     requestMessage: Message,
     uApiSchema: UApiSchema,
     handler: (message: Message) => Promise<Message>,
-    onError: (error: Error) => void
+    onError: (error: Error) => void,
 ): Promise<Message> {
     const responseHeaders: { [key: string]: any } = {};
     const requestHeaders = requestMessage.header;
@@ -3116,14 +3114,14 @@ export async function handleMessage(
     const requestHeaderValidationFailures = validateHeaders(
         requestHeaders,
         uApiSchema.parsedRequestHeaders,
-        functionType
+        functionType,
     );
     if (requestHeaderValidationFailures.length > 0) {
         return getInvalidErrorMessage(
             'ErrorInvalidRequestHeaders_',
             requestHeaderValidationFailures,
             resultUnionType,
-            responseHeaders
+            responseHeaders,
         );
     }
 
@@ -3181,7 +3179,7 @@ export async function handleMessage(
             'ErrorInvalidRequestBody_',
             callValidationFailures,
             resultUnionType,
-            responseHeaders
+            responseHeaders,
         );
     }
 
@@ -3228,21 +3226,21 @@ export async function handleMessage(
                 'ErrorInvalidResponseBody_',
                 resultValidationFailures,
                 resultUnionType,
-                responseHeaders
+                responseHeaders,
             );
         }
 
         const responseHeaderValidationFailures = validateHeaders(
             finalResponseHeaders,
             uApiSchema.parsedResponseHeaders,
-            functionType
+            functionType,
         );
         if (responseHeaderValidationFailures.length > 0) {
             return getInvalidErrorMessage(
                 'ErrorInvalidResponseHeaders_',
                 responseHeaderValidationFailures,
                 resultUnionType,
-                responseHeaders
+                responseHeaders,
             );
         }
     }
@@ -3252,7 +3250,7 @@ export async function handleMessage(
         finalResultUnion = selectStructFields(
             new _UTypeDeclaration(resultUnionType, false, []),
             resultUnion,
-            selectStructFieldsHeader
+            selectStructFieldsHeader,
         );
     } else {
         finalResultUnion = resultUnion;
@@ -3265,7 +3263,7 @@ export function parseRequestMessage(
     requestMessageBytes: Uint8Array,
     serializer: Serializer,
     uApiSchema: UApiSchema,
-    onError: (e: Error) => void
+    onError: (e: Error) => void,
 ): Message {
     try {
         return serializer.deserialize(requestMessageBytes);
@@ -3296,7 +3294,7 @@ export async function processBytes(
     onError: (e: Error) => void,
     onRequest: (m: Message) => void,
     onResponse: (m: Message) => void,
-    handler: (m: Message) => Promise<Message>
+    handler: (m: Message) => Promise<Message>,
 ): Promise<Uint8Array> {
     try {
         const requestMessage = parseRequestMessage(requestMessageBytes, serializer, uApiSchema, onError);
@@ -3395,7 +3393,7 @@ function verify(
     argument: { [key: string]: any },
     exactMatch: boolean,
     verificationTimes: { [key: string]: any },
-    invocations: _MockInvocation[]
+    invocations: _MockInvocation[],
 ): Record<string, any> {
     let matchesFound = 0;
     for (const invocation of invocations) {
@@ -3505,7 +3503,7 @@ export function mockHandle(
     uApiSchema: UApiSchema,
     enableGeneratedDefaultStub: boolean,
     enableOptionalFieldGeneration: boolean,
-    randomizeOptionalFieldGeneration: boolean
+    randomizeOptionalFieldGeneration: boolean,
 ): Message {
     console.log(`enableOptionalFieldGeneration: ${enableOptionalFieldGeneration}`);
     const header = requestMessage.header;
@@ -3587,7 +3585,7 @@ export function mockHandle(
                                 randomizeOptionalFieldGeneration,
                                 [],
                                 [],
-                                random
+                                random,
                             );
                             if (stub.count > 0) {
                                 stub.count -= 1;
@@ -3605,7 +3603,7 @@ export function mockHandle(
                                 randomizeOptionalFieldGeneration,
                                 [],
                                 [],
-                                random
+                                random,
                             );
                             if (stub.count > 0) {
                                 stub.count -= 1;
@@ -3631,7 +3629,7 @@ export function mockHandle(
                     randomizeOptionalFieldGeneration,
                     [],
                     [],
-                    random
+                    random,
                 );
                 return new Message({}, { Ok: randomOkStruct });
             } else {
@@ -3646,7 +3644,7 @@ export async function processRequestObject(
     adapter: (requestMessage: Message, serializer: Serializer) => Promise<Message>,
     serializer: Serializer,
     timeoutMsDefault: number,
-    useBinaryDefault: boolean
+    useBinaryDefault: boolean,
 ): Promise<Message> {
     const header = requestMessage.header;
 

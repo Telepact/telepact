@@ -109,9 +109,7 @@ def find_schema_key(definition: dict[str, Any], index: int) -> str:
 
 def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[str, None]:
     for k in schema_keys:
-        split_k = k.split(".")[1]
-        split_schema_key = schema_key.split(".")[1]
-        if split_k == split_schema_key:
+        if k == schema_key:
             return k
     return None
 

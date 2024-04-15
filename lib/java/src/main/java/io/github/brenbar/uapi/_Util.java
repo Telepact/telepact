@@ -143,9 +143,7 @@ class _Util {
 
     public static String findMatchingSchemaKey(Set<String> schemaKeys, String schemaKey) {
         for (final var k : schemaKeys) {
-            var splitK = k.split("\\.")[1];
-            var splitSchemaKey = schemaKey.split("\\.")[1];
-            if (Objects.equals(splitK, splitSchemaKey)) {
+            if (Objects.equals(k, schemaKey)) {
                 return k;
             }
         }
