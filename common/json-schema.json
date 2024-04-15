@@ -207,22 +207,15 @@
         "additionalProperties": false,
         "minProperties": 1,
         "patternProperties": {
-          "^error\\.[a-zA-Z_]\\w*": {
+          "^errors\\.[a-zA-Z_]\\w*": {
             "type": "object",
-            "maxProperties": 1,
-            "required": ["->"],
-            "properties": {
-              "->": {
+            "patternProperties": {
+              "^[a-zA-Z_]\\w*?$": {
                 "type": "object",
+                "additionalProperties": false,
                 "patternProperties": {
-                  "^[a-zA-Z_]\\w*?$": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "patternProperties": {
-                      "^[a-zA-Z_]\\w*!?$": {
-                        "$ref": "#/$defs/typeDeclaration"
-                      }
-                    }
+                  "^[a-zA-Z_]\\w*!?$": {
+                    "$ref": "#/$defs/typeDeclaration"
                   }
                 }
               }
