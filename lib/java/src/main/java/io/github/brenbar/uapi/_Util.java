@@ -801,6 +801,44 @@ class _Util {
         return new _UFn(schemaKey, callType, resultType, errorsRegex);
     }
 
+    static void catchHeaderCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> headerIndices) {
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+
+        final var indices = headerIndices.stream().sorted().toList();
+
+        for (var i = 0; i < indices.size(); i += 1) {
+            for (var j = i + 1; j < indices.size(); j += 1) {
+                final var index = indices.get(i);
+                final var otherIndex = indices.get(j);
+
+                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
+                final var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
+
+                final var reqDef = (Map<String, Object>) def.get("headers");
+                final var otherReqDef = (Map<String, Object>) otherDef.get("headers");
+
+                for (final var key : reqDef.keySet()) {
+                    if (otherReqDef.containsKey(key)) {
+                        parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "headers", key), "PathCollision", Map.of("other", List.of(index, "headers", key)), "headers"));
+                    }
+                }
+                
+                final var resDef = (Map<String, Object>) def.get("->");
+                final var otherResDef = (Map<String, Object>) otherDef.get("->");
+
+                for (final var key : resDef.keySet()) {
+                    if (otherResDef.containsKey(key)) {
+                        parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "->", key), "PathCollision", Map.of("other", List.of(index, "->", key)), "headers"));
+                    }
+                }
+            }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
+    }
+
     static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
         final var objectMapper = new ObjectMapper();
 
@@ -983,6 +1021,12 @@ class _Util {
                 parseFailures.addAll(e.schemaParseFailures);
             }
         }
+
+        try {
+            catchHeaderCollisions(uApiSchemaPseudoJson, headerIndices);
+        } catch (UApiSchemaParseError e) {
+            parseFailures.addAll(e.schemaParseFailures);
+        }        
 
         if (!parseFailures.isEmpty()) {
             final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
