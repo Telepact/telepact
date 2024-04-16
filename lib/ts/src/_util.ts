@@ -1092,6 +1092,105 @@ export function parseFunctionType(
     return new _UFn(schemaKey, callType!, resultType!, errorsRegex);
 }
 
+function catchHeaderCollisions(uApiSchemaPseudoJson: object[], headerIndices: Set<number>): void {
+    const parseFailures: _SchemaParseFailure[] = [];
+
+    const indices = Array.from(headerIndices).sort();
+
+    for (let i = 0; i < indices.length; i++) {
+        for (let j = i + 1; j < indices.length; j++) {
+            const index = indices[i];
+            const otherIndex = indices[j];
+
+            const def = uApiSchemaPseudoJson[index] as Record<string, any>;
+            const otherDef = uApiSchemaPseudoJson[otherIndex] as Record<string, any>;
+
+            const reqDef = def.headers;
+            const otherReqDef = otherDef.headers;
+
+            for (const key in reqDef) {
+                if (otherReqDef.hasOwnProperty(key)) {
+                    parseFailures.push({
+                        path: [otherIndex, 'headers', key],
+                        reason: 'PathCollision',
+                        data: { other: [index, 'headers', key] },
+                        key: 'headers',
+                    });
+                }
+            }
+
+            const resDef = def['->'] as object;
+            const otherResDef = otherDef['->'] as object;
+
+            for (const key in resDef) {
+                if (otherResDef.hasOwnProperty(key)) {
+                    parseFailures.push({
+                        path: [otherIndex, '->', key],
+                        reason: 'PathCollision',
+                        data: { other: [index, '->', key] },
+                        key: 'headers',
+                    });
+                }
+            }
+        }
+    }
+
+    if (parseFailures.length !== 0) {
+        throw new UApiSchemaParseError(parseFailures);
+    }
+}
+
+function catchErrorCollisions(
+    uApiSchemaPseudoJson: object[],
+    errorKeys: Set<string>,
+    keysToIndex: Record<string, number>,
+): void {
+    const parseFailures: _SchemaParseFailure[] = [];
+
+    const indexToSchemaKey = new Map<number, string>();
+    for (const [key, value] of Object.entries(keysToIndex)) {
+        indexToSchemaKey.set(value, key);
+    }
+
+    const indices = Array.from(errorKeys)
+        .map((k) => keysToIndex[k])
+        .filter((index) => index !== undefined)
+        .sort() as number[];
+
+    for (let i = 0; i < indices.length; i++) {
+        for (let j = i + 1; j < indices.length; j++) {
+            const index = indices[i];
+            const otherIndex = indices[j];
+
+            const def = uApiSchemaPseudoJson[index] as { [key: string]: object };
+            const otherDef = uApiSchemaPseudoJson[otherIndex] as { [key: string]: object };
+
+            const key = indexToSchemaKey.get(index);
+            const otherKey = indexToSchemaKey.get(otherIndex);
+
+            const errDef = def[key] as { [key: string]: object };
+            const otherErrDef = otherDef[otherKey] as { [key: string]: object };
+
+            for (const key2 in errDef) {
+                if (Object.prototype.hasOwnProperty.call(errDef, key2)) {
+                    if (otherErrDef.hasOwnProperty(key2)) {
+                        parseFailures.push({
+                            path: [otherIndex, otherKey, key2],
+                            reason: 'PathCollision',
+                            data: { other: [index, key, key2] },
+                            key: otherKey,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    if (parseFailures.length !== 0) {
+        throw new UApiSchemaParseError(parseFailures);
+    }
+}
+
 export function newUApiSchema(uApiSchemaJson: string, typeExtensions: Record<string, _UType>): UApiSchema {
     let uApiSchemaPseudoJsonInit: any;
     try {
@@ -1265,56 +1364,76 @@ export function parseUApiSchema(
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
-    for (const errorKey of errorKeys) {
-        const thisIndex: number = schemaKeysToIndex[errorKey]!;
-        const def = uApiSchemaPseudoJson[thisIndex] as Map<string, any>;
+    try {
+        catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex);
 
-        try {
-            const error = parseErrorType(
-                def,
-                errorKey,
-                uApiSchemaPseudoJson,
-                schemaKeysToIndex,
-                parsedTypes,
-                typeExtensions,
-                parseFailures,
-                failedTypes,
-            );
-            applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
-        } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
-                parseFailures.push(...e.schemaParseFailures);
-            } else {
-                throw e;
+        for (const errorKey of errorKeys) {
+            const thisIndex: number = schemaKeysToIndex[errorKey]!;
+            const def = uApiSchemaPseudoJson[thisIndex] as Map<string, any>;
+
+            try {
+                const error = parseErrorType(
+                    def,
+                    errorKey,
+                    uApiSchemaPseudoJson,
+                    schemaKeysToIndex,
+                    parsedTypes,
+                    typeExtensions,
+                    parseFailures,
+                    failedTypes,
+                );
+                applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
+            } catch (e) {
+                if (e instanceof UApiSchemaParseError) {
+                    parseFailures.push(...e.schemaParseFailures);
+                } else {
+                    throw e;
+                }
             }
+        }
+    } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
+            parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
     }
 
     const requestHeaders: Record<string, _UFieldDeclaration> = {};
     const responseHeaders: Record<string, _UFieldDeclaration> = {};
 
-    for (const thisIndex of headerIndices) {
-        const def = uApiSchemaPseudoJson[thisIndex] as Map<string, any>;
+    try {
+        catchHeaderCollisions(uApiSchemaPseudoJson, headerIndices);
 
-        try {
-            const headersType = parseHeadersType(
-                def,
-                thisIndex,
-                uApiSchemaPseudoJson,
-                schemaKeysToIndex,
-                parsedTypes,
-                typeExtensions,
-                parseFailures,
-                failedTypes,
-            );
-            Object.assign(requestHeaders, headersType.requestHeaders);
-            Object.assign(responseHeaders, headersType.responseHeaders);
-        } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
-                parseFailures.push(...e.schemaParseFailures);
-            } else {
-                throw e;
+        for (const thisIndex of headerIndices) {
+            const def = uApiSchemaPseudoJson[thisIndex] as Map<string, any>;
+
+            try {
+                const headersType = parseHeadersType(
+                    def,
+                    thisIndex,
+                    uApiSchemaPseudoJson,
+                    schemaKeysToIndex,
+                    parsedTypes,
+                    typeExtensions,
+                    parseFailures,
+                    failedTypes,
+                );
+                Object.assign(requestHeaders, headersType.requestHeaders);
+                Object.assign(responseHeaders, headersType.responseHeaders);
+            } catch (e) {
+                if (e instanceof UApiSchemaParseError) {
+                    parseFailures.push(...e.schemaParseFailures);
+                } else {
+                    throw e;
+                }
             }
+        }
+    } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
+            parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
     }
 
