@@ -39,10 +39,10 @@ invalid_cases = {
         [[{}, {'fn.createStub_': {'stub': 0}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn.createStub_': {'stub': ''}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Object': {}}}}}]}}]],
         [[{}, {'fn.createStub_': {'stub': []}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'TypeUnexpected': {'actual': {'Array': {}}, 'expected': {'Object': {}}}}}]}}]],
-        [[{}, {'fn.createStub_': {'stub': {}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 0, 'expected': 1}}}]}}]],
+        [[{}, {'fn.createStub_': {'stub': {}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 0, 'expected': 1, 'keys': []}}}]}}]],
         [[{}, {'fn.createStub_': {'stub': {'fn.test': {}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub', '->'], 'reason': {'RequiredObjectKeyMissing': {}}}]}}]],
         [[{}, {'fn.createStub_': {'stub': {'fn.test': {}, '->': {}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub', '->'], 'reason': {'ObjectSizeUnexpected': {'actual': 0, 'expected': 1}}}]}}]],
-        [[{}, {'fn.createStub_': {'stub': {'fn.testAnother': {}, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 2, 'expected': 1}}}]}}]],
+        [[{}, {'fn.createStub_': {'stub': {'fn.testAnother': {}, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub'], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^fn\\..*$', 'actual': 2, 'expected': 1, 'keys': ['fn.test', 'fn.testAnother']}}}]}}]],
         [[{}, {'fn.createStub_': {'stub': {'wrong': True, 'fn.test': {}, '->': {'Ok': {}}}}}], [{}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.createStub_', 'stub', 'wrong'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],
 }

@@ -94,6 +94,7 @@ export function offsetSchemaIndex(
     initialFailures: _SchemaParseFailure[],
     offset: number,
     schemaKeysToIndex: Record<string, number>,
+    headerIndices: Set<number>,
 ): _SchemaParseFailure[] {
     const finalList: _SchemaParseFailure[] = [];
 
@@ -118,7 +119,14 @@ export function offsetSchemaIndex(
             finalData = data;
         }
 
-        const schemaKey = indexToSchemaKey.get(newPath[0]) ?? null;
+        const index = newPath[0];
+
+        let schemaKey: string;
+        if (headerIndices.has(index)) {
+            schemaKey = 'headers';
+        } else {
+            schemaKey = indexToSchemaKey.get(index) ?? null;
+        }
 
         finalList.push({ path: newPath, reason, data: finalData, key: schemaKey });
     }
@@ -130,7 +138,10 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
     const regex = '^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)';
     const matches: string[] = [];
 
-    for (const e of Object.keys(definition)) {
+    const keys = Object.keys(definition);
+    keys.sort();
+
+    for (const e of keys) {
         if (e.match(regex)) {
             matches.push(e);
         }
@@ -149,6 +160,7 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
                     regex: regex,
                     actual: matches.length,
                     expected: 1,
+                    keys: keys,
                 },
                 null,
             ),
@@ -1206,7 +1218,7 @@ export function parseUApiSchema(
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -1249,7 +1261,7 @@ export function parseUApiSchema(
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -1307,7 +1319,7 @@ export function parseUApiSchema(
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -2771,7 +2783,10 @@ export function validateMockCall(
 
     const regexString = '^fn\\..*$';
 
-    const matches = [...Object.keys(givenMap)].filter((k: string) => k.match(regexString));
+    const keys = Object.keys(givenMap);
+    keys.sort();
+
+    const matches = [...keys].filter((k: string) => k.match(regexString));
     if (matches.length !== 1) {
         return [
             {
@@ -2781,6 +2796,7 @@ export function validateMockCall(
                     regex: regexString,
                     actual: matches.length,
                     expected: 1,
+                    keys: keys,
                 },
             },
         ];
@@ -2826,7 +2842,10 @@ export function validateMockStub(
 
     const regexString = '^fn\\..*$';
 
-    const matches = Object.keys(givenMap).filter((k) => k.match(regexString)) as string[];
+    const keys = Object.keys(givenMap);
+    keys.sort();
+
+    const matches = keys.filter((k) => k.match(regexString)) as string[];
     if (matches.length !== 1) {
         return [
             {
@@ -2836,6 +2855,7 @@ export function validateMockStub(
                     regex: regexString,
                     actual: matches.length,
                     expected: 1,
+                    keys: keys,
                 },
             },
         ];

@@ -63,7 +63,7 @@ def as_map(obj: Any) -> Dict[str, Any]:
     return obj
 
 
-def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int, schema_keys_to_index: Dict[str, int]) -> List[_types._SchemaParseFailure]:
+def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int, schema_keys_to_index: Dict[str, int], header_indices: int) -> List[_types._SchemaParseFailure]:
     final_list = []
 
     index_to_schema_key = {v: k for k, v in schema_keys_to_index.items()}
@@ -82,7 +82,12 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
         else:
             final_data = data
 
-        schema_key = index_to_schema_key.get(new_path[0], None)
+        index = new_path[0]
+
+        if index in header_indices:
+            schema_key = 'headers'
+        else:
+            schema_key = index_to_schema_key.get(index, None)
 
         final_list.append(_types._SchemaParseFailure(
             new_path, reason, final_data, schema_key))
@@ -96,7 +101,9 @@ def find_schema_key(definition: dict[str, Any], index: int) -> str:
     regex = "^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)"
     matches = []
 
-    for e in definition.keys():
+    keys = sorted(definition.keys())
+
+    for e in keys:
         if re.match(regex, e):
             matches.append(e)
 
@@ -104,7 +111,7 @@ def find_schema_key(definition: dict[str, Any], index: int) -> str:
         return matches[0]
     else:
         raise types.UApiSchemaParseError([_types._SchemaParseFailure([index], "ObjectKeyRegexMatchCountUnexpected",
-                                                                     {"regex": regex, "actual": len(matches), "expected": 1}, None)])
+                                                                     {"regex": regex, "actual": len(matches), "expected": 1, "keys": keys}, None)])
 
 
 def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[str, None]:
@@ -749,7 +756,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index)
+            parse_failures, path_offset, schema_keys_to_index, header_indices)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     error_keys = set()
@@ -772,7 +779,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index)
+            parse_failures, path_offset, schema_keys_to_index, header_indices)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     for error_key in error_keys:
@@ -807,7 +814,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index)
+            parse_failures, path_offset, schema_keys_to_index, header_indices)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     return types.UApiSchema(uapi_schema_pseudo_json, parsed_types, request_headers, response_headers, type_extensions)
@@ -1750,7 +1757,9 @@ def validate_mock_call(given_obj: Any, select: Dict[str, object], fn: str, type_
 
     regex_string = "^fn\\..*$"
 
-    matches = [k for k in given_map.keys() if re.match(regex_string, k)]
+    keys = sorted(given_map.keys())
+
+    matches = [k for k in keys if re.match(regex_string, k)]
     if len(matches) != 1:
         return [_types._ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
                                           {"regex": regex_string, "actual": len(matches), "expected": 1})]
@@ -1786,10 +1795,12 @@ def validate_mock_stub(given_obj: Any, select: Dict[str, object], fn: str, type_
 
     regex_string = "^fn\\..*$"
 
-    matches = [k for k in given_map.keys() if re.match(regex_string, k)]
+    keys = sorted(given_map.keys())
+
+    matches = [k for k in keys if re.match(regex_string, k)]
     if len(matches) != 1:
         return [_types._ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
-                                          {"regex": regex_string, "actual": len(matches), "expected": 1})]
+                                          {"regex": regex_string, "actual": len(matches), "expected": 1, "keys": keys})]
 
     function_name = matches[0]
     function_def = types[function_name]

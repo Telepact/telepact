@@ -101,7 +101,8 @@
             "ObjectKeyRegexMatchCountUnexpected": {
                 "regex": ["string"],
                 "expected": ["integer"],
-                "actual": ["integer"]
+                "actual": ["integer"],
+                "keys": ["array", ["string"]]
             },
             "RequiredObjectKeyMissing": {},
             "FunctionUnknown": {}

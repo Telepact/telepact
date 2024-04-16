@@ -90,7 +90,7 @@ class _Util {
         return (Map<String, Object>) object;
     }
 
-    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset, Map<String, Integer> schemaKeysToIndex) {
+    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset, Map<String, Integer> schemaKeysToIndex, Set<Integer> headerIndices) {
         final var finalList = new ArrayList<_SchemaParseFailure>();
 
         final var indexToSchemaKey = schemaKeysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
@@ -113,9 +113,16 @@ class _Util {
                 finalData = data;
             }
 
-            final var schemeKey = indexToSchemaKey.get(newPath.get(0));
+            final var index = newPath.get(0);
 
-            finalList.add(new _SchemaParseFailure(newPath, reason, finalData, schemeKey));
+            String schemaKey;
+            if (headerIndices.contains(index)) {
+                schemaKey = "headers";
+            } else {
+                schemaKey = indexToSchemaKey.get(index);
+            }
+
+            finalList.add(new _SchemaParseFailure(newPath, reason, finalData, schemaKey));
         }
 
         return finalList;
@@ -125,7 +132,9 @@ class _Util {
         final var regex = "^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
         final var matches = new ArrayList<String>();
 
-        for (final var e : definition.keySet()) {
+        final var keys = definition.keySet().stream().sorted().toList();
+
+        for (final var e : keys) {
             if (e.matches(regex)) {
                 matches.add(e);
             }
@@ -137,7 +146,7 @@ class _Util {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
                     "ObjectKeyRegexMatchCountUnexpected",
                     new TreeMap<>(
-                            Map.of("regex", regex, "actual", matches.size(), "expected", 1)), null)));
+                            Map.of("regex", regex, "actual", matches.size(), "expected", 1, "keys", keys)), null)));
         }
     }
 
@@ -915,7 +924,7 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -942,7 +951,7 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -976,7 +985,7 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -2192,10 +2201,12 @@ class _Util {
 
         final var regexString = "^fn\\..*$";
 
-        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        final var keys = givenMap.keySet().stream().sorted().toList();
+
+        final var matches = keys.stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(new _ValidationFailure(new ArrayList<Object>(), "ObjectKeyRegexMatchCountUnexpected",
-                    Map.of("regex", regexString, "actual", matches.size(), "expected", 1)));
+                    Map.of("regex", regexString, "actual", matches.size(), "expected", 1, "keys", keys)));
         }
 
         final var functionName = matches.get(0);
@@ -2234,13 +2245,15 @@ class _Util {
 
         final var regexString = "^fn\\..*$";
 
-        final var matches = givenMap.keySet().stream().filter(k -> k.matches(regexString)).toList();
+        final var keys = givenMap.keySet().stream().sorted().toList();
+
+        final var matches = keys.stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(
                     new _ValidationFailure(List.of(),
                             "ObjectKeyRegexMatchCountUnexpected",
                             Map.of("regex", regexString, "actual",
-                                    matches.size(), "expected", 1)));
+                                    matches.size(), "expected", 1, "keys", keys)));
 
         }
 
