@@ -122,7 +122,7 @@ class _Util {
     }
 
     public static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*";
+        final var regex = "^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
         final var matches = new ArrayList<String>();
 
         for (final var e : definition.keySet()) {
@@ -667,10 +667,10 @@ class _Util {
     }
 
     static _UHeaders parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson,
-            String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var index = schemaKeysToIndex.get(schemaKey);
+        final String schemaKey = "headers";
         final List<Object> path = List.of(index);
 
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
@@ -864,6 +864,8 @@ class _Util {
         final var schemaKeysToIndex = new HashMap<String, Integer>();
         final var schemaKeys = new HashSet<String>();
 
+        final var headerIndices = new HashSet<Integer>();
+
         var index = -1;
         for (final var definition : uApiSchemaPseudoJson) {
             index += 1;
@@ -886,6 +888,11 @@ class _Util {
                 schemaKey = findSchemaKey(def, index);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
+                continue;
+            }
+
+            if (schemaKey.equals("headers")) {
+                headerIndices.add(index);
                 continue;
             }
 
@@ -913,7 +920,6 @@ class _Util {
         }
 
         final var errorKeys = new HashSet<String>();
-        final var headerKeys = new HashSet<String>();
         final var rootTypeParameterCount = 0;
 
         for (final var schemaKey : schemaKeys) {
@@ -921,9 +927,6 @@ class _Util {
                 continue;
             } else if (schemaKey.startsWith("errors.")) {
                 errorKeys.add(schemaKey);
-                continue;
-            } else if (schemaKey.startsWith("headers.")) {
-                headerKeys.add(schemaKey);
                 continue;
             }
 
@@ -959,12 +962,11 @@ class _Util {
         final Map<String, _UFieldDeclaration> requestHeaders = new HashMap<>();
         final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();
 
-        for (final var headerKey : headerKeys) {
-            final var thisIndex = schemaKeysToIndex.get(headerKey);
+        for (final var thisIndex : headerIndices) {
             final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
 
             try {
-                final var headersType = parseHeadersType(def, headerKey, uApiSchemaPseudoJson,
+                final var headersType = parseHeadersType(def, thisIndex, uApiSchemaPseudoJson,
                         schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                 requestHeaders.putAll(headersType.requestHeaders);
                 responseHeaders.putAll(headersType.responseHeaders);

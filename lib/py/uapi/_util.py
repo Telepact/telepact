@@ -93,7 +93,7 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
 def find_schema_key(definition: dict[str, Any], index: int) -> str:
     import re
 
-    regex = "^((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*"
+    regex = "^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)"
     matches = []
 
     for e in definition.keys():
@@ -549,10 +549,10 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_
 
 
 def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
-                       schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
+                       index: int, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
                        parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
                        all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UHeaders:
-    index = schema_keys_to_index.get(schema_key)
+    schema_key = "headers"
     path = [index]
 
     parse_failures = []
@@ -708,6 +708,7 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
     failed_types: Set[str] = set()
     schema_keys_to_index: Dict[str, int] = {}
     schema_keys: Set[str] = set()
+    header_indices: Set[int] = set()
 
     index = -1
     for definition in uapi_schema_pseudo_json:
@@ -729,6 +730,10 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
             parse_failures.extend(e.schema_parse_failures)
             continue
 
+        if (schema_key == 'headers'):
+            header_indices.add(index)
+            continue
+
         ignore_if_duplicate: bool = def_dict.get('_ignoreIfDuplicate', False)
         matching_schema_key = find_matching_schema_key(schema_keys, schema_key)
         if matching_schema_key:
@@ -748,7 +753,6 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     error_keys = set()
-    header_keys = set()
     root_type_parameter_count = 0
 
     for schema_key in schema_keys:
@@ -756,9 +760,6 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
             continue
         elif schema_key.startswith("errors."):
             error_keys.add(schema_key)
-            continue
-        elif schema_key.startswith("headers."):
-            header_keys.add(schema_key)
             continue
 
         this_index = schema_keys_to_index[schema_key]
@@ -789,12 +790,11 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
     request_headers: Dict[str, _types._UFieldDeclaration] = {}
     response_headers: Dict[str, _types._UFieldDeclaration] = {}
 
-    for header_key in header_keys:
-        this_index = schema_keys_to_index[header_key]
+    for this_index in header_indices:
         def_dict = uapi_schema_pseudo_json[this_index]
 
         try:
-            headers_type = parse_headers_type(def_dict, header_key, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
+            headers_type = parse_headers_type(def_dict, this_index, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
                                               type_extensions, parse_failures, failed_types)
 
             print(f'headers_type {headers_type}')

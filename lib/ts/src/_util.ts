@@ -127,7 +127,7 @@ export function offsetSchemaIndex(
 }
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
-    const regex = '^((fn|errors|info|headers)|((struct|union|_ext)(<[0-2]>)?))\\..*';
+    const regex = '^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)';
     const matches: string[] = [];
 
     for (const e of Object.keys(definition)) {
@@ -876,7 +876,7 @@ export function parseErrorType(
 
 export function parseHeadersType(
     headersDefinitionAsParsedJson: Record<string, any>,
-    schemaKey: string,
+    index: number,
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: Record<string, number>,
     parsedTypes: Record<string, _UType>,
@@ -884,7 +884,7 @@ export function parseHeadersType(
     allParseFailures: _SchemaParseFailure[],
     failedTypes: Set<string>,
 ): _UHeaders {
-    const index = schemaKeysToIndex[schemaKey];
+    const schemaKey = 'headers';
     const path = [index];
 
     const parseFailures: _SchemaParseFailure[] = [];
@@ -1146,6 +1146,7 @@ export function parseUApiSchema(
     const failedTypes: Set<string> = new Set();
     const schemaKeysToIndex: Record<string, number> = {};
     const schemaKeys: Set<string> = new Set();
+    const headerIndices: Set<number> = new Set();
 
     let index = -1;
     for (const definition of uApiSchemaPseudoJson) {
@@ -1171,6 +1172,11 @@ export function parseUApiSchema(
             } else {
                 throw e;
             }
+            continue;
+        }
+
+        if (schemaKey === 'headers') {
+            headerIndices.add(index);
             continue;
         }
 
@@ -1275,14 +1281,13 @@ export function parseUApiSchema(
     const requestHeaders: Record<string, _UFieldDeclaration> = {};
     const responseHeaders: Record<string, _UFieldDeclaration> = {};
 
-    for (const headerKey of headerKeys) {
-        const thisIndex: number = schemaKeysToIndex[headerKey]!;
+    for (const thisIndex of headerIndices) {
         const def = uApiSchemaPseudoJson[thisIndex] as Map<string, any>;
 
         try {
             const headersType = parseHeadersType(
                 def,
-                headerKey,
+                thisIndex,
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,

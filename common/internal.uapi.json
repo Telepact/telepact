@@ -26,70 +26,43 @@
     },
     {
         "///": [
+            " ---                                                                             ",
+            "                                                                                 ",
             " The `tim_` request header represents the timeout in milliseconds set by the     ",
-            " client when the request was submitted.                                          "
-        ],
-        "headers.Time_": {
-            "tim_": ["integer"]
-        },
-        "->": {}
-    },
-    {
-        "///": [
+            " client when the request was submitted.                                          ",
+            "                                                                                 ",
             " The `auth_` header is the conventional location for sending credentials to the  ",
-            " server for the purpose of authentication and authorization.                     "
-        ],
-        "headers.Authenticated_": {
-            "auth_": ["struct.Auth_"]
-        },
-        "->": {}
-    },
-    {
-        "///": [
+            " server for the purpose of authentication and authorization.                     ",
+            "                                                                                 ",
             " If the `unsafe_` request header is set to `true`, response validation by the    ",
-            " server will be disabled.                                                        "
-        ],
-        "headers.Unsafe_": {
-            "unsafe_": ["boolean"]
-        },
-        "->": {}
-    },
-    {
-        "///": [
+            " server will be disabled.                                                        ",
+            "                                                                                 ",
             " The `select_` header is used to select fields from structs. It is an object of  ",
             " string arrays keyed by struct reference name pointing to field names of that    ",
             " struct that should be selected. Field names not included in the array are       ",
-            " omitted in the response wherever that field would have appeared.                "
-        ],
-        "headers.Selectable_": {
-            "select_": ["_ext.Select_"]
-        },
-        "->": {}
-    },
-    {
-        "///": [
+            " omitted in the response wherever that field would have appeared.                ",
+            "                                                                                 ",
             " A `bin_` request header indicates the binary checksums known by the client,     ",
             " which will prompt the inclusion of the `bin_` response header with the binary   ",
             " checksum currently in use by the server. If server binary checksum does not     ",
             " match one of the client-indicated binary checksums in the `bin_` request        ",
             " header, then the server will also include the `enc_` response header            ",
             " containing the binary encoding, an object of possible keys mapped onto a field  ",
-            " id.                                                                             "
+            " id.                                                                             ",
+            "                                                                                 ",
+            " A `id_` request header will be reflected as-is in the `id_` response header.    "
         ],
-        "headers.Binary_": {
-            "bin_": ["array", ["integer"]]
-        },
-        "->": {
+        "headers": {
+            "tim_": ["integer"],
+            "auth_": ["struct.Auth_"],
+            "unsafe_": ["boolean"],
+            "select_": ["_ext.Select_"],
             "bin_": ["array", ["integer"]],
-            "enc_": ["object", ["integer"]]
-        }
-    },
-    {
-        "///": " A `id_` request header will be reflected as-is in the `id_` response header. ",
-        "headers.Identified_": {
             "id_": ["any"]
         },
         "->": {
+            "bin_": ["array", ["integer"]],
+            "enc_": ["object", ["integer"]],
             "id_": ["any"]
         }
     },
