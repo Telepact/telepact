@@ -839,6 +839,40 @@ class _Util {
         }
     }
 
+    static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<String> errorKeys, Map<String, Integer> keysToIndex) {
+        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+
+        final var indexToSchemaKey = keysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+
+        final var indices = errorKeys.stream().map(k -> keysToIndex.get(k)).sorted().toList();
+
+        for (var i = 0; i < indices.size(); i += 1) {
+            for (var j = i + 1; j < indices.size(); j += 1) {
+                final var index = indices.get(i);
+                final var otherIndex = indices.get(j);
+
+                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
+                final var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
+
+                final var key = indexToSchemaKey.get(index);
+                final var otherKey = indexToSchemaKey.get(otherIndex);
+
+                final var errDef = (Map<String, Object>) def.get(key);
+                final var otherErrDef = (Map<String, Object>) otherDef.get(otherKey);
+
+                for (final var key2 : errDef.keySet()) {
+                    if (otherErrDef.containsKey(key2)) {
+                        parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, otherKey, key2), "PathCollision", Map.of("other", List.of(index, key, key2)), otherKey));
+                    }
+                }
+            }
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
+    }    
+
     static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
         final var objectMapper = new ObjectMapper();
 
@@ -993,37 +1027,45 @@ class _Util {
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        for (final var errorKey : errorKeys) {
-            final var thisIndex = schemaKeysToIndex.get(errorKey);
-            final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+        try {
+            catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex); 
 
-            try {
-                final var error = parseErrorType(def, errorKey, uApiSchemaPseudoJson,
-                        schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-                applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
-            } catch (UApiSchemaParseError e) {
-                parseFailures.addAll(e.schemaParseFailures);
+            for (final var errorKey : errorKeys) {
+                final var thisIndex = schemaKeysToIndex.get(errorKey);
+                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+    
+                try {
+                    final var error = parseErrorType(def, errorKey, uApiSchemaPseudoJson,
+                            schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
+                    applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
+                } catch (UApiSchemaParseError e) {
+                    parseFailures.addAll(e.schemaParseFailures);
+                }
             }
+    
+        } catch (UApiSchemaParseError e) {
+            parseFailures.addAll(e.schemaParseFailures);
         }
 
         final Map<String, _UFieldDeclaration> requestHeaders = new HashMap<>();
         final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();
 
-        for (final var thisIndex : headerIndices) {
-            final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
-
-            try {
-                final var headersType = parseHeadersType(def, thisIndex, uApiSchemaPseudoJson,
-                        schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-                requestHeaders.putAll(headersType.requestHeaders);
-                responseHeaders.putAll(headersType.responseHeaders);
-            } catch (UApiSchemaParseError e) {
-                parseFailures.addAll(e.schemaParseFailures);
-            }
-        }
-
         try {
             catchHeaderCollisions(uApiSchemaPseudoJson, headerIndices);
+
+            for (final var thisIndex : headerIndices) {
+                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+    
+                try {
+                    final var headersType = parseHeadersType(def, thisIndex, uApiSchemaPseudoJson,
+                            schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
+                    requestHeaders.putAll(headersType.requestHeaders);
+                    responseHeaders.putAll(headersType.responseHeaders);
+                } catch (UApiSchemaParseError e) {
+                    parseFailures.addAll(e.schemaParseFailures);
+                }
+            }
+    
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }        
