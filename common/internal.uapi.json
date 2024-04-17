@@ -26,8 +26,6 @@
     },
     {
         "///": [
-            " ---                                                                             ",
-            "                                                                                 ",
             " The `tim_` request header represents the timeout in milliseconds set by the     ",
             " client when the request was submitted.                                          ",
             "                                                                                 ",
