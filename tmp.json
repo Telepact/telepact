@@ -1,52 +1,107 @@
-{
-    "struct.Example": {
-        "field1": ["string"],
-        "field2": ["integer"],
-        "'''": [
-            " Hello this is a doc string. This has all of the necessary information to        ",
-            " explain how to do doc strings. Just keep in mind that it will all be very       ",
-            " complicated along the way. Note that `field1` is the first field.               "
-        ]
-    },
-    "fn.test": {
-        "'''": [
-            " Hello this is a doc string. This has all of the necessary information to        ",
-            " explain how to do doc strings. Just keep in mind that it will all be very       ",
-            " complicated along the way. Note that `field1` is the first field.               "
+[
+    {
+        "///": [
+            " The main struct example.                                                        ",
+            "                                                                                 ",
+            " The [required] field must be supplied. The optional field does not need to be   ",
+            " supplied.                                                                       "
         ],
-        "in": {
-            "'''": [
-                " Hello this is a doc string. This has all of the necessary information to        ",
-                " explain how to do doc strings. Just keep in mind that it will all be very       ",
-                " complicated along the way. Note that `one` is the first field.                  "
-            ],
-            "one": ["string"],
-            "two": ["string"]
-        },
-        "out": {
-            "'''": [
-                " Hello this is a doc string. This has all of the necessary information to        ",
-                " explain how to do doc strings. Just keep in mind that it will all be very       ",
-                " complicated along the way. Note that `field1` is the first field.               "
-            ],
-            "First": {
-                "'''": [
-                    " Hello this is a doc string. This has all of the necessary information to        ",
-                    " explain how to do doc strings. Just keep in mind that it will all be very       ",
-                    " complicated along the way. Note that `field1` is the first field.               "
-                ],
-                "field": ["boolean"],
-                "field2": ["boolean"]
-            },
-            "Second": {
-                "'''": [
-                    " Hello this is a doc string. This has all of the necessary information to        ",
-                    " explain how to do doc strings. Just keep in mind that it will all be very       ",
-                    " complicated along the way. Note that `field1` is the first field.               "
-                ],
-                "field": ["boolean"],
-                "field2": ["boolean"]
+        "struct.ExStruct": {
+            "required": ["boolean"],
+            "optional!": ["boolean"],
+            "optional2!": ["integer"]
+        }
+    },
+    {
+        "union.ExUnion": {
+            "One": {},
+            "Two": {
+                "required": ["boolean"],
+                "optional!": ["boolean"]
             }
         }
+    },
+    {
+        "struct<1>.PStr": {
+            "wrap": ["T.0"]
+        }
+    },
+    {
+        "struct<1>.PdStr": {
+            "dwrap": ["struct<1>.PStr", ["boolean"]]
+        }
+    },
+    {
+        "struct<2>.P2Str": {
+            "wrap": ["T.0"],
+            "nest": ["array", ["T.1"]]
+        }
+    },
+    {
+        "union<1>.PUnion": {
+            "One": {},
+            "Two": {
+                "ewrap": ["T.0"]
+            }
+        }
+    },
+    {
+        "union<2>.P2Union": {
+            "One": {},
+            "Two": {
+                "ewrap": ["T.0"],
+                "enest": ["array", ["T.1"]]
+            }
+        }
+    },
+    {
+        "struct.Big": {
+            "aF": ["boolean"],
+            "cF": ["boolean"],
+            "bF": ["boolean"],
+            "dF": ["boolean"]
+        }
+    },
+    {
+        "///": " An example function. ",
+        "fn.example": {
+            "required": ["boolean"],
+            "optional!": ["boolean"]
+        },
+        "->": {
+            "Ok": {
+                "required": ["boolean"],
+                "optional!": ["boolean"]
+            }
+        }
+    },
+    {
+        "fn.test": {
+            "value!": ["struct.Value"]
+        },
+        "->": {
+            "Ok": {
+                "value!": ["struct.Value"]
+            },
+            "ErrorExample": {
+                "property": ["string"]
+            }
+        }
+    },
+    {
+        "fn.getBigList": {},
+        "->": {
+            "Ok": {
+                "items": ["array", ["struct.Big"]]
+            }
+        }
+    },
+    {
+        "headers": {
+            "in": ["boolean"]
+        },
+        "->": {
+            "out": ["boolean"]
+        }
     }
-}
+]

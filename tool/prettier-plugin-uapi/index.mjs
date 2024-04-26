@@ -77,10 +77,13 @@ const jsonExtendedPrinter = {
         }
 
         let tabWidth = options.tabWidth;
+        console.log(`Node type: ${node.type}`);
+        console.log(`Tab width: ${tabWidth}`);
 
-        const depth = path.stack.length / 2;
+        const depth = (path.stack.length - 1) / 2 - 1;
+        console.log(`depth: ${depth}`);
         const indentation = " ".repeat(tabWidth * depth);
-        const indentation2 = " ".repeat(tabWidth * (depth + 1));
+        const indentationR = depth > 0 ? " ".repeat(tabWidth * (depth - 1)) : "";
 
         if (node.type === "ArrayExpression") {
             if (
@@ -92,9 +95,9 @@ const jsonExtendedPrinter = {
                     "[",
                     path
                         .map(print, "elements")
-                        .map((e) => indentation2 + e)
+                        .map((e) => indentation + e)
                         .join(",\n"),
-                    indentation + "]",
+                    indentationR + "]",
                 ].join("\n");
             } else {
                 // This is a nested array, format inline
@@ -106,9 +109,9 @@ const jsonExtendedPrinter = {
                 "{",
                 path
                     .map(print, "properties")
-                    .map((e) => indentation2 + e)
+                    .map((e) => indentation + e)
                     .join(",\n"),
-                indentation + "}",
+                indentationR + "}",
             ].join("\n");
         } else if (node.type === "ObjectProperty") {
             // This is a property, print the key and the value
