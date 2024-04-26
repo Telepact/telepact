@@ -1,6 +1,7 @@
 import * as prettier from "prettier";
 import parserPkg from "prettier/parser-babel";
 const { parsers: babelParsers } = parserPkg;
+import markdownPlugin from "prettier/plugins/markdown";
 
 function padLength(strings) {
     const paddedStrings = strings.map((str) => {
@@ -33,6 +34,7 @@ async function formatDocstrings(obj) {
                     parser: "markdown",
                     printWidth: 78,
                     proseWrap: "always",
+                    plugins: [markdownPlugin],
                 });
 
                 const formatted = formattedWhole.split("\n");
