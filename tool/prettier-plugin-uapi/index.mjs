@@ -102,7 +102,7 @@ function printJsonAst(path, options, print) {
     }
 
     if (node.type === "StringLiteral") {
-        return `"${node.value}"`;
+        return JSON.stringify(node.value);
     }
 
     if (node.type === "NumericLiteral") {
