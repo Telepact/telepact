@@ -1,8 +1,9 @@
 {
     "name": "prettier-plugin-uapi",
-    "version": "0.1.0",
+    "version": "0.1.14",
     "description": "Prettier plugin to format uapi docstrings.",
     "main": "index.mjs",
+    "types": "index.d.ts",
     "private": true,
     "keywords": [
         "prettier",
@@ -12,5 +13,8 @@
     "dependencies": {
         "@prettier/sync": "^0.5.1",
         "prettier": "^3.2.5"
+    },
+    "scripts": {
+        "build": "npm pack"
     }
 }

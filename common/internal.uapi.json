@@ -12,7 +12,15 @@
         "fn.api_": {},
         "->": {
             "Ok": {
-                "api": ["array", ["object", ["any"]]]
+                "api": [
+                    "array",
+                    [
+                        "object",
+                        [
+                            "any"
+                        ]
+                    ]
+                ]
             }
         },
         "_errors": "^errors\\.Validated_$"
@@ -51,17 +59,44 @@
             " A `id_` request header will be reflected as-is in the `id_` response header.    "
         ],
         "headers": {
-            "tim_": ["integer"],
-            "auth_": ["struct.Auth_"],
-            "unsafe_": ["boolean"],
-            "select_": ["_ext.Select_"],
-            "bin_": ["array", ["integer"]],
-            "id_": ["any"]
+            "tim_": [
+                "integer"
+            ],
+            "auth_": [
+                "struct.Auth_"
+            ],
+            "unsafe_": [
+                "boolean"
+            ],
+            "select_": [
+                "_ext.Select_"
+            ],
+            "bin_": [
+                "array",
+                [
+                    "integer"
+                ]
+            ],
+            "id_": [
+                "any"
+            ]
         },
         "->": {
-            "bin_": ["array", ["integer"]],
-            "enc_": ["object", ["integer"]],
-            "id_": ["any"]
+            "bin_": [
+                "array",
+                [
+                    "integer"
+                ]
+            ],
+            "enc_": [
+                "object",
+                [
+                    "integer"
+                ]
+            ],
+            "id_": [
+                "any"
+            ]
         }
     },
     {
@@ -82,25 +117,51 @@
         "///": " A reason for the validation failure in the body. ",
         "union.ValidationFailureReason_": {
             "TypeUnexpected": {
-                "expected": ["union.Type_"],
-                "actual": ["union.Type_"]
+                "expected": [
+                    "union.Type_"
+                ],
+                "actual": [
+                    "union.Type_"
+                ]
             },
             "NullDisallowed": {},
             "ObjectKeyDisallowed": {},
             "NumberOutOfRange": {},
             "ObjectSizeUnexpected": {
-                "expected": ["integer"],
-                "actual": ["integer"]
+                "expected": [
+                    "integer"
+                ],
+                "actual": [
+                    "integer"
+                ]
             },
             "ExtensionValidationFailed": {
-                "reason": ["string"],
-                "data!": ["object", ["any"]]
+                "reason": [
+                    "string"
+                ],
+                "data!": [
+                    "object",
+                    [
+                        "any"
+                    ]
+                ]
             },
             "ObjectKeyRegexMatchCountUnexpected": {
-                "regex": ["string"],
-                "expected": ["integer"],
-                "actual": ["integer"],
-                "keys": ["array", ["string"]]
+                "regex": [
+                    "string"
+                ],
+                "expected": [
+                    "integer"
+                ],
+                "actual": [
+                    "integer"
+                ],
+                "keys": [
+                    "array",
+                    [
+                        "string"
+                    ]
+                ]
             },
             "RequiredObjectKeyMissing": {},
             "FunctionUnknown": {}
@@ -119,8 +180,15 @@
     {
         "///": " A validation failure located at a `path` explained by a `reason`. ",
         "struct.ValidationFailure_": {
-            "path": ["array", ["any"]],
-            "reason": ["union.ValidationFailureReason_"]
+            "path": [
+                "array",
+                [
+                    "any"
+                ]
+            ],
+            "reason": [
+                "union.ValidationFailureReason_"
+            ]
         }
     },
     {
@@ -138,19 +206,44 @@
         "errors.Validated_": {
             "ErrorUnknown_": {},
             "ErrorInvalidRequestHeaders_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
+                "cases": [
+                    "array",
+                    [
+                        "struct.ValidationFailure_"
+                    ]
+                ]
             },
             "ErrorInvalidRequestBody_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
+                "cases": [
+                    "array",
+                    [
+                        "struct.ValidationFailure_"
+                    ]
+                ]
             },
             "ErrorInvalidResponseHeaders_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
+                "cases": [
+                    "array",
+                    [
+                        "struct.ValidationFailure_"
+                    ]
+                ]
             },
             "ErrorInvalidResponseBody_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
+                "cases": [
+                    "array",
+                    [
+                        "struct.ValidationFailure_"
+                    ]
+                ]
             },
             "ErrorParseFailure_": {
-                "reasons": ["array", ["union.ParseFailure_"]]
+                "reasons": [
+                    "array",
+                    [
+                        "union.ParseFailure_"
+                    ]
+                ]
             }
         }
     },
@@ -166,10 +259,14 @@
         ],
         "errors.Authenticated_": {
             "ErrorUnauthenticated_": {
-                "message!": ["string"]
+                "message!": [
+                    "string"
+                ]
             },
             "ErrorUnauthorized_": {
-                "message!": ["string"]
+                "message!": [
+                    "string"
+                ]
             }
         }
     }

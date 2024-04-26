@@ -1,5 +1,6 @@
-import syncPrettier  from '@prettier/sync';
-import * as prettierPluginBabel from 'prettier/plugins/babel';
+import * as prettier from 'prettier';
+import pkg from 'prettier/parser-babel';
+const { parsers: babelParsers } = pkg;
 
 function padLength(strings) {
     const paddedStrings = strings.map(str => {
@@ -9,12 +10,16 @@ function padLength(strings) {
     return paddedStrings;
 }
 
-function formatDocstrings(obj) {
+async function formatDocstrings(obj) {
     if (Array.isArray(obj)) {
+        let newArr = [];
         for (const e of obj) {
-            formatDocstrings(e);
+            let formatted = await formatDocstrings(e);
+            newArr.push(formatted);
         }
+        return newArr;
     } else if (typeof obj === 'object' && obj !== null) {
+        let newObj = {};
         for (const [k, v] of Object.entries(obj)) {
             if (k === '///') {
                 let docstring;
@@ -24,35 +29,61 @@ function formatDocstrings(obj) {
                     docstring = v.map(e => e.trim()).join('\n');
                 }
 
-                const formattedWhole = syncPrettier.format(docstring, {parser: 'markdown', printWidth: 78, proseWrap: "always"})
+                const formattedWhole = await prettier.format(docstring, {parser: 'markdown', printWidth: 78, proseWrap: "always"})
 
                 const formatted = formattedWhole.split('\n');
 
                 formatted.pop();
 
                 if (formatted.length === 1) {
-                    obj[k] = ' ' + formatted[0] + ' ';
+                    newObj[k] = ' ' + formatted[0] + ' ';
                 } else {
-                    obj[k] = padLength(formatted);
+                    newObj[k] = padLength(formatted);
                 }
             } else {
-                formatDocstrings(v)
+                newObj[k] = await formatDocstrings(v)
             }
         }
+        return newObj;
+    } else {
+        return obj;
     }
 }
 
-function preprocess(text) {
+async function preprocess(text) {
     let json = JSON.parse(text);
 
-    formatDocstrings(json);
+    const newJson = await formatDocstrings(json);
 
-    return JSON.stringify(json, null, 4);
+    const result = JSON.stringify(newJson, null, 4);
+
+    return result;
 }
 
-export const parsers = {
-    json: {
-        ...prettierPluginBabel.parsers.json,
-        preprocess
-    }
-}
+const jsonParser = babelParsers['json-stringify'];
+
+const { parse } = jsonParser;
+
+const jsonExtendedParser = {
+  ...jsonParser,
+  parse: async (text, parsers, options) => {
+    console.log('Before parsing...');
+    const preprocessedText = await preprocess(text);
+    const ast = parse(preprocessedText, parsers, options);
+    console.log('After parsing...');
+    return ast;
+  },
+};
+
+const jsonExtended = {
+  name: 'uapi',
+  parsers: ['uapi-parse'],
+  extensions: ['.uapi.json'],
+};
+
+export default {
+  languages: [jsonExtended],
+  parsers: {
+    'uapi-parse': jsonExtendedParser,
+  },
+};

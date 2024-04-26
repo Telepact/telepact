@@ -1,0 +1,52 @@
+{
+    "struct.Example": {
+        "field1": ["string"],
+        "field2": ["integer"],
+        "'''": [
+            " Hello this is a doc string. This has all of the necessary information to        ",
+            " explain how to do doc strings. Just keep in mind that it will all be very       ",
+            " complicated along the way. Note that `field1` is the first field.               "
+        ]
+    },
+    "fn.test": {
+        "'''": [
+            " Hello this is a doc string. This has all of the necessary information to        ",
+            " explain how to do doc strings. Just keep in mind that it will all be very       ",
+            " complicated along the way. Note that `field1` is the first field.               "
+        ],
+        "in": {
+            "'''": [
+                " Hello this is a doc string. This has all of the necessary information to        ",
+                " explain how to do doc strings. Just keep in mind that it will all be very       ",
+                " complicated along the way. Note that `one` is the first field.                  "
+            ],
+            "one": ["string"],
+            "two": ["string"]
+        },
+        "out": {
+            "'''": [
+                " Hello this is a doc string. This has all of the necessary information to        ",
+                " explain how to do doc strings. Just keep in mind that it will all be very       ",
+                " complicated along the way. Note that `field1` is the first field.               "
+            ],
+            "First": {
+                "'''": [
+                    " Hello this is a doc string. This has all of the necessary information to        ",
+                    " explain how to do doc strings. Just keep in mind that it will all be very       ",
+                    " complicated along the way. Note that `field1` is the first field.               "
+                ],
+                "field": ["boolean"],
+                "field2": ["boolean"]
+            },
+            "Second": {
+                "'''": [
+                    " Hello this is a doc string. This has all of the necessary information to        ",
+                    " explain how to do doc strings. Just keep in mind that it will all be very       ",
+                    " complicated along the way. Note that `field1` is the first field.               "
+                ],
+                "field": ["boolean"],
+                "field2": ["boolean"]
+            }
+        }
+    }
+}

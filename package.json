@@ -1,8 +1,8 @@
 {
-  "devDependencies": {
-    "prettier": "3.2.5"
-  },
-  "dependencies": {
-    "prettier-plugin-uapi": "file:tool/prettier-plugin-uapi/prettier-plugin-uapi-0.1.0.tgz"
-  }
+    "devDependencies": {
+        "prettier": "3.2.5"
+    },
+    "dependencies": {
+        "prettier-plugin-uapi": "file:tool/prettier-plugin-uapi/prettier-plugin-uapi-0.1.14.tgz"
+    }
 }
