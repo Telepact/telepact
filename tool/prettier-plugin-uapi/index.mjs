@@ -64,76 +64,74 @@ async function preprocess(text) {
     return result;
 }
 
+const { concat, indent, line, softline, hardline, join } = prettier.doc.builders;
+
+function printJsonAst(path, options, print) {
+    const node = path.getValue();
+
+    if (node.type === "JsonRoot") {
+        return path.call(print, "node");
+    }
+
+    if (node.type === "ArrayExpression") {
+        const parent = path.getParentNode();
+        const isRoot = parent.type === "JsonRoot";
+        const isComment = parent && parent.type === "ObjectProperty" && parent.key.value === "///";
+
+        if (isRoot || isComment) {
+            return [
+                "[",
+                indent(concat([softline, join(concat([",", softline]), path.map(print, "elements"))])),
+                softline,
+                "]",
+            ];
+        } else {
+            return concat(["[", join(", ", path.map(print, "elements")), "]"]);
+        }
+    }
+
+    if (node.type === "ObjectExpression") {
+        return node.properties.length === 0
+            ? "{}"
+            : [
+                  "{",
+                  indent(concat([softline, join(concat([",", line]), path.map(print, "properties"))])),
+                  softline,
+                  "}",
+              ];
+    }
+
+    if (node.type === "StringLiteral") {
+        return `"${node.value}"`;
+    }
+
+    if (node.type === "NumericLiteral") {
+        return node.value.toString();
+    }
+
+    if (node.type === "BooleanLiteral") {
+        return node.value ? "true" : "false";
+    }
+
+    if (node.type === "NullLiteral") {
+        return "null";
+    }
+
+    if (node.type === "ObjectProperty") {
+        return concat([path.call(print, "key"), ": ", path.call(print, "value")]);
+    }
+
+    console.log(`Node type not handled: ${node.type}`);
+
+    return "";
+}
+
 const jsonParser = babelParsers["json-stringify"];
 const jsonPrinter = jsonParser.printer;
 
 const jsonExtendedPrinter = {
     ...jsonPrinter,
-    print(path, options, print) {
-        const node = path.getValue();
-
-        if (node.type === "JsonRoot") {
-            return path.call(print, "node");
-        }
-
-        let tabWidth = options.tabWidth;
-        console.log(`Node type: ${node.type}`);
-        console.log(`Tab width: ${tabWidth}`);
-
-        const depth = (path.stack.length - 1) / 2 - 1;
-        console.log(`depth: ${depth}`);
-        const indentation = " ".repeat(tabWidth * depth);
-        const indentationR = depth > 0 ? " ".repeat(tabWidth * (depth - 1)) : "";
-
-        if (node.type === "ArrayExpression") {
-            if (
-                path.getParentNode().type === "JsonRoot" ||
-                (path.getParentNode().type === "ObjectProperty" && path.getParentNode().key.value === "///")
-            ) {
-                // This is the root level array, format with newlines
-                return [
-                    "[",
-                    path
-                        .map(print, "elements")
-                        .map((e) => indentation + e)
-                        .join(",\n"),
-                    indentationR + "]",
-                ].join("\n");
-            } else {
-                // This is a nested array, format inline
-                return ["[", path.map(print, "elements").join(", "), "]"].join("");
-            }
-        } else if (node.type === "ObjectExpression") {
-            // This is an object, format with newlines and indentation
-            return [
-                "{",
-                path
-                    .map(print, "properties")
-                    .map((e) => indentation + e)
-                    .join(",\n"),
-                indentationR + "}",
-            ].join("\n");
-        } else if (node.type === "ObjectProperty") {
-            // This is a property, print the key and the value
-            const key = path.call(print, "key");
-            const value = path.call(print, "value");
-            return `${key}: ${value}`;
-        } else if (node.type === "StringLiteral") {
-            // This is a string, format with double quotes
-            return `"${node.value}"`;
-        } else if (node.type === "NumericLiteral") {
-            // This is a number, format as is
-            return node.value;
-        } else if (node.type === "BooleanLiteral") {
-            // This is a boolean, format as is
-            return node.value;
-        } else if (node.type === "NullLiteral") {
-            // This is null, format as is
-            return "null";
-        }
-
-        return print(path);
-    },
+    print: printJsonAst,
 };
 
 const { parse } = jsonParser;
