@@ -64,7 +64,7 @@ async function preprocess(text) {
     return result;
 }
 
-const { concat, indent, line, softline, hardline, join } = prettier.doc.builders;
+const { concat, indent, line, softline, join } = prettier.doc.builders;
 
 function printJsonAst(path, options, print) {
     const node = path.getValue();
@@ -106,7 +106,7 @@ function printJsonAst(path, options, print) {
     }
 
     if (node.type === "NumericLiteral") {
-        return node.value.toString();
+        return JSON.stringify(node.value);
     }
 
     if (node.type === "BooleanLiteral") {
