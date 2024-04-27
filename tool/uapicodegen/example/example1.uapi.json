@@ -1,0 +1,18 @@
+[
+  {
+    "struct.Struct1": {
+      "bool": ["boolean"],
+      "nullBool": ["boolean?"],
+      "arrBool": ["array", ["boolean"]],
+      "arrNullBool": ["array", ["boolean?"]],
+      "objBool": ["object", ["boolean"]],
+      "objNullBool": ["object", ["boolean?"]],
+      "optBool!": ["boolean"],
+      "optNullBool!": ["boolean?"],
+      "optArrBool!": ["array", ["boolean"]],
+      "optArrNullBool!": ["array", ["boolean?"]],
+      "optObjBool!": ["object", ["boolean"]],
+      "optObjNullBool!": ["object", ["boolean?"]]
+    }
+  }
+]
