@@ -1,0 +1,14 @@
+import java.util.List;
+import java.util.Map;
+
+public class {{className}} {
+    {{#each properties}}
+    public final {{this.type}} {{this.name}};
+    {{/each}}
+
+    public {{className}}({{#each properties}}{{this.type}} {{this.name}}, {{/each}}) {
+        {{#each properties}}
+        this.{{this.name}} = {{this.name}};
+        {{/each}}
+    }
+}
