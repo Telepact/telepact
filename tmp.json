@@ -103,5 +103,39 @@
         "->": {
             "out": ["boolean"]
         }
+    },
+    {
+        "///": [" A cause for a process failure. ", " ", " dd"],
+        "union.ProcessFailureCause": {
+            "Unknown": {},
+            "InvalidRequestBody": {
+                "cases": [
+                    {
+                        "required": ["string"]
+                    }
+                ]
+            },
+            "InvalidRequestHeader": {
+                "cases": [
+                    {
+                        "required": ["string"]
+                    }
+                ]
+            },
+            "InvalidResponseHeader": {
+                "cases": [
+                    {
+                        "required": ["string"]
+                    }
+                ]
+            },
+            "InvalidResponseBody": {
+                "cases": [
+                    {
+                        "required": ["string"]
+                    }
+                ]
+            }
+        }
     }
 ]

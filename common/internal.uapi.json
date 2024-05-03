@@ -5,7 +5,7 @@
         "->": {
             "Ok": {}
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": " Get the uAPI `schema` of this server. ",
@@ -15,7 +15,7 @@
                 "api": ["array", ["object", ["any"]]]
             }
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "struct.Auth_": {},
@@ -124,53 +124,49 @@
         }
     },
     {
-        "///": [
-            " All functions may return a validation error:                                    ",
-            "                                                                                 ",
-            " - `ErrorInvalidRequestHeaders_`: The Headers on the Request is invalid as       ",
-            "   outlined by a list of `cases`.                                                ",
-            " - `ErrorInvalidRequestBody_`: The Body on the Request is invalid as outlined    ",
-            "   by a list of `cases`.                                                         ",
-            " - `ErrorInvalidResponseBody_`: The Body that the Server attempted to put on     ",
-            "   the Response is invalid as outlined by a list of `cases.                      ",
-            " - `ErrorParseFailure_`: The Request could not be parsed as a uAPI Message.      "
-        ],
-        "errors.Validated_": {
-            "ErrorUnknown_": {},
-            "ErrorInvalidRequestHeaders_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            },
-            "ErrorInvalidRequestBody_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            },
-            "ErrorInvalidResponseHeaders_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            },
-            "ErrorInvalidResponseBody_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            },
-            "ErrorParseFailure_": {
-                "reasons": ["array", ["union.ParseFailure_"]]
-            }
+        "///": " The server implementation raised an unknown error. ",
+        "err.UnhandledImplementationError_": {}
+    },
+    {
+        "///": " The headers on the request are invalid. ",
+        "err.InvalidRequestHeaders_": {
+            "cases": ["array", ["struct.ValidationFailure_"]]
         }
     },
     {
-        "///": [
-            " When the `struct._Auth` struct is defined, all functions may return one of the  ",
-            " following errors:                                                               ",
-            "                                                                                 ",
-            " 1. `ErrorUnauthenticated_` indicating that the credentials in the `_auth`       ",
-            "    header were missing or invalid                                               ",
-            " 2. `ErrorUnauthorized_` indicating that the credentials in the `_auth` header   ",
-            "    were insufficient to run the function                                        "
-        ],
-        "errors.Authenticated_": {
-            "ErrorUnauthenticated_": {
-                "message!": ["string"]
-            },
-            "ErrorUnauthorized_": {
-                "message!": ["string"]
-            }
+        "///": " The body on the request is invalid. ",
+        "err.InvalidRequestBody_": {
+            "cases": ["array", ["struct.ValidationFailure_"]]
+        }
+    },
+    {
+        "///": " The headers on the response are invalid. ",
+        "err.InvalidResponseHeaders_": {
+            "cases": ["array", ["struct.ValidationFailure_"]]
+        }
+    },
+    {
+        "///": " The body that the server attempted to put on the response is invalid. ",
+        "err.InvalidResponseBody_": {
+            "cases": ["array", ["struct.ValidationFailure_"]]
+        }
+    },
+    {
+        "///": " The request could not be parsed as a uAPI Message. ",
+        "err.ParseFailure_": {
+            "reasons": ["array", ["union.ParseFailure_"]]
+        }
+    },
+    {
+        "///": " The credentials in the `_auth` header were missing or invalid. ",
+        "err.Unauthenticated_": {
+            "message!": ["string"]
+        }
+    },
+    {
+        "///": " The credentials in the `_auth` header were insufficient to run the function. ",
+        "err.Unauthorized_": {
+            "message!": ["string"]
         }
     }
 ]

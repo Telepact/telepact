@@ -38,16 +38,17 @@
     },
     {
         "///": [
-            " Create a function stub that will cause the server to return the `stub` result when the `stub` argument   ",
-            " matches the function argument on a request.                                                              ",
-            "                                                                                                          ",
-            " If `ignoreMissingArgFields` is `true`, then the server will skip field omission validation on the `stub` ",
-            " argument, and the stub will match calls where the given `stub` argument is Exactly a json sub-structure  ",
-            " of the request function argument.                                                                        ",
-            "                                                                                                          ",
-            " If `generateMissingResultFields` is `true`, then the server will skip field omission validation on the   ",
-            " `stub` result, and the server will generate the necessary data required to make the `result` pass on     ",
-            " response validation.                                                                                     "
+            " Create a function stub that will cause the server to return the `stub` result   ",
+            " when the `stub` argument matches the function argument on a request.            ",
+            "                                                                                 ",
+            " If `ignoreMissingArgFields` is `true`, then the server will skip field          ",
+            " omission validation on the `stub` argument, and the stub will match calls       ",
+            " where the given `stub` argument is Exactly a json sub-structure of the request  ",
+            " function argument.                                                              ",
+            "                                                                                 ",
+            " If `generateMissingResultFields` is `true`, then the server will skip field     ",
+            " omission validation on the `stub` result, and the server will generate the      ",
+            " necessary data required to make the `result` pass on response validation.       "
         ],
         "fn.createStub_": {
             "stub": ["_ext.Stub_"],
@@ -57,13 +58,14 @@
         "->": {
             "Ok": {}
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": [
-            " Verify a call was made with this mock that matches the given `call` and `multiplicity` criteria. If    ",
-            " `allowPartialArgMatch` is supplied as `true`, then the server will skip field omission validation, and ",
-            " match calls where the given `call` argument is Exactly a json sub-structure of the actual argument.    "
+            " Verify a call was made with this mock that matches the given `call` and         ",
+            " `multiplicity` criteria. If `allowPartialArgMatch` is supplied as `true`, then  ",
+            " the server will skip field omission validation, and match calls where the       ",
+            " given `call` argument is Exactly a json sub-structure of the actual argument.   "
         ],
         "fn.verify_": {
             "call": ["_ext.Call_"],
@@ -76,12 +78,12 @@
                 "reason": ["union.VerificationFailure_"]
             }
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": [
-            " Verify that no interactions have occurred with this mock or that all ",
-            " interactions have been verified.                                     "
+            " Verify that no interactions have occurred with this mock or that all            ",
+            " interactions have been verified.                                                "
         ],
         "fn.verifyNoMoreInteractions_": {},
         "->": {
@@ -90,14 +92,15 @@
                 "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
             }
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": " Clear all stub conditions. ",
         "fn.clearStubs_": {},
         "->": {
             "Ok": {}
-        }
+        },
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": " Clear all call data. ",
@@ -105,7 +108,7 @@
         "->": {
             "Ok": {}
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": " Set the seed of the random generator. ",
@@ -115,16 +118,13 @@
         "->": {
             "Ok": {}
         },
-        "_errors": "^errors\\.Validated_$"
+        "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": [
-            " If random generation is disabled, functions may return a `ErrorNoMatchingStub_`  ",
-            " error, indicating that the mock could not return a result for that function call ",
-            " due to no matching stub being available.                                         "
+            " The mock could not return a result for that function call due to no matching    ",
+            " stub being available.                                                           "
         ],
-        "errors.Mockable_": {
-            "ErrorNoMatchingStub_": {}
-        }
+        "err.ErrorNoMatchingStub__": {}
     }
 ]
