@@ -443,9 +443,9 @@ class _Util {
         final List<Object> thisPath = append(path, schemaKey);
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
-        final Map<String, Object> definition;
+        final List<Object> definition;
         try {
-            definition = asMap(defInit);
+            definition = asList(defInit);
         } catch (ClassCastException e) {
             final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Object");
@@ -459,27 +459,43 @@ class _Util {
         if (definition.isEmpty() && requiredKeys.isEmpty()) {
             parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of(), null));
         } else {
-            for (final var requiredKey : requiredKeys) {
-                if (!definition.containsKey(requiredKey)) {
-                    final List<Object> branchPath = append(thisPath, requiredKey);
-
-                    parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
+            outerLoop: for (final var requiredKey : requiredKeys) {
+                for (final var element : definition) {
+                    final var map = asMap(element);
+                    final var keys = new HashSet<>(map.keySet());
+                    keys.remove("///");
+                    if (keys.contains(requiredKey)) {
+                        continue outerLoop;
+                    }
                 }
+                final List<Object> branchPath = append(thisPath, requiredKey);
+                parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
             }
         }
 
-        for (final var entry : definition.entrySet()) {
-            final var unionCase = entry.getKey();
-            final List<Object> unionKeyPath = append(thisPath, unionCase);
-            final var regexString = "^([A-Z][a-zA-Z0-9_]*)$";
-            final var regex = Pattern.compile(regexString);
+        for (int i = 0; i < definition.size(); i++) {
+            final var element = definition.get(i);
+            final List<Object> loopPath = append(thisPath, i);
 
-            final var matcher = regex.matcher(unionCase);
-            if (!matcher.find()) {
-                parseFailures.add(new _SchemaParseFailure(unionKeyPath,
-                        "KeyRegexMatchFailed", Map.of("regex", regexString), null));
+            final var map = asMap(element);
+            final var keys = new HashSet<>(map.keySet());
+
+            final var regexString = "^([A-Z][a-zA-Z0-9_]*)$";
+
+            final var matches = keys.stream().filter(k -> k.matches(regexString)).toList();
+            if (matches.size() != 1) {
+                parseFailures.add(
+                        new _SchemaParseFailure(loopPath,
+                                "ObjectKeyRegexMatchCountUnexpected",
+                                Map.of("regex", regexString, "actual",
+                                        matches.size(), "expected", 1, "keys", keys), null));
                 continue;
             }
+
+
+            final var entry = unionEntry(map);
+            final var unionCase = entry.getKey();
+            final List<Object> unionKeyPath = append(loopPath, unionCase);
 
             final Map<String, Object> unionCaseStruct;
             try {
@@ -639,11 +655,12 @@ class _Util {
         }
     }
 
-    public static _UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String schemaKey,
+    public static _UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
             List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
+        final var schemaKey = "errors";
         final var index = schemaKeysToIndex.get(schemaKey);
         final List<Object> basePath = List.of(index);
 
@@ -675,68 +692,27 @@ class _Util {
         return new _UError(schemaKey, error);
     }
 
-    static _UHeaders parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson,
+    static _UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey, String headerField,
             int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final String schemaKey = "headers";
         final List<Object> path = List.of(index);
 
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+        var typeDeclarationValue = headersDefinitionAsParsedJson.get(schemaKey);
+
         final var typeParameterCount = 0;
 
-        _UStruct requestHeadersStruct = null;
+        final _UFieldDeclaration parsedField;
         try {
-            requestHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
-                    schemaKey, List.of("->"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
-                    typeExtensions,
-                    allParseFailures, failedTypes);
-            for (final var e : requestHeadersStruct.fields.entrySet()) {
-                final var key = e.getKey();
-                final var field = e.getValue();
-                if (field.optional) {
-                    final var thisPath = append(append(path, schemaKey), key);
-                    final var regexString = "^([a-z][a-zA-Z0-9_]*)$";
-                    parseFailures.add(
-                            new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString), null));
-                }
-            }
+            parsedField = parseField(path, headerField,
+                    typeDeclarationValue, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
+                    parsedTypes,
+                    typeExtensions, allParseFailures, failedTypes);
 
+            return parsedField;
         } catch (UApiSchemaParseError e) {
-            parseFailures.addAll(e.schemaParseFailures);
+            throw new UApiSchemaParseError(e.schemaParseFailures);
         }
-
-        final var resultSchemaKey = "->";
-        final List<Object> resPath = append(path, resultSchemaKey);
-
-        _UStruct responseHeadersStruct = null;
-        if (!headersDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of(), null));
-        } else {
-            try {
-                responseHeadersStruct = parseStructType(path, headersDefinitionAsParsedJson,
-                        resultSchemaKey, List.of(schemaKey), typeParameterCount, uApiSchemaPseudoJson,
-                        schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
-                for (final var e : responseHeadersStruct.fields.entrySet()) {
-                    final var key = e.getKey();
-                    final var field = e.getValue();
-                    if (field.optional) {
-                        final var thisPath = append(append(path, schemaKey), key);
-                        final var regexString = "^([a-z][a-zA-Z0-9_]*)$";
-                        parseFailures.add(
-                                new _SchemaParseFailure(thisPath, "KeyRegexMatchFailed", Map.of("regex", regexString), null));
-                    }
-                }
-            } catch (UApiSchemaParseError e) {
-                parseFailures.addAll(e.schemaParseFailures);
-            }
-        }
-
-        if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
-        }
-
-        return new _UHeaders(schemaKey, requestHeadersStruct.fields, responseHeadersStruct.fields);
     }
 
     static _UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
@@ -767,7 +743,7 @@ class _Util {
         } else {
             try {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
-                        resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok"), typeParameterCount, uApiSchemaPseudoJson,
+                        resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"), typeParameterCount, uApiSchemaPseudoJson,
                         schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -839,12 +815,12 @@ class _Util {
         }
     }
 
-    static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<String> errorKeys, Map<String, Integer> keysToIndex) {
+    // TODO: Fix this
+    static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices, Map<String, Integer> keysToIndex) {
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
 
-        final var indexToSchemaKey = keysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
-
-        final var indices = errorKeys.stream().map(k -> keysToIndex.get(k)).sorted().toList();
+        final var indexToSchemaKey = keysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));        
+        final var indices = errorIndices.stream().sorted().toList();
 
         for (var i = 0; i < indices.size(); i += 1) {
             for (var j = i + 1; j < indices.size(); j += 1) {
@@ -854,15 +830,22 @@ class _Util {
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
                 final var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
 
-                final var key = indexToSchemaKey.get(index);
-                final var otherKey = indexToSchemaKey.get(otherIndex);
+                final var errDef = (Map<String, Object>) def.get("errors");
+                final var otherErrDef = (Map<String, Object>) otherDef.get("errors");
 
-                final var errDef = (Map<String, Object>) def.get(key);
-                final var otherErrDef = (Map<String, Object>) otherDef.get(otherKey);
+                for (final int k = 0; k < errDef.size(); k += 1) {
+                    final var thisErrDef = asMap(errDef.get(k));
+                    final var thisErrDefKeys = new HashSet<>(thisErrDef.keySet());
+                    thisErrDefKeys.remove("///");
 
-                for (final var key2 : errDef.keySet()) {
-                    if (otherErrDef.containsKey(key2)) {
-                        parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, otherKey, key2), "PathCollision", Map.of("other", List.of(index, key, key2)), otherKey));
+                    for (final int l = 0; l < otherErrDef.size(); l += 1) {
+                        final var thisOtherErrDef = otherErrDef.get(l);
+                        final var thisOtherErrDefKeys = new HashSet<>(thisOtherErrDef.keySet());
+                        thisOtherErrDefKeys.remove("///");
+
+                        if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
+                            parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, otherKey, key2), "PathCollision", Map.of("other", List.of(index, key, key2)), otherKey));
+                        }
                     }
                 }
             }
@@ -946,6 +929,7 @@ class _Util {
         final var schemaKeys = new HashSet<String>();
 
         final var headerIndices = new HashSet<Integer>();
+        final var errorIndices = new HashSet<Integer>();
 
         var index = -1;
         for (final var definition : uApiSchemaPseudoJson) {
@@ -976,6 +960,10 @@ class _Util {
                 headerIndices.add(index);
                 continue;
             }
+            if (schemaKey.equals("errors")) {
+                errorIndices.add(index);
+                continue;
+            }
 
             final var ignoreIfDuplicate = (Boolean) def.getOrDefault("_ignoreIfDuplicate", false);
             final var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
@@ -1001,6 +989,8 @@ class _Util {
         }
 
         final var errorKeys = new HashSet<String>();
+        final var requestHeaderKeys = new HashSet<String>();
+        final var responseHeaderKeys = new HashSet<String>();
         final var rootTypeParameterCount = 0;
 
         for (final var schemaKey : schemaKeys) {
@@ -1008,6 +998,12 @@ class _Util {
                 continue;
             } else if (schemaKey.startsWith("errors.")) {
                 errorKeys.add(schemaKey);
+                continue;
+            } else if (schemaKey.startsWith("requestHeader.")) {
+                requestHeaderKeys.add(schemaKey);
+                continue;
+            } else if (schemaKey.startsWith("responseHeader.")) {
+                responseHeaderKeys.add(schemaKey);
                 continue;
             }
 
@@ -1030,12 +1026,11 @@ class _Util {
         try {
             catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex); 
 
-            for (final var errorKey : errorKeys) {
-                final var thisIndex = schemaKeysToIndex.get(errorKey);
+            for (final var thisIndex : errorIndices) {
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
     
                 try {
-                    final var error = parseErrorType(def, errorKey, uApiSchemaPseudoJson,
+                    final var error = parseErrorType(def, uApiSchemaPseudoJson,
                             schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                     applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
                 } catch (UApiSchemaParseError e) {
@@ -1053,19 +1048,33 @@ class _Util {
         try {
             catchHeaderCollisions(uApiSchemaPseudoJson, headerIndices);
 
-            for (final var thisIndex : headerIndices) {
+            for (final var requestHeaderKey : requestHeaderKeys) {
+                final var thisIndex = schemaKeysToIndex.get(requestHeaderKey);
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+                final var headerField = requestHeaderKey.substring("requestHeader.".length());
     
                 try {
-                    final var headersType = parseHeadersType(def, thisIndex, uApiSchemaPseudoJson,
+                    final var requestHeaderType = parseHeadersType(def, requestHeaderKey, headerField, thisIndex, uApiSchemaPseudoJson,
                             schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-                    requestHeaders.putAll(headersType.requestHeaders);
-                    responseHeaders.putAll(headersType.responseHeaders);
+                    requestHeaders.put(requestHeaderType.fieldName, requestHeaderType);
                 } catch (UApiSchemaParseError e) {
                     parseFailures.addAll(e.schemaParseFailures);
                 }
             }
+            for (final var responseHeaderKey : responseHeaderKeys) {
+                final var thisIndex = schemaKeysToIndex.get(responseHeaderKey);
+                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+                final var headerField = responseHeaderKey.substring("responseHeader.".length());
     
+                try {
+                    final var responseHeaderType = parseHeadersType(def, responseHeaderKey, headerField, thisIndex, uApiSchemaPseudoJson,
+                            schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
+                    responseHeaders.put(responseHeaderType.fieldName, responseHeaderType);
+                } catch (UApiSchemaParseError e) {
+                    parseFailures.addAll(e.schemaParseFailures);
+                }
+            }
+
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }        
@@ -2632,9 +2641,9 @@ class _Util {
 
         final Message resultMessage;
         if (requestTarget.equals("fn.ping_")) {
-            resultMessage = new Message(Map.of(), Map.of("Ok", Map.of()));
+            resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of()));
         } else if (requestTarget.equals("fn.api_")) {
-            resultMessage = new Message(Map.of(), Map.of("Ok", Map.of("api", uApiSchema.original)));
+            resultMessage = new Message(Map.of(), Map.of("Ok_", Map.of("api", uApiSchema.original)));
         } else {
             try {
                 resultMessage = handler.apply(callMessage);
@@ -2847,7 +2856,7 @@ class _Util {
         }
 
         if (verificationFailurePseudoJson == null) {
-            return Map.of("Ok", Map.of());
+            return Map.of("Ok_", Map.of());
         }
 
         return Map.of("ErrorVerificationFailure", Map.of("reason", verificationFailurePseudoJson));
@@ -2865,7 +2874,7 @@ class _Util {
                     Map.of("additionalUnverifiedCalls", unverifiedCallsPseudoJson));
         }
 
-        return Map.of("Ok", Map.of());
+        return Map.of("Ok_", Map.of());
     }
 
     static Message mockHandle(Message requestMessage, List<_MockStub> stubs, List<_MockInvocation> invocations,
@@ -2893,7 +2902,7 @@ class _Util {
                         allowArgumentPartialMatch, stubCount);
 
                 stubs.add(0, stub);
-                return new Message(Map.of(), Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok_", Map.of()));
             }
             case "fn.verify_" -> {
                 final var givenCall = (Map<String, Object>) argument.get("call");
@@ -2917,17 +2926,17 @@ class _Util {
             }
             case "fn.clearCalls_" -> {
                 invocations.clear();
-                return new Message(Map.of(), Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok_", Map.of()));
             }
             case "fn.clearStubs_" -> {
                 stubs.clear();
-                return new Message(Map.of(), Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok_", Map.of()));
             }
             case "fn.setRandomSeed_" -> {
                 final var givenSeed = (Integer) argument.get("seed");
 
                 random.setSeed(givenSeed);
-                return new Message(Map.of(), Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok_", Map.of()));
             }
             default -> {
                 invocations.add(new _MockInvocation(functionName, new TreeMap<>(argument)));
@@ -2975,12 +2984,12 @@ class _Util {
 
                 if (definition != null) {
                     final var resultUnion = (_UUnion) definition.result;
-                    final var okStructRef = resultUnion.cases.get("Ok");
+                    final var okStructRef = resultUnion.cases.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;
                     final var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
                             includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
-                    return new Message(Map.of(), Map.of("Ok", randomOkStruct));
+                    return new Message(Map.of(), Map.of("Ok_", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));
                 }
