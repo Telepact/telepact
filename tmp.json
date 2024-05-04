@@ -13,13 +13,22 @@
         }
     },
     {
-        "union.ExUnion": {
-            "One": {},
-            "Two": {
-                "required": ["boolean"],
-                "optional!": ["boolean"]
+        "///": [
+            " The main union example.                                                         ",
+            "                                                                                 ",
+            " The [One] field must be supplied. The [Two] field does not need to be supplied. "
+        ],
+        "union.ExUnion": [
+            {
+                "case.One": {}
+            },
+            {
+                "case.Two": {
+                    "required": ["boolean"],
+                    "optional!": ["boolean"]
+                }
             }
-        }
+        ]
     },
     {
         "struct<1>.PStr": {
@@ -68,12 +77,19 @@
             "required": ["boolean"],
             "optional!": ["boolean"]
         },
-        "->": {
-            "Ok": {
-                "required": ["boolean"],
-                "optional!": ["boolean"]
+        "->": [
+            {
+                "ok": {
+                    "required": ["boolean"],
+                    "optional!": ["boolean"]
+                }
+            },
+            {
+                "err.Example": {
+                    "property": ["string"]
+                }
             }
-        }
+        ]
     },
     {
         "fn.test": {

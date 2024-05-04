@@ -9,32 +9,35 @@
     },
     {
         "///": " The number of times a function is allowed to be called. ",
-        "union.CallCountCriteria_": {
+        "union.CallCountCriteria_": [{
             "Exact": {
                 "times": ["integer"]
-            },
+            }
+        }, {
             "AtMost": {
                 "times": ["integer"]
-            },
+            }
+        }, {
             "AtLeast": {
                 "times": ["integer"]
             }
-        }
+        }]
     },
     {
         "///": " Possible causes for a mock verification to fail. ",
-        "union.VerificationFailure_": {
+        "union.VerificationFailure_": [{
             "TooFewMatchingCalls": {
                 "wanted": ["union.CallCountCriteria_"],
                 "found": ["integer"],
                 "allCalls": ["array", ["_ext.Call_"]]
-            },
+            }
+        }, {
             "TooManyMatchingCalls": {
                 "wanted": ["union.CallCountCriteria_"],
                 "found": ["integer"],
                 "allCalls": ["array", ["_ext.Call_"]]
             }
-        }
+        }]
     },
     {
         "///": [
@@ -55,10 +58,10 @@
             "strictMatch!": ["boolean"],
             "count!": ["integer"]
         },
-        "->": {
-            "Ok": {}
-        },
-        "_errors": "^err\\..*[^_]_$"
+        "->": [{
+            "Ok_": {}
+        }],
+        "_errors": "^.*[^_]_$"
     },
     {
         "///": [
@@ -72,12 +75,13 @@
             "strictMatch!": ["boolean"],
             "count!": ["union.CallCountCriteria_"]
         },
-        "->": {
-            "Ok": {},
+        "->": [{
+            "Ok_": {}
+        }, {
             "ErrorVerificationFailure": {
                 "reason": ["union.VerificationFailure_"]
             }
-        },
+        }],
         "_errors": "^err\\..*[^_]_$"
     },
     {
@@ -86,28 +90,29 @@
             " interactions have been verified.                                                "
         ],
         "fn.verifyNoMoreInteractions_": {},
-        "->": {
-            "Ok": {},
+        "->": [{
+            "Ok_": {}
+        }, {
             "ErrorVerificationFailure": {
                 "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
             }
-        },
+        }],
         "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": " Clear all stub conditions. ",
         "fn.clearStubs_": {},
-        "->": {
-            "Ok": {}
-        },
+        "->": [{
+            "Ok_": {}
+        }],
         "_errors": "^err\\..*[^_]_$"
     },
     {
         "///": " Clear all call data. ",
         "fn.clearCalls_": {},
-        "->": {
-            "Ok": {}
-        },
+        "->": [{
+            "Ok_": {}
+        }],
         "_errors": "^err\\..*[^_]_$"
     },
     {
@@ -115,16 +120,15 @@
         "fn.setRandomSeed_": {
             "seed": ["integer"]
         },
-        "->": {
-            "Ok": {}
-        },
+        "->": [{
+            "Ok_": {}
+        }],
         "_errors": "^err\\..*[^_]_$"
     },
     {
-        "///": [
-            " The mock could not return a result for that function call due to no matching    ",
-            " stub being available.                                                           "
-        ],
-        "err.ErrorNoMatchingStub__": {}
+        "errors": [{
+            "///": " The mock could not return a result due to no matching stub being available. ",
+            "NoMatchingStub__": {}
+        }]
     }
 ]

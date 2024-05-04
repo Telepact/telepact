@@ -2,20 +2,20 @@
     {
         "///": " Ping the server. ",
         "fn.ping_": {},
-        "->": {
-            "Ok": {}
-        },
-        "_errors": "^err\\..*[^_]_$"
+        "->": [{
+            "Ok_": {}
+        }],
+        "_errors": "^.*[^_]_$"
     },
     {
         "///": " Get the uAPI `schema` of this server. ",
         "fn.api_": {},
-        "->": {
-            "Ok": {
+        "->": [{
+            "Ok_": {
                 "api": ["array", ["object", ["any"]]]
             }
-        },
-        "_errors": "^err\\..*[^_]_$"
+        }],
+        "_errors": "^.*[^_]_$"
     },
     {
         "struct.Auth_": {},
@@ -25,96 +25,136 @@
         "_ext.Select_": {}
     },
     {
+        "///": " The timeout in milliseconds set by the client ",
+        "requestHeader.time_": ["integer"]
+    },
+    {
         "///": [
-            " The `tim_` request header represents the timeout in milliseconds set by the     ",
-            " client when the request was submitted.                                          ",
-            "                                                                                 ",
-            " The `auth_` header is the conventional location for sending credentials to the  ",
-            " server for the purpose of authentication and authorization.                     ",
-            "                                                                                 ",
-            " If the `unsafe_` request header is set to `true`, response validation by the    ",
-            " server will be disabled.                                                        ",
-            "                                                                                 ",
-            " The `select_` header is used to select fields from structs. It is an object of  ",
-            " string arrays keyed by struct reference name pointing to field names of that    ",
-            " struct that should be selected. Field names not included in the array are       ",
-            " omitted in the response wherever that field would have appeared.                ",
-            "                                                                                 ",
-            " A `bin_` request header indicates the binary checksums known by the client,     ",
-            " which will prompt the inclusion of the `bin_` response header with the binary   ",
-            " checksum currently in use by the server. If server binary checksum does not     ",
-            " match one of the client-indicated binary checksums in the `bin_` request        ",
-            " header, then the server will also include the `enc_` response header            ",
-            " containing the binary encoding, an object of possible keys mapped onto a field  ",
-            " id.                                                                             ",
-            "                                                                                 ",
-            " A `id_` request header will be reflected as-is in the `id_` response header.    "
+            " The conventional location for sending credentials to the server for the         ",
+            " purpose of authentication and authorization.                                    "
         ],
-        "headers": {
-            "tim_": ["integer"],
-            "auth_": ["struct.Auth_"],
-            "unsafe_": ["boolean"],
-            "select_": ["_ext.Select_"],
-            "bin_": ["array", ["integer"]],
-            "id_": ["any"]
-        },
-        "->": {
-            "bin_": ["array", ["integer"]],
-            "enc_": ["object", ["integer"]],
-            "id_": ["any"]
-        }
+        "requestHeader.auth_": ["struct.Auth_"]
+    },
+    {
+        "///": " If set to `true`, response validation by the server will be disabled. ",
+        "requestHeader.unsafe_": ["boolean"]
+    },
+    {
+        "///": [
+            " Used to select fields from structs. It is an object of string arrays keyed by   ",
+            " struct reference name pointing to field names of that struct that should be     ",
+            " selected. Field names not included in the array are omitted in the response     ",
+            " wherever that field would have appeared.                                        "
+        ],
+        "requestHeader.select_": ["_ext.Select_"]
+    },
+    {
+        "///": [
+            " Indicates the binary checksums known by the client, which will prompt the       ",
+            " inclusion of the `bin_` response header with the binary checksum currently in   ",
+            " use by the server. If server binary checksum does not match one of the          ",
+            " client-indicated binary checksums in the `bin_` request header, then the        ",
+            " server will also include the `enc_` response header containing the binary       ",
+            " encoding, an object of possible keys mapped onto a field id.                    "
+        ],
+        "requestHeader.bin_": ["array", ["integer"]]
+    },
+    {
+        "///": [
+            " Indicates the binary checksums known by the client, which will prompt the       ",
+            " inclusion of the `bin_` response header with the binary checksum currently in   ",
+            " use by the server. If server binary checksum does not match one of the          ",
+            " client-indicated binary checksums in the `bin_` request header, then the        ",
+            " server will also include the `enc_` response header containing the binary       ",
+            " encoding, an object of possible keys mapped onto a field id.                    "
+        ],
+        "responseHeader.bin_": ["array", ["integer"]]
+    },
+    {
+        "///": [
+            " The binary encoding used by the server, an object of possible keys mapped onto  ",
+            " a field id.                                                                     "
+        ],
+        "responseHeader.enc_": ["object", ["integer"]]
+    },
+    {
+        "///": " Will be reflected as-is in `responseHeader.id_`. ",
+        "requestHeader.id_": ["any"]
+    },
+    {
+        "///": " The value of `requestHeader.id_`, if provided. ",
+        "responseHeader.id_": ["any"]
     },
     {
         "///": " A type. ",
-        "union.Type_": {
-            "Null": {},
-            "Boolean": {},
-            "Integer": {},
-            "Number": {},
-            "String": {},
-            "Array": {},
-            "Object": {},
-            "Any": {},
+        "union.Type_": [{
+            "Null": {}
+        }, {
+            "Boolean": {}
+        }, {
+            "Integer": {}
+        }, {
+            "Number": {}
+        }, {
+            "String": {}
+        }, {
+            "Array": {}
+        }, {
+            "Object": {}
+        }, {
+            "Any": {}
+        }, {
             "Unknown": {}
-        }
+        }]
     },
     {
         "///": " A reason for the validation failure in the body. ",
-        "union.ValidationFailureReason_": {
+        "union.ValidationFailureReason_": [{
             "TypeUnexpected": {
                 "expected": ["union.Type_"],
                 "actual": ["union.Type_"]
-            },
-            "NullDisallowed": {},
-            "ObjectKeyDisallowed": {},
-            "NumberOutOfRange": {},
+            }
+        }, {
+            "NullDisallowed": {}
+        }, {
+            "ObjectKeyDisallowed": {}
+        }, {
+            "NumberOutOfRange": {}
+        }, {
             "ObjectSizeUnexpected": {
                 "expected": ["integer"],
                 "actual": ["integer"]
-            },
+            }
+        }, {
             "ExtensionValidationFailed": {
                 "reason": ["string"],
                 "data!": ["object", ["any"]]
-            },
+            }
+        }, {
             "ObjectKeyRegexMatchCountUnexpected": {
                 "regex": ["string"],
                 "expected": ["integer"],
                 "actual": ["integer"],
                 "keys": ["array", ["string"]]
-            },
+            }
+        }, {
             "RequiredObjectKeyMissing": {},
             "FunctionUnknown": {}
-        }
+        }]
     },
     {
         "///": " A parse failure. ",
-        "union.ParseFailure_": {
-            "IncompatibleBinaryEncoding": {},
-            "BinaryDecodeFailure": {},
-            "JsonInvalid": {},
-            "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {},
+        "union.ParseFailure_": [{
+            "IncompatibleBinaryEncoding": {}
+        }, {
+            "BinaryDecodeFailure": {}
+        }, {
+            "JsonInvalid": {}
+        }, {
+            "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+        }, {
             "ExpectedJsonArrayOfTwoObjects": {}
-        }
+        }]
     },
     {
         "///": " A validation failure located at a `path` explained by a `reason`. ",
@@ -124,49 +164,44 @@
         }
     },
     {
-        "///": " The server implementation raised an unknown error. ",
-        "err.UnhandledImplementationError_": {}
-    },
-    {
-        "///": " The headers on the request are invalid. ",
-        "err.InvalidRequestHeaders_": {
-            "cases": ["array", ["struct.ValidationFailure_"]]
-        }
-    },
-    {
-        "///": " The body on the request is invalid. ",
-        "err.InvalidRequestBody_": {
-            "cases": ["array", ["struct.ValidationFailure_"]]
-        }
-    },
-    {
-        "///": " The headers on the response are invalid. ",
-        "err.InvalidResponseHeaders_": {
-            "cases": ["array", ["struct.ValidationFailure_"]]
-        }
-    },
-    {
-        "///": " The body that the server attempted to put on the response is invalid. ",
-        "err.InvalidResponseBody_": {
-            "cases": ["array", ["struct.ValidationFailure_"]]
-        }
-    },
-    {
-        "///": " The request could not be parsed as a uAPI Message. ",
-        "err.ParseFailure_": {
-            "reasons": ["array", ["union.ParseFailure_"]]
-        }
-    },
-    {
-        "///": " The credentials in the `_auth` header were missing or invalid. ",
-        "err.Unauthenticated_": {
-            "message!": ["string"]
-        }
-    },
-    {
-        "///": " The credentials in the `_auth` header were insufficient to run the function. ",
-        "err.Unauthorized_": {
-            "message!": ["string"]
-        }
+        "errors": [{
+            "///": " The server implementation raised an unknown error. ",
+            "UnhandledImplementationError_": {}
+        }, {
+            "///": " The headers on the request are invalid. ",
+            "InvalidRequestHeaders_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            }
+        }, {
+            "///": " The body on the request is invalid. ",
+            "InvalidRequestBody_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            }
+        }, {
+            "///": " The headers on the response are invalid. ",
+            "InvalidResponseHeaders_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            }
+        }, {
+            "///": " The body that the server attempted to put on the response is invalid. ",
+            "InvalidResponseBody_": {
+                "cases": ["array", ["struct.ValidationFailure_"]]
+            }
+        }, {
+            "///": " The request could not be parsed as a uAPI Message. ",
+            "ParseFailure_": {
+                "reasons": ["array", ["union.ParseFailure_"]]
+            }
+        }, {
+            "///": " The credentials in the `_auth` header were missing or invalid. ",
+            "Unauthenticated_": {
+                "message!": ["string"]
+            }
+        }, {
+            "///": " The credentials in the `_auth` header were insufficient to run the function. ",
+            "Unauthorized_": {
+                "message!": ["string"]
+            }
+        }]
     }
 ]

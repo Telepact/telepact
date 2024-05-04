@@ -1,22 +1,22 @@
 {
-  "json.schemas": [
-    {
-      "fileMatch": ["*.uapi.json"],
-      "url": "./idl/schema.json"
+    "json.schemas": [
+        {
+            "fileMatch": ["*.uapi.json"],
+            "url": "./common/json-schema.json"
+        }
+    ],
+    "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test_*.py"],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": ["."],
+    "autopep8.args": ["--exclude=**/*cases.py"],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "[java]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
-  ],
-  "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test_*.py"],
-  "python.testing.pytestEnabled": true,
-  "python.testing.unittestEnabled": false,
-  "python.testing.pytestArgs": ["."],
-  "autopep8.args": ["--exclude=**/*cases.py"],
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.autopep8"
-  },
-  "[java]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
 }
