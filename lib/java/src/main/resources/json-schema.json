@@ -102,52 +102,73 @@
                         }
                     },
                     "union<1>\\.[a-zA-Z_]\\w*$": {
-                        "type": "object",
-                        "description": "An union with 1 or more fields.",
-                        "additionalProperties": false,
-                        "minProperties": 1,
-                        "patternProperties": {
-                            "^[a-zA-Z_]\\w*?$": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "patternProperties": {
-                                    "^[a-zA-Z_]\\w*!?$": {
-                                        "$ref": "#/$defs/typeDeclarationParam1"
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "An union with 1 or more fields.",
+                            "minProperties": 1,
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclarationParam1"
+                                        }
                                     }
+                                }
+                            },
+                            "properties": {
+                                "///": {
+                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
                                 }
                             }
                         }
                     },
                     "union<2>\\.[a-zA-Z_]\\w*$": {
-                        "type": "object",
-                        "description": "An union with 1 or more fields.",
-                        "additionalProperties": false,
-                        "minProperties": 1,
-                        "patternProperties": {
-                            "^[a-zA-Z_]\\w*?$": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "patternProperties": {
-                                    "^[a-zA-Z_]\\w*!?$": {
-                                        "$ref": "#/$defs/typeDeclarationParam2"
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "An union with 1 or more fields.",
+                            "minProperties": 1,
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclarationParam2"
+                                        }
                                     }
+                                }
+                            },
+                            "properties": {
+                                "///": {
+                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
                                 }
                             }
                         }
                     },
                     "union<3>\\.[a-zA-Z_]\\w*$": {
-                        "type": "object",
-                        "description": "An union with 1 or more fields.",
-                        "additionalProperties": false,
-                        "minProperties": 1,
-                        "patternProperties": {
-                            "^[a-zA-Z_]\\w*?$": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "patternProperties": {
-                                    "^[a-zA-Z_]\\w*!?$": {
-                                        "$ref": "#/$defs/typeDeclarationParam3"
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "An union with 1 or more fields.",
+                            "minProperties": 1,
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclarationParam3"
+                                        }
                                     }
+                                }
+                            },
+                            "properties": {
+                                "///": {
+                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
                                 }
                             }
                         }

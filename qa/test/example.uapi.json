@@ -145,10 +145,7 @@
             "pUnionP2Str!": ["union<1>.PUnion", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
             "pUnionNullP2Str!": ["union<1>.PUnion", ["struct<2>.P2Str?", ["boolean"], ["integer"]]],
             "arrPStrP2Str!": ["array", ["struct<1>.PStr", ["struct<2>.P2Str", ["boolean"], ["integer"]]]],
-            "arrP2StrP2Str!": [
-                "array",
-                ["struct<2>.P2Str", ["boolean"], ["struct<2>.P2Str", ["boolean"], ["integer"]]]
-            ],
+            "arrP2StrP2Str!": ["array", ["struct<2>.P2Str", ["boolean"], ["struct<2>.P2Str", ["boolean"], ["integer"]]]],
             "p2Union!": ["union<2>.P2Union", ["boolean"], ["integer"]],
             "nullP2Union!": ["union<2>.P2Union?", ["boolean"], ["integer"]],
             "arrP2Union!": ["array", ["union<2>.P2Union", ["boolean"], ["integer"]]],
@@ -160,10 +157,7 @@
             "pUnionP2Union!": ["union<1>.PUnion", ["union<2>.P2Union", ["boolean"], ["integer"]]],
             "pUnionNullP2Union!": ["union<1>.PUnion", ["union<2>.P2Union?", ["boolean"], ["integer"]]],
             "arrPStrP2Union!": ["array", ["struct<1>.PStr", ["union<2>.P2Union", ["boolean"], ["integer"]]]],
-            "arrP2StrP2Union!": [
-                "array",
-                ["struct<2>.P2Str", ["boolean"], ["union<2>.P2Union", ["boolean"], ["integer"]]]
-            ],
+            "arrP2StrP2Union!": ["array", ["struct<2>.P2Str", ["boolean"], ["union<2>.P2Union", ["boolean"], ["integer"]]]],
             "pdStr!": ["struct<1>.PdStr", ["struct<1>.PStr", ["boolean"]]]
         }
     },
@@ -181,13 +175,14 @@
         }
     },
     {
-        "union.ExUnion": {
-            "One": {},
+        "union.ExUnion": [{
+            "One": {}
+        }, {
             "Two": {
                 "required": ["boolean"],
                 "optional!": ["boolean"]
             }
-        }
+        }]
     },
     {
         "struct<1>.PStr": {
@@ -206,21 +201,23 @@
         }
     },
     {
-        "union<1>.PUnion": {
-            "One": {},
+        "union<1>.PUnion": [{
+            "One": {}
+        }, {
             "Two": {
                 "ewrap": ["T.0"]
             }
-        }
+        }]
     },
     {
-        "union<2>.P2Union": {
-            "One": {},
+        "union<2>.P2Union": [{
+            "One": {}
+        }, {
             "Two": {
                 "ewrap": ["T.0"],
                 "enest": ["array", ["T.1"]]
             }
-        }
+        }]
     },
     {
         "struct.Big": {
@@ -236,40 +233,39 @@
             "required": ["boolean"],
             "optional!": ["boolean"]
         },
-        "->": {
-            "Ok": {
+        "->": [{
+            "Ok_": {
                 "required": ["boolean"],
                 "optional!": ["boolean"]
             }
-        }
+        }]
     },
     {
         "fn.test": {
             "value!": ["struct.Value"]
         },
-        "->": {
-            "Ok": {
+        "->": [{
+            "Ok_": {
                 "value!": ["struct.Value"]
-            },
+            }
+        }, {
             "ErrorExample": {
                 "property": ["string"]
             }
-        }
+        }]
     },
     {
         "fn.getBigList": {},
-        "->": {
-            "Ok": {
+        "->": [{
+            "Ok_": {
                 "items": ["array", ["struct.Big"]]
             }
-        }
+        }]
     },
     {
-        "headers": {
-            "in": ["boolean"]
-        },
-        "->": {
-            "out": ["boolean"]
-        }
+        "requestHeader.in": ["boolean"]
+    },
+    {
+        "responseHeader.out": ["boolean"]
     }
 ]

@@ -129,7 +129,7 @@ class _Util {
     }
 
     public static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
+        final var regex = "^(errors|((fn|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
         final var matches = new ArrayList<String>();
 
         final var keys = definition.keySet().stream().sorted().toList();
@@ -443,15 +443,28 @@ class _Util {
         final List<Object> thisPath = append(path, schemaKey);
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
-        final List<Object> definition;
+        final List<Object> definition2;
         try {
-            definition = asList(defInit);
+            definition2 = asList(defInit);
         } catch (ClassCastException e) {
             final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
-                    defInit, "Object");
+                    defInit, "Array");
 
             parseFailures.addAll(finalParseFailures);
             throw new UApiSchemaParseError(parseFailures);
+        }
+
+        final List<Map<String, Object>> definition = new ArrayList<>();
+        for (final var element : definition2) {
+            try {
+                definition.add(asMap(element));
+            } catch (ClassCastException e) {
+                final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
+                        element, "Object");
+
+                parseFailures.addAll(finalParseFailures);
+                throw new UApiSchemaParseError(parseFailures);
+            }
         }
 
         final var cases = new HashMap<String, _UStruct>();
@@ -815,11 +828,9 @@ class _Util {
         }
     }
 
-    // TODO: Fix this
     static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices, Map<String, Integer> keysToIndex) {
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
 
-        final var indexToSchemaKey = keysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));        
         final var indices = errorIndices.stream().sorted().toList();
 
         for (var i = 0; i < indices.size(); i += 1) {
@@ -833,18 +844,18 @@ class _Util {
                 final var errDef = (Map<String, Object>) def.get("errors");
                 final var otherErrDef = (Map<String, Object>) otherDef.get("errors");
 
-                for (final int k = 0; k < errDef.size(); k += 1) {
+                for (int k = 0; k < errDef.size(); k += 1) {
                     final var thisErrDef = asMap(errDef.get(k));
                     final var thisErrDefKeys = new HashSet<>(thisErrDef.keySet());
                     thisErrDefKeys.remove("///");
 
-                    for (final int l = 0; l < otherErrDef.size(); l += 1) {
-                        final var thisOtherErrDef = otherErrDef.get(l);
+                    for (int l = 0; l < otherErrDef.size(); l += 1) {
+                        final var thisOtherErrDef = asMap(otherErrDef.get(l));
                         final var thisOtherErrDefKeys = new HashSet<>(thisOtherErrDef.keySet());
                         thisOtherErrDefKeys.remove("///");
 
                         if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
-                            parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, otherKey, key2), "PathCollision", Map.of("other", List.of(index, key, key2)), otherKey));
+                            parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "errors", l), "PathCollision", Map.of("other", List.of(index, "errors", k)), "errors"));
                         }
                     }
                 }
@@ -1024,7 +1035,7 @@ class _Util {
         }
 
         try {
-            catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex); 
+            catchErrorCollisions(uApiSchemaPseudoJson, errorIndices, schemaKeysToIndex); 
 
             for (final var thisIndex : errorIndices) {
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
