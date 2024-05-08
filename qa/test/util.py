@@ -45,14 +45,14 @@ def handler(request):
     if '_onResponseError' in header:
         response_header['_onResponseError'] = header['_onResponseError']
 
-    if 'Ok' in header:
-        return [response_header, {'Ok': header['Ok']}]
+    if 'Ok_' in header:
+        return [response_header, {'Ok_': header['Ok_']}]
     elif 'result' in header:
         return [response_header, header['result']]
     elif 'throw' in header:
         return None
     else:
-        return [response_header, {'Ok': {}}]
+        return [response_header, {'Ok_': {}}]
 
 
 async def backdoor_handler(nats_client: nats.aio.client.Client, backdoor_topic):

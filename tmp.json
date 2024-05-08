@@ -96,7 +96,7 @@
             "value!": ["struct.Value"]
         },
         "->": {
-            "Ok": {
+            "Ok_": {
                 "value!": ["struct.Value"]
             },
             "ErrorExample": {
@@ -107,7 +107,7 @@
     {
         "fn.getBigList": {},
         "->": {
-            "Ok": {
+            "Ok_": {
                 "items": ["array", ["struct.Big"]]
             }
         }

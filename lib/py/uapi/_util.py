@@ -636,7 +636,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
             res_path, "RequiredObjectKeyMissing", {}, None))
     else:
         try:
-            result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key, function_definition_as_parsed_json.keys(), ['Ok'],
+            result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key, function_definition_as_parsed_json.keys(), ['Ok_'],
                                            type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
                                            parsed_types, type_extensions, all_parse_failures, failed_types)
         except types.UApiSchemaParseError as e:
@@ -2148,10 +2148,10 @@ async def handle_message(request_message: 'types.Message', u_api_schema: 'types.
         request_headers, {request_target: request_payload})
 
     if request_target == 'fn.ping_':
-        result_message: types.Message = types.Message({}, {'Ok': {}})
+        result_message: types.Message = types.Message({}, {'Ok_': {}})
     elif request_target == 'fn.api_':
         result_message = types.Message(
-            {}, {'Ok': {'api': u_api_schema.original}})
+            {}, {'Ok_': {'api': u_api_schema.original}})
     else:
         try:
             result_message = await handler(call_message)
@@ -2318,7 +2318,7 @@ def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
             }
 
     if verification_failure_pseudo_json is None:
-        return {"Ok": {}}
+        return {"Ok_": {}}
 
     return {"ErrorVerificationFailure": {"reason": verification_failure_pseudo_json}}
 
@@ -2332,7 +2332,7 @@ def verify_no_more_interactions(invocations: List[_types._MockInvocation]) -> Di
                                         for invocation in invocations_not_verified]
         return {"ErrorVerificationFailure": {"additionalUnverifiedCalls": unverified_calls_pseudo_json}}
 
-    return {"Ok": {}}
+    return {"Ok_": {}}
 
 
 async def mock_handle(request_message: 'types.Message', stubs: List[_types._MockStub], invocations: List[_types._MockInvocation],
@@ -2361,7 +2361,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
                                 allow_argument_partial_match, stub_count)
 
         stubs.insert(0, stub)
-        return types.Message({}, {"Ok": {}})
+        return types.Message({}, {"Ok_": {}})
 
     elif function_name == "fn.verify_":
         given_call: Dict[str, Any] = argument["call"]
@@ -2385,17 +2385,17 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
 
     elif function_name == "fn.clearCalls_":
         invocations.clear()
-        return types.Message({}, {"Ok": {}})
+        return types.Message({}, {"Ok_": {}})
 
     elif function_name == "fn.clearStubs_":
         stubs.clear()
-        return types.Message({}, {"Ok": {}})
+        return types.Message({}, {"Ok_": {}})
 
     elif function_name == "fn.setRandomSeed_":
         given_seed: int = argument["seed"]
 
         random.set_seed(given_seed)
-        return types.Message({}, {"Ok": {}})
+        return types.Message({}, {"Ok_": {}})
 
     else:
         invocations.append(_types._MockInvocation(
@@ -2433,13 +2433,13 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
 
         if definition is not None:
             result_union = definition.result
-            ok_struct_ref = result_union.cases["Ok"]
+            ok_struct_ref = result_union.cases["Ok_"]
             use_blueprint_value = True
             include_optional_fields = True
             random_ok_struct = ok_struct_ref.generate_random_value({}, use_blueprint_value,
                                                                    include_optional_fields, randomize_optional_field_generation,
                                                                    [], [], random)
-            return types.Message({}, {"Ok": random_ok_struct})
+            return types.Message({}, {"Ok_": random_ok_struct})
         else:
             raise types.UApiError(
                 "Unexpected unknown function: %s" % function_name)

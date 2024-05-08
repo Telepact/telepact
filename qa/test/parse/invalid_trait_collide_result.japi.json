@@ -2,7 +2,7 @@
     {
         "fn.example": {},
         "->": {
-            "Ok": {
+            "Ok_": {
                 "result1": ["boolean"]
             }
         }
@@ -11,7 +11,7 @@
         "errors.Collide": {
             "fn.*": {},
             "->": {
-                "Ok": {
+                "Ok_": {
                     "result1": ["boolean"]
                 }
             }

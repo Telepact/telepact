@@ -653,10 +653,6 @@ class _Util {
             String fnName = f.name;
 
             var regex = Pattern.compile(f.errorsRegex);
-            var matcher = regex.matcher(errorName);
-            if (!matcher.find()) {
-                continue;
-            }
 
             _UUnion fnResult = f.result;
             Map<String, _UStruct> fnResultCases = fnResult.cases;
@@ -665,6 +661,12 @@ class _Util {
 
             for (var errorResultField : errorFnResultCases.entrySet()) {
                 var newKey = errorResultField.getKey();
+
+                var matcher = regex.matcher(newKey);
+                if (!matcher.find()) {
+                    continue;
+                }
+
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
                     parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, errorName, newKey),
@@ -783,7 +785,7 @@ class _Util {
             parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
-                    "^errors\\..*$");
+                    "^.*$");
             try {
                 errorsRegex = asString(errorsRegexInit);
             } catch (ClassCastException e) {

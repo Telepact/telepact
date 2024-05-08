@@ -160,7 +160,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
             schema = types.UApiSchema.from_json(schema_json)
             if extend_schema_json:
                 types.UApiSchema.extend(schema, extend_schema_json)
-            return types.Message({}, {"Ok": {}})
+            return types.Message({}, {"Ok_": {}})
         except types.UApiSchemaParseError as e:
             on_err(e)
             return types.Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
@@ -368,7 +368,7 @@ async def run_dispatcher_server():
             else:
                 raise RuntimeError("no matching server")
 
-            response_bytes = json.dumps([{}, {"Ok": {}}]).encode("utf-8")
+            response_bytes = json.dumps([{}, {"Ok_": {}}]).encode("utf-8")
 
         except Exception as e:
             on_err(e)

@@ -1,16 +1,16 @@
 [
-  {
-    "struct.Data": {
-      "id": ["integer"],
-      "name": ["string"]
+    {
+        "struct.Data": {
+            "id": ["integer"],
+            "name": ["string"]
+        }
+    },
+    {
+        "fn.example": {},
+        "->": {
+            "Ok_": {
+                "data": ["array", ["struct.Data"]]
+            }
+        }
     }
-  },
-  {
-    "fn.example": {},
-    "->": {
-      "Ok": {
-        "data": ["array", ["struct.Data"]]
-      }
-    }
-  }
 ]

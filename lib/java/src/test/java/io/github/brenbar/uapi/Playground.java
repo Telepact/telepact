@@ -14,7 +14,7 @@ public class Playground {
         System.out.println("Done!");
 
         Function<Message, Message> handler = (requestMessage) -> {
-            return new Message(Map.of(), Map.of("Ok", Map.of()));
+            return new Message(Map.of(), Map.of("Ok_", Map.of()));
         };
 
         var server = new Server(uApi, handler, new Server.Options());

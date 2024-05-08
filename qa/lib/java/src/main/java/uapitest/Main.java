@@ -198,7 +198,7 @@ public class Main {
                 if (extendSchemaJson != null) {
                     UApiSchema.extend(schema, extendSchemaJson);
                 }
-                return new Message(Map.of(), Map.of("Ok", Map.of()));
+                return new Message(Map.of(), Map.of("Ok_", Map.of()));
             } catch (UApiSchemaParseError e) {
                 e.printStackTrace();
                 System.err.flush();
@@ -453,7 +453,7 @@ public class Main {
                     }
                     ;
 
-                    responseBytes = objectMapper.writeValueAsBytes(List.of(Map.of(), Map.of("Ok", Map.of())));
+                    responseBytes = objectMapper.writeValueAsBytes(List.of(Map.of(), Map.of("Ok_", Map.of())));
                 } catch (Throwable e) {
                     e.printStackTrace();
                     try {

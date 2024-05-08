@@ -3,7 +3,7 @@
         "///": " Ping the server. ",
         "fn.ping_": {},
         "->": {
-            "Ok": {}
+            "Ok_": {}
         },
         "_errors": "^error\\._Validated$"
     },
@@ -12,7 +12,7 @@
         "///": " Get the uAPI `schema` of this server. ",
         "fn.api_": {},
         "->": {
-            "Ok": {
+            "Ok_": {
                 "api": ["array", ["object", ["any"]]]
             }
         },
@@ -23,7 +23,7 @@
         "///": " A placeholder function when the requested function is unknown. ",
         "fn._unknown": {},
         "->": {
-            "Ok": {}
+            "Ok_": {}
         },
         "_errors": "^error\\._Validated$"
     },

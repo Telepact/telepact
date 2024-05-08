@@ -1,4 +1,14 @@
-import { Client, ClientOptions, Server, ServerOptions, Message, SerializationError, MockServer, MockServerOptions, UApiSchema, } from "uapi";
+import {
+    Client,
+    ClientOptions,
+    Server,
+    ServerOptions,
+    Message,
+    SerializationError,
+    MockServer,
+    MockServerOptions,
+    UApiSchema,
+} from "uapi";
 import { connect } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
@@ -25,8 +35,7 @@ class Registry {
             if (!fs.existsSync(fileName)) {
                 try {
                     fs.mkdirSync("./metrics");
-                }
-                catch (e) { }
+                } catch (e) {}
                 const header = "count,min,max,mean,median,p75,p95,p99\n";
                 fs.writeFileSync(fileName, header);
             }
@@ -43,12 +52,10 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
             let requestBytes;
             try {
                 requestBytes = s.serialize(m);
-            }
-            catch (e) {
+            } catch (e) {
                 if (e instanceof SerializationError) {
-                    return new Message({ numberTooBig: true }, { 'ErrorUnknown_': {} });
-                }
-                else {
+                    return new Message({ numberTooBig: true }, { ErrorUnknown_: {} });
+                } else {
                     throw e;
                 }
             }
@@ -58,8 +65,7 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
             console.log(`   ->c  ${new TextDecoder().decode(responseBytes)}`);
             const responseMessage = s.deserialize(responseBytes);
             return responseMessage;
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
             throw e;
         }
@@ -81,8 +87,7 @@ function startClientTestServer(connection, registry, clientFrontdoorTopic, clien
             const time = timer.startTimer();
             try {
                 response = await client.request(request);
-            }
-            finally {
+            } finally {
                 time();
             }
             const responsePseudoJson = [response.header, response.body];
@@ -116,8 +121,7 @@ function startMockTestServer(connection, registry, apiSchemaPath, frontdoorTopic
             const time = timer.startTimer();
             try {
                 responseBytes = await server.process(requestBytes);
-            }
-            finally {
+            } finally {
                 time();
             }
             console.log(`    <-S ${new TextDecoder().decode(responseBytes)}`);
@@ -140,12 +144,10 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
         if (serializeSchema) {
             try {
                 schemaJson = JSON.stringify(schemaPseudoJson);
-            }
-            catch (e) {
+            } catch (e) {
                 throw e;
             }
-        }
-        else {
+        } else {
             schemaJson = schemaPseudoJson;
         }
         try {
@@ -154,14 +156,16 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
                 UApiSchema.extend(schema, extendSchemaJson);
             }
             return new Message({}, { Ok: {} });
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
-            return new Message({}, {
-                ErrorValidationFailure: {
-                    cases: e.schemaParseFailuresPseudoJson,
+            return new Message(
+                {},
+                {
+                    ErrorValidationFailure: {
+                        cases: e.schemaParseFailuresPseudoJson,
+                    },
                 },
-            });
+            );
         }
     };
     const options = new ServerOptions();
@@ -177,8 +181,7 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
             const time = timer.startTimer();
             try {
                 responseBytes = await server.process(requestBytes);
-            }
-            finally {
+            } finally {
                 time();
             }
             console.log(`    <-S ${new TextDecoder().decode(responseBytes)}`);
@@ -190,17 +193,19 @@ function startSchemaTestServer(connection, registry, apiSchemaPath, frontdoorTop
 function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic, authRequired) {
     const json = fs.readFileSync(apiSchemaPath, "utf-8");
     let uApi = UApiSchema.fromJson(json);
-    const alternateUApi = UApiSchema.extend(uApi, `
+    const alternateUApi = UApiSchema.extend(
+        uApi,
+        `
         [
             {
                 "struct.BackwardsCompatibleChange": {}
             }
         ]
-    `);
+    `,
+    );
     const timer = registry.createTimer(frontdoorTopic);
     const serveAlternateServer = { value: false };
-    class ThisError extends Error {
-    }
+    class ThisError extends Error {}
     const handler = async (requestMessage) => {
         const requestHeaders = requestMessage.header;
         const requestBody = requestMessage.body;
@@ -255,12 +260,10 @@ function startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, ba
             try {
                 if (serveAlternateServer.value) {
                     responseBytes = await alternateServer.process(requestBytes);
-                }
-                else {
+                } else {
                     responseBytes = await server.process(requestBytes);
                 }
-            }
-            finally {
+            } finally {
                 time();
             }
             console.log(`    <-S ${new TextDecoder().decode(responseBytes)}`);
@@ -317,7 +320,14 @@ async function runDispatcherServer() {
                         const frontdoorTopic = payload["frontdoorTopic"];
                         const backdoorTopic = payload["backdoorTopic"];
                         const authRequired = payload["authRequired!"] ?? false;
-                        const d = startTestServer(connection, registry, apiSchemaPath, frontdoorTopic, backdoorTopic, authRequired);
+                        const d = startTestServer(
+                            connection,
+                            registry,
+                            apiSchemaPath,
+                            frontdoorTopic,
+                            backdoorTopic,
+                            authRequired,
+                        );
                         servers[id] = d;
                         break;
                     }
@@ -326,7 +336,13 @@ async function runDispatcherServer() {
                         const clientFrontdoorTopic = payload["clientFrontdoorTopic"];
                         const clientBackdoorTopic = payload["clientBackdoorTopic"];
                         const useBinary = payload["useBinary"] ?? false;
-                        const d = startClientTestServer(connection, registry, clientFrontdoorTopic, clientBackdoorTopic, useBinary);
+                        const d = startClientTestServer(
+                            connection,
+                            registry,
+                            clientFrontdoorTopic,
+                            clientBackdoorTopic,
+                            useBinary,
+                        );
                         servers[id] = d;
                         break;
                     }
@@ -351,22 +367,14 @@ async function runDispatcherServer() {
                         throw new Error("no matching server");
                     }
                 }
-                const responseJson = JSON.stringify([
-                    new Map(),
-                    new Map([["Ok", new Map()]]),
-                ]);
+                const responseJson = JSON.stringify([new Map(), new Map([["Ok_", new Map()]])]);
                 responseBytes = new TextEncoder().encode(responseJson);
-            }
-            catch (e) {
+            } catch (e) {
                 console.error(e);
                 try {
-                    const responseJson = JSON.stringify([
-                        new Map(),
-                        new Map([["ErrorUnknown", new Map()]]),
-                    ]);
+                    const responseJson = JSON.stringify([new Map(), new Map([["ErrorUnknown", new Map()]])]);
                     responseBytes = new TextEncoder().encode(responseJson);
-                }
-                catch (e1) {
+                } catch (e1) {
                     throw new Error();
                 }
             }

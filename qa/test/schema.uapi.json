@@ -89,7 +89,7 @@
             "extend!": ["any?"]
         },
         "->": {
-            "Ok": {},
+            "Ok_": {},
             "ErrorValidationFailure": {
                 "cases": ["array", ["struct.ValidationFailure"]]
             }

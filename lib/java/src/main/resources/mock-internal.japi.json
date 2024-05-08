@@ -54,7 +54,7 @@
             "strictMatch!": ["boolean"]
         },
         "->": {
-            "Ok": {}
+            "Ok_": {}
         },
         "_errors": "^error\\._Validated$"
     },
@@ -70,7 +70,7 @@
             "count!": ["union.CallCountCriteria_"]
         },
         "->": {
-            "Ok": {},
+            "Ok_": {},
             "ErrorVerificationFailure": {
                 "reason": ["union.VerificationFailure_"]
             }
@@ -84,7 +84,7 @@
         ],
         "fn.verifyNoMoreInteractions_": {},
         "->": {
-            "Ok": {},
+            "Ok_": {},
             "ErrorVerificationFailure": {
                 "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
             }
@@ -95,14 +95,14 @@
         "///": " Clear all stub conditions. ",
         "fn.clearStubs_": {},
         "->": {
-            "Ok": {}
+            "Ok_": {}
         }
     },
     {
         "///": " Clear all call data. ",
         "fn.clearCalls_": {},
         "->": {
-            "Ok": {}
+            "Ok_": {}
         },
         "_errors": "^error\\._Validated$"
     },
@@ -112,7 +112,7 @@
             "seed": ["integer"]
         },
         "->": {
-            "Ok": {}
+            "Ok_": {}
         },
         "_errors": "^error\\._Validated$"
     },

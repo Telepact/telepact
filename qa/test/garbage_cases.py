@@ -10,7 +10,7 @@ cases = {
         [[{}, {}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject': {}}]}}]],
         [[{}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfTwoObjects': {}}]}}]],
         [[{}, {}, {}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfTwoObjects': {}}]}}]],
-        [[{}, {'Ok': 'wrong'}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject': {}}]}}]],
+        [[{}, {'Ok_': 'wrong'}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject': {}}]}}]],
         [[False, {'fn.ping_': {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfTwoObjects': {}}]}}]],
         [[0, {'fn.ping_': {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfTwoObjects': {}}]}}]],
         [['', {'fn.ping_': {}}], [{}, {'ErrorParseFailure_': {'reasons': [{'ExpectedJsonArrayOfTwoObjects': {}}]}}]],
