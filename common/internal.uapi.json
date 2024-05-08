@@ -138,7 +138,8 @@
                 "keys": ["array", ["string"]]
             }
         }, {
-            "RequiredObjectKeyMissing": {},
+            "RequiredObjectKeyMissing": {}
+        }, {
             "FunctionUnknown": {}
         }]
     },
@@ -147,6 +148,7 @@
         "union.ParseFailure_": [{
             "IncompatibleBinaryEncoding": {}
         }, {
+            "///": " The binary decoder encountered a field id that could not be mapped to a key. ",
             "BinaryDecodeFailure": {}
         }, {
             "JsonInvalid": {}
@@ -166,40 +168,40 @@
     {
         "errors": [{
             "///": " The server implementation raised an unknown error. ",
-            "UnhandledImplementationError_": {}
+            "ErrorUnknown_": {}
         }, {
             "///": " The headers on the request are invalid. ",
-            "InvalidRequestHeaders_": {
+            "ErrorInvalidRequestHeaders_": {
                 "cases": ["array", ["struct.ValidationFailure_"]]
             }
         }, {
             "///": " The body on the request is invalid. ",
-            "InvalidRequestBody_": {
+            "ErrorInvalidRequestBody_": {
                 "cases": ["array", ["struct.ValidationFailure_"]]
             }
         }, {
             "///": " The headers on the response are invalid. ",
-            "InvalidResponseHeaders_": {
+            "ErrorInvalidResponseHeaders_": {
                 "cases": ["array", ["struct.ValidationFailure_"]]
             }
         }, {
             "///": " The body that the server attempted to put on the response is invalid. ",
-            "InvalidResponseBody_": {
+            "ErrorInvalidResponseBody_": {
                 "cases": ["array", ["struct.ValidationFailure_"]]
             }
         }, {
             "///": " The request could not be parsed as a uAPI Message. ",
-            "ParseFailure_": {
+            "ErrorParseFailure_": {
                 "reasons": ["array", ["union.ParseFailure_"]]
             }
         }, {
             "///": " The credentials in the `_auth` header were missing or invalid. ",
-            "Unauthenticated_": {
+            "ErrorUnauthenticated_": {
                 "message!": ["string"]
             }
         }, {
             "///": " The credentials in the `_auth` header were insufficient to run the function. ",
-            "Unauthorized_": {
+            "ErrorUnauthorized_": {
                 "message!": ["string"]
             }
         }]

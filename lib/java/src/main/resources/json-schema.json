@@ -81,7 +81,7 @@
                         "type": "array",
                         "items": {
                             "type": "object",
-                            "description": "An union with 1 or more fields.",
+                            "description": "An union with 1 or more fields huzzah.",
                             "minProperties": 1,
                             "patternProperties": {
                                 "^[a-zA-Z_]\\w*?$": {
@@ -94,10 +94,26 @@
                                     }
                                 }
                             },
-                            "properties": {
-                                "///": {
-                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                            "if": {
+                                "properties": {
+                                    "///": {
+                                        "type": ["string", "array"]
+                                    }
                                 }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
                             }
                         }
                     },
@@ -118,10 +134,24 @@
                                     }
                                 }
                             },
-                            "properties": {
-                                "///": {
-                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                            "if": {
+                                "properties": {
+                                    "///": {}
                                 }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
                             }
                         }
                     },
@@ -142,10 +172,26 @@
                                     }
                                 }
                             },
-                            "properties": {
-                                "///": {
-                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                            "if": {
+                                "properties": {
+                                    "///": {
+                                        "type": ["string", "array"]
+                                    }
                                 }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
                             }
                         }
                     },
@@ -166,10 +212,24 @@
                                     }
                                 }
                             },
-                            "properties": {
-                                "///": {
-                                    "anyOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+                            "if": {
+                                "properties": {
+                                    "///": {}
                                 }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
                             }
                         }
                     }

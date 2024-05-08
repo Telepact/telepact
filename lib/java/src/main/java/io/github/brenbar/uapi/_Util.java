@@ -90,10 +90,12 @@ class _Util {
         return (Map<String, Object>) object;
     }
 
-    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset, Map<String, Integer> schemaKeysToIndex, Set<Integer> headerIndices) {
+    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset,
+            Map<String, Integer> schemaKeysToIndex, Set<Integer> errorIndices) {
         final var finalList = new ArrayList<_SchemaParseFailure>();
 
-        final var indexToSchemaKey = schemaKeysToIndex.entrySet().stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
+        final var indexToSchemaKey = schemaKeysToIndex.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
 
         for (final var f : initialFailures) {
             final String reason = f.reason;
@@ -101,7 +103,8 @@ class _Util {
             final Map<String, Object> data = f.data;
             final var newPath = new ArrayList<>(path);
 
-            newPath.set(0, (Integer) newPath.get(0) - offset);
+            final var originalIndex = (Integer) newPath.get(0);
+            newPath.set(0, originalIndex - offset);
 
             final Map<String, Object> finalData;
             if (reason.equals("PathCollision")) {
@@ -113,13 +116,11 @@ class _Util {
                 finalData = data;
             }
 
-            final var index = newPath.get(0);
-
             String schemaKey;
-            if (headerIndices.contains(index)) {
-                schemaKey = "headers";
+            if (errorIndices.contains(originalIndex)) {
+                schemaKey = "errors";
             } else {
-                schemaKey = indexToSchemaKey.get(index);
+                schemaKey = indexToSchemaKey.get(originalIndex);
             }
 
             finalList.add(new _SchemaParseFailure(newPath, reason, finalData, schemaKey));
@@ -146,7 +147,8 @@ class _Util {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
                     "ObjectKeyRegexMatchCountUnexpected",
                     new TreeMap<>(
-                            Map.of("regex", regex, "actual", matches.size(), "expected", 1, "keys", keys)), null)));
+                            Map.of("regex", regex, "actual", matches.size(), "expected", 1, "keys", keys)),
+                    null)));
         }
     }
 
@@ -227,7 +229,8 @@ class _Util {
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
             throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
-                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1), null)));
+                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1),
+                    null)));
         }
 
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
@@ -418,7 +421,8 @@ class _Util {
     }
 
     static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
-            List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
+            List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount,
+            List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -490,7 +494,9 @@ class _Util {
             final var element = definition.get(i);
             final List<Object> loopPath = append(thisPath, i);
 
-            final var map = asMap(element);
+            final var mapInit = asMap(element);
+            final var map = new HashMap<>(mapInit);
+            map.remove("///");
             final var keys = new HashSet<>(map.keySet());
 
             final var regexString = "^([A-Z][a-zA-Z0-9_]*)$";
@@ -501,10 +507,15 @@ class _Util {
                         new _SchemaParseFailure(loopPath,
                                 "ObjectKeyRegexMatchCountUnexpected",
                                 Map.of("regex", regexString, "actual",
-                                        matches.size(), "expected", 1, "keys", keys), null));
+                                        matches.size(), "expected", 1, "keys", keys),
+                                null));
                 continue;
             }
-
+            if (map.size() != 1) {
+                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectSizeUnexpected",
+                        Map.of("expected", 1, "actual", map.size()), null));
+                continue;
+            }
 
             final var entry = unionEntry(map);
             final var unionCase = entry.getKey();
@@ -669,12 +680,11 @@ class _Util {
     }
 
     public static _UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
-            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            List<Object> uApiSchemaPseudoJson, int index, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes,
             Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         final var schemaKey = "errors";
-        final var index = schemaKeysToIndex.get(schemaKey);
         final List<Object> basePath = List.of(index);
 
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
@@ -705,7 +715,8 @@ class _Util {
         return new _UError(schemaKey, error);
     }
 
-    static _UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey, String headerField,
+    static _UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey,
+            String headerField,
             int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -756,7 +767,8 @@ class _Util {
         } else {
             try {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
-                        resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"), typeParameterCount, uApiSchemaPseudoJson,
+                        resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
+                        typeParameterCount, uApiSchemaPseudoJson,
                         schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -790,45 +802,8 @@ class _Util {
         return new _UFn(schemaKey, callType, resultType, errorsRegex);
     }
 
-    static void catchHeaderCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> headerIndices) {
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
-
-        final var indices = headerIndices.stream().sorted().toList();
-
-        for (var i = 0; i < indices.size(); i += 1) {
-            for (var j = i + 1; j < indices.size(); j += 1) {
-                final var index = indices.get(i);
-                final var otherIndex = indices.get(j);
-
-                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
-                final var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
-
-                final var reqDef = (Map<String, Object>) def.get("headers");
-                final var otherReqDef = (Map<String, Object>) otherDef.get("headers");
-
-                for (final var key : reqDef.keySet()) {
-                    if (otherReqDef.containsKey(key)) {
-                        parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "headers", key), "PathCollision", Map.of("other", List.of(index, "headers", key)), "headers"));
-                    }
-                }
-                
-                final var resDef = (Map<String, Object>) def.get("->");
-                final var otherResDef = (Map<String, Object>) otherDef.get("->");
-
-                for (final var key : resDef.keySet()) {
-                    if (otherResDef.containsKey(key)) {
-                        parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "->", key), "PathCollision", Map.of("other", List.of(index, "->", key)), "headers"));
-                    }
-                }
-            }
-        }
-
-        if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
-        }
-    }
-
-    static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices, Map<String, Integer> keysToIndex) {
+    static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices,
+            Map<String, Integer> keysToIndex) {
         final var parseFailures = new ArrayList<_SchemaParseFailure>();
 
         final var indices = errorIndices.stream().sorted().toList();
@@ -855,7 +830,8 @@ class _Util {
                         thisOtherErrDefKeys.remove("///");
 
                         if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
-                            parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "errors", l), "PathCollision", Map.of("other", List.of(index, "errors", k)), "errors"));
+                            parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "errors", l), "PathCollision",
+                                    Map.of("other", List.of(index, "errors", k)), "errors"));
                         }
                     }
                 }
@@ -865,7 +841,7 @@ class _Util {
         if (!parseFailures.isEmpty()) {
             throw new UApiSchemaParseError(parseFailures);
         }
-    }    
+    }
 
     static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, _UType> typeExtensions) {
         final var objectMapper = new ObjectMapper();
@@ -939,7 +915,6 @@ class _Util {
         final var schemaKeysToIndex = new HashMap<String, Integer>();
         final var schemaKeys = new HashSet<String>();
 
-        final var headerIndices = new HashSet<Integer>();
         final var errorIndices = new HashSet<Integer>();
 
         var index = -1;
@@ -967,10 +942,6 @@ class _Util {
                 continue;
             }
 
-            if (schemaKey.equals("headers")) {
-                headerIndices.add(index);
-                continue;
-            }
             if (schemaKey.equals("errors")) {
                 errorIndices.add(index);
                 continue;
@@ -995,20 +966,17 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex,
+                    errorIndices);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
-        final var errorKeys = new HashSet<String>();
         final var requestHeaderKeys = new HashSet<String>();
         final var responseHeaderKeys = new HashSet<String>();
         final var rootTypeParameterCount = 0;
 
         for (final var schemaKey : schemaKeys) {
             if (schemaKey.startsWith("info.")) {
-                continue;
-            } else if (schemaKey.startsWith("errors.")) {
-                errorKeys.add(schemaKey);
                 continue;
             } else if (schemaKey.startsWith("requestHeader.")) {
                 requestHeaderKeys.add(schemaKey);
@@ -1030,25 +998,26 @@ class _Util {
         }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex,
+                    errorIndices);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
         try {
-            catchErrorCollisions(uApiSchemaPseudoJson, errorIndices, schemaKeysToIndex); 
+            catchErrorCollisions(uApiSchemaPseudoJson, errorIndices, schemaKeysToIndex);
 
             for (final var thisIndex : errorIndices) {
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
-    
+
                 try {
-                    final var error = parseErrorType(def, uApiSchemaPseudoJson,
+                    final var error = parseErrorType(def, uApiSchemaPseudoJson, thisIndex,
                             schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                     applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
                 } catch (UApiSchemaParseError e) {
                     parseFailures.addAll(e.schemaParseFailures);
                 }
             }
-    
+
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
@@ -1057,15 +1026,14 @@ class _Util {
         final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();
 
         try {
-            catchHeaderCollisions(uApiSchemaPseudoJson, headerIndices);
-
             for (final var requestHeaderKey : requestHeaderKeys) {
                 final var thisIndex = schemaKeysToIndex.get(requestHeaderKey);
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
                 final var headerField = requestHeaderKey.substring("requestHeader.".length());
-    
+
                 try {
-                    final var requestHeaderType = parseHeadersType(def, requestHeaderKey, headerField, thisIndex, uApiSchemaPseudoJson,
+                    final var requestHeaderType = parseHeadersType(def, requestHeaderKey, headerField, thisIndex,
+                            uApiSchemaPseudoJson,
                             schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                     requestHeaders.put(requestHeaderType.fieldName, requestHeaderType);
                 } catch (UApiSchemaParseError e) {
@@ -1076,9 +1044,10 @@ class _Util {
                 final var thisIndex = schemaKeysToIndex.get(responseHeaderKey);
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
                 final var headerField = responseHeaderKey.substring("responseHeader.".length());
-    
+
                 try {
-                    final var responseHeaderType = parseHeadersType(def, responseHeaderKey, headerField, thisIndex, uApiSchemaPseudoJson,
+                    final var responseHeaderType = parseHeadersType(def, responseHeaderKey, headerField, thisIndex,
+                            uApiSchemaPseudoJson,
                             schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
                     responseHeaders.put(responseHeaderType.fieldName, responseHeaderType);
                 } catch (UApiSchemaParseError e) {
@@ -1088,10 +1057,11 @@ class _Util {
 
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
-        }        
+        }
 
         if (!parseFailures.isEmpty()) {
-            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, headerIndices);
+            final var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex,
+                    errorIndices);
             throw new UApiSchemaParseError(offsetParseFailures);
         }
 
@@ -3046,13 +3016,15 @@ class _Util {
     static List<Object> mapSchemaParseFailuresToPseudoJson(
             List<_SchemaParseFailure> schemaParseFailures) {
         return (List<Object>) schemaParseFailures.stream()
-                .map(f -> (Object) new TreeMap<>() {{
-                    put("path", f.path);
-                    put("reason", Map.of(f.reason, f.data));
-                    if (f.key != null) {
-                        put("key!", f.key);
+                .map(f -> (Object) new TreeMap<>() {
+                    {
+                        put("path", f.path);
+                        put("reason", Map.of(f.reason, f.data));
+                        if (f.key != null) {
+                            put("key!", f.key);
+                        }
                     }
-                }})
+                })
                 .toList();
     }
 }
