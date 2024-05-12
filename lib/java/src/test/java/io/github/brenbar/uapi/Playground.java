@@ -9,7 +9,7 @@ import java.util.function.Function;
 public class Playground {
     public static void main(String[] args) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
-                "example.uapi.json"));
+                "parse.uapi.json"));
         var uApi = UApiSchema.fromJson(json);
         System.out.println("Done!");
 
