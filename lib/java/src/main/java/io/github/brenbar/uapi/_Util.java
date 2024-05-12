@@ -818,8 +818,8 @@ class _Util {
                 final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
                 final var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
 
-                final var errDef = (Map<String, Object>) def.get("errors");
-                final var otherErrDef = (Map<String, Object>) otherDef.get("errors");
+                final var errDef = (List<Object>) def.get("errors");
+                final var otherErrDef = (List<Object>) otherDef.get("errors");
 
                 for (int k = 0; k < errDef.size(); k += 1) {
                     final var thisErrDef = asMap(errDef.get(k));
