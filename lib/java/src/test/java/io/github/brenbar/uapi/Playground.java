@@ -6,6 +6,9 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Playground {
     public static void main(String[] args) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
@@ -13,11 +16,50 @@ public class Playground {
         var uApi = UApiSchema.fromJson(json);
         System.out.println("Done!");
 
+        var objectMapper = new ObjectMapper();
+
         Function<Message, Message> handler = (requestMessage) -> {
-            return new Message(Map.of(), Map.of("Ok_", Map.of()));
+            var requestBody = requestMessage.body;
+
+            var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
+            var schemaPseudoJson = arg.get("schema");
+            var extendSchemaJson = (String) arg.get("extend!");
+
+            var serializeSchema = (Boolean) requestMessage.header.getOrDefault("_serializeSchema", true);
+
+            String schemaJson;
+            if (serializeSchema) {
+                try {
+                    var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
+                    schemaJson = new String(schemaJsonBytes);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                schemaJson = (String) schemaPseudoJson;
+            }
+
+            try {
+                var schema = UApiSchema.fromJson(schemaJson);
+                if (extendSchemaJson != null) {
+                    UApiSchema.extend(schema, extendSchemaJson);
+                }
+                return new Message(Map.of(), Map.of("Ok_", Map.of()));
+            } catch (UApiSchemaParseError e) {
+                e.printStackTrace();
+                System.err.flush();
+                return new Message(Map.of(),
+                        Map.of("ErrorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
+            }
         };
 
         var server = new Server(uApi, handler, new Server.Options());
+
+        server.process(
+                """
+                        [{}, {"fn.validateSchema": {"schema": [{"requestHeader.field": ["boolean"]}, {"requestHeader.field": ["integer"]}]}}]
+                            """
+                        .getBytes());
 
         // BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
         // return CompletableFuture.supplyAsync(() -> {
