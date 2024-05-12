@@ -88,11 +88,12 @@
             "schema": ["any?"],
             "extend!": ["any?"]
         },
-        "->": {
-            "Ok_": {},
+        "->": [{
+            "Ok_": {}
+        }, {
             "ErrorValidationFailure": {
                 "cases": ["array", ["struct.ValidationFailure"]]
             }
-        }
+        }]
     }
 ]

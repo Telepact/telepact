@@ -2429,7 +2429,7 @@ async def mock_handle(request_message: 'types.Message', stubs: List[_types._Mock
                         return types.Message({}, result)
 
         if not enable_generated_default_stub and not enable_generation_stub:
-            return types.Message({}, {"ErrorNoMatchingStub_": {}})
+            return types.Message({}, {"ErrorNoMatchingStub__": {}})
 
         if definition is not None:
             result_union = definition.result

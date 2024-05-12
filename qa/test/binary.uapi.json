@@ -7,10 +7,10 @@
     },
     {
         "fn.example": {},
-        "->": {
+        "->": [{
             "Ok_": {
                 "data": ["array", ["struct.Data"]]
             }
-        }
+        }]
     }
 ]

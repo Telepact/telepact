@@ -24,10 +24,10 @@
     },
     {
         "fn.getData": {},
-        "->": {
+        "->": [{
             "Ok_": {
                 "data": ["array", ["struct.Data1"]]
             }
-        }
+        }]
     }
 ]

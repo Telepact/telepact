@@ -3759,7 +3759,7 @@ export function mockHandle(
             }
 
             if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                return new Message({}, { ErrorNoMatchingStub_: {} });
+                return new Message({}, { ErrorNoMatchingStub__: {} });
             }
 
             if (definition) {

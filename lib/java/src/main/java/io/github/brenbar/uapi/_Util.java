@@ -2962,7 +2962,7 @@ class _Util {
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return new Message(Map.of(), Map.of("ErrorNoMatchingStub_", Map.of()));
+                    return new Message(Map.of(), Map.of("ErrorNoMatchingStub__", Map.of()));
                 }
 
                 if (definition != null) {

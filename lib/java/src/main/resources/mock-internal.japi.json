@@ -118,13 +118,13 @@
     },
     {
         "///": [
-            " If random generation is disabled, functions may return a `ErrorNoMatchingStub_`  ",
+            " If random generation is disabled, functions may return a `ErrorNoMatchingStub__`  ",
             " error, indicating that the mock could not return a result for that function call ",
             " due to no matching stub being available.                                         "
         ],
         "errors.Mockable_": {
             "->": {
-                "ErrorNoMatchingStub_": {}
+                "ErrorNoMatchingStub__": {}
             }
         }
     }
