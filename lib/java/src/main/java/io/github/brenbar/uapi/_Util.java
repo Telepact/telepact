@@ -497,7 +497,7 @@ class _Util {
             final var mapInit = asMap(element);
             final var map = new HashMap<>(mapInit);
             map.remove("///");
-            final var keys = new HashSet<>(map.keySet());
+            final var keys = new ArrayList<>(map.keySet());
 
             final var regexString = "^([A-Z][a-zA-Z0-9_]*)$";
 

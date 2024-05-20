@@ -57,11 +57,20 @@ public class Playground {
         options.authRequired = false;
         var server = new Server(uApi, handler, options);
 
-        server.process(
+        var result = server.process(
                 """
-                        [{}, {"fn.validateSchema": {"schema": [{"requestHeader.field": ["boolean"]}, {"requestHeader.field": ["integer"]}]}}]
-                            """
+                        [{}, {"fn.validateSchema": {"schema": [{"union.Broken": [{"case": {}}]}]}}]
+                                """
                         .getBytes());
+
+        System.out.println(new String(result));
+
+        // server.process(
+        // """
+        // [{}, {"fn.validateSchema": {"schema": [{"requestHeader.field": ["boolean"]},
+        // {"requestHeader.field": ["integer"]}]}}]
+        // """
+        // .getBytes());
 
         // BiFunction<Message, Serializer, Future<Message>> adapter = (m, s) -> {
         // return CompletableFuture.supplyAsync(() -> {
