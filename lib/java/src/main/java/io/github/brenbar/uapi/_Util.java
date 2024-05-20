@@ -722,20 +722,29 @@ class _Util {
             int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
             List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final List<Object> path = List.of(index);
+        final List<Object> path = List.of(index, schemaKey);
 
         var typeDeclarationValue = headersDefinitionAsParsedJson.get(schemaKey);
 
+        final List<Object> typeDeclarationArray;
+        try {
+            typeDeclarationArray = asList(typeDeclarationValue);
+        } catch (ClassCastException e) {
+            throw new UApiSchemaParseError(
+                    getTypeUnexpectedParseFailure(path, typeDeclarationValue, "Array"));
+        }
+
         final var typeParameterCount = 0;
 
-        final _UFieldDeclaration parsedField;
         try {
-            parsedField = parseField(path, headerField,
-                    typeDeclarationValue, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
+            final var typeDeclaration = parseTypeDeclaration(path,
+                    typeDeclarationArray, typeParameterCount,
+                    uApiSchemaPseudoJson,
+                    schemaKeysToIndex,
                     parsedTypes,
                     typeExtensions, allParseFailures, failedTypes);
 
-            return parsedField;
+            return new _UFieldDeclaration(schemaKey, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {
             throw new UApiSchemaParseError(e.schemaParseFailures);
         }

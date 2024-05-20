@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Playground {
     public static void main(String[] args) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
-                "parse.uapi.json"));
+                "schema.uapi.json"));
         var uApi = UApiSchema.fromJson(json);
         System.out.println("Done!");
 
@@ -53,7 +53,9 @@ public class Playground {
             }
         };
 
-        var server = new Server(uApi, handler, new Server.Options());
+        var options = new Server.Options();
+        options.authRequired = false;
+        var server = new Server(uApi, handler, options);
 
         server.process(
                 """
