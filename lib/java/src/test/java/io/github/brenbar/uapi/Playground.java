@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Playground {
     public static void main(String[] args) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
-                "schema.uapi.json"));
+                "binary.uapi.json"));
         var uApi = UApiSchema.fromJson(json);
         System.out.println("Done!");
 
@@ -59,7 +59,7 @@ public class Playground {
 
         var result = server.process(
                 """
-                        [{}, {"fn.validateSchema": {"schema": [{"union.Broken": [{"case": {}}]}]}}]
+                        [{"bin_": [{}]}, {"fn.ping_": {}}]
                                 """
                         .getBytes());
 

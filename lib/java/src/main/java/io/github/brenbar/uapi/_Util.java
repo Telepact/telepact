@@ -752,7 +752,7 @@ class _Util {
                     parsedTypes,
                     typeExtensions, allParseFailures, failedTypes);
 
-            return new _UFieldDeclaration(schemaKey, typeDeclaration, false);
+            return new _UFieldDeclaration(headerField, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {
             throw new UApiSchemaParseError(e.schemaParseFailures);
         }
