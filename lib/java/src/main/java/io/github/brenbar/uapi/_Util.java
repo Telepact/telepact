@@ -661,11 +661,11 @@ class _Util {
 
             _UUnion fnResult = f.result;
             Map<String, _UStruct> fnResultCases = fnResult.cases;
-            _UUnion errorFnResult = error.errors;
-            Map<String, _UStruct> errorFnResultCases = errorFnResult.cases;
+            _UUnion errorErrors = error.errors;
+            Map<String, _UStruct> errorCases = errorErrors.cases;
 
-            for (var errorResultField : errorFnResultCases.entrySet()) {
-                var newKey = errorResultField.getKey();
+            for (var errorCase : errorCases.entrySet()) {
+                var newKey = errorCase.getKey();
 
                 var matcher = regex.matcher(newKey);
                 if (!matcher.find()) {
@@ -680,7 +680,7 @@ class _Util {
                             "PathCollision", Map.of("other", List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey)),
                             null));
                 }
-                fnResultCases.put(newKey, errorResultField.getValue());
+                fnResultCases.put(newKey, errorCase.getValue());
             }
         }
 
