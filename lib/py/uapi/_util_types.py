@@ -199,9 +199,10 @@ class _UStruct(_UType):
 
 
 class _UUnion(_UType):
-    def __init__(self, name: str, cases: Dict[str, _UStruct], type_parameter_count: int):
+    def __init__(self, name: str, cases: Dict[str, _UStruct], case_indices: Dict[str, int], type_parameter_count: int):
         self.name = name
         self.cases = cases
+        self.case_indices = case_indices
         self.type_parameter_count = type_parameter_count
 
     def get_type_parameter_count(self) -> int:
