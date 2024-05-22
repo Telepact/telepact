@@ -459,22 +459,26 @@ class _Util {
         }
 
         final List<Map<String, Object>> definition = new ArrayList<>();
+        int index = -1;
         for (final var element : definition2) {
+            index += 1;
+            final List<Object> loopPath = append(thisPath, index);
             try {
                 definition.add(asMap(element));
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
+                final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(loopPath,
                         element, "Object");
 
                 parseFailures.addAll(finalParseFailures);
-                throw new UApiSchemaParseError(parseFailures);
             }
         }
 
-        final var cases = new HashMap<String, _UStruct>();
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
 
         if (definition.isEmpty() && requiredKeys.isEmpty()) {
-            parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyObjectDisallowed", Map.of(), null));
+            parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyArrayDisallowed", Map.of(), null));
         } else {
             outerLoop: for (final var requiredKey : requiredKeys) {
                 for (final var element : definition) {
@@ -485,10 +489,13 @@ class _Util {
                         continue outerLoop;
                     }
                 }
-                final List<Object> branchPath = append(thisPath, requiredKey);
+                final List<Object> branchPath = append(append(thisPath, 0), requiredKey);
                 parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
             }
         }
+
+        final var cases = new HashMap<String, _UStruct>();
+        final var caseIndices = new HashMap<String, Integer>();
 
         for (int i = 0; i < definition.size(); i++) {
             final var element = definition.get(i);
@@ -545,13 +552,14 @@ class _Util {
             final var unionStruct = new _UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
 
             cases.put(unionCase, unionStruct);
+            caseIndices.put(unionCase, i);
         }
 
         if (!parseFailures.isEmpty()) {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        return new _UUnion(schemaKey, cases, typeParameterCount);
+        return new _UUnion(schemaKey, cases, caseIndices, typeParameterCount);
     }
 
     static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
@@ -636,11 +644,8 @@ class _Util {
         return new _UFieldDeclaration(fieldName, typeDeclaration, optional);
     }
 
-    static void applyErrorToParsedTypes(_UError error, Map<String, _UType> parsedTypes,
+    static void applyErrorToParsedTypes(int errorIndex, _UError error, Map<String, _UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
-        String errorName = error.name;
-        var errorIndex = schemaKeysToIndex.get(errorName);
-
         var parseFailures = new ArrayList<_SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
             _UFn f;
@@ -668,9 +673,12 @@ class _Util {
                 }
 
                 if (fnResultCases.containsKey(newKey)) {
-                    var otherPathIndex = schemaKeysToIndex.get(fnName);
-                    parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, errorName, newKey),
-                            "PathCollision", Map.of("other", List.of(otherPathIndex, "->", newKey)), null));
+                    final var otherPathIndex = schemaKeysToIndex.get(fnName);
+                    final var errorCaseIndex = error.errors.caseIndices.get(newKey);
+                    final var fnErrorCaseIndex = f.result.caseIndices.get(newKey);
+                    parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, "errors", errorCaseIndex, newKey),
+                            "PathCollision", Map.of("other", List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey)),
+                            null));
                 }
                 fnResultCases.put(newKey, errorResultField.getValue());
             }
@@ -764,7 +772,7 @@ class _Util {
                     parsedTypes,
                     typeExtensions,
                     allParseFailures, failedTypes);
-            callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), typeParameterCount);
+            callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0), typeParameterCount);
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
@@ -841,8 +849,11 @@ class _Util {
                         thisOtherErrDefKeys.remove("///");
 
                         if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
-                            parseFailures.add(new _SchemaParseFailure(List.of(otherIndex, "errors", l), "PathCollision",
-                                    Map.of("other", List.of(index, "errors", k)), "errors"));
+                            final var thisErrorDefKey = thisErrDefKeys.stream().findFirst().get();
+                            final var thisOtherErrorDefKey = thisOtherErrDefKeys.stream().findFirst().get();
+                            parseFailures.add(new _SchemaParseFailure(
+                                    List.of(otherIndex, "errors", l, thisOtherErrorDefKey), "PathCollision",
+                                    Map.of("other", List.of(index, "errors", k, thisErrorDefKey)), "errors"));
                         }
                     }
                 }
@@ -1023,7 +1034,7 @@ class _Util {
                 try {
                     final var error = parseErrorType(def, uApiSchemaPseudoJson, thisIndex,
                             schemaKeysToIndex, parsedTypes, typeExtensions, parseFailures, failedTypes);
-                    applyErrorToParsedTypes(error, parsedTypes, schemaKeysToIndex);
+                    applyErrorToParsedTypes(thisIndex, error, parsedTypes, schemaKeysToIndex);
                 } catch (UApiSchemaParseError e) {
                     parseFailures.addAll(e.schemaParseFailures);
                 }

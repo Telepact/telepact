@@ -367,11 +367,13 @@ class _UUnion implements _UType {
 
     public final String name;
     public final Map<String, _UStruct> cases;
+    public final Map<String, Integer> caseIndices;
     public final int typeParameterCount;
 
-    public _UUnion(String name, Map<String, _UStruct> cases, int typeParameterCount) {
+    public _UUnion(String name, Map<String, _UStruct> cases, Map<String, Integer> caseIndices, int typeParameterCount) {
         this.name = name;
         this.cases = cases;
+        this.caseIndices = caseIndices;
         this.typeParameterCount = typeParameterCount;
     }
 
