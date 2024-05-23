@@ -1,3 +1,7 @@
+from typing import Dict, List, Set
+from typing import Dict, List, Set, Union
+from typing import Dict, List, Union
+from typing import List, Dict, Set, Tuple, Any, Union
 import binascii
 from concurrent.futures import Future
 from typing import Any, Coroutine, Dict, List, Tuple, Callable, Union, Callable, List, Union, Dict, Any, Tuple,  Optional, Set, Pattern, cast
@@ -63,7 +67,8 @@ def as_map(obj: Any) -> Dict[str, Any]:
     return obj
 
 
-def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int, schema_keys_to_index: Dict[str, int], header_indices: int) -> List[_types._SchemaParseFailure]:
+def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offset: int,
+                        schema_keys_to_index: Dict[str, int], error_indices: Set[int]) -> List[_types._SchemaParseFailure]:
     final_list = []
 
     index_to_schema_key = {v: k for k, v in schema_keys_to_index.items()}
@@ -73,21 +78,22 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
         path = f.path
         data = f.data
         new_path = list(path)
-        new_path[0] = new_path[0] - offset
+
+        original_index = new_path[0]
+        new_path[0] = original_index - offset
 
         if reason == "PathCollision":
-            other_new_path = list(data["other"])
+            other_new_path = list(data.get("other"))
+
             other_new_path[0] = other_new_path[0] - offset
             final_data = {"other": other_new_path}
         else:
             final_data = data
 
-        index = new_path[0]
-
-        if index in header_indices:
-            schema_key = 'headers'
+        if original_index in error_indices:
+            schema_key = "errors"
         else:
-            schema_key = index_to_schema_key.get(index, None)
+            schema_key = index_to_schema_key.get(original_index)
 
         final_list.append(_types._SchemaParseFailure(
             new_path, reason, final_data, schema_key))
@@ -95,13 +101,11 @@ def offset_schema_index(initial_failures: List[_types._SchemaParseFailure], offs
     return final_list
 
 
-def find_schema_key(definition: dict[str, Any], index: int) -> str:
-    import re
-
-    regex = "^(headers|((fn|errors|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)"
+def find_schema_key(definition: Dict[str, Any], index: int) -> str:
+    regex = r"^(errors|((fn|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\..*)"
     matches = []
 
-    keys = sorted(definition.keys())
+    keys = sorted(list(definition.keys()))
 
     for e in keys:
         if re.match(regex, e):
@@ -110,8 +114,11 @@ def find_schema_key(definition: dict[str, Any], index: int) -> str:
     if len(matches) == 1:
         return matches[0]
     else:
-        raise types.UApiSchemaParseError([_types._SchemaParseFailure([index], "ObjectKeyRegexMatchCountUnexpected",
-                                                                     {"regex": regex, "actual": len(matches), "expected": 1, "keys": keys}, None)])
+        raise types.UApiSchemaParseError([_types._SchemaParseFailure([index],
+                                                                     "ObjectKeyRegexMatchCountUnexpected",
+                                                                     {"regex": regex, "actual": len(
+                                                                         matches), "expected": 1, "keys": keys},
+                                                                     None)])
 
 
 def find_matching_schema_key(schema_keys: Set[str], schema_key: str) -> Union[str, None]:
@@ -337,17 +344,18 @@ def parse_struct_type(path: List[object], struct_definition_as_pseudo_json: Dict
     return _types._UStruct(schema_key, fields, type_parameter_count)
 
 
-def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[str, object],
-                     schema_key: str, ignore_keys: List[str], required_keys: List[str], type_parameter_count: int,
-                     uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                     parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
+def parse_union_type(path: List[Any], union_definition_as_pseudo_json: Dict[str, Any], schema_key: str,
+                     ignore_keys: List[str], required_keys: List[str], type_parameter_count: int,
+                     u_api_schema_pseudo_json: List[Any],
+                     schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, Any],
+                     type_extensions: Dict[str, Any],
                      all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UUnion:
     parse_failures = []
 
     other_keys = set(union_definition_as_pseudo_json.keys())
+
     other_keys.discard(schema_key)
     other_keys.discard("///")
-
     for ignore_key in ignore_keys:
         other_keys.discard(ignore_key)
 
@@ -360,60 +368,102 @@ def parse_union_type(path: List[object], union_definition_as_pseudo_json: Dict[s
     def_init = union_definition_as_pseudo_json.get(schema_key)
 
     try:
-        definition = as_map(def_init)
+        definition2 = as_map(def_init)
     except TypeError:
         final_parse_failures = get_type_unexpected_parse_failure(
-            this_path, def_init, "Object")
+            this_path, def_init, "Array")
+
         parse_failures.extend(final_parse_failures)
         raise types.UApiSchemaParseError(parse_failures)
 
-    cases = {}
+    definition = []
+    for index, element in enumerate(definition2):
+        loop_path = this_path + [index]
+        try:
+            definition.append(dict(element))
+        except TypeError:
+            final_parse_failures = get_type_unexpected_parse_failure(
+                loop_path, element, "Object")
 
-    if not definition and len(required_keys) == 0:
+            parse_failures.extend(final_parse_failures)
+
+    if parse_failures:
+        raise types.UApiSchemaParseError(parse_failures)
+
+    if not definition and not required_keys:
         parse_failures.append(_types._SchemaParseFailure(
-            this_path, "EmptyObjectDisallowed", {}, None))
+            this_path, "EmptyArrayDisallowed", {}, None))
     else:
         for required_key in required_keys:
-            if required_key not in definition:
-                branch_path = this_path + [required_key]
+            for element in definition:
+                map = dict(element)
+                keys = set(map.keys())
+                keys.discard("///")
+                if required_key in keys:
+                    break
+            else:
+                branch_path = this_path + [0] + [required_key]
                 parse_failures.append(_types._SchemaParseFailure(
                     branch_path, "RequiredObjectKeyMissing", {}, None))
 
-    for union_case, entry_value in definition.items():
-        union_key_path = this_path + [union_case]
-        regex_string = r"^([A-Z][a-zA-Z0-9_]*)$"
-        regex = re.compile(regex_string)
-        matcher = regex.search(union_case)
+    cases = {}
+    case_indices = {}
 
-        if not matcher:
-            parse_failures.append(_types._SchemaParseFailure(union_key_path, "KeyRegexMatchFailed",
-                                                             {"regex": regex_string}, None))
+    for i, element in enumerate(definition):
+        loop_path = append(this_path, i)
+
+        map_init = dict(element)
+        map = {k: v for k, v in map_init.items()}
+        map.pop("///", None)
+        keys = list(map.keys())
+
+        regex_string = "^([A-Z][a-zA-Z0-9_]*)$"
+
+        matches = [k for k in keys if re.match(regex_string, k)]
+        if len(matches) != 1:
+            parse_failures.append(
+                _types._SchemaParseFailure(loop_path,
+                                           "ObjectKeyRegexMatchCountUnexpected",
+                                           {"regex": regex_string, "actual": len(
+                                               matches), "expected": 1, "keys": keys},
+                                           None))
+            continue
+        if len(map) != 1:
+            parse_failures.append(_types._SchemaParseFailure(loop_path, "ObjectSizeUnexpected",
+                                                             {"expected": 1, "actual": len(map)}, None))
             continue
 
+        entry = union_entry(map)
+        union_case = entry[0]
+        union_key_path = loop_path + [union_case]
+
         try:
-            union_case_struct = as_map(entry_value)
+            union_case_struct = as_map(entry[1])
         except TypeError:
             this_parse_failures = get_type_unexpected_parse_failure(
-                union_key_path, entry_value, "Object")
+                union_key_path, entry[1], "Object")
+
             parse_failures.extend(this_parse_failures)
             continue
 
         try:
             fields = parse_struct_fields(union_case_struct, union_key_path, type_parameter_count,
-                                         uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
-                                         type_extensions, all_parse_failures, failed_types)
+                                         u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
+                                         all_parse_failures, failed_types)
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue
 
         union_struct = _types._UStruct(
             f"{schema_key}.{union_case}", fields, type_parameter_count)
+
         cases[union_case] = union_struct
+        case_indices[union_case] = i
 
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
 
-    return _types._UUnion(schema_key, cases, type_parameter_count)
+    return _types._UUnion(schema_key, cases, case_indices, type_parameter_count)
 
 
 def parse_struct_fields(reference_struct: Dict[str, object], path: List[object],
@@ -487,12 +537,8 @@ def parse_field(path: List[object], field_declaration: str, type_declaration_val
     return _types._UFieldDeclaration(field_name, type_declaration, optional)
 
 
-def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _types._UType],
+def apply_error_to_parsed_types(error_index: int, error: '_types._UError', parsed_types: Dict[str, '_types._UType'],
                                 schema_keys_to_index: Dict[str, int]) -> None:
-    import pprint
-    error_name = error.name
-    error_index = schema_keys_to_index.get(error_name)
-
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
         if not isinstance(parsed_type, _types._UFn):
@@ -502,128 +548,113 @@ def apply_error_to_parsed_types(error: _types._UError, parsed_types: Dict[str, _
         fn_name = f.name
 
         regex = re.compile(f.errors_regex)
-        matcher = regex.search(error_name)
-        if not matcher:
-            continue
 
         fn_result = f.result
         fn_result_cases = fn_result.cases
-        error_fn_result = error.errors
-        error_fn_result_cases = error_fn_result.cases
+        error_errors = error.errors
+        error_cases = error_errors.cases
 
-        for error_result_field, error_result_struct in error_fn_result_cases.items():
-            new_key = error_result_field
+        for error_case in error_cases.items():
+            new_key = error_case[0]
+
+            matcher = regex.match(new_key)
+            if not matcher:
+                continue
+
             if new_key in fn_result_cases:
-                other_path_index = schema_keys_to_index.get(fn_name)
-                parse_failures.append(_types._SchemaParseFailure([error_index, error_name, new_key],
-                                                                 "PathCollision", {"other": [other_path_index, "->", new_key]}, None))
+                other_path_index = schema_keys_to_index[fn_name]
+                error_case_index = error.errors.case_indices[new_key]
+                fn_error_case_index = f.result.case_indices[new_key]
+                parse_failures.append(_types._SchemaParseFailure([error_index, "errors", error_case_index, new_key],
+                                                                 "PathCollision",
+                                                                 {"other": [
+                                                                     other_path_index, "->", fn_error_case_index, new_key]},
+                                                                 None))
 
-            fn_result_cases[new_key] = error_result_struct
+            fn_result_cases[new_key] = error_case[1]
 
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
 
 
-def parse_error_type(error_definition_as_parsed_json: Dict[str, object], schema_key: str,
-                     uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                     parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
-                     all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UError:
-    index = schema_keys_to_index.get(schema_key)
+def parse_error_type(error_definition_as_parsed_json: Dict[str, object],
+                     u_api_schema_pseudo_json: List[object], index: int,
+                     schema_keys_to_index: Dict[str, int],
+                     parsed_types: Dict[str, '_types._UType'],
+                     type_extensions: Dict[str, '_types._UType'],
+                     all_parse_failures: List['_types._SchemaParseFailure'],
+                     failed_types: Set[str]) -> '_types._UError':
+    schema_key = "errors"
     base_path = [index]
 
     parse_failures = []
 
     other_keys = set(error_definition_as_parsed_json.keys())
+
     other_keys.discard(schema_key)
     other_keys.discard("///")
 
     if other_keys:
         for k in other_keys:
             loop_path = base_path + [k]
+
             parse_failures.append(_types._SchemaParseFailure(
                 loop_path, "ObjectKeyDisallowed", {}, None))
-
-    type_parameter_count = 0
 
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
 
-    error = parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [], type_parameter_count,
-                             uapi_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
-                             all_parse_failures, failed_types)
+    type_parameter_count = 0
+
+    error = parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [],
+                             type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
+                             parsed_types, type_extensions, all_parse_failures, failed_types)
 
     return _types._UError(schema_key, error)
 
 
-def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object],
-                       index: int, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                       parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
-                       all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UHeaders:
-    schema_key = "headers"
-    path = [index]
+def parse_headers_type(headers_definition_as_parsed_json: Dict[str, object], schema_key: str,
+                       header_field: str, index: int, u_api_schema_pseudo_json: List[object],
+                       schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, '_types._UType'],
+                       type_extensions: Dict[str, '_types._UType'], all_parse_failures: List['_types._SchemaParseFailure'],
+                       failed_types: Set[str]) -> '_types._UFieldDeclaration':
+    path = [index, schema_key]
 
-    parse_failures = []
+    type_declaration_value = headers_definition_as_parsed_json.get(schema_key)
+
+    try:
+        type_declaration_array = as_list(type_declaration_value)
+    except TypeError:
+        raise types.UApiSchemaParseError(
+            get_type_unexpected_parse_failure(path, type_declaration_value, "Array"))
+
     type_parameter_count = 0
 
-    request_headers_struct = None
     try:
-        request_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, schema_key, ['->'],
-                                                   type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
-                                                   parsed_types, type_extensions, all_parse_failures, failed_types)
+        type_declaration = parse_type_declaration(path, type_declaration_array, type_parameter_count,
+                                                  u_api_schema_pseudo_json, schema_keys_to_index,
+                                                  parsed_types, type_extensions, all_parse_failures, failed_types)
 
-        for key, field in request_headers_struct.fields.items():
-            if field.optional:
-                this_path = append(append(path, schema_key), key)
-                regex_string = '^([a-z][a-zA-Z0-9_]*)$'
-                parse_failures.append(_types._SchemaParseFailure(
-                    this_path, 'KeyRegexMatchFailed', {'regex': regex_string}, None))
-
+        return _types._UFieldDeclaration(header_field, type_declaration, False)
     except types.UApiSchemaParseError as e:
-        parse_failures.extend(e.schema_parse_failures)
-
-    result_schema_key = "->"
-    res_path = path + [result_schema_key]
-
-    response_headers_struct = None
-    if result_schema_key not in headers_definition_as_parsed_json:
-        parse_failures.append(_types._SchemaParseFailure(
-            res_path, "RequiredObjectKeyMissing", {}, None))
-    else:
-        try:
-            response_headers_struct = parse_struct_type(path, headers_definition_as_parsed_json, result_schema_key, [schema_key],
-                                                        type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
-                                                        parsed_types, type_extensions, all_parse_failures, failed_types)
-
-            for key, field in response_headers_struct.fields.items():
-                if field.optional:
-                    this_path = append(append(path, schema_key), key)
-                    regex_string = '^([a-z][a-zA-Z0-9_]*)$'
-                    parse_failures.append(_types._SchemaParseFailure(
-                        this_path, 'KeyRegexMatchFailed', {'regex': regex_string}, None))
-
-        except types.UApiSchemaParseError as e:
-            parse_failures.extend(e.schema_parse_failures)
-
-    if parse_failures:
-        raise types.UApiSchemaParseError(parse_failures)
-
-    return _types._UHeaders(schema_key, request_headers_struct.fields, response_headers_struct.fields)
+        raise types.UApiSchemaParseError(e.schema_parse_failures)
 
 
 def parse_function_type(path: List[object], function_definition_as_parsed_json: Dict[str, object],
-                        schema_key: str, uapi_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                        parsed_types: Dict[str, _types._UType], type_extensions: Dict[str, _types._UType],
-                        all_parse_failures: List[_types._SchemaParseFailure], failed_types: Set[str]) -> _types._UFn:
+                        schema_key: str, u_api_schema_pseudo_json: List[object],
+                        schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, '_types._UType'],
+                        type_extensions: Dict[str, '_types._UType'], all_parse_failures: List['_types._SchemaParseFailure'],
+                        failed_types: Set[str]) -> '_types._UFn':
     parse_failures = []
     type_parameter_count = 0
 
     call_type = None
     try:
-        arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, ['->', '_errors'],
-                                     type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
+        arg_type = parse_struct_type(path, function_definition_as_parsed_json, schema_key, ["->", "_errors"],
+                                     type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
                                      parsed_types, type_extensions, all_parse_failures, failed_types)
-        call_type = _types._UUnion(
-            schema_key, {schema_key: arg_type}, type_parameter_count)
+        call_type = _types._UUnion(schema_key, {schema_key: arg_type}, {
+            schema_key: 0}, type_parameter_count)
     except types.UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
 
@@ -636,8 +667,10 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
             res_path, "RequiredObjectKeyMissing", {}, None))
     else:
         try:
-            result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key, function_definition_as_parsed_json.keys(), ['Ok_'],
-                                           type_parameter_count, uapi_schema_pseudo_json, schema_keys_to_index,
+            result_type = parse_union_type(path, function_definition_as_parsed_json, result_schema_key,
+                                           list(function_definition_as_parsed_json.keys()), [
+                                               "Ok_"],
+                                           type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
                                            parsed_types, type_extensions, all_parse_failures, failed_types)
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
@@ -651,7 +684,7 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
             regex_path, "ObjectKeyDisallowed", {}, None))
     else:
         errors_regex_init = function_definition_as_parsed_json.get(
-            errors_regex_key, "^errors\\..*$")
+            errors_regex_key, "^.*$")
         try:
             errors_regex = as_string(errors_regex_init)
         except TypeError:
@@ -665,76 +698,41 @@ def parse_function_type(path: List[object], function_definition_as_parsed_json: 
     return _types._UFn(schema_key, call_type, result_type, errors_regex)
 
 
-def catch_header_collisions(u_api_schema_pseudo_json: List[Dict[str, Any]], header_indices: Set[int]) -> None:
-    parse_failures: List[Dict[str, Any]] = []
+def catch_error_collisions(u_api_schema_pseudo_json: List[object], error_indices: Set[int],
+                           keys_to_index: Dict[str, int]) -> None:
+    parse_failures = []
 
-    indices = sorted(header_indices)
-
-    for i in range(len(indices)):
-        for j in range(i + 1, len(indices)):
-            index = indices[i]
-            other_index = indices[j]
-
-            def_dict = u_api_schema_pseudo_json[index]
-            other_def_dict = u_api_schema_pseudo_json[other_index]
-
-            req_def = def_dict.get("headers", {})
-            other_req_def = other_def_dict.get("headers", {})
-
-            for key in req_def:
-                if key in other_req_def:
-                    parse_failures.append(_types._SchemaParseFailure(
-                        [other_index, "headers", key],
-                        "PathCollision",
-                        {"other": [index, "headers", key]},
-                        "headers"
-                    ))
-
-            res_def = def_dict.get("->", {})
-            other_res_def = other_def_dict.get("->", {})
-
-            for key in res_def:
-                if key in other_res_def:
-                    parse_failures.append(_types._SchemaParseFailure(
-                        [other_index, "->", key],
-                        "PathCollision",
-                        {"other": [index, "->", key]},
-                        "headers"
-                    ))
-
-    if parse_failures:
-        raise types.UApiSchemaParseError(parse_failures)
-
-
-def catch_error_collisions(u_api_schema_pseudo_json: List[Dict[str, Any]], error_keys: Set[str], keys_to_index: Dict[str, int]) -> None:
-    parse_failures: List[Dict[str, Any]] = []
-
-    index_to_schema_key = {v: k for k, v in keys_to_index.items()}
-
-    indices = sorted([keys_to_index[k] for k in error_keys])
+    indices = sorted(list(error_indices))
 
     for i in range(len(indices)):
         for j in range(i + 1, len(indices)):
             index = indices[i]
             other_index = indices[j]
 
-            def_dict = u_api_schema_pseudo_json[index]
-            other_def_dict = u_api_schema_pseudo_json[other_index]
+            def_ = u_api_schema_pseudo_json[index]
+            other_def = u_api_schema_pseudo_json[other_index]
 
-            key = index_to_schema_key[index]
-            other_key = index_to_schema_key[other_index]
+            err_def = def_["errors"]
+            other_err_def = other_def["errors"]
 
-            err_def = def_dict.get(key, {})
-            other_err_def = other_def_dict.get(other_key, {})
+            for k in range(len(err_def)):
+                this_err_def = err_def[k]
+                this_err_def_keys = set(this_err_def.keys())
+                this_err_def_keys.discard("///")
 
-            for key2 in err_def:
-                if key2 in other_err_def:
-                    parse_failures.append(_types._SchemaParseFailure(
-                        [other_index, other_key, key2],
-                        "PathCollision",
-                        {"other": [index, key, key2]},
-                        other_key
-                    ))
+                for l in range(len(other_err_def)):
+                    this_other_err_def = other_err_def[l]
+                    this_other_err_def_keys = set(this_other_err_def.keys())
+                    this_other_err_def_keys.discard("///")
+
+                    if this_err_def_keys == this_other_err_def_keys:
+                        this_error_def_key = next(iter(this_err_def_keys))
+                        this_other_error_def_key = next(
+                            iter(this_other_err_def_keys))
+                        parse_failures.append(_types._SchemaParseFailure(
+                            [other_index, "errors", l,
+                                this_other_error_def_key], "PathCollision",
+                            {"other": [index, "errors", k, this_error_def_key]}, "errors"))
 
     if parse_failures:
         raise types.UApiSchemaParseError(parse_failures)
@@ -784,22 +782,23 @@ def extend_uapi_schema(first: 'types.UApiSchema', second_uapi_schema_json: str, 
     return parse_uapi_schema(original, type_extensions, len(first_original))
 
 
-def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Dict[str, Any], path_offset: int) -> 'types.UApiSchema':
-    parsed_types: Dict[str, Any] = {}
-    parse_failures: List[_types._SchemaParseFailure] = []
-    failed_types: Set[str] = set()
-    schema_keys_to_index: Dict[str, int] = {}
-    schema_keys: Set[str] = set()
-    header_indices: Set[int] = set()
+def parse_uapi_schema(u_api_schema_pseudo_json: List[Any], type_extensions: Dict[str, '_types._UType'], path_offset: int) -> 'types.UApiSchema':
+    parsed_types = {}
+    parse_failures = []
+    failed_types = set()
+    schema_keys_to_index = {}
+    schema_keys = set()
+
+    error_indices = set()
 
     index = -1
-    for definition in uapi_schema_pseudo_json:
+    for definition in u_api_schema_pseudo_json:
         index += 1
 
         loop_path = [index]
 
         try:
-            def_dict = as_map(definition)
+            def_ = as_map(definition)
         except TypeError as e:
             this_parse_failures = get_type_unexpected_parse_failure(
                 loop_path, definition, "Object")
@@ -807,23 +806,25 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
             continue
 
         try:
-            schema_key = find_schema_key(def_dict, index)
+            schema_key = find_schema_key(def_, index)
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue
 
-        if (schema_key == 'headers'):
-            header_indices.add(index)
+        if schema_key == "errors":
+            error_indices.add(index)
             continue
 
-        ignore_if_duplicate: bool = def_dict.get('_ignoreIfDuplicate', False)
+        ignore_if_duplicate = def_.get("_ignoreIfDuplicate", False)
         matching_schema_key = find_matching_schema_key(schema_keys, schema_key)
-        if matching_schema_key:
+        if matching_schema_key is not None:
             if not ignore_if_duplicate:
-                other_path_index = schema_keys_to_index[matching_schema_key]
+                other_path_index = schema_keys_to_index.get(
+                    matching_schema_key)
                 final_path = loop_path + [schema_key]
-                parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision", {
-                    "other": [other_path_index, matching_schema_key]}, None))
+
+                parse_failures.append(_types._SchemaParseFailure(final_path, "PathCollision",
+                                                                 {"other": [other_path_index, matching_schema_key]}, schema_key))
             continue
 
         schema_keys.add(schema_key)
@@ -831,67 +832,82 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index, header_indices)
+            parse_failures, path_offset, schema_keys_to_index, error_indices)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
-    error_keys = set()
+    request_header_keys = set()
+    response_header_keys = set()
     root_type_parameter_count = 0
 
     for schema_key in schema_keys:
         if schema_key.startswith("info."):
             continue
-        elif schema_key.startswith("errors."):
-            error_keys.add(schema_key)
+        elif schema_key.startswith("requestHeader."):
+            request_header_keys.add(schema_key)
+            continue
+        elif schema_key.startswith("responseHeader."):
+            response_header_keys.add(schema_key)
             continue
 
-        this_index = schema_keys_to_index[schema_key]
+        this_index = schema_keys_to_index.get(schema_key)
 
         try:
-            get_or_parse_type([this_index], schema_key, root_type_parameter_count, uapi_schema_pseudo_json,
-                              schema_keys_to_index, parsed_types, type_extensions, parse_failures, failed_types)
+            get_or_parse_type([this_index], schema_key, root_type_parameter_count,
+                              u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions, parse_failures,
+                              failed_types)
         except types.UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index, header_indices)
+            parse_failures, path_offset, schema_keys_to_index, error_indices)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
     try:
-        catch_error_collisions(uapi_schema_pseudo_json,
-                               error_keys, schema_keys_to_index)
+        catch_error_collisions(u_api_schema_pseudo_json,
+                               error_indices, schema_keys_to_index)
 
-        for error_key in error_keys:
-            this_index = schema_keys_to_index[error_key]
-            def_dict = uapi_schema_pseudo_json[this_index]
+        for this_index in error_indices:
+            def_ = dict(u_api_schema_pseudo_json[this_index])
 
             try:
-                error = parse_error_type(def_dict, error_key, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
-                                         type_extensions, parse_failures, failed_types)
+                error = parse_error_type(def_, u_api_schema_pseudo_json, this_index,
+                                         schema_keys_to_index, parsed_types, type_extensions, parse_failures, failed_types)
                 apply_error_to_parsed_types(
-                    error, parsed_types, schema_keys_to_index)
+                    this_index, error, parsed_types, schema_keys_to_index)
             except types.UApiSchemaParseError as e:
                 parse_failures.extend(e.schema_parse_failures)
 
     except types.UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
 
-    request_headers: Dict[str, _types._UFieldDeclaration] = {}
-    response_headers: Dict[str, _types._UFieldDeclaration] = {}
+    request_headers = {}
+    response_headers = {}
 
     try:
-        catch_header_collisions(uapi_schema_pseudo_json, header_indices)
-
-        for this_index in header_indices:
-            def_dict = uapi_schema_pseudo_json[this_index]
+        for request_header_key in request_header_keys:
+            this_index = schema_keys_to_index.get(request_header_key)
+            def_ = dict(u_api_schema_pseudo_json[this_index])
+            header_field = request_header_key[len("requestHeader."):]
 
             try:
-                headers_type = parse_headers_type(def_dict, this_index, uapi_schema_pseudo_json, schema_keys_to_index, parsed_types,
-                                                  type_extensions, parse_failures, failed_types)
+                request_header_type = parse_headers_type(def_, request_header_key, header_field, this_index,
+                                                         u_api_schema_pseudo_json,
+                                                         schema_keys_to_index, parsed_types, type_extensions, parse_failures, failed_types)
+                request_headers[request_header_type.field_name] = request_header_type
+            except types.UApiSchemaParseError as e:
+                parse_failures.extend(e.schema_parse_failures)
 
-                request_headers.update(headers_type.request_headers)
-                response_headers.update(headers_type.response_headers)
+        for response_header_key in response_header_keys:
+            this_index = schema_keys_to_index.get(response_header_key)
+            def_ = dict(u_api_schema_pseudo_json[this_index])
+            header_field = response_header_key[len("responseHeader."):]
 
+            try:
+                response_header_type = parse_headers_type(def_, response_header_key, header_field, this_index,
+                                                          u_api_schema_pseudo_json,
+                                                          schema_keys_to_index, parsed_types, type_extensions, parse_failures, failed_types)
+                response_headers[response_header_type.field_name] = response_header_type
             except types.UApiSchemaParseError as e:
                 parse_failures.extend(e.schema_parse_failures)
 
@@ -900,10 +916,10 @@ def parse_uapi_schema(uapi_schema_pseudo_json: List[object], type_extensions: Di
 
     if parse_failures:
         offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index, header_indices)
+            parse_failures, path_offset, schema_keys_to_index, error_indices)
         raise types.UApiSchemaParseError(offset_parse_failures)
 
-    return types.UApiSchema(uapi_schema_pseudo_json, parsed_types, request_headers, response_headers, type_extensions)
+    return types.UApiSchema(u_api_schema_pseudo_json, parsed_types, request_headers, response_headers, type_extensions)
 
 
 class _BinaryPackNode:

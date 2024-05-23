@@ -975,7 +975,6 @@ class _Util {
                 if (!ignoreIfDuplicate) {
                     final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
                     final List<Object> finalPath = append(loopPath, schemaKey);
-                    System.out.print(otherPathIndex);
 
                     parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",
                             Map.of("other", List.of(otherPathIndex, matchingSchemaKey)), schemaKey));
