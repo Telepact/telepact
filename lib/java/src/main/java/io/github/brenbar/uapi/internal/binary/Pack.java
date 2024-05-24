@@ -1,21 +1,20 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.PackList.packList;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.github.brenbar.uapi.internal.UnpackList.unpackList;
-
-public class Unpack {
-
-    static Object unpack(Object value) {
+public class Pack {
+    static Object pack(Object value) {
         if (value instanceof final List l) {
-            return unpackList(l);
+            return packList(l);
         } else if (value instanceof final Map<?, ?> m) {
             final var newMap = new HashMap<Object, Object>();
 
-            for (Map.Entry<?, ?> entry : m.entrySet()) {
-                newMap.put(entry.getKey(), unpack(entry.getValue()));
+            for (final var entry : m.entrySet()) {
+                newMap.put(entry.getKey(), pack(entry.getValue()));
             }
 
             return newMap;

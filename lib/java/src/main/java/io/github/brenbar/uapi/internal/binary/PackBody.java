@@ -1,9 +1,9 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.Pack.pack;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.github.brenbar.uapi.internal.Pack.pack;
 
 public class PackBody {
     static Map<Object, Object> packBody(Map<Object, Object> body) {

@@ -1,4 +1,4 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
 
 import java.util.HashMap;
 import java.util.List;

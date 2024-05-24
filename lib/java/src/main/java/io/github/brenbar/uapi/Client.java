@@ -3,7 +3,7 @@ package io.github.brenbar.uapi;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
-import io.github.brenbar.uapi.internal.ClientBinaryEncoder;
+import io.github.brenbar.uapi.internal.binary.ClientBinaryEncoder;
 
 import static io.github.brenbar.uapi.internal.ProcessRequestObject.processRequestObject;
 

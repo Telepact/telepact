@@ -1,4 +1,4 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
 
 import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;

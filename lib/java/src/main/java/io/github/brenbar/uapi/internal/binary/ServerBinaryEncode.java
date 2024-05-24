@@ -1,11 +1,11 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.EncodeBody.encodeBody;
+import static io.github.brenbar.uapi.internal.binary.PackBody.packBody;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static io.github.brenbar.uapi.internal.EncodeBody.encodeBody;
-import static io.github.brenbar.uapi.internal.PackBody.packBody;
 
 public class ServerBinaryEncode {
     static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {

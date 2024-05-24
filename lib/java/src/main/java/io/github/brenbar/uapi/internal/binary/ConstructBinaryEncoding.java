@@ -1,4 +1,6 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.CreateChecksum.createChecksum;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +11,6 @@ import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UFn;
 import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UUnion;
-
-import static io.github.brenbar.uapi.internal.CreateChecksum.createChecksum;
 
 public class ConstructBinaryEncoding {
     public static BinaryEncoding constructBinaryEncoding(UApiSchema uApiSchema) {

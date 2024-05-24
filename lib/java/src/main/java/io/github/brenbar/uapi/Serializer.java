@@ -1,8 +1,9 @@
 package io.github.brenbar.uapi;
 
-import io.github.brenbar.uapi.internal.BinaryEncoder;
-
 import static io.github.brenbar.uapi.internal.SerializeInternal.serializeInternal;
+
+import io.github.brenbar.uapi.internal.binary.BinaryEncoder;
+
 import static io.github.brenbar.uapi.internal.DeserializeInternal.deserializeInternal;
 
 /**

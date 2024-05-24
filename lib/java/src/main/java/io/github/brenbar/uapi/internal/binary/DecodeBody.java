@@ -1,8 +1,8 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.DecodeKeys.decodeKeys;
 
 import java.util.Map;
-
-import static io.github.brenbar.uapi.internal.DecodeKeys.decodeKeys;
 
 public class DecodeBody {
     static Map<String, Object> decodeBody(Map<Object, Object> encodedMessageBody, BinaryEncoding binaryEncoder) {

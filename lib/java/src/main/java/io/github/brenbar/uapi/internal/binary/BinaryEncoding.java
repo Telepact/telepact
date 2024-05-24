@@ -1,4 +1,4 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
 
 import java.util.Map;
 import java.util.stream.Collectors;

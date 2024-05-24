@@ -1,4 +1,6 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.Pack.pack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
-
-import static io.github.brenbar.uapi.internal.Pack.pack;
 
 public class PackMap {
 

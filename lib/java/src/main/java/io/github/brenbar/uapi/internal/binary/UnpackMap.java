@@ -1,13 +1,13 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.PackMap.UNDEFINED_BYTE;
+import static io.github.brenbar.uapi.internal.binary.Unpack.unpack;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
-
-import static io.github.brenbar.uapi.internal.Unpack.unpack;
-import static io.github.brenbar.uapi.internal.PackMap.UNDEFINED_BYTE;
 
 public class UnpackMap {
     static Map<Integer, Object> unpackMap(List<Object> row, List<Object> header) {

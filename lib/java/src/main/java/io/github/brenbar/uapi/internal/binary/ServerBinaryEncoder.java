@@ -1,9 +1,9 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.ServerBinaryDecode.serverBinaryDecode;
+import static io.github.brenbar.uapi.internal.binary.ServerBinaryEncode.serverBinaryEncode;
 
 import java.util.List;
-
-import static io.github.brenbar.uapi.internal.ServerBinaryDecode.serverBinaryDecode;
-import static io.github.brenbar.uapi.internal.ServerBinaryEncode.serverBinaryEncode;
 
 public class ServerBinaryEncoder implements BinaryEncoder {
 

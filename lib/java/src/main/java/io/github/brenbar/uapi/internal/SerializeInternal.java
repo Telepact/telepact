@@ -6,6 +6,8 @@ import java.util.Objects;
 import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.SerializationError;
 import io.github.brenbar.uapi.SerializationImpl;
+import io.github.brenbar.uapi.internal.binary.BinaryEncoder;
+import io.github.brenbar.uapi.internal.binary.BinaryEncoderUnavailableError;
 
 public class SerializeInternal {
     public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,

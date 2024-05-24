@@ -1,13 +1,13 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.PackList.PACKED_BYTE;
+import static io.github.brenbar.uapi.internal.binary.Unpack.unpack;
+import static io.github.brenbar.uapi.internal.binary.UnpackMap.unpackMap;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.msgpack.jackson.dataformat.MessagePackExtensionType;
-
-import static io.github.brenbar.uapi.internal.Unpack.unpack;
-import static io.github.brenbar.uapi.internal.UnpackMap.unpackMap;
-import static io.github.brenbar.uapi.internal.PackList.PACKED_BYTE;
 
 public class UnpackList {
     static List<Object> unpackList(List<Object> list) {

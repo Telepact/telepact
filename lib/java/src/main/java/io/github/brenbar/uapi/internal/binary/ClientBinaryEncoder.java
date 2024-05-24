@@ -1,13 +1,13 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.ClientBinaryDecode.clientBinaryDecode;
+import static io.github.brenbar.uapi.internal.binary.ClientBinaryEncode.clientBinaryEncode;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.brenbar.uapi.ClientBinaryStrategy;
-
-import static io.github.brenbar.uapi.internal.ClientBinaryEncode.clientBinaryEncode;
-import static io.github.brenbar.uapi.internal.ClientBinaryDecode.clientBinaryDecode;
 
 public class ClientBinaryEncoder implements BinaryEncoder {
 

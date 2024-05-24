@@ -1,4 +1,7 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.binary;
+
+import static io.github.brenbar.uapi.internal.binary.EncodeBody.encodeBody;
+import static io.github.brenbar.uapi.internal.binary.PackBody.packBody;
 
 import java.util.List;
 import java.util.Map;
@@ -6,9 +9,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.github.brenbar.uapi.ClientBinaryStrategy;
-
-import static io.github.brenbar.uapi.internal.EncodeBody.encodeBody;
-import static io.github.brenbar.uapi.internal.PackBody.packBody;
 
 public class ClientBinaryEncode {
     static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,

@@ -7,6 +7,8 @@ import java.util.function.Consumer;
 import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.Serializer;
 import io.github.brenbar.uapi.UApiSchema;
+import io.github.brenbar.uapi.internal.binary.BinaryEncoderUnavailableError;
+import io.github.brenbar.uapi.internal.binary.BinaryEncodingMissing;
 
 public class ParseRequestMessage {
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,

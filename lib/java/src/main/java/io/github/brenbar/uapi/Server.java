@@ -5,15 +5,15 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import io.github.brenbar.uapi.internal.ServerBinaryEncoder;
+import io.github.brenbar.uapi.internal.binary.ServerBinaryEncoder;
 import io.github.brenbar.uapi.internal.types.USelect;
 import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.ConstructBinaryEncoding.constructBinaryEncoding;
 import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
 import static io.github.brenbar.uapi.internal.GetInternalUApiJson.getInternalUApiJson;
 import static io.github.brenbar.uapi.internal.ProcessBytes.processBytes;
+import static io.github.brenbar.uapi.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
 
 /**
  * A uAPI Server.
