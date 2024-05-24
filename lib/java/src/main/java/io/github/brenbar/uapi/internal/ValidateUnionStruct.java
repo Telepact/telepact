@@ -3,6 +3,9 @@ package io.github.brenbar.uapi.internal;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+
 import static io.github.brenbar.uapi.internal.ValidateStructFields.validateStructFields;
 
 public class ValidateUnionStruct {

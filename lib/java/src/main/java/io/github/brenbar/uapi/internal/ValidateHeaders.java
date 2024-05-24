@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UFn;
+
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 
 public class ValidateHeaders {

@@ -4,12 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+
 import static io.github.brenbar.uapi.internal.ValidateUnionCases.validateUnionCases;
+import static io.github.brenbar.uapi.internal.types.UUnion._UNION_NAME;
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
-import static io.github.brenbar.uapi.internal.UUnion._UNION_NAME;
 
 public class ValidateUnion {
-    static List<ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn,
+    public static List<ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics, String name, Map<String, UStruct> cases) {
         if (value instanceof Map<?, ?> m) {

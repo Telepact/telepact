@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.brenbar.uapi.internal.UFieldDeclaration;
-import io.github.brenbar.uapi.internal.UType;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
 import static io.github.brenbar.uapi.internal.NewUApiSchema.newUApiSchema;

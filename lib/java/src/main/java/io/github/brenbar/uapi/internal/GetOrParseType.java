@@ -6,6 +6,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UAny;
+import io.github.brenbar.uapi.internal.types.UArray;
+import io.github.brenbar.uapi.internal.types.UBoolean;
+import io.github.brenbar.uapi.internal.types.UGeneric;
+import io.github.brenbar.uapi.internal.types.UInteger;
+import io.github.brenbar.uapi.internal.types.UNumber;
+import io.github.brenbar.uapi.internal.types.UObject;
+import io.github.brenbar.uapi.internal.types.UString;
+import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.ParseStructType.parseStructType;
 import static io.github.brenbar.uapi.internal.ParseUnionType.parseUnionType;

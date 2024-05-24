@@ -1,15 +1,16 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.GenerateRandomNumber.generateRandomNumber;
-import static io.github.brenbar.uapi.internal.ValidateNumber.validateNumber;
+import static io.github.brenbar.uapi.internal.ValidateString.validateString;
+import static io.github.brenbar.uapi.internal.GenerateRandomString.generateRandomString;
 
-public class UNumber implements UType {
-    public static final String _NUMBER_NAME = "Number";
+public class UString implements UType {
+    public static final String _STRING_NAME = "String";
 
     @Override
     public int getTypeParameterCount() {
@@ -20,7 +21,7 @@ public class UNumber implements UType {
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        return validateNumber(value);
+        return validateString(value);
     }
 
     @Override
@@ -28,11 +29,11 @@ public class UNumber implements UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
-        return generateRandomNumber(blueprintValue, useBlueprintValue, randomGenerator);
+        return generateRandomString(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
     @Override
     public String getName(List<UTypeDeclaration> generics) {
-        return _NUMBER_NAME;
+        return _STRING_NAME;
     }
 }

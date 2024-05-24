@@ -9,6 +9,8 @@ import java.util.TreeMap;
 import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.UApiError;
 import io.github.brenbar.uapi.UApiSchema;
+import io.github.brenbar.uapi.internal.types.UFn;
+import io.github.brenbar.uapi.internal.types.UUnion;
 import io.github.brenbar.uapi.RandomGenerator;
 
 import static io.github.brenbar.uapi.internal.IsSubMap.isSubMap;

@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
-import static io.github.brenbar.uapi.internal.UArray._ARRAY_NAME;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
+import static io.github.brenbar.uapi.internal.types.UArray._ARRAY_NAME;
 
 public class ValidateArray {
-    static List<ValidationFailure> validateArray(Object value, Map<String, Object> select, String fn,
+    public static List<ValidationFailure> validateArray(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
         if (value instanceof final List l) {

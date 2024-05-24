@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.brenbar.uapi.UApiSchema;
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.ParseUApiSchema.parseUApiSchema;

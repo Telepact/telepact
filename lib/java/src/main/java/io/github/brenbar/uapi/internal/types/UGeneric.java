@@ -1,15 +1,17 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.ValidateString.validateString;
-import static io.github.brenbar.uapi.internal.GenerateRandomString.generateRandomString;
+public class UGeneric implements UType {
+    public final int index;
 
-public class UString implements UType {
-    public static final String _STRING_NAME = "String";
+    public UGeneric(int index) {
+        this.index = index;
+    }
 
     @Override
     public int getTypeParameterCount() {
@@ -20,7 +22,8 @@ public class UString implements UType {
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        return validateString(value);
+        final var typeDeclaration = generics.get(this.index);
+        return typeDeclaration.validate(value, select, fn, List.of());
     }
 
     @Override
@@ -28,11 +31,14 @@ public class UString implements UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
-        return generateRandomString(blueprintValue, useBlueprintValue, randomGenerator);
+        final var genericTypeDeclaration = generics.get(this.index);
+        return genericTypeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
+                includeOptionalFields, randomizeOptionalFields, List.of(), randomGenerator);
     }
 
     @Override
     public String getName(List<UTypeDeclaration> generics) {
-        return _STRING_NAME;
+        final var typeDeclaration = generics.get(this.index);
+        return typeDeclaration.type.getName(generics);
     }
 }

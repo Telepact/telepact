@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.ParseTypeDeclaration.parseTypeDeclaration;
 import static io.github.brenbar.uapi.internal.Append.append;

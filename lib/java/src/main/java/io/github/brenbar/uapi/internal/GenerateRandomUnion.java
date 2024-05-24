@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
 import static io.github.brenbar.uapi.internal.ConstructRandomUnion.constructRandomUnion;
 
 public class GenerateRandomUnion {
-    static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
+    public static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator, Map<String, UStruct> cases) {

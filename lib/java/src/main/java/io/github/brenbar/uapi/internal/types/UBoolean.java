@@ -1,16 +1,17 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
-public class UGeneric implements UType {
-    public final int index;
+import static io.github.brenbar.uapi.internal.ValidateBoolean.validateBoolean;
+import static io.github.brenbar.uapi.internal.GenerateRandomBoolean.generateRandomBoolean;
 
-    public UGeneric(int index) {
-        this.index = index;
-    }
+public class UBoolean implements UType {
+
+    public static final String _BOOLEAN_NAME = "Boolean";
 
     @Override
     public int getTypeParameterCount() {
@@ -21,8 +22,7 @@ public class UGeneric implements UType {
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        final var typeDeclaration = generics.get(this.index);
-        return typeDeclaration.validate(value, select, fn, List.of());
+        return validateBoolean(value);
     }
 
     @Override
@@ -30,14 +30,12 @@ public class UGeneric implements UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
-        final var genericTypeDeclaration = generics.get(this.index);
-        return genericTypeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
-                includeOptionalFields, randomizeOptionalFields, List.of(), randomGenerator);
+        return generateRandomBoolean(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
     @Override
     public String getName(List<UTypeDeclaration> generics) {
-        final var typeDeclaration = generics.get(this.index);
-        return typeDeclaration.type.getName(generics);
+        return _BOOLEAN_NAME;
     }
+
 }

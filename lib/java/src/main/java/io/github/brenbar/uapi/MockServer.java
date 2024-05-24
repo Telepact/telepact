@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 
 import io.github.brenbar.uapi.internal.MockInvocation;
 import io.github.brenbar.uapi.internal.MockStub;
-import io.github.brenbar.uapi.internal.UMockCall;
-import io.github.brenbar.uapi.internal.UMockStub;
-import io.github.brenbar.uapi.internal.UType;
+import io.github.brenbar.uapi.internal.types.UMockCall;
+import io.github.brenbar.uapi.internal.types.UMockStub;
+import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
 import static io.github.brenbar.uapi.internal.GetMockUApiJson.getMockUApiJson;

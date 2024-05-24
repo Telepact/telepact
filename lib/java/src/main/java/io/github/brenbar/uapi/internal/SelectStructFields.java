@@ -5,6 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UArray;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UFn;
+import io.github.brenbar.uapi.internal.types.UObject;
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+import io.github.brenbar.uapi.internal.types.UUnion;
+
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 
 public class SelectStructFields {

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UStruct;
+
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.AsList.asList;

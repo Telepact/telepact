@@ -9,6 +9,10 @@ import java.util.function.Function;
 
 import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.UApiSchema;
+import io.github.brenbar.uapi.internal.types.UFn;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.SelectStructFields.selectStructFields;
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;

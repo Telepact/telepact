@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
 public class ConstructRandomStruct {
     static Map<String, Object> constructRandomStruct(

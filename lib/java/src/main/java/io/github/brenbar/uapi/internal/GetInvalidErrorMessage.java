@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.Message;
+import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.MapValidationFailuresToInvalidFieldCases.mapValidationFailuresToInvalidFieldCases;
 import static io.github.brenbar.uapi.internal.ValidateResult.validateResult;

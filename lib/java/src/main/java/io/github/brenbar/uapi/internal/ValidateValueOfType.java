@@ -3,11 +3,15 @@ package io.github.brenbar.uapi.internal;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UGeneric;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 public class ValidateValueOfType {
 
-    static List<ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn,
+    public static List<ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> generics,
             UType thisType, boolean nullable, List<UTypeDeclaration> typeParameters) {
         if (value == null) {

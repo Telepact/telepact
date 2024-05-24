@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UError;
+import io.github.brenbar.uapi.internal.types.UFn;
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UUnion;
 
 public class ApplyErrorToParsedTypes {
     static void applyErrorToParsedTypes(int errorIndex, UError error, Map<String, UType> parsedTypes,

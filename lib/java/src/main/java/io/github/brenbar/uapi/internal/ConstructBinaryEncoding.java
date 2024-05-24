@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import io.github.brenbar.uapi.UApiSchema;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UFn;
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.CreateChecksum.createChecksum;
 

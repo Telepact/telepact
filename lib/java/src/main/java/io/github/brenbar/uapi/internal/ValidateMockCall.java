@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal.types.UFn;
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
+import io.github.brenbar.uapi.internal.types.UUnion;
+
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 
 public class ValidateMockCall {
-    static List<ValidationFailure> validateMockCall(Object givenObj, Map<String, Object> select, String fn,
+    public static List<ValidationFailure> validateMockCall(Object givenObj, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics, Map<String, UType> types) {
         final Map<String, Object> givenMap;

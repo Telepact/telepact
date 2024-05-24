@@ -8,6 +8,8 @@ import java.util.Map;
 
 import io.github.brenbar.uapi.UApiSchema;
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.ParseErrorType.parseErrorType;

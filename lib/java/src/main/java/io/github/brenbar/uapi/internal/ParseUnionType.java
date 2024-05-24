@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.types.UStruct;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.AsList.asList;

@@ -3,6 +3,7 @@ package io.github.brenbar.uapi.internal;
 import java.util.List;
 
 import io.github.brenbar.uapi.UApiError;
+import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.MapValidationFailuresToInvalidFieldCases.mapValidationFailuresToInvalidFieldCases;
 

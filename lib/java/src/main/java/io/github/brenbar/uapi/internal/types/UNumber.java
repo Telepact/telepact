@@ -1,21 +1,16 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.ValidateMockCall.validateMockCall;
+import static io.github.brenbar.uapi.internal.GenerateRandomNumber.generateRandomNumber;
+import static io.github.brenbar.uapi.internal.ValidateNumber.validateNumber;
 
-public class UMockCall implements UType {
-
-    public static final String _MOCK_CALL_NAME = "_ext.Call_";
-
-    public final Map<String, UType> types;
-
-    public UMockCall(Map<String, UType> types) {
-        this.types = types;
-    }
+public class UNumber implements UType {
+    public static final String _NUMBER_NAME = "Number";
 
     @Override
     public int getTypeParameterCount() {
@@ -23,10 +18,10 @@ public class UMockCall implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
+    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        return validateMockCall(givenObj, select, fn, typeParameters, generics, this.types);
+        return validateNumber(value);
     }
 
     @Override
@@ -34,12 +29,11 @@ public class UMockCall implements UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
-        throw new UnsupportedOperationException("Not implemented");
+        return generateRandomNumber(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
     @Override
     public String getName(List<UTypeDeclaration> generics) {
-        return _MOCK_CALL_NAME;
+        return _NUMBER_NAME;
     }
-
 }

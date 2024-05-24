@@ -1,16 +1,17 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
 import static io.github.brenbar.uapi.internal.GenerateRandomObject.generateRandomObject;
 import static io.github.brenbar.uapi.internal.ValidateObject.validateObject;
 
 public class UObject implements UType {
 
-    static final String _OBJECT_NAME = "Object";
+    public static final String _OBJECT_NAME = "Object";
 
     @Override
     public int getTypeParameterCount() {

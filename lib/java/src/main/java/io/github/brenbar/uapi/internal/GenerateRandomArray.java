@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
 public class GenerateRandomArray {
-    static Object generateRandomArray(Object blueprintValue, boolean useBlueprintValue,
+    public static Object generateRandomArray(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {

@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.github.brenbar.uapi.UApiSchemaParseError;
+import io.github.brenbar.uapi.internal.types.UGeneric;
+import io.github.brenbar.uapi.internal.types.UType;
+import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
 import static io.github.brenbar.uapi.internal.GetType.getType;
 import static io.github.brenbar.uapi.internal.Append.append;

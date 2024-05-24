@@ -1,16 +1,17 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
 import static io.github.brenbar.uapi.internal.GenerateRandomUnion.generateRandomUnion;
 import static io.github.brenbar.uapi.internal.ValidateUnion.validateUnion;
 
 public class UUnion implements UType {
 
-    static final String _UNION_NAME = "Object";
+    public static final String _UNION_NAME = "Object";
 
     public final String name;
     public final Map<String, UStruct> cases;

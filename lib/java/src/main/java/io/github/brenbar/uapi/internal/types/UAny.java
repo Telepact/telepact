@@ -1,21 +1,16 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.types;
 
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
+import io.github.brenbar.uapi.internal.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.ValidateSelect.validateSelect;
+import static io.github.brenbar.uapi.internal.GenerateRandomAny.generateRandomAny;
 
-public class USelect implements UType {
+public class UAny implements UType {
 
-    public static final String _SELECT = "Object";
-
-    public final Map<String, UType> types;
-
-    public USelect(Map<String, UType> types) {
-        this.types = types;
-    }
+    static final String _ANY_NAME = "Any";
 
     @Override
     public int getTypeParameterCount() {
@@ -23,10 +18,10 @@ public class USelect implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
+    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics) {
-        return validateSelect(givenObj, select, fn, typeParameters, generics, this.types);
+        return List.of();
     }
 
     @Override
@@ -34,12 +29,11 @@ public class USelect implements UType {
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
-        throw new UnsupportedOperationException("Not implemented");
+        return generateRandomAny(randomGenerator);
     }
 
     @Override
     public String getName(List<UTypeDeclaration> generics) {
-        return _SELECT;
+        return _ANY_NAME;
     }
-
 }
