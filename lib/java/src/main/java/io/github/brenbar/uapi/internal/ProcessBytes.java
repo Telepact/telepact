@@ -9,8 +9,8 @@ import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.Serializer;
 import io.github.brenbar.uapi.UApiSchema;
 
-import static io.github.brenbar.uapi.internal.ParseRequestMessage.parseRequestMessage;
 import static io.github.brenbar.uapi.internal.HandleMessage.handleMessage;
+import static io.github.brenbar.uapi.internal.ParseRequestMessage.parseRequestMessage;
 
 public class ProcessBytes {
     public static byte[] processBytes(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,

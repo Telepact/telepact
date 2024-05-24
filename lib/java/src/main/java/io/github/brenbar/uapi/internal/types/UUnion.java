@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
-import io.github.brenbar.uapi.internal.ValidationFailure;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.GenerateRandomUnion.generateRandomUnion;
-import static io.github.brenbar.uapi.internal.ValidateUnion.validateUnion;
+import static io.github.brenbar.uapi.internal.generation.GenerateRandomUnion.generateRandomUnion;
+import static io.github.brenbar.uapi.internal.validation.ValidateUnion.validateUnion;
 
 public class UUnion implements UType {
 

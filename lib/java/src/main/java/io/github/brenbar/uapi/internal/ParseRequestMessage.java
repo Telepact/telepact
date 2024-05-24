@@ -9,6 +9,8 @@ import io.github.brenbar.uapi.Serializer;
 import io.github.brenbar.uapi.UApiSchema;
 import io.github.brenbar.uapi.internal.binary.BinaryEncoderUnavailableError;
 import io.github.brenbar.uapi.internal.binary.BinaryEncodingMissing;
+import io.github.brenbar.uapi.internal.validation.InvalidMessage;
+import io.github.brenbar.uapi.internal.validation.InvalidMessageBody;
 
 public class ParseRequestMessage {
     static Message parseRequestMessage(byte[] requestMessageBytes, Serializer serializer, UApiSchema uApiSchema,

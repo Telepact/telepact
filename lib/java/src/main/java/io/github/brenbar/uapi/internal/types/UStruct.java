@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
-import io.github.brenbar.uapi.internal.ValidationFailure;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.ValidateStruct.validateStruct;
-import static io.github.brenbar.uapi.internal.GenerateRandomStruct.generateRandomStruct;
+import static io.github.brenbar.uapi.internal.generation.GenerateRandomStruct.generateRandomStruct;
+import static io.github.brenbar.uapi.internal.validation.ValidateStruct.validateStruct;
 
 public class UStruct implements UType {
 

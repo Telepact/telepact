@@ -1,14 +1,14 @@
 package io.github.brenbar.uapi;
 
+import static io.github.brenbar.uapi.internal.schema.ExtendUApiSchema.extendUApiSchema;
+import static io.github.brenbar.uapi.internal.schema.NewUApiSchema.newUApiSchema;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UType;
-
-import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
-import static io.github.brenbar.uapi.internal.NewUApiSchema.newUApiSchema;
 
 /**
  * A parsed uAPI schema.

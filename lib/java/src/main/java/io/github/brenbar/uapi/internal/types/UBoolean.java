@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
-import io.github.brenbar.uapi.internal.ValidationFailure;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.ValidateBoolean.validateBoolean;
-import static io.github.brenbar.uapi.internal.GenerateRandomBoolean.generateRandomBoolean;
+import static io.github.brenbar.uapi.internal.generation.GenerateRandomBoolean.generateRandomBoolean;
+import static io.github.brenbar.uapi.internal.validation.ValidateBoolean.validateBoolean;
 
 public class UBoolean implements UType {
 

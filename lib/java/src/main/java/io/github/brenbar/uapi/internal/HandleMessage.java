@@ -13,12 +13,13 @@ import io.github.brenbar.uapi.internal.types.UFn;
 import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 import io.github.brenbar.uapi.internal.types.UUnion;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
 import static io.github.brenbar.uapi.internal.SelectStructFields.selectStructFields;
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
-import static io.github.brenbar.uapi.internal.ValidateHeaders.validateHeaders;
-import static io.github.brenbar.uapi.internal.ValidateResult.validateResult;
-import static io.github.brenbar.uapi.internal.GetInvalidErrorMessage.getInvalidErrorMessage;
+import static io.github.brenbar.uapi.internal.validation.GetInvalidErrorMessage.getInvalidErrorMessage;
+import static io.github.brenbar.uapi.internal.validation.ValidateHeaders.validateHeaders;
+import static io.github.brenbar.uapi.internal.validation.ValidateResult.validateResult;
 
 public class HandleMessage {
     static Message handleMessage(Message requestMessage, UApiSchema uApiSchema, Function<Message, Message> handler,

@@ -12,9 +12,9 @@ import io.github.brenbar.uapi.internal.types.UMockCall;
 import io.github.brenbar.uapi.internal.types.UMockStub;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
-import static io.github.brenbar.uapi.internal.GetMockUApiJson.getMockUApiJson;
 import static io.github.brenbar.uapi.internal.MockHandle.mockHandle;
+import static io.github.brenbar.uapi.internal.schema.ExtendUApiSchema.extendUApiSchema;
+import static io.github.brenbar.uapi.internal.schema.GetMockUApiJson.getMockUApiJson;
 
 /**
  * A Mock instance of a uAPI server.

@@ -1,12 +1,12 @@
 package io.github.brenbar.uapi.internal.types;
 
+import static io.github.brenbar.uapi.internal.generation.GenerateRandomAny.generateRandomAny;
+
 import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
-import io.github.brenbar.uapi.internal.ValidationFailure;
-
-import static io.github.brenbar.uapi.internal.GenerateRandomAny.generateRandomAny;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
 public class UAny implements UType {
 

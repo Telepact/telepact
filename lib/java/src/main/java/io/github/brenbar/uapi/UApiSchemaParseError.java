@@ -1,10 +1,10 @@
 package io.github.brenbar.uapi;
 
+import static io.github.brenbar.uapi.internal.schema.MapSchemaParseFailuresToPseudoJson.mapSchemaParseFailuresToPseudoJson;
+
 import java.util.List;
 
-import io.github.brenbar.uapi.internal.SchemaParseFailure;
-
-import static io.github.brenbar.uapi.internal.MapSchemaParseFailuresToPseudoJson.mapSchemaParseFailuresToPseudoJson;
+import io.github.brenbar.uapi.internal.schema.SchemaParseFailure;
 
 /**
  * Indicates failure to parse a uAPI Schema.

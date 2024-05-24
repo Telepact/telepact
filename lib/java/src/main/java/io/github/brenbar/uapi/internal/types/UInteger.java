@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
-import io.github.brenbar.uapi.internal.ValidationFailure;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.GenerateRandomInteger.generateRandomInteger;
-import static io.github.brenbar.uapi.internal.ValidateInteger.validateInteger;
+import static io.github.brenbar.uapi.internal.generation.GenerateRandomInteger.generateRandomInteger;
+import static io.github.brenbar.uapi.internal.validation.ValidateInteger.validateInteger;
 
 public class UInteger implements UType {
     public static final String _INTEGER_NAME = "Integer";

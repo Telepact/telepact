@@ -6,6 +6,8 @@ import java.util.Map;
 import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.SerializationImpl;
 import io.github.brenbar.uapi.internal.binary.BinaryEncoder;
+import io.github.brenbar.uapi.internal.validation.InvalidMessage;
+import io.github.brenbar.uapi.internal.validation.InvalidMessageBody;
 
 import static io.github.brenbar.uapi.internal.AsList.asList;
 import static io.github.brenbar.uapi.internal.AsMap.asMap;

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.github.brenbar.uapi.RandomGenerator;
-import io.github.brenbar.uapi.internal.ValidationFailure;
+import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
-import static io.github.brenbar.uapi.internal.GenerateRandomArray.generateRandomArray;
-import static io.github.brenbar.uapi.internal.ValidateArray.validateArray;
+import static io.github.brenbar.uapi.internal.generation.GenerateRandomArray.generateRandomArray;
+import static io.github.brenbar.uapi.internal.validation.ValidateArray.validateArray;
 
 public class UArray implements UType {
 
