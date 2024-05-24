@@ -5,6 +5,16 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import io.github.brenbar.uapi.internal._ServerBinaryEncoder;
+import io.github.brenbar.uapi.internal._USelect;
+import io.github.brenbar.uapi.internal._UType;
+import io.github.brenbar.uapi.internal._UStruct;
+
+import static io.github.brenbar.uapi.internal.ConstructBinaryEncoding.constructBinaryEncoding;
+import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
+import static io.github.brenbar.uapi.internal.GetInternalUApiJson.getInternalUApiJson;
+import static io.github.brenbar.uapi.internal.ProcessBytes.processBytes;
+
 /**
  * A uAPI Server.
  */
@@ -69,11 +79,11 @@ public class Server {
 
         typeExtensions.put("_ext.Select_", new _USelect(parsedTypes));
 
-        this.uApiSchema = _Util.extendUApiSchema(uApiSchema, _Util.getInternalUApiJson(), typeExtensions);
+        this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
 
         parsedTypes.putAll(this.uApiSchema.parsed);
 
-        final var binaryEncoding = _Util.constructBinaryEncoding(this.uApiSchema);
+        final var binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
 
@@ -90,7 +100,7 @@ public class Server {
      * @return
      */
     public byte[] process(byte[] requestMessageBytes) {
-        return _Util.processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
+        return processBytes(requestMessageBytes, this.serializer, this.uApiSchema, this.onError,
                 this.onRequest, this.onResponse, this.handler);
     }
 }

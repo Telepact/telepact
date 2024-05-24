@@ -3,6 +3,8 @@ package io.github.brenbar.uapi;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
+
 /**
  * A uAPI Message.
  */
@@ -16,12 +18,12 @@ public class Message {
     }
 
     public String getBodyTarget() {
-        var entry = _Util.unionEntry(body);
+        var entry = unionEntry(body);
         return entry.getKey();
     }
 
     public Map<String, Object> getBodyPayload() {
-        var entry = _Util.unionEntry(body);
+        var entry = unionEntry(body);
         return (Map<String, Object>) entry.getValue();
     }
 }

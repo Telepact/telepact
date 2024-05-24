@@ -4,16 +4,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.brenbar.uapi.internal._UFieldDeclaration;
+import io.github.brenbar.uapi.internal._UType;
+
+import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
+import static io.github.brenbar.uapi.internal.NewUApiSchema.newUApiSchema;
+
 /**
  * A parsed uAPI schema.
  */
 public class UApiSchema {
 
-    final List<Object> original;
-    final Map<String, _UType> parsed;
-    final Map<String, _UFieldDeclaration> parsedRequestHeaders;
-    final Map<String, _UFieldDeclaration> parsedResponseHeaders;
-    final Map<String, _UType> typeExtensions;
+    public final List<Object> original;
+    public final Map<String, _UType> parsed;
+    public final Map<String, _UFieldDeclaration> parsedRequestHeaders;
+    public final Map<String, _UFieldDeclaration> parsedResponseHeaders;
+    public final Map<String, _UType> typeExtensions;
 
     public UApiSchema(List<Object> original,
             Map<String, _UType> parsed,
@@ -28,10 +34,10 @@ public class UApiSchema {
     }
 
     public static UApiSchema fromJson(String json) {
-        return _Util.newUApiSchema(json, new HashMap<>());
+        return newUApiSchema(json, new HashMap<>());
     }
 
     public static UApiSchema extend(UApiSchema base, String json) {
-        return _Util.extendUApiSchema(base, json, new HashMap<>());
+        return extendUApiSchema(base, json, new HashMap<>());
     }
 }

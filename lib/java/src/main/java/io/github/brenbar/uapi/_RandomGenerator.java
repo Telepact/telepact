@@ -3,7 +3,7 @@ package io.github.brenbar.uapi;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
-class _RandomGenerator {
+public class _RandomGenerator {
     int seed = 0;
     private int collectionLengthMin;
     private int collectionLengthMax;

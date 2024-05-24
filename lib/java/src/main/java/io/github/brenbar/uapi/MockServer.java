@@ -6,6 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import io.github.brenbar.uapi.internal._MockInvocation;
+import io.github.brenbar.uapi.internal._MockStub;
+import io.github.brenbar.uapi.internal._UMockCall;
+import io.github.brenbar.uapi.internal._UMockStub;
+import io.github.brenbar.uapi.internal._UType;
+
+import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
+import static io.github.brenbar.uapi.internal.GetMockUApiJson.getMockUApiJson;
+import static io.github.brenbar.uapi.internal.MockHandle.mockHandle;
+
 /**
  * A Mock instance of a uAPI server.
  */
@@ -77,7 +87,7 @@ public class MockServer {
         typeExtensions.put("_ext.Call_", new _UMockCall(parsedTypes));
         typeExtensions.put("_ext.Stub_", new _UMockStub(parsedTypes));
 
-        final var combinedUApiSchema = _Util.extendUApiSchema(uApiSchema, _Util.getMockUApiJson(),
+        final var combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(),
                 typeExtensions);
 
         final var serverOptions = new Server.Options();
@@ -103,7 +113,7 @@ public class MockServer {
     }
 
     private Message handle(Message requestMessage) {
-        return _Util.mockHandle(requestMessage, this.stubs, this.invocations, this.random,
+        return mockHandle(requestMessage, this.stubs, this.invocations, this.random,
                 this.server.uApiSchema, this.enableGeneratedDefaultStub, this.enableOptionalFieldGeneration,
                 this.randomizeOptionalFieldGeneration);
     }

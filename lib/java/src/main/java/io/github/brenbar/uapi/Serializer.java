@@ -1,5 +1,10 @@
 package io.github.brenbar.uapi;
 
+import io.github.brenbar.uapi.internal._BinaryEncoder;
+
+import static io.github.brenbar.uapi.internal.SerializeInternal.serializeInternal;
+import static io.github.brenbar.uapi.internal.DeserializeInternal.deserializeInternal;
+
 /**
  * A serializer that converts a Message to and from a serialized form.
  */
@@ -20,7 +25,7 @@ public class Serializer {
      * @return
      */
     public byte[] serialize(Message message) {
-        return _Util.serialize(message, this.binaryEncoder, this.serializationImpl);
+        return serializeInternal(message, this.binaryEncoder, this.serializationImpl);
     }
 
     /**
@@ -30,6 +35,6 @@ public class Serializer {
      * @return
      */
     public Message deserialize(byte[] messageBytes) {
-        return _Util.deserialize(messageBytes, this.serializationImpl, this.binaryEncoder);
+        return deserializeInternal(messageBytes, this.serializationImpl, this.binaryEncoder);
     }
 }

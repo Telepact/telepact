@@ -3,6 +3,10 @@ package io.github.brenbar.uapi;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
+import io.github.brenbar.uapi.internal._ClientBinaryEncoder;
+
+import static io.github.brenbar.uapi.internal.ProcessRequestObject.processRequestObject;
+
 /**
  * A uAPI client.
  */
@@ -75,7 +79,7 @@ public class Client {
      * @return
      */
     public Message request(Message requestMessage) {
-        return _Util.processRequestObject(requestMessage, this.adapter, this.serializer,
+        return processRequestObject(requestMessage, this.adapter, this.serializer,
                 this.timeoutMsDefault, this.useBinaryDefault);
     }
 
