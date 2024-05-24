@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.brenbar.uapi.internal._UFieldDeclaration;
-import io.github.brenbar.uapi.internal._UType;
+import io.github.brenbar.uapi.internal.UFieldDeclaration;
+import io.github.brenbar.uapi.internal.UType;
 
 import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
 import static io.github.brenbar.uapi.internal.NewUApiSchema.newUApiSchema;
@@ -16,16 +16,16 @@ import static io.github.brenbar.uapi.internal.NewUApiSchema.newUApiSchema;
 public class UApiSchema {
 
     public final List<Object> original;
-    public final Map<String, _UType> parsed;
-    public final Map<String, _UFieldDeclaration> parsedRequestHeaders;
-    public final Map<String, _UFieldDeclaration> parsedResponseHeaders;
-    public final Map<String, _UType> typeExtensions;
+    public final Map<String, UType> parsed;
+    public final Map<String, UFieldDeclaration> parsedRequestHeaders;
+    public final Map<String, UFieldDeclaration> parsedResponseHeaders;
+    public final Map<String, UType> typeExtensions;
 
     public UApiSchema(List<Object> original,
-            Map<String, _UType> parsed,
-            Map<String, _UFieldDeclaration> parsedRequestHeaders,
-            Map<String, _UFieldDeclaration> parsedResponseHeaders,
-            Map<String, _UType> typeExtensions) {
+            Map<String, UType> parsed,
+            Map<String, UFieldDeclaration> parsedRequestHeaders,
+            Map<String, UFieldDeclaration> parsedResponseHeaders,
+            Map<String, UType> typeExtensions) {
         this.original = original;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;

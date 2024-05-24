@@ -12,15 +12,15 @@ import static io.github.brenbar.uapi.internal.ParseUnionType.parseUnionType;
 import static io.github.brenbar.uapi.internal.Append.append;
 
 public class ParseErrorType {
-    public static _UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
+    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
             List<Object> uApiSchemaPseudoJson, int index, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures,
+            Map<String, UType> parsedTypes,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         final var schemaKey = "errors";
         final List<Object> basePath = List.of(index);
 
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
 
         final var otherKeys = new HashSet<>(errorDefinitionAsParsedJson.keySet());
 
@@ -31,7 +31,7 @@ public class ParseErrorType {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = append(basePath, k);
 
-                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
@@ -41,10 +41,10 @@ public class ParseErrorType {
 
         final var typeParameterCount = 0;
 
-        final _UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey, List.of(), List.of(),
+        final UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey, List.of(), List.of(),
                 typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
                 allParseFailures, failedTypes);
 
-        return new _UError(schemaKey, error);
+        return new UError(schemaKey, error);
     }
 }

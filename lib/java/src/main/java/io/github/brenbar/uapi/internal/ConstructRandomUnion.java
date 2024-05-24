@@ -6,17 +6,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.ConstructRandomStruct.constructRandomStruct;
 
 public class ConstructRandomUnion {
-    static Map<String, Object> constructRandomUnion(Map<String, _UStruct> unionCasesReference,
+    static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionCasesReference,
             Map<String, Object> startingUnion,
             boolean includeOptionalFields, boolean randomizeOptionalFields,
-            List<_UTypeDeclaration> typeParameters,
-            _RandomGenerator randomGenerator) {
+            List<UTypeDeclaration> typeParameters,
+            RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
             final var entry = unionEntry(startingUnion);
             final var unionCase = entry.getKey();

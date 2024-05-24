@@ -12,7 +12,7 @@ import static io.github.brenbar.uapi.internal.AsMap.asMap;
 public class DeserializeInternal {
 
     public static Message deserializeInternal(byte[] messageBytes, SerializationImpl serializer,
-            _BinaryEncoder binaryEncoder) {
+            BinaryEncoder binaryEncoder) {
         final Object messageAsPseudoJson;
         final boolean isMsgPack;
 
@@ -25,18 +25,18 @@ public class DeserializeInternal {
                 messageAsPseudoJson = serializer.fromJson(messageBytes);
             }
         } catch (Throwable e) {
-            throw new _InvalidMessage(e);
+            throw new InvalidMessage(e);
         }
 
         final List<Object> messageAsPseudoJsonList;
         try {
             messageAsPseudoJsonList = asList(messageAsPseudoJson);
         } catch (ClassCastException e) {
-            throw new _InvalidMessage();
+            throw new InvalidMessage();
         }
 
         if (messageAsPseudoJsonList.size() != 2) {
-            throw new _InvalidMessage();
+            throw new InvalidMessage();
         }
 
         final List<Object> finalMessageAsPseudoJsonList;
@@ -52,22 +52,22 @@ public class DeserializeInternal {
         try {
             headers = asMap(finalMessageAsPseudoJsonList.get(0));
         } catch (ClassCastException e) {
-            throw new _InvalidMessage();
+            throw new InvalidMessage();
         }
 
         try {
             body = asMap(finalMessageAsPseudoJsonList.get(1));
             if (body.size() != 1) {
-                throw new _InvalidMessageBody();
+                throw new InvalidMessageBody();
             } else {
                 try {
                     var givenPayload = asMap(body.values().stream().findAny().get());
                 } catch (ClassCastException e) {
-                    throw new _InvalidMessageBody();
+                    throw new InvalidMessageBody();
                 }
             }
         } catch (ClassCastException e) {
-            throw new _InvalidMessage();
+            throw new InvalidMessage();
         }
 
         return new Message(headers, body);

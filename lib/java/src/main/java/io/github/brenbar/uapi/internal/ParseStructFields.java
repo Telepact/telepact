@@ -12,12 +12,12 @@ import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.ParseField.parseField;
 
 public class ParseStructFields {
-    static Map<String, _UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
+    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
-        final var fields = new HashMap<String, _UFieldDeclaration>();
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var fields = new HashMap<String, UFieldDeclaration>();
 
         for (final var structEntry : referenceStruct.entrySet()) {
             final var fieldDeclaration = structEntry.getKey();
@@ -30,14 +30,14 @@ public class ParseStructFields {
                     final List<Object> finalOtherPath = append(path, existingField);
 
                     parseFailures
-                            .add(new _SchemaParseFailure(finalPath, "PathCollision",
+                            .add(new SchemaParseFailure(finalPath, "PathCollision",
                                     Map.of("other", finalOtherPath), null));
                 }
             }
 
             final var typeDeclarationValue = structEntry.getValue();
 
-            final _UFieldDeclaration parsedField;
+            final UFieldDeclaration parsedField;
             try {
                 parsedField = parseField(path, fieldDeclaration,
                         typeDeclarationValue, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,

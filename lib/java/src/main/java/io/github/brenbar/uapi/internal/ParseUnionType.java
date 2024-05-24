@@ -17,13 +17,13 @@ import static io.github.brenbar.uapi.internal.ParseStructFields.parseStructField
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 
 public class ParseUnionType {
-    static _UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
+    static UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount,
             List<Object> uApiSchemaPseudoJson,
-            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+            Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
+            Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
 
         final var otherKeys = new HashSet<>(unionDefinitionAsPseudoJson.keySet());
 
@@ -37,7 +37,7 @@ public class ParseUnionType {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = append(path, k);
 
-                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
@@ -48,7 +48,7 @@ public class ParseUnionType {
         try {
             definition2 = asList(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
+            final List<SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Array");
 
             parseFailures.addAll(finalParseFailures);
@@ -63,7 +63,7 @@ public class ParseUnionType {
             try {
                 definition.add(asMap(element));
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(loopPath,
+                final List<SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(loopPath,
                         element, "Object");
 
                 parseFailures.addAll(finalParseFailures);
@@ -75,7 +75,7 @@ public class ParseUnionType {
         }
 
         if (definition.isEmpty() && requiredKeys.isEmpty()) {
-            parseFailures.add(new _SchemaParseFailure(thisPath, "EmptyArrayDisallowed", Map.of(), null));
+            parseFailures.add(new SchemaParseFailure(thisPath, "EmptyArrayDisallowed", Map.of(), null));
         } else {
             outerLoop: for (final var requiredKey : requiredKeys) {
                 for (final var element : definition) {
@@ -87,11 +87,11 @@ public class ParseUnionType {
                     }
                 }
                 final List<Object> branchPath = append(append(thisPath, 0), requiredKey);
-                parseFailures.add(new _SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
             }
         }
 
-        final var cases = new HashMap<String, _UStruct>();
+        final var cases = new HashMap<String, UStruct>();
         final var caseIndices = new HashMap<String, Integer>();
 
         for (int i = 0; i < definition.size(); i++) {
@@ -108,7 +108,7 @@ public class ParseUnionType {
             final var matches = keys.stream().filter(k -> k.matches(regexString)).toList();
             if (matches.size() != 1) {
                 parseFailures.add(
-                        new _SchemaParseFailure(loopPath,
+                        new SchemaParseFailure(loopPath,
                                 "ObjectKeyRegexMatchCountUnexpected",
                                 Map.of("regex", regexString, "actual",
                                         matches.size(), "expected", 1, "keys", keys),
@@ -116,7 +116,7 @@ public class ParseUnionType {
                 continue;
             }
             if (map.size() != 1) {
-                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectSizeUnexpected",
+                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectSizeUnexpected",
                         Map.of("expected", 1, "actual", map.size()), null));
                 continue;
             }
@@ -129,14 +129,14 @@ public class ParseUnionType {
             try {
                 unionCaseStruct = asMap(entry.getValue());
             } catch (ClassCastException e) {
-                List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,
+                List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,
                         entry.getValue(), "Object");
 
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
 
-            final Map<String, _UFieldDeclaration> fields;
+            final Map<String, UFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
                         uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
@@ -146,7 +146,7 @@ public class ParseUnionType {
                 continue;
             }
 
-            final var unionStruct = new _UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
+            final var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
 
             cases.put(unionCase, unionStruct);
             caseIndices.put(unionCase, i);
@@ -156,6 +156,6 @@ public class ParseUnionType {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        return new _UUnion(schemaKey, cases, caseIndices, typeParameterCount);
+        return new UUnion(schemaKey, cases, caseIndices, typeParameterCount);
     }
 }

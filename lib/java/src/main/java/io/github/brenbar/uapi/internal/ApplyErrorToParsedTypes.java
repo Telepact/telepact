@@ -8,13 +8,13 @@ import java.util.regex.Pattern;
 import io.github.brenbar.uapi.UApiSchemaParseError;
 
 public class ApplyErrorToParsedTypes {
-    static void applyErrorToParsedTypes(int errorIndex, _UError error, Map<String, _UType> parsedTypes,
+    static void applyErrorToParsedTypes(int errorIndex, UError error, Map<String, UType> parsedTypes,
             Map<String, Integer> schemaKeysToIndex) {
-        var parseFailures = new ArrayList<_SchemaParseFailure>();
+        var parseFailures = new ArrayList<SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
-            _UFn f;
+            UFn f;
             try {
-                f = (_UFn) parsedType.getValue();
+                f = (UFn) parsedType.getValue();
             } catch (ClassCastException e) {
                 continue;
             }
@@ -23,10 +23,10 @@ public class ApplyErrorToParsedTypes {
 
             var regex = Pattern.compile(f.errorsRegex);
 
-            _UUnion fnResult = f.result;
-            Map<String, _UStruct> fnResultCases = fnResult.cases;
-            _UUnion errorErrors = error.errors;
-            Map<String, _UStruct> errorCases = errorErrors.cases;
+            UUnion fnResult = f.result;
+            Map<String, UStruct> fnResultCases = fnResult.cases;
+            UUnion errorErrors = error.errors;
+            Map<String, UStruct> errorCases = errorErrors.cases;
 
             for (var errorCase : errorCases.entrySet()) {
                 var newKey = errorCase.getKey();
@@ -40,7 +40,7 @@ public class ApplyErrorToParsedTypes {
                     final var otherPathIndex = schemaKeysToIndex.get(fnName);
                     final var errorCaseIndex = error.errors.caseIndices.get(newKey);
                     final var fnErrorCaseIndex = f.result.caseIndices.get(newKey);
-                    parseFailures.add(new _SchemaParseFailure(List.of(errorIndex, "errors", errorCaseIndex, newKey),
+                    parseFailures.add(new SchemaParseFailure(List.of(errorIndex, "errors", errorCaseIndex, newKey),
                             "PathCollision", Map.of("other", List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey)),
                             null));
                 }

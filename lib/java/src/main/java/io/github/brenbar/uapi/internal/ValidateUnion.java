@@ -6,12 +6,12 @@ import java.util.Map;
 
 import static io.github.brenbar.uapi.internal.ValidateUnionCases.validateUnionCases;
 import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
-import static io.github.brenbar.uapi.internal._UUnion._UNION_NAME;
+import static io.github.brenbar.uapi.internal.UUnion._UNION_NAME;
 
 public class ValidateUnion {
-    static List<_ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn,
-            List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, String name, Map<String, _UStruct> cases) {
+    static List<ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn,
+            List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics, String name, Map<String, UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
             Map<String, Object> selectedCases;
             if (name.startsWith("fn.")) {

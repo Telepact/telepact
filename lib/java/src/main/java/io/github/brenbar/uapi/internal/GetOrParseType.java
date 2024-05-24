@@ -12,10 +12,10 @@ import static io.github.brenbar.uapi.internal.ParseUnionType.parseUnionType;
 import static io.github.brenbar.uapi.internal.ParseFunctionType.parseFunctionType;
 
 public class GetOrParseType {
-    static _UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
+    static UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
             List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions, List<_SchemaParseFailure> allParseFailures,
+            Map<String, UType> parsedTypes,
+            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
@@ -40,20 +40,20 @@ public class GetOrParseType {
 
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "StringRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
         final var standardTypeName = matcher.group(1);
         if (standardTypeName != null) {
             return switch (standardTypeName) {
-                case "boolean" -> new _UBoolean();
-                case "integer" -> new _UInteger();
-                case "number" -> new _UNumber();
-                case "string" -> new _UString();
-                case "array" -> new _UArray();
-                case "object" -> new _UObject();
-                default -> new _UAny();
+                case "boolean" -> new UBoolean();
+                case "integer" -> new UInteger();
+                case "number" -> new UNumber();
+                case "string" -> new UString();
+                case "array" -> new UArray();
+                case "object" -> new UObject();
+                default -> new UAny();
             };
         }
 
@@ -61,14 +61,14 @@ public class GetOrParseType {
             final var genericParameterIndexString = matcher.group(9);
             if (genericParameterIndexString != null) {
                 final var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
-                return new _UGeneric(genericParameterIndex);
+                return new UGeneric(genericParameterIndex);
             }
         }
 
         final var customTypeName = matcher.group(2);
         final var index = schemaKeysToIndex.get(customTypeName);
         if (index == null) {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName), null)));
         }
         final var definition = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
@@ -82,7 +82,7 @@ public class GetOrParseType {
         }
 
         try {
-            final _UType type;
+            final UType type;
             if (customTypeName.startsWith("struct")) {
                 type = parseStructType(List.of(index), definition, customTypeName, List.of(),
                         typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
@@ -98,7 +98,7 @@ public class GetOrParseType {
             } else {
                 type = typeExtensions.get(customTypeName);
                 if (type == null) {
-                    throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(List.of(index),
+                    throw new UApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
                             "TypeExtensionImplementationMissing", Map.of("name", customTypeName), null)));
                 }
             }

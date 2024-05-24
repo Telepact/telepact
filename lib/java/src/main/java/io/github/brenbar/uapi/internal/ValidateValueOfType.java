@@ -7,12 +7,12 @@ import static io.github.brenbar.uapi.internal.GetTypeUnexpectedValidationFailure
 
 public class ValidateValueOfType {
 
-    static List<_ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn,
-            List<_UTypeDeclaration> generics,
-            _UType thisType, boolean nullable, List<_UTypeDeclaration> typeParameters) {
+    static List<ValidationFailure> validateValueOfType(Object value, Map<String, Object> select, String fn,
+            List<UTypeDeclaration> generics,
+            UType thisType, boolean nullable, List<UTypeDeclaration> typeParameters) {
         if (value == null) {
             final boolean isNullable;
-            if (thisType instanceof _UGeneric g) {
+            if (thisType instanceof UGeneric g) {
                 final int genericIndex = g.index;
                 final var generic = generics.get(genericIndex);
                 isNullable = generic.nullable;

@@ -28,7 +28,7 @@ public class PackList {
 
         packedList.add(header);
 
-        final var keyIndexMap = new HashMap<Integer, _BinaryPackNode>();
+        final var keyIndexMap = new HashMap<Integer, BinaryPackNode>();
         try {
             for (final var e : list) {
                 if (e instanceof final Map<?, ?> m) {

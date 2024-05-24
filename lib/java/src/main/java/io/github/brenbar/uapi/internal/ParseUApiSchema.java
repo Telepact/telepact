@@ -23,9 +23,9 @@ import static io.github.brenbar.uapi.internal.Append.append;
 
 public class ParseUApiSchema {
     public static UApiSchema parseUApiSchema(List<Object> uApiSchemaPseudoJson,
-            Map<String, _UType> typeExtensions, int pathOffset) {
-        final var parsedTypes = new HashMap<String, _UType>();
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+            Map<String, UType> typeExtensions, int pathOffset) {
+        final var parsedTypes = new HashMap<String, UType>();
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var failedTypes = new HashSet<String>();
         final var schemaKeysToIndex = new HashMap<String, Integer>();
         final var schemaKeys = new HashSet<String>();
@@ -42,7 +42,7 @@ public class ParseUApiSchema {
             try {
                 def = asMap(definition);
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
                         definition, "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -69,7 +69,7 @@ public class ParseUApiSchema {
                     final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
                     final List<Object> finalPath = append(loopPath, schemaKey);
 
-                    parseFailures.add(new _SchemaParseFailure(finalPath, "PathCollision",
+                    parseFailures.add(new SchemaParseFailure(finalPath, "PathCollision",
                             Map.of("other", List.of(otherPathIndex, matchingSchemaKey)), schemaKey));
                 }
                 continue;
@@ -136,8 +136,8 @@ public class ParseUApiSchema {
             parseFailures.addAll(e.schemaParseFailures);
         }
 
-        final Map<String, _UFieldDeclaration> requestHeaders = new HashMap<>();
-        final Map<String, _UFieldDeclaration> responseHeaders = new HashMap<>();
+        final Map<String, UFieldDeclaration> requestHeaders = new HashMap<>();
+        final Map<String, UFieldDeclaration> responseHeaders = new HashMap<>();
 
         try {
             for (final var requestHeaderKey : requestHeaderKeys) {

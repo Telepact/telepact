@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 import static io.github.brenbar.uapi.internal.ConstructRandomUnion.constructRandomUnion;
 
 public class GenerateRandomUnion {
     static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics,
-            _RandomGenerator randomGenerator, Map<String, _UStruct> cases) {
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
+            RandomGenerator randomGenerator, Map<String, UStruct> cases) {
         if (useBlueprintValue) {
             final var startingUnionCase = (Map<String, Object>) blueprintValue;
             return constructRandomUnion(cases, startingUnionCase, includeOptionalFields, randomizeOptionalFields,

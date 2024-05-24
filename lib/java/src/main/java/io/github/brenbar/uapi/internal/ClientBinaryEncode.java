@@ -11,9 +11,9 @@ import static io.github.brenbar.uapi.internal.EncodeBody.encodeBody;
 import static io.github.brenbar.uapi.internal.PackBody.packBody;
 
 public class ClientBinaryEncode {
-    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
+    static List<Object> clientBinaryEncode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
             ClientBinaryStrategy binaryChecksumStrategy)
-            throws _BinaryEncoderUnavailableError {
+            throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var forceSendJson = headers.remove("_forceSendJson");
@@ -21,18 +21,18 @@ public class ClientBinaryEncode {
         headers.put("bin_", binaryChecksumStrategy.getCurrentChecksums());
 
         if (Objects.equals(forceSendJson, true)) {
-            throw new _BinaryEncoderUnavailableError();
+            throw new BinaryEncoderUnavailableError();
         }
 
         if (recentBinaryEncoders.size() > 1) {
-            throw new _BinaryEncoderUnavailableError();
+            throw new BinaryEncoderUnavailableError();
         }
 
-        final Optional<_BinaryEncoding> binaryEncoderOptional = recentBinaryEncoders.values().stream().findAny();
+        final Optional<BinaryEncoding> binaryEncoderOptional = recentBinaryEncoders.values().stream().findAny();
         if (!binaryEncoderOptional.isPresent()) {
-            throw new _BinaryEncoderUnavailableError();
+            throw new BinaryEncoderUnavailableError();
         }
-        final _BinaryEncoding binaryEncoder = binaryEncoderOptional.get();
+        final BinaryEncoding binaryEncoder = binaryEncoderOptional.get();
 
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 

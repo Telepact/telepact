@@ -24,7 +24,7 @@ public class FindSchemaKey {
         if (matches.size() == 1) {
             return matches.get(0);
         } else {
-            final var parseFailure = new _SchemaParseFailure(List.of(index),
+            final var parseFailure = new SchemaParseFailure(List.of(index),
                     "ObjectKeyRegexMatchCountUnexpected",
                     new TreeMap<>(
                             Map.of("regex", regex, "actual", matches.size(), "expected", 1, "keys", keys)),

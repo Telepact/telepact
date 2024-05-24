@@ -19,7 +19,7 @@ import static io.github.brenbar.uapi.internal.GetTypeUnexpectedParseFailure.getT
 public class ExtendUApiSchema {
 
     public static UApiSchema extendUApiSchema(UApiSchema first, String secondUApiSchemaJson,
-            Map<String, _UType> secondTypeExtensions) {
+            Map<String, UType> secondTypeExtensions) {
         final var objectMapper = new ObjectMapper();
 
         final Object secondUApiSchemaPseudoJsonInit;
@@ -28,7 +28,7 @@ public class ExtendUApiSchema {
             });
         } catch (IOException e) {
             throw new UApiSchemaParseError(
-                    List.of(new _SchemaParseFailure(List.of(), "JsonInvalid", Map.of(), null)),
+                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of(), null)),
                     e);
         }
 
@@ -36,20 +36,20 @@ public class ExtendUApiSchema {
         try {
             secondUApiSchemaPseudoJson = asList(secondUApiSchemaPseudoJsonInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(List.of(),
+            final List<SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(List.of(),
                     secondUApiSchemaPseudoJsonInit, "Array");
             throw new UApiSchemaParseError(thisParseFailure, e);
         }
 
         final List<Object> firstOriginal = first.original;
-        final Map<String, _UType> firstTypeExtensions = first.typeExtensions;
+        final Map<String, UType> firstTypeExtensions = first.typeExtensions;
 
         final var original = new ArrayList<Object>();
 
         original.addAll(firstOriginal);
         original.addAll(secondUApiSchemaPseudoJson);
 
-        final var typeExtensions = new HashMap<String, _UType>();
+        final var typeExtensions = new HashMap<String, UType>();
 
         typeExtensions.putAll(firstTypeExtensions);
         typeExtensions.putAll(secondTypeExtensions);

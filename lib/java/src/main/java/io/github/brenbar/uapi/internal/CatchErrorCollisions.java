@@ -13,7 +13,7 @@ import static io.github.brenbar.uapi.internal.AsMap.asMap;
 public class CatchErrorCollisions {
     static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices,
             Map<String, Integer> keysToIndex) {
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
 
         final var indices = errorIndices.stream().sorted().toList();
 
@@ -41,7 +41,7 @@ public class CatchErrorCollisions {
                         if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
                             final var thisErrorDefKey = thisErrDefKeys.stream().findFirst().get();
                             final var thisOtherErrorDefKey = thisOtherErrDefKeys.stream().findFirst().get();
-                            parseFailures.add(new _SchemaParseFailure(
+                            parseFailures.add(new SchemaParseFailure(
                                     List.of(otherIndex, "errors", l, thisOtherErrorDefKey), "PathCollision",
                                     Map.of("other", List.of(index, "errors", k, thisErrorDefKey)), "errors"));
                         }

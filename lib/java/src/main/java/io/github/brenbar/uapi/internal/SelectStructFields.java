@@ -8,13 +8,13 @@ import java.util.Map;
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 
 public class SelectStructFields {
-    static Object selectStructFields(_UTypeDeclaration typeDeclaration, Object value,
+    static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
             Map<String, Object> selectedStructFields) {
-        final _UType typeDeclarationType = typeDeclaration.type;
-        final List<_UTypeDeclaration> typeDeclarationTypeParams = typeDeclaration.typeParameters;
+        final UType typeDeclarationType = typeDeclaration.type;
+        final List<UTypeDeclaration> typeDeclarationTypeParams = typeDeclaration.typeParameters;
 
-        if (typeDeclarationType instanceof final _UStruct s) {
-            final Map<String, _UFieldDeclaration> fields = s.fields;
+        if (typeDeclarationType instanceof final UStruct s) {
+            final Map<String, UFieldDeclaration> fields = s.fields;
             final String structName = s.name;
             final var selectedFields = (List<String>) selectedStructFields.get(structName);
             final var valueAsMap = (Map<String, Object>) value;
@@ -24,7 +24,7 @@ public class SelectStructFields {
                 final var fieldName = entry.getKey();
                 if (selectedFields == null || selectedFields.contains(fieldName)) {
                     final var field = fields.get(fieldName);
-                    final _UTypeDeclaration fieldTypeDeclaration = field.typeDeclaration;
+                    final UTypeDeclaration fieldTypeDeclaration = field.typeDeclaration;
                     final var valueWithSelectedFields = selectStructFields(fieldTypeDeclaration, entry.getValue(),
                             selectedStructFields);
 
@@ -33,15 +33,15 @@ public class SelectStructFields {
             }
 
             return finalMap;
-        } else if (typeDeclarationType instanceof final _UFn f) {
+        } else if (typeDeclarationType instanceof final UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
             final Map.Entry<String, Object> uEntry = unionEntry(valueAsMap);
             final var unionCase = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
             final String fnName = f.name;
-            final _UUnion fnCall = f.call;
-            final Map<String, _UStruct> fnCallCases = fnCall.cases;
+            final UUnion fnCall = f.call;
+            final Map<String, UStruct> fnCallCases = fnCall.cases;
 
             final var argStructReference = fnCallCases.get(unionCase);
             final var selectedFields = (List<String>) selectedStructFields.get(fnName);
@@ -59,13 +59,13 @@ public class SelectStructFields {
             }
 
             return Map.of(uEntry.getKey(), finalMap);
-        } else if (typeDeclarationType instanceof final _UUnion u) {
+        } else if (typeDeclarationType instanceof final UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
             final var uEntry = unionEntry(valueAsMap);
             final var unionCase = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
-            final Map<String, _UStruct> unionCases = u.cases;
+            final Map<String, UStruct> unionCases = u.cases;
             final var unionStructReference = unionCases.get(unionCase);
             final var unionStructRefFields = unionStructReference.fields;
             final var defaultCasesToFields = new HashMap<String, List<String>>();
@@ -95,7 +95,7 @@ public class SelectStructFields {
             }
 
             return Map.of(uEntry.getKey(), finalMap);
-        } else if (typeDeclarationType instanceof final _UObject o) {
+        } else if (typeDeclarationType instanceof final UObject o) {
             final var nestedTypeDeclaration = typeDeclarationTypeParams.get(0);
             final var valueAsMap = (Map<String, Object>) value;
 
@@ -107,7 +107,7 @@ public class SelectStructFields {
             }
 
             return finalMap;
-        } else if (typeDeclarationType instanceof final _UArray a) {
+        } else if (typeDeclarationType instanceof final UArray a) {
             final var nestedType = typeDeclarationTypeParams.get(0);
             final var valueAsList = (List<Object>) value;
 

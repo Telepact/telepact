@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VerifyNoMoreInteractions {
-    static Map<String, Object> verifyNoMoreInteractions(List<_MockInvocation> invocations) {
+    static Map<String, Object> verifyNoMoreInteractions(List<MockInvocation> invocations) {
         final var invocationsNotVerified = invocations.stream().filter(i -> !i.verified).toList();
 
         if (invocationsNotVerified.size() > 0) {

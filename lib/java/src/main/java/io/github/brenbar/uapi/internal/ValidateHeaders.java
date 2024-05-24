@@ -7,9 +7,9 @@ import java.util.Map;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 
 public class ValidateHeaders {
-    static List<_ValidationFailure> validateHeaders(
-            Map<String, Object> headers, Map<String, _UFieldDeclaration> parsedRequestHeaders, _UFn functionType) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+    static List<ValidationFailure> validateHeaders(
+            Map<String, Object> headers, Map<String, UFieldDeclaration> parsedRequestHeaders, UFn functionType) {
+        final var validationFailures = new ArrayList<ValidationFailure>();
 
         for (final var entry : headers.entrySet()) {
             final var header = entry.getKey();
@@ -19,7 +19,7 @@ public class ValidateHeaders {
                 final var thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name,
                         List.of());
                 final var thisValidationFailuresPath = thisValidationFailures.stream()
-                        .map(e -> new _ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
+                        .map(e -> new ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
                 validationFailures.addAll(thisValidationFailuresPath);
             }
         }

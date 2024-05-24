@@ -7,7 +7,7 @@ import java.util.Map;
 public class MapValidationFailuresToInvalidFieldCases {
 
     static List<Map<String, Object>> mapValidationFailuresToInvalidFieldCases(
-            List<_ValidationFailure> argumentValidationFailures) {
+            List<ValidationFailure> argumentValidationFailures) {
         final var validationFailureCases = new ArrayList<Map<String, Object>>();
         for (final var validationFailure : argumentValidationFailures) {
             final Map<String, Object> validationFailureCase = Map.of(

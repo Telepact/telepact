@@ -8,7 +8,7 @@ import static io.github.brenbar.uapi.internal.EncodeBody.encodeBody;
 import static io.github.brenbar.uapi.internal.PackBody.packBody;
 
 public class ServerBinaryEncode {
-    static List<Object> serverBinaryEncode(List<Object> message, _BinaryEncoding binaryEncoder) {
+    static List<Object> serverBinaryEncode(List<Object> message, BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var messageBody = (Map<String, Object>) message.get(1);
         final var clientKnownBinaryChecksums = (List<Integer>) headers.remove("_clientKnownBinaryChecksums");

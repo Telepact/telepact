@@ -14,12 +14,12 @@ import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.ParseStructFields.parseStructFields;
 
 public class ParseStructType {
-    static _UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
+    static UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey, List<String> ignoreKeys, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
-            Map<String, Integer> schemaKeysToIndex, Map<String, _UType> parsedTypes,
-            Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+            Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
+            Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var otherKeys = new HashSet<>(structDefinitionAsPseudoJson.keySet());
 
         otherKeys.remove(schemaKey);
@@ -33,7 +33,7 @@ public class ParseStructType {
             for (final var k : otherKeys) {
                 final List<Object> loopPath = append(path, k);
 
-                parseFailures.add(new _SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
@@ -44,7 +44,7 @@ public class ParseStructType {
         try {
             definition = asMap(defInit);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(thisPath,
+            final List<SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);
@@ -58,6 +58,6 @@ public class ParseStructType {
                 uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                 failedTypes);
 
-        return new _UStruct(schemaKey, fields, typeParameterCount);
+        return new UStruct(schemaKey, fields, typeParameterCount);
     }
 }

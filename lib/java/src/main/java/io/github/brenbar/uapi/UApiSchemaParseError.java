@@ -2,7 +2,7 @@ package io.github.brenbar.uapi;
 
 import java.util.List;
 
-import io.github.brenbar.uapi.internal._SchemaParseFailure;
+import io.github.brenbar.uapi.internal.SchemaParseFailure;
 
 import static io.github.brenbar.uapi.internal.MapSchemaParseFailuresToPseudoJson.mapSchemaParseFailuresToPseudoJson;
 
@@ -11,16 +11,16 @@ import static io.github.brenbar.uapi.internal.MapSchemaParseFailuresToPseudoJson
  */
 public class UApiSchemaParseError extends RuntimeException {
 
-    public final List<_SchemaParseFailure> schemaParseFailures;
+    public final List<SchemaParseFailure> schemaParseFailures;
     public final List<Object> schemaParseFailuresPseudoJson;
 
-    public UApiSchemaParseError(List<_SchemaParseFailure> schemaParseFailures) {
+    public UApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)));
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
     }
 
-    public UApiSchemaParseError(List<_SchemaParseFailure> schemaParseFailures, Throwable cause) {
+    public UApiSchemaParseError(List<SchemaParseFailure> schemaParseFailures, Throwable cause) {
         super(String.valueOf(mapSchemaParseFailuresToPseudoJson(schemaParseFailures)), cause);
         this.schemaParseFailures = schemaParseFailures;
         this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);

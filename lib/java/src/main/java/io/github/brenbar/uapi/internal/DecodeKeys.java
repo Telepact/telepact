@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DecodeKeys {
-    static Object decodeKeys(Object given, _BinaryEncoding binaryEncoder) {
+    static Object decodeKeys(Object given, BinaryEncoding binaryEncoder) {
         if (given instanceof Map<?, ?> m) {
             final var newMap = new HashMap<String, Object>();
 
@@ -17,7 +17,7 @@ public class DecodeKeys {
                     key = (String) binaryEncoder.decodeMap.get(e.getKey());
 
                     if (key == null) {
-                        throw new _BinaryEncodingMissing(key);
+                        throw new BinaryEncodingMissing(key);
                     }
                 }
                 final var encodedValue = decodeKeys(e.getValue(), binaryEncoder);

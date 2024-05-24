@@ -13,17 +13,17 @@ import static io.github.brenbar.uapi.internal.GetTypeUnexpectedParseFailure.getT
 import static io.github.brenbar.uapi.internal.AsList.asList;
 
 public class ParseField {
-    static _UFieldDeclaration parseField(List<Object> path, String fieldDeclaration, Object typeDeclarationValue,
+    static UFieldDeclaration parseField(List<Object> path, String fieldDeclaration, Object typeDeclarationValue,
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
         final var regex = Pattern.compile(regexString);
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
             final List<Object> finalPath = append(path, fieldDeclaration);
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(finalPath,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
                     "KeyRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
@@ -46,6 +46,6 @@ public class ParseField {
                 parsedTypes,
                 typeExtensions, allParseFailures, failedTypes);
 
-        return new _UFieldDeclaration(fieldName, typeDeclaration, optional);
+        return new UFieldDeclaration(fieldName, typeDeclaration, optional);
     }
 }

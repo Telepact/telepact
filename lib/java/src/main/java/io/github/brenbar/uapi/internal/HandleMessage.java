@@ -22,7 +22,7 @@ public class HandleMessage {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
         final Map<String, Object> requestHeaders = requestMessage.header;
         final Map<String, Object> requestBody = requestMessage.body;
-        final Map<String, _UType> parsedUApiSchema = uApiSchema.parsed;
+        final Map<String, UType> parsedUApiSchema = uApiSchema.parsed;
         final Map.Entry<String, Object> requestEntry = unionEntry(requestBody);
 
         final String requestTargetInit = requestEntry.getKey();
@@ -38,7 +38,7 @@ public class HandleMessage {
             requestTarget = requestTargetInit;
         }
 
-        final var functionType = (_UFn) parsedUApiSchema.get(requestTarget);
+        final var functionType = (UFn) parsedUApiSchema.get(requestTarget);
         final var resultUnionType = functionType.result;
 
         final var callId = requestHeaders.get("id_");
@@ -56,7 +56,7 @@ public class HandleMessage {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final List<_ValidationFailure> requestHeaderValidationFailures = validateHeaders(requestHeaders,
+        final List<ValidationFailure> requestHeaderValidationFailures = validateHeaders(requestHeaders,
                 uApiSchema.parsedRequestHeaders, functionType);
         if (!requestHeaderValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidRequestHeaders_", requestHeaderValidationFailures,
@@ -87,7 +87,7 @@ public class HandleMessage {
             return new Message(responseHeaders, newErrorResult);
         }
 
-        final _UUnion functionTypeCall = functionType.call;
+        final UUnion functionTypeCall = functionType.call;
 
         final var callValidationFailures = functionTypeCall.validate(requestBody, null, null, List.of(), List.of());
         if (!callValidationFailures.isEmpty()) {
@@ -130,7 +130,7 @@ public class HandleMessage {
                 return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
                         responseHeaders);
             }
-            final List<_ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
+            final List<ValidationFailure> responseHeaderValidationFailures = validateHeaders(finalResponseHeaders,
                     uApiSchema.parsedResponseHeaders, functionType);
             if (!responseHeaderValidationFailures.isEmpty()) {
                 return getInvalidErrorMessage("ErrorInvalidResponseHeaders_", responseHeaderValidationFailures,
@@ -142,7 +142,7 @@ public class HandleMessage {
         final Map<String, Object> finalResultUnion;
         if (selectStructFieldsHeader != null) {
             finalResultUnion = (Map<String, Object>) selectStructFields(
-                    new _UTypeDeclaration(resultUnionType, false, List.of()),
+                    new UTypeDeclaration(resultUnionType, false, List.of()),
                     resultUnion,
                     selectStructFieldsHeader);
         } else {

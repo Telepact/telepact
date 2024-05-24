@@ -15,21 +15,21 @@ import static io.github.brenbar.uapi.internal.GetTypeUnexpectedParseFailure.getT
 
 public class ParseFunctionType {
 
-    static _UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
+    static UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var typeParameterCount = 0;
 
-        _UUnion callType = null;
+        UUnion callType = null;
         try {
-            final _UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
+            final UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
                     schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
                     parsedTypes,
                     typeExtensions,
                     allParseFailures, failedTypes);
-            callType = new _UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0), typeParameterCount);
+            callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0), typeParameterCount);
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
@@ -37,9 +37,9 @@ public class ParseFunctionType {
         final var resultSchemaKey = "->";
         final List<Object> resPath = append(path, resultSchemaKey);
 
-        _UUnion resultType = null;
+        UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new _SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of(), null));
+            parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of(), null));
         } else {
             try {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
@@ -56,14 +56,14 @@ public class ParseFunctionType {
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.endsWith("_")) {
-            parseFailures.add(new _SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
+            parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^.*$");
             try {
                 errorsRegex = asString(errorsRegexInit);
             } catch (ClassCastException e) {
-                final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
                         regexPath, errorsRegexInit, "String");
 
                 parseFailures
@@ -75,7 +75,7 @@ public class ParseFunctionType {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        return new _UFn(schemaKey, callType, resultType, errorsRegex);
+        return new UFn(schemaKey, callType, resultType, errorsRegex);
     }
 
 }

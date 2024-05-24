@@ -11,7 +11,7 @@ import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 
 public class Verify {
     static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,
-            Map<String, Object> verificationTimes, List<_MockInvocation> invocations) {
+            Map<String, Object> verificationTimes, List<MockInvocation> invocations) {
         var matchesFound = 0;
         for (final var invocation : invocations) {
             if (Objects.equals(invocation.functionName, functionName)) {

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 public class ConstructRandomStruct {
     static Map<String, Object> constructRandomStruct(
-            Map<String, _UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
-            _RandomGenerator randomGenerator) {
+            Map<String, UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
+            RandomGenerator randomGenerator) {
 
         final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -23,7 +23,7 @@ public class ConstructRandomStruct {
             final var fieldDeclaration = field.getValue();
             final var blueprintValue = startingStruct.get(fieldName);
             final var useBlueprintValue = startingStruct.containsKey(fieldName);
-            final _UTypeDeclaration typeDeclaration = fieldDeclaration.typeDeclaration;
+            final UTypeDeclaration typeDeclaration = fieldDeclaration.typeDeclaration;
 
             final Object value;
             if (useBlueprintValue) {

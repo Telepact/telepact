@@ -3,13 +3,13 @@ package io.github.brenbar.uapi.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 public class GenerateRandomArray {
     static Object generateRandomArray(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics,
-            _RandomGenerator randomGenerator) {
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics,
+            RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
 
         if (useBlueprintValue) {

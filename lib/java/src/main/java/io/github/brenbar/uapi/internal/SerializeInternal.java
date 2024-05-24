@@ -8,7 +8,7 @@ import io.github.brenbar.uapi.SerializationError;
 import io.github.brenbar.uapi.SerializationImpl;
 
 public class SerializeInternal {
-    public static byte[] serializeInternal(Message message, _BinaryEncoder binaryEncoder,
+    public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,
             SerializationImpl serializer) {
         final var headers = message.header;
 
@@ -26,7 +26,7 @@ public class SerializeInternal {
                 try {
                     final var encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
                     return serializer.toMsgPack(encodedMessage);
-                } catch (_BinaryEncoderUnavailableError e) {
+                } catch (BinaryEncoderUnavailableError e) {
                     // We can still submit as json
                     return serializer.toJson(messageAsPseudoJson);
                 }

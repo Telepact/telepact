@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OffsetSchemaIndex {
-    public static List<_SchemaParseFailure> offsetSchemaIndex(List<_SchemaParseFailure> initialFailures, int offset,
+    public static List<SchemaParseFailure> offsetSchemaIndex(List<SchemaParseFailure> initialFailures, int offset,
             Map<String, Integer> schemaKeysToIndex, Set<Integer> errorIndices) {
-        final var finalList = new ArrayList<_SchemaParseFailure>();
+        final var finalList = new ArrayList<SchemaParseFailure>();
 
         final var indexToSchemaKey = schemaKeysToIndex.entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getValue(), e -> e.getKey()));
@@ -40,7 +40,7 @@ public class OffsetSchemaIndex {
                 schemaKey = indexToSchemaKey.get(originalIndex);
             }
 
-            finalList.add(new _SchemaParseFailure(newPath, reason, finalData, schemaKey));
+            finalList.add(new SchemaParseFailure(newPath, reason, finalData, schemaKey));
         }
 
         return finalList;

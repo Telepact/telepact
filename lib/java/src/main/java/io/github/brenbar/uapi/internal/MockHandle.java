@@ -9,15 +9,15 @@ import java.util.TreeMap;
 import io.github.brenbar.uapi.Message;
 import io.github.brenbar.uapi.UApiError;
 import io.github.brenbar.uapi.UApiSchema;
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 import static io.github.brenbar.uapi.internal.IsSubMap.isSubMap;
 import static io.github.brenbar.uapi.internal.Verify.verify;
 import static io.github.brenbar.uapi.internal.VerifyNoMoreInteractions.verifyNoMoreInteractions;
 
 public class MockHandle {
-    public static Message mockHandle(Message requestMessage, List<_MockStub> stubs, List<_MockInvocation> invocations,
-            _RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub,
+    public static Message mockHandle(Message requestMessage, List<MockStub> stubs, List<MockInvocation> invocations,
+            RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub,
             boolean enableOptionalFieldGeneration, boolean randomizeOptionalFieldGeneration) {
         final Map<String, Object> header = requestMessage.header;
 
@@ -37,7 +37,7 @@ public class MockHandle {
                 final var allowArgumentPartialMatch = !((Boolean) argument.getOrDefault("strictMatch!", false));
                 final var stubCount = (Integer) argument.getOrDefault("count!", -1);
 
-                final var stub = new _MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
+                final var stub = new MockStub(stubFunctionName, new TreeMap<>(stubArg), stubResult,
                         allowArgumentPartialMatch, stubCount);
 
                 stubs.add(0, stub);
@@ -78,9 +78,9 @@ public class MockHandle {
                 return new Message(Map.of(), Map.of("Ok_", Map.of()));
             }
             default -> {
-                invocations.add(new _MockInvocation(functionName, new TreeMap<>(argument)));
+                invocations.add(new MockInvocation(functionName, new TreeMap<>(argument)));
 
-                final var definition = (_UFn) uApiSchema.parsed.get(functionName);
+                final var definition = (UFn) uApiSchema.parsed.get(functionName);
 
                 for (final var stub : stubs) {
                     if (stub.count == 0) {
@@ -122,7 +122,7 @@ public class MockHandle {
                 }
 
                 if (definition != null) {
-                    final var resultUnion = (_UUnion) definition.result;
+                    final var resultUnion = (UUnion) definition.result;
                     final var okStructRef = resultUnion.cases.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;

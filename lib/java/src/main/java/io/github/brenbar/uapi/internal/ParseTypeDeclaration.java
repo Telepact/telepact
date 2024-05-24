@@ -16,12 +16,12 @@ import static io.github.brenbar.uapi.internal.AsList.asList;
 import static io.github.brenbar.uapi.internal.GetOrParseType.getOrParseType;
 
 public class ParseTypeDeclaration {
-    static _UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
+    static UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.isEmpty()) {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "EmptyArrayDisallowed", Map.of(), null)));
         }
 
@@ -32,7 +32,7 @@ public class ParseTypeDeclaration {
         try {
             rootTypeString = asString(baseType);
         } catch (ClassCastException e) {
-            final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(basePath,
+            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(basePath,
                     baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
@@ -42,31 +42,31 @@ public class ParseTypeDeclaration {
 
         final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(basePath,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final _UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, uApiSchemaPseudoJson,
+        final UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, uApiSchemaPseudoJson,
                 schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
 
-        if (type instanceof _UGeneric && nullable) {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(basePath,
+        if (type instanceof UGeneric && nullable) {
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
                     "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"), null)));
         }
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new UApiSchemaParseError(List.of(new _SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "ArrayLengthUnexpected",
                     Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1),
                     null)));
         }
 
-        final var parseFailures = new ArrayList<_SchemaParseFailure>();
-        final var typeParameters = new ArrayList<_UTypeDeclaration>();
+        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        final var typeParameters = new ArrayList<UTypeDeclaration>();
         final var givenTypeParameters = typeDeclarationArray.subList(1, typeDeclarationArray.size());
 
         var index = 0;
@@ -78,14 +78,14 @@ public class ParseTypeDeclaration {
             try {
                 l = asList(e);
             } catch (ClassCastException e1) {
-                final List<_SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e,
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e,
                         "Array");
 
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
 
-            final _UTypeDeclaration typeParameterTypeDeclaration;
+            final UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
                         uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
@@ -101,6 +101,6 @@ public class ParseTypeDeclaration {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        return new _UTypeDeclaration(type, nullable, typeParameters);
+        return new UTypeDeclaration(type, nullable, typeParameters);
     }
 }

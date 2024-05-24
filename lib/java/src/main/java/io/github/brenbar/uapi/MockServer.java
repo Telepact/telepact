@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import io.github.brenbar.uapi.internal._MockInvocation;
-import io.github.brenbar.uapi.internal._MockStub;
-import io.github.brenbar.uapi.internal._UMockCall;
-import io.github.brenbar.uapi.internal._UMockStub;
-import io.github.brenbar.uapi.internal._UType;
+import io.github.brenbar.uapi.internal.MockInvocation;
+import io.github.brenbar.uapi.internal.MockStub;
+import io.github.brenbar.uapi.internal.UMockCall;
+import io.github.brenbar.uapi.internal.UMockStub;
+import io.github.brenbar.uapi.internal.UType;
 
 import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
 import static io.github.brenbar.uapi.internal.GetMockUApiJson.getMockUApiJson;
@@ -62,13 +62,13 @@ public class MockServer {
     }
 
     private final Server server;
-    private final _RandomGenerator random;
+    private final RandomGenerator random;
     private final boolean enableGeneratedDefaultStub;
     private final boolean enableOptionalFieldGeneration;
     private final boolean randomizeOptionalFieldGeneration;
 
-    private final List<_MockStub> stubs = new ArrayList<>();
-    private final List<_MockInvocation> invocations = new ArrayList<>();
+    private final List<MockStub> stubs = new ArrayList<>();
+    private final List<MockInvocation> invocations = new ArrayList<>();
 
     /**
      * Create a mock server with the given uAPI Schema.
@@ -76,16 +76,16 @@ public class MockServer {
      * @param uApiSchemaAsJson
      */
     public MockServer(UApiSchema uApiSchema, Options options) {
-        this.random = new _RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
+        this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
         this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
-        final var parsedTypes = new HashMap<String, _UType>();
-        final var typeExtensions = new HashMap<String, _UType>();
+        final var parsedTypes = new HashMap<String, UType>();
+        final var typeExtensions = new HashMap<String, UType>();
 
-        typeExtensions.put("_ext.Call_", new _UMockCall(parsedTypes));
-        typeExtensions.put("_ext.Stub_", new _UMockStub(parsedTypes));
+        typeExtensions.put("_ext.Call_", new UMockCall(parsedTypes));
+        typeExtensions.put("_ext.Stub_", new UMockStub(parsedTypes));
 
         final var combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(),
                 typeExtensions);
@@ -97,7 +97,7 @@ public class MockServer {
         this.server = new Server(combinedUApiSchema, this::handle, serverOptions);
 
         final UApiSchema finalUApiSchema = this.server.uApiSchema;
-        final Map<String, _UType> finalParsedUApiSchema = finalUApiSchema.parsed;
+        final Map<String, UType> finalParsedUApiSchema = finalUApiSchema.parsed;
 
         parsedTypes.putAll(finalParsedUApiSchema);
     }

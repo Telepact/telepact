@@ -1,6 +1,6 @@
 package io.github.brenbar.uapi;
 
-import io.github.brenbar.uapi.internal._BinaryEncoder;
+import io.github.brenbar.uapi.internal.BinaryEncoder;
 
 import static io.github.brenbar.uapi.internal.SerializeInternal.serializeInternal;
 import static io.github.brenbar.uapi.internal.DeserializeInternal.deserializeInternal;
@@ -11,9 +11,9 @@ import static io.github.brenbar.uapi.internal.DeserializeInternal.deserializeInt
 public class Serializer {
 
     private SerializationImpl serializationImpl;
-    private _BinaryEncoder binaryEncoder;
+    private BinaryEncoder binaryEncoder;
 
-    Serializer(SerializationImpl serializationImpl, _BinaryEncoder binaryEncoder) {
+    Serializer(SerializationImpl serializationImpl, BinaryEncoder binaryEncoder) {
         this.serializationImpl = serializationImpl;
         this.binaryEncoder = binaryEncoder;
     }

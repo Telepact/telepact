@@ -10,9 +10,9 @@ import static io.github.brenbar.uapi.internal.DecodeBody.decodeBody;
 import static io.github.brenbar.uapi.internal.UnpackBody.unpackBody;
 
 public class ClientBinaryDecode {
-    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, _BinaryEncoding> recentBinaryEncoders,
+    static List<Object> clientBinaryDecode(List<Object> message, Map<Integer, BinaryEncoding> recentBinaryEncoders,
             ClientBinaryStrategy binaryChecksumStrategy)
-            throws _BinaryEncoderUnavailableError {
+            throws BinaryEncoderUnavailableError {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
         final var binaryChecksums = (List<Integer>) headers.get("bin_");
@@ -21,7 +21,7 @@ public class ClientBinaryDecode {
         // If there is a binary encoding included on this message, cache it
         if (headers.containsKey("enc_")) {
             final var binaryEncoding = (Map<String, Integer>) headers.get("enc_");
-            final var newBinaryEncoder = new _BinaryEncoding(binaryEncoding, binaryChecksum);
+            final var newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
 
             recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
         }

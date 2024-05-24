@@ -10,10 +10,10 @@ import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 
 public class ValidateMockStub {
-    static List<_ValidationFailure> validateMockStub(Object givenObj, Map<String, Object> select, String fn,
-            List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+    static List<ValidationFailure> validateMockStub(Object givenObj, Map<String, Object> select, String fn,
+            List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics, Map<String, UType> types) {
+        final var validationFailures = new ArrayList<ValidationFailure>();
 
         final Map<String, Object> givenMap;
         try {
@@ -29,7 +29,7 @@ public class ValidateMockStub {
         final var matches = keys.stream().filter(k -> k.matches(regexString)).toList();
         if (matches.size() != 1) {
             return List.of(
-                    new _ValidationFailure(List.of(),
+                    new ValidationFailure(List.of(),
                             "ObjectKeyRegexMatchCountUnexpected",
                             Map.of("regex", regexString, "actual",
                                     matches.size(), "expected", 1, "keys", keys)));
@@ -37,20 +37,20 @@ public class ValidateMockStub {
         }
 
         final var functionName = matches.get(0);
-        final var functionDef = (_UFn) types.get(functionName);
+        final var functionDef = (UFn) types.get(functionName);
         final var input = givenMap.get(functionName);
 
-        final _UUnion functionDefCall = functionDef.call;
+        final UUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
-        final Map<String, _UStruct> functionDefCallCases = functionDefCall.cases;
+        final Map<String, UStruct> functionDefCallCases = functionDefCall.cases;
         final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(),
                 List.of());
 
-        final var inputFailuresWithPath = new ArrayList<_ValidationFailure>();
+        final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (final var f : inputFailures) {
             final List<Object> thisPath = prepend(functionName, f.path);
 
-            inputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+            inputFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
         }
 
         final var inputFailuresWithoutMissingRequired = inputFailuresWithPath.stream()
@@ -61,18 +61,18 @@ public class ValidateMockStub {
         final var resultDefKey = "->";
 
         if (!givenMap.containsKey(resultDefKey)) {
-            validationFailures.add(new _ValidationFailure(List.of(resultDefKey),
+            validationFailures.add(new ValidationFailure(List.of(resultDefKey),
                     "RequiredObjectKeyMissing",
                     Map.of()));
         } else {
             final var output = givenMap.get(resultDefKey);
             final var outputFailures = functionDef.result.validate(output, select, fn, List.of(), List.of());
 
-            final var outputFailuresWithPath = new ArrayList<_ValidationFailure>();
+            final var outputFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : outputFailures) {
                 final List<Object> thisPath = prepend(resultDefKey, f.path);
 
-                outputFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+                outputFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
             }
 
             final var failuresWithoutMissingRequired = outputFailuresWithPath
@@ -87,7 +87,7 @@ public class ValidateMockStub {
                 .filter(k -> !matches.contains(k) && !Objects.equals(k, resultDefKey)).toList();
         for (final var disallowedField : disallowedFields) {
             validationFailures
-                    .add(new _ValidationFailure(List.of(disallowedField), "ObjectKeyDisallowed", Map.of()));
+                    .add(new ValidationFailure(List.of(disallowedField), "ObjectKeyDisallowed", Map.of()));
         }
 
         return validationFailures;

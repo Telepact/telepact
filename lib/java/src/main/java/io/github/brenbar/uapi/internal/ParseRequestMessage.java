@@ -18,13 +18,13 @@ public class ParseRequestMessage {
             onError.accept(e);
 
             String reason;
-            if (e instanceof _BinaryEncoderUnavailableError) {
+            if (e instanceof BinaryEncoderUnavailableError) {
                 reason = "IncompatibleBinaryEncoding";
-            } else if (e instanceof _BinaryEncodingMissing) {
+            } else if (e instanceof BinaryEncodingMissing) {
                 reason = "BinaryDecodeFailure";
-            } else if (e instanceof _InvalidMessage) {
+            } else if (e instanceof InvalidMessage) {
                 reason = "ExpectedJsonArrayOfTwoObjects";
-            } else if (e instanceof _InvalidMessageBody) {
+            } else if (e instanceof InvalidMessageBody) {
                 reason = "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject";
             } else {
                 reason = "ExpectedJsonArrayOfTwoObjects";

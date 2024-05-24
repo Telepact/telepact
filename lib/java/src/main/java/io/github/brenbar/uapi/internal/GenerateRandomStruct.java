@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 import static io.github.brenbar.uapi.internal.ConstructRandomStruct.constructRandomStruct;
 
 public class GenerateRandomStruct {
     static Object generateRandomStruct(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, _RandomGenerator randomGenerator,
-            Map<String, _UFieldDeclaration> fields) {
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics, RandomGenerator randomGenerator,
+            Map<String, UFieldDeclaration> fields) {
         if (useBlueprintValue) {
             final var startingStructValue = (Map<String, Object>) blueprintValue;
             return constructRandomStruct(fields, startingStructValue, includeOptionalFields, randomizeOptionalFields,

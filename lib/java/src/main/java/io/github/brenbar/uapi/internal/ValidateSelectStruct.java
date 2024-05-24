@@ -10,9 +10,9 @@ import static io.github.brenbar.uapi.internal.AsList.asList;
 import static io.github.brenbar.uapi.internal.AsString.asString;
 
 public class ValidateSelectStruct {
-    static List<_ValidationFailure> validateSelectStruct(_UStruct structReference, List<Object> basePath,
+    static List<ValidationFailure> validateSelectStruct(UStruct structReference, List<Object> basePath,
             Object selectedFields) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+        final var validationFailures = new ArrayList<ValidationFailure>();
 
         final List<Object> fields;
         try {
@@ -35,7 +35,7 @@ public class ValidateSelectStruct {
             if (!structReference.fields.containsKey(stringField)) {
                 final List<Object> thisPath = append(basePath, i);
 
-                validationFailures.add(new _ValidationFailure(thisPath, "ObjectKeyDisallowed", Map.of()));
+                validationFailures.add(new ValidationFailure(thisPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 

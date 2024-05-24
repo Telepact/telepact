@@ -11,11 +11,11 @@ import static io.github.brenbar.uapi.internal.GetTypeUnexpectedParseFailure.getT
 import static io.github.brenbar.uapi.internal.AsList.asList;
 
 public class ParseHeadersType {
-    static _UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey,
+    static UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey,
             String headerField,
             int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, _UType> parsedTypes, Map<String, _UType> typeExtensions,
-            List<_SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final List<Object> path = List.of(index, schemaKey);
 
         var typeDeclarationValue = headersDefinitionAsParsedJson.get(schemaKey);
@@ -38,7 +38,7 @@ public class ParseHeadersType {
                     parsedTypes,
                     typeExtensions, allParseFailures, failedTypes);
 
-            return new _UFieldDeclaration(headerField, typeDeclaration, false);
+            return new UFieldDeclaration(headerField, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {
             throw new UApiSchemaParseError(e.schemaParseFailures);
         }

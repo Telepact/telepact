@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class EncodeKeys {
-    static Object encodeKeys(Object given, _BinaryEncoding binaryEncoder) {
+    static Object encodeKeys(Object given, BinaryEncoding binaryEncoder) {
         if (given == null) {
             return given;
         } else if (given instanceof final Map<?, ?> m) {

@@ -10,8 +10,8 @@ import static io.github.brenbar.uapi.internal.ValidateResult.validateResult;
 
 public class GetInvalidErrorMessage {
 
-    static Message getInvalidErrorMessage(String error, List<_ValidationFailure> validationFailures,
-            _UUnion resultUnionType, Map<String, Object> responseHeaders) {
+    static Message getInvalidErrorMessage(String error, List<ValidationFailure> validationFailures,
+            UUnion resultUnionType, Map<String, Object> responseHeaders) {
         final var validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
         final Map<String, Object> newErrorResult = Map.of(error,
                 Map.of("cases", validationFailureCases));

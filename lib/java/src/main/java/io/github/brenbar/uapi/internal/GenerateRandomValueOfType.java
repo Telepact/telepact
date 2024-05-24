@@ -2,13 +2,13 @@ package io.github.brenbar.uapi.internal;
 
 import java.util.List;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 public class GenerateRandomValueOfType {
     static Object generateRandomValueOfType(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<_UTypeDeclaration> generics,
-            _RandomGenerator randomGenerator, _UType thisType, boolean nullable,
-            List<_UTypeDeclaration> typeParameters) {
+            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> generics,
+            RandomGenerator randomGenerator, UType thisType, boolean nullable,
+            List<UTypeDeclaration> typeParameters) {
         if (nullable && !useBlueprintValue && randomGenerator.nextBoolean()) {
             return null;
         } else {

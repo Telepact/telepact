@@ -3,7 +3,7 @@ package io.github.brenbar.uapi;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
-import io.github.brenbar.uapi.internal._ClientBinaryEncoder;
+import io.github.brenbar.uapi.internal.ClientBinaryEncoder;
 
 import static io.github.brenbar.uapi.internal.ProcessRequestObject.processRequestObject;
 
@@ -32,13 +32,13 @@ public class Client {
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
-        public SerializationImpl serializationImpl = new _DefaultSerializer();
+        public SerializationImpl serializationImpl = new DefaultSerializer();
 
         /**
          * The client binary strategy that should be used to maintain binary
          * compatibility with the server.
          */
-        public ClientBinaryStrategy binaryStrategy = new _DefaultClientBinaryStrategy();
+        public ClientBinaryStrategy binaryStrategy = new DefaultClientBinaryStrategy();
     }
 
     private final BiFunction<Message, Serializer, Future<Message>> adapter;
@@ -69,7 +69,7 @@ public class Client {
         this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;
         this.serializer = new Serializer(options.serializationImpl,
-                new _ClientBinaryEncoder(options.binaryStrategy));
+                new ClientBinaryEncoder(options.binaryStrategy));
     }
 
     /**

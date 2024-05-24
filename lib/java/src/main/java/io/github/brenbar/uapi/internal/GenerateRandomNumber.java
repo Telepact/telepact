@@ -1,10 +1,10 @@
 package io.github.brenbar.uapi.internal;
 
-import io.github.brenbar.uapi._RandomGenerator;
+import io.github.brenbar.uapi.RandomGenerator;
 
 public class GenerateRandomNumber {
     static Object generateRandomNumber(Object blueprintValue, boolean useBlueprintValue,
-            _RandomGenerator randomGenerator) {
+            RandomGenerator randomGenerator) {
         if (useBlueprintValue) {
             return blueprintValue;
         } else {

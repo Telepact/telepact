@@ -14,7 +14,7 @@ public class PackMap {
     public static final byte UNDEFINED_BYTE = (byte) 18;
 
     static List<Object> packMap(Map<?, ?> m, List<Object> header,
-            Map<Integer, _BinaryPackNode> keyIndexMap) throws CannotPack {
+            Map<Integer, BinaryPackNode> keyIndexMap) throws CannotPack {
         final var row = new ArrayList<Object>();
         for (final var entry : m.entrySet()) {
             if (entry.getKey() instanceof final String s) {
@@ -24,9 +24,9 @@ public class PackMap {
             final var key = (Integer) entry.getKey();
             final var keyIndex = keyIndexMap.get(key);
 
-            final _BinaryPackNode finalKeyIndex;
+            final BinaryPackNode finalKeyIndex;
             if (keyIndex == null) {
-                finalKeyIndex = new _BinaryPackNode(header.size() - 1, new HashMap<>());
+                finalKeyIndex = new BinaryPackNode(header.size() - 1, new HashMap<>());
 
                 if (entry.getValue() instanceof Map<?, ?>) {
                     header.add(new ArrayList<>(List.of(key)));
@@ -40,7 +40,7 @@ public class PackMap {
             }
 
             final Integer keyIndexValue = finalKeyIndex.value;
-            final Map<Integer, _BinaryPackNode> keyIndexNested = finalKeyIndex.nested;
+            final Map<Integer, BinaryPackNode> keyIndexNested = finalKeyIndex.nested;
 
             final Object packedValue;
             if (entry.getValue() instanceof Map<?, ?> m2) {

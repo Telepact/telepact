@@ -7,12 +7,12 @@ import java.util.Map;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 
 public class ValidateStructFields {
-    static List<_ValidationFailure> validateStructFields(
-            Map<String, _UFieldDeclaration> fields,
+    static List<ValidationFailure> validateStructFields(
+            Map<String, UFieldDeclaration> fields,
             List<String> selectedFields,
             Map<String, Object> actualStruct, Map<String, Object> select, String fn,
-            List<_UTypeDeclaration> typeParameters) {
-        final var validationFailures = new ArrayList<_ValidationFailure>();
+            List<UTypeDeclaration> typeParameters) {
+        final var validationFailures = new ArrayList<ValidationFailure>();
 
         final var missingFields = new ArrayList<String>();
         for (final var entry : fields.entrySet()) {
@@ -26,7 +26,7 @@ public class ValidateStructFields {
         }
 
         for (final var missingField : missingFields) {
-            final var validationFailure = new _ValidationFailure(List.of(missingField),
+            final var validationFailure = new ValidationFailure(List.of(missingField),
                     "RequiredObjectKeyMissing",
                     Map.of());
 
@@ -39,23 +39,23 @@ public class ValidateStructFields {
 
             final var referenceField = fields.get(fieldName);
             if (referenceField == null) {
-                var validationFailure = new _ValidationFailure(List.of(fieldName), "ObjectKeyDisallowed",
+                var validationFailure = new ValidationFailure(List.of(fieldName), "ObjectKeyDisallowed",
                         Map.of());
 
                 validationFailures.add(validationFailure);
                 continue;
             }
 
-            final _UTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
+            final UTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
 
             final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn,
                     typeParameters);
 
-            final var nestedValidationFailuresWithPath = new ArrayList<_ValidationFailure>();
+            final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {
                 final List<Object> thisPath = prepend(fieldName, f.path);
 
-                nestedValidationFailuresWithPath.add(new _ValidationFailure(thisPath, f.reason, f.data));
+                nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
             }
 
             validationFailures.addAll(nestedValidationFailuresWithPath);

@@ -8,14 +8,14 @@ import static io.github.brenbar.uapi.internal.DecodeBody.decodeBody;
 import static io.github.brenbar.uapi.internal.UnpackBody.unpackBody;
 
 public class ServerBinaryDecode {
-    static List<Object> serverBinaryDecode(List<Object> message, _BinaryEncoding binaryEncoder) {
+    static List<Object> serverBinaryDecode(List<Object> message, BinaryEncoding binaryEncoder) {
         final var headers = (Map<String, Object>) message.get(0);
         final var encodedMessageBody = (Map<Object, Object>) message.get(1);
         final var clientKnownBinaryChecksums = (List<Integer>) headers.get("bin_");
         final var binaryChecksumUsedByClientOnThisMessage = clientKnownBinaryChecksums.get(0);
 
         if (!Objects.equals(binaryChecksumUsedByClientOnThisMessage, binaryEncoder.checksum)) {
-            throw new _BinaryEncoderUnavailableError();
+            throw new BinaryEncoderUnavailableError();
         }
 
         final Map<Object, Object> finalEncodedMessageBody;

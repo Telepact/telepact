@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import io.github.brenbar.uapi.internal._ServerBinaryEncoder;
-import io.github.brenbar.uapi.internal._USelect;
-import io.github.brenbar.uapi.internal._UType;
-import io.github.brenbar.uapi.internal._UStruct;
+import io.github.brenbar.uapi.internal.ServerBinaryEncoder;
+import io.github.brenbar.uapi.internal.USelect;
+import io.github.brenbar.uapi.internal.UType;
+import io.github.brenbar.uapi.internal.UStruct;
 
 import static io.github.brenbar.uapi.internal.ConstructBinaryEncoding.constructBinaryEncoding;
 import static io.github.brenbar.uapi.internal.ExtendUApiSchema.extendUApiSchema;
@@ -52,7 +52,7 @@ public class Server {
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
-        public SerializationImpl serializer = new _DefaultSerializer();
+        public SerializationImpl serializer = new DefaultSerializer();
     }
 
     final UApiSchema uApiSchema;
@@ -74,20 +74,20 @@ public class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        final Map<String, _UType> parsedTypes = new HashMap<>();
-        final Map<String, _UType> typeExtensions = new HashMap<>();
+        final Map<String, UType> parsedTypes = new HashMap<>();
+        final Map<String, UType> typeExtensions = new HashMap<>();
 
-        typeExtensions.put("_ext.Select_", new _USelect(parsedTypes));
+        typeExtensions.put("_ext.Select_", new USelect(parsedTypes));
 
         this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
 
         parsedTypes.putAll(this.uApiSchema.parsed);
 
         final var binaryEncoding = constructBinaryEncoding(this.uApiSchema);
-        final var binaryEncoder = new _ServerBinaryEncoder(binaryEncoding);
+        final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serializer, binaryEncoder);
 
-        if (((_UStruct) this.uApiSchema.parsed.get("struct.Auth_")).fields.size() == 0 && options.authRequired) {
+        if (((UStruct) this.uApiSchema.parsed.get("struct.Auth_")).fields.size() == 0 && options.authRequired) {
             throw new RuntimeException(
                     "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.");
         }

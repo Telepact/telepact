@@ -9,9 +9,9 @@ import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.ValidateSelectStruct.validateSelectStruct;
 
 public class ValidateSelect {
-    static List<_ValidationFailure> validateSelect(Object givenObj, Map<String, Object> select, String fn,
-            List<_UTypeDeclaration> typeParameters,
-            List<_UTypeDeclaration> generics, Map<String, _UType> types) {
+    static List<ValidationFailure> validateSelect(Object givenObj, Map<String, Object> select, String fn,
+            List<UTypeDeclaration> typeParameters,
+            List<UTypeDeclaration> generics, Map<String, UType> types) {
         Map<String, Object> selectStructFieldsHeader;
         try {
             selectStructFieldsHeader = asMap(givenObj);
@@ -20,14 +20,14 @@ public class ValidateSelect {
                     givenObj, "Object");
         }
 
-        final var validationFailures = new ArrayList<_ValidationFailure>();
-        final var functionType = (_UFn) types.get(fn);
+        final var validationFailures = new ArrayList<ValidationFailure>();
+        final var functionType = (UFn) types.get(fn);
 
         for (final var entry : selectStructFieldsHeader.entrySet()) {
             final var typeName = entry.getKey();
             final var selectValue = entry.getValue();
 
-            final _UType typeReference;
+            final UType typeReference;
             if (typeName.equals("->")) {
                 typeReference = functionType.result;
             } else {
@@ -35,12 +35,12 @@ public class ValidateSelect {
             }
 
             if (typeReference == null) {
-                validationFailures.add(new _ValidationFailure(List.of(typeName),
+                validationFailures.add(new ValidationFailure(List.of(typeName),
                         "ObjectKeyDisallowed", Map.of()));
                 continue;
             }
 
-            if (typeReference instanceof final _UUnion u) {
+            if (typeReference instanceof final UUnion u) {
                 final Map<String, Object> unionCases;
                 try {
                     unionCases = asMap(selectValue);
@@ -58,7 +58,7 @@ public class ValidateSelect {
                     final List<Object> loopPath = List.of(typeName, unionCase);
 
                     if (structRef == null) {
-                        validationFailures.add(new _ValidationFailure(
+                        validationFailures.add(new ValidationFailure(
                                 loopPath,
                                 "ObjectKeyDisallowed", Map.of()));
                         continue;
@@ -69,9 +69,9 @@ public class ValidateSelect {
 
                     validationFailures.addAll(nestedValidationFailures);
                 }
-            } else if (typeReference instanceof final _UFn f) {
-                final _UUnion fnCall = f.call;
-                final Map<String, _UStruct> fnCallCases = fnCall.cases;
+            } else if (typeReference instanceof final UFn f) {
+                final UUnion fnCall = f.call;
+                final Map<String, UStruct> fnCallCases = fnCall.cases;
                 final String fnName = f.name;
                 final var argStruct = fnCallCases.get(fnName);
                 final var nestedValidationFailures = validateSelectStruct(argStruct, List.of(typeName),
@@ -79,7 +79,7 @@ public class ValidateSelect {
 
                 validationFailures.addAll(nestedValidationFailures);
             } else {
-                final var structRef = (_UStruct) typeReference;
+                final var structRef = (UStruct) typeReference;
                 final var nestedValidationFailures = validateSelectStruct(structRef, List.of(typeName),
                         selectValue);
 

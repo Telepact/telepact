@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 public class MapSchemaParseFailuresToPseudoJson {
     public static List<Object> mapSchemaParseFailuresToPseudoJson(
-            List<_SchemaParseFailure> schemaParseFailures) {
+            List<SchemaParseFailure> schemaParseFailures) {
         return (List<Object>) schemaParseFailures.stream()
                 .map(f -> (Object) new TreeMap<>() {
                     {
