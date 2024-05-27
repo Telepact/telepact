@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import io.github.brenbar.uapi.internal.MockInvocation;
-import io.github.brenbar.uapi.internal.MockStub;
+import io.github.brenbar.uapi.internal.mock.MockInvocation;
+import io.github.brenbar.uapi.internal.mock.MockStub;
 import io.github.brenbar.uapi.internal.types.UMockCall;
 import io.github.brenbar.uapi.internal.types.UMockStub;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.MockHandle.mockHandle;
+import static io.github.brenbar.uapi.internal.mock.MockHandle.mockHandle;
 import static io.github.brenbar.uapi.internal.schema.ExtendUApiSchema.extendUApiSchema;
 import static io.github.brenbar.uapi.internal.schema.GetMockUApiJson.getMockUApiJson;
 

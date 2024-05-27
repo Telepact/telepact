@@ -1,14 +1,14 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.mock;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static io.github.brenbar.uapi.internal.PartiallyMatches.partiallyMatches;
-import static io.github.brenbar.uapi.internal.IsSubMap.isSubMap;
+import static io.github.brenbar.uapi.internal.mock.IsSubMap.isSubMap;
+import static io.github.brenbar.uapi.internal.mock.PartiallyMatches.partiallyMatches;
 
 public class IsSubMapEntryEqual {
-    static boolean isSubMapEntryEqual(Object partValue, Object wholeValue) {
+    public static boolean isSubMapEntryEqual(Object partValue, Object wholeValue) {
         if (partValue instanceof final Map m1 && wholeValue instanceof final Map m2) {
             return isSubMap(m1, m2);
         } else if (partValue instanceof final List partList && wholeValue instanceof final List wholeList) {

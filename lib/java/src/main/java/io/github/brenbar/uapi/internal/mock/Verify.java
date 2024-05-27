@@ -1,4 +1,4 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import static io.github.brenbar.uapi.internal.IsSubMap.isSubMap;
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
+import static io.github.brenbar.uapi.internal.mock.IsSubMap.isSubMap;
 
 public class Verify {
     static Map<String, Object> verify(String functionName, Map<String, Object> argument, boolean exactMatch,

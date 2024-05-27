@@ -1,4 +1,4 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.mock;
 
 import java.util.Map;
 

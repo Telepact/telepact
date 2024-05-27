@@ -1,4 +1,8 @@
-package io.github.brenbar.uapi.internal;
+package io.github.brenbar.uapi.internal.mock;
+
+import static io.github.brenbar.uapi.internal.mock.IsSubMap.isSubMap;
+import static io.github.brenbar.uapi.internal.mock.Verify.verify;
+import static io.github.brenbar.uapi.internal.mock.VerifyNoMoreInteractions.verifyNoMoreInteractions;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,10 +16,6 @@ import io.github.brenbar.uapi.UApiSchema;
 import io.github.brenbar.uapi.internal.types.UFn;
 import io.github.brenbar.uapi.internal.types.UUnion;
 import io.github.brenbar.uapi.RandomGenerator;
-
-import static io.github.brenbar.uapi.internal.IsSubMap.isSubMap;
-import static io.github.brenbar.uapi.internal.Verify.verify;
-import static io.github.brenbar.uapi.internal.VerifyNoMoreInteractions.verifyNoMoreInteractions;
 
 public class MockHandle {
     public static Message mockHandle(Message requestMessage, List<MockStub> stubs, List<MockInvocation> invocations,
