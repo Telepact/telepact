@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.UApiSchema;
 import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.AsList.asList;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseUApiSchema.parseUApiSchema;
 
@@ -29,14 +28,12 @@ public class NewUApiSchema {
                     e);
         }
 
-        final List<Object> uApiSchemaPseudoJson;
-        try {
-            uApiSchemaPseudoJson = asList(uApiSchemaPseudoJsonInit);
-        } catch (ClassCastException e) {
-            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(List.of(),
+        if (!(uApiSchemaPseudoJsonInit instanceof List)) {
+            final List<SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(List.of(),
                     uApiSchemaPseudoJsonInit, "Array");
-            throw new UApiSchemaParseError(thisParseFailures, e);
+            throw new UApiSchemaParseError(thisParseFailure);
         }
+        final List<Object> uApiSchemaPseudoJson = (List<Object>) uApiSchemaPseudoJsonInit;
 
         return parseUApiSchema(uApiSchemaPseudoJson, typeExtensions, 0);
     }

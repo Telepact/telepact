@@ -12,11 +12,8 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
 import static io.github.brenbar.uapi.internal.Append.append;
-import static io.github.brenbar.uapi.internal.AsString.asString;
 import static io.github.brenbar.uapi.internal.schema.GetOrParseType.getOrParseType;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
-import static io.github.brenbar.uapi.internal.types.GetType.getType;
-import static io.github.brenbar.uapi.internal.AsList.asList;
 
 public class ParseTypeDeclaration {
     static UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
@@ -31,14 +28,12 @@ public class ParseTypeDeclaration {
         final List<Object> basePath = append(path, 0);
         final var baseType = typeDeclarationArray.get(0);
 
-        final String rootTypeString;
-        try {
-            rootTypeString = asString(baseType);
-        } catch (ClassCastException e) {
+        if (!(baseType instanceof String)) {
             final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(basePath,
                     baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
+        final String rootTypeString = (String) baseType;
 
         final var regexString = "^(.+?)(\\?)?$";
         final var regex = Pattern.compile(regexString);
@@ -77,16 +72,14 @@ public class ParseTypeDeclaration {
             index += 1;
             final List<Object> loopPath = append(path, index);
 
-            final List<Object> l;
-            try {
-                l = asList(e);
-            } catch (ClassCastException e1) {
+            if (!(e instanceof List)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e,
                         "Array");
 
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
+            final List<Object> l = (List<Object>) e;
 
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {

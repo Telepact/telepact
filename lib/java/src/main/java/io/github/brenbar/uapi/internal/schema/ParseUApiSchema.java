@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.schema.ApplyErrorToParsedTypes.applyErrorToParsedTypes;
 import static io.github.brenbar.uapi.internal.schema.CatchErrorCollisions.catchErrorCollisions;
 import static io.github.brenbar.uapi.internal.schema.FindMatchingSchemaKey.findMatchingSchemaKey;
@@ -40,16 +39,14 @@ public class ParseUApiSchema {
 
             final List<Object> loopPath = List.of(index);
 
-            final Map<String, Object> def;
-            try {
-                def = asMap(definition);
-            } catch (ClassCastException e) {
+            if (!(definition instanceof Map)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
                         definition, "Object");
 
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
+            final Map<String, Object> def = (Map<String, Object>) definition;
 
             final String schemaKey;
             try {

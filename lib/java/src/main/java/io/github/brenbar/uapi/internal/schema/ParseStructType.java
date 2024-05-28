@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UType;
 
 import static io.github.brenbar.uapi.internal.Append.append;
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructFields.parseStructFields;
 
@@ -43,13 +42,13 @@ public class ParseStructType {
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
         Map<String, Object> definition = null;
-        try {
-            definition = asMap(defInit);
-        } catch (ClassCastException e) {
+        if (!(defInit instanceof Map)) {
             final List<SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);
+        } else {
+            definition = (Map<String, Object>) defInit;
         }
 
         if (parseFailures.size() > 0) {

@@ -10,7 +10,6 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
@@ -18,12 +17,10 @@ public class ValidateMockCall {
     public static List<ValidationFailure> validateMockCall(Object givenObj, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics, Map<String, UType> types) {
-        final Map<String, Object> givenMap;
-        try {
-            givenMap = asMap(givenObj);
-        } catch (ClassCastException e) {
+        if (!(givenObj instanceof Map)) {
             return getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }
+        final Map<String, Object> givenMap = (Map<String, Object>) givenObj;
 
         final var regexString = "^fn\\..*$";
 

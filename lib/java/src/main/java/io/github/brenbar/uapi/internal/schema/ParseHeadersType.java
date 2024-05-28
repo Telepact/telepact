@@ -8,7 +8,6 @@ import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.AsList.asList;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseTypeDeclaration.parseTypeDeclaration;
 
@@ -22,13 +21,11 @@ public class ParseHeadersType {
 
         var typeDeclarationValue = headersDefinitionAsParsedJson.get(schemaKey);
 
-        final List<Object> typeDeclarationArray;
-        try {
-            typeDeclarationArray = asList(typeDeclarationValue);
-        } catch (ClassCastException e) {
+        if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(
                     getTypeUnexpectedParseFailure(path, typeDeclarationValue, "Array"));
         }
+        final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
         final var typeParameterCount = 0;
 

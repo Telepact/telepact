@@ -12,7 +12,6 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.Append.append;
-import static io.github.brenbar.uapi.internal.AsString.asString;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructType.parseStructType;
 import static io.github.brenbar.uapi.internal.schema.ParseUnionType.parseUnionType;
@@ -64,14 +63,15 @@ public class ParseFunctionType {
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^.*$");
-            try {
-                errorsRegex = asString(errorsRegexInit);
-            } catch (ClassCastException e) {
+
+            if (!(errorsRegexInit instanceof String)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
                         regexPath, errorsRegexInit, "String");
 
                 parseFailures
                         .addAll(thisParseFailures);
+            } else {
+                errorsRegex = (String) errorsRegexInit;
             }
         }
 

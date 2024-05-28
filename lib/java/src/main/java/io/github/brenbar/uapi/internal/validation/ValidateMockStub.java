@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.Prepend.prepend;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
@@ -21,12 +20,10 @@ public class ValidateMockStub {
             List<UTypeDeclaration> generics, Map<String, UType> types) {
         final var validationFailures = new ArrayList<ValidationFailure>();
 
-        final Map<String, Object> givenMap;
-        try {
-            givenMap = asMap(givenObj);
-        } catch (ClassCastException e) {
+        if (!(givenObj instanceof Map)) {
             return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
+        final Map<String, Object> givenMap = (Map<String, Object>) givenObj;
 
         final var regexString = "^fn\\..*$";
 

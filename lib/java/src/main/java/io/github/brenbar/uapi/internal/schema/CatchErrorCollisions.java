@@ -8,8 +8,6 @@ import java.util.Set;
 
 import io.github.brenbar.uapi.UApiSchemaParseError;
 
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
-
 public class CatchErrorCollisions {
     static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices,
             Map<String, Integer> keysToIndex) {
@@ -29,12 +27,12 @@ public class CatchErrorCollisions {
                 final var otherErrDef = (List<Object>) otherDef.get("errors");
 
                 for (int k = 0; k < errDef.size(); k += 1) {
-                    final var thisErrDef = asMap(errDef.get(k));
+                    final var thisErrDef = (Map<String, Object>) errDef.get(k);
                     final var thisErrDefKeys = new HashSet<>(thisErrDef.keySet());
                     thisErrDefKeys.remove("///");
 
                     for (int l = 0; l < otherErrDef.size(); l += 1) {
-                        final var thisOtherErrDef = asMap(otherErrDef.get(l));
+                        final var thisOtherErrDef = (Map<String, Object>) otherErrDef.get(l);
                         final var thisOtherErrDefKeys = new HashSet<>(thisOtherErrDef.keySet());
                         thisOtherErrDefKeys.remove("///");
 

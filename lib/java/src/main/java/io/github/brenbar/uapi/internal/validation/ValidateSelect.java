@@ -12,19 +12,16 @@ import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 import static io.github.brenbar.uapi.internal.validation.ValidateSelectStruct.validateSelectStruct;
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
 
 public class ValidateSelect {
     public static List<ValidationFailure> validateSelect(Object givenObj, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters,
             List<UTypeDeclaration> generics, Map<String, UType> types) {
-        Map<String, Object> selectStructFieldsHeader;
-        try {
-            selectStructFieldsHeader = asMap(givenObj);
-        } catch (ClassCastException e) {
-            return getTypeUnexpectedValidationFailure(List.of(),
-                    givenObj, "Object");
+
+        if (!(givenObj instanceof Map)) {
+            return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
         }
+        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) givenObj;
 
         final var validationFailures = new ArrayList<ValidationFailure>();
         final var functionType = (UFn) types.get(fn);
@@ -47,14 +44,12 @@ public class ValidateSelect {
             }
 
             if (typeReference instanceof final UUnion u) {
-                final Map<String, Object> unionCases;
-                try {
-                    unionCases = asMap(selectValue);
-                } catch (ClassCastException e) {
+                if (!(selectValue instanceof Map)) {
                     validationFailures.addAll(
                             getTypeUnexpectedValidationFailure(List.of(typeName), selectValue, "Object"));
                     continue;
                 }
+                final Map<String, Object> unionCases = (Map<String, Object>) selectValue;
 
                 for (final var unionCaseEntry : unionCases.entrySet()) {
                     final var unionCase = unionCaseEntry.getKey();

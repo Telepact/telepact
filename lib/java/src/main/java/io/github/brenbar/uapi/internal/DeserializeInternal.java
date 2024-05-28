@@ -9,9 +9,6 @@ import io.github.brenbar.uapi.internal.binary.BinaryEncoder;
 import io.github.brenbar.uapi.internal.validation.InvalidMessage;
 import io.github.brenbar.uapi.internal.validation.InvalidMessageBody;
 
-import static io.github.brenbar.uapi.internal.AsList.asList;
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
-
 public class DeserializeInternal {
 
     public static Message deserializeInternal(byte[] messageBytes, SerializationImpl serializer,
@@ -31,12 +28,10 @@ public class DeserializeInternal {
             throw new InvalidMessage(e);
         }
 
-        final List<Object> messageAsPseudoJsonList;
-        try {
-            messageAsPseudoJsonList = asList(messageAsPseudoJson);
-        } catch (ClassCastException e) {
+        if (!(messageAsPseudoJson instanceof List)) {
             throw new InvalidMessage();
         }
+        final List<Object> messageAsPseudoJsonList = (List<Object>) messageAsPseudoJson;
 
         if (messageAsPseudoJsonList.size() != 2) {
             throw new InvalidMessage();
@@ -49,28 +44,22 @@ public class DeserializeInternal {
             finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
         }
 
-        Map<String, Object> headers = null;
-        Map<String, Object> body = null;
-
-        try {
-            headers = asMap(finalMessageAsPseudoJsonList.get(0));
-        } catch (ClassCastException e) {
+        if (!(finalMessageAsPseudoJsonList.get(0) instanceof Map)) {
             throw new InvalidMessage();
         }
+        Map<String, Object> headers = (Map<String, Object>) finalMessageAsPseudoJsonList.get(0);
 
-        try {
-            body = asMap(finalMessageAsPseudoJsonList.get(1));
-            if (body.size() != 1) {
-                throw new InvalidMessageBody();
-            } else {
-                try {
-                    var givenPayload = asMap(body.values().stream().findAny().get());
-                } catch (ClassCastException e) {
-                    throw new InvalidMessageBody();
-                }
-            }
-        } catch (ClassCastException e) {
+        if (!(finalMessageAsPseudoJsonList.get(1) instanceof Map)) {
             throw new InvalidMessage();
+        }
+        Map<String, Object> body = (Map<String, Object>) finalMessageAsPseudoJsonList.get(1);
+
+        if (body.size() != 1) {
+            throw new InvalidMessageBody();
+        }
+
+        if (!(body.values().stream().findAny().get() instanceof Map)) {
+            throw new InvalidMessageBody();
         }
 
         return new Message(headers, body);

@@ -14,8 +14,6 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
 import static io.github.brenbar.uapi.internal.Append.append;
-import static io.github.brenbar.uapi.internal.AsList.asList;
-import static io.github.brenbar.uapi.internal.AsMap.asMap;
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructFields.parseStructFields;
@@ -48,30 +46,30 @@ public class ParseUnionType {
         final List<Object> thisPath = append(path, schemaKey);
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
-        final List<Object> definition2;
-        try {
-            definition2 = asList(defInit);
-        } catch (ClassCastException e) {
+        if (!(defInit instanceof List)) {
             final List<SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
                     defInit, "Array");
 
             parseFailures.addAll(finalParseFailures);
             throw new UApiSchemaParseError(parseFailures);
         }
+        final List<Object> definition2 = (List<Object>) defInit;
 
         final List<Map<String, Object>> definition = new ArrayList<>();
         int index = -1;
         for (final var element : definition2) {
             index += 1;
             final List<Object> loopPath = append(thisPath, index);
-            try {
-                definition.add(asMap(element));
-            } catch (ClassCastException e) {
-                final List<SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(loopPath,
+
+            if (!(element instanceof Map)) {
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
                         element, "Object");
 
-                parseFailures.addAll(finalParseFailures);
+                parseFailures.addAll(thisParseFailures);
+                continue;
             }
+
+            definition.add((Map<String, Object>) element);
         }
 
         if (!parseFailures.isEmpty()) {
@@ -83,7 +81,7 @@ public class ParseUnionType {
         } else {
             outerLoop: for (final var requiredKey : requiredKeys) {
                 for (final var element : definition) {
-                    final var map = asMap(element);
+                    final var map = (Map<String, Object>) element;
                     final var keys = new HashSet<>(map.keySet());
                     keys.remove("///");
                     if (keys.contains(requiredKey)) {
@@ -102,7 +100,7 @@ public class ParseUnionType {
             final var element = definition.get(i);
             final List<Object> loopPath = append(thisPath, i);
 
-            final var mapInit = asMap(element);
+            final var mapInit = (Map<String, Object>) element;
             final var map = new HashMap<>(mapInit);
             map.remove("///");
             final var keys = new ArrayList<>(map.keySet());
@@ -129,16 +127,14 @@ public class ParseUnionType {
             final var unionCase = entry.getKey();
             final List<Object> unionKeyPath = append(loopPath, unionCase);
 
-            final Map<String, Object> unionCaseStruct;
-            try {
-                unionCaseStruct = asMap(entry.getValue());
-            } catch (ClassCastException e) {
-                List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,
+            if (!(entry.getValue() instanceof Map)) {
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,
                         entry.getValue(), "Object");
 
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
+            final Map<String, Object> unionCaseStruct = (Map<String, Object>) entry.getValue();
 
             final Map<String, UFieldDeclaration> fields;
             try {
