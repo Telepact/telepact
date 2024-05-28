@@ -7,6 +7,10 @@ import java.util.function.BiFunction;
 
 import uapi.internal.binary.ClientBinaryEncoder;
 
+import uapi.DefaultSerialization;
+import uapi.DefaultClientBinaryStrategy;
+import uapi.Serializer;
+
 /**
  * A uAPI client.
  */
@@ -32,7 +36,7 @@ public class Client {
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
-        public SerializationImpl serializationImpl = new DefaultSerializer();
+        public Serialization serializationImpl = new DefaultSerialization();
 
         /**
          * The client binary strategy that should be used to maintain binary

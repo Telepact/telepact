@@ -5,13 +5,13 @@ import java.util.Objects;
 
 import uapi.Message;
 import uapi.SerializationError;
-import uapi.SerializationImpl;
+import uapi.Serialization;
 import uapi.internal.binary.BinaryEncoder;
 import uapi.internal.binary.BinaryEncoderUnavailableError;
 
 public class SerializeInternal {
     public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,
-            SerializationImpl serializer) {
+            Serialization serializer) {
         final var headers = message.header;
 
         final boolean serializeAsBinary;

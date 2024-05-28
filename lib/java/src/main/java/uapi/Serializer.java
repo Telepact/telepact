@@ -10,10 +10,10 @@ import uapi.internal.binary.BinaryEncoder;
  */
 public class Serializer {
 
-    private SerializationImpl serializationImpl;
+    private Serialization serializationImpl;
     private BinaryEncoder binaryEncoder;
 
-    Serializer(SerializationImpl serializationImpl, BinaryEncoder binaryEncoder) {
+    Serializer(Serialization serializationImpl, BinaryEncoder binaryEncoder) {
         this.serializationImpl = serializationImpl;
         this.binaryEncoder = binaryEncoder;
     }

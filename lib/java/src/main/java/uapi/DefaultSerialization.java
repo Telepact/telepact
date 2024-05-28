@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-class DefaultSerializer implements SerializationImpl {
+class DefaultSerialization implements Serialization {
 
     static class MessagePackMapDeserializer extends MapDeserializer {
 

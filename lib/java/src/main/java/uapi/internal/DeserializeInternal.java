@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.Message;
-import uapi.SerializationImpl;
+import uapi.Serialization;
 import uapi.internal.binary.BinaryEncoder;
 import uapi.internal.validation.InvalidMessage;
 import uapi.internal.validation.InvalidMessageBody;
 
 public class DeserializeInternal {
 
-    public static Message deserializeInternal(byte[] messageBytes, SerializationImpl serializer,
+    public static Message deserializeInternal(byte[] messageBytes, Serialization serializer,
             BinaryEncoder binaryEncoder) {
         final Object messageAsPseudoJson;
         final boolean isMsgPack;

@@ -7,7 +7,7 @@ package uapi;
  * Pseudo-JSON objects are defined as data structures that represent JSON
  * objects as Maps and JSON arrays as Lists.
  */
-public interface SerializationImpl {
+public interface Serialization {
 
     byte[] toJson(Object message) throws Throwable;
 

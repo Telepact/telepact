@@ -52,7 +52,7 @@ public class Server {
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
-        public SerializationImpl serializer = new DefaultSerializer();
+        public Serialization serializer = new DefaultSerialization();
     }
 
     final UApiSchema uApiSchema;
