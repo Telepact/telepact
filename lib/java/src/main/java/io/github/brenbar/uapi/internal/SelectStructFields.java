@@ -14,8 +14,6 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
-
 public class SelectStructFields {
     static Object selectStructFields(UTypeDeclaration typeDeclaration, Object value,
             Map<String, Object> selectedStructFields) {
@@ -44,7 +42,7 @@ public class SelectStructFields {
             return finalMap;
         } else if (typeDeclarationType instanceof final UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
-            final Map.Entry<String, Object> uEntry = unionEntry(valueAsMap);
+            final Map.Entry<String, Object> uEntry = valueAsMap.entrySet().stream().findAny().get();
             final var unionCase = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
@@ -70,7 +68,7 @@ public class SelectStructFields {
             return Map.of(uEntry.getKey(), finalMap);
         } else if (typeDeclarationType instanceof final UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
-            final var uEntry = unionEntry(valueAsMap);
+            final var uEntry = valueAsMap.entrySet().stream().findAny().get();
             final var unionCase = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 

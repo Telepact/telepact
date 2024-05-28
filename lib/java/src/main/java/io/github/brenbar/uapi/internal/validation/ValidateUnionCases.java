@@ -8,7 +8,6 @@ import java.util.Map;
 import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
-import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 import static io.github.brenbar.uapi.internal.validation.ValidateUnionStruct.validateUnionStruct;
 
@@ -22,7 +21,7 @@ public class ValidateUnionCases {
                             "ObjectSizeUnexpected", Map.of("actual", actual.size(), "expected", 1)));
         }
 
-        final var entry = unionEntry((Map<String, Object>) actual);
+        final var entry = ((Map<String, Object>) actual).entrySet().stream().findAny().get();
         final var unionTarget = (String) entry.getKey();
         final var unionPayload = entry.getValue();
 

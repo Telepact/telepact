@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.mock.IsSubMap.isSubMap;
 
 public class Verify {
@@ -35,7 +34,7 @@ public class Verify {
             allCallsPseudoJson.add(Map.of(invocation.functionName, invocation.functionArgument));
         }
 
-        final Map.Entry<String, Object> verifyTimesEntry = unionEntry(verificationTimes);
+        final Map.Entry<String, Object> verifyTimesEntry = verificationTimes.entrySet().stream().findAny().get();
         final var verifyKey = verifyTimesEntry.getKey();
         final var verifyTimesStruct = (Map<String, Object>) verifyTimesEntry.getValue();
 

@@ -13,7 +13,6 @@ import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructFields.parseStructFields;
 
@@ -133,7 +132,7 @@ public class ParseUnionType {
                 continue;
             }
 
-            final var entry = unionEntry(map);
+            final var entry = map.entrySet().stream().findAny().get();
             final var unionCase = entry.getKey();
 
             final List<Object> unionKeyPath = new ArrayList<>(loopPath);

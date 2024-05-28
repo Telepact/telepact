@@ -10,7 +10,6 @@ import io.github.brenbar.uapi.RandomGenerator;
 import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
-import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.generation.ConstructRandomStruct.constructRandomStruct;
 
 public class ConstructRandomUnion {
@@ -20,7 +19,7 @@ public class ConstructRandomUnion {
             List<UTypeDeclaration> typeParameters,
             RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
-            final var entry = unionEntry(startingUnion);
+            final var entry = startingUnion.entrySet().stream().findAny().get();
             final var unionCase = entry.getKey();
             final var unionStructType = unionCasesReference.get(unionCase);
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);

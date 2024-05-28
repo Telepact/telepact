@@ -16,7 +16,6 @@ import io.github.brenbar.uapi.internal.types.UUnion;
 import io.github.brenbar.uapi.internal.validation.ValidationFailure;
 
 import static io.github.brenbar.uapi.internal.SelectStructFields.selectStructFields;
-import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.validation.GetInvalidErrorMessage.getInvalidErrorMessage;
 import static io.github.brenbar.uapi.internal.validation.ValidateHeaders.validateHeaders;
 import static io.github.brenbar.uapi.internal.validation.ValidateResult.validateResult;
@@ -28,7 +27,7 @@ public class HandleMessage {
         final Map<String, Object> requestHeaders = requestMessage.header;
         final Map<String, Object> requestBody = requestMessage.body;
         final Map<String, UType> parsedUApiSchema = uApiSchema.parsed;
-        final Map.Entry<String, Object> requestEntry = unionEntry(requestBody);
+        final Map.Entry<String, Object> requestEntry = requestBody.entrySet().stream().findAny().get();
 
         final String requestTargetInit = requestEntry.getKey();
         final Map<String, Object> requestPayload = (Map<String, Object>) requestEntry.getValue();
