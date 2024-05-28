@@ -52,7 +52,7 @@ public class Server {
          * The serialization implementation that should be used to serialize and
          * deserialize messages.
          */
-        public Serialization serializer = new DefaultSerialization();
+        public Serialization serialization = new DefaultSerialization();
     }
 
     final UApiSchema uApiSchema;
@@ -85,7 +85,7 @@ public class Server {
 
         final var binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
-        this.serializer = new Serializer(options.serializer, binaryEncoder);
+        this.serializer = new Serializer(options.serialization, binaryEncoder);
 
         if (((UStruct) this.uApiSchema.parsed.get("struct.Auth_")).fields.size() == 0 && options.authRequired) {
             throw new RuntimeException(
