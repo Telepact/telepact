@@ -1,5 +1,6 @@
 package io.github.brenbar.uapi.internal.schema;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,7 +10,6 @@ import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseTypeDeclaration.parseTypeDeclaration;
 
@@ -23,14 +23,18 @@ public class ParseField {
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            final List<Object> finalPath = append(path, fieldDeclaration);
+            final List<Object> finalPath = new ArrayList<>(path);
+            finalPath.add(fieldDeclaration);
+
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
                     "KeyRegexMatchFailed", Map.of("regex", regexString), null)));
         }
 
         final var fieldName = matcher.group(0);
         final var optional = matcher.group(2) != null;
-        final List<Object> thisPath = append(path, fieldName);
+
+        final List<Object> thisPath = new ArrayList<>(path);
+        thisPath.add(fieldName);
 
         if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(

@@ -7,8 +7,6 @@ import java.util.Map;
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UFn;
 
-import static io.github.brenbar.uapi.internal.Prepend.prepend;
-
 public class ValidateHeaders {
     public static List<ValidationFailure> validateHeaders(
             Map<String, Object> headers, Map<String, UFieldDeclaration> parsedRequestHeaders, UFn functionType) {
@@ -22,7 +20,12 @@ public class ValidateHeaders {
                 final var thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name,
                         List.of());
                 final var thisValidationFailuresPath = thisValidationFailures.stream()
-                        .map(e -> new ValidationFailure(prepend(header, e.path), e.reason, e.data)).toList();
+                        .map(e -> {
+                            final var path = new ArrayList<>(e.path);
+                            path.add(0, header);
+
+                            return new ValidationFailure(path, e.reason, e.data);
+                        }).toList();
                 validationFailures.addAll(thisValidationFailuresPath);
             }
         }

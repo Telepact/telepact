@@ -6,7 +6,6 @@ import java.util.Map;
 
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
-import static io.github.brenbar.uapi.internal.Prepend.prepend;
 import static io.github.brenbar.uapi.internal.types.UObject._OBJECT_NAME;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
@@ -26,7 +25,8 @@ public class ValidateObject {
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
                 for (var f : nestedValidationFailures) {
-                    final List<Object> thisPath = prepend(k, f.path);
+                    final List<Object> thisPath = new ArrayList<>(f.path);
+                    thisPath.add(0, k);
 
                     nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
                 }

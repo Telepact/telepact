@@ -10,7 +10,6 @@ import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.schema.ParseField.parseField;
 
 public class ParseStructFields {
@@ -28,8 +27,11 @@ public class ParseStructFields {
                 final var existingFieldNoOpt = existingField.split("!")[0];
                 final var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
-                    final List<Object> finalPath = append(path, fieldDeclaration);
-                    final List<Object> finalOtherPath = append(path, existingField);
+                    final List<Object> finalPath = new ArrayList<>(path);
+                    finalPath.add(fieldDeclaration);
+
+                    final List<Object> finalOtherPath = new ArrayList<>(path);
+                    finalOtherPath.add(existingField);
 
                     parseFailures
                             .add(new SchemaParseFailure(finalPath, "PathCollision",

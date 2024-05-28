@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.Prepend.prepend;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 public class ValidateMockStub {
@@ -51,7 +50,8 @@ public class ValidateMockStub {
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (final var f : inputFailures) {
-            final List<Object> thisPath = prepend(functionName, f.path);
+            final List<Object> thisPath = new ArrayList<>(f.path);
+            thisPath.add(0, functionName);
 
             inputFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
         }
@@ -73,7 +73,8 @@ public class ValidateMockStub {
 
             final var outputFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : outputFailures) {
-                final List<Object> thisPath = prepend(resultDefKey, f.path);
+                final List<Object> thisPath = new ArrayList<>(f.path);
+                thisPath.add(0, resultDefKey);
 
                 outputFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
             }

@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.internal.types.UError;
 import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.schema.ParseUnionType.parseUnionType;
 
 public class ParseErrorType {
@@ -32,7 +31,8 @@ public class ParseErrorType {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = append(basePath, k);
+                final List<Object> loopPath = new ArrayList<>(basePath);
+                loopPath.add(k);
 
                 parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }

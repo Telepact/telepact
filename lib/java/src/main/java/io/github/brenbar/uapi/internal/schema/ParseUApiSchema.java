@@ -20,7 +20,6 @@ import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailu
 import static io.github.brenbar.uapi.internal.schema.OffsetSchemaIndex.offsetSchemaIndex;
 import static io.github.brenbar.uapi.internal.schema.ParseErrorType.parseErrorType;
 import static io.github.brenbar.uapi.internal.schema.ParseHeadersType.parseHeadersType;
-import static io.github.brenbar.uapi.internal.Append.append;
 
 public class ParseUApiSchema {
     public static UApiSchema parseUApiSchema(List<Object> uApiSchemaPseudoJson,
@@ -66,7 +65,9 @@ public class ParseUApiSchema {
             if (matchingSchemaKey != null) {
                 if (!ignoreIfDuplicate) {
                     final var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
-                    final List<Object> finalPath = append(loopPath, schemaKey);
+
+                    final List<Object> finalPath = new ArrayList<>(loopPath);
+                    finalPath.add(schemaKey);
 
                     parseFailures.add(new SchemaParseFailure(finalPath, "PathCollision",
                             Map.of("other", List.of(otherPathIndex, matchingSchemaKey)), schemaKey));

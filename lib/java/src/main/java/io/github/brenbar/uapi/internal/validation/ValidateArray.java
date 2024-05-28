@@ -6,7 +6,6 @@ import java.util.Map;
 
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
-import static io.github.brenbar.uapi.internal.Prepend.prepend;
 import static io.github.brenbar.uapi.internal.types.UArray._ARRAY_NAME;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
@@ -25,7 +24,9 @@ public class ValidateArray {
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
                 for (var f : nestedValidationFailures) {
-                    final List<Object> finalPath = prepend(index, f.path);
+                    final List<Object> finalPath = new ArrayList<>(f.path);
+                    finalPath.add(0, index);
+
                     nestedValidationFailuresWithPath.add(new ValidationFailure(finalPath, f.reason,
                             f.data));
                 }

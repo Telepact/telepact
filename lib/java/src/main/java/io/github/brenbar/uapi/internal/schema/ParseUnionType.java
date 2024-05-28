@@ -13,7 +13,6 @@ import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.UnionEntry.unionEntry;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructFields.parseStructFields;
@@ -37,13 +36,16 @@ public class ParseUnionType {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = append(path, k);
+                final List<Object> loopPath = new ArrayList<>(path);
+                loopPath.add(k);
 
                 parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
-        final List<Object> thisPath = append(path, schemaKey);
+        final List<Object> thisPath = new ArrayList<>(path);
+        thisPath.add(schemaKey);
+
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
         if (!(defInit instanceof List)) {
@@ -59,7 +61,9 @@ public class ParseUnionType {
         int index = -1;
         for (final var element : definition2) {
             index += 1;
-            final List<Object> loopPath = append(thisPath, index);
+
+            final List<Object> loopPath = new ArrayList<>(thisPath);
+            loopPath.add(index);
 
             if (!(element instanceof Map)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
@@ -88,7 +92,11 @@ public class ParseUnionType {
                         continue outerLoop;
                     }
                 }
-                final List<Object> branchPath = append(append(thisPath, 0), requiredKey);
+
+                final List<Object> branchPath = new ArrayList<>(thisPath);
+                branchPath.add(0);
+                branchPath.add(requiredKey);
+
                 parseFailures.add(new SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
             }
         }
@@ -98,7 +106,9 @@ public class ParseUnionType {
 
         for (int i = 0; i < definition.size(); i++) {
             final var element = definition.get(i);
-            final List<Object> loopPath = append(thisPath, i);
+
+            final List<Object> loopPath = new ArrayList<>(thisPath);
+            loopPath.add(i);
 
             final var mapInit = (Map<String, Object>) element;
             final var map = new HashMap<>(mapInit);
@@ -125,7 +135,9 @@ public class ParseUnionType {
 
             final var entry = unionEntry(map);
             final var unionCase = entry.getKey();
-            final List<Object> unionKeyPath = append(loopPath, unionCase);
+
+            final List<Object> unionKeyPath = new ArrayList<>(loopPath);
+            unionKeyPath.add(unionCase);
 
             if (!(entry.getValue() instanceof Map)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,

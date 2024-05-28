@@ -6,7 +6,6 @@ import java.util.Map;
 
 import io.github.brenbar.uapi.internal.types.UStruct;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
 
 public class ValidateSelectStruct {
@@ -23,7 +22,8 @@ public class ValidateSelectStruct {
             var field = fields.get(i);
 
             if (!(field instanceof String)) {
-                final List<Object> thisPath = append(basePath, i);
+                final List<Object> thisPath = new ArrayList<>(basePath);
+                thisPath.add(i);
 
                 validationFailures.addAll(getTypeUnexpectedValidationFailure(thisPath, field, "String"));
                 continue;
@@ -31,7 +31,8 @@ public class ValidateSelectStruct {
             final String stringField = (String) field;
 
             if (!structReference.fields.containsKey(stringField)) {
-                final List<Object> thisPath = append(basePath, i);
+                final List<Object> thisPath = new ArrayList<>(basePath);
+                thisPath.add(i);
 
                 validationFailures.add(new ValidationFailure(thisPath, "ObjectKeyDisallowed", Map.of()));
             }

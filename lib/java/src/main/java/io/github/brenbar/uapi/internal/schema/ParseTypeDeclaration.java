@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.internal.types.UGeneric;
 import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.schema.GetOrParseType.getOrParseType;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 
@@ -25,7 +24,9 @@ public class ParseTypeDeclaration {
                     "EmptyArrayDisallowed", Map.of(), null)));
         }
 
-        final List<Object> basePath = append(path, 0);
+        final List<Object> basePath = new ArrayList<>(path);
+        basePath.add(0);
+
         final var baseType = typeDeclarationArray.get(0);
 
         if (!(baseType instanceof String)) {
@@ -70,7 +71,9 @@ public class ParseTypeDeclaration {
         var index = 0;
         for (final var e : givenTypeParameters) {
             index += 1;
-            final List<Object> loopPath = append(path, index);
+
+            final List<Object> loopPath = new ArrayList<>(path);
+            loopPath.add(index);
 
             if (!(e instanceof List)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e,

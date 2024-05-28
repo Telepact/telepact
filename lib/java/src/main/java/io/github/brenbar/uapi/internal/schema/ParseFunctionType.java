@@ -11,7 +11,6 @@ import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UType;
 import io.github.brenbar.uapi.internal.types.UUnion;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructType.parseStructType;
 import static io.github.brenbar.uapi.internal.schema.ParseUnionType.parseUnionType;
@@ -38,7 +37,9 @@ public class ParseFunctionType {
         }
 
         final var resultSchemaKey = "->";
-        final List<Object> resPath = append(path, resultSchemaKey);
+
+        final List<Object> resPath = new ArrayList<>(path);
+        resPath.add(resultSchemaKey);
 
         UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
@@ -55,7 +56,9 @@ public class ParseFunctionType {
         }
 
         final var errorsRegexKey = "_errors";
-        final var regexPath = append(path, errorsRegexKey);
+
+        final var regexPath = new ArrayList<>(path);
+        regexPath.add(errorsRegexKey);
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.endsWith("_")) {

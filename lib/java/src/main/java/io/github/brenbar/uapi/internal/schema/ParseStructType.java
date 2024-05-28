@@ -10,7 +10,6 @@ import io.github.brenbar.uapi.UApiSchemaParseError;
 import io.github.brenbar.uapi.internal.types.UStruct;
 import io.github.brenbar.uapi.internal.types.UType;
 
-import static io.github.brenbar.uapi.internal.Append.append;
 import static io.github.brenbar.uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static io.github.brenbar.uapi.internal.schema.ParseStructFields.parseStructFields;
 
@@ -32,13 +31,16 @@ public class ParseStructType {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = append(path, k);
+                final List<Object> loopPath = new ArrayList<>(path);
+                loopPath.add(k);
 
                 parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
             }
         }
 
-        final List<Object> thisPath = append(path, schemaKey);
+        final List<Object> thisPath = new ArrayList<>(path);
+        thisPath.add(schemaKey);
+
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
         Map<String, Object> definition = null;

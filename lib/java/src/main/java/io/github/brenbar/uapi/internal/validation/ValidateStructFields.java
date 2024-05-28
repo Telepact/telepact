@@ -7,8 +7,6 @@ import java.util.Map;
 import io.github.brenbar.uapi.internal.types.UFieldDeclaration;
 import io.github.brenbar.uapi.internal.types.UTypeDeclaration;
 
-import static io.github.brenbar.uapi.internal.Prepend.prepend;
-
 public class ValidateStructFields {
     static List<ValidationFailure> validateStructFields(
             Map<String, UFieldDeclaration> fields,
@@ -56,7 +54,8 @@ public class ValidateStructFields {
 
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {
-                final List<Object> thisPath = prepend(fieldName, f.path);
+                final List<Object> thisPath = new ArrayList<>(f.path);
+                thisPath.add(0, fieldName);
 
                 nestedValidationFailuresWithPath.add(new ValidationFailure(thisPath, f.reason, f.data));
             }
