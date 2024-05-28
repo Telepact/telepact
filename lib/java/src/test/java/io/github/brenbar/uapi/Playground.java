@@ -9,6 +9,11 @@ import java.util.function.Function;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import uapi.Message;
+import uapi.Server;
+import uapi.UApiSchema;
+import uapi.UApiSchemaParseError;
+
 public class Playground {
     public static void main(String[] args) throws IOException {
         var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
