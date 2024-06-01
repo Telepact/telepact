@@ -1,6 +1,10 @@
 from typing import List, Dict, Any, Set
-from uapi.internal.types import UFieldDeclaration, UType
-from uapi import UApiSchemaParseError
+
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.ParseField import parse_field
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UType import UType
 
 
 def parse_struct_fields(reference_struct: Dict[str, Any], path: List[Any], type_parameter_count: int,

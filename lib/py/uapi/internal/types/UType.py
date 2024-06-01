@@ -1,8 +1,9 @@
 from typing import List, Dict, Any
 from abc import ABC, abstractmethod
 
-import uapi.RandomGenerator
-import uapi.internal.validation.ValidationFailure
+from uapi.RandomGenerator import RandomGenerator
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
 class UType(ABC):

@@ -1,16 +1,16 @@
-from typing import List, Union
+from typing import Any, List, Union
 from decimal import Decimal
 from numbers import Integral
-from uapi.internal.types import UInteger
-from uapi.internal.validation import GetTypeUnexpectedValidationFailure, ValidationFailure
+from uapi.internal.types.UInteger import _INTEGER_NAME
+from uapi.internal.validation.ValidationFailure import ValidationFailure
+from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
 
-def validate_integer(value: Union[int, Integral, Decimal]) -> List[ValidationFailure]:
-    if isinstance(value, (int, Integral)):
-        return []
-    elif isinstance(value, (int, Decimal)):
-        return [
-            ValidationFailure([], "NumberOutOfRange", {})
-        ]
-    else:
-        return GetTypeUnexpectedValidationFailure([], value, UInteger._INTEGER_NAME)
+def validate_integer(value: Any) -> List['ValidationFailure']:
+    if isinstance(value, (int)) and not isinstance(value, (bool, float)):
+        if (value > 2**63-1 or value < -(2**63)):
+            return [ValidationFailure([], "NumberOutOfRange", {})]
+        else:
+            return []
+
+    return get_type_unexpected_validation_failure([], value, _INTEGER_NAME)

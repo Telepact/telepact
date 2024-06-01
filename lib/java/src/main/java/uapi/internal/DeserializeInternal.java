@@ -11,7 +11,7 @@ import uapi.internal.validation.InvalidMessageBody;
 
 public class DeserializeInternal {
 
-    public static Message deserializeInternal(byte[] messageBytes, Serialization serializer,
+    public static Message deserializeInternal(byte[] messageBytes, Serialization serialization,
             BinaryEncoder binaryEncoder) {
         final Object messageAsPseudoJson;
         final boolean isMsgPack;
@@ -19,10 +19,10 @@ public class DeserializeInternal {
         try {
             if (messageBytes[0] == (byte) 0x92) { // MsgPack
                 isMsgPack = true;
-                messageAsPseudoJson = serializer.fromMsgPack(messageBytes);
+                messageAsPseudoJson = serialization.fromMsgPack(messageBytes);
             } else {
                 isMsgPack = false;
-                messageAsPseudoJson = serializer.fromJson(messageBytes);
+                messageAsPseudoJson = serialization.fromJson(messageBytes);
             }
         } catch (Throwable e) {
             throw new InvalidMessage(e);

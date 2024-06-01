@@ -1,10 +1,13 @@
 from typing import List, Dict, Any, Union
-from uapi import Message, SerializationError, Serialization
-from uapi.internal.binary import BinaryEncoder, BinaryEncoderUnavailableError
+
+from uapi import Serialization, SerializationError
+from uapi.Message import Message
+from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
 
-def serialize_internal(message: Message, binary_encoder: BinaryEncoder,
-                       serializer: Serialization) -> bytes:
+def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
+                       serializer: 'Serialization') -> bytes:
     headers: Dict[str, Any] = message.header
 
     serialize_as_binary: bool
@@ -20,7 +23,7 @@ def serialize_internal(message: Message, binary_encoder: BinaryEncoder,
         if serialize_as_binary:
             try:
                 encoded_message = binary_encoder.encode(message_as_pseudo_json)
-                return serializer.to_msgpack(encoded_message)
+                return serializer.to_msg_pack(encoded_message)
             except BinaryEncoderUnavailableError:
                 # We can still submit as json
                 return serializer.to_json(message_as_pseudo_json)

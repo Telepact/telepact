@@ -1,164 +1,167 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from uapi import Message, UApiSchema
-from uapi.internal.types import UFn, UType, UTypeDeclaration, UUnion
 
-from uapi.internal.validation import (
-    getInvalidErrorMessage,
-    selectStructFields,
-    validateHeaders,
-    validateResult,
-    ValidationFailure,
-)
+from uapi.Message import Message
+from uapi.UApiSchema import UApiSchema
+from uapi.internal.SelectStructFields import select_struct_fields
+from uapi.internal.types.UFn import UFn
+from uapi.internal.types.UType import UType
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from uapi.internal.types.UUnion import UUnion
+from uapi.internal.validation.GetInvalidErrorMessage import get_invalid_error_message
+from uapi.internal.validation.ValidateHeaders import validate_headers
+from uapi.internal.validation.ValidateResult import validate_result
+from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def handleMessage(
-    requestMessage: Message,
-    uApiSchema: UApiSchema,
-    handler: Callable[[Message], Message],
-    onError: Callable[[Exception], None],
-) -> Message:
-    responseHeaders: Dict[str, Any] = {}
-    requestHeaders: Dict[str, Any] = requestMessage.header
-    requestBody: Dict[str, Any] = requestMessage.body
-    parsedUApiSchema: Dict[str, UType] = uApiSchema.parsed
-    requestEntry: Tuple[str, Any] = next(iter(requestBody.items()))
+def handle_message(
+    request_message: 'Message',
+    u_api_schema: 'UApiSchema',
+    handler: Callable[['Message'], 'Message'],
+    on_error: Callable[[Exception], None],
+) -> 'Message':
+    response_headers: Dict[str, Any] = {}
+    request_headers: Dict[str, Any] = request_message.header
+    request_body: Dict[str, Any] = request_message.body
+    parsed_u_api_schema: Dict[str, UType] = u_api_schema.parsed
+    request_entry: Tuple[str, Any] = next(iter(request_body.items()))
 
-    requestTargetInit: str = requestEntry[0]
-    requestPayload: Dict[str, Any] = requestEntry[1]
+    request_target_init: str = request_entry[0]
+    request_payload: Dict[str, Any] = request_entry[1]
 
-    unknownTarget: Optional[str]
-    requestTarget: str
-    if requestTargetInit not in parsedUApiSchema:
-        unknownTarget = requestTargetInit
-        requestTarget = "fn.ping_"
+    unknown_target: Optional[str]
+    request_target: str
+    if request_target_init not in parsed_u_api_schema:
+        unknown_target = request_target_init
+        request_target = "fn.ping_"
     else:
-        unknownTarget = None
-        requestTarget = requestTargetInit
+        unknown_target = None
+        request_target = request_target_init
 
-    functionType: UFn = parsedUApiSchema[requestTarget]
-    resultUnionType: UUnion = functionType.result
+    function_type: UFn = parsed_u_api_schema[request_target]
+    result_union_type: UUnion = function_type.result
 
-    callId = requestHeaders.get("id_")
-    if callId is not None:
-        responseHeaders["id_"] = callId
+    call_id = request_headers.get("id_")
+    if call_id is not None:
+        response_headers["id_"] = call_id
 
-    if "_parseFailures" in requestHeaders:
-        parseFailures: List[Any] = requestHeaders["_parseFailures"]
-        newErrorResult: Dict[str, Any] = {
-            "ErrorParseFailure_": {"reasons": parseFailures}
+    if "_parseFailures" in request_headers:
+        parse_failures: List[Any] = request_headers["_parseFailures"]
+        new_error_result: Dict[str, Any] = {
+            "ErrorParseFailure_": {"reasons": parse_failures}
         }
 
-        validateResult(resultUnionType, newErrorResult)
+        validate_result(result_union_type, new_error_result)
 
-        return Message(responseHeaders, newErrorResult)
+        return Message(response_headers, new_error_result)
 
-    requestHeaderValidationFailures: List[ValidationFailure] = validateHeaders(
-        requestHeaders, uApiSchema.parsedRequestHeaders, functionType
+    request_header_validation_failures: List[ValidationFailure] = validate_headers(
+        request_headers, u_api_schema.parsed_request_headers, function_type
     )
-    if requestHeaderValidationFailures:
-        return getInvalidErrorMessage(
+    if request_header_validation_failures:
+        return get_invalid_error_message(
             "ErrorInvalidRequestHeaders_",
-            requestHeaderValidationFailures,
-            resultUnionType,
-            responseHeaders,
+            request_header_validation_failures,
+            result_union_type,
+            response_headers,
         )
 
-    if "bin_" in requestHeaders:
-        clientKnownBinaryChecksums: List[Any] = requestHeaders["bin_"]
+    if "bin_" in request_headers:
+        client_known_binary_checksums: List[Any] = request_headers["bin_"]
 
-        responseHeaders["_binary"] = True
-        responseHeaders["_clientKnownBinaryChecksums"] = clientKnownBinaryChecksums
+        response_headers["_binary"] = True
+        response_headers["_clientKnownBinaryChecksums"] = client_known_binary_checksums
 
-        if "_pac" in requestHeaders:
-            responseHeaders["_pac"] = requestHeaders["_pac"]
+        if "_pac" in request_headers:
+            response_headers["_pac"] = request_headers["_pac"]
 
-    selectStructFieldsHeader: Optional[Dict[str, Any]] = requestHeaders.get(
-        "select_")
+    select_struct_fields_header: Optional[Dict[str, Any]] = request_headers.get(
+        "select_"
+    )
 
-    if unknownTarget is not None:
-        newErrorResult: Dict[str, Any] = {
+    if unknown_target is not None:
+        new_error_result: Dict[str, Any] = {
             "ErrorInvalidRequestBody_": {
                 "cases": [
                     {
-                        "path": [unknownTarget],
+                        "path": [unknown_target],
                         "reason": {"FunctionUnknown": {}},
                     }
                 ]
             }
         }
 
-        validateResult(resultUnionType, newErrorResult)
-        return Message(responseHeaders, newErrorResult)
+        validate_result(result_union_type, new_error_result)
+        return Message(response_headers, new_error_result)
 
-    functionTypeCall: UUnion = functionType.call
+    function_type_call: UUnion = function_type.call
 
-    callValidationFailures: List[ValidationFailure] = functionTypeCall.validate(
-        requestBody, None, None, [], []
+    call_validation_failures: List[ValidationFailure] = function_type_call.validate(
+        request_body, None, None, [], []
     )
-    if callValidationFailures:
-        return getInvalidErrorMessage(
+    if call_validation_failures:
+        return get_invalid_error_message(
             "ErrorInvalidRequestBody_",
-            callValidationFailures,
-            resultUnionType,
-            responseHeaders,
+            call_validation_failures,
+            result_union_type,
+            response_headers,
         )
 
-    unsafeResponseEnabled: bool = requestHeaders.get("unsafe_", False)
+    unsafe_response_enabled: bool = request_headers.get("unsafe_", False)
 
-    callMessage: Message = Message(
-        requestHeaders, {requestTarget: requestPayload})
+    call_message: Message = Message(
+        request_headers, {request_target: request_payload})
 
-    resultMessage: Message
-    if requestTarget == "fn.ping_":
-        resultMessage = Message({}, {"Ok_": {}})
-    elif requestTarget == "fn.api_":
-        resultMessage = Message({}, {"Ok_": {"api": uApiSchema.original}})
+    result_message: Message
+    if request_target == "fn.ping_":
+        result_message = Message({}, {"Ok_": {}})
+    elif request_target == "fn.api_":
+        result_message = Message({}, {"Ok_": {"api": u_api_schema.original}})
     else:
         try:
-            resultMessage = handler(callMessage)
+            result_message = handler(call_message)
         except Exception as e:
             try:
-                onError(e)
+                on_error(e)
             except Exception:
                 pass
-            return Message(responseHeaders, {"ErrorUnknown_": {}})
+            return Message(response_headers, {"ErrorUnknown_": {}})
 
-    resultUnion: Dict[str, Any] = resultMessage.body
+    result_union: Dict[str, Any] = result_message.body
 
-    resultMessage.header.update(responseHeaders)
-    finalResponseHeaders: Dict[str, Any] = resultMessage.header
+    result_message.header.update(response_headers)
+    final_response_headers: Dict[str, Any] = result_message.header
 
-    skipResultValidation: bool = unsafeResponseEnabled
-    if not skipResultValidation:
-        resultValidationFailures: List[ValidationFailure] = resultUnionType.validate(
-            resultUnion, selectStructFieldsHeader, None, [], []
+    skip_result_validation: bool = unsafe_response_enabled
+    if not skip_result_validation:
+        result_validation_failures: List[ValidationFailure] = result_union_type.validate(
+            result_union, select_struct_fields_header, None, [], []
         )
-        if resultValidationFailures:
-            return getInvalidErrorMessage(
+        if result_validation_failures:
+            return get_invalid_error_message(
                 "ErrorInvalidResponseBody_",
-                resultValidationFailures,
-                resultUnionType,
-                responseHeaders,
+                result_validation_failures,
+                result_union_type,
+                response_headers,
             )
-        responseHeaderValidationFailures: List[ValidationFailure] = validateHeaders(
-            finalResponseHeaders, uApiSchema.parsedResponseHeaders, functionType
+        response_header_validation_failures: List[ValidationFailure] = validate_headers(
+            final_response_headers, u_api_schema.parsed_response_headers, function_type
         )
-        if responseHeaderValidationFailures:
-            return getInvalidErrorMessage(
+        if response_header_validation_failures:
+            return get_invalid_error_message(
                 "ErrorInvalidResponseHeaders_",
-                responseHeaderValidationFailures,
-                resultUnionType,
-                responseHeaders,
+                response_header_validation_failures,
+                result_union_type,
+                response_headers,
             )
 
-    finalResultUnion: Dict[str, Any]
-    if selectStructFieldsHeader is not None:
-        finalResultUnion = selectStructFields(
-            UTypeDeclaration(resultUnionType, False, []),
-            resultUnion,
-            selectStructFieldsHeader,
+    final_result_union: Dict[str, Any]
+    if select_struct_fields_header is not None:
+        final_result_union = select_struct_fields(
+            UTypeDeclaration(result_union_type, False, []),
+            result_union,
+            select_struct_fields_header,
         )
     else:
-        finalResultUnion = resultUnion
+        final_result_union = result_union
 
-    return Message(finalResponseHeaders, finalResultUnion)
+    return Message(final_response_headers, final_result_union)

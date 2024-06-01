@@ -1,12 +1,14 @@
 from typing import Any, Dict, List, Tuple
-from uapi.internal.types import UObject
-from uapi.internal.validation import GetTypeUnexpectedValidationFailure
-from uapi.internal.types import UTypeDeclaration
+
+from uapi.internal.types.UObject import _OBJECT_NAME
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from uapi.internal.validation.ValidationFailure import ValidationFailure
+from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
 
 def validate_object(value: Any, select: Dict[str, Any], fn: str,
-                    type_parameters: List[UTypeDeclaration],
-                    generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
+                    type_parameters: List['UTypeDeclaration'],
+                    generics: List['UTypeDeclaration']) -> List['ValidationFailure']:
     if isinstance(value, dict):
         nested_type_declaration = type_parameters[0]
 
@@ -26,4 +28,4 @@ def validate_object(value: Any, select: Dict[str, Any], fn: str,
 
         return validation_failures
     else:
-        return getTypeUnexpectedValidationFailure([], value, UObject._OBJECT_NAME)
+        return get_type_unexpected_validation_failure([], value, _OBJECT_NAME)

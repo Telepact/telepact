@@ -1,11 +1,13 @@
-from typing import Any, Dict, List, Union
-from uapi.internal.types import UTypeDeclaration
-from uapi.internal.validation import GetTypeUnexpectedValidationFailure
+from typing import List, Dict
+from uapi.internal.types.UArray import _ARRAY_NAME
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_array(value: Any, select: Dict[str, Any], fn: str,
-                   type_parameters: List[UTypeDeclaration],
-                   generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
+def validate_array(value: object, select: Dict[str, object], fn: str,
+                   type_parameters: List['UTypeDeclaration'],
+                   generics: List['UTypeDeclaration']) -> List['ValidationFailure']:
     if isinstance(value, list):
         nested_type_declaration = type_parameters[0]
 
@@ -26,4 +28,4 @@ def validate_array(value: Any, select: Dict[str, Any], fn: str,
 
         return validation_failures
     else:
-        return GetTypeUnexpectedValidationFailure([], value, _ARRAY_NAME)
+        return get_type_unexpected_validation_failure([], value, _ARRAY_NAME)

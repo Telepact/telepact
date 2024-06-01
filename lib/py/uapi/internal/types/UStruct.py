@@ -1,33 +1,35 @@
 from typing import List, Dict
-from uapi import RandomGenerator
-from uapi.internal.validation import ValidationFailure
-from uapi.internal.types import UType, UFieldDeclaration, UTypeDeclaration
-from uapi.internal.generation import GenerateRandomStruct
-from uapi.internal.validation import ValidateStruct
+from uapi.internal.generation.GenerateRandomStruct import generate_random_struct
+from uapi.internal.validation.ValidateStruct import validate_struct
+from uapi.RandomGenerator import RandomGenerator
+from uapi.internal.validation.ValidationFailure import ValidationFailure
+from uapi.internal.types.UType import UType
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+
+_STRUCT_NAME: str = "Object"
 
 
 class UStruct(UType):
-    _STRUCT_NAME: str = "Object"
 
-    def __init__(self, name: str, fields: Dict[str, UFieldDeclaration], typeParameterCount: int) -> None:
+    def __init__(self, name: str, fields: Dict[str, UFieldDeclaration], type_parameter_count: int) -> None:
         self.name = name
         self.fields = fields
-        self.typeParameterCount = typeParameterCount
+        self.type_parameter_count = type_parameter_count
 
-    def getTypeParameterCount(self) -> int:
-        return self.typeParameterCount
+    def get_type_parameter_count(self) -> int:
+        return self.type_parameter_count
 
     def validate(self, value: object, select: Dict[str, object], fn: str,
-                 typeParameters: List[UTypeDeclaration], generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
-        return ValidateStruct.validateStruct(value, select, fn, typeParameters, generics, self.name, self.fields)
+                 type_parameters: List[UTypeDeclaration], generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
+        return validate_struct(value, select, fn, type_parameters, generics, self.name, self.fields)
 
-    def generateRandomValue(self, blueprintValue: object, useBlueprintValue: bool,
-                            includeOptionalFields: bool, randomizeOptionalFields: bool,
-                            typeParameters: List[UTypeDeclaration], generics: List[UTypeDeclaration],
-                            random: RandomGenerator) -> object:
-        return GenerateRandomStruct.generateRandomStruct(blueprintValue, useBlueprintValue, includeOptionalFields,
-                                                         randomizeOptionalFields, typeParameters, generics, random,
-                                                         self.fields)
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
+                              include_optional_fields: bool, randomize_optional_fields: bool,
+                              type_parameters: List[UTypeDeclaration], generics: List[UTypeDeclaration],
+                              random: RandomGenerator) -> object:
+        return generate_random_struct(blueprint_value, use_blueprint_value, include_optional_fields,
+                                      randomize_optional_fields, type_parameters, generics, random, self.fields)
 
-    def getName(self, generics: List[UTypeDeclaration]) -> str:
-        return self._STRUCT_NAME
+    def get_name(self, generics: List[UTypeDeclaration]) -> str:
+        return _STRUCT_NAME

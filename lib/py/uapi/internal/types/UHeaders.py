@@ -1,5 +1,7 @@
 from typing import Dict
 
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+
 
 class UHeaders:
     def __init__(

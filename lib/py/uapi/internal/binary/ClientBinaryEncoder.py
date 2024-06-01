@@ -1,6 +1,6 @@
 from typing import List
 from collections import defaultdict
-from uapi import ClientBinaryStrategy
+from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 from uapi.internal.binary.BinaryEncoder import BinaryEncoder
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 from uapi.internal.binary.ClientBinaryDecode import client_binary_decode

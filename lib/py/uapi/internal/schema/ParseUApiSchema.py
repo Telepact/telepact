@@ -1,17 +1,19 @@
 from typing import List, Dict, Any, Union, Set
-from uapi import UApiSchema, UApiSchemaParseError, UFieldDeclaration, UType
 
-from uapi.internal.schema import (
-    apply_error_to_parsed_types,
-    catch_error_collisions,
-    find_matching_schema_key,
-    find_schema_key,
-    get_or_parse_type,
-    get_type_unexpected_parse_failure,
-    offset_schema_index,
-    parse_error_type,
-    parse_headers_type,
-)
+from uapi.UApiSchema import UApiSchema
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.ApplyErrorToParsedTypes import apply_error_to_parsed_types
+from uapi.internal.schema.CatchErrorCollisions import catch_error_collisions
+from uapi.internal.schema.FindMatchingSchemaKey import find_matching_schema_key
+from uapi.internal.schema.FindSchemaKey import find_schema_key
+from uapi.internal.schema.GetOrParseType import get_or_parse_type
+from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+from uapi.internal.schema.OffsetSchemaIndex import offset_schema_index
+from uapi.internal.schema.ParseErrorType import parse_error_type
+from uapi.internal.schema.ParseHeadersType import parse_headers_type
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UType import UType
 
 
 def parse_uapi_schema(
@@ -37,10 +39,10 @@ def parse_uapi_schema(
             parse_failures.extend(this_parse_failures)
             continue
 
-        def = definition
+        def_ = definition
 
         try:
-            schema_key = find_schema_key(def, index)
+            schema_key = find_schema_key(def_, index)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue
@@ -49,7 +51,7 @@ def parse_uapi_schema(
             error_indices.add(index)
             continue
 
-        ignore_if_duplicate = def .get("_ignoreIfDuplicate", False)
+        ignore_if_duplicate = def_.get("_ignoreIfDuplicate", False)
         matching_schema_key = find_matching_schema_key(schema_keys, schema_key)
         if matching_schema_key is not None:
             if not ignore_if_duplicate:
@@ -110,15 +112,15 @@ def parse_uapi_schema(
         raise UApiSchemaParseError(offset_parse_failures)
 
     try:
-        catchErrorCollisions(u_api_schema_pseudo_json,
-                             error_indices, schema_keys_to_index)
+        catch_error_collisions(u_api_schema_pseudo_json,
+                               error_indices, schema_keys_to_index)
 
         for this_index in error_indices:
-            def = u_api_schema_pseudo_json[this_index]
+            def_ = u_api_schema_pseudo_json[this_index]
 
             try:
                 error = parse_error_type(
-                    def,
+                    def_,
                     u_api_schema_pseudo_json,
                     this_index,
                     schema_keys_to_index,
@@ -141,12 +143,12 @@ def parse_uapi_schema(
     try:
         for request_header_key in request_header_keys:
             this_index = schema_keys_to_index[request_header_key]
-            def = u_api_schema_pseudo_json[this_index]
+            def_ = u_api_schema_pseudo_json[this_index]
             header_field = request_header_key[len("requestHeader."):]
 
             try:
                 request_header_type = parse_headers_type(
-                    def,
+                    def_,
                     request_header_key,
                     header_field,
                     this_index,
@@ -163,12 +165,12 @@ def parse_uapi_schema(
 
         for response_header_key in response_header_keys:
             this_index = schema_keys_to_index[response_header_key]
-            def = u_api_schema_pseudo_json[this_index]
+            def_ = u_api_schema_pseudo_json[this_index]
             header_field = response_header_key[len("responseHeader."):]
 
             try:
                 response_header_type = parse_headers_type(
-                    def,
+                    def_,
                     response_header_key,
                     header_field,
                     this_index,

@@ -1,10 +1,11 @@
 from typing import Any, Dict, List, Union
 import msgpack
 import json
-import uapi.types as types
+
+from uapi.Serialization import Serialization
 
 
-class DefaultSerializer(types.SerializationImpl):
+class DefaultSerialization(Serialization):
 
     def to_json(self, uapi_message: Any) -> bytes:
         return json.dumps(uapi_message).encode()

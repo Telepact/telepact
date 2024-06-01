@@ -1,4 +1,4 @@
-from typing import Union
+from uapi.internal.types.UUnion import UUnion
 
 
 class UError:

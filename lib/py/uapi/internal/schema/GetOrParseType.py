@@ -17,8 +17,8 @@ from uapi.internal.types.UType import UType
 
 def get_or_parse_type(path: List[object], type_name: str, this_type_parameter_count: int,
                       u_api_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                      parsed_types: Dict[str, UType], type_extensions: Dict[str, UType],
-                      all_parse_failures: List[object], failed_types: Set[str]) -> UType:
+                      parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
+                      all_parse_failures: List[object], failed_types: Set[str]) -> 'UType':
     if type_name in failed_types:
         raise UApiSchemaParseError([])
 

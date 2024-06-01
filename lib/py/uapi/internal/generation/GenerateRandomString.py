@@ -1,4 +1,4 @@
-from uapi import RandomGenerator
+from uapi.RandomGenerator import RandomGenerator
 
 
 def generate_random_string(blueprint_value: object, use_blueprint_value: bool,

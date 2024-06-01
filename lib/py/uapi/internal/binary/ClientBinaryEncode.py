@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional
-from uapi import ClientBinaryStrategy
+from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 from uapi.internal.binary.EncodeBody import encode_body

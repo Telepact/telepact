@@ -1,6 +1,7 @@
 from typing import List, Dict
 from collections import OrderedDict
-from uapi import UApiSchemaParseError
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
 def find_schema_key(definition: Dict[str, object], index: int) -> str:

@@ -1,5 +1,5 @@
 from typing import Any
-from uapi import RandomGenerator
+from uapi.RandomGenerator import RandomGenerator
 
 
 def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,

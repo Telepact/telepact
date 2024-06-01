@@ -1,27 +1,30 @@
+from uapi.RandomGenerator import RandomGenerator
+from uapi.internal.generation.GenerateRandomArray import generate_random_array
+from uapi.internal.validation.ValidateArray import validate_array
 from typing import List, Dict
-from uapi import RandomGenerator
-from uapi.internal.validation import ValidationFailure
-from uapi.internal.types import UType, UTypeDeclaration
-from uapi.internal.generation import GenerateRandomArray
-from uapi.internal.validation import ValidateArray
+from uapi.internal.validation.ValidationFailure import ValidationFailure
+from uapi.internal.types.UType import UType
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+
+
+_ARRAY_NAME = "Array"
 
 
 class UArray(UType):
-    _ARRAY_NAME: str = "Array"
 
-    def getTypeParameterCount(self) -> int:
+    def get_type_parameter_count(self) -> int:
         return 1
 
     def validate(self, value: object, select: Dict[str, object], fn: str,
-                 typeParameters: List[UTypeDeclaration], generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
-        return ValidateArray.validateArray(value, select, fn, typeParameters, generics)
+                 type_parameters: List[UTypeDeclaration], generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
+        return validate_array(value, select, fn, type_parameters, generics)
 
-    def generateRandomValue(self, blueprintValue: object, useBlueprintValue: bool, includeOptionalFields: bool,
-                            randomizeOptionalFields: bool, typeParameters: List[UTypeDeclaration],
-                            generics: List[UTypeDeclaration], randomGenerator: RandomGenerator) -> object:
-        return GenerateRandomArray.generateRandomArray(blueprintValue, useBlueprintValue, includeOptionalFields,
-                                                       randomizeOptionalFields, typeParameters, generics,
-                                                       randomGenerator)
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
+                              include_optional_fields: bool, randomize_optional_fields: bool,
+                              type_parameters: List[UTypeDeclaration], generics: List[UTypeDeclaration],
+                              random_generator: RandomGenerator) -> object:
+        return generate_random_array(blueprint_value, use_blueprint_value, include_optional_fields,
+                                     randomize_optional_fields, type_parameters, generics, random_generator)
 
-    def getName(self, generics: List[UTypeDeclaration]) -> str:
-        return self._ARRAY_NAME
+    def get_name(self, generics: List[UTypeDeclaration]) -> str:
+        return _ARRAY_NAME

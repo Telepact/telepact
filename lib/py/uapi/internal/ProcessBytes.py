@@ -1,10 +1,15 @@
 from typing import List, Dict, Any, Callable
-from uapi import Message, Serializer, UApiSchema
+
+from uapi.Message import Message
+from uapi.Serializer import Serializer
+from uapi.UApiSchema import UApiSchema
+from uapi.internal.HandleMessage import handle_message
+from uapi.internal.ParseRequestMessage import parse_request_message
 
 
-def process_bytes(request_message_bytes: bytes, serializer: Serializer, uapi_schema: UApiSchema,
-                  on_error: Callable[[Exception], None], on_request: Callable[[Message], None],
-                  on_response: Callable[[Message], None], handler: Callable[[Message], Message]) -> bytes:
+def process_bytes(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',
+                  on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
+                  on_response: Callable[['Message'], None], handler: Callable[['Message'], 'Message']) -> bytes:
     try:
         request_message = parse_request_message(
             request_message_bytes, serializer, uapi_schema, on_error)
@@ -30,15 +35,3 @@ def process_bytes(request_message_bytes: bytes, serializer: Serializer, uapi_sch
             pass
 
         return serializer.serialize(Message({}, {"ErrorUnknown_": {}}))
-
-
-def parse_request_message(request_message_bytes: bytes, serializer: Serializer, uapi_schema: UApiSchema,
-                          on_error: Callable[[Exception], None]) -> Message:
-    # Implement the logic to parse the request message
-    pass
-
-
-def handle_message(request_message: Message, uapi_schema: UApiSchema, handler: Callable[[Message], Message],
-                   on_error: Callable[[Exception], None]) -> Message:
-    # Implement the logic to handle the message
-    pass

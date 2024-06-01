@@ -1,6 +1,11 @@
 from typing import List, Dict, Any, Set
-from uapi.internal.types import UStruct, UType
-from uapi import UApiSchemaParseError
+
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+from uapi.internal.schema.ParseStructFields import parse_struct_fields
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from uapi.internal.types.UStruct import UStruct
+from uapi.internal.types.UType import UType
 
 
 def parse_struct_type(path: List[Any], struct_definition_as_pseudo_json: Dict[str, Any],

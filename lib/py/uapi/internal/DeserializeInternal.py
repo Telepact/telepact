@@ -1,11 +1,13 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, cast
+
 from uapi import Message, Serialization
-from uapi.internal.binary import BinaryEncoder
-from uapi.internal.validation import InvalidMessage, InvalidMessageBody
+from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+from uapi.internal.validation.InvalidMessage import InvalidMessage
+from uapi.internal.validation.InvalidMessageBody import InvalidMessageBody
 
 
-def deserialize_internal(message_bytes: bytes, serializer: Serialization,
-                         binary_encoder: BinaryEncoder) -> Message:
+def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
+                         binary_encoder: 'BinaryEncoder') -> 'Message':
     message_as_pseudo_json: Any
     is_msg_pack: bool
 

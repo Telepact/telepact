@@ -1,6 +1,9 @@
 from typing import List, Dict, Any
-from uapi.internal.types import UType, UFieldDeclaration
-from uapi.internal.schema import extend_u_api_schema, new_u_api_schema
+
+from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
+from uapi.internal.schema.NewUApiSchema import new_uapi_schema
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UType import UType
 
 
 class UApiSchema:
@@ -18,8 +21,8 @@ class UApiSchema:
 
     @staticmethod
     def from_json(json: str) -> 'UApiSchema':
-        return new_u_api_schema(json, {})
+        return new_uapi_schema(json, {})
 
     @staticmethod
     def extend(base: 'UApiSchema', json: str) -> 'UApiSchema':
-        return extend_u_api_schema(base, json, {})
+        return extend_uapi_schema(base, json, {})

@@ -1,5 +1,5 @@
 from typing import List, Dict
-from uapi import RandomGenerator
+from uapi.RandomGenerator import RandomGenerator
 from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 

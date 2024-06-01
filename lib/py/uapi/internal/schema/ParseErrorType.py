@@ -1,7 +1,9 @@
 from typing import List, Dict, Any, Union, Set
-from uapi import UApiSchemaParseError
-from uapi.internal.types import UError, UType, UUnion
-from uapi.internal.schema import ParseUnionType
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.ParseUnionType import parse_union_type
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from uapi.internal.types.UError import UError
+from uapi.internal.types.UType import UType
 
 
 def parse_error_type(error_definition_as_parsed_json: Dict[str, Any],
@@ -32,8 +34,8 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, Any],
 
     type_parameter_count = 0
 
-    error = ParseUnionType.parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [],
-                                            type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
-                                            parsed_types, type_extensions, all_parse_failures, failed_types)
+    error = parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [],
+                             type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
+                             parsed_types, type_extensions, all_parse_failures, failed_types)
 
     return UError(schema_key, error)

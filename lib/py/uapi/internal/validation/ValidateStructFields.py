@@ -1,13 +1,16 @@
 from typing import List, Dict
-from uapi.internal.types import UFieldDeclaration, UTypeDeclaration
+
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_struct_fields(fields: Dict[str, UFieldDeclaration],
+def validate_struct_fields(fields: Dict[str, 'UFieldDeclaration'],
                            selected_fields: List[str],
                            actual_struct: Dict[str, object],
                            select: Dict[str, object],
                            fn: str,
-                           type_parameters: List[UTypeDeclaration]) -> List[ValidationFailure]:
+                           type_parameters: List['UTypeDeclaration']) -> List['ValidationFailure']:
     validation_failures = []
 
     missing_fields = []

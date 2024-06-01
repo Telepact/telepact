@@ -1,12 +1,19 @@
 from typing import Callable
 from concurrent.futures import Future
 
+from uapi.DefaultClientBinaryStrategy import DefaultClientBinaryStrategy
+from uapi.DefaultSerialization import DefaultSerialization
+from uapi.Message import Message
+from uapi.Serializer import Serializer
+from uapi.internal.ProcessRequestObject import process_request_object
+from uapi.internal.binary.ClientBinaryEncoder import ClientBinaryEncoder
+
 
 class Options:
     def __init__(self):
         self.use_binary = False
         self.timeout_ms_default = 5000
-        self.serialization_impl = DefaultSerializer()
+        self.serialization_impl = DefaultSerialization()
         self.binary_strategy = DefaultClientBinaryStrategy()
 
 
@@ -19,8 +26,4 @@ class Client:
             options.serialization_impl, ClientBinaryEncoder(options.binary_strategy))
 
     def request(self, request_message: Message):
-        return self.process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default)
-
-    @staticmethod
-    def process_request_object(request_message, adapter, serializer, timeout_ms_default, use_binary_default):
-        pass
+        return process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default)

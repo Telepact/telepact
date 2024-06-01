@@ -1,10 +1,11 @@
 from typing import List, Union
-from uapi.internal.types import UString
-from uapi.internal.validation import GetTypeUnexpectedValidationFailure
+from uapi.internal.types.UString import _STRING_NAME
+from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_string(value: Union[str, object]) -> List[ValidationFailure]:
+def validate_string(value: Union[str, object]) -> List['ValidationFailure']:
     if isinstance(value, str):
         return []
     else:
-        return GetTypeUnexpectedValidationFailure([], value, UString._STRING_NAME)
+        return get_type_unexpected_validation_failure([], value, _STRING_NAME)

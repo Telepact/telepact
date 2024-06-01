@@ -11,9 +11,9 @@ from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 def parse_type_declaration(path: List[object], type_declaration_array: List[object],
                            this_type_parameter_count: int, uapi_schema_pseudo_json: List[object],
-                           schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, UType],
-                           type_extensions: Dict[str, UType], all_parse_failures: List[SchemaParseFailure],
-                           failed_types: Set[str]) -> UTypeDeclaration:
+                           schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, 'UType'],
+                           type_extensions: Dict[str, 'UType'], all_parse_failures: List['SchemaParseFailure'],
+                           failed_types: Set[str]) -> 'UTypeDeclaration':
     if not type_declaration_array:
         raise UApiSchemaParseError(
             [SchemaParseFailure(path, "EmptyArrayDisallowed", {}, None)])

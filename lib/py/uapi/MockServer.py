@@ -1,8 +1,17 @@
 from typing import Callable, Dict, List, Any
-from uapi.internal.mock import MockInvocation, MockStub
-from uapi.internal.types import UMockCall, UMockStub, UType
-from uapi.internal.schema import extend_uapi_schema, get_mock_uapi_json
-from uapi import Server, UApiSchema, RandomGenerator, Message
+
+from uapi.Message import Message
+from uapi.Server import Server
+from uapi.RandomGenerator import RandomGenerator
+from uapi.UApiSchema import UApiSchema
+from uapi.internal.mock.MockHandle import mock_handle
+from uapi.internal.mock.MockInvocation import MockInvocation
+from uapi.internal.mock.MockStub import MockStub
+from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
+from uapi.internal.schema.GetMockUApiJson import get_mock_uapi_json
+from uapi.internal.types.UMockCall import UMockCall
+from uapi.internal.types.UMockStub import UMockStub
+from uapi.internal.types.UType import UType
 
 
 class Options:

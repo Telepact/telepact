@@ -1,13 +1,16 @@
 from typing import Any, Callable, Dict, List, Union
 from concurrent.futures import Future
-from uapi import Message, Serializer, UApiError
+
+from uapi import UApiError
+from uapi.Message import Message
+from uapi.Serializer import Serializer
 
 
-def process_request_object(request_message: Message,
-                           adapter: Callable[[Message, Serializer], Future[Message]],
-                           serializer: Serializer,
+def process_request_object(request_message: 'Message',
+                           adapter: Callable[['Message', 'Serializer'], Future['Message']],
+                           serializer: 'Serializer',
                            timeout_ms_default: int,
-                           use_binary_default: bool) -> Message:
+                           use_binary_default: bool) -> 'Message':
     header: Dict[str, Any] = request_message.header
 
     try:

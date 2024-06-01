@@ -1,8 +1,16 @@
 from typing import Callable, Dict, Any
-from uapi.internal.binary import ServerBinaryEncoder
-from uapi.internal import process_bytes, construct_binary_encoding, extend_u_api_schema, get_internal_u_api_json
-from uapi.internal.types import USelect, UStruct, UType
-from uapi import Message, UApiSchema, Serializer, DefaultSerialization
+
+from uapi.DefaultSerialization import DefaultSerialization
+from uapi.Message import Message
+from uapi.Serializer import Serializer
+from uapi.UApiSchema import UApiSchema
+from uapi.internal.ProcessBytes import process_bytes
+from uapi.internal.binary.ConstructBinaryEncoding import construct_binary_encoding
+from uapi.internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
+from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
+from uapi.internal.schema.GetInternalUApiJson import get_internal_uapi_json
+from uapi.internal.types.USelect import USelect
+from uapi.internal.types.UType import UType
 
 
 class Server:
@@ -34,8 +42,8 @@ class Server:
         type_extensions: Dict[str, UType] = {
             "_ext.Select_": USelect(parsed_types)}
 
-        self.u_api_schema = extend_u_api_schema(
-            u_api_schema, get_internal_u_api_json(), type_extensions)
+        self.u_api_schema = extend_uapi_schema(
+            u_api_schema, get_internal_uapi_json(), type_extensions)
 
         parsed_types.update(self.u_api_schema.parsed)
 

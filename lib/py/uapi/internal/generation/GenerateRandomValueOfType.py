@@ -1,6 +1,5 @@
 from typing import List, Optional
-import uapi
-from uapi import RandomGenerator
+from uapi.RandomGenerator import RandomGenerator
 from uapi.internal.types.UType import UType
 from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 

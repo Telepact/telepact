@@ -1,9 +1,10 @@
 from typing import List, Dict
-from uapi.internal.types import UFieldDeclaration, UFn
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UFn import UFn
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_headers(headers: Dict[str, object], parsed_request_headers: Dict[str, UFieldDeclaration], function_type: UFn) -> List[ValidationFailure]:
+def validate_headers(headers: Dict[str, object], parsed_request_headers: Dict[str, 'UFieldDeclaration'], function_type: 'UFn') -> List['ValidationFailure']:
     validation_failures = []
 
     for header, header_value in headers.items():

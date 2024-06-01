@@ -1,5 +1,7 @@
 from typing import List, Any
-from uapi.internal.schema import SchemaParseFailure, map_schema_parse_failures_to_pseudo_json
+
+from uapi.internal.schema.MapSchemaParseFailuresToPseudoJson import map_schema_parse_failures_to_pseudo_json
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
 class UApiSchemaParseError(Exception):

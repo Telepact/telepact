@@ -1,10 +1,14 @@
 import re
 from typing import List, Dict
-from uapi.internal.types import UError, UFn, UStruct, UType, UUnion
-from uapi import UApiSchemaParseError
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from uapi.internal.types.UError import UError
+from uapi.internal.types.UStruct import UStruct
+from uapi.internal.types.UType import UType
+from uapi.internal.types.UUnion import UUnion
 
 
-def apply_error_to_parsed_types(error_index: int, error: UError, parsed_types: Dict[str, UType], schema_keys_to_index: Dict[str, int]) -> None:
+def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types: Dict[str, 'UType'], schema_keys_to_index: Dict[str, int]) -> None:
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
         try:

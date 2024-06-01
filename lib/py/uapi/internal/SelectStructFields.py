@@ -1,100 +1,108 @@
 from typing import Any, Dict, List, Union
 
+from uapi.internal.types.UArray import UArray
+from uapi.internal.types.UFn import UFn
+from uapi.internal.types.UObject import UObject
+from uapi.internal.types.UStruct import UStruct
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from uapi.internal.types.UUnion import UUnion
 
-def select_struct_fields(typeDeclaration: UTypeDeclaration, value: Any,
-                         selectedStructFields: Dict[str, Any]) -> Any:
-    typeDeclarationType = typeDeclaration.type
-    typeDeclarationTypeParams = typeDeclaration.typeParameters
 
-    if isinstance(typeDeclarationType, UStruct):
-        fields = typeDeclarationType.fields
-        structName = typeDeclarationType.name
-        selectedFields = selectedStructFields.get(structName, [])
-        valueAsMap = value
-        finalMap = {}
+def select_struct_fields(type_declaration: 'UTypeDeclaration', value: Any,
+                         selected_struct_fields: Dict[str, Any]) -> Any:
+    type_declaration_type = type_declaration.type
+    type_declaration_type_params = type_declaration.type_parameters
 
-        for fieldName, fieldValue in valueAsMap.items():
-            if selectedFields == [] or fieldName in selectedFields:
-                field = fields.get(fieldName)
-                fieldTypeDeclaration = field.typeDeclaration
-                valueWithSelectedFields = select_struct_fields(fieldTypeDeclaration, fieldValue,
-                                                               selectedStructFields)
+    if isinstance(type_declaration_type, UStruct):
+        fields = type_declaration_type.fields
+        struct_name = type_declaration_type.name
+        selected_fields = selected_struct_fields.get(struct_name, [])
+        value_as_map = value
+        final_map = {}
 
-                finalMap[fieldName] = valueWithSelectedFields
+        for field_name, field_value in value_as_map.items():
+            if not selected_fields or field_name in selected_fields:
+                field = fields.get(field_name)
+                field_type_declaration = field.type_declaration
+                value_with_selected_fields = select_struct_fields(field_type_declaration, field_value,
+                                                                  selected_struct_fields)
 
-        return finalMap
-    elif isinstance(typeDeclarationType, UFn):
-        valueAsMap = value
-        unionCase, unionData = next(iter(valueAsMap.items()))
+                final_map[field_name] = value_with_selected_fields
 
-        fnName = typeDeclarationType.name
-        fnCall = typeDeclarationType.call
-        fnCallCases = fnCall.cases
+        return final_map
+    elif isinstance(type_declaration_type, UFn):
+        value_as_map = value
+        union_case, union_data = next(iter(value_as_map.items()))
 
-        argStructReference = fnCallCases.get(unionCase)
-        selectedFields = selectedStructFields.get(fnName, [])
-        finalMap = {}
+        fn_name = type_declaration_type.name
+        fn_call = type_declaration_type.call
+        fn_call_cases = fn_call.cases
 
-        for fieldName, fieldValue in unionData.items():
-            if selectedFields == [] or fieldName in selectedFields:
-                field = argStructReference.fields.get(fieldName)
-                valueWithSelectedFields = select_struct_fields(field.typeDeclaration, fieldValue,
-                                                               selectedStructFields)
+        arg_struct_reference = fn_call_cases.get(union_case)
+        selected_fields = selected_struct_fields.get(fn_name, [])
+        final_map = {}
 
-                finalMap[fieldName] = valueWithSelectedFields
+        for field_name, field_value in union_data.items():
+            if not selected_fields or field_name in selected_fields:
+                field = arg_struct_reference.fields.get(field_name)
+                value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
+                                                                  selected_struct_fields)
 
-        return {unionCase: finalMap}
-    elif isinstance(typeDeclarationType, UUnion):
-        valueAsMap = value
-        unionCase, unionData = next(iter(valueAsMap.items()))
+                final_map[field_name] = value_with_selected_fields
 
-        unionCases = typeDeclarationType.cases
-        unionStructReference = unionCases.get(unionCase)
-        unionStructRefFields = unionStructReference.fields
-        defaultCasesToFields = {}
+        return {union_case: final_map}
+    elif isinstance(type_declaration_type, UUnion):
+        value_as_map = value
+        union_case, union_data = next(iter(value_as_map.items()))
 
-        for case, unionStruct in unionCases.items():
-            unionStructFields = unionStruct.fields
-            fields = list(unionStructFields.keys())
-            defaultCasesToFields[case] = fields
+        union_cases = type_declaration_type.cases
+        union_struct_reference = union_cases.get(union_case)
+        union_struct_ref_fields = union_struct_reference.fields
+        default_cases_to_fields = {}
 
-        unionSelectedFields = selectedStructFields.get(
-            typeDeclarationType.name, defaultCasesToFields)
-        thisUnionCaseSelectedFieldsDefault = defaultCasesToFields.get(
-            unionCase)
-        selectedFields = unionSelectedFields.get(
-            unionCase, thisUnionCaseSelectedFieldsDefault)
+        for case, union_struct in union_cases.items():
+            fields = list(union_struct.fields.keys())
+            default_cases_to_fields[case] = fields
 
-        finalMap = {}
-        for fieldName, fieldValue in unionData.items():
-            if selectedFields == [] or fieldName in selectedFields:
-                field = unionStructRefFields.get(fieldName)
-                valueWithSelectedFields = select_struct_fields(field.typeDeclaration, fieldValue,
-                                                               selectedStructFields)
-                finalMap[fieldName] = valueWithSelectedFields
+        union_selected_fields = selected_struct_fields.get(
+            type_declaration_type.name, default_cases_to_fields)
+        this_union_case_selected_fields_default = default_cases_to_fields.get(
+            union_case)
+        selected_fields = union_selected_fields.get(
+            union_case, this_union_case_selected_fields_default)
 
-        return {unionCase: finalMap}
-    elif isinstance(typeDeclarationType, UObject):
-        nestedTypeDeclaration = typeDeclarationTypeParams[0]
-        valueAsMap = value
+        final_map = {}
+        for field_name, field_value in union_data.items():
+            if not selected_fields or field_name in selected_fields:
+                field = union_struct_ref_fields.get(field_name)
+                value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
+                                                                  selected_struct_fields)
 
-        finalMap = {}
-        for key, nestedValue in valueAsMap.items():
-            valueWithSelectedFields = select_struct_fields(nestedTypeDeclaration, nestedValue,
-                                                           selectedStructFields)
-            finalMap[key] = valueWithSelectedFields
+                final_map[field_name] = value_with_selected_fields
 
-        return finalMap
-    elif isinstance(typeDeclarationType, UArray):
-        nestedType = typeDeclarationTypeParams[0]
-        valueAsList = value
+        return {union_case: final_map}
+    elif isinstance(type_declaration_type, UObject):
+        nested_type_declaration = type_declaration_type_params[0]
+        value_as_map = value
 
-        finalList = []
-        for entry in valueAsList:
-            valueWithSelectedFields = select_struct_fields(
-                nestedType, entry, selectedStructFields)
-            finalList.append(valueWithSelectedFields)
+        final_map = {}
+        for key, value in value_as_map.items():
+            value_with_selected_fields = select_struct_fields(nested_type_declaration, value,
+                                                              selected_struct_fields)
 
-        return finalList
+            final_map[key] = value_with_selected_fields
+
+        return final_map
+    elif isinstance(type_declaration_type, UArray):
+        nested_type = type_declaration_type_params[0]
+        value_as_list = value
+
+        final_list = []
+        for entry in value_as_list:
+            value_with_selected_fields = select_struct_fields(
+                nested_type, entry, selected_struct_fields)
+            final_list.append(value_with_selected_fields)
+
+        return final_list
     else:
         return value

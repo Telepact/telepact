@@ -1,12 +1,17 @@
 from typing import List, Dict, Any
+from uapi.Message import Message
+from uapi.RandomGenerator import RandomGenerator
+from uapi.UApiSchema import UApiSchema
+from uapi.internal.mock.IsSubMap import is_sub_map
 from uapi.internal.mock.MockInvocation import MockInvocation
 from uapi.internal.mock.MockStub import MockStub
-from uapi import Message, RandomGenerator, UApiSchema, UFn, UUnion, UApiError
+from uapi.internal.mock.Verify import verify
+from uapi.internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
 
 
-def mock_handle(request_message: Message, stubs: List['MockStub'], invocations: List['MockInvocation'],
-                random: RandomGenerator, u_api_schema: UApiSchema, enable_generated_default_stub: bool,
-                enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> Message:
+def mock_handle(request_message: 'Message', stubs: List['MockStub'], invocations: List['MockInvocation'],
+                random: 'RandomGenerator', u_api_schema: 'UApiSchema', enable_generated_default_stub: bool,
+                enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'Message':
     header: Dict[str, Any] = request_message.header
 
     enable_generation_stub = header.get("_gen", False)
@@ -37,11 +42,11 @@ def mock_handle(request_message: Message, stubs: List['MockStub'], invocations: 
         verify_times = argument.get("count!", {"AtLeast": {"times": 1}})
         strict_match = argument.get("strictMatch!", False)
 
-        verification_result = Verify.verify(
+        verification_result = verify(
             call_function_name, call_arg, strict_match, verify_times, invocations)
         return Message({}, verification_result)
     elif function_name == "fn.verifyNoMoreInteractions_":
-        verification_result = VerifyNoMoreInteractions.verify_no_more_interactions(
+        verification_result = verify_no_more_interactions(
             invocations)
         return Message({}, verification_result)
     elif function_name == "fn.clearCalls_":
@@ -65,7 +70,7 @@ def mock_handle(request_message: Message, stubs: List['MockStub'], invocations: 
                 continue
             if stub.when_function == function_name:
                 if stub.allow_argument_partial_match:
-                    if IsSubMap.is_sub_map(stub.when_argument, argument):
+                    if is_sub_map(stub.when_argument, argument):
                         use_blueprint_value = True
                         include_optional_fields = False
                         result = definition.result.generate_random_value(stub.then_result, use_blueprint_value,

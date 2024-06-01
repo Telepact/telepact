@@ -1,7 +1,11 @@
 from typing import Any
-from uapi.internal.binary import BinaryEncoder
-from uapi.internal import deserialize_internal, serialize_internal
-from uapi import Message
+
+from uapi.Message import Message
+from uapi.Serialization import Serialization
+from uapi.internal.DeserializeInternal import deserialize_internal
+from uapi.internal.SerializeInternal import serialize_internal
+from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+w
 
 
 class Serializer:
@@ -9,7 +13,7 @@ class Serializer:
     A serializer that converts a Message to and from a serialized form.
     """
 
-    def __init__(self, serialization_impl: 'SerializationImpl', binary_encoder: BinaryEncoder):
+    def __init__(self, serialization_impl: Serialization, binary_encoder: BinaryEncoder):
         self.serialization_impl = serialization_impl
         self.binary_encoder = binary_encoder
 

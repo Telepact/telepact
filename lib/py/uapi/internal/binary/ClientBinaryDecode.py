@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Union
-from uapi import ClientBinaryStrategy
+from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 from uapi.internal.binary.DecodeBody import decode_body
 from uapi.internal.binary.UnpackBody import unpack_body

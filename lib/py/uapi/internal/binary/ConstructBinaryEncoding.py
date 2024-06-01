@@ -1,8 +1,10 @@
 from typing import Dict, Union
 from uapi import UApiSchema
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
-from uapi.internal.types import UFieldDeclaration, UStruct, UUnion
-from uapi.internal.binary import CreateChecksum
+from uapi.internal.binary.CreateChecksum import create_checksum
+from uapi.internal.types.UFn import UFn
+from uapi.internal.types.UStruct import UStruct
+from uapi.internal.types.UUnion import UUnion
 
 
 def construct_binary_encoding(u_api_schema: 'UApiSchema') -> 'BinaryEncoding':
@@ -38,5 +40,5 @@ def construct_binary_encoding(u_api_schema: 'UApiSchema') -> 'BinaryEncoding':
     binary_encoding_map = {key: i for i, key in enumerate(all_keys)}
     final_string = "\n".join(all_keys)
 
-    checksum = CreateChecksum.create_checksum(final_string)
+    checksum = create_checksum(final_string)
     return BinaryEncoding(binary_encoding_map, checksum)

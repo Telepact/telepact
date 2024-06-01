@@ -1,8 +1,10 @@
 from typing import List, Dict
-from uapi import RandomGenerator
-from uapi.internal.validation import ValidationFailure
-from uapi.internal.generation import GenerateRandomValueOfType
-from uapi.internal.types import UType
+
+from uapi.RandomGenerator import RandomGenerator
+from uapi.internal.generation.GenerateRandomValueOfType import generate_random_value_of_type
+from uapi.internal.types.UType import UType
+from uapi.internal.validation.ValidateValueOfType import validate_value_of_type
+from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
 class UTypeDeclaration:
