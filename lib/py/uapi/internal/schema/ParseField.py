@@ -1,0 +1,44 @@
+import re
+from typing import List, Dict, Any, Set
+from uapi.internal.types import UFieldDeclaration, UType
+from uapi import UApiSchemaParseError
+
+
+def parse_field(path: List[Any], field_declaration: str, type_declaration_value: Any,
+                type_parameter_count: int, uapi_schema_pseudo_json: List[Any],
+                schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, UType],
+                type_extensions: Dict[str, UType], all_parse_failures: List[SchemaParseFailure],
+                failed_types: Set[str]) -> UFieldDeclaration:
+    regex_string = r"^([a-z][a-zA-Z0-9_]*)(!)?$"
+    regex = re.compile(regex_string)
+
+    matcher = regex.match(field_declaration)
+    if not matcher:
+        final_path = path + [field_declaration]
+        raise UApiSchemaParseError([SchemaParseFailure(final_path,
+                                                       "KeyRegexMatchFailed",
+                                                       {"regex": regex_string},
+                                                       None)])
+
+    field_name = matcher.group(0)
+    optional = bool(matcher.group(2))
+
+    this_path = path + [field_name]
+
+    if not isinstance(type_declaration_value, list):
+        raise UApiSchemaParseError(get_type_unexpected_parse_failure(this_path,
+                                                                     type_declaration_value,
+                                                                     "Array"))
+    type_declaration_array = type_declaration_value
+
+    type_declaration = parse_type_declaration(this_path,
+                                              type_declaration_array,
+                                              type_parameter_count,
+                                              uapi_schema_pseudo_json,
+                                              schema_keys_to_index,
+                                              parsed_types,
+                                              type_extensions,
+                                              all_parse_failures,
+                                              failed_types)
+
+    return UFieldDeclaration(field_name, type_declaration, optional)

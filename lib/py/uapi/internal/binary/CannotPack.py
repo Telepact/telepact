@@ -1,0 +1,2 @@
+class CannotPack(Exception):
+    pass

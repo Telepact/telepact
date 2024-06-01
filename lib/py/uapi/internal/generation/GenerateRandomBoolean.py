@@ -1,0 +1,10 @@
+from typing import Any
+from uapi import RandomGenerator
+
+
+def generate_random_boolean(blueprint_value: Any, use_blueprint_value: bool,
+                            random_generator: RandomGenerator) -> Any:
+    if use_blueprint_value:
+        return blueprint_value
+    else:
+        return random_generator.next_boolean()

@@ -20,8 +20,8 @@ public class Verify {
                         matchesFound += 1;
                     }
                 } else {
-                    boolean isSubMap = isSubMap(argument, invocation.functionArgument);
-                    if (isSubMap) {
+                    boolean isSubMapResult = isSubMap(argument, invocation.functionArgument);
+                    if (isSubMapResult) {
                         invocation.verified = true;
                         matchesFound += 1;
                     }

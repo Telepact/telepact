@@ -1,0 +1,2 @@
+class BinaryEncoderUnavailableError(RuntimeError):
+    pass

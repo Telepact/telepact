@@ -1,0 +1,45 @@
+import re
+from typing import List, Dict
+from uapi.internal.types import UError, UFn, UStruct, UType, UUnion
+from uapi import UApiSchemaParseError
+
+
+def apply_error_to_parsed_types(error_index: int, error: UError, parsed_types: Dict[str, UType], schema_keys_to_index: Dict[str, int]) -> None:
+    parse_failures = []
+    for parsed_type_name, parsed_type in parsed_types.items():
+        try:
+            f = parsed_type.__class__
+        except AttributeError:
+            continue
+
+        fn_name = f.name
+
+        regex = re.compile(f.errors_regex)
+
+        fn_result: UUnion = f.result
+        fn_result_cases: Dict[str, UStruct] = fn_result.cases
+        error_errors: UUnion = error.errors
+        error_cases: Dict[str, UStruct] = error_errors.cases
+
+        for error_case_name, error_case in error_cases.items():
+            new_key = error_case_name
+
+            matcher = regex.match(new_key)
+            if not matcher:
+                continue
+
+            if new_key in fn_result_cases:
+                other_path_index = schema_keys_to_index[fn_name]
+                error_case_index = error.errors.case_indices[new_key]
+                fn_error_case_index = f.result.case_indices[new_key]
+                parse_failures.append(SchemaParseFailure(
+                    [error_index, "errors", error_case_index, new_key],
+                    "PathCollision",
+                    {"other": [other_path_index, "->",
+                               fn_error_case_index, new_key]},
+                    None
+                ))
+            fn_result_cases[new_key] = error_case
+
+    if parse_failures:
+        raise UApiSchemaParseError(parse_failures)

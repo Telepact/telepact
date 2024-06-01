@@ -4,16 +4,7 @@ import json
 import uapi.types as types
 
 
-class _DefaultSerializer(types.SerializationImpl):
-    class MessagePackMapDeserializer(msgpack.Unpacker):
-        @staticmethod
-        def deserialize_key(s: str) -> Union[int, str]:
-            if isinstance(s, str):
-                return s
-            return int(s)
-
-    class MessagePackUntypedObjectDeserializer(msgpack.Unpacker):
-        pass
+class DefaultSerializer(types.SerializationImpl):
 
     def to_json(self, uapi_message: Any) -> bytes:
         return json.dumps(uapi_message).encode()
