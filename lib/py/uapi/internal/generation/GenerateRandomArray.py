@@ -1,12 +1,12 @@
 from typing import List, Any
 from random import randint
 from uapi import RandomGenerator
-from uapi.internal.types import UTypeDeclaration
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def generate_random_array(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool,
-                          randomize_optional_fields: bool, type_parameters: List[UTypeDeclaration],
-                          generics: List[UTypeDeclaration], random_generator: RandomGenerator) -> List[Any]:
+                          randomize_optional_fields: bool, type_parameters: List['UTypeDeclaration'],
+                          generics: List['UTypeDeclaration'], random_generator: 'RandomGenerator') -> List[Any]:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:

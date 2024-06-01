@@ -1,12 +1,12 @@
-from typing import Any, Dict, List, Tuple
-from uapi.internal.binary.Pack import pack
+from typing import Any, Dict, List, Tuple, Union
+from msgpack import ExtType
+
 from uapi.internal.binary.BinaryPackNode import BinaryPackNode
+from uapi.internal.binary.CannotPack import CannotPack
+from uapi.internal.binary.Pack import pack
 
-UNDEFINED_BYTE = b'\x12\x00'
 
-
-class CannotPack(Exception):
-    pass
+UNDEFINED_BYTE = 18
 
 
 def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, 'BinaryPackNode']) -> List[Any]:
@@ -15,6 +15,7 @@ def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, 'Bin
         if isinstance(key, str):
             raise CannotPack()
 
+        key = int(key)
         key_index = key_index_map.get(key)
 
         if key_index is None:
@@ -36,7 +37,7 @@ def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, 'Bin
             try:
                 nested_header = header[key_index_value + 1]
                 if not isinstance(nested_header, list):
-                    raise CannotPack()
+                    raise TypeError()
             except (IndexError, TypeError):
                 raise CannotPack()
 
@@ -48,7 +49,7 @@ def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, 'Bin
             packed_value = pack(value)
 
         while len(row) < key_index_value:
-            row.append(UNDEFINED_BYTE)
+            row.append(ExtType(UNDEFINED_BYTE, b''))
 
         if len(row) == key_index_value:
             row.append(packed_value)

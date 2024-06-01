@@ -5,7 +5,7 @@ from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
 class ServerBinaryEncoder:
-    def __init__(self, binary_encoder: BinaryEncoding):
+    def __init__(self, binary_encoder: 'BinaryEncoding'):
         self.binary_encoder = binary_encoder
 
     def encode(self, message: List[object]) -> List[object]:

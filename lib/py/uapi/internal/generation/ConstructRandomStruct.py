@@ -1,14 +1,15 @@
 from typing import Dict, Any, List
-from uapi.internal.types import UFieldDeclaration, UTypeDeclaration
 from uapi import RandomGenerator
+from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def construct_random_struct(reference_struct: Dict[str, UFieldDeclaration],
+def construct_random_struct(reference_struct: Dict[str, 'UFieldDeclaration'],
                             starting_struct: Dict[str, Any],
                             include_optional_fields: bool,
                             randomize_optional_fields: bool,
-                            type_parameters: List[UTypeDeclaration],
-                            random_generator: RandomGenerator) -> Dict[str, Any]:
+                            type_parameters: List['UTypeDeclaration'],
+                            random_generator: 'RandomGenerator') -> Dict[str, Any]:
 
     sorted_reference_struct = sorted(
         reference_struct.items(), key=lambda x: x[0])

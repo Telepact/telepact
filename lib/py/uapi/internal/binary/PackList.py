@@ -4,6 +4,8 @@ from uapi.internal.binary.BinaryPackNode import BinaryPackNode
 from uapi.internal.binary.Pack import pack
 from uapi.internal.binary.PackMap import CannotPack, pack_map
 
+PACKED_BYTE = 17
+
 
 def pack_list(lst: List[Any]) -> List[Any]:
     if not lst:
@@ -12,7 +14,7 @@ def pack_list(lst: List[Any]) -> List[Any]:
     packed_list: List[Any] = []
     header: List[Any] = []
 
-    packed_list.append(ExtType(17, b''))
+    packed_list.append(ExtType(PACKED_BYTE, b''))
 
     header.append(None)
 

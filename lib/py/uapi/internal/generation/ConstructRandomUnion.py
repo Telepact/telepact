@@ -1,21 +1,27 @@
 from typing import Dict, Any, List
-from random import randint
-from uapi.internal.types import UStruct, UTypeDeclaration
 from uapi import RandomGenerator
-from uapi.internal.generation.ConstructRandomStruct import constructRandomStruct
+from uapi.internal.generation.ConstructRandomStruct import construct_random_struct
+from uapi.internal.types.UStruct import UStruct
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def constructRandomUnion(unionCasesReference: Dict[str, UStruct],
-                         startingUnion: Dict[str, Any],
-                         includeOptionalFields: bool,
-                         randomizeOptionalFields: bool,
-                         typeParameters: List[UTypeDeclaration],
-                         randomGenerator: RandomGenerator) -> Dict[str, Any]:
-    if not startingUnion:
-        unionCase, unionData = sorted(unionCasesReference.items())[
-            randint(0, len(unionCasesReference) - 1)]
-        return {unionCase: constructRandomStruct(unionData.fields, {}, includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator)}
+def construct_random_union(union_cases_reference: Dict[str, 'UStruct'],
+                           starting_union: Dict[str, Any],
+                           include_optional_fields: bool,
+                           randomize_optional_fields: bool,
+                           type_parameters: List['UTypeDeclaration'],
+                           random_generator: 'RandomGenerator') -> Dict[str, Any]:
+    if not starting_union:
+        sorted_union_cases_reference = sorted(
+            union_cases_reference.items(), key=lambda x: x[0])
+        random_index = random_generator.randint(
+            0, len(sorted_union_cases_reference) - 1)
+        union_case, union_data = sorted_union_cases_reference[random_index]
+        return {union_case: construct_random_struct(union_data.fields, {}, include_optional_fields,
+                                                    randomize_optional_fields, type_parameters, random_generator)}
     else:
-        unionCase, unionStartingStruct = next(iter(startingUnion.items()))
-        unionStructType = unionCasesReference[unionCase]
-        return {unionCase: constructRandomStruct(unionStructType.fields, unionStartingStruct, includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator)}
+        union_case, union_starting_struct = next(iter(starting_union.items()))
+        union_struct_type = union_cases_reference[union_case]
+        return {union_case: construct_random_struct(union_struct_type.fields, union_starting_struct,
+                                                    include_optional_fields, randomize_optional_fields,
+                                                    type_parameters, random_generator)}

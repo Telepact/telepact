@@ -3,7 +3,7 @@ from uapi.internal.binary import EncodeBody, PackBody
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def server_binary_encode(message: List[Any], binary_encoder: BinaryEncoding) -> List[Any]:
+def server_binary_encode(message: List[Any], binary_encoder: 'BinaryEncoding') -> List[Any]:
     headers: Dict[str, Any] = message[0]
     message_body: Dict[str, Any] = message[1]
     client_known_binary_checksums: List[int] = headers.pop(

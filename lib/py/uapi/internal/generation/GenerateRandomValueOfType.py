@@ -1,14 +1,15 @@
 from typing import List, Optional
 import uapi
-from uapi.internal.types import UType, UTypeDeclaration
 from uapi import RandomGenerator
+from uapi.internal.types.UType import UType
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def generate_random_value_of_type(blueprint_value: object, use_blueprint_value: bool,
                                   include_optional_fields: bool, randomize_optional_fields: bool,
-                                  generics: List[UTypeDeclaration], random_generator: RandomGenerator,
-                                  this_type: UType, nullable: bool,
-                                  type_parameters: List[UTypeDeclaration]) -> Optional[object]:
+                                  generics: List['UTypeDeclaration'], random_generator: 'RandomGenerator',
+                                  this_type: 'UType', nullable: bool,
+                                  type_parameters: List['UTypeDeclaration']) -> Optional[object]:
     if nullable and not use_blueprint_value and random_generator.next_boolean():
         return None
     else:

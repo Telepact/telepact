@@ -1,13 +1,14 @@
 from typing import Any, Dict, List
 from uapi import RandomGenerator
-from uapi.internal.types import UStruct, UTypeDeclaration
 from uapi.internal.generation.ConstructRandomUnion import construct_random_union
+from uapi.internal.types.UStruct import UStruct
+from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def generate_random_fn(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool,
-                       randomize_optional_fields: bool, type_parameters: List[UTypeDeclaration],
-                       generics: List[UTypeDeclaration], random_generator: RandomGenerator,
-                       call_cases: Dict[str, UStruct]) -> Any:
+                       randomize_optional_fields: bool, type_parameters: List['UTypeDeclaration'],
+                       generics: List['UTypeDeclaration'], random_generator: 'RandomGenerator',
+                       call_cases: Dict[str, 'UStruct']) -> Any:
     if use_blueprint_value:
         # Assuming blueprint_value is already a dictionary
         starting_fn_value = blueprint_value

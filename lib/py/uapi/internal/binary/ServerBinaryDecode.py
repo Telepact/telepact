@@ -1,9 +1,11 @@
 from typing import List, Dict, Any
-from uapi.internal.binary import decode_body, unpack_body
 from uapi.internal.binary import BinaryEncoding
+from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+from uapi.internal.binary.DecodeBody import decode_body
+from uapi.internal.binary.UnpackBody import unpack_body
 
 
-def server_binary_decode(message: List[Any], binary_encoder: BinaryEncoding) -> List[Any]:
+def server_binary_decode(message: List[Any], binary_encoder: 'BinaryEncoding') -> List[Any]:
     headers: Dict[str, Any] = message[0]
     encoded_message_body: Dict[Any, Any] = message[1]
     client_known_binary_checksums: List[int] = headers.get("bin_", [])

@@ -3,7 +3,7 @@ from uapi import RandomGenerator
 
 
 def generate_random_integer(blueprint_value: Any, use_blueprint_value: bool,
-                            random_generator: RandomGenerator) -> Any:
+                            random_generator: 'RandomGenerator') -> Any:
     if use_blueprint_value:
         return blueprint_value
     else:
