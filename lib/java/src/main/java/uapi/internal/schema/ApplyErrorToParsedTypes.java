@@ -17,12 +17,10 @@ public class ApplyErrorToParsedTypes {
             Map<String, Integer> schemaKeysToIndex) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
         for (var parsedType : parsedTypes.entrySet()) {
-            UFn f;
-            try {
-                f = (UFn) parsedType.getValue();
-            } catch (ClassCastException e) {
+            if (!(parsedType.getValue() instanceof UFn)) {
                 continue;
             }
+            UFn f = (UFn) parsedType.getValue();
 
             String fnName = f.name;
 

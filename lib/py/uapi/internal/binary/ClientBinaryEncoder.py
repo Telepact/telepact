@@ -1,13 +1,17 @@
-from typing import List
+from typing import List, TYPE_CHECKING
 from collections import defaultdict
-from uapi.ClientBinaryStrategy import ClientBinaryStrategy
+
 from uapi.internal.binary.BinaryEncoder import BinaryEncoder
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
-from uapi.internal.binary.ClientBinaryDecode import client_binary_decode
-from uapi.internal.binary.ClientBinaryEncode import client_binary_encode
+
+if TYPE_CHECKING:
+    from uapi.ClientBinaryStrategy import ClientBinaryStrategy
+    from uapi.internal.binary.ClientBinaryDecode import client_binary_decode
+    from uapi.internal.binary.ClientBinaryEncode import client_binary_encode
 
 
-class ClientBinaryEncoder('BinaryEncoder'):
+class ClientBinaryEncoder(BinaryEncoder):
+
     def __init__(self, binaryChecksumStrategy: 'ClientBinaryStrategy'):
         self.recentBinaryEncoders = defaultdict(BinaryEncoding)
         self.binaryChecksumStrategy = binaryChecksumStrategy

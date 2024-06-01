@@ -1,10 +1,11 @@
 from typing import List, Dict
 from collections import OrderedDict
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
 def find_schema_key(definition: Dict[str, object], index: int) -> str:
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+
     regex = r"^(errors|((fn|request_header|response_header|info)|((struct|union|_ext)(<[0-2]>)?))\..*)"
     matches = []
 

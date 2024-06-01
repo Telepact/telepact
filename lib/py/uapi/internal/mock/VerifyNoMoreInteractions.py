@@ -1,6 +1,7 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TYPE_CHECKING
 
-from uapi.internal.mock.MockInvocation import MockInvocation
+if TYPE_CHECKING:
+    from uapi.internal.mock.MockInvocation import MockInvocation
 
 
 def verify_no_more_interactions(invocations: List['MockInvocation']) -> Dict[str, Any]:

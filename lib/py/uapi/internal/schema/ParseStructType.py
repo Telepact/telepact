@@ -1,11 +1,9 @@
-from typing import List, Dict, Any, Set
-
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.schema.ParseStructFields import parse_struct_fields
+from typing import List, Dict, Any, Set, TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UType import UType
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UType import UType
 
 
 def parse_struct_type(path: List[Any], struct_definition_as_pseudo_json: Dict[str, Any],
@@ -13,6 +11,10 @@ def parse_struct_type(path: List[Any], struct_definition_as_pseudo_json: Dict[st
                       uapi_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
                       parsed_types: Dict[str, UType], type_extensions: Dict[str, UType],
                       all_parse_failures: List[SchemaParseFailure], failed_types: Set[str]) -> UStruct:
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.ParseStructFields import parse_struct_fields
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+
     parse_failures = []
     other_keys = set(struct_definition_as_pseudo_json.keys())
 

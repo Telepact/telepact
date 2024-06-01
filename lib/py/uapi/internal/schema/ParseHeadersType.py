@@ -1,11 +1,9 @@
-from typing import List, Dict, Any, Set
-
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.schema.ParseTypeDeclaration import parse_type_declaration
-from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from typing import List, Dict, Any, Set, TYPE_CHECKING
 from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-from uapi.internal.types.UType import UType
+
+if TYPE_CHECKING:
+    from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+    from uapi.internal.types.UType import UType
 
 
 def parse_headers_type(headers_definition_as_parsed_json: Dict[str, Any], schema_key: str,
@@ -13,6 +11,10 @@ def parse_headers_type(headers_definition_as_parsed_json: Dict[str, Any], schema
                        schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, 'UType'],
                        type_extensions: Dict[str, 'UType'], all_parse_failures: List['SchemaParseFailure'],
                        failed_types: Set[str]) -> 'UFieldDeclaration':
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.ParseTypeDeclaration import parse_type_declaration
+
     path = [index, schema_key]
 
     type_declaration_value = headers_definition_as_parsed_json.get(schema_key)

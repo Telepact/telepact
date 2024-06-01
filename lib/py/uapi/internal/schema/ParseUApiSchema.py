@@ -1,26 +1,30 @@
-from typing import List, Dict, Any, Union, Set
+from typing import List, Dict, Any, Union, Set, TYPE_CHECKING
 
 from uapi.UApiSchema import UApiSchema
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.ApplyErrorToParsedTypes import apply_error_to_parsed_types
-from uapi.internal.schema.CatchErrorCollisions import catch_error_collisions
-from uapi.internal.schema.FindMatchingSchemaKey import find_matching_schema_key
-from uapi.internal.schema.FindSchemaKey import find_schema_key
-from uapi.internal.schema.GetOrParseType import get_or_parse_type
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.schema.OffsetSchemaIndex import offset_schema_index
-from uapi.internal.schema.ParseErrorType import parse_error_type
-from uapi.internal.schema.ParseHeadersType import parse_headers_type
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
-from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-from uapi.internal.types.UType import UType
+
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UType import UType
+    from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
 
 
 def parse_uapi_schema(
     u_api_schema_pseudo_json: List[Any],
-    type_extensions: Dict[str, UType],
+    type_extensions: Dict[str, 'UType'],
     path_offset: int
-) -> UApiSchema:
+) -> 'UApiSchema':
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.ApplyErrorToParsedTypes import apply_error_to_parsed_types
+    from uapi.internal.schema.CatchErrorCollisions import catch_error_collisions
+    from uapi.internal.schema.FindMatchingSchemaKey import find_matching_schema_key
+    from uapi.internal.schema.FindSchemaKey import find_schema_key
+    from uapi.internal.schema.GetOrParseType import get_or_parse_type
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.OffsetSchemaIndex import offset_schema_index
+    from uapi.internal.schema.ParseErrorType import parse_error_type
+    from uapi.internal.schema.ParseHeadersType import parse_headers_type
+
     parsed_types: Dict[str, UType] = {}
     parse_failures: List[SchemaParseFailure] = []
     failed_types: Set[str] = set()

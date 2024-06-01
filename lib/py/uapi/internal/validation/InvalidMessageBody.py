@@ -1,5 +1,2 @@
-from uapi.internal.validation import RuntimeException
-
-
-class InvalidMessageBody(RuntimeException):
+class InvalidMessageBody(Exception):
     pass

@@ -1,13 +1,17 @@
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, TYPE_CHECKING
 from msgpack import ExtType
-from uapi.internal.binary.BinaryPackNode import BinaryPackNode
-from uapi.internal.binary.Pack import pack
-from uapi.internal.binary.PackMap import CannotPack, pack_map
+
+if TYPE_CHECKING:
+    from uapi.internal.binary.BinaryPackNode import BinaryPackNode
+
 
 PACKED_BYTE = 17
 
 
 def pack_list(lst: List[Any]) -> List[Any]:
+    from uapi.internal.binary.Pack import pack
+    from uapi.internal.binary.PackMap import CannotPack, pack_map
+
     if not lst:
         return lst
 

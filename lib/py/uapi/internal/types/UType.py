@@ -1,9 +1,10 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TYPE_CHECKING
 from abc import ABC, abstractmethod
 
-from uapi.RandomGenerator import RandomGenerator
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
 class UType(ABC):
@@ -13,18 +14,18 @@ class UType(ABC):
 
     @abstractmethod
     def validate(self, value: Any, select: Dict[str, Any], fn: str,
-                 type_parameters: List[UTypeDeclaration],
-                 generics: List[UTypeDeclaration]) -> List[ValidationFailure]:
+                 type_parameters: List['UTypeDeclaration'],
+                 generics: List['UTypeDeclaration']) -> List['ValidationFailure']:
         pass
 
     @abstractmethod
     def generate_random_value(self, blueprint_value: Any, use_blueprint_value: bool,
                               include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: List[UTypeDeclaration],
-                              generics: List[UTypeDeclaration],
-                              random_generator: RandomGenerator) -> Any:
+                              type_parameters: List['UTypeDeclaration'],
+                              generics: List['UTypeDeclaration'],
+                              random_generator: 'RandomGenerator') -> Any:
         pass
 
     @abstractmethod
-    def get_name(self, generics: List[UTypeDeclaration]) -> str:
+    def get_name(self, generics: List['UTypeDeclaration']) -> str:
         pass

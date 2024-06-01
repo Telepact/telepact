@@ -1,12 +1,13 @@
 from typing import List, Dict, Any, Union
 from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
-from uapi.internal.binary.DecodeBody import decode_body
-from uapi.internal.binary.UnpackBody import unpack_body
 
 
 def client_binary_decode(message: List[Any], recent_binary_encoders: Dict[int, 'BinaryEncoding'],
                          binary_checksum_strategy: 'ClientBinaryStrategy') -> List[Any]:
+    from uapi.internal.binary.DecodeBody import decode_body
+    from uapi.internal.binary.UnpackBody import unpack_body
+
     headers = message[0]
     encoded_message_body = message[1]
     binary_checksums = headers.get("bin_", [])

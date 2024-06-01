@@ -1,11 +1,10 @@
 import re
-from typing import List, Dict, Any, Set
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.schema.ParseTypeDeclaration import parse_type_declaration
+from typing import List, Dict, Any, Set, TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-from uapi.internal.types.UType import UType
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UType import UType
 
 
 def parse_field(path: List[Any], field_declaration: str, type_declaration_value: Any,
@@ -13,6 +12,10 @@ def parse_field(path: List[Any], field_declaration: str, type_declaration_value:
                 schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, 'UType'],
                 type_extensions: Dict[str, UType], all_parse_failures: List['SchemaParseFailure'],
                 failed_types: Set[str]) -> 'UFieldDeclaration':
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.ParseTypeDeclaration import parse_type_declaration
+
     regex_string = r"^([a-z][a-zA-Z0-9_]*)(!)?$"
     regex = re.compile(regex_string)
 

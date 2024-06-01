@@ -1,7 +1,9 @@
-from typing import Dict, Any, List
-from uapi.RandomGenerator import RandomGenerator
-from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from typing import Dict, Any, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def construct_random_struct(reference_struct: Dict[str, 'UFieldDeclaration'],

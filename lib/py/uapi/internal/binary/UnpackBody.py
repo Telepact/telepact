@@ -1,8 +1,9 @@
 from typing import Any, Dict
-from uapi.internal.binary.Unpack import unpack
 
 
 def unpack_body(body: Dict[Any, Any]) -> Dict[Any, Any]:
+    from uapi.internal.binary.Unpack import unpack
+
     result = {}
 
     for key, value in body.items():

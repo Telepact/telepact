@@ -19,7 +19,14 @@ import json
 from nats.aio.client import Client as NATSClient, Subscription
 import asyncio
 import nats
-import uapi.types as types
+from uapi.SerializationError import SerializationError
+from uapi.Message import Message
+from uapi.Serializer import Serializer
+from uapi.Client import Client
+from uapi.Server import Server
+from uapi.UApiSchema import UApiSchema
+from uapi.MockServer import MockServer
+from uapi.UApiSchemaParseError import UApiSchemaParseError
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -37,12 +44,12 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
     timers = Summary(client_frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
 
-    async def adapter(m: types.Message, s: types.Serializer) -> types.Message:
+    async def adapter(m: Message, s: Serializer) -> Message:
         try:
             request_bytes = s.serialize(m)
-        except types.SerializationError as e:
+        except SerializationError as e:
             if isinstance(e.__context__, OverflowError):
-                return types.Message({"numberTooBig": True}, {"ErrorUnknown_": {}})
+                return Message({"numberTooBig": True}, {"ErrorUnknown_": {}})
             else:
                 raise
 
@@ -63,9 +70,9 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         response_message = s.deserialize(response_bytes)
         return response_message
 
-    options = types.Client.Options()
+    options = Client.Options()
     options.use_binary = default_binary
-    client = types.Client(adapter, options)
+    client = Client(adapter, options)
 
     async def message_handler(msg: Msg) -> None:
         request_bytes = msg.data
@@ -77,8 +84,8 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         request_headers, request_body = request_pseudo_json
 
         @timers.time()
-        async def c() -> 'types.Message':
-            return await client.request(types.Message(request_headers, request_body))
+        async def c() -> 'Message':
+            return await client.request(Message(request_headers, request_body))
 
         response = await c()
 
@@ -95,9 +102,9 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schema_path: str,
                                  frontdoor_topic: str, config: Dict[str, Any]) -> Subscription:
     api_schema_content = Path(api_schema_path).read_text()
-    u_api = types.UApiSchema.from_json(api_schema_content)
+    u_api = UApiSchema.from_json(api_schema_content)
 
-    options = types.MockServer.Options()
+    options = MockServer.Options()
     options.on_error = on_err
     options.enable_message_response_generation = False
 
@@ -109,7 +116,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
-    server = types.MockServer(u_api, options)
+    server = MockServer(u_api, options)
 
     async def message_handler(msg: Msg) -> None:
         nonlocal server
@@ -134,12 +141,12 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
 async def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
     json_data = Path(api_schema_path).read_text()
-    u_api = types.UApiSchema.from_json(json_data)
+    u_api = UApiSchema.from_json(json_data)
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
 
-    async def handler(request_message: 'types.Message') -> 'types.Message':
+    async def handler(request_message: 'Message') -> 'Message':
         request_body = request_message.body
 
         arg = request_body.get("fn.validateSchema", {})
@@ -157,18 +164,18 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
             schema_json = schema_pseudo_json
 
         try:
-            schema = types.UApiSchema.from_json(schema_json)
+            schema = UApiSchema.from_json(schema_json)
             if extend_schema_json:
-                types.UApiSchema.extend(schema, extend_schema_json)
-            return types.Message({}, {"Ok_": {}})
-        except types.UApiSchemaParseError as e:
+                UApiSchema.extend(schema, extend_schema_json)
+            return Message({}, {"Ok_": {}})
+        except UApiSchemaParseError as e:
             on_err(e)
-            return types.Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
+            return Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
 
-    options = types.Server.Options()
+    options = Server.Options()
     options.on_error = on_err
     options.auth_required = False
-    server = types.Server(u_api, handler, options)
+    server = Server(u_api, handler, options)
 
     async def handle_message(msg: Msg) -> None:
         nonlocal server
@@ -193,8 +200,8 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
 async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool) -> Subscription:
     json_data = Path(api_schema_path).read_text()
-    u_api = types.UApiSchema.from_json(json_data)
-    alternate_u_api = types.UApiSchema.extend(u_api, """
+    u_api = UApiSchema.from_json(json_data)
+    alternate_u_api = UApiSchema.extend(u_api, """
             [
                 {
                     "struct.BackwardsCompatibleChange": {}
@@ -212,7 +219,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     class ThisError(RuntimeError):
         pass
 
-    async def handler(request_message: 'types.Message') -> 'types.Message':
+    async def handler(request_message: 'Message') -> 'Message':
         nonlocal serve_alternate_server
         nonlocal executor
 
@@ -244,20 +251,20 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         if throw_error == True:
             raise ThisError()
 
-        return types.Message(response_headers, response_body)
+        return Message(response_headers, response_body)
 
-    options = types.Server.Options()
+    options = Server.Options()
 
     options.on_error = on_err
     options.on_request = lambda m: None  # onRequest handling
     options.on_response = lambda m: None  # onResponse handling
     options.auth_required = auth_required
 
-    server = types.Server(u_api, handler, options)
-    alternate_options = types.Server.Options()
+    server = Server(u_api, handler, options)
+    alternate_options = Server.Options()
     alternate_options.on_error = on_err
     alternate_options.auth_required = auth_required
-    alternate_server = types.Server(
+    alternate_server = Server(
         alternate_u_api, handler, alternate_options)
 
     async def handle_test_message(msg: Msg) -> None:

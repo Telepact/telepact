@@ -1,15 +1,17 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, TYPE_CHECKING
 from msgpack import ExtType
 
-from uapi.internal.binary.BinaryPackNode import BinaryPackNode
-from uapi.internal.binary.CannotPack import CannotPack
-from uapi.internal.binary.Pack import pack
+if TYPE_CHECKING:
+    from uapi.internal.binary.BinaryPackNode import BinaryPackNode
 
 
 UNDEFINED_BYTE = 18
 
 
 def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, 'BinaryPackNode']) -> List[Any]:
+    from uapi.internal.binary.CannotPack import CannotPack
+    from uapi.internal.binary.Pack import pack
+
     row: List[Any] = []
     for key, value in m.items():
         if isinstance(key, str):

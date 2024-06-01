@@ -5,7 +5,6 @@ from uapi.Serialization import Serialization
 from uapi.internal.DeserializeInternal import deserialize_internal
 from uapi.internal.SerializeInternal import serialize_internal
 from uapi.internal.binary.BinaryEncoder import BinaryEncoder
-w
 
 
 class Serializer:

@@ -1,6 +1,8 @@
-from typing import List, Dict
-from uapi.RandomGenerator import RandomGenerator
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from typing import List, Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def generate_random_object(blueprint_value: Dict[str, object], use_blueprint_value: bool,

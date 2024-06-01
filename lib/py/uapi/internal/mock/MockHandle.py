@@ -1,17 +1,22 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TYPE_CHECKING
+
 from uapi.Message import Message
-from uapi.RandomGenerator import RandomGenerator
-from uapi.UApiSchema import UApiSchema
-from uapi.internal.mock.IsSubMap import is_sub_map
 from uapi.internal.mock.MockInvocation import MockInvocation
 from uapi.internal.mock.MockStub import MockStub
-from uapi.internal.mock.Verify import verify
-from uapi.internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
+
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.UApiSchema import UApiSchema
 
 
 def mock_handle(request_message: 'Message', stubs: List['MockStub'], invocations: List['MockInvocation'],
                 random: 'RandomGenerator', u_api_schema: 'UApiSchema', enable_generated_default_stub: bool,
                 enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'Message':
+    from uapi.internal.mock.IsSubMap import is_sub_map
+    from uapi.internal.mock.Verify import verify
+    from uapi.internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
+    from uapi.UApiError import UApiError
+
     header: Dict[str, Any] = request_message.header
 
     enable_generation_stub = header.get("_gen", False)

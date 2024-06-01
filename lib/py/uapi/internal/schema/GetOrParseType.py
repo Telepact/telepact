@@ -1,24 +1,27 @@
 import re
-from typing import List, Dict, Set, Union
-from uapi.internal.schema.ParseFunctionType import parse_function_type
-from uapi.internal.schema.ParseStructType import parse_struct_type
-from uapi.internal.schema.ParseUnionType import parse_union_type
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.types.UAny import UAny
-from uapi.internal.types.UArray import UArray
-from uapi.internal.types.UBoolean import UBoolean
-from uapi.internal.types.UGeneric import UGeneric
-from uapi.internal.types.UInteger import UInteger
-from uapi.internal.types.UNumber import UNumber
-from uapi.internal.types.UObject import UObject
-from uapi.internal.types.UString import UString
-from uapi.internal.types.UType import UType
+from typing import List, Dict, Set, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UType import UType
 
 
 def get_or_parse_type(path: List[object], type_name: str, this_type_parameter_count: int,
                       u_api_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
                       parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
                       all_parse_failures: List[object], failed_types: Set[str]) -> 'UType':
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.types.UAny import UAny
+    from uapi.internal.types.UArray import UArray
+    from uapi.internal.types.UBoolean import UBoolean
+    from uapi.internal.types.UGeneric import UGeneric
+    from uapi.internal.types.UInteger import UInteger
+    from uapi.internal.types.UNumber import UNumber
+    from uapi.internal.types.UObject import UObject
+    from uapi.internal.types.UString import UString
+    from uapi.internal.schema.ParseFunctionType import parse_function_type
+    from uapi.internal.schema.ParseStructType import parse_struct_type
+    from uapi.internal.schema.ParseUnionType import parse_union_type
+
     if type_name in failed_types:
         raise UApiSchemaParseError([])
 

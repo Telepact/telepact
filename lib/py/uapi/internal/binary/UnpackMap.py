@@ -2,10 +2,11 @@ from typing import List, Dict, Any, Union
 from msgpack import ExtType
 
 from uapi.internal.binary.PackMap import UNDEFINED_BYTE
-from uapi.internal.binary.Unpack import unpack
 
 
 def unpack_map(row: List[Any], header: List[Any]) -> Dict[int, Union[Dict[int, Any], Any]]:
+    from uapi.internal.binary.Unpack import unpack
+
     final_map: Dict[int, Union[Dict[int, Any], Any]] = {}
 
     for j in range(len(row)):

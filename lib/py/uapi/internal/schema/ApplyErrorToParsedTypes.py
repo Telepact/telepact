@@ -1,20 +1,24 @@
 import re
-from typing import List, Dict
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
-from uapi.internal.types.UError import UError
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UType import UType
-from uapi.internal.types.UUnion import UUnion
+from typing import List, Dict, TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UError import UError
+    from uapi.internal.types.UStruct import UStruct
+    from uapi.internal.types.UType import UType
+    from uapi.internal.types.UUnion import UUnion
 
 
 def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types: Dict[str, 'UType'], schema_keys_to_index: Dict[str, int]) -> None:
+    from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.types.UFn import UFn
+
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
-        try:
-            f = parsed_type.__class__
-        except AttributeError:
+        if not isinstance(parsed_type[1], UFn):
             continue
+        f = parsed_type[1]
 
         fn_name = f.name
 

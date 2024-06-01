@@ -1,8 +1,9 @@
 from typing import List, Dict, Any
-from uapi.internal.binary.PackList import pack_list
 
 
 def pack(value: Any) -> Any:
+    from uapi.internal.binary.PackList import pack_list
+
     if isinstance(value, List):
         return pack_list(value)
     elif isinstance(value, Dict):

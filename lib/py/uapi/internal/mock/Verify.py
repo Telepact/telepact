@@ -1,11 +1,11 @@
 from typing import Any, Dict, List, Union
 from collections import OrderedDict
 
-from uapi.internal.mock.IsSubMap import is_sub_map
-
 
 def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
            verification_times: Dict[str, Any], invocations: List[Dict[str, Any]]) -> Dict[str, Any]:
+    from uapi.internal.mock.IsSubMap import is_sub_map
+
     matches_found = 0
     for invocation in invocations:
         if invocation['functionName'] == function_name:

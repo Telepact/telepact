@@ -1,8 +1,9 @@
-from typing import Dict, Any, List
-from uapi.RandomGenerator import RandomGenerator
-from uapi.internal.generation.ConstructRandomStruct import construct_random_struct
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from typing import Dict, Any, List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.internal.types.UStruct import UStruct
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def construct_random_union(union_cases_reference: Dict[str, 'UStruct'],
@@ -11,6 +12,8 @@ def construct_random_union(union_cases_reference: Dict[str, 'UStruct'],
                            randomize_optional_fields: bool,
                            type_parameters: List['UTypeDeclaration'],
                            random_generator: 'RandomGenerator') -> Dict[str, Any]:
+    from uapi.internal.generation.ConstructRandomStruct import construct_random_struct
+
     if not starting_union:
         sorted_union_cases_reference = sorted(
             union_cases_reference.items(), key=lambda x: x[0])

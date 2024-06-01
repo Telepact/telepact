@@ -1,7 +1,9 @@
-from typing import List, Optional
-from uapi.RandomGenerator import RandomGenerator
-from uapi.internal.types.UType import UType
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from typing import List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.internal.types.UType import UType
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def generate_random_value_of_type(blueprint_value: object, use_blueprint_value: bool,

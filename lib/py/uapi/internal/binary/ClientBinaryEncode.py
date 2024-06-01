@@ -2,12 +2,13 @@ from typing import List, Dict, Optional
 from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
-from uapi.internal.binary.EncodeBody import encode_body
-from uapi.internal.binary.PackBody import pack_body
 
 
 def client_binary_encode(message: List[object], recent_binary_encoders: Dict[int, 'BinaryEncoding'],
                          binary_checksum_strategy: 'ClientBinaryStrategy') -> List[object]:
+    from uapi.internal.binary.EncodeBody import encode_body
+    from uapi.internal.binary.PackBody import pack_body
+
     headers = message[0]
     message_body = message[1]
     force_send_json = headers.pop("_forceSendJson", None)

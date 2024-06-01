@@ -1,10 +1,12 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, TYPE_CHECKING
 
-from uapi.internal.binary.BinaryEncoding import BinaryEncoding
-from uapi.internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
+if TYPE_CHECKING:
+    from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
 def decode_keys(given: Any, binary_encoder: 'BinaryEncoding') -> Any:
+    from uapi.internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
+
     if isinstance(given, dict):
         new_dict: Dict[str, Any] = {}
 

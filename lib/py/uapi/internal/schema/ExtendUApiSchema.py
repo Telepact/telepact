@@ -1,14 +1,17 @@
-from typing import List, Dict
+from typing import List, Dict, TYPE_CHECKING
 import json
-from uapi.UApiSchema import UApiSchema
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.types.UType import UType
-from uapi.internal.schema.ParseUApiSchema import parse_uapi_schema
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UType import UType
+    from uapi.UApiSchema import UApiSchema
 
 
 def extend_uapi_schema(first: 'UApiSchema', second_uapi_schema_json: str,
                        second_type_extensions: Dict[str, 'UType']) -> 'UApiSchema':
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.ParseUApiSchema import parse_uapi_schema
+
     second_uapi_schema_pseudo_json_init = json.loads(second_uapi_schema_json)
 
     if not isinstance(second_uapi_schema_pseudo_json_init, list):

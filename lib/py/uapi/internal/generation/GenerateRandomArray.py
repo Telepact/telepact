@@ -1,7 +1,8 @@
-from typing import List, Any
-from random import randint
-from uapi.RandomGenerator import RandomGenerator
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from typing import List, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.RandomGenerator import RandomGenerator
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def generate_random_array(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool,

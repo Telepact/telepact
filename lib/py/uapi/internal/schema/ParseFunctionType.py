@@ -1,12 +1,8 @@
-from typing import List, Dict, Any, Set
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.schema.ParseStructType import parse_struct_type
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.ParseUnionType import parse_union_type
-from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
-from uapi.internal.types.UFn import UFn
-from uapi.internal.types.UType import UType
-from uapi.internal.types.UUnion import UUnion
+from typing import List, Dict, Any, Set, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UFn import UFn
+    from uapi.internal.types.UType import UType
 
 
 def parse_function_type(path: List[Any], function_definition_as_parsed_json: Dict[str, Any],
@@ -14,6 +10,13 @@ def parse_function_type(path: List[Any], function_definition_as_parsed_json: Dic
                         schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, 'UType'],
                         type_extensions: Dict[str, 'UType'], all_parse_failures: List[Any],
                         failed_types: Set[str]) -> 'UFn':
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.ParseStructType import parse_struct_type
+    from uapi.internal.schema.ParseUnionType import parse_union_type
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+    from uapi.internal.types.UUnion import UUnion
+
     parse_failures = []
     type_parameter_count = 0
 

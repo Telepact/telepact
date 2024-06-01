@@ -1,10 +1,10 @@
 from typing import List, Set, Dict, Any
 
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
-
 
 def catch_error_collisions(u_api_schema_pseudo_json: List[Any], error_indices: Set[int], keys_to_index: Dict[str, int]) -> None:
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+
     parse_failures = []
 
     indices = sorted(error_indices)

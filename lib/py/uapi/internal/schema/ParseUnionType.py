@@ -1,13 +1,10 @@
 import re
-from typing import List, Dict, Any, Set
-
-from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-from uapi.internal.schema.ParseStructFields import parse_struct_fields
+from typing import List, Dict, Any, Set, TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UType import UType
 from uapi.internal.types.UUnion import UUnion
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UType import UType
 
 
 def parse_union_type(path: List[Any], union_definition_as_pseudo_json: Dict[str, Any], schema_key: str,
@@ -15,6 +12,11 @@ def parse_union_type(path: List[Any], union_definition_as_pseudo_json: Dict[str,
                      u_api_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
                      parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
                      all_parse_failures: List['SchemaParseFailure'], failed_types: Set[str]) -> 'UUnion':
+    from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
+    from uapi.internal.schema.ParseStructFields import parse_struct_fields
+    from uapi.internal.types.UStruct import UStruct
+
     parse_failures = []
 
     other_keys = set(union_definition_as_pseudo_json.keys())

@@ -1,6 +1,7 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, TYPE_CHECKING
 
-from uapi.internal.binary.BinaryEncoding import BinaryEncoding
+if TYPE_CHECKING:
+    from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
 def encode_keys(given: Any, binary_encoding: 'BinaryEncoding') -> Any:
