@@ -2,11 +2,10 @@ from typing import List, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi import RandomGenerator
-    from uapi.internal.types.UType import UType
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
 
-
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+from uapi.internal.types.UType import UType
 
 
 class UAny(UType):

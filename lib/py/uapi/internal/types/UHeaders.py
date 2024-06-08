@@ -1,14 +1,15 @@
-from typing import Dict
+from typing import Dict, TYPE_CHECKING
 
-from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+if TYPE_CHECKING:
+    from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
 
 
 class UHeaders:
     def __init__(
             self,
             name: str,
-            requestHeaders: Dict[str, UFieldDeclaration],
-            responseHeaders: Dict[str, UFieldDeclaration]
+            requestHeaders: Dict[str, 'UFieldDeclaration'],
+            responseHeaders: Dict[str, 'UFieldDeclaration']
     ) -> None:
         self.name = name
         self.requestHeaders = requestHeaders
