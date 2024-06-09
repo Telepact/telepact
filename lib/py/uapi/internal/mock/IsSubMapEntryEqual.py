@@ -1,7 +1,7 @@
-from typing import List, Union
+from typing import list, Union
 
 
-def is_sub_map_entry_equal(part_value: Union[dict, List], whole_value: Union[dict, List]) -> bool:
+def is_sub_map_entry_equal(part_value: Union[dict, list], whole_value: Union[dict, list]) -> bool:
     from uapi.internal.mock.IsSubMap import is_sub_map
     from uapi.internal.mock.PartiallyMatches import partially_matches
 

@@ -1,16 +1,18 @@
-from typing import List, Dict, Optional
-from uapi.ClientBinaryStrategy import ClientBinaryStrategy
+from typing import cast, TYPE_CHECKING
 from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 
+if TYPE_CHECKING:
+    from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 
-def client_binary_encode(message: List[object], recent_binary_encoders: Dict[int, 'BinaryEncoding'],
-                         binary_checksum_strategy: 'ClientBinaryStrategy') -> List[object]:
+
+def client_binary_encode(message: list[object], recent_binary_encoders: dict[int, 'BinaryEncoding'],
+                         binary_checksum_strategy: 'ClientBinaryStrategy') -> list[object]:
     from uapi.internal.binary.EncodeBody import encode_body
     from uapi.internal.binary.PackBody import pack_body
 
-    headers = message[0]
-    message_body = message[1]
+    headers = cast(dict[str, object], message[0])
+    message_body = cast(dict[str, object], message[1])
     force_send_json = headers.pop("_forceSendJson", None)
 
     headers["bin_"] = binary_checksum_strategy.get_current_checksums()

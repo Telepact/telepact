@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Union, TYPE_CHECKING
+from typing import object, Callable, dict, list, Union, TYPE_CHECKING
 from concurrent.futures import Future
 
 from uapi import UApiError
@@ -13,7 +13,7 @@ def process_request_object(request_message: 'Message',
                            serializer: 'Serializer',
                            timeout_ms_default: int,
                            use_binary_default: bool) -> 'Message':
-    header: Dict[str, Any] = request_message.header
+    header: dict[str, object] = request_message.header
 
     try:
         if "tim_" not in header:

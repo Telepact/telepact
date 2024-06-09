@@ -1,11 +1,11 @@
-from typing import List, Dict, TYPE_CHECKING
+from typing import list, dict, TYPE_CHECKING
 from collections import defaultdict
 
 if TYPE_CHECKING:
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
-def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: List['SchemaParseFailure']) -> List[Dict[str, object]]:
+def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: list['SchemaParseFailure']) -> list[dict[str, object]]:
     pseudo_json_list = []
     for f in schema_parse_failures:
         pseudo_json = defaultdict(dict)

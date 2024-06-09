@@ -1,7 +1,7 @@
-from typing import Dict, Any
+from typing import dict, object
 
 
-def is_sub_map(part: Dict[str, Any], whole: Dict[str, Any]) -> bool:
+def is_sub_map(part: dict[str, object], whole: dict[str, object]) -> bool:
     from uapi.internal.mock.IsSubMapEntryEqual import is_sub_map_entry_equal
 
     for part_key in part.keys():

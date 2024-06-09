@@ -1,9 +1,9 @@
-from typing import List, Dict, Any, Union
+from typing import list, dict, object, Union
 from uapi.internal.types.UNumber import _NUMBER_NAME
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_number(value: Any) -> List['ValidationFailure']:
+def validate_number(value: object) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if isinstance(value, (int, float)) and not isinstance(value, (bool, str)):

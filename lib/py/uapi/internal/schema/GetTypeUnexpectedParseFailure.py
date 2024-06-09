@@ -1,9 +1,9 @@
-from typing import List, Any, Dict
+from typing import list, object, dict
 
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
-def get_type_unexpected_parse_failure(path: List[Any], value: Any, expected_type: str) -> List[SchemaParseFailure]:
+def get_type_unexpected_parse_failure(path: list[object], value: object, expected_type: str) -> list[SchemaParseFailure]:
     from uapi.internal.types.GetType import get_type
 
     actual_type = get_type(value)

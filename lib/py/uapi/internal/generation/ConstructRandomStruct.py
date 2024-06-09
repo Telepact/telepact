@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, TYPE_CHECKING
+from typing import dict, object, list, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -6,12 +6,12 @@ if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def construct_random_struct(reference_struct: Dict[str, 'UFieldDeclaration'],
-                            starting_struct: Dict[str, Any],
+def construct_random_struct(reference_struct: dict[str, 'UFieldDeclaration'],
+                            starting_struct: dict[str, object],
                             include_optional_fields: bool,
                             randomize_optional_fields: bool,
-                            type_parameters: List['UTypeDeclaration'],
-                            random_generator: 'RandomGenerator') -> Dict[str, Any]:
+                            type_parameters: list['UTypeDeclaration'],
+                            random_generator: 'RandomGenerator') -> dict[str, object]:
 
     sorted_reference_struct = sorted(
         reference_struct.items(), key=lambda x: x[0])

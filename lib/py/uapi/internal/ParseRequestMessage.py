@@ -1,4 +1,4 @@
-from typing import List, Dict, Callable, TYPE_CHECKING
+from typing import list, dict, Callable, TYPE_CHECKING
 
 from uapi.Message import Message
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError

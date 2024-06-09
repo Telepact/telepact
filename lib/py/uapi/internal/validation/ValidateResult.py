@@ -1,4 +1,4 @@
-from typing import List, TYPE_CHECKING
+from typing import list, TYPE_CHECKING
 from uapi.UApiError import UApiError
 
 if TYPE_CHECKING:

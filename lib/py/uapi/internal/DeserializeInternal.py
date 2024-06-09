@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, cast, TYPE_CHECKING
+from typing import list, dict, object, cast, TYPE_CHECKING
 
 from uapi.Message import Message
 from uapi.internal.validation.InvalidMessage import InvalidMessage
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
                          binary_encoder: 'BinaryEncoder') -> 'Message':
-    message_as_pseudo_json: Any
+    message_as_pseudo_json: object
     is_msg_pack: bool
 
     try:
@@ -27,12 +27,12 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
     if not isinstance(message_as_pseudo_json, list):
         raise InvalidMessage()
 
-    message_as_pseudo_json_list = cast(List[Any], message_as_pseudo_json)
+    message_as_pseudo_json_list = cast(list[object], message_as_pseudo_json)
 
     if len(message_as_pseudo_json_list) != 2:
         raise InvalidMessage()
 
-    final_message_as_pseudo_json_list: List[Any]
+    final_message_as_pseudo_json_list: list[object]
     if is_msg_pack:
         final_message_as_pseudo_json_list = binary_encoder.decode(
             message_as_pseudo_json_list)
@@ -42,12 +42,12 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
     if not isinstance(final_message_as_pseudo_json_list[0], dict):
         raise InvalidMessage()
 
-    headers = cast(Dict[str, Any], final_message_as_pseudo_json_list[0])
+    headers = cast(dict[str, object], final_message_as_pseudo_json_list[0])
 
     if not isinstance(final_message_as_pseudo_json_list[1], dict):
         raise InvalidMessage()
 
-    body = cast(Dict[str, Any], final_message_as_pseudo_json_list[1])
+    body = cast(dict[str, object], final_message_as_pseudo_json_list[1])
 
     if len(body) != 1:
         raise InvalidMessageBody()

@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, TYPE_CHECKING
+from typing import list, dict, object, TYPE_CHECKING
 from uapi.internal.types.UType import UType
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ _UNION_NAME: str = "Object"
 
 class UUnion(UType):
 
-    def __init__(self, name: str, cases: Dict[str, 'UStruct'], case_indices: Dict[str, int], type_parameter_count: int) -> None:
+    def __init__(self, name: str, cases: dict[str, 'UStruct'], case_indices: dict[str, int], type_parameter_count: int) -> None:
         self.name = name
         self.cases = cases
         self.case_indices = case_indices
@@ -21,13 +21,13 @@ class UUnion(UType):
     def get_type_parameter_count(self) -> int:
         return self.type_parameter_count
 
-    def validate(self, value: Any, select: Dict[str, Any], fn: str, type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration']) -> List['ValidationFailure']:
+    def validate(self, value: object, select: dict[str, object], fn: str, type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateUnion import validate_union
         return validate_union(value, select, fn, type_parameters, generics, self.name, self.cases)
 
-    def generate_random_value(self, blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'], random: 'RandomGenerator') -> Any:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool, randomize_optional_fields: bool, type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'], random: 'RandomGenerator') -> object:
         from uapi.internal.generation.GenerateRandomUnion import generate_random_union
         return generate_random_union(blueprint_value, use_blueprint_value, include_optional_fields, randomize_optional_fields, type_parameters, generics, random, self.cases)
 
-    def get_name(self, generics: List['UTypeDeclaration']) -> str:
+    def get_name(self, generics: list['UTypeDeclaration']) -> str:
         return _UNION_NAME

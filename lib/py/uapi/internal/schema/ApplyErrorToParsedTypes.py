@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, TYPE_CHECKING
+from typing import list, dict, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UUnion import UUnion
 
 
-def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types: Dict[str, 'UType'], schema_keys_to_index: Dict[str, int]) -> None:
+def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types: dict[str, 'UType'], schema_keys_to_index: dict[str, int]) -> None:
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.types.UFn import UFn
@@ -25,9 +25,9 @@ def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types:
         regex = re.compile(f.errors_regex)
 
         fn_result: UUnion = f.result
-        fn_result_cases: Dict[str, UStruct] = fn_result.cases
+        fn_result_cases: dict[str, UStruct] = fn_result.cases
         error_errors: UUnion = error.errors
-        error_cases: Dict[str, UStruct] = error_errors.cases
+        error_cases: dict[str, UStruct] = error_errors.cases
 
         for error_case_name, error_case in error_cases.items():
             new_key = error_case_name

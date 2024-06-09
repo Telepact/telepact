@@ -1,8 +1,8 @@
-from typing import List, Dict, Set, Any
+from typing import list, dict, Set, object
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
-def offset_schema_index(initial_failures: List['SchemaParseFailure'], offset: int, schema_keys_to_index: Dict[str, int], error_indices: Set[int]) -> List['SchemaParseFailure']:
+def offset_schema_index(initial_failures: list['SchemaParseFailure'], offset: int, schema_keys_to_index: dict[str, int], error_indices: Set[int]) -> list['SchemaParseFailure']:
     final_list = []
 
     index_to_schema_key = {v: k for k, v in schema_keys_to_index.items()}

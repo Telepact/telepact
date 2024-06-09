@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, TYPE_CHECKING
+from typing import dict, object, list, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -6,12 +6,12 @@ if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def construct_random_union(union_cases_reference: Dict[str, 'UStruct'],
-                           starting_union: Dict[str, Any],
+def construct_random_union(union_cases_reference: dict[str, 'UStruct'],
+                           starting_union: dict[str, object],
                            include_optional_fields: bool,
                            randomize_optional_fields: bool,
-                           type_parameters: List['UTypeDeclaration'],
-                           random_generator: 'RandomGenerator') -> Dict[str, Any]:
+                           type_parameters: list['UTypeDeclaration'],
+                           random_generator: 'RandomGenerator') -> dict[str, object]:
     from uapi.internal.generation.ConstructRandomStruct import construct_random_struct
 
     if not starting_union:

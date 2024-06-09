@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union, TYPE_CHECKING
+from typing import object, dict, list, Tuple, Union, TYPE_CHECKING
 from msgpack import ExtType
 
 if TYPE_CHECKING:
@@ -8,11 +8,11 @@ if TYPE_CHECKING:
 UNDEFINED_BYTE = 18
 
 
-def pack_map(m: Dict[Any, Any], header: List[Any], key_index_map: Dict[int, 'BinaryPackNode']) -> List[Any]:
+def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[int, 'BinaryPackNode']) -> list[object]:
     from uapi.internal.binary.CannotPack import CannotPack
     from uapi.internal.binary.Pack import pack
 
-    row: List[Any] = []
+    row: list[object] = []
     for key, value in m.items():
         if isinstance(key, str):
             raise CannotPack()

@@ -1,8 +1,10 @@
-from typing import Dict, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
+
+
+from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 if TYPE_CHECKING:
-    from uapi import UApiSchema
-    from uapi.internal.binary.BinaryEncoding import BinaryEncoding
+    from uapi.UApiSchema import UApiSchema
 
 
 def construct_binary_encoding(u_api_schema: 'UApiSchema') -> 'BinaryEncoding':

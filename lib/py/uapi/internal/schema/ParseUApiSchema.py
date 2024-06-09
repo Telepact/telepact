@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Union, Set, TYPE_CHECKING
+from typing import list, dict, object, Union, Set, TYPE_CHECKING
 
 from uapi.UApiSchema import UApiSchema
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 
 def parse_uapi_schema(
-    u_api_schema_pseudo_json: List[Any],
-    type_extensions: Dict[str, 'UType'],
+    u_api_schema_pseudo_json: list[object],
+    type_extensions: dict[str, 'UType'],
     path_offset: int
 ) -> 'UApiSchema':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -25,10 +25,10 @@ def parse_uapi_schema(
     from uapi.internal.schema.ParseErrorType import parse_error_type
     from uapi.internal.schema.ParseHeadersType import parse_headers_type
 
-    parsed_types: Dict[str, UType] = {}
-    parse_failures: List[SchemaParseFailure] = []
+    parsed_types: dict[str, UType] = {}
+    parse_failures: list[SchemaParseFailure] = []
     failed_types: Set[str] = set()
-    schema_keys_to_index: Dict[str, int] = {}
+    schema_keys_to_index: dict[str, int] = {}
     schema_keys: Set[str] = set()
     error_indices: Set[int] = set()
 
@@ -141,8 +141,8 @@ def parse_uapi_schema(
     except UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
 
-    request_headers: Dict[str, UFieldDeclaration] = {}
-    response_headers: Dict[str, UFieldDeclaration] = {}
+    request_headers: dict[str, UFieldDeclaration] = {}
+    response_headers: dict[str, UFieldDeclaration] = {}
 
     try:
         for request_header_key in request_header_keys:

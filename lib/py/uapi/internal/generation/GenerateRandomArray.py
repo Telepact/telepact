@@ -1,13 +1,13 @@
-from typing import List, Any, TYPE_CHECKING
+from typing import list, object, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def generate_random_array(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool,
-                          randomize_optional_fields: bool, type_parameters: List['UTypeDeclaration'],
-                          generics: List['UTypeDeclaration'], random_generator: 'RandomGenerator') -> List[Any]:
+def generate_random_array(blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool,
+                          randomize_optional_fields: bool, type_parameters: list['UTypeDeclaration'],
+                          generics: list['UTypeDeclaration'], random_generator: 'RandomGenerator') -> list[object]:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:

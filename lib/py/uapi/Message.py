@@ -1,8 +1,8 @@
-from typing import Dict, Any
+from typing import dict, object
 
 
 class Message:
-    def __init__(self, header: Dict[str, Any], body: Dict[str, Any]):
+    def __init__(self, header: dict[str, object], body: dict[str, object]):
         self.header = header.copy()
         self.body = body
 
@@ -10,6 +10,6 @@ class Message:
         entry = next(iter(self.body.items()), None)
         return entry[0] if entry else None
 
-    def get_body_payload(self) -> Dict[str, Any]:
+    def get_body_payload(self) -> dict[str, object]:
         entry = next(iter(self.body.items()), None)
         return entry[1] if entry else None

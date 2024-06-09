@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, TYPE_CHECKING
+from typing import list, dict, object, TYPE_CHECKING
 
 from uapi.Message import Message
 from uapi.internal.mock.MockInvocation import MockInvocation
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from uapi.UApiSchema import UApiSchema
 
 
-def mock_handle(request_message: 'Message', stubs: List['MockStub'], invocations: List['MockInvocation'],
+def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations: list['MockInvocation'],
                 random: 'RandomGenerator', u_api_schema: 'UApiSchema', enable_generated_default_stub: bool,
                 enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'Message':
     from uapi.internal.mock.IsSubMap import is_sub_map
@@ -17,7 +17,7 @@ def mock_handle(request_message: 'Message', stubs: List['MockStub'], invocations
     from uapi.internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
     from uapi.UApiError import UApiError
 
-    header: Dict[str, Any] = request_message.header
+    header: dict[str, object] = request_message.header
 
     enable_generation_stub = header.get("_gen", False)
     function_name = request_message.get_body_target()

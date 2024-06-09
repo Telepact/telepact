@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, TYPE_CHECKING
+from typing import object, dict, list, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -6,10 +6,10 @@ if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def generate_random_fn(blueprint_value: Any, use_blueprint_value: bool, include_optional_fields: bool,
-                       randomize_optional_fields: bool, type_parameters: List['UTypeDeclaration'],
-                       generics: List['UTypeDeclaration'], random_generator: 'RandomGenerator',
-                       call_cases: Dict[str, 'UStruct']) -> Any:
+def generate_random_fn(blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool,
+                       randomize_optional_fields: bool, type_parameters: list['UTypeDeclaration'],
+                       generics: list['UTypeDeclaration'], random_generator: 'RandomGenerator',
+                       call_cases: dict[str, 'UStruct']) -> object:
     from uapi.internal.generation.ConstructRandomUnion import construct_random_union
 
     if use_blueprint_value:

@@ -1,12 +1,12 @@
-from typing import List
+from typing import list
 from msgpack import ExtType
 
-from uapi.internal.binary.PackList import PACKED_BYTE
+from uapi.internal.binary.Packlist import PACKED_BYTE
 from uapi.internal.binary.Unpack import unpack
 from uapi.internal.binary.UnpackMap import unpack_map
 
 
-def unpack_list(lst: List[object]) -> List[object]:
+def unpack_list(lst: list[object]) -> list[object]:
     if not lst:
         return lst
 

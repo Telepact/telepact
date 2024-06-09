@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import object, dict, list, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.validation.ValidationFailure import ValidationFailure
@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def validate_value_of_type(value: Any, select: Dict[str, Any], fn: str,
-                           generics: List['UTypeDeclaration'], this_type: 'UType',
-                           nullable: bool, type_parameters: List['UTypeDeclaration']) -> List['ValidationFailure']:
+def validate_value_of_type(value: object, select: dict[str, object], fn: str,
+                           generics: list['UTypeDeclaration'], this_type: 'UType',
+                           nullable: bool, type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if value is None:

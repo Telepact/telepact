@@ -1,12 +1,12 @@
-from typing import List, Dict, Any
+from typing import list, dict, object
 
 
-def pack(value: Any) -> Any:
-    from uapi.internal.binary.PackList import pack_list
+def pack(value: object) -> object:
+    from uapi.internal.binary.Packlist import pack_list
 
-    if isinstance(value, List):
+    if isinstance(value, list):
         return pack_list(value)
-    elif isinstance(value, Dict):
+    elif isinstance(value, dict):
         new_map = {}
 
         for key, val in value.items():

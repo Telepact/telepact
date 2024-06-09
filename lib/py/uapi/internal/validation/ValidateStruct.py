@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, TYPE_CHECKING
+from typing import list, dict, object, Optional, TYPE_CHECKING
 from uapi.internal.types.UStruct import _STRUCT_NAME
 
 if TYPE_CHECKING:
@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_struct(value: Any, select: Optional[Dict[str, Any]], fn: str,
-                    type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'],
-                    name: str, fields: Dict[str, 'UFieldDeclaration']) -> List['ValidationFailure']:
+def validate_struct(value: object, select: Optional[dict[str, object]], fn: str,
+                    type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                    name: str, fields: dict[str, 'UFieldDeclaration']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateStructFields import validate_struct_fields
 

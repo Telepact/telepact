@@ -1,10 +1,10 @@
-from typing import List, Dict, Any, TYPE_CHECKING
+from typing import list, dict, object, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.mock.MockInvocation import MockInvocation
 
 
-def verify_no_more_interactions(invocations: List['MockInvocation']) -> Dict[str, Any]:
+def verify_no_more_interactions(invocations: list['MockInvocation']) -> dict[str, object]:
     invocations_not_verified = [i for i in invocations if not i.verified]
 
     if invocations_not_verified:

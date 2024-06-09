@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Any, TYPE_CHECKING
+from typing import Callable, dict, object, TYPE_CHECKING
 
 from uapi.DefaultSerialization import DefaultSerialization
 from uapi.Serializer import Serializer
@@ -40,8 +40,8 @@ class Server:
         self.on_request = options.on_request
         self.on_response = options.on_response
 
-        parsed_types: Dict[str, UType] = {}
-        type_extensions: Dict[str, UType] = {
+        parsed_types: dict[str, UType] = {}
+        type_extensions: dict[str, UType] = {
             "_ext.Select_": USelect(parsed_types)}
 
         self.u_api_schema = extend_uapi_schema(

@@ -1,14 +1,14 @@
-from typing import Any, Dict, List, Union, TYPE_CHECKING
+from typing import object, dict, list, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def encode_keys(given: Any, binary_encoding: 'BinaryEncoding') -> Any:
+def encode_keys(given: object, binary_encoding: 'BinaryEncoding') -> object:
     if given is None:
         return given
     elif isinstance(given, dict):
-        new_dict: Dict[Any, Any] = {}
+        new_dict: dict[object, object] = {}
 
         for key, value in given.items():
             final_key = binary_encoding.encode_map.get(key, key)

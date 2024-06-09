@@ -1,11 +1,11 @@
-from typing import List, Dict, Any, TYPE_CHECKING
+from typing import list, dict, object, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
 def map_validation_failures_to_invalid_field_cases(
-        argument_validation_failures: List['ValidationFailure']) -> List[Dict[str, Any]]:
+        argument_validation_failures: list['ValidationFailure']) -> list[dict[str, object]]:
     validation_failure_cases = []
     for validation_failure in argument_validation_failures:
         validation_failure_case = {

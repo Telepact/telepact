@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union, TYPE_CHECKING
+from typing import object, dict, list, Union, TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 from uapi.internal.types.UUnion import UUnion
 from uapi.internal.types.UFn import UFn
@@ -8,9 +8,9 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def validate_select(given_obj: Any, select: Dict[str, Any], fn: str,
-                    type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'],
-                    types: Dict[str, 'UType']) -> List['ValidationFailure']:
+def validate_select(given_obj: object, select: dict[str, object], fn: str,
+                    type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                    types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateSelectStruct import validate_select_struct
 

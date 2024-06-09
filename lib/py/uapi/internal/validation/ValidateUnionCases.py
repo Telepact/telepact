@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Union, TYPE_CHECKING
+from typing import list, dict, object, Union, TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
@@ -6,9 +6,9 @@ if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def validate_union_cases(reference_cases: Dict[str, 'UStruct'], selected_cases: Dict[str, Any],
-                         actual: Dict[Any, Any], select: Dict[str, Any], fn: str,
-                         type_parameters: List['UTypeDeclaration']) -> List['ValidationFailure']:
+def validate_union_cases(reference_cases: dict[str, 'UStruct'], selected_cases: dict[str, object],
+                         actual: dict[object, object], select: dict[str, object], fn: str,
+                         type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateUnionStruct import validate_union_struct
 

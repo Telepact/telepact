@@ -1,23 +1,25 @@
-from typing import Any, Dict, List, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
-def decode_keys(given: Any, binary_encoder: 'BinaryEncoding') -> Any:
+def decode_keys(given: object, binary_encoder: 'BinaryEncoding') -> object:
     from uapi.internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 
     if isinstance(given, dict):
-        new_dict: Dict[str, Any] = {}
+        new_dict: dict[str, object] = {}
 
         for key, value in given.items():
             if isinstance(key, str):
                 new_key = key
             else:
-                new_key = binary_encoder.decode_map.get(key)
+                possible_new_key = binary_encoder.decode_map.get(key)
 
-                if new_key is None:
+                if possible_new_key is None:
                     raise BinaryEncodingMissing(key)
+
+                new_key = possible_new_key
 
             encoded_value = decode_keys(value, binary_encoder)
             new_dict[new_key] = encoded_value

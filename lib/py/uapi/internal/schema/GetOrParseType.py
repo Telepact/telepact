@@ -1,16 +1,16 @@
 import re
-from typing import List, Dict, Set, Union, TYPE_CHECKING
+from typing import list, dict, Set, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def get_or_parse_type(path: List[object], type_name: str, this_type_parameter_count: int,
-                      u_api_schema_pseudo_json: List[object], schema_keys_to_index: Dict[str, int],
-                      parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
-                      all_parse_failures: List[object], failed_types: Set[str]) -> 'UType':
+def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_count: int,
+                      u_api_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
+                      parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
+                      all_parse_failures: list[object], failed_types: Set[str]) -> 'UType':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
-    from uapi.internal.types.UAny import UAny
+    from uapi.internal.types.Uobject import Uobject
     from uapi.internal.types.UArray import UArray
     from uapi.internal.types.UBoolean import UBoolean
     from uapi.internal.types.UGeneric import UGeneric
@@ -52,7 +52,7 @@ def get_or_parse_type(path: List[object], type_name: str, this_type_parameter_co
             "string": UString(),
             "array": UArray(),
             "object": UObject()
-        }.get(standard_type_name, UAny())
+        }.get(standard_type_name, Uobject())
 
     if this_type_parameter_count > 0:
         generic_parameter_index_string = matcher.group(9)

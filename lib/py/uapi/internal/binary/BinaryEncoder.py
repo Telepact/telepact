@@ -1,9 +1,12 @@
-from typing import List
+from abc import ABC, abstractmethod
 
 
-class BinaryEncoder:
-    def encode(self, message: List[object]) -> List[object]:
+class BinaryEncoder(ABC):
+
+    @abstractmethod
+    def encode(self, message: list[object]) -> list[object]:
         pass
 
-    def decode(self, message: List[object]) -> List[object]:
+    @abstractmethod
+    def decode(self, message: list[object]) -> list[object]:
         pass

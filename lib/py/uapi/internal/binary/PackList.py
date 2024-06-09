@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Union, TYPE_CHECKING
+from typing import list, dict, object, Union, TYPE_CHECKING
 from msgpack import ExtType
 
 if TYPE_CHECKING:
@@ -8,15 +8,16 @@ if TYPE_CHECKING:
 PACKED_BYTE = 17
 
 
-def pack_list(lst: List[Any]) -> List[Any]:
+def pack_list(lst: list[object]) -> list[object]:
     from uapi.internal.binary.Pack import pack
-    from uapi.internal.binary.PackMap import CannotPack, pack_map
+    from uapi.internal.binary.PackMap import pack_map
+    from uapi.internal.binary.CannotPack import CannotPack
 
     if not lst:
         return lst
 
-    packed_list: List[Any] = []
-    header: List[Any] = []
+    packed_list: list[object] = []
+    header: list[object] = []
 
     packed_list.append(ExtType(PACKED_BYTE, b''))
 
@@ -24,7 +25,7 @@ def pack_list(lst: List[Any]) -> List[Any]:
 
     packed_list.append(header)
 
-    key_index_map: Dict[int, BinaryPackNode] = {}
+    key_index_map: dict[int, BinaryPackNode] = {}
     try:
         for item in lst:
             if isinstance(item, dict):

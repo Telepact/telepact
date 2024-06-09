@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Set, TYPE_CHECKING
+from typing import list, dict, object, Set, TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UStruct import UStruct
 
@@ -6,11 +6,11 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def parse_struct_type(path: List[Any], struct_definition_as_pseudo_json: Dict[str, Any],
-                      schema_key: str, ignore_keys: List[str], type_parameter_count: int,
-                      uapi_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
-                      parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
-                      all_parse_failures: List['SchemaParseFailure'], failed_types: Set[str]) -> 'UStruct':
+def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict[str, object],
+                      schema_key: str, ignore_keys: list[str], type_parameter_count: int,
+                      uapi_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
+                      parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
+                      all_parse_failures: list['SchemaParseFailure'], failed_types: Set[str]) -> 'UStruct':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructFields import parse_struct_fields
     from uapi.UApiSchemaParseError import UApiSchemaParseError

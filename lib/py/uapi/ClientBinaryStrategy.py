@@ -1,4 +1,4 @@
-from typing import List
+from typing import list
 
 
 class ClientBinaryStrategy:
@@ -17,7 +17,7 @@ class ClientBinaryStrategy:
         """
         pass
 
-    def get_current_checksums(self) -> List[int]:
+    def get_current_checksums(self) -> list[int]:
         """
         Get the current binary encoding strategy as a list of binary encoding
         checksums that should be sent to the server.

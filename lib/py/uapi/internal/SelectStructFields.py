@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union, TYPE_CHECKING
+from typing import object, dict, list, Union, TYPE_CHECKING
 
 from uapi.internal.types.UArray import UArray
 from uapi.internal.types.UFn import UFn
@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def select_struct_fields(type_declaration: 'UTypeDeclaration', value: Any,
-                         selected_struct_fields: Dict[str, Any]) -> Any:
+def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
+                         selected_struct_fields: dict[str, object]) -> object:
     type_declaration_type = type_declaration.type
     type_declaration_type_params = type_declaration.type_parameters
 

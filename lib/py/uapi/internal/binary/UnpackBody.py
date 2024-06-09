@@ -1,7 +1,7 @@
-from typing import Any, Dict
+from typing import object, dict
 
 
-def unpack_body(body: Dict[Any, Any]) -> Dict[Any, Any]:
+def unpack_body(body: dict[object, object]) -> dict[object, object]:
     from uapi.internal.binary.Unpack import unpack
 
     result = {}

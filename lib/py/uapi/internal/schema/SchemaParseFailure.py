@@ -1,8 +1,8 @@
-from typing import List, Dict
+from typing import list, dict
 
 
 class SchemaParseFailure:
-    def __init__(self, path: List[object], reason: str, data: Dict[str, object], key: str) -> None:
+    def __init__(self, path: list[object], reason: str, data: dict[str, object], key: str | None) -> None:
         self.path = path
         self.reason = reason
         self.data = data

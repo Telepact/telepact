@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Union, Set, TYPE_CHECKING
+from typing import list, dict, object, Union, Set, TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UError import UError
 
@@ -6,13 +6,13 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def parse_error_type(error_definition_as_parsed_json: Dict[str, Any],
-                     u_api_schema_pseudo_json: List[Any],
+def parse_error_type(error_definition_as_parsed_json: dict[str, object],
+                     u_api_schema_pseudo_json: list[object],
                      index: int,
-                     schema_keys_to_index: Dict[str, int],
-                     parsed_types: Dict[str, 'UType'],
-                     type_extensions: Dict[str, 'UType'],
-                     all_parse_failures: List['SchemaParseFailure'],
+                     schema_keys_to_index: dict[str, int],
+                     parsed_types: dict[str, 'UType'],
+                     type_extensions: dict[str, 'UType'],
+                     all_parse_failures: list['SchemaParseFailure'],
                      failed_types: Set[str]) -> 'UError':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseUnionType import parse_union_type

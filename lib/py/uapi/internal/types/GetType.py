@@ -1,7 +1,7 @@
-from typing import Any, List, Dict
+from typing import object, list, dict
 
 
-def get_type(value: Any) -> str:
+def get_type(value: object) -> str:
     if value is None:
         return "Null"
     elif isinstance(value, bool):

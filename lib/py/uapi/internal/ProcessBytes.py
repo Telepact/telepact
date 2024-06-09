@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Callable, TYPE_CHECKING
+from typing import list, dict, object, Callable, TYPE_CHECKING
 
 from uapi.Message import Message
 

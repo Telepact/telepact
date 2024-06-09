@@ -1,13 +1,13 @@
-from typing import List, Dict, Any, Union
+from typing import list, dict, object, Union
 from msgpack import ExtType
 
 from uapi.internal.binary.PackMap import UNDEFINED_BYTE
 
 
-def unpack_map(row: List[Any], header: List[Any]) -> Dict[int, Union[Dict[int, Any], Any]]:
+def unpack_map(row: list[object], header: list[object]) -> dict[int, Union[dict[int, object], object]]:
     from uapi.internal.binary.Unpack import unpack
 
-    final_map: Dict[int, Union[Dict[int, Any], Any]] = {}
+    final_map: dict[int, Union[dict[int, object], object]] = {}
 
     for j in range(len(row)):
         key = header[j + 1]

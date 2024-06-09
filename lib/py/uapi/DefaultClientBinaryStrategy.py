@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import list
 import threading
 
 
@@ -30,7 +30,7 @@ class DefaultClientBinaryStrategy:
 
             self.last_update = datetime.now()
 
-    def get_current_checksums(self) -> List[int]:
+    def get_current_checksums(self) -> list[int]:
         with self.lock:
             if self.primary is None:
                 return []

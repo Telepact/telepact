@@ -1,9 +1,9 @@
-from typing import Any, Dict, List, Union
-from collections import OrderedDict
+from typing import object, dict, list, Union
+from collections import Ordereddict
 
 
-def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
-           verification_times: Dict[str, Any], invocations: List[Dict[str, Any]]) -> Dict[str, Any]:
+def verify(function_name: str, argument: dict[str, object], exact_match: bool,
+           verification_times: dict[str, object], invocations: list[dict[str, object]]) -> dict[str, object]:
     from uapi.internal.mock.IsSubMap import is_sub_map
 
     matches_found = 0
@@ -34,7 +34,7 @@ def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
         times = verify_times_struct['times']
         if matches_found > times:
             verification_failure_pseudo_json = {
-                "TooManyMatchingCalls": OrderedDict([
+                "TooManyMatchingCalls": Ordereddict([
                     ("wanted", {"Exact": {"times": times}}),
                     ("found", matches_found),
                     ("allCalls", all_calls_pseudo_json)
@@ -42,7 +42,7 @@ def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
             }
         elif matches_found < times:
             verification_failure_pseudo_json = {
-                "TooFewMatchingCalls": OrderedDict([
+                "TooFewMatchingCalls": Ordereddict([
                     ("wanted", {"Exact": {"times": times}}),
                     ("found", matches_found),
                     ("allCalls", all_calls_pseudo_json)
@@ -52,7 +52,7 @@ def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
         times = verify_times_struct['times']
         if matches_found > times:
             verification_failure_pseudo_json = {
-                "TooManyMatchingCalls": OrderedDict([
+                "TooManyMatchingCalls": Ordereddict([
                     ("wanted", {"AtMost": {"times": times}}),
                     ("found", matches_found),
                     ("allCalls", all_calls_pseudo_json)
@@ -62,7 +62,7 @@ def verify(function_name: str, argument: Dict[str, Any], exact_match: bool,
         times = verify_times_struct['times']
         if matches_found < times:
             verification_failure_pseudo_json = {
-                "TooFewMatchingCalls": OrderedDict([
+                "TooFewMatchingCalls": Ordereddict([
                     ("wanted", {"AtLeast": {"times": times}}),
                     ("found", matches_found),
                     ("allCalls", all_calls_pseudo_json)

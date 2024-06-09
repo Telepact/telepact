@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Any, TYPE_CHECKING
+from typing import Callable, dict, list, object, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.Message import Message
@@ -32,8 +32,8 @@ class MockServer:
         self.enable_optional_field_generation = options.enable_optional_field_generation
         self.randomize_optional_field_generation = options.randomize_optional_field_generation
 
-        parsed_types: Dict[str, UType] = {}
-        type_extensions: Dict[str, UType] = {
+        parsed_types: dict[str, UType] = {}
+        type_extensions: dict[str, UType] = {
             "_ext.Call_": UMockCall(parsed_types),
             "_ext.Stub_": UMockStub(parsed_types)
         }
@@ -52,8 +52,8 @@ class MockServer:
 
         parsed_types.update(final_parsed_uapi_schema)
 
-        self.stubs: List[MockStub] = []
-        self.invocations: List[MockInvocation] = []
+        self.stubs: list[MockStub] = []
+        self.invocations: list[MockInvocation] = []
 
     def process(self, message: bytes) -> bytes:
         return self.server.process(message)

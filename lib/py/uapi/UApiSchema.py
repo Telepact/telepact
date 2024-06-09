@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, TYPE_CHECKING
+from typing import list, dict, object, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
@@ -10,8 +10,8 @@ class UApiSchema:
     A parsed uAPI schema.
     """
 
-    def __init__(self, original: List[Any], parsed: Dict[str, 'UType'], parsed_request_headers: Dict[str, 'UFieldDeclaration'],
-                 parsed_response_headers: Dict[str, 'UFieldDeclaration'], type_extensions: Dict[str, 'UType']):
+    def __init__(self, original: list[object], parsed: dict[str, 'UType'], parsed_request_headers: dict[str, 'UFieldDeclaration'],
+                 parsed_response_headers: dict[str, 'UFieldDeclaration'], type_extensions: dict[str, 'UType']):
         self.original = original
         self.parsed = parsed
         self.parsed_request_headers = parsed_request_headers

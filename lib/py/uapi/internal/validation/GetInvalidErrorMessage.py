@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, TYPE_CHECKING
+from typing import list, dict, object, TYPE_CHECKING
 from uapi.Message import Message
 
 if TYPE_CHECKING:
@@ -6,8 +6,8 @@ if TYPE_CHECKING:
     from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def get_invalid_error_message(error: str, validation_failures: List['ValidationFailure'],
-                              result_union_type: 'UUnion', response_headers: Dict[str, Any]) -> 'Message':
+def get_invalid_error_message(error: str, validation_failures: list['ValidationFailure'],
+                              result_union_type: 'UUnion', response_headers: dict[str, object]) -> 'Message':
     from uapi.internal.validation.MapValidationFailuresToInvalidFieldCases import map_validation_failures_to_invalid_field_cases
     from uapi.internal.validation.ValidateResult import validate_result
 

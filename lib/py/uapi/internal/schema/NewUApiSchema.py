@@ -1,4 +1,4 @@
-from typing import List, Dict, TYPE_CHECKING
+from typing import list, dict, TYPE_CHECKING
 import json
 
 if TYPE_CHECKING:
@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def new_uapi_schema(uapi_schema_json: str, type_extensions: Dict[str, 'UType']) -> 'UApiSchema':
+def new_uapi_schema(uapi_schema_json: str, type_extensions: dict[str, 'UType']) -> 'UApiSchema':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseUApiSchema import parse_uapi_schema

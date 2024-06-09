@@ -1,4 +1,4 @@
-from typing import Any
+from typing import object
 
 from uapi.Message import Message
 from uapi.Serialization import Serialization

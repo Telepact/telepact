@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union, TYPE_CHECKING
+from typing import object, dict, list, Union, TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
@@ -9,17 +9,17 @@ if TYPE_CHECKING:
     from uapi.internal.types.UUnion import UUnion
 
 
-def validate_mock_stub(given_obj: Any, select: Dict[str, Any], fn: str,
-                       type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'],
-                       types: Dict[str, 'UType']) -> List['ValidationFailure']:
+def validate_mock_stub(given_obj: object, select: dict[str, object], fn: str,
+                       type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                       types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
-    validation_failures: List[ValidationFailure] = []
+    validation_failures: list[ValidationFailure] = []
 
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
 
-    given_map: Dict[str, Any] = given_obj
+    given_map: dict[str, object] = given_obj
 
     regex_string = "^fn\\..*$"
 
@@ -38,7 +38,7 @@ def validate_mock_stub(given_obj: Any, select: Dict[str, Any], fn: str,
 
     function_def_call: UUnion = function_def.call
     function_def_name: str = function_def.name
-    function_def_call_cases: Dict[str, UStruct] = function_def_call.cases
+    function_def_call_cases: dict[str, UStruct] = function_def_call.cases
     input_failures = function_def_call_cases[function_def_name].validate(
         input, select, fn, [], [])
 

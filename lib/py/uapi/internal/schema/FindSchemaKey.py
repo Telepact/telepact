@@ -1,8 +1,8 @@
-from typing import List, Dict
-from collections import OrderedDict
+from typing import list, dict
+from collections import Ordereddict
 
 
-def find_schema_key(definition: Dict[str, object], index: int) -> str:
+def find_schema_key(definition: dict[str, object], index: int) -> str:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
     import re

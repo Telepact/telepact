@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Union, TYPE_CHECKING
+from typing import list, dict, object, Union, TYPE_CHECKING
 
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 from uapi.SerializationError import SerializationError
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
                        serializer: 'Serialization') -> bytes:
-    headers: Dict[str, Any] = message.header
+    headers: dict[str, object] = message.header
 
     serialize_as_binary: bool
     if "_binary" in headers:
@@ -19,7 +19,7 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
     else:
         serialize_as_binary = False
 
-    message_as_pseudo_json: List[Union[Dict[str, Any], Any]] = [
+    message_as_pseudo_json: list[Union[dict[str, object], object]] = [
         message.header, message.body]
 
     try:
