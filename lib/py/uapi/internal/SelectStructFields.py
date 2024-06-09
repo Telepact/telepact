@@ -1,11 +1,13 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, TYPE_CHECKING
 
 from uapi.internal.types.UArray import UArray
 from uapi.internal.types.UFn import UFn
 from uapi.internal.types.UObject import UObject
 from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 from uapi.internal.types.UUnion import UUnion
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def select_struct_fields(type_declaration: 'UTypeDeclaration', value: Any,

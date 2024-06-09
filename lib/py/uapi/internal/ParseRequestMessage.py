@@ -1,12 +1,14 @@
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, TYPE_CHECKING
 
 from uapi.Message import Message
-from uapi.Serializer import Serializer
-from uapi.UApiSchema import UApiSchema
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 from uapi.internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
 from uapi.internal.validation.InvalidMessage import InvalidMessage
 from uapi.internal.validation.InvalidMessageBody import InvalidMessageBody
+
+if TYPE_CHECKING:
+    from uapi.Serializer import Serializer
+    from uapi.UApiSchema import UApiSchema
 
 
 def parse_request_message(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',

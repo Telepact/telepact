@@ -1,7 +1,9 @@
-from typing import List, Dict, Any
-from uapi.internal.types import UStruct
+from typing import List, Dict, Any, TYPE_CHECKING
 from uapi.internal.validation import GetTypeUnexpectedValidationFailure
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types import UStruct
 
 
 def validate_select_struct(struct_reference: 'UStruct', base_path: List[Any], selected_fields: Any) -> List['ValidationFailure']:

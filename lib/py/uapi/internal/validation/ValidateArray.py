@@ -1,13 +1,16 @@
-from typing import List, Dict
+from typing import List, Dict, TYPE_CHECKING
 from uapi.internal.types.UArray import _ARRAY_NAME
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
 def validate_array(value: object, select: Dict[str, object], fn: str,
                    type_parameters: List['UTypeDeclaration'],
                    generics: List['UTypeDeclaration']) -> List['ValidationFailure']:
+    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+
     if isinstance(value, list):
         nested_type_declaration = type_parameters[0]
 

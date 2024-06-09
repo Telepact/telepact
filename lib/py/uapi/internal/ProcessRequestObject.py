@@ -1,9 +1,11 @@
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, TYPE_CHECKING
 from concurrent.futures import Future
 
 from uapi import UApiError
-from uapi.Message import Message
-from uapi.Serializer import Serializer
+
+if TYPE_CHECKING:
+    from uapi.Message import Message
+    from uapi.Serializer import Serializer
 
 
 def process_request_object(request_message: 'Message',

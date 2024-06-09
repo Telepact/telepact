@@ -1,6 +1,7 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, TYPE_CHECKING
 
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+if TYPE_CHECKING:
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
 def map_validation_failures_to_invalid_field_cases(

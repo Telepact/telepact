@@ -1,8 +1,10 @@
-from typing import List, Dict
+from typing import List, Dict, TYPE_CHECKING
 
-from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def validate_struct_fields(fields: Dict[str, 'UFieldDeclaration'],

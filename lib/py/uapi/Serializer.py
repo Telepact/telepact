@@ -2,8 +2,6 @@ from typing import Any
 
 from uapi.Message import Message
 from uapi.Serialization import Serialization
-from uapi.internal.DeserializeInternal import deserialize_internal
-from uapi.internal.SerializeInternal import serialize_internal
 from uapi.internal.binary.BinaryEncoder import BinaryEncoder
 
 
@@ -20,10 +18,12 @@ class Serializer:
         """
         Serialize a Message into a byte array.
         """
+        from uapi.internal.SerializeInternal import serialize_internal
         return serialize_internal(message, self.binary_encoder, self.serialization_impl)
 
     def deserialize(self, message_bytes: bytes) -> Message:
         """
         Deserialize a Message from a byte array.
         """
+        from uapi.internal.DeserializeInternal import deserialize_internal
         return deserialize_internal(message_bytes, self.serialization_impl, self.binary_encoder)

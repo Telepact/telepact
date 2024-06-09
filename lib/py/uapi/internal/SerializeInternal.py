@@ -1,9 +1,12 @@
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, TYPE_CHECKING
 
-from uapi import Serialization, SerializationError
-from uapi.Message import Message
-from uapi.internal.binary.BinaryEncoder import BinaryEncoder
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
+from uapi.SerializationError import SerializationError
+
+if TYPE_CHECKING:
+    from uapi.Serialization import Serialization
+    from uapi.Message import Message
+    from uapi.internal.binary.BinaryEncoder import BinaryEncoder
 
 
 def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',

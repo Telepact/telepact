@@ -1,9 +1,12 @@
-from typing import List, Dict, Any, cast
+from typing import List, Dict, Any, cast, TYPE_CHECKING
 
-from uapi import Message, Serialization
-from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+from uapi.Message import Message
 from uapi.internal.validation.InvalidMessage import InvalidMessage
 from uapi.internal.validation.InvalidMessageBody import InvalidMessageBody
+
+if TYPE_CHECKING:
+    from uapi.Serialization import Serialization
+    from uapi.internal.binary.BinaryEncoder import BinaryEncoder
 
 
 def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',

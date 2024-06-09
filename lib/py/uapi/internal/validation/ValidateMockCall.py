@@ -1,14 +1,16 @@
-from typing import Any, Dict, List, Union
-
+from typing import Any, Dict, List, Union, TYPE_CHECKING
 from uapi.internal.types.UType import UType
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def validate_mock_call(given_obj: Any, select: Dict[str, Any], fn: str,
                        type_parameters: List['UTypeDeclaration'],
                        generics: List['UTypeDeclaration'], types: Dict[str, 'UType']) -> List['ValidationFailure']:
+    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
 

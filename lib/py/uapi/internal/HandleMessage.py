@@ -1,16 +1,14 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
 from uapi.Message import Message
-from uapi.UApiSchema import UApiSchema
-from uapi.internal.SelectStructFields import select_struct_fields
-from uapi.internal.types.UFn import UFn
-from uapi.internal.types.UType import UType
 from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.types.UUnion import UUnion
-from uapi.internal.validation.GetInvalidErrorMessage import get_invalid_error_message
-from uapi.internal.validation.ValidateHeaders import validate_headers
-from uapi.internal.validation.ValidateResult import validate_result
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UUnion import UUnion
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
+    from uapi.internal.types.UType import UType
+    from uapi.internal.types.UFn import UFn
+    from uapi.UApiSchema import UApiSchema
 
 
 def handle_message(
@@ -19,6 +17,11 @@ def handle_message(
     handler: Callable[['Message'], 'Message'],
     on_error: Callable[[Exception], None],
 ) -> 'Message':
+    from uapi.internal.SelectStructFields import select_struct_fields
+    from uapi.internal.validation.GetInvalidErrorMessage import get_invalid_error_message
+    from uapi.internal.validation.ValidateHeaders import validate_headers
+    from uapi.internal.validation.ValidateResult import validate_result
+
     response_headers: Dict[str, Any] = {}
     request_headers: Dict[str, Any] = request_message.header
     request_body: Dict[str, Any] = request_message.body

@@ -1,10 +1,13 @@
-from typing import List
+from typing import List, TYPE_CHECKING
 from uapi.UApiError import UApiError
-from uapi.internal.types.UUnion import UUnion
-from uapi.internal.validation.MapValidationFailuresToInvalidFieldCases import map_validation_failures_to_invalid_field_cases
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UUnion import UUnion
 
 
 def validate_result(result_union_type: 'UUnion', error_result: object) -> None:
+    from uapi.internal.validation.MapValidationFailuresToInvalidFieldCases import map_validation_failures_to_invalid_field_cases
+
     new_error_result_validation_failures = result_union_type.validate(
         error_result, None, None, [], []
     )

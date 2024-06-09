@@ -1,17 +1,19 @@
-from typing import Any, Dict, List, Union
-
-from uapi.internal.types.UFn import UFn
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UType import UType
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.types.UUnion import UUnion
-from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+from typing import Any, Dict, List, Union, TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UFn import UFn
+    from uapi.internal.types.UStruct import UStruct
+    from uapi.internal.types.UType import UType
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.types.UUnion import UUnion
 
 
 def validate_mock_stub(given_obj: Any, select: Dict[str, Any], fn: str,
                        type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'],
                        types: Dict[str, 'UType']) -> List['ValidationFailure']:
+    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+
     validation_failures: List[ValidationFailure] = []
 
     if not isinstance(given_obj, dict):

@@ -1,15 +1,18 @@
-from typing import List, Dict, Any, Callable
+from typing import List, Dict, Any, Callable, TYPE_CHECKING
 
 from uapi.Message import Message
-from uapi.Serializer import Serializer
-from uapi.UApiSchema import UApiSchema
-from uapi.internal.HandleMessage import handle_message
-from uapi.internal.ParseRequestMessage import parse_request_message
+
+if TYPE_CHECKING:
+    from uapi.Serializer import Serializer
+    from uapi.UApiSchema import UApiSchema
 
 
 def process_bytes(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',
                   on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
                   on_response: Callable[['Message'], None], handler: Callable[['Message'], 'Message']) -> bytes:
+    from uapi.internal.HandleMessage import handle_message
+    from uapi.internal.ParseRequestMessage import parse_request_message
+
     try:
         request_message = parse_request_message(
             request_message_bytes, serializer, uapi_schema, on_error)

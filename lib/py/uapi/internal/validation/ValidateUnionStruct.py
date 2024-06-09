@@ -1,8 +1,9 @@
-from typing import List, Dict
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.validation.ValidateStructFields import validate_struct_fields
+from typing import List, Dict, TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UStruct import UStruct
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def validate_union_struct(
@@ -16,6 +17,8 @@ def validate_union_struct(
 ) -> List['ValidationFailure']:
     selected_fields = selected_cases.get(
         union_case) if selected_cases else None
+    from uapi.internal.validation.ValidateStructFields import validate_struct_fields
+
     return validate_struct_fields(
         union_struct.fields,
         selected_fields,

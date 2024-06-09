@@ -1,16 +1,18 @@
-from typing import Any, Dict, List, Optional
-
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from uapi.internal.types.UUnion import _UNION_NAME
-from uapi.internal.validation.ValidateUnionCases import validate_union_cases
 from uapi.internal.validation.ValidationFailure import ValidationFailure
-from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UStruct import UStruct
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
 def validate_union(value: Any, select: Optional[Dict[str, Any]], fn: str,
                    type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'],
                    name: str, cases: Dict[str, 'UStruct']) -> List['ValidationFailure']:
+    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+    from uapi.internal.validation.ValidateUnionCases import validate_union_cases
+
     if isinstance(value, dict):
         selected_cases: Dict[str, Any]
         if name.startswith("fn."):

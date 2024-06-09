@@ -1,11 +1,12 @@
 from typing import List, Dict, TYPE_CHECKING
-from uapi.internal.types.UType import UType
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.validation.ValidationFailure import ValidationFailure
     from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+
+from uapi.internal.types.UType import UType
 
 _STRUCT_NAME: str = "Object"
 

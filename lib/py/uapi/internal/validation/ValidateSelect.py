@@ -1,16 +1,18 @@
-from typing import Any, Dict, List, Union
-from uapi.internal.types.UFn import UFn
-from uapi.internal.types.UType import UType
-from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-from uapi.internal.types.UUnion import UUnion
-from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-from uapi.internal.validation.ValidateSelectStruct import validate_select_struct
+from typing import Any, Dict, List, Union, TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+from uapi.internal.types.UUnion import UUnion
+from uapi.internal.types.UFn import UFn
+
+if TYPE_CHECKING:
+    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.types.UType import UType
 
 
 def validate_select(given_obj: Any, select: Dict[str, Any], fn: str,
-                    type_parameters: List[UTypeDeclaration], generics: List[UTypeDeclaration],
-                    types: Dict[str, UType]) -> List[ValidationFailure]:
+                    type_parameters: List['UTypeDeclaration'], generics: List['UTypeDeclaration'],
+                    types: Dict[str, 'UType']) -> List['ValidationFailure']:
+    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+    from uapi.internal.validation.ValidateSelectStruct import validate_select_struct
 
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
