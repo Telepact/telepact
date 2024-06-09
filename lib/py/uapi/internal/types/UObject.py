@@ -26,7 +26,7 @@ class UObject(UType):
                               include_optional_fields: bool, randomize_optional_fields: bool,
                               type_parameters: List['UTypeDeclaration'],
                               generics: List['UTypeDeclaration'],
-                              random_generator: RandomGenerator) -> object:
+                              random_generator: 'RandomGenerator') -> object:
         from uapi.internal.generation.GenerateRandomObject import generate_random_object
         return generate_random_object(blueprint_value, use_blueprint_value, include_optional_fields,
                                       randomize_optional_fields, type_parameters, generics, random_generator)

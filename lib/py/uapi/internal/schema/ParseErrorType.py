@@ -10,10 +10,10 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, Any],
                      u_api_schema_pseudo_json: List[Any],
                      index: int,
                      schema_keys_to_index: Dict[str, int],
-                     parsed_types: Dict[str, UType],
-                     type_extensions: Dict[str, UType],
-                     all_parse_failures: List[SchemaParseFailure],
-                     failed_types: Set[str]) -> UError:
+                     parsed_types: Dict[str, 'UType'],
+                     type_extensions: Dict[str, 'UType'],
+                     all_parse_failures: List['SchemaParseFailure'],
+                     failed_types: Set[str]) -> 'UError':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseUnionType import parse_union_type
 
@@ -23,8 +23,8 @@ def parse_error_type(error_definition_as_parsed_json: Dict[str, Any],
     parse_failures = []
 
     other_keys = set(error_definition_as_parsed_json.keys())
-    other_keys.remove(schema_key)
-    other_keys.remove("///")
+    other_keys.discard(schema_key)
+    other_keys.discard("///")
 
     if other_keys:
         for k in other_keys:

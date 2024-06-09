@@ -6,6 +6,7 @@ python_full_version = "3.11.0"
 msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
+mypy = "*"
 
 [packages]
 build = "*"

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 def parse_field(path: List[Any], field_declaration: str, type_declaration_value: Any,
                 type_parameter_count: int, uapi_schema_pseudo_json: List[Any],
                 schema_keys_to_index: Dict[str, int], parsed_types: Dict[str, 'UType'],
-                type_extensions: Dict[str, UType], all_parse_failures: List['SchemaParseFailure'],
+                type_extensions: Dict[str, 'UType'], all_parse_failures: List['SchemaParseFailure'],
                 failed_types: Set[str]) -> 'UFieldDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure

@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 def parse_struct_fields(reference_struct: Dict[str, Any], path: List[Any], type_parameter_count: int,
                         uapi_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
-                        parsed_types: Dict[str, UType], type_extensions: Dict[str, UType],
-                        all_parse_failures: List[SchemaParseFailure], failed_types: Set[str]) -> Dict[str, UFieldDeclaration]:
+                        parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
+                        all_parse_failures: List['SchemaParseFailure'], failed_types: Set[str]) -> Dict[str, 'UFieldDeclaration']:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseField import parse_field
 

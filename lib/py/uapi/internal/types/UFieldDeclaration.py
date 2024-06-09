@@ -7,10 +7,10 @@ if TYPE_CHECKING:
 class UFieldDeclaration:
     def __init__(
             self,
-            fieldName: str,
-            typeDeclaration: 'UTypeDeclaration',
+            field_name: str,
+            type_declaration: 'UTypeDeclaration',
             optional: bool
     ) -> None:
-        self.fieldName = fieldName
-        self.typeDeclaration = typeDeclaration
+        self.field_name = field_name
+        self.type_declaration = type_declaration
         self.optional = optional

@@ -18,13 +18,13 @@ class Client:
             self.serialization_impl = DefaultSerialization()
             self.binary_strategy = DefaultClientBinaryStrategy()
 
-    def __init__(self, adapter: Callable[[Message, Serializer], Future[Message]], options: Options):
+    def __init__(self, adapter: Callable[['Message', 'Serializer'], Future['Message']], options: 'Options'):
         self.adapter = adapter
         self.use_binary_default = options.use_binary
         self.timeout_ms_default = options.timeout_ms_default
         self.serializer = Serializer(
             options.serialization_impl, ClientBinaryEncoder(options.binary_strategy))
 
-    def request(self, request_message: Message):
+    def request(self, request_message: 'Message'):
         from uapi.internal.ProcessRequestObject import process_request_object
         return process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default)

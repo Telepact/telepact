@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 def parse_struct_type(path: List[Any], struct_definition_as_pseudo_json: Dict[str, Any],
                       schema_key: str, ignore_keys: List[str], type_parameter_count: int,
                       uapi_schema_pseudo_json: List[Any], schema_keys_to_index: Dict[str, int],
-                      parsed_types: Dict[str, UType], type_extensions: Dict[str, UType],
-                      all_parse_failures: List[SchemaParseFailure], failed_types: Set[str]) -> UStruct:
+                      parsed_types: Dict[str, 'UType'], type_extensions: Dict[str, 'UType'],
+                      all_parse_failures: List['SchemaParseFailure'], failed_types: Set[str]) -> 'UStruct':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructFields import parse_struct_fields
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -18,11 +18,11 @@ def parse_struct_type(path: List[Any], struct_definition_as_pseudo_json: Dict[st
     parse_failures = []
     other_keys = set(struct_definition_as_pseudo_json.keys())
 
-    other_keys.remove(schema_key)
-    other_keys.remove("///")
-    other_keys.remove("_ignore_if_duplicate")
+    other_keys.discard(schema_key)
+    other_keys.discard("///")
+    other_keys.discard("_ignoreIfDuplicate")
     for ignore_key in ignore_keys:
-        other_keys.remove(ignore_key)
+        other_keys.discard(ignore_key)
 
     if other_keys:
         for k in other_keys:

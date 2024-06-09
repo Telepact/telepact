@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Set, TYPE_CHECKING
+from uapi.internal.types.UFn import UFn
 
 if TYPE_CHECKING:
-    from uapi.internal.types.UFn import UFn
     from uapi.internal.types.UType import UType
 
 

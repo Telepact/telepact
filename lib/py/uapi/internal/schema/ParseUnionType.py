@@ -20,10 +20,10 @@ def parse_union_type(path: List[Any], union_definition_as_pseudo_json: Dict[str,
     parse_failures = []
 
     other_keys = set(union_definition_as_pseudo_json.keys())
-    other_keys.remove(schema_key)
-    other_keys.remove("///")
+    other_keys.discard(schema_key)
+    other_keys.discard("///")
     for ignore_key in ignore_keys:
-        other_keys.remove(ignore_key)
+        other_keys.discard(ignore_key)
 
     if other_keys:
         for k in other_keys:
@@ -63,7 +63,7 @@ def parse_union_type(path: List[Any], union_definition_as_pseudo_json: Dict[str,
         for required_key in required_keys:
             for element in definition:
                 keys = set(element.keys())
-                keys.remove("///")
+                keys.discard("///")
                 if required_key in keys:
                     break
             else:
