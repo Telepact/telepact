@@ -1,4 +1,4 @@
-from typing import object, dict, list, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -14,7 +14,7 @@ def generate_random_struct(blueprint_value: object, use_blueprint_value: bool, i
 
     if use_blueprint_value:
         # Assuming blueprint_value is already a dict
-        starting_struct_value = blueprint_value
+        starting_struct_value = cast(dict[str, object], blueprint_value)
         return construct_random_struct(fields, starting_struct_value, include_optional_fields,
                                        randomize_optional_fields, type_parameters, random_generator)
     else:

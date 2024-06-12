@@ -1,4 +1,4 @@
-from typing import object, dict, list, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -14,7 +14,7 @@ def generate_random_fn(blueprint_value: object, use_blueprint_value: bool, inclu
 
     if use_blueprint_value:
         # Assuming blueprint_value is already a dictionary
-        starting_fn_value = blueprint_value
+        starting_fn_value = cast(dict[str, object], blueprint_value)
         return construct_random_union(call_cases, starting_fn_value, include_optional_fields,
                                       randomize_optional_fields, [], random_generator)
     else:

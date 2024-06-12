@@ -1,4 +1,4 @@
-from typing import list, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -10,7 +10,7 @@ def generate_random_value_of_type(blueprint_value: object, use_blueprint_value: 
                                   include_optional_fields: bool, randomize_optional_fields: bool,
                                   generics: list['UTypeDeclaration'], random_generator: 'RandomGenerator',
                                   this_type: 'UType', nullable: bool,
-                                  type_parameters: list['UTypeDeclaration']) -> Optional[object]:
+                                  type_parameters: list['UTypeDeclaration']) -> object:
     if nullable and not use_blueprint_value and random_generator.next_boolean():
         return None
     else:

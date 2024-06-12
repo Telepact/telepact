@@ -1,8 +1,5 @@
-from typing import list, dict, object
-
-
 def unpack(value: object) -> object:
-    from uapi.internal.binary.Unpacklist import unpack_list
+    from uapi.internal.binary.UnpackList import unpack_list
 
     if isinstance(value, list):
         return unpack_list(value)

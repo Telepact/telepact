@@ -1,8 +1,5 @@
-from typing import list, dict, object
-
-
 def pack(value: object) -> object:
-    from uapi.internal.binary.Packlist import pack_list
+    from uapi.internal.binary.PackList import pack_list
 
     if isinstance(value, list):
         return pack_list(value)

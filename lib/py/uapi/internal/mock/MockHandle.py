@@ -1,4 +1,4 @@
-from typing import list, dict, object, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from uapi.Message import Message
 from uapi.internal.mock.MockInvocation import MockInvocation
@@ -24,28 +24,31 @@ def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations
     argument = request_message.get_body_payload()
 
     if function_name == "fn.create_stub_":
-        given_stub = argument.get("stub")
+        given_stub = cast(dict[str, object], argument.get("stub"))
 
         stub_call = next((e for e in given_stub.items()
-                         if e[0].startswith("fn.")), None)
-        stub_function_name, stub_arg = stub_call
-        stub_result = given_stub.get("->")
+                         if e[0].startswith("fn.")))
+        stub_function_name, stub_arg = cast(
+            tuple[str, dict[str, object]], stub_call)
+        stub_result = cast(dict[str, object], given_stub.get("->"))
         allow_argument_partial_match = not argument.get("strictMatch!", False)
-        stub_count = argument.get("count!", -1)
+        stub_count = cast(int, argument.get("count!", -1))
 
-        stub = MockStub(stub_function_name, dict(stub_arg),
+        stub = MockStub(stub_function_name, stub_arg,
                         stub_result, allow_argument_partial_match, stub_count)
 
         stubs.insert(0, stub)
         return Message({}, {"Ok_": {}})
     elif function_name == "fn.verify_":
-        given_call = argument.get("call")
+        given_call = cast(dict[str, object], argument.get("call"))
 
         call = next((e for e in given_call.items()
                     if e[0].startswith("fn.")), None)
-        call_function_name, call_arg = call
-        verify_times = argument.get("count!", {"AtLeast": {"times": 1}})
-        strict_match = argument.get("strictMatch!", False)
+        call_function_name, call_arg = cast(
+            tuple[str, dict[str, object]], call)
+        verify_times = cast(dict[str, object], argument.get(
+            "count!", {"AtLeast": {"times": 1}}))
+        strict_match = cast(bool, argument.get("strictMatch!", False))
 
         verification_result = verify(
             call_function_name, call_arg, strict_match, verify_times, invocations)
@@ -61,7 +64,7 @@ def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations
         stubs.clear()
         return Message({}, {"Ok_": {}})
     elif function_name == "fn.setRandomSeed_":
-        given_seed = argument.get("seed")
+        given_seed = cast(int, argument.get("seed"))
 
         random.set_seed(given_seed)
         return Message({}, {"Ok_": {}})

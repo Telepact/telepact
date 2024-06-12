@@ -1,6 +1,3 @@
-from typing import object, dict
-
-
 def pack_body(body: dict[object, object]) -> dict[object, object]:
     from uapi.internal.binary.Pack import pack
 

@@ -1,6 +1,3 @@
-from typing import dict, object
-
-
 class Message:
     def __init__(self, header: dict[str, object], body: dict[str, object]):
         self.header = header.copy()

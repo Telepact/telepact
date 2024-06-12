@@ -1,4 +1,4 @@
-from typing import object, dict, list, Tuple, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from msgpack import ExtType
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[
         if isinstance(key, str):
             raise CannotPack()
 
-        key = int(key)
+        key = cast(int, key)
         key_index = key_index_map.get(key)
 
         if key_index is None:
@@ -34,6 +34,8 @@ def pack_map(m: dict[object, object], header: list[object], key_index_map: dict[
 
         key_index_value = final_key_index.value
         key_index_nested = final_key_index.nested
+
+        packed_value: object
 
         if isinstance(value, dict):
             try:

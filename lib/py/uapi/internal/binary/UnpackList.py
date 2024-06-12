@@ -1,7 +1,7 @@
-from typing import list
+from typing import cast
 from msgpack import ExtType
 
-from uapi.internal.binary.Packlist import PACKED_BYTE
+from uapi.internal.binary.PackList import PACKED_BYTE
 from uapi.internal.binary.Unpack import unpack
 from uapi.internal.binary.UnpackMap import unpack_map
 
@@ -16,11 +16,11 @@ def unpack_list(lst: list[object]) -> list[object]:
             new_lst.append(unpack(item))
         return new_lst
 
-    unpacked_lst = []
-    headers = lst[1]
+    unpacked_lst: list[object] = []
+    headers = cast(list[object], lst[1])
 
     for i in range(2, len(lst)):
-        row = lst[i]
+        row = cast(list[object], lst[i])
         m = unpack_map(row, headers)
 
         unpacked_lst.append(m)

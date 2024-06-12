@@ -11,7 +11,7 @@ def client_binary_decode(message: list[object], recent_binary_encoders: dict[int
     from uapi.internal.binary.UnpackBody import unpack_body
 
     headers = cast(dict[str, object], message[0])
-    encoded_message_body = cast(dict[str, object], message[1])
+    encoded_message_body = cast(dict[object, object], message[1])
     binary_checksums: list[int] = cast(list[int], headers["bin_"])
     binary_checksum: int = binary_checksums[0]
 

@@ -1,13 +1,12 @@
-from typing import list, dict, object, Union
-from msgpack import ExtType
+from msgpack import ExtType, cast
 
 from uapi.internal.binary.PackMap import UNDEFINED_BYTE
 
 
-def unpack_map(row: list[object], header: list[object]) -> dict[int, Union[dict[int, object], object]]:
+def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
     from uapi.internal.binary.Unpack import unpack
 
-    final_map: dict[int, Union[dict[int, object], object]] = {}
+    final_map: dict[int, object] = {}
 
     for j in range(len(row)):
         key = header[j + 1]
@@ -18,7 +17,7 @@ def unpack_map(row: list[object], header: list[object]) -> dict[int, Union[dict[
 
         if isinstance(key, list):
             nested_header = key
-            nested_row = value
+            nested_row = cast(list[object], value)
             m = unpack_map(nested_row, nested_header)
             i = nested_header[0]
 

@@ -12,6 +12,7 @@ def _find_stack() -> str:
         stack_str = f'{stack}'
         if not '_util_types.py' in stack_str:
             return f'{stack.function}'
+    return 'unknown'
 
 
 class RandomGenerator:

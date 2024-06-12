@@ -1,4 +1,5 @@
-from typing import list, dict, object, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
+
 from msgpack import ExtType
 
 if TYPE_CHECKING:

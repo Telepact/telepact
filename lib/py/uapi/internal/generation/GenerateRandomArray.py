@@ -1,4 +1,4 @@
-from typing import list, object, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -11,7 +11,7 @@ def generate_random_array(blueprint_value: object, use_blueprint_value: bool, in
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:
-        starting_array = blueprint_value
+        starting_array = cast(list[object], blueprint_value)
 
         array = []
         for starting_array_value in starting_array:

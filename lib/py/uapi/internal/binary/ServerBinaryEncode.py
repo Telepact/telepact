@@ -1,4 +1,4 @@
-from typing import list, dict, object, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from uapi.internal.binary.BinaryEncoding import BinaryEncoding
@@ -8,10 +8,10 @@ def server_binary_encode(message: list[object], binary_encoder: 'BinaryEncoding'
     from uapi.internal.binary.EncodeBody import encode_body
     from uapi.internal.binary.PackBody import pack_body
 
-    headers: dict[str, object] = message[0]
-    message_body: dict[str, object] = message[1]
-    client_known_binary_checksums: list[int] = headers.pop(
-        "_clientKnownBinaryChecksums", None)
+    headers = cast(dict[str, object], message[0])
+    message_body = cast(dict[str, object], message[1])
+    client_known_binary_checksums = cast(list[int], headers.pop(
+        "_clientKnownBinaryChecksums", None))
 
     if client_known_binary_checksums is None or binary_encoder.checksum not in client_known_binary_checksums:
         headers["enc_"] = binary_encoder.encode_map

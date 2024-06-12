@@ -1,4 +1,4 @@
-from typing import list, dict, object, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -13,7 +13,7 @@ def generate_random_union(blueprint_value: object, use_blueprint_value: bool, in
     from uapi.internal.generation.ConstructRandomUnion import construct_random_union
 
     if use_blueprint_value:
-        starting_union_case = blueprint_value
+        starting_union_case = cast(dict[str, object], blueprint_value)
         return construct_random_union(cases, starting_union_case, include_optional_fields,
                                       randomize_optional_fields, type_parameters, random_generator)
     else:

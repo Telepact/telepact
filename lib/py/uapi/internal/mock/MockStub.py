@@ -1,6 +1,3 @@
-from typing import dict
-
-
 class MockStub:
     def __init__(self, when_function: str, when_argument: dict[str, object],
                  then_result: dict[str, object], allow_argument_partial_match: bool, count: int) -> None:
