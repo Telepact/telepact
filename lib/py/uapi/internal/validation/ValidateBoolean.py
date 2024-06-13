@@ -1,4 +1,4 @@
-from typing import list, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.types.UBoolean import _BOOLEAN_NAME
 
 if TYPE_CHECKING:

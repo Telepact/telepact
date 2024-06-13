@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
@@ -8,10 +8,10 @@ if TYPE_CHECKING:
 
 
 def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
-                           selected_fields: list[str],
+                           selected_fields: list[str] | None,
                            actual_struct: dict[str, object],
-                           select: dict[str, object],
-                           fn: str,
+                           select: dict[str, object] | None,
+                           fn: str | None,
                            type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
     validation_failures = []
 

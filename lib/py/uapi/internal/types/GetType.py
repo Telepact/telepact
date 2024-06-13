@@ -1,6 +1,3 @@
-from typing import object, list, dict
-
-
 def get_type(value: object) -> str:
     if value is None:
         return "Null"

@@ -1,4 +1,4 @@
-from typing import list, dict, object, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.types.UType import UType
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ class UUnion(UType):
     def get_type_parameter_count(self) -> int:
         return self.type_parameter_count
 
-    def validate(self, value: object, select: dict[str, object], fn: str, type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+    def validate(self, value: object, select: dict[str, object] | None, fn: str | None, type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateUnion import validate_union
         return validate_union(value, select, fn, type_parameters, generics, self.name, self.cases)
 

@@ -1,15 +1,17 @@
-from typing import object, dict, list, Union, TYPE_CHECKING
-from uapi.internal.types.UType import UType
+from typing import TYPE_CHECKING, cast
 from uapi.internal.validation.ValidationFailure import ValidationFailure
+import re
 
 if TYPE_CHECKING:
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.types.UType import UType
 
 
-def validate_mock_call(given_obj: object, select: dict[str, object], fn: str,
+def validate_mock_call(given_obj: object, select: dict[str, object] | None, fn: str | None,
                        type_parameters: list['UTypeDeclaration'],
                        generics: list['UTypeDeclaration'], types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+    from uapi.internal.types.UFn import UFn
 
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, "Object")
@@ -26,7 +28,7 @@ def validate_mock_call(given_obj: object, select: dict[str, object], fn: str,
                                   {"regex": regex_string, "actual": len(matches), "expected": 1, "keys": keys})]
 
     function_name = matches[0]
-    function_def = types[function_name]
+    function_def = cast(UFn, types[function_name])
     input = given_map[function_name]
 
     function_def_call = function_def.call

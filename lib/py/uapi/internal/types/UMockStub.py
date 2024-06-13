@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -18,7 +18,7 @@ class UMockStub(UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, given_obj: object, select: dict[str, object], fn: str,
+    def validate(self, given_obj: object, select: dict[str, object] | None, fn: str | None,
                  type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateMockStub import validate_mock_stub
         return validate_mock_stub(given_obj, select, fn, type_parameters, generics, self.types)

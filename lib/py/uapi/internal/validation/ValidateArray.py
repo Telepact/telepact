@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.types.UArray import _ARRAY_NAME
 
 if TYPE_CHECKING:
@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_array(value: object, select: dict[str, object], fn: str,
+def validate_array(value: object, select: dict[str, object] | None, fn: str | None,
                    type_parameters: list['UTypeDeclaration'],
                    generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure

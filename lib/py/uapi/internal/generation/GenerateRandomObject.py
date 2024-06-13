@@ -1,18 +1,18 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def generate_random_object(blueprint_value: dict[str, object], use_blueprint_value: bool,
+def generate_random_object(blueprint_value: object, use_blueprint_value: bool,
                            include_optional_fields: bool, randomize_optional_fields: bool,
                            type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
-                           random_generator: 'RandomGenerator') -> dict[str, object]:
+                           random_generator: 'RandomGenerator') -> object:
     nested_type_declaration = type_parameters[0]
 
     if use_blueprint_value:
-        starting_obj = blueprint_value
+        starting_obj = cast(dict[str, object], blueprint_value)
 
         obj = {}
         for key, starting_obj_value in starting_obj.items():

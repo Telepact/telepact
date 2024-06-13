@@ -1,18 +1,20 @@
-from typing import object, dict, list, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
+import re
+
 if TYPE_CHECKING:
-    from uapi.internal.types.UFn import UFn
     from uapi.internal.types.UStruct import UStruct
     from uapi.internal.types.UType import UType
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
     from uapi.internal.types.UUnion import UUnion
 
 
-def validate_mock_stub(given_obj: object, select: dict[str, object], fn: str,
+def validate_mock_stub(given_obj: object, select: dict[str, object] | None, fn: str | None,
                        type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
                        types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+    from uapi.internal.types.UFn import UFn
 
     validation_failures: list[ValidationFailure] = []
 
@@ -33,7 +35,7 @@ def validate_mock_stub(given_obj: object, select: dict[str, object], fn: str,
         ]
 
     function_name = matches[0]
-    function_def: UFn = types[function_name]
+    function_def = cast(UFn, types[function_name])
     input = given_map[function_name]
 
     function_def_call: UUnion = function_def.call
@@ -65,7 +67,7 @@ def validate_mock_stub(given_obj: object, select: dict[str, object], fn: str,
         output_failures = function_def.result.validate(
             output, select, fn, [], [])
 
-        output_failures_with_path = []
+        output_failures_with_path: list[ValidationFailure] = []
         for f in output_failures:
             this_path = [result_def_key] + f.path
 

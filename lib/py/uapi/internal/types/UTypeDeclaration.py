@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -12,7 +12,7 @@ class UTypeDeclaration:
         self.nullable = nullable
         self.type_parameters = type_parameters
 
-    def validate(self, value: object, select: dict[str, object], fn: str,
+    def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
                  generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateValueOfType import validate_value_of_type
         return validate_value_of_type(value, select, fn, generics, self.type, self.nullable, self.type_parameters)

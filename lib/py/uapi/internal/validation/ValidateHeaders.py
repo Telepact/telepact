@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:

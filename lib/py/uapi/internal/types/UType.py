@@ -1,5 +1,5 @@
-from typing import list, dict, object, TYPE_CHECKING
-from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+from abc import ABCMeta, abstractmethod
 
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
@@ -7,13 +7,13 @@ if TYPE_CHECKING:
     from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-class UType(ABC):
+class UType(metaclass=ABCMeta):
     @abstractmethod
     def get_type_parameter_count(self) -> int:
         pass
 
     @abstractmethod
-    def validate(self, value: object, select: dict[str, object], fn: str,
+    def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
                  type_parameters: list['UTypeDeclaration'],
                  generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
         pass

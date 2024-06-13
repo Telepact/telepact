@@ -1,4 +1,4 @@
-from typing import object, Callable, dict, list, Optional, Tuple, Union, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, cast
 
 from uapi.Message import Message
 from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
@@ -26,12 +26,13 @@ def handle_message(
     request_headers: dict[str, object] = request_message.header
     request_body: dict[str, object] = request_message.body
     parsed_u_api_schema: dict[str, UType] = u_api_schema.parsed
-    request_entry: Tuple[str, object] = next(iter(request_body.items()))
+    request_entry: tuple[str, object] = next(iter(request_body.items()))
 
-    request_target_init: str = request_entry[0]
-    request_payload: dict[str, object] = request_entry[1]
+    request_target_init = request_entry[0]
+    request_payload = cast(
+        dict[str, object], request_entry[1])
 
-    unknown_target: Optional[str]
+    unknown_target: str | None
     request_target: str
     if request_target_init not in parsed_u_api_schema:
         unknown_target = request_target_init
@@ -40,7 +41,7 @@ def handle_message(
         unknown_target = None
         request_target = request_target_init
 
-    function_type: UFn = parsed_u_api_schema[request_target]
+    function_type = cast(UFn, parsed_u_api_schema[request_target])
     result_union_type: UUnion = function_type.result
 
     call_id = request_headers.get("id_")

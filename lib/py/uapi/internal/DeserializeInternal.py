@@ -1,4 +1,4 @@
-from typing import list, dict, object, cast, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 
 from uapi.Message import Message
 from uapi.internal.validation.InvalidMessage import InvalidMessage
@@ -22,7 +22,7 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
             is_msg_pack = False
             message_as_pseudo_json = serializer.from_json(message_bytes)
     except Exception as e:
-        raise InvalidMessage(str(e))
+        raise InvalidMessage() from e
 
     if not isinstance(message_as_pseudo_json, list):
         raise InvalidMessage()

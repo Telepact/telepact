@@ -34,14 +34,15 @@ public class ValidateSelect {
             if (typeName.equals("->")) {
                 typeReference = functionType.result;
             } else {
-                typeReference = types.get(typeName);
+                var possibleTypeReference = types.get(typeName);
+                if (possibleTypeReference == null) {
+                    validationFailures.add(new ValidationFailure(List.of(typeName),
+                            "ObjectKeyDisallowed", Map.of()));
+                    continue;
+                }
+                typeReference = possibleTypeReference;
             }
 
-            if (typeReference == null) {
-                validationFailures.add(new ValidationFailure(List.of(typeName),
-                        "ObjectKeyDisallowed", Map.of()));
-                continue;
-            }
 
             if (typeReference instanceof final UUnion u) {
                 if (!(selectValue instanceof Map)) {
@@ -79,12 +80,15 @@ public class ValidateSelect {
                         selectValue);
 
                 validationFailures.addAll(nestedValidationFailures);
-            } else {
-                final var structRef = (UStruct) typeReference;
+            } else if (typeReference instanceof final UStruct s) {
+                final var structRef = s;
                 final var nestedValidationFailures = validateSelectStruct(structRef, List.of(typeName),
                         selectValue);
 
                 validationFailures.addAll(nestedValidationFailures);
+            } else {
+                validationFailures.add(new ValidationFailure(List.of(typeName),
+                        "ObjectKeyDisallowed", Map.of()));
             }
         }
 

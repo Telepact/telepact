@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ class UObject(UType):
     def get_type_parameter_count(self) -> int:
         return 1
 
-    def validate(self, value: object, select: dict[str, object], fn: str,
+    def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
                  type_parameters: list['UTypeDeclaration'],
                  generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateObject import validate_object

@@ -1,4 +1,4 @@
-from typing import list, dict, object, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.Message import Message
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ def get_invalid_error_message(error: str, validation_failures: list['ValidationF
 
     validation_failure_cases = map_validation_failures_to_invalid_field_cases(
         validation_failures)
-    new_error_result = {
+    new_error_result: dict[str, object] = {
         error: {
             "cases": validation_failure_cases
         }

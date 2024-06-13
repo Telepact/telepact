@@ -1,4 +1,3 @@
-from typing import object, list, Union
 from uapi.internal.types.UInteger import _INTEGER_NAME
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 

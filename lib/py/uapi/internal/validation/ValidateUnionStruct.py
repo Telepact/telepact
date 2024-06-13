@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
@@ -11,12 +11,12 @@ def validate_union_struct(
     union_case: str,
     actual: dict[str, object],
     selected_cases: dict[str, object],
-    select: dict[str, object],
-    fn: str,
+    select: dict[str, object] | None,
+    fn: str | None,
     type_parameters: list['UTypeDeclaration']
 ) -> list['ValidationFailure']:
-    selected_fields = selected_cases.get(
-        union_case) if selected_cases else None
+    selected_fields = cast(list[str], selected_cases.get(
+        union_case)) if selected_cases else None
     from uapi.internal.validation.ValidateStructFields import validate_struct_fields
 
     return validate_struct_fields(

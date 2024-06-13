@@ -1,16 +1,16 @@
-from typing import list, dict, object, TYPE_CHECKING
-from uapi.internal.validation import GetTypeUnexpectedValidationFailure
+from typing import TYPE_CHECKING
+from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
-    from uapi.internal.types import UStruct
+    from uapi.internal.types.UStruct import UStruct
 
 
 def validate_select_struct(struct_reference: 'UStruct', base_path: list[object], selected_fields: object) -> list['ValidationFailure']:
     validation_failures = []
 
     if not isinstance(selected_fields, list):
-        return GetTypeUnexpectedValidationFailure(base_path, selected_fields, "Array")
+        return get_type_unexpected_validation_failure(base_path, selected_fields, "Array")
 
     fields = selected_fields
 
@@ -18,7 +18,7 @@ def validate_select_struct(struct_reference: 'UStruct', base_path: list[object],
         if not isinstance(field, str):
             this_path = base_path + [i]
             validation_failures.extend(
-                GetTypeUnexpectedValidationFailure(this_path, field, "String"))
+                get_type_unexpected_validation_failure(this_path, field, "String"))
             continue
 
         string_field = field
