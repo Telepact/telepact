@@ -1,5 +1,3 @@
-from typing import list, object, dict
-
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
@@ -7,7 +5,7 @@ def get_type_unexpected_parse_failure(path: list[object], value: object, expecte
     from uapi.internal.types.GetType import get_type
 
     actual_type = get_type(value)
-    data = {
+    data: dict[str, object] = {
         "actual": {actual_type: {}},
         "expected": {expected_type: {}}
     }

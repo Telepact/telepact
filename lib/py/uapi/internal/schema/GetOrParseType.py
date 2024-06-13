@@ -1,5 +1,7 @@
 import re
-from typing import list, dict, Set, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
@@ -8,9 +10,9 @@ if TYPE_CHECKING:
 def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_count: int,
                       u_api_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
                       parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
-                      all_parse_failures: list[object], failed_types: Set[str]) -> 'UType':
+                      all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> 'UType':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
-    from uapi.internal.types.Uobject import Uobject
+    from uapi.internal.types.UObject import UObject
     from uapi.internal.types.UArray import UArray
     from uapi.internal.types.UBoolean import UBoolean
     from uapi.internal.types.UGeneric import UGeneric
@@ -52,7 +54,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
             "string": UString(),
             "array": UArray(),
             "object": UObject()
-        }.get(standard_type_name, Uobject())
+        }.get(standard_type_name, UObject())
 
     if this_type_parameter_count > 0:
         generic_parameter_index_string = matcher.group(9)
@@ -65,12 +67,13 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     if index is None:
         raise UApiSchemaParseError(
             [{"path": path, "error": "TypeUnknown", "name": custom_type_name}])
-    definition = u_api_schema_pseudo_json[index]
+    definition = cast(dict[str, object], u_api_schema_pseudo_json[index])
 
     type_parameter_count_string = matcher.group(6)
     type_parameter_count = int(
         type_parameter_count_string) if type_parameter_count_string else 0
 
+    type: 'UType'
     try:
         if custom_type_name.startswith("struct"):
             type = parse_struct_type([index], definition, custom_type_name, [], type_parameter_count,
@@ -85,10 +88,11 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
                                        schema_keys_to_index, parsed_types, type_extensions, all_parse_failures,
                                        failed_types)
         else:
-            type = type_extensions.get(custom_type_name)
-            if type is None:
+            possible_type = type_extensions.get(custom_type_name)
+            if possible_type is None:
                 raise UApiSchemaParseError(
                     [{"path": [index], "error": "TypeExtensionImplementationMissing", "name": custom_type_name}])
+            type = possible_type
 
         parsed_types[custom_type_name] = type
 

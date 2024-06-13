@@ -1,4 +1,4 @@
-from typing import list, dict, object, Union, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from uapi.UApiSchema import UApiSchema
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
@@ -27,10 +27,10 @@ def parse_uapi_schema(
 
     parsed_types: dict[str, UType] = {}
     parse_failures: list[SchemaParseFailure] = []
-    failed_types: Set[str] = set()
+    failed_types: set[str] = set()
     schema_keys_to_index: dict[str, int] = {}
-    schema_keys: Set[str] = set()
-    error_indices: Set[int] = set()
+    schema_keys: set[str] = set()
+    error_indices: set[int] = set()
 
     index = -1
     for definition in u_api_schema_pseudo_json:
@@ -39,7 +39,7 @@ def parse_uapi_schema(
 
         if not isinstance(definition, dict):
             this_parse_failures = get_type_unexpected_parse_failure(
-                loop_path, definition, "Object")
+                cast(list[object], loop_path), definition, "Object")
             parse_failures.extend(this_parse_failures)
             continue
 
@@ -63,7 +63,7 @@ def parse_uapi_schema(
                 final_path = loop_path + [schema_key]
                 parse_failures.append(
                     SchemaParseFailure(
-                        final_path,
+                        cast(list[object], final_path),
                         "PathCollision",
                         {"other": [other_path_index, matching_schema_key]},
                         schema_key,
@@ -79,8 +79,8 @@ def parse_uapi_schema(
             parse_failures, path_offset, schema_keys_to_index, error_indices)
         raise UApiSchemaParseError(offset_parse_failures)
 
-    request_header_keys: Set[str] = set()
-    response_header_keys: Set[str] = set()
+    request_header_keys: set[str] = set()
+    response_header_keys: set[str] = set()
     root_type_parameter_count = 0
 
     for schema_key in schema_keys:
@@ -120,7 +120,8 @@ def parse_uapi_schema(
                                error_indices, schema_keys_to_index)
 
         for this_index in error_indices:
-            def_ = u_api_schema_pseudo_json[this_index]
+            def_ = cast(dict[str, object],
+                        u_api_schema_pseudo_json[this_index])
 
             try:
                 error = parse_error_type(
@@ -147,7 +148,8 @@ def parse_uapi_schema(
     try:
         for request_header_key in request_header_keys:
             this_index = schema_keys_to_index[request_header_key]
-            def_ = u_api_schema_pseudo_json[this_index]
+            def_ = cast(dict[str, object],
+                        u_api_schema_pseudo_json[this_index])
             header_field = request_header_key[len("requestHeader."):]
 
             try:
@@ -169,7 +171,8 @@ def parse_uapi_schema(
 
         for response_header_key in response_header_keys:
             this_index = schema_keys_to_index[response_header_key]
-            def_ = u_api_schema_pseudo_json[this_index]
+            def_ = cast(dict[str, object],
+                        u_api_schema_pseudo_json[this_index])
             header_field = response_header_key[len("responseHeader."):]
 
             try:

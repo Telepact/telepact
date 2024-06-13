@@ -1,4 +1,4 @@
-from typing import list, dict, object, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UStruct import UStruct
 
@@ -10,7 +10,7 @@ def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict
                       schema_key: str, ignore_keys: list[str], type_parameter_count: int,
                       uapi_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
                       parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
-                      all_parse_failures: list['SchemaParseFailure'], failed_types: Set[str]) -> 'UStruct':
+                      all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> 'UStruct':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructFields import parse_struct_fields
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -31,7 +31,8 @@ def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict
                 loop_path, "ObjectKeyDisallowed", {}, None))
 
     this_path = path + [schema_key]
-    def_init = struct_definition_as_pseudo_json.get(schema_key)
+    def_init = cast(dict[str, object],
+                    struct_definition_as_pseudo_json.get(schema_key))
 
     definition = None
     if not isinstance(def_init, dict):

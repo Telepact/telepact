@@ -1,4 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 import json
 
 if TYPE_CHECKING:

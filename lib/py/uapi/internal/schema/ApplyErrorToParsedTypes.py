@@ -1,5 +1,5 @@
 import re
-from typing import list, dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -16,9 +16,9 @@ def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types:
 
     parse_failures = []
     for parsed_type_name, parsed_type in parsed_types.items():
-        if not isinstance(parsed_type[1], UFn):
+        if not isinstance(parsed_type, UFn):
             continue
-        f = parsed_type[1]
+        f = parsed_type
 
         fn_name = f.name
 

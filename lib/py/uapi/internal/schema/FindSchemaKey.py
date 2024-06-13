@@ -1,5 +1,4 @@
-from typing import list, dict
-from collections import Ordereddict
+from collections import OrderedDict
 
 
 def find_schema_key(definition: dict[str, object], index: int) -> str:

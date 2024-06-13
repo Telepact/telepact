@@ -1,4 +1,4 @@
-from typing import list, dict, object, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
 
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ def parse_headers_type(headers_definition_as_parsed_json: dict[str, object], sch
                        header_field: str, index: int, uapi_schema_pseudo_json: list[object],
                        schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
                        type_extensions: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
-                       failed_types: Set[str]) -> 'UFieldDeclaration':
+                       failed_types: set[str]) -> 'UFieldDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseTypeDeclaration import parse_type_declaration

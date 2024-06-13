@@ -1,4 +1,5 @@
-from typing import list, dict, object, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UFn import UFn
 
 if TYPE_CHECKING:
@@ -8,8 +9,8 @@ if TYPE_CHECKING:
 def parse_function_type(path: list[object], function_definition_as_parsed_json: dict[str, object],
                         schema_key: str, u_api_schema_pseudo_json: list[object],
                         schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
-                        type_extensions: dict[str, 'UType'], all_parse_failures: list[object],
-                        failed_types: Set[str]) -> 'UFn':
+                        type_extensions: dict[str, 'UType'], all_parse_failures: list[SchemaParseFailure],
+                        failed_types: set[str]) -> 'UFn':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructType import parse_struct_type
     from uapi.internal.schema.ParseUnionType import parse_union_type
@@ -74,4 +75,4 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
-    return UFn(schema_key, call_type, result_type, errors_regex)
+    return UFn(schema_key, cast(UUnion, call_type), cast(UUnion, result_type), cast(str, errors_regex))

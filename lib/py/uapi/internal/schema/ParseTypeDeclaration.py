@@ -1,5 +1,5 @@
 import re
-from typing import list, dict, Set, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
@@ -11,7 +11,7 @@ def parse_type_declaration(path: list[object], type_declaration_array: list[obje
                            this_type_parameter_count: int, uapi_schema_pseudo_json: list[object],
                            schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
                            type_extensions: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
-                           failed_types: Set[str]) -> 'UTypeDeclaration':
+                           failed_types: set[str]) -> 'UTypeDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetOrParseType import get_or_parse_type
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure

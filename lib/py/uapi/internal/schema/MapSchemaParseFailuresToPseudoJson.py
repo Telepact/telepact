@@ -1,6 +1,4 @@
-from typing import list, dict, TYPE_CHECKING
-from collections import defaultdict
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
@@ -8,7 +6,7 @@ if TYPE_CHECKING:
 def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: list['SchemaParseFailure']) -> list[dict[str, object]]:
     pseudo_json_list = []
     for f in schema_parse_failures:
-        pseudo_json = defaultdict(dict)
+        pseudo_json: dict[str, object] = {}
         pseudo_json["path"] = f.path
         pseudo_json["reason"] = {f.reason: f.data}
         if f.key is not None:

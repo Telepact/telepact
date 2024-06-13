@@ -1,4 +1,4 @@
-from typing import list, dict, object, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
@@ -10,12 +10,12 @@ if TYPE_CHECKING:
 def parse_struct_fields(reference_struct: dict[str, object], path: list[object], type_parameter_count: int,
                         uapi_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
                         parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
-                        all_parse_failures: list['SchemaParseFailure'], failed_types: Set[str]) -> dict[str, 'UFieldDeclaration']:
+                        all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> dict[str, 'UFieldDeclaration']:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseField import parse_field
 
     parse_failures = []
-    fields = {}
+    fields: dict[str, 'UFieldDeclaration'] = {}
 
     for field_declaration, type_declaration_value in reference_struct.items():
         for existing_field in fields.keys():

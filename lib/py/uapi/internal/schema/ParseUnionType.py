@@ -1,5 +1,5 @@
 import re
-from typing import list, dict, object, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UUnion import UUnion
 
@@ -11,7 +11,7 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
                      ignore_keys: list[str], required_keys: list[str], type_parameter_count: int,
                      u_api_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
                      parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
-                     all_parse_failures: list['SchemaParseFailure'], failed_types: Set[str]) -> 'UUnion':
+                     all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> 'UUnion':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructFields import parse_struct_fields
@@ -62,9 +62,9 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
     else:
         for required_key in required_keys:
             for element in definition:
-                keys = set(element.keys())
-                keys.discard("///")
-                if required_key in keys:
+                these_keys = set(element.keys())
+                these_keys.discard("///")
+                if required_key in these_keys:
                     break
             else:
                 branch_path = this_path + [0, required_key]

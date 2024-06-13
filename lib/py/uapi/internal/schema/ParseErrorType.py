@@ -1,4 +1,4 @@
-from typing import list, dict, object, Union, Set, TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UError import UError
 
@@ -13,12 +13,12 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
                      parsed_types: dict[str, 'UType'],
                      type_extensions: dict[str, 'UType'],
                      all_parse_failures: list['SchemaParseFailure'],
-                     failed_types: Set[str]) -> 'UError':
+                     failed_types: set[str]) -> 'UError':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseUnionType import parse_union_type
 
     schema_key = "errors"
-    base_path = [index]
+    base_path: list[object] = [index]
 
     parse_failures = []
 
@@ -30,7 +30,7 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
         for k in other_keys:
             loop_path = base_path + [k]
             parse_failures.append(SchemaParseFailure(
-                loop_path, "ObjectKeyDisallowed", {}, None))
+                cast(list[object], loop_path), "ObjectKeyDisallowed", {}, None))
 
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)

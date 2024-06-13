@@ -1,7 +1,7 @@
-from typing import list, Set, dict, object
+from typing import cast
 
 
-def catch_error_collisions(u_api_schema_pseudo_json: list[object], error_indices: Set[int], keys_to_index: dict[str, int]) -> None:
+def catch_error_collisions(u_api_schema_pseudo_json: list[object], error_indices: set[int], keys_to_index: dict[str, int]) -> None:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
@@ -14,19 +14,21 @@ def catch_error_collisions(u_api_schema_pseudo_json: list[object], error_indices
             index = indices[i]
             other_index = indices[j]
 
-            def_ = u_api_schema_pseudo_json[index]
-            other_def = u_api_schema_pseudo_json[other_index]
+            def_ = cast(dict[str, object], u_api_schema_pseudo_json[index])
+            other_def = cast(dict[str, object],
+                             u_api_schema_pseudo_json[other_index])
 
-            err_def = def_["errors"]
-            other_err_def = other_def["errors"]
+            err_def = cast(list[object], def_["errors"])
+            other_err_def = cast(list[object], other_def["errors"])
 
             for k in range(len(err_def)):
-                this_err_def = err_def[k]
+                this_err_def = cast(dict[str, object], err_def[k])
                 this_err_def_keys = set(this_err_def.keys())
                 this_err_def_keys.remove("///")
 
                 for l in range(len(other_err_def)):
-                    this_other_err_def = other_err_def[l]
+                    this_other_err_def = cast(
+                        dict[str, object], other_err_def[l])
                     this_other_err_def_keys = set(this_other_err_def.keys())
                     this_other_err_def_keys.remove("///")
 
