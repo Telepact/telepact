@@ -13,7 +13,7 @@ def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
         key = header[j + 1]
         value = row[j]
 
-        if isinstance(value, ExtType) and value.type == UNDEFINED_BYTE:
+        if isinstance(value, ExtType) and value.code == UNDEFINED_BYTE:
             continue
 
         if isinstance(key, list):
