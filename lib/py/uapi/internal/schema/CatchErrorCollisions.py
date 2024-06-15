@@ -24,13 +24,13 @@ def catch_error_collisions(u_api_schema_pseudo_json: list[object], error_indices
             for k in range(len(err_def)):
                 this_err_def = cast(dict[str, object], err_def[k])
                 this_err_def_keys = set(this_err_def.keys())
-                this_err_def_keys.remove("///")
+                this_err_def_keys.discard("///")
 
                 for l in range(len(other_err_def)):
                     this_other_err_def = cast(
                         dict[str, object], other_err_def[l])
                     this_other_err_def_keys = set(this_other_err_def.keys())
-                    this_other_err_def_keys.remove("///")
+                    this_other_err_def_keys.discard("///")
 
                     if this_err_def_keys == this_other_err_def_keys:
                         this_error_def_key = next(iter(this_err_def_keys))
