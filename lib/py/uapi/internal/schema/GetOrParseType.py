@@ -20,6 +20,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     from uapi.internal.types.UNumber import UNumber
     from uapi.internal.types.UObject import UObject
     from uapi.internal.types.UString import UString
+    from uapi.internal.types.UAny import UAny
     from uapi.internal.schema.ParseFunctionType import parse_function_type
     from uapi.internal.schema.ParseStructType import parse_struct_type
     from uapi.internal.schema.ParseUnionType import parse_union_type
@@ -54,7 +55,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
             "string": UString(),
             "array": UArray(),
             "object": UObject()
-        }.get(standard_type_name, UObject())
+        }.get(standard_type_name, UAny())
 
     if this_type_parameter_count > 0:
         generic_parameter_index_string = matcher.group(9)

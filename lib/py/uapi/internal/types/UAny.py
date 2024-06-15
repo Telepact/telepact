@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from uapi.internal.types.UType import UType
 
 
-class Uobject(UType):
+class UAny(UType):
     _ANY_NAME = "object"
 
     def get_type_parameter_count(self) -> int:
