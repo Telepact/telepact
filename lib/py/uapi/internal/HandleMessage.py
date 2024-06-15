@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from uapi.internal.types.UUnion import UUnion
     from uapi.internal.validation.ValidationFailure import ValidationFailure
     from uapi.internal.types.UType import UType
-    from uapi.internal.types.UFn import UFn
     from uapi.UApiSchema import UApiSchema
 
 
@@ -21,6 +20,7 @@ async def handle_message(
     from uapi.internal.validation.GetInvalidErrorMessage import get_invalid_error_message
     from uapi.internal.validation.ValidateHeaders import validate_headers
     from uapi.internal.validation.ValidateResult import validate_result
+    from uapi.internal.types.UFn import UFn
 
     response_headers: dict[str, object] = {}
     request_headers: dict[str, object] = request_message.header
