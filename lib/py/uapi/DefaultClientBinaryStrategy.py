@@ -20,7 +20,7 @@ class DefaultClientBinaryStrategy(ClientBinaryStrategy):
         self.last_update = datetime.now()
         self.lock = Lock()
 
-    def update(self, new_checksum: int) -> None:
+    def update_checksum(self, new_checksum: int) -> None:
         with self.lock:
             if self.primary is None:
                 self.primary = Checksum(new_checksum, 0)

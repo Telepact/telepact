@@ -12,8 +12,8 @@ def client_binary_decode(message: list[object], recent_binary_encoders: dict[int
 
     headers = cast(dict[str, object], message[0])
     encoded_message_body = cast(dict[object, object], message[1])
-    binary_checksums: list[int] = cast(list[int], headers["bin_"])
-    binary_checksum: int = binary_checksums[0]
+    binary_checksums = cast(list[int], headers.get("bin_", []))
+    binary_checksum = binary_checksums[0]
 
     # If there is a binary encoding included on this message, cache it
     if "enc_" in headers:
@@ -22,10 +22,20 @@ def client_binary_decode(message: list[object], recent_binary_encoders: dict[int
 
         recent_binary_encoders[binary_checksum] = new_binary_encoder
 
-    binary_encoder: BinaryEncoding = recent_binary_encoders[binary_checksum]
+    binary_checksum_strategy.update_checksum(binary_checksum)
+    new_current_checksum_strategy = binary_checksum_strategy.get_current_checksums()
 
-    final_encoded_message_body = unpack_body(
-        encoded_message_body) if headers.get("_pac") else encoded_message_body
+    for key in list(recent_binary_encoders.keys()):
+        if key not in new_current_checksum_strategy:
+            del recent_binary_encoders[key]
+
+    binary_encoder = recent_binary_encoders[binary_checksum]
+
+    final_encoded_message_body: dict[object, object]
+    if headers.get("_pac") is True:
+        final_encoded_message_body = unpack_body(encoded_message_body)
+    else:
+        final_encoded_message_body = encoded_message_body
 
     message_body = decode_body(final_encoded_message_body, binary_encoder)
     return [headers, message_body]

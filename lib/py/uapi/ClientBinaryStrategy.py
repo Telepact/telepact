@@ -8,7 +8,7 @@ class ClientBinaryStrategy(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def update(self, checksum: int) -> None:
+    def update_checksum(self, checksum: int) -> None:
         """
         Update the strategy according to a recent binary encoding checksum returned
         by the server.
