@@ -24,7 +24,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     function_name = request_message.get_body_target()
     argument = request_message.get_body_payload()
 
-    if function_name == "fn.create_stub_":
+    if function_name == "fn.createStub_":
         given_stub = cast(dict[str, object], argument.get("stub"))
 
         stub_call = next((e for e in given_stub.items()

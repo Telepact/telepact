@@ -24,10 +24,10 @@ def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types:
 
         regex = re.compile(f.errors_regex)
 
-        fn_result: UUnion = f.result
-        fn_result_cases: dict[str, UStruct] = fn_result.cases
-        error_errors: UUnion = error.errors
-        error_cases: dict[str, UStruct] = error_errors.cases
+        fn_result = f.result
+        fn_result_cases = fn_result.cases
+        error_errors = error.errors
+        error_cases = error_errors.cases
 
         for error_case_name, error_case in error_cases.items():
             new_key = error_case_name
