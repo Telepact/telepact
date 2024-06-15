@@ -1,4 +1,5 @@
-from msgpack import ExtType, cast
+from msgpack import ExtType
+from typing import cast
 
 from uapi.internal.binary.PackMap import UNDEFINED_BYTE
 
@@ -24,7 +25,6 @@ def unpack_map(row: list[object], header: list[object]) -> dict[int, object]:
             final_map[i] = m
         else:
             i = key
-            # Assuming you have a function called `unpack` defined elsewhere
             unpacked_value = unpack(value)
 
             final_map[i] = unpacked_value

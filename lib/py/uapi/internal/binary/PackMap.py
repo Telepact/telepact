@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING, cast
 from msgpack import ExtType
 
-if TYPE_CHECKING:
-    from uapi.internal.binary.BinaryPackNode import BinaryPackNode
+from uapi.internal.binary.BinaryPackNode import BinaryPackNode
 
 
 UNDEFINED_BYTE = 18
