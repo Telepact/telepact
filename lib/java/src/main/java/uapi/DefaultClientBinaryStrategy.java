@@ -22,7 +22,7 @@ class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
     private final ReentrantLock lock = new ReentrantLock();
 
     @Override
-    public void update(Integer newChecksum) {
+    public void updateChecksum(Integer newChecksum) {
         try {
             lock.lock();
 

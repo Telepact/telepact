@@ -14,7 +14,7 @@ public interface ClientBinaryStrategy {
      * 
      * @param checksum
      */
-    void update(Integer checksum);
+    void updateChecksum(Integer checksum);
 
     /**
      * Get the current binary encoding strategy as a list of binary encoding

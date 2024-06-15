@@ -26,7 +26,7 @@ public class ClientBinaryDecode {
             recentBinaryEncoders.put(binaryChecksum, newBinaryEncoder);
         }
 
-        binaryChecksumStrategy.update(binaryChecksum);
+        binaryChecksumStrategy.updateChecksum(binaryChecksum);
         final var newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
         recentBinaryEncoders.entrySet().removeIf(e -> !newCurrentChecksumStrategy.contains(e.getKey()));
