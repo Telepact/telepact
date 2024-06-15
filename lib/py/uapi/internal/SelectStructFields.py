@@ -19,12 +19,12 @@ def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
         fields = type_declaration_type.fields
         struct_name = type_declaration_type.name
         selected_fields = cast(
-            list[str], selected_struct_fields.get(struct_name, []))
+            list[str] | None, selected_struct_fields.get(struct_name))
         value_as_map = cast(dict[str, object], value)
         final_map = {}
 
         for field_name, field_value in value_as_map.items():
-            if not selected_fields or field_name in selected_fields:
+            if selected_fields is None or field_name in selected_fields:
                 field = fields[field_name]
                 field_type_declaration = field.type_declaration
                 value_with_selected_fields = select_struct_fields(field_type_declaration, field_value,
@@ -44,11 +44,11 @@ def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
 
         arg_struct_reference = fn_call_cases[union_case]
         selected_fields = cast(
-            list[str], selected_struct_fields.get(fn_name, []))
+            list[str] | None, selected_struct_fields.get(fn_name))
         final_map = {}
 
         for field_name, field_value in union_data.items():
-            if not selected_fields or field_name in selected_fields:
+            if selected_fields is None or field_name in selected_fields:
                 field = arg_struct_reference.fields[field_name]
                 value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
                                                                   selected_struct_fields)
@@ -74,12 +74,12 @@ def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
             type_declaration_type.name, default_cases_to_fields))
         this_union_case_selected_fields_default = default_cases_to_fields.get(
             union_case)
-        selected_fields = cast(list[str], union_selected_fields.get(
+        selected_fields = cast(list[str] | None, union_selected_fields.get(
             union_case, this_union_case_selected_fields_default))
 
         final_map = {}
         for field_name, field_value in union_data.items():
-            if not selected_fields or field_name in selected_fields:
+            if selected_fields is None or field_name in selected_fields:
                 field = union_struct_ref_fields[field_name]
                 value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
                                                                   selected_struct_fields)
