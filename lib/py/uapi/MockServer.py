@@ -26,7 +26,7 @@ class MockServer:
             self.generated_collection_length_min: int = 0
             self.generated_collection_length_max: int = 3
 
-    def __init__(self, u_api_schema: UApiSchema, options: Options) -> None:
+    def __init__(self, u_api_schema: 'UApiSchema', options: Options) -> None:
         from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
         from uapi.internal.schema.GetMockUApiJson import get_mock_uapi_json
         from uapi.Server import Server

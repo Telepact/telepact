@@ -85,9 +85,9 @@ public class ParseUnionType {
             outerLoop: for (final var requiredKey : requiredKeys) {
                 for (final var element : definition) {
                     final var map = (Map<String, Object>) element;
-                    final var keys = new HashSet<>(map.keySet());
-                    keys.remove("///");
-                    if (keys.contains(requiredKey)) {
+                    final var caseKeys = new HashSet<>(map.keySet());
+                    caseKeys.remove("///");
+                    if (caseKeys.contains(requiredKey)) {
                         continue outerLoop;
                     }
                 }

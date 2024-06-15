@@ -80,8 +80,8 @@ public class SelectStructFields {
             for (final var entry : unionCases.entrySet()) {
                 final var unionStruct = entry.getValue();
                 final var unionStructFields = unionStruct.fields;
-                final var fields = unionStructFields.keySet().stream().toList();
-                defaultCasesToFields.put(entry.getKey(), fields);
+                final var fieldNames = unionStructFields.keySet().stream().toList();
+                defaultCasesToFields.put(entry.getKey(), fieldNames);
             }
 
             final var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(u.name,

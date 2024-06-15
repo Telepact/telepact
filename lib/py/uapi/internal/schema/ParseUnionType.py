@@ -62,9 +62,9 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
     else:
         for required_key in required_keys:
             for element in definition:
-                these_keys = set(element.keys())
-                these_keys.discard("///")
-                if required_key in these_keys:
+                case_keys = set(element.keys())
+                case_keys.discard("///")
+                if required_key in case_keys:
                     break
             else:
                 branch_path = this_path + [0, required_key]

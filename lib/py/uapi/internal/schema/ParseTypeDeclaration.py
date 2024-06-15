@@ -51,6 +51,10 @@ def parse_type_declaration(path: list[object], type_declaration_array: list[obje
 
     given_type_parameter_count = len(type_declaration_array) - 1
     if type_.get_type_parameter_count() != given_type_parameter_count:
+        print('path', path)
+        print('type_.get_type_parameter_count()',
+              type_.get_type_parameter_count())
+        print('given_type_parameter_count', given_type_parameter_count)
         raise UApiSchemaParseError([SchemaParseFailure(path, "ArrayLengthUnexpected",
                                                        {"actual": len(type_declaration_array),
                                                         "expected": type_.get_type_parameter_count() + 1}, None)])
