@@ -43,7 +43,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     matcher = regex.match(type_name)
     if not matcher:
         raise UApiSchemaParseError(
-            [{"path": path, "error": "StringRegexMatchFailed", "regex": regex_string}])
+            [SchemaParseFailure(path, "StringRegexMatchFailed", {"regex": regex_string}, None)])
 
     standard_type_name = matcher.group(1)
     if standard_type_name is not None:
@@ -66,7 +66,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     index = schema_keys_to_index.get(custom_type_name)
     if index is None:
         raise UApiSchemaParseError(
-            [{"path": path, "error": "TypeUnknown", "name": custom_type_name}])
+            [SchemaParseFailure(path, "TypeUnknown", {"name": custom_type_name}, None)])
     definition = cast(dict[str, object], u_api_schema_pseudo_json[index])
 
     type_parameter_count_string = matcher.group(6)
@@ -90,8 +90,8 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
         else:
             possible_type = type_extensions.get(custom_type_name)
             if possible_type is None:
-                raise UApiSchemaParseError(
-                    [{"path": [index], "error": "TypeExtensionImplementationMissing", "name": custom_type_name}])
+                raise UApiSchemaParseError([SchemaParseFailure(
+                    [index], "TypeExtensionImplementationMissing", {"name": custom_type_name}, None)])
             type = possible_type
 
         parsed_types[custom_type_name] = type

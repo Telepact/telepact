@@ -17,7 +17,7 @@ def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
     try:
         if message_bytes[0] == 0x92:  # MsgPack
             is_msg_pack = True
-            message_as_pseudo_json = serializer.from_msg_pack(message_bytes)
+            message_as_pseudo_json = serializer.from_msgpack(message_bytes)
         else:
             is_msg_pack = False
             message_as_pseudo_json = serializer.from_json(message_bytes)

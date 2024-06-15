@@ -1,4 +1,4 @@
-from typing import list, dict, object, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
 from uapi.SerializationError import SerializationError
@@ -19,18 +19,18 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
     else:
         serialize_as_binary = False
 
-    message_as_pseudo_json: list[Union[dict[str, object], object]] = [
+    message_as_pseudo_json: list[object] = [
         message.header, message.body]
 
     try:
         if serialize_as_binary:
             try:
                 encoded_message = binary_encoder.encode(message_as_pseudo_json)
-                return serializer.to_msg_pack(encoded_message)
+                return serializer.to_msgpack(encoded_message)
             except BinaryEncoderUnavailableError:
                 # We can still submit as json
                 return serializer.to_json(message_as_pseudo_json)
         else:
             return serializer.to_json(message_as_pseudo_json)
     except Exception as e:
-        raise SerializationError(e)
+        raise SerializationError() from e

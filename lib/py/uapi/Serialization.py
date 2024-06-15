@@ -1,7 +1,7 @@
-from typing import object
+from abc import ABCMeta, abstractmethod
 
 
-class Serialization:
+class Serialization(metaclass=ABCMeta):
     """
     A serialization implementation that converts between pseudo-JSON Objects and
     byte array JSON payloads.
@@ -10,14 +10,18 @@ class Serialization:
     objects as dicts and JSON arrays as lists.
     """
 
+    @abstractmethod
     def to_json(self, message: object) -> bytes:
         pass
 
-    def to_msg_pack(self, message: object) -> bytes:
+    @abstractmethod
+    def to_msgpack(self, message: object) -> bytes:
         pass
 
+    @abstractmethod
     def from_json(self, bytes_: bytes) -> object:
         pass
 
-    def from_msg_pack(self, bytes_: bytes) -> object:
+    @abstractmethod
+    def from_msgpack(self, bytes_: bytes) -> object:
         pass

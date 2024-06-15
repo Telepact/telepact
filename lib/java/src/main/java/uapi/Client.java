@@ -7,10 +7,6 @@ import java.util.function.BiFunction;
 
 import uapi.internal.binary.ClientBinaryEncoder;
 
-import uapi.DefaultSerialization;
-import uapi.DefaultClientBinaryStrategy;
-import uapi.Serializer;
-
 /**
  * A uAPI client.
  */

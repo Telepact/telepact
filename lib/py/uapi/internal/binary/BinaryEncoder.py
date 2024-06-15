@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 
-class BinaryEncoder(ABC):
+class BinaryEncoder(metaclass=ABCMeta):
 
     @abstractmethod
     def encode(self, message: list[object]) -> list[object]:

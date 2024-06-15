@@ -1,4 +1,4 @@
-from typing import list, dict, object, Callable, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, Awaitable
 
 from uapi.Message import Message
 
@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from uapi.UApiSchema import UApiSchema
 
 
-def process_bytes(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',
-                  on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
-                  on_response: Callable[['Message'], None], handler: Callable[['Message'], 'Message']) -> bytes:
+async def process_bytes(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',
+                        on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
+                        on_response: Callable[['Message'], None], handler: Callable[['Message'], Awaitable['Message']]) -> bytes:
     from uapi.internal.HandleMessage import handle_message
     from uapi.internal.ParseRequestMessage import parse_request_message
 
@@ -22,7 +22,7 @@ def process_bytes(request_message_bytes: bytes, serializer: 'Serializer', uapi_s
         except Exception:
             pass
 
-        response_message = handle_message(
+        response_message = await handle_message(
             request_message, uapi_schema, handler, on_error)
 
         try:

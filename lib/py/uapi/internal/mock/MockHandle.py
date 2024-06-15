@@ -9,13 +9,14 @@ if TYPE_CHECKING:
     from uapi.UApiSchema import UApiSchema
 
 
-def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations: list['MockInvocation'],
-                random: 'RandomGenerator', u_api_schema: 'UApiSchema', enable_generated_default_stub: bool,
-                enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'Message':
+async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations: list['MockInvocation'],
+                      random: 'RandomGenerator', u_api_schema: 'UApiSchema', enable_generated_default_stub: bool,
+                      enable_optional_field_generation: bool, randomize_optional_field_generation: bool) -> 'Message':
     from uapi.internal.mock.IsSubMap import is_sub_map
     from uapi.internal.mock.Verify import verify
     from uapi.internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
     from uapi.UApiError import UApiError
+    from uapi.internal.types.UFn import UFn
 
     header: dict[str, object] = request_message.header
 
@@ -71,7 +72,7 @@ def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations
     else:
         invocations.append(MockInvocation(function_name, dict(argument)))
 
-        definition = u_api_schema.parsed.get(function_name)
+        definition = cast(UFn, u_api_schema.parsed.get(function_name))
 
         for stub in stubs:
             if stub.count == 0:
@@ -81,10 +82,11 @@ def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations
                     if is_sub_map(stub.when_argument, argument):
                         use_blueprint_value = True
                         include_optional_fields = False
-                        result = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
-                                                                         include_optional_fields,
-                                                                         randomize_optional_field_generation,
-                                                                         [], [], random)
+                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
+                                                                              include_optional_fields,
+                                                                              randomize_optional_field_generation,
+                                                                              [], [], random)
+                        result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
                         return Message({}, result)
@@ -92,10 +94,11 @@ def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations
                     if stub.when_argument == argument:
                         use_blueprint_value = True
                         include_optional_fields = False
-                        result = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
-                                                                         include_optional_fields,
-                                                                         randomize_optional_field_generation,
-                                                                         [], [], random)
+                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
+                                                                              include_optional_fields,
+                                                                              randomize_optional_field_generation,
+                                                                              [], [], random)
+                        result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
                         return Message({}, result)
@@ -105,13 +108,14 @@ def mock_handle(request_message: 'Message', stubs: list['MockStub'], invocations
 
         if definition is not None:
             result_union = definition.result
-            ok_struct_ref = result_union.cases.get("Ok_")
+            ok_struct_ref = result_union.cases["Ok_"]
             use_blueprint_value = True
             include_optional_fields = True
-            random_ok_struct = ok_struct_ref.generate_random_value({}, use_blueprint_value,
-                                                                   include_optional_fields,
-                                                                   randomize_optional_field_generation,
-                                                                   [], [], random)
+            random_ok_struct_init = ok_struct_ref.generate_random_value({}, use_blueprint_value,
+                                                                        include_optional_fields,
+                                                                        randomize_optional_field_generation,
+                                                                        [], [], random)
+            random_ok_struct = cast(dict[str, object], random_ok_struct_init)
             return Message({}, {"Ok_": random_ok_struct})
         else:
             raise UApiError(

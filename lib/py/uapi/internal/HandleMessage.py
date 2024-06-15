@@ -1,4 +1,4 @@
-from typing import Callable, TYPE_CHECKING, cast
+from typing import Callable, TYPE_CHECKING, cast, Awaitable
 
 from uapi.Message import Message
 from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
@@ -11,10 +11,10 @@ if TYPE_CHECKING:
     from uapi.UApiSchema import UApiSchema
 
 
-def handle_message(
+async def handle_message(
     request_message: 'Message',
     u_api_schema: 'UApiSchema',
-    handler: Callable[['Message'], 'Message'],
+    handler: Callable[['Message'], Awaitable['Message']],
     on_error: Callable[[Exception], None],
 ) -> 'Message':
     from uapi.internal.SelectStructFields import select_struct_fields
@@ -49,7 +49,7 @@ def handle_message(
         response_headers["id_"] = call_id
 
     if "_parseFailures" in request_headers:
-        parse_failures: list[object] = request_headers["_parseFailures"]
+        parse_failures = cast(list[object], request_headers["_parseFailures"])
         new_error_result: dict[str, object] = {
             "ErrorParseFailure_": {"reasons": parse_failures}
         }
@@ -70,7 +70,8 @@ def handle_message(
         )
 
     if "bin_" in request_headers:
-        client_known_binary_checksums: list[object] = request_headers["bin_"]
+        client_known_binary_checksums = cast(
+            list[object], request_headers["bin_"])
 
         response_headers["_binary"] = True
         response_headers["_clientKnownBinaryChecksums"] = client_known_binary_checksums
@@ -78,12 +79,12 @@ def handle_message(
         if "_pac" in request_headers:
             response_headers["_pac"] = request_headers["_pac"]
 
-    select_struct_fields_header: Optional[dict[str, object]] = request_headers.get(
+    select_struct_fields_header: dict[str, object] | None = cast(dict[str, object] | None, request_headers.get(
         "select_"
-    )
+    ))
 
     if unknown_target is not None:
-        new_error_result: dict[str, object] = {
+        new_error_result = {
             "ErrorInvalidRequestBody_": {
                 "cases": [
                     {
@@ -110,7 +111,7 @@ def handle_message(
             response_headers,
         )
 
-    unsafe_response_enabled: bool = request_headers.get("unsafe_", False)
+    unsafe_response_enabled = cast(bool, request_headers.get("unsafe_", False))
 
     call_message: Message = Message(
         request_headers, {request_target: request_payload})
@@ -122,7 +123,7 @@ def handle_message(
         result_message = Message({}, {"Ok_": {"api": u_api_schema.original}})
     else:
         try:
-            result_message = handler(call_message)
+            result_message = await handler(call_message)
         except Exception as e:
             try:
                 on_error(e)
@@ -160,11 +161,11 @@ def handle_message(
 
     final_result_union: dict[str, object]
     if select_struct_fields_header is not None:
-        final_result_union = select_struct_fields(
+        final_result_union = cast(dict[str, object], select_struct_fields(
             UTypeDeclaration(result_union_type, False, []),
             result_union,
             select_struct_fields_header,
-        )
+        ))
     else:
         final_result_union = result_union
 

@@ -1,11 +1,13 @@
 from typing import TYPE_CHECKING
 
+from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+
 
 if TYPE_CHECKING:
     from uapi.internal.binary.BinaryEncoding import BinaryEncoding
 
 
-class ServerBinaryEncoder:
+class ServerBinaryEncoder(BinaryEncoder):
     def __init__(self, binary_encoder: 'BinaryEncoding'):
         self.binary_encoder = binary_encoder
 

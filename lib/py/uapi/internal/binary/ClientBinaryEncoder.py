@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class ClientBinaryEncoder(BinaryEncoder):
 
-    def __init__(self, binaryChecksumStrategy: 'ClientBinaryStrategy'):
+    def __init__(self, binaryChecksumStrategy: 'ClientBinaryStrategy') -> None:
         self.recentBinaryEncoders: dict[int, BinaryEncoding] = {}
         self.binaryChecksumStrategy = binaryChecksumStrategy
 

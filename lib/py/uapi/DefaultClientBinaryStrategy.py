@@ -1,22 +1,26 @@
 from datetime import datetime
-from typing import list
 import threading
+from threading import Lock
+
+
+from uapi.ClientBinaryStrategy import ClientBinaryStrategy
 
 
 class Checksum:
-    def __init__(self, value: int, expiration: int):
+    def __init__(self, value: int, expiration: int) -> None:
         self.value = value
         self.expiration = expiration
 
 
-class DefaultClientBinaryStrategy:
-    def __init__(self):
-        self.primary = None
-        self.secondary = None
-        self.last_update = datetime.now()
-        self.lock = threading.Lock()
+class DefaultClientBinaryStrategy(ClientBinaryStrategy):
 
-    def update(self, new_checksum: int):
+    def __init__(self) -> None:
+        self.primary: Checksum | None = None
+        self.secondary: Checksum | None = None
+        self.last_update = datetime.now()
+        self.lock = Lock()
+
+    def update(self, new_checksum: int) -> None:
         with self.lock:
             if self.primary is None:
                 self.primary = Checksum(new_checksum, 0)

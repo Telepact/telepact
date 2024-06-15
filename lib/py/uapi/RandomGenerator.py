@@ -22,7 +22,7 @@ class RandomGenerator:
         self.collection_length_max = collection_length_max
         self.count = 0
 
-    def set_seed(self, seed: int):
+    def set_seed(self, seed: int) -> None:
         self.seed = c_int32((seed & 0x7ffffffe) + 1)
 
     def next_int(self) -> int:
