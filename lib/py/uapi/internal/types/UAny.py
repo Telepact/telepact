@@ -7,9 +7,10 @@ if TYPE_CHECKING:
 
 from uapi.internal.types.UType import UType
 
+_ANY_NAME = "Any"
+
 
 class UAny(UType):
-    _ANY_NAME = "object"
 
     def get_type_parameter_count(self) -> int:
         return 0
@@ -26,4 +27,4 @@ class UAny(UType):
         return generate_random_any(random_generator)
 
     def get_name(self, generics: list['UTypeDeclaration']) -> str:
-        return self._ANY_NAME
+        return _ANY_NAME
