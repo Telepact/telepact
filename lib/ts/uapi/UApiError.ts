@@ -1,6 +1,5 @@
-class UApiError(Exception):
-    """
-    Indicates critical failure in uAPI processing logic.
-    """
-
-    pass
+export class UApiError {
+    /**
+     * Indicates critical failure in uAPI processing logic.
+     */
+}

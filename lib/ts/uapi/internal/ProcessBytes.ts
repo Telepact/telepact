@@ -1,40 +1,48 @@
-from typing import Callable, TYPE_CHECKING, Awaitable
+import { Serializer } from 'uapi/Serializer';
+import { UApiSchema } from 'uapi/UApiSchema';
+import { Message } from 'uapi/Message';
+import { handleMessage } from 'uapi/internal/HandleMessage';
+import { parseRequestMessage } from 'uapi/internal/ParseRequestMessage';
 
-from uapi.Message import Message
+export type ErrorHandler = (error: any) => void;
+export type RequestHandler = (message: Message) => void;
+export type ResponseHandler = (message: Message) => void;
+export type MessageHandler = (message: Message) => Promise<Message>;
 
-if TYPE_CHECKING:
-    from uapi.Serializer import Serializer
-    from uapi.UApiSchema import UApiSchema
+export async function processBytes(
+    requestMessageBytes: Uint8Array,
+    serializer: Serializer,
+    uapiSchema: UApiSchema,
+    onError: ErrorHandler,
+    onRequest: RequestHandler,
+    onResponse: ResponseHandler,
+    handler: MessageHandler,
+): Promise<Uint8Array> {
+    try {
+        const requestMessage = parseRequestMessage(requestMessageBytes, serializer, uapiSchema, onError);
 
+        try {
+            onRequest(requestMessage);
+        } catch (error) {
+            // Handle error
+        }
 
-async def process_bytes(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',
-                        on_error: Callable[[Exception], None], on_request: Callable[['Message'], None],
-                        on_response: Callable[['Message'], None], handler: Callable[['Message'], Awaitable['Message']]) -> bytes:
-    from uapi.internal.HandleMessage import handle_message
-    from uapi.internal.ParseRequestMessage import parse_request_message
+        const responseMessage = await handleMessage(requestMessage, uapiSchema, handler, onError);
 
-    try:
-        request_message = parse_request_message(
-            request_message_bytes, serializer, uapi_schema, on_error)
+        try {
+            onResponse(responseMessage);
+        } catch (error) {
+            // Handle error
+        }
 
-        try:
-            on_request(request_message)
-        except Exception:
-            pass
+        return serializer.serialize(responseMessage);
+    } catch (error) {
+        try {
+            onError(error);
+        } catch (error) {
+            // Handle error
+        }
 
-        response_message = await handle_message(
-            request_message, uapi_schema, handler, on_error)
-
-        try:
-            on_response(response_message)
-        except Exception:
-            pass
-
-        return serializer.serialize(response_message)
-    except Exception as e:
-        try:
-            on_error(e)
-        except Exception:
-            pass
-
-        return serializer.serialize(Message({}, {"ErrorUnknown_": {}}))
+        return serializer.serialize(new Message({}, { ErrorUnknown_: {} }));
+    }
+}

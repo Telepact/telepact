@@ -1,34 +1,33 @@
-from typing import TYPE_CHECKING
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { get_type_unexpected_validation_failure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
 
-from uapi.internal.types.UObject import _OBJECT_NAME
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+export function validateObject(
+    value: any,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+    generics: UTypeDeclaration[],
+): ValidationFailure[] {
+    if (typeof value === 'object' && value !== null) {
+        const nestedTypeDeclaration = typeParameters[0];
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+        const validationFailures: ValidationFailure[] = [];
+        for (const [k, v] of Object.entries(value)) {
+            const nestedValidationFailures = nestedTypeDeclaration.validate(v, select, fn, generics);
 
+            const nestedValidationFailuresWithPath: ValidationFailure[] = [];
+            for (const f of nestedValidationFailures) {
+                const thisPath = [k, ...f.path];
 
-def validate_object(value: object, select: dict[str, object] | None, fn: str | None,
-                    type_parameters: list['UTypeDeclaration'],
-                    generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+                nestedValidationFailuresWithPath.push(new ValidationFailure(thisPath, f.reason, f.data));
+            }
 
-    if isinstance(value, dict):
-        nested_type_declaration = type_parameters[0]
+            validationFailures.push(...nestedValidationFailuresWithPath);
+        }
 
-        validation_failures = []
-        for k, v in value.items():
-            nested_validation_failures = nested_type_declaration.validate(
-                v, select, fn, generics)
-
-            nested_validation_failures_with_path = []
-            for f in nested_validation_failures:
-                this_path = [k] + f.path
-
-                nested_validation_failures_with_path.append(
-                    ValidationFailure(this_path, f.reason, f.data))
-
-            validation_failures.extend(nested_validation_failures_with_path)
-
-        return validation_failures
-    else:
-        return get_type_unexpected_validation_failure([], value, _OBJECT_NAME)
+        return validationFailures;
+    } else {
+        return get_type_unexpected_validation_failure([], value, _OBJECT_NAME);
+    }
+}

@@ -1,2 +1,1 @@
-class InvalidMessageBody(Exception):
-    pass
+export class InvalidMessageBody extends Error {}

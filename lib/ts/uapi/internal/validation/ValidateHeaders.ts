@@ -1,23 +1,25 @@
-from typing import TYPE_CHECKING
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
+import { UFn } from 'uapi/internal/types/UFn';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-    from uapi.internal.types.UFn import UFn
+export function validateHeaders(
+    headers: Record<string, any>,
+    parsedRequestHeaders: Record<string, UFieldDeclaration>,
+    functionType: UFn,
+): ValidationFailure[] {
+    const validationFailures: ValidationFailure[] = [];
 
+    for (const header in headers) {
+        const headerValue = headers[header];
+        const field = parsedRequestHeaders[header];
+        if (field) {
+            const thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name, []);
+            const thisValidationFailuresPath = thisValidationFailures.map(
+                (e) => new ValidationFailure([header, ...e.path], e.reason, e.data),
+            );
+            validationFailures.push(...thisValidationFailuresPath);
+        }
+    }
 
-def validate_headers(headers: dict[str, object], parsed_request_headers: dict[str, 'UFieldDeclaration'], function_type: 'UFn') -> list['ValidationFailure']:
-    validation_failures = []
-
-    for header, header_value in headers.items():
-        field = parsed_request_headers.get(header)
-        if field:
-            this_validation_failures = field.type_declaration.validate(
-                header_value, None, function_type.name, [])
-            this_validation_failures_path = [
-                ValidationFailure([header] + e.path, e.reason, e.data)
-                for e in this_validation_failures
-            ]
-            validation_failures.extend(this_validation_failures_path)
-
-    return validation_failures
+    return validationFailures;
+}

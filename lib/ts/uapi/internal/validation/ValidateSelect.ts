@@ -1,85 +1,84 @@
-from typing import TYPE_CHECKING, cast
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { UType } from 'uapi/internal/types/UType';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { validateSelectStruct } from 'uapi/internal/validation/ValidateSelectStruct';
+import { UUnion } from 'uapi/internal/types/UUnion';
+import { UFn } from 'uapi/internal/types/UFn';
+import { UStruct } from 'uapi/internal/types/UStruct';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-    from uapi.internal.types.UType import UType
+export function validateSelect(
+    givenObj: any,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+    generics: UTypeDeclaration[],
+    types: Record<string, UType>,
+): ValidationFailure[] {
+    if (!(givenObj instanceof Object)) {
+        return [getTypeUnexpectedValidationFailure([], givenObj, 'Object')];
+    }
 
+    const selectStructFieldsHeader = givenObj;
 
-def validate_select(given_obj: object, select: dict[str, object] | None, fn: str | None,
-                    type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
-                    types: dict[str, 'UType']) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from uapi.internal.validation.ValidateSelectStruct import validate_select_struct
-    from uapi.internal.types.UUnion import UUnion
-    from uapi.internal.types.UFn import UFn
-    from uapi.internal.types.UStruct import UStruct
+    const validationFailures: ValidationFailure[] = [];
+    const functionType = types[fn as string] as UFn;
 
-    if not isinstance(given_obj, dict):
-        return get_type_unexpected_validation_failure([], given_obj, "Object")
+    for (const [type, selectValue] of Object.entries(selectStructFieldsHeader)) {
+        let typeReference: UType;
+        if (type === '->') {
+            typeReference = functionType.result;
+        } else {
+            const possibleTypeReference = types[type];
+            if (possibleTypeReference === undefined) {
+                validationFailures.push(new ValidationFailure([type], 'ObjectKeyDisallowed', {}));
+                continue;
+            }
 
-    select_struct_fields_header = given_obj
+            typeReference = possibleTypeReference;
+        }
 
-    validation_failures = []
-    function_type = cast(UFn, types[cast(str, fn)])
+        if (typeReference instanceof UUnion) {
+            const u = typeReference;
+            if (!(selectValue instanceof Object)) {
+                validationFailures.push(...getTypeUnexpectedValidationFailure([type], selectValue, 'Object'));
+                continue;
+            }
 
-    for entry in select_struct_fields_header.items():
-        type_name, select_value = entry
+            const unionCases = selectValue;
 
-        type_reference: 'UType'
-        if type_name == "->":
-            type_reference = function_type.result
-        else:
-            possible_type_reference = types.get(type_name)
-            if possible_type_reference is None:
-                validation_failures.append(ValidationFailure(
-                    [type_name], "ObjectKeyDisallowed", {}))
-                continue
+            for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
+                const structRef = u.cases[unionCase];
 
-            type_reference = possible_type_reference
+                const loopPath = [type, unionCase];
 
-        if isinstance(type_reference, UUnion):
-            u = type_reference
-            if not isinstance(select_value, dict):
-                validation_failures.extend(
-                    get_type_unexpected_validation_failure([type_name], select_value, "Object"))
-                continue
+                if (structRef === undefined) {
+                    validationFailures.push(new ValidationFailure(loopPath, 'ObjectKeyDisallowed', {}));
+                    continue;
+                }
 
-            union_cases = select_value
+                const nestedValidationFailures = validateSelectStruct(structRef, loopPath, selectedCaseStructFields);
 
-            for union_case_entry in union_cases.items():
-                union_case, selected_case_struct_fields = union_case_entry
-                struct_ref = u.cases.get(union_case)
+                validationFailures.push(...nestedValidationFailures);
+            }
+        } else if (typeReference instanceof UFn) {
+            const f = typeReference;
+            const fnCall = f.call;
+            const fnCallCases = fnCall.cases;
+            const fnName = f.name;
+            const argStruct = fnCallCases[fnName];
+            const nestedValidationFailures = validateSelectStruct(argStruct, [type], selectValue);
 
-                loop_path = [type_name, union_case]
+            validationFailures.push(...nestedValidationFailures);
+        } else if (typeReference instanceof UStruct) {
+            const structRef = typeReference;
+            const nestedValidationFailures = validateSelectStruct(structRef, [type], selectValue);
 
-                if struct_ref is None:
-                    validation_failures.append(ValidationFailure(
-                        loop_path, "ObjectKeyDisallowed", {}))
-                    continue
+            validationFailures.push(...nestedValidationFailures);
+        } else {
+            validationFailures.push(new ValidationFailure([type], 'ObjectKeyDisallowed', {}));
+        }
+    }
 
-                nested_validation_failures = validate_select_struct(
-                    struct_ref, loop_path, selected_case_struct_fields)
-
-                validation_failures.extend(nested_validation_failures)
-        elif isinstance(type_reference, UFn):
-            f = type_reference
-            fn_call = f.call
-            fn_call_cases = fn_call.cases
-            fn_name = f.name
-            arg_struct = fn_call_cases[fn_name]
-            nested_validation_failures = validate_select_struct(
-                arg_struct, [type_name], select_value)
-
-            validation_failures.extend(nested_validation_failures)
-        elif isinstance(type_reference, UStruct):
-            struct_ref = type_reference
-            nested_validation_failures = validate_select_struct(
-                struct_ref, [type_name], select_value)
-
-            validation_failures.extend(nested_validation_failures)
-        else:
-            validation_failures.append(ValidationFailure(
-                [type_name], "ObjectKeyDisallowed", {}))
-
-    return validation_failures
+    return validationFailures;
+}

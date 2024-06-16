@@ -1,30 +1,45 @@
-from typing import Callable, TYPE_CHECKING, Awaitable, Any
-from concurrent.futures import Future
+import { Callable, Awaitable } from 'concurrent.futures';
+import { DefaultClientBinaryStrategy } from 'uapi/DefaultClientBinaryStrategy';
+import { DefaultSerialization } from 'uapi/DefaultSerialization';
+import { Serializer } from 'uapi/Serializer';
+import { ClientBinaryEncoder } from 'uapi/internal/binary/ClientBinaryEncoder';
+import { Message } from 'uapi/Message';
+import { processRequestObject } from 'uapi/internal/ProcessRequestObject';
 
-from uapi.DefaultClientBinaryStrategy import DefaultClientBinaryStrategy
-from uapi.DefaultSerialization import DefaultSerialization
-from uapi.Serializer import Serializer
-from uapi.internal.binary.ClientBinaryEncoder import ClientBinaryEncoder
+export class Client {
+    private adapter: Callable<[Message, Serializer], Awaitable<Message>>;
+    private useBinaryDefault: boolean;
+    private timeoutMsDefault: number;
+    private serializer: Serializer;
 
-if TYPE_CHECKING:
-    from uapi.Message import Message
+    constructor(adapter: Callable<[Message, Serializer], Awaitable<Message>>, options: Options) {
+        this.adapter = adapter;
+        this.useBinaryDefault = options.useBinary;
+        this.timeoutMsDefault = options.timeoutMsDefault;
+        this.serializer = new Serializer(options.serializationImpl, new ClientBinaryEncoder(options.binaryStrategy));
+    }
 
+    async request(requestMessage: Message): Promise<Message> {
+        return await processRequestObject(
+            requestMessage,
+            this.adapter,
+            this.serializer,
+            this.timeoutMsDefault,
+            this.useBinaryDefault,
+        );
+    }
+}
 
-class Client:
-    class Options:
-        def __init__(self) -> None:
-            self.use_binary = False
-            self.timeout_ms_default = 5000
-            self.serialization_impl = DefaultSerialization()
-            self.binary_strategy = DefaultClientBinaryStrategy()
+export class Options {
+    useBinary: boolean;
+    timeoutMsDefault: number;
+    serializationImpl: DefaultSerialization;
+    binaryStrategy: DefaultClientBinaryStrategy;
 
-    def __init__(self, adapter: Callable[['Message', 'Serializer'], Awaitable['Message']], options: 'Options'):
-        self.adapter = adapter
-        self.use_binary_default = options.use_binary
-        self.timeout_ms_default = options.timeout_ms_default
-        self.serializer = Serializer(
-            options.serialization_impl, ClientBinaryEncoder(options.binary_strategy))
-
-    async def request(self, request_message: 'Message') -> 'Message':
-        from uapi.internal.ProcessRequestObject import process_request_object
-        return await process_request_object(request_message, self.adapter, self.serializer, self.timeout_ms_default, self.use_binary_default)
+    constructor() {
+        this.useBinary = false;
+        this.timeoutMsDefault = 5000;
+        this.serializationImpl = new DefaultSerialization();
+        this.binaryStrategy = new DefaultClientBinaryStrategy();
+    }
+}

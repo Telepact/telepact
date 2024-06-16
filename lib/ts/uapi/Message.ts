@@ -1,15 +1,16 @@
-from typing import cast
+export class Message {
+    constructor(
+        private header: Record<string, any>,
+        private body: Record<string, any>,
+    ) {}
 
+    getBodyTarget(): string {
+        const entry = Object.entries(this.body)[0];
+        return entry[0];
+    }
 
-class Message:
-    def __init__(self, header: dict[str, object], body: dict[str, object]):
-        self.header = header.copy()
-        self.body = body
-
-    def get_body_target(self) -> str:
-        entry = next(iter(self.body.items()))
-        return entry[0]
-
-    def get_body_payload(self) -> dict[str, object]:
-        entry = next(iter(self.body.items()))
-        return cast(dict[str, object], entry[1])
+    getBodyPayload(): Record<string, any> {
+        const entry = Object.entries(this.body)[0];
+        return entry[1] as Record<string, any>;
+    }
+}

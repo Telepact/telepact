@@ -1,58 +1,66 @@
-from typing import cast, TYPE_CHECKING
+import { Serialization } from 'uapi/Serialization';
+import { BinaryEncoder } from 'uapi/internal/binary/BinaryEncoder';
+import { Message } from 'uapi/Message';
+import { InvalidMessage } from 'uapi/internal/validation/InvalidMessage';
+import { InvalidMessageBody } from 'uapi/internal/validation/InvalidMessageBody';
 
-from uapi.Message import Message
-from uapi.internal.validation.InvalidMessage import InvalidMessage
-from uapi.internal.validation.InvalidMessageBody import InvalidMessageBody
+export function deserializeInternal(
+    messageBytes: Buffer,
+    serializer: Serialization,
+    binaryEncoder: BinaryEncoder,
+): Message {
+    let messageAsPseudoJson: any;
+    let isMsgPack: boolean;
 
-if TYPE_CHECKING:
-    from uapi.Serialization import Serialization
-    from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+    try {
+        if (messageBytes[0] === 0x92) {
+            // MsgPack
+            isMsgPack = true;
+            messageAsPseudoJson = serializer.fromMsgpack(messageBytes);
+        } else {
+            isMsgPack = false;
+            messageAsPseudoJson = serializer.fromJson(messageBytes);
+        }
+    } catch (e) {
+        throw new InvalidMessage();
+    }
 
+    if (!Array.isArray(messageAsPseudoJson)) {
+        throw new InvalidMessage();
+    }
 
-def deserialize_internal(message_bytes: bytes, serializer: 'Serialization',
-                         binary_encoder: 'BinaryEncoder') -> 'Message':
-    message_as_pseudo_json: object
-    is_msg_pack: bool
+    const messageAsPseudoJsonList: any[] = messageAsPseudoJson;
 
-    try:
-        if message_bytes[0] == 0x92:  # MsgPack
-            is_msg_pack = True
-            message_as_pseudo_json = serializer.from_msgpack(message_bytes)
-        else:
-            is_msg_pack = False
-            message_as_pseudo_json = serializer.from_json(message_bytes)
-    except Exception as e:
-        raise InvalidMessage() from e
+    if (messageAsPseudoJsonList.length !== 2) {
+        throw new InvalidMessage();
+    }
 
-    if not isinstance(message_as_pseudo_json, list):
-        raise InvalidMessage()
+    let finalMessageAsPseudoJsonList: any[];
+    if (isMsgPack) {
+        finalMessageAsPseudoJsonList = binaryEncoder.decode(messageAsPseudoJsonList);
+    } else {
+        finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
+    }
 
-    message_as_pseudo_json_list = cast(list[object], message_as_pseudo_json)
+    if (typeof finalMessageAsPseudoJsonList[0] !== 'object') {
+        throw new InvalidMessage();
+    }
 
-    if len(message_as_pseudo_json_list) != 2:
-        raise InvalidMessage()
+    const headers: { [key: string]: any } = finalMessageAsPseudoJsonList[0];
 
-    final_message_as_pseudo_json_list: list[object]
-    if is_msg_pack:
-        final_message_as_pseudo_json_list = binary_encoder.decode(
-            message_as_pseudo_json_list)
-    else:
-        final_message_as_pseudo_json_list = message_as_pseudo_json_list
+    if (typeof finalMessageAsPseudoJsonList[1] !== 'object') {
+        throw new InvalidMessage();
+    }
 
-    if not isinstance(final_message_as_pseudo_json_list[0], dict):
-        raise InvalidMessage()
+    const body: { [key: string]: any } = finalMessageAsPseudoJsonList[1];
 
-    headers = cast(dict[str, object], final_message_as_pseudo_json_list[0])
+    if (Object.keys(body).length !== 1) {
+        throw new InvalidMessageBody();
+    }
 
-    if not isinstance(final_message_as_pseudo_json_list[1], dict):
-        raise InvalidMessage()
+    if (typeof Object.values(body)[0] !== 'object') {
+        throw new InvalidMessageBody();
+    }
 
-    body = cast(dict[str, object], final_message_as_pseudo_json_list[1])
-
-    if len(body) != 1:
-        raise InvalidMessageBody()
-
-    if not isinstance(next(iter(body.values())), dict):
-        raise InvalidMessageBody()
-
-    return Message(headers, body)
+    return new Message(headers, body);
+}

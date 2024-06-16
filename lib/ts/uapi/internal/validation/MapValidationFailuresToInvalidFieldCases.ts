@@ -1,17 +1,16 @@
-from typing import TYPE_CHECKING
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 
-if TYPE_CHECKING:
-    from uapi.internal.validation.ValidationFailure import ValidationFailure
+export function mapValidationFailuresToInvalidFieldCases(
+    argumentValidationFailures: ValidationFailure[],
+): { path: string; reason: { [key: string]: any } }[] {
+    const validationFailureCases: { path: string; reason: { [key: string]: any } }[] = [];
+    for (const validationFailure of argumentValidationFailures) {
+        const validationFailureCase: { path: string; reason: { [key: string]: any } } = {
+            path: validationFailure.path,
+            reason: { [validationFailure.reason]: validationFailure.data },
+        };
+        validationFailureCases.push(validationFailureCase);
+    }
 
-
-def map_validation_failures_to_invalid_field_cases(
-        argument_validation_failures: list['ValidationFailure']) -> list[dict[str, object]]:
-    validation_failure_cases: list[dict[str, object]] = []
-    for validation_failure in argument_validation_failures:
-        validation_failure_case: dict[str, object] = {
-            "path": validation_failure.path,
-            "reason": {validation_failure.reason: validation_failure.data}
-        }
-        validation_failure_cases.append(validation_failure_case)
-
-    return validation_failure_cases
+    return validationFailureCases;
+}

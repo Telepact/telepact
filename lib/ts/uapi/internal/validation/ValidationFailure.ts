@@ -1,5 +1,7 @@
-class ValidationFailure:
-    def __init__(self, path: list[object], reason: str, data: dict[str, object]):
-        self.path = path
-        self.reason = reason
-        self.data = data
+export class ValidationFailure {
+    constructor(
+        public path: any[],
+        public reason: string,
+        public data: Record<string, any>,
+    ) {}
+}

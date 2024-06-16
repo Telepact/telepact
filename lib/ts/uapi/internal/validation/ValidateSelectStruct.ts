@@ -1,31 +1,36 @@
-from typing import TYPE_CHECKING
-from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { UStruct } from 'uapi/internal/types/UStruct';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UStruct import UStruct
+export function validateSelectStruct(
+    structReference: UStruct,
+    basePath: any[],
+    selectedFields: any,
+): ValidationFailure[] {
+    const validationFailures: ValidationFailure[] = [];
 
+    if (!Array.isArray(selectedFields)) {
+        return getTypeUnexpectedValidationFailure(basePath, selectedFields, 'Array');
+    }
 
-def validate_select_struct(struct_reference: 'UStruct', base_path: list[object], selected_fields: object) -> list['ValidationFailure']:
-    validation_failures = []
+    const fields = selectedFields;
 
-    if not isinstance(selected_fields, list):
-        return get_type_unexpected_validation_failure(base_path, selected_fields, "Array")
+    for (let i = 0; i < fields.length; i++) {
+        const field = fields[i];
 
-    fields = selected_fields
+        if (typeof field !== 'string') {
+            const thisPath = [...basePath, i];
+            validationFailures.push(getTypeUnexpectedValidationFailure(thisPath, field, 'String'));
+            continue;
+        }
 
-    for i, field in enumerate(fields):
-        if not isinstance(field, str):
-            this_path = base_path + [i]
-            validation_failures.extend(
-                get_type_unexpected_validation_failure(this_path, field, "String"))
-            continue
+        const stringField = field;
 
-        string_field = field
+        if (!(stringField in structReference.fields)) {
+            const thisPath = [...basePath, i];
+            validationFailures.push(new ValidationFailure(thisPath, 'ObjectKeyDisallowed', {}));
+        }
+    }
 
-        if string_field not in struct_reference.fields:
-            this_path = base_path + [i]
-            validation_failures.append(ValidationFailure(
-                this_path, "ObjectKeyDisallowed", {}))
-
-    return validation_failures
+    return validationFailures;
+}

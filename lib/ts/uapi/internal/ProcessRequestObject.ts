@@ -1,39 +1,39 @@
-import asyncio
-from typing import Callable, TYPE_CHECKING, cast, Awaitable
+import { Message } from 'uapi/Message';
+import { Serializer } from 'uapi/Serializer';
+import { UApiError } from 'uapi/UApiError';
+import { timeout } from 'util';
 
-if TYPE_CHECKING:
-    from uapi.Message import Message
-    from uapi.Serializer import Serializer
+export async function processRequestObject(
+    requestMessage: Message,
+    adapter: (message: Message, serializer: Serializer) => Promise<Message>,
+    serializer: Serializer,
+    timeoutMsDefault: number,
+    useBinaryDefault: boolean,
+): Promise<Message> {
+    const header: Record<string, any> = requestMessage.header;
 
+    try {
+        if (!header.hasOwnProperty('tim_')) {
+            header['tim_'] = timeoutMsDefault;
+        }
 
-async def process_request_object(request_message: 'Message',
-                                 adapter: Callable[['Message', 'Serializer'], Awaitable['Message']],
-                                 serializer: 'Serializer',
-                                 timeout_ms_default: int,
-                                 use_binary_default: bool) -> 'Message':
-    from uapi.UApiError import UApiError
+        if (useBinaryDefault) {
+            header['_binary'] = true;
+        }
 
-    header: dict[str, object] = request_message.header
+        const timeoutMs = header['tim_'] as number;
 
-    try:
-        if "tim_" not in header:
-            header["tim_"] = timeout_ms_default
+        const responseMessage = await timeout(timeoutMs / 1000, adapter(requestMessage, serializer));
 
-        if use_binary_default:
-            header["_binary"] = True
+        if (responseMessage.body === { ErrorParseFailure_: { reasons: [{ IncompatibleBinaryEncoding: {} }] } }) {
+            header['_binary'] = true;
+            header['_forceSendJson'] = true;
 
-        timeout_ms = cast(int, header.get("tim_"))
+            return await timeout(timeoutMs / 1000, adapter(requestMessage, serializer));
+        }
 
-        async with asyncio.timeout(timeout_ms / 1000):
-            response_message = await adapter(request_message, serializer)
-
-        if response_message.body == {"ErrorParseFailure_": {"reasons": [{"IncompatibleBinaryEncoding": {}}]}}:
-            header["_binary"] = True
-            header["_forceSendJson"] = True
-
-            async with asyncio.timeout(timeout_ms / 1000):
-                return await adapter(request_message, serializer)
-
-        return response_message
-    except Exception as e:
-        raise UApiError() from e
+        return responseMessage;
+    } catch (e) {
+        throw new UApiError();
+    }
+}

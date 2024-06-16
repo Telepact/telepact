@@ -1,17 +1,17 @@
-from typing import TYPE_CHECKING
+import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
+import { mapSchemaParseFailuresToPseudoJson } from 'uapi/internal/schema/MapSchemaParseFailuresToPseudoJson';
 
-if TYPE_CHECKING:
-    from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+export class UApiSchemaParseError extends Error {
+    /**
+     * Indicates failure to parse a uAPI Schema.
+     */
 
+    public schemaParseFailures: SchemaParseFailure[];
+    public schemaParseFailuresPseudoJson: any;
 
-class UApiSchemaParseError(Exception):
-    """
-    Indicates failure to parse a uAPI Schema.
-    """
-
-    def __init__(self, schema_parse_failures: list['SchemaParseFailure']) -> None:
-        from uapi.internal.schema.MapSchemaParseFailuresToPseudoJson import map_schema_parse_failures_to_pseudo_json
-        super().__init__(str(map_schema_parse_failures_to_pseudo_json(schema_parse_failures)))
-        self.schema_parse_failures = schema_parse_failures
-        self.schema_parse_failures_pseudo_json = map_schema_parse_failures_to_pseudo_json(
-            schema_parse_failures)
+    constructor(schemaParseFailures: SchemaParseFailure[]) {
+        super(mapSchemaParseFailuresToPseudoJson(schemaParseFailures).toString());
+        this.schemaParseFailures = schemaParseFailures;
+        this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
+    }
+}

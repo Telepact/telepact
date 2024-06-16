@@ -1,80 +1,93 @@
-from typing import Callable, TYPE_CHECKING
+import { UApiSchema } from 'uapi/UApiSchema';
+import { MockInvocation } from 'uapi/internal/mock/MockInvocation';
+import { MockStub } from 'uapi/internal/mock/MockStub';
+import { UType } from 'uapi/internal/types/UType';
+import { extendUApiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
+import { getMockUApiJson } from 'uapi/internal/schema/GetMockUApiJson';
+import { Server } from 'uapi/Server';
+import { RandomGenerator } from 'uapi/RandomGenerator';
+import { UMockCall } from 'uapi/internal/types/UMockCall';
+import { UMockStub } from 'uapi/internal/types/UMockStub';
+import { mockHandle } from 'uapi/internal/mock/MockHandle';
 
-if TYPE_CHECKING:
-    from uapi.Message import Message
-    from uapi.UApiSchema import UApiSchema
-    from uapi.internal.mock.MockInvocation import MockInvocation
-    from uapi.internal.mock.MockStub import MockStub
-    from uapi.internal.types.UType import UType
+export class MockServer {
+    /**
+     * A Mock instance of a uAPI server.
+     */
 
+    constructor(
+        private uApiSchema: UApiSchema,
+        private options: Options,
+    ) {
+        this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
+        this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
+        this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
+        this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
-class MockServer:
-    """
-    A Mock instance of a uAPI server.
-    """
+        this.stubs = [];
+        this.invocations = [];
 
-    class Options:
-        """
-        Options for the MockServer.
-        """
+        const parsedTypes: { [key: string]: UType } = {};
+        const typeExtensions: { [key: string]: UType } = {};
 
-        def __init__(self) -> None:
-            self.on_error: Callable[[Exception], None] = lambda e: None
-            self.enable_message_response_generation: bool = True
-            self.enable_optional_field_generation: bool = True
-            self.randomize_optional_field_generation: bool = True
-            self.generated_collection_length_min: int = 0
-            self.generated_collection_length_max: int = 3
+        typeExtensions['_ext.Call_'] = new UMockCall(parsedTypes);
+        typeExtensions['_ext.Stub_'] = new UMockStub(parsedTypes);
 
-    def __init__(self, u_api_schema: 'UApiSchema', options: Options) -> None:
-        from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
-        from uapi.internal.schema.GetMockUApiJson import get_mock_uapi_json
-        from uapi.Server import Server
-        from uapi.RandomGenerator import RandomGenerator
-        from uapi.internal.types.UMockCall import UMockCall
-        from uapi.internal.types.UMockStub import UMockStub
+        const combinedUApiSchema: UApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(), typeExtensions);
 
-        self.random: RandomGenerator = RandomGenerator(
-            options.generated_collection_length_min, options.generated_collection_length_max)
-        self.enableGeneratedDefaultStub: bool = options.enable_message_response_generation
-        self.enable_optional_field_generation: bool = options.enable_optional_field_generation
-        self.randomize_optional_field_generation: bool = options.randomize_optional_field_generation
+        const serverOptions = new Server.Options();
+        serverOptions.onError = options.onError;
+        serverOptions.authRequired = false;
 
-        self.stubs: list[MockStub] = []
-        self.invocations: list[MockInvocation] = []
+        this.server = new Server(combinedUApiSchema, this.handle, serverOptions);
 
-        parsed_types: dict[str, UType] = {}
-        type_extensions: dict[str, UType] = {}
+        const finalUApiSchema: UApiSchema = this.server.uApiSchema;
+        const finalParsedUApiSchema = finalUApiSchema.parsed;
 
-        type_extensions["_ext.Call_"] = UMockCall(parsed_types)
-        type_extensions["_ext.Stub_"] = UMockStub(parsed_types)
+        Object.assign(parsedTypes, finalParsedUApiSchema);
+    }
 
-        combined_u_api_schema: UApiSchema = extend_uapi_schema(
-            u_api_schema, get_mock_uapi_json(), type_extensions)
+    private random: RandomGenerator;
+    private enableGeneratedDefaultStub: boolean;
+    private enableOptionalFieldGeneration: boolean;
+    private randomizeOptionalFieldGeneration: boolean;
+    private stubs: MockStub[];
+    private invocations: MockInvocation[];
+    private server: Server;
 
-        server_options = Server.Options()
-        server_options.on_error = options.on_error
-        server_options.auth_required = False
+    async process(message: Buffer): Promise<Buffer> {
+        /**
+         * Process a given uAPI Request Message into a uAPI Response Message.
+         *
+         * @param message - The uAPI request message.
+         * @returns The uAPI response message.
+         */
+        return await this.server.process(message);
+    }
 
-        self.server = Server(
-            combined_u_api_schema, self._handle, server_options)
+    private handle = async (requestMessage: any): Promise<any> => {
+        return await mockHandle(
+            requestMessage,
+            this.stubs,
+            this.invocations,
+            this.random,
+            this.server.uApiSchema,
+            this.enableGeneratedDefaultStub,
+            this.enableOptionalFieldGeneration,
+            this.randomizeOptionalFieldGeneration,
+        );
+    };
+}
 
-        final_u_api_schema: UApiSchema = self.server.u_api_schema
-        final_parsed_u_api_schema = final_u_api_schema.parsed
+export class Options {
+    /**
+     * Options for the MockServer.
+     */
 
-        parsed_types.update(final_parsed_u_api_schema)
-
-    async def process(self, message: bytes) -> bytes:
-        """
-        Process a given uAPI Request Message into a uAPI Response Message.
-
-        :param message: The uAPI request message.
-        :return: The uAPI response message.
-        """
-        return await self.server.process(message)
-
-    async def _handle(self, request_message: 'Message') -> 'Message':
-        from uapi.internal.mock.MockHandle import mock_handle
-        return await mock_handle(request_message, self.stubs, self.invocations, self.random,
-                                 self.server.u_api_schema, self.enableGeneratedDefaultStub,
-                                 self.enable_optional_field_generation, self.randomize_optional_field_generation)
+    onError: (error: Error) => void = (e) => {};
+    enableMessageResponseGeneration = true;
+    enableOptionalFieldGeneration = true;
+    randomizeOptionalFieldGeneration = true;
+    generatedCollectionLengthMin = 0;
+    generatedCollectionLengthMax = 3;
+}

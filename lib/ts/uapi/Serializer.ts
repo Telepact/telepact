@@ -1,27 +1,33 @@
-from uapi.Message import Message
-from uapi.Serialization import Serialization
-from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+import { Message } from 'uapi/Message';
+import { Serialization } from 'uapi/Serialization';
+import { BinaryEncoder } from 'uapi/internal/binary/BinaryEncoder';
+import { serializeInternal } from 'uapi/internal/SerializeInternal';
+import { deserializeInternal } from 'uapi/internal/DeserializeInternal';
 
+export class Serializer {
+    /**
+     * A serializer that converts a Message to and from a serialized form.
+     */
 
-class Serializer:
-    """
-    A serializer that converts a Message to and from a serialized form.
-    """
+    private serializationImpl: Serialization;
+    private binaryEncoder: BinaryEncoder;
 
-    def __init__(self, serialization_impl: Serialization, binary_encoder: BinaryEncoder):
-        self.serialization_impl = serialization_impl
-        self.binary_encoder = binary_encoder
+    constructor(serializationImpl: Serialization, binaryEncoder: BinaryEncoder) {
+        this.serializationImpl = serializationImpl;
+        this.binaryEncoder = binaryEncoder;
+    }
 
-    def serialize(self, message: Message) -> bytes:
-        """
-        Serialize a Message into a byte array.
-        """
-        from uapi.internal.SerializeInternal import serialize_internal
-        return serialize_internal(message, self.binary_encoder, self.serialization_impl)
+    public serialize(message: Message): Uint8Array {
+        /**
+         * Serialize a Message into a byte array.
+         */
+        return serializeInternal(message, this.binaryEncoder, this.serializationImpl);
+    }
 
-    def deserialize(self, message_bytes: bytes) -> Message:
-        """
-        Deserialize a Message from a byte array.
-        """
-        from uapi.internal.DeserializeInternal import deserialize_internal
-        return deserialize_internal(message_bytes, self.serialization_impl, self.binary_encoder)
+    public deserialize(messageBytes: Uint8Array): Message {
+        /**
+         * Deserialize a Message from a byte array.
+         */
+        return deserializeInternal(messageBytes, this.serializationImpl, this.binaryEncoder);
+    }
+}

@@ -1,34 +1,40 @@
-from typing import TYPE_CHECKING
-from uapi.internal.types.UArray import _ARRAY_NAME
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { TYPE_CHECKING } from 'typing';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+export function validateArray(
+    value: any,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+    generics: UTypeDeclaration[],
+): ValidationFailure[] {
+    if (TYPE_CHECKING) {
+        // Add type checking related code here
+    }
 
+    if (Array.isArray(value)) {
+        const nestedTypeDeclaration = typeParameters[0];
 
-def validate_array(value: object, select: dict[str, object] | None, fn: str | None,
-                   type_parameters: list['UTypeDeclaration'],
-                   generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+        const validationFailures: ValidationFailure[] = [];
+        for (let i = 0; i < value.length; i++) {
+            const element = value[i];
+            const nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn, generics);
+            const index = i;
 
-    if isinstance(value, list):
-        nested_type_declaration = type_parameters[0]
+            const nestedValidationFailuresWithPath: ValidationFailure[] = [];
+            for (const f of nestedValidationFailures) {
+                const finalPath = [index, ...f.path];
 
-        validation_failures = []
-        for i, element in enumerate(value):
-            nested_validation_failures = nested_type_declaration.validate(
-                element, select, fn, generics)
-            index = i
+                nestedValidationFailuresWithPath.push(new ValidationFailure(finalPath, f.reason, f.data));
+            }
 
-            nested_validation_failures_with_path = []
-            for f in nested_validation_failures:
-                final_path = [index] + f.path
+            validationFailures.push(...nestedValidationFailuresWithPath);
+        }
 
-                nested_validation_failures_with_path.append(
-                    ValidationFailure(final_path, f.reason, f.data))
-
-            validation_failures.extend(nested_validation_failures_with_path)
-
-        return validation_failures
-    else:
-        return get_type_unexpected_validation_failure([], value, _ARRAY_NAME)
+        return validationFailures;
+    } else {
+        return getTypeUnexpectedValidationFailure([], value, _ARRAY_NAME);
+    }
+}

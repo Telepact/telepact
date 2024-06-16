@@ -1,19 +1,24 @@
-import msgpack
-import json
+import { Packr, Unpackr } from 'msgpackr';
 
-from uapi.Serialization import Serialization
+export class _DefaultSerializationImpl {
+    private packr = new Packr({ mapsAsObjects: false, useRecords: false });
+    private unpackr = new Unpackr({ mapsAsObjects: false, useRecords: false });
 
+    public toJson(uapiMessage: any): Uint8Array {
+        const jsonStr = JSON.stringify(uapiMessage);
+        return new TextEncoder().encode(jsonStr);
+    }
 
-class DefaultSerialization(Serialization):
+    public toMsgPack(uapiMessage: any): Uint8Array {
+        return this.packr.encode(uapiMessage);
+    }
 
-    def to_json(self, uapi_message: object) -> bytes:
-        return json.dumps(uapi_message).encode()
+    public fromJson(bytes: Uint8Array): any {
+        const jsonStr = new TextDecoder().decode(bytes);
+        return JSON.parse(jsonStr);
+    }
 
-    def to_msgpack(self, uapi_message: object) -> bytes:
-        return msgpack.dumps(uapi_message)
-
-    def from_json(self, bytes_: bytes) -> object:
-        return json.loads(bytes_)
-
-    def from_msgpack(self, bytes_: bytes) -> object:
-        return msgpack.loads(bytes_, strict_map_key=False)
+    public fromMsgPack(bytes: Uint8Array): any {
+        return this.unpackr.decode(bytes);
+    }
+}

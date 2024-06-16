@@ -1,89 +1,90 @@
-from typing import TYPE_CHECKING, cast
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { UStruct } from 'uapi/internal/types/UStruct';
+import { UType } from 'uapi/internal/types/UType';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { UUnion } from 'uapi/internal/types/UUnion';
 
-import re
+export function validateMockStub(
+    givenObj: any,
+    select: { [key: string]: any } | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+    generics: UTypeDeclaration[],
+    types: { [key: string]: UType },
+): ValidationFailure[] {
+    const validationFailures: ValidationFailure[] = [];
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UStruct import UStruct
-    from uapi.internal.types.UType import UType
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-    from uapi.internal.types.UUnion import UUnion
+    if (!(givenObj instanceof Object)) {
+        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
+    }
 
+    const givenMap: { [key: string]: any } = givenObj;
 
-def validate_mock_stub(given_obj: object, select: dict[str, object] | None, fn: str | None,
-                       type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
-                       types: dict[str, 'UType']) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from uapi.internal.types.UFn import UFn
+    const regexString = '^fn\\..*$';
 
-    validation_failures: list[ValidationFailure] = []
+    const keys = Object.keys(givenMap).sort();
 
-    if not isinstance(given_obj, dict):
-        return get_type_unexpected_validation_failure([], given_obj, "Object")
-
-    given_map: dict[str, object] = given_obj
-
-    regex_string = "^fn\\..*$"
-
-    keys = sorted(given_map.keys())
-
-    matches = [k for k in keys if re.match(regex_string, k)]
-    if len(matches) != 1:
+    const matches = keys.filter((k) => re.match(regexString, k));
+    if (matches.length !== 1) {
         return [
-            ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
-                              {"regex": regex_string, "actual": len(matches), "expected": 1, "keys": keys})
-        ]
+            new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
+                regex: regexString,
+                actual: matches.length,
+                expected: 1,
+                keys: keys,
+            }),
+        ];
+    }
 
-    function_name = matches[0]
-    function_def = cast(UFn, types[function_name])
-    input = given_map[function_name]
+    const functionName = matches[0];
+    const functionDef = types[functionName] as UFn;
+    const input = givenMap[functionName];
 
-    function_def_call: UUnion = function_def.call
-    function_def_name: str = function_def.name
-    function_def_call_cases: dict[str, UStruct] = function_def_call.cases
-    input_failures = function_def_call_cases[function_def_name].validate(
-        input, select, fn, [], [])
+    const functionDefCall: UUnion = functionDef.call;
+    const functionDefName: string = functionDef.name;
+    const functionDefCallCases: { [key: string]: UStruct } = functionDefCall.cases;
+    const inputFailures = functionDefCallCases[functionDefName].validate(input, select, fn, [], []);
 
-    input_failures_with_path = []
-    for f in input_failures:
-        this_path = [function_name] + f.path
+    const inputFailuresWithPath: ValidationFailure[] = [];
+    for (const f of inputFailures) {
+        const thisPath = [functionName, ...f.path];
 
-        input_failures_with_path.append(
-            ValidationFailure(this_path, f.reason, f.data))
+        inputFailuresWithPath.push(new ValidationFailure(thisPath, f.reason, f.data));
+    }
 
-    input_failures_without_missing_required = [
-        f for f in input_failures_with_path if f.reason != "RequiredObjectKeyMissing"
-    ]
+    const inputFailuresWithoutMissingRequired = inputFailuresWithPath.filter(
+        (f) => f.reason !== 'RequiredObjectKeyMissing',
+    );
 
-    validation_failures.extend(input_failures_without_missing_required)
+    validationFailures.push(...inputFailuresWithoutMissingRequired);
 
-    result_def_key = "->"
+    const resultDefKey = '->';
 
-    if result_def_key not in given_map:
-        validation_failures.append(ValidationFailure(
-            [result_def_key], "RequiredObjectKeyMissing", {}))
-    else:
-        output = given_map[result_def_key]
-        output_failures = function_def.result.validate(
-            output, select, fn, [], [])
+    if (!(resultDefKey in givenMap)) {
+        validationFailures.push(new ValidationFailure([resultDefKey], 'RequiredObjectKeyMissing', {}));
+    } else {
+        const output = givenMap[resultDefKey];
+        const outputFailures = functionDef.result.validate(output, select, fn, [], []);
 
-        output_failures_with_path: list[ValidationFailure] = []
-        for f in output_failures:
-            this_path = [result_def_key] + f.path
+        const outputFailuresWithPath: ValidationFailure[] = [];
+        for (const f of outputFailures) {
+            const thisPath = [resultDefKey, ...f.path];
 
-            output_failures_with_path.append(
-                ValidationFailure(this_path, f.reason, f.data))
+            outputFailuresWithPath.push(new ValidationFailure(thisPath, f.reason, f.data));
+        }
 
-        failures_without_missing_required = [
-            f for f in output_failures_with_path if f.reason != "RequiredObjectKeyMissing"
-        ]
+        const failuresWithoutMissingRequired = outputFailuresWithPath.filter(
+            (f) => f.reason !== 'RequiredObjectKeyMissing',
+        );
 
-        validation_failures.extend(failures_without_missing_required)
+        validationFailures.push(...failuresWithoutMissingRequired);
+    }
 
-    disallowed_fields = [k for k in given_map.keys(
-    ) if k not in matches and k != result_def_key]
-    for disallowed_field in disallowed_fields:
-        validation_failures.append(ValidationFailure(
-            [disallowed_field], "ObjectKeyDisallowed", {}))
+    const disallowedFields = Object.keys(givenMap).filter((k) => !matches.includes(k) && k !== resultDefKey);
+    for (const disallowedField of disallowedFields) {
+        validationFailures.push(new ValidationFailure([disallowedField], 'ObjectKeyDisallowed', {}));
+    }
 
-    return validation_failures
+    return validationFailures;
+}

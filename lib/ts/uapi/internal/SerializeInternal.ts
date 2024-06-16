@@ -1,36 +1,39 @@
-from typing import TYPE_CHECKING
+import { BinaryEncoderUnavailableError } from 'uapi/internal/binary/BinaryEncoderUnavailableError';
+import { SerializationError } from 'uapi/SerializationError';
+import { Serialization } from 'uapi/Serialization';
+import { Message } from 'uapi/Message';
+import { BinaryEncoder } from 'uapi/internal/binary/BinaryEncoder';
 
-from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
-from uapi.SerializationError import SerializationError
+export function serializeInternal(
+    message: Message,
+    binaryEncoder: BinaryEncoder,
+    serializer: Serialization,
+): Uint8Array {
+    const headers: Record<string, any> = message.header;
 
-if TYPE_CHECKING:
-    from uapi.Serialization import Serialization
-    from uapi.Message import Message
-    from uapi.internal.binary.BinaryEncoder import BinaryEncoder
+    let serializeAsBinary: boolean;
+    if ('_binary' in headers) {
+        serializeAsBinary = headers['_binary'] === true;
+        delete headers['_binary'];
+    } else {
+        serializeAsBinary = false;
+    }
 
+    const messageAsPseudoJson: any[] = [message.header, message.body];
 
-def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
-                       serializer: 'Serialization') -> bytes:
-    headers: dict[str, object] = message.header
-
-    serialize_as_binary: bool
-    if "_binary" in headers:
-        serialize_as_binary = headers.pop("_binary") is True
-    else:
-        serialize_as_binary = False
-
-    message_as_pseudo_json: list[object] = [
-        message.header, message.body]
-
-    try:
-        if serialize_as_binary:
-            try:
-                encoded_message = binary_encoder.encode(message_as_pseudo_json)
-                return serializer.to_msgpack(encoded_message)
-            except BinaryEncoderUnavailableError:
-                # We can still submit as json
-                return serializer.to_json(message_as_pseudo_json)
-        else:
-            return serializer.to_json(message_as_pseudo_json)
-    except Exception as e:
-        raise SerializationError() from e
+    try {
+        if (serializeAsBinary) {
+            try {
+                const encodedMessage = binaryEncoder.encode(messageAsPseudoJson);
+                return serializer.toMsgpack(encodedMessage);
+            } catch (error) {
+                // We can still submit as JSON
+                return serializer.toJson(messageAsPseudoJson);
+            }
+        } else {
+            return serializer.toJson(messageAsPseudoJson);
+        }
+    } catch (error) {
+        throw new SerializationError();
+    }
+}

@@ -1,69 +1,75 @@
-from typing import Callable, TYPE_CHECKING, Awaitable, cast
+import { DefaultSerialization } from 'uapi/DefaultSerialization';
+import { Serializer } from 'uapi/Serializer';
+import { ServerBinaryEncoder } from 'uapi/internal/binary/ServerBinaryEncoder';
+import { USelect } from 'uapi/internal/types/USelect';
+import { Message } from 'uapi/Message';
+import { UApiSchema } from 'uapi/UApiSchema';
+import { UType } from 'uapi/internal/types/UType';
+import { constructBinaryEncoding } from 'uapi/internal/binary/ConstructBinaryEncoding';
+import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
+import { getInternalUapiJson } from 'uapi/internal/schema/GetInternalUapiJson';
+import { UStruct } from 'uapi/internal/types/UStruct';
+import { processBytes } from 'uapi/internal/ProcessBytes';
 
-from uapi.DefaultSerialization import DefaultSerialization
-from uapi.Serializer import Serializer
-from uapi.internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
-from uapi.internal.types.USelect import USelect
+export class Server {
+    handler: (message: Message) => Promise<Message>;
+    onError: (error: any) => void;
+    onRequest: (message: Message) => void;
+    onResponse: (message: Message) => void;
+    uApiSchema: UApiSchema;
+    serializer: Serializer;
 
-if TYPE_CHECKING:
-    from uapi.Message import Message
-    from uapi.UApiSchema import UApiSchema
-    from uapi.internal.types.UType import UType
+    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: Server.Options) {
+        this.handler = handler;
+        this.onError = options.onError;
+        this.onRequest = options.onRequest;
+        this.onResponse = options.onResponse;
 
+        const parsedTypes: { [key: string]: UType } = {};
+        const typeExtensions: { [key: string]: UType } = {
+            '_ext.Select_': new USelect(parsedTypes),
+        };
 
-class Server:
-    """
-    A uAPI Server.
-    """
-    class Options:
-        """
-        Options for the Server.
-        """
+        this.uApiSchema = extendUapiSchema(uApiSchema, getInternalUapiJson(), typeExtensions);
 
-        def __init__(self) -> None:
-            self.on_error = lambda e: None
-            self.on_request = lambda m: None
-            self.on_response = lambda m: None
-            self.auth_required = True
-            self.serialization = DefaultSerialization()
+        Object.assign(parsedTypes, this.uApiSchema.parsed);
 
-    def __init__(self, u_api_schema: 'UApiSchema', handler: Callable[['Message'], Awaitable['Message']], options: Options):
-        """
-        Create a server with the given uAPI schema and handler.
-        """
-        from uapi.internal.binary.ConstructBinaryEncoding import construct_binary_encoding
-        from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
-        from uapi.internal.schema.GetInternalUApiJson import get_internal_uapi_json
-        from uapi.internal.types.UStruct import UStruct
+        const binaryEncoding = constructBinaryEncoding(this.uApiSchema);
+        const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
+        this.serializer = new Serializer(options.serialization, binaryEncoder);
 
-        self.handler = handler
-        self.on_error = options.on_error
-        self.on_request = options.on_request
-        self.on_response = options.on_response
+        if ((<UStruct>this.uApiSchema.parsed['struct.Auth_']).fields.length === 0 && options.authRequired) {
+            throw new Error(
+                'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.',
+            );
+        }
+    }
 
-        parsed_types: dict[str, UType] = {}
-        type_extensions: dict[str, UType] = {
-            "_ext.Select_": USelect(parsed_types)}
+    async process(requestMessageBytes: Uint8Array): Promise<Uint8Array> {
+        return await processBytes(
+            requestMessageBytes,
+            this.serializer,
+            this.uApiSchema,
+            this.onError,
+            this.onRequest,
+            this.onResponse,
+            this.handler,
+        );
+    }
+}
 
-        self.u_api_schema = extend_uapi_schema(
-            u_api_schema, get_internal_uapi_json(), type_extensions)
+export class Options {
+    onError: (error: any) => void;
+    onRequest: (message: Message) => void;
+    onResponse: (message: Message) => void;
+    authRequired: boolean;
+    serialization: DefaultSerialization;
 
-        parsed_types.update(self.u_api_schema.parsed)
-
-        binary_encoding = construct_binary_encoding(self.u_api_schema)
-        binary_encoder = ServerBinaryEncoder(binary_encoding)
-        self.serializer = Serializer(options.serialization, binary_encoder)
-
-        if len(cast(UStruct, self.u_api_schema.parsed["struct.Auth_"]).fields) == 0 and options.auth_required:
-            raise RuntimeError(
-                "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `false`."
-            )
-
-    async def process(self, request_message_bytes: bytes) -> bytes:
-        """
-        Process a given uAPI Request Message into a uAPI Response Message.
-        """
-        from uapi.internal.ProcessBytes import process_bytes
-
-        return await process_bytes(request_message_bytes, self.serializer, self.u_api_schema, self.on_error,
-                                   self.on_request, self.on_response, self.handler)
+    constructor() {
+        this.onError = (e: any) => {};
+        this.onRequest = (m: Message) => {};
+        this.onResponse = (m: Message) => {};
+        this.authRequired = true;
+        this.serialization = new DefaultSerialization();
+    }
+}

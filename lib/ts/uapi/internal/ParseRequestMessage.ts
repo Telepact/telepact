@@ -1,32 +1,35 @@
-from typing import Callable, TYPE_CHECKING
+import { Serializer } from 'uapi/Serializer';
+import { UApiSchema } from 'uapi/UApiSchema';
+import { Message } from 'uapi/Message';
+import { BinaryEncoderUnavailableError } from 'uapi/internal/binary/BinaryEncoderUnavailableError';
+import { BinaryEncodingMissing } from 'uapi/internal/binary/BinaryEncodingMissing';
+import { InvalidMessage } from 'uapi/internal/validation/InvalidMessage';
+import { InvalidMessageBody } from 'uapi/internal/validation/InvalidMessageBody';
 
-from uapi.Message import Message
-from uapi.internal.binary.BinaryEncoderUnavailableError import BinaryEncoderUnavailableError
-from uapi.internal.binary.BinaryEncodingMissing import BinaryEncodingMissing
-from uapi.internal.validation.InvalidMessage import InvalidMessage
-from uapi.internal.validation.InvalidMessageBody import InvalidMessageBody
+export function parseRequestMessage(
+    requestMessageBytes: Buffer,
+    serializer: Serializer,
+    uapiSchema: UApiSchema,
+    onError: (error: Error) => void,
+): Message {
+    try {
+        return serializer.deserialize(requestMessageBytes);
+    } catch (e) {
+        onError(e);
 
-if TYPE_CHECKING:
-    from uapi.Serializer import Serializer
-    from uapi.UApiSchema import UApiSchema
+        let reason: string;
+        if (e instanceof BinaryEncoderUnavailableError) {
+            reason = 'IncompatibleBinaryEncoding';
+        } else if (e instanceof BinaryEncodingMissing) {
+            reason = 'BinaryDecodeFailure';
+        } else if (e instanceof InvalidMessage) {
+            reason = 'ExpectedJsonArrayOfTwoObjects';
+        } else if (e instanceof InvalidMessageBody) {
+            reason = 'ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject';
+        } else {
+            reason = 'ExpectedJsonArrayOfTwoObjects';
+        }
 
-
-def parse_request_message(request_message_bytes: bytes, serializer: 'Serializer', uapi_schema: 'UApiSchema',
-                          on_error: Callable[[Exception], None]) -> 'Message':
-    try:
-        return serializer.deserialize(request_message_bytes)
-    except Exception as e:
-        on_error(e)
-
-        if isinstance(e, BinaryEncoderUnavailableError):
-            reason = "IncompatibleBinaryEncoding"
-        elif isinstance(e, BinaryEncodingMissing):
-            reason = "BinaryDecodeFailure"
-        elif isinstance(e, InvalidMessage):
-            reason = "ExpectedJsonArrayOfTwoObjects"
-        elif isinstance(e, InvalidMessageBody):
-            reason = "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject"
-        else:
-            reason = "ExpectedJsonArrayOfTwoObjects"
-
-        return Message({"_parseFailures": [{reason: {}}]}, {"_unknown": {}})
+        return new Message({ _parseFailures: [{ [reason]: {} }] }, { _unknown: {} });
+    }
+}

@@ -1,29 +1,18 @@
-from typing import TYPE_CHECKING, cast
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { UStruct } from 'uapi/internal/types/UStruct';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { validateStructFields } from 'uapi/internal/validation/ValidateStructFields';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UStruct import UStruct
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+export function validateUnionStruct(
+    unionStruct: UStruct,
+    unionCase: string,
+    actual: Record<string, any>,
+    selectedCases: Record<string, any>,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+): ValidationFailure[] {
+    const selectedFields = selectedCases?.[unionCase] as string[] | undefined;
 
-
-def validate_union_struct(
-    union_struct: 'UStruct',
-    union_case: str,
-    actual: dict[str, object],
-    selected_cases: dict[str, object],
-    select: dict[str, object] | None,
-    fn: str | None,
-    type_parameters: list['UTypeDeclaration']
-) -> list['ValidationFailure']:
-    selected_fields = cast(list[str], selected_cases.get(
-        union_case)) if selected_cases else None
-    from uapi.internal.validation.ValidateStructFields import validate_struct_fields
-
-    return validate_struct_fields(
-        union_struct.fields,
-        selected_fields,
-        actual,
-        select,
-        fn,
-        type_parameters
-    )
+    return validateStructFields(unionStruct.fields, selectedFields, actual, select, fn, typeParameters);
+}

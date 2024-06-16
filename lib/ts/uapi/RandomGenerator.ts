@@ -1,57 +1,73 @@
-import inspect
-import math
-from ctypes import c_int32
+function findStack() {
+    const e = new Error();
+    const stack = e.stack.split('\n');
+    let i = 0;
+    for (const line of stack) {
+        i += 1;
+        if (i < 3) {
+            continue;
+        }
+        if (!line.includes('_RandomGenerator')) {
+            return line;
+        }
+    }
+    throw new Error();
+}
 
+export class _RandomGenerator {
+    seed: number;
+    private collectionLengthMin: number;
+    private collectionLengthMax: number;
+    private count: number = 0;
 
-def _find_stack() -> str:
-    i = 0
-    for stack in inspect.stack():
-        i += 1
-        if i == 1:
-            continue
-        stack_str = f'{stack}'
-        if not '_util_types.py' in stack_str:
-            return f'{stack.function}'
-    return 'unknown'
+    constructor(collectionLengthMin: number, collectionLengthMax: number) {
+        this.setSeed(0);
+        this.collectionLengthMin = collectionLengthMin;
+        this.collectionLengthMax = collectionLengthMax;
+    }
 
+    setSeed(seed: number): void {
+        this.seed = (seed & 0x7ffffffe) + 1;
+    }
 
-class RandomGenerator:
-    def __init__(self, collection_length_min: int, collection_length_max: int):
-        self.set_seed(0)
-        self.collection_length_min = collection_length_min
-        self.collection_length_max = collection_length_max
-        self.count = 0
+    nextInt(): number {
+        let x = this.seed;
+        x ^= x << 13;
+        x ^= x >> 17;
+        x ^= x << 5;
+        this.seed = (x & 0x7ffffffe) + 1;
+        this.count += 1;
+        const result = this.seed;
+        // console.log(`${this.count} ${result} ${findStack()}`);
+        return result;
+    }
 
-    def set_seed(self, seed: int) -> None:
-        self.seed = c_int32((seed & 0x7ffffffe) + 1)
+    nextIntWithCeiling(ceiling: number): number {
+        if (ceiling === 0) {
+            return 0;
+        }
+        return this.nextInt() % ceiling;
+    }
 
-    def next_int(self) -> int:
-        x: c_int32 = c_int32(self.seed.value)
-        x = c_int32(x.value ^ (x.value << 13))
-        x = c_int32(x.value ^ (x.value >> 17))
-        x = c_int32(x.value ^ (x.value << 5))
-        self.seed = c_int32((x.value & 0x7ffffffe) + 1)
-        self.count += 1
-        result = self.seed.value
-        # print(f'{self.count} {result} {_find_stack()}')
-        return result
+    nextBoolean(): boolean {
+        return this.nextIntWithCeiling(31) > 15;
+    }
 
-    def next_int_with_ceiling(self, ceiling: int) -> int:
-        if ceiling == 0:
-            return 0
-        return self.next_int() % ceiling
+    nextString(): string {
+        const buffer = new ArrayBuffer(4);
+        const view = new DataView(buffer);
+        view.setInt32(0, this.nextInt());
 
-    def next_boolean(self) -> bool:
-        return self.next_int_with_ceiling(31) > 15
+        const byteArray = new Uint8Array(buffer);
+        const base64String = btoa(String.fromCharCode.apply(null, byteArray));
+        return base64String.replace(/=/g, '');
+    }
 
-    def next_string(self) -> str:
-        import base64
-        import struct
-        bytes_data = struct.pack(">i", self.next_int())
-        return base64.b64encode(bytes_data).decode().rstrip("=")
+    nextDouble(): number {
+        return (this.nextInt() & 0x7fffffff) / 0x7fffffff;
+    }
 
-    def next_double(self) -> float:
-        return float(self.next_int() & 0x7fffffff) / float(0x7fffffff)
-
-    def next_collection_length(self) -> int:
-        return self.next_int_with_ceiling(self.collection_length_max - self.collection_length_min) + self.collection_length_min
+    nextCollectionLength(): number {
+        return this.nextIntWithCeiling(this.collectionLengthMax - this.collectionLengthMin) + this.collectionLengthMin;
+    }
+}

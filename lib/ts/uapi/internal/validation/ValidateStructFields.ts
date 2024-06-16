@@ -1,54 +1,54 @@
-from typing import TYPE_CHECKING
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+export function validateStructFields(
+    fields: Record<string, UFieldDeclaration>,
+    selectedFields: string[] | null,
+    actualStruct: Record<string, any>,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+): ValidationFailure[] {
+    const validationFailures: ValidationFailure[] = [];
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    const missingFields: string[] = [];
+    for (const [fieldName, fieldDeclaration] of Object.entries(fields)) {
+        const isOptional = fieldDeclaration.optional;
+        const isOmittedBySelect = selectedFields !== null && !selectedFields.includes(fieldName);
+        if (!(fieldName in actualStruct) && !isOptional && !isOmittedBySelect) {
+            missingFields.push(fieldName);
+        }
+    }
 
+    for (const missingField of missingFields) {
+        const validationFailure = new ValidationFailure([missingField], 'RequiredObjectKeyMissing', {});
 
-def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
-                           selected_fields: list[str] | None,
-                           actual_struct: dict[str, object],
-                           select: dict[str, object] | None,
-                           fn: str | None,
-                           type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
-    validation_failures = []
+        validationFailures.push(validationFailure);
+    }
 
-    missing_fields = []
-    for field_name, field_declaration in fields.items():
-        is_optional = field_declaration.optional
-        is_omitted_by_select = selected_fields is not None and field_name not in selected_fields
-        if field_name not in actual_struct and not is_optional and not is_omitted_by_select:
-            missing_fields.append(field_name)
+    for (const [fieldName, fieldValue] of Object.entries(actualStruct)) {
+        const referenceField = fields[fieldName];
+        if (referenceField === undefined) {
+            const validationFailure = new ValidationFailure([fieldName], 'ObjectKeyDisallowed', {});
 
-    for missing_field in missing_fields:
-        validation_failure = ValidationFailure(
-            [missing_field], "RequiredObjectKeyMissing", {})
+            validationFailures.push(validationFailure);
+            continue;
+        }
 
-        validation_failures.append(validation_failure)
+        const refFieldTypeDeclaration = referenceField.typeDeclaration;
 
-    for field_name, field_value in actual_struct.items():
-        reference_field = fields.get(field_name)
-        if reference_field is None:
-            validation_failure = ValidationFailure(
-                [field_name], "ObjectKeyDisallowed", {})
+        const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn, typeParameters);
 
-            validation_failures.append(validation_failure)
-            continue
+        const nestedValidationFailuresWithPath: ValidationFailure[] = [];
+        for (const failure of nestedValidationFailures) {
+            const thisPath = [fieldName, ...failure.path];
 
-        ref_field_type_declaration = reference_field.type_declaration
+            nestedValidationFailuresWithPath.push(new ValidationFailure(thisPath, failure.reason, failure.data));
+        }
 
-        nested_validation_failures = ref_field_type_declaration.validate(
-            field_value, select, fn, type_parameters)
+        validationFailures.push(...nestedValidationFailuresWithPath);
+    }
 
-        nested_validation_failures_with_path = []
-        for failure in nested_validation_failures:
-            this_path = [field_name] + failure.path
-
-            nested_validation_failures_with_path.append(
-                ValidationFailure(this_path, failure.reason, failure.data))
-
-        validation_failures.extend(nested_validation_failures_with_path)
-
-    return validation_failures
+    return validationFailures;
+}

@@ -1,25 +1,27 @@
-from typing import TYPE_CHECKING, cast
-from uapi.internal.types.UUnion import _UNION_NAME
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+import { UStruct } from 'uapi/internal/types/UStruct';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { validateUnionCases } from 'uapi/internal/validation/ValidateUnionCases';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UStruct import UStruct
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-
-
-def validate_union(value: object, select: dict[str, object] | None, fn: str | None,
-                   type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
-                   name: str, cases: dict[str, 'UStruct']) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from uapi.internal.validation.ValidateUnionCases import validate_union_cases
-
-    if isinstance(value, dict):
-        selected_cases: dict[str, object]
-        if name.startswith("fn."):
-            selected_cases = {name: select.get(name) if select else None}
-        else:
-            selected_cases = cast(
-                dict[str, object], select.get(name) if select else None)
-        return validate_union_cases(cases, selected_cases, value, select, fn, type_parameters)
-    else:
-        return get_type_unexpected_validation_failure([], value, _UNION_NAME)
+export function validateUnion(
+    value: any,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+    generics: UTypeDeclaration[],
+    name: string,
+    cases: Record<string, UStruct>,
+): ValidationFailure[] {
+    if (typeof value === 'object' && value !== null) {
+        let selectedCases: Record<string, any>;
+        if (name.startsWith('fn.')) {
+            selectedCases = { [name]: select?.[name] ?? null };
+        } else {
+            selectedCases = select?.[name] ?? null;
+        }
+        return validateUnionCases(cases, selectedCases, value, select, fn, typeParameters);
+    } else {
+        return getTypeUnexpectedValidationFailure([], value, _UNION_NAME);
+    }
+}

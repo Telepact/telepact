@@ -1,114 +1,124 @@
-from typing import TYPE_CHECKING, cast
+import { UArray } from 'uapi/internal/types/UArray';
+import { UFn } from 'uapi/internal/types/UFn';
+import { UObject } from 'uapi/internal/types/UObject';
+import { UStruct } from 'uapi/internal/types/UStruct';
+import { UUnion } from 'uapi/internal/types/UUnion';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 
-from uapi.internal.types.UArray import UArray
-from uapi.internal.types.UFn import UFn
-from uapi.internal.types.UObject import UObject
-from uapi.internal.types.UStruct import UStruct
-from uapi.internal.types.UUnion import UUnion
+export function selectStructFields(
+    typeDeclaration: UTypeDeclaration,
+    value: any,
+    selectedStructFields: { [key: string]: any },
+): any {
+    const typeDeclarationType = typeDeclaration.type;
+    const typeDeclarationTypeParams = typeDeclaration.typeParameters;
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    if (typeDeclarationType instanceof UStruct) {
+        const fields = typeDeclarationType.fields;
+        const structName = typeDeclarationType.name;
+        const selectedFields = selectedStructFields[structName] as string[] | undefined;
+        const valueAsMap = value as { [key: string]: any };
+        const finalMap: { [key: string]: any } = {};
 
+        for (const [fieldName, fieldValue] of Object.entries(valueAsMap)) {
+            if (selectedFields === undefined || selectedFields.includes(fieldName)) {
+                const field = fields[fieldName];
+                const fieldTypeDeclaration = field.typeDeclaration;
+                const valueWithSelectedFields = selectStructFields(
+                    fieldTypeDeclaration,
+                    fieldValue,
+                    selectedStructFields,
+                );
 
-def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
-                         selected_struct_fields: dict[str, object]) -> object:
-    type_declaration_type = type_declaration.type
-    type_declaration_type_params = type_declaration.type_parameters
+                finalMap[fieldName] = valueWithSelectedFields;
+            }
+        }
 
-    if isinstance(type_declaration_type, UStruct):
-        fields = type_declaration_type.fields
-        struct_name = type_declaration_type.name
-        selected_fields = cast(
-            list[str] | None, selected_struct_fields.get(struct_name))
-        value_as_map = cast(dict[str, object], value)
-        final_map = {}
+        return finalMap;
+    } else if (typeDeclarationType instanceof UFn) {
+        const valueAsMap = value as { [key: string]: any };
+        const [unionCase, unionData] = Object.entries(valueAsMap)[0];
+        const fnName = typeDeclarationType.name;
+        const fnCall = typeDeclarationType.call;
+        const fnCallCases = fnCall.cases;
 
-        for field_name, field_value in value_as_map.items():
-            if selected_fields is None or field_name in selected_fields:
-                field = fields[field_name]
-                field_type_declaration = field.type_declaration
-                value_with_selected_fields = select_struct_fields(field_type_declaration, field_value,
-                                                                  selected_struct_fields)
+        const argStructReference = fnCallCases[unionCase];
+        const selectedFields = selectedStructFields[fnName] as string[] | undefined;
+        const finalMap: { [key: string]: any } = {};
 
-                final_map[field_name] = value_with_selected_fields
+        for (const [fieldName, fieldValue] of Object.entries(unionData)) {
+            if (selectedFields === undefined || selectedFields.includes(fieldName)) {
+                const field = argStructReference.fields[fieldName];
+                const valueWithSelectedFields = selectStructFields(
+                    field.typeDeclaration,
+                    fieldValue,
+                    selectedStructFields,
+                );
 
-        return final_map
-    elif isinstance(type_declaration_type, UFn):
-        value_as_map = cast(dict[str, object], value)
-        union_case, union_data = cast(
-            tuple[str, dict[str, object]], next(iter(value_as_map.items())))
+                finalMap[fieldName] = valueWithSelectedFields;
+            }
+        }
 
-        fn_name = type_declaration_type.name
-        fn_call = type_declaration_type.call
-        fn_call_cases = fn_call.cases
+        return { [unionCase]: finalMap };
+    } else if (typeDeclarationType instanceof UUnion) {
+        const valueAsMap = value as { [key: string]: any };
+        const [unionCase, unionData] = Object.entries(valueAsMap)[0];
 
-        arg_struct_reference = fn_call_cases[union_case]
-        selected_fields = cast(
-            list[str] | None, selected_struct_fields.get(fn_name))
-        final_map = {}
+        const unionCases = typeDeclarationType.cases;
+        const unionStructReference = unionCases[unionCase];
+        const unionStructRefFields = unionStructReference.fields;
+        const defaultCasesToFields: { [key: string]: string[] } = {};
 
-        for field_name, field_value in union_data.items():
-            if selected_fields is None or field_name in selected_fields:
-                field = arg_struct_reference.fields[field_name]
-                value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
-                                                                  selected_struct_fields)
+        for (const [caseName, unionStruct] of Object.entries(unionCases)) {
+            const fieldNames = Object.keys(unionStruct.fields);
+            defaultCasesToFields[caseName] = fieldNames;
+        }
 
-                final_map[field_name] = value_with_selected_fields
+        const unionSelectedFields = selectedStructFields[typeDeclarationType.name] as
+            | { [key: string]: any }
+            | undefined;
+        const thisUnionCaseSelectedFieldsDefault = defaultCasesToFields[unionCase];
+        const selectedFields = unionSelectedFields?.[unionCase] || thisUnionCaseSelectedFieldsDefault;
 
-        return {union_case: final_map}
-    elif isinstance(type_declaration_type, UUnion):
-        value_as_map = cast(dict[str, object], value)
-        union_case, union_data = cast(
-            tuple[str, dict[str, object]], next(iter(value_as_map.items())))
+        const finalMap: { [key: string]: any } = {};
+        for (const [fieldName, fieldValue] of Object.entries(unionData)) {
+            if (selectedFields === undefined || selectedFields.includes(fieldName)) {
+                const field = unionStructRefFields[fieldName];
+                const valueWithSelectedFields = selectStructFields(
+                    field.typeDeclaration,
+                    fieldValue,
+                    selectedStructFields,
+                );
 
-        union_cases = type_declaration_type.cases
-        union_struct_reference = union_cases[union_case]
-        union_struct_ref_fields = union_struct_reference.fields
-        default_cases_to_fields = {}
+                finalMap[fieldName] = valueWithSelectedFields;
+            }
+        }
 
-        for case, union_struct in union_cases.items():
-            field_names = list(union_struct.fields.keys())
-            default_cases_to_fields[case] = field_names
+        return { [unionCase]: finalMap };
+    } else if (typeDeclarationType instanceof UObject) {
+        const nestedTypeDeclaration = typeDeclarationTypeParams[0];
+        const valueAsMap = value as { [key: string]: any };
 
-        union_selected_fields = cast(dict[str, object], selected_struct_fields.get(
-            type_declaration_type.name, default_cases_to_fields))
-        this_union_case_selected_fields_default = default_cases_to_fields.get(
-            union_case)
-        selected_fields = cast(list[str] | None, union_selected_fields.get(
-            union_case, this_union_case_selected_fields_default))
+        const finalMap: { [key: string]: any } = {};
+        for (const [key, value] of Object.entries(valueAsMap)) {
+            const valueWithSelectedFields = selectStructFields(nestedTypeDeclaration, value, selectedStructFields);
 
-        final_map = {}
-        for field_name, field_value in union_data.items():
-            if selected_fields is None or field_name in selected_fields:
-                field = union_struct_ref_fields[field_name]
-                value_with_selected_fields = select_struct_fields(field.type_declaration, field_value,
-                                                                  selected_struct_fields)
+            finalMap[key] = valueWithSelectedFields;
+        }
 
-                final_map[field_name] = value_with_selected_fields
+        return finalMap;
+    } else if (typeDeclarationType instanceof UArray) {
+        const nestedType = typeDeclarationTypeParams[0];
+        const valueAsList = value as any[];
 
-        return {union_case: final_map}
-    elif isinstance(type_declaration_type, UObject):
-        nested_type_declaration = type_declaration_type_params[0]
-        value_as_map = cast(dict[str, object], value)
+        const finalList: any[] = [];
+        for (const entry of valueAsList) {
+            const valueWithSelectedFields = selectStructFields(nestedType, entry, selectedStructFields);
+            finalList.push(valueWithSelectedFields);
+        }
 
-        final_map = {}
-        for key, value in value_as_map.items():
-            value_with_selected_fields = select_struct_fields(nested_type_declaration, value,
-                                                              selected_struct_fields)
-
-            final_map[key] = value_with_selected_fields
-
-        return final_map
-    elif isinstance(type_declaration_type, UArray):
-        nested_type = type_declaration_type_params[0]
-        value_as_list = cast(list[str], value)
-
-        final_list = []
-        for entry in value_as_list:
-            value_with_selected_fields = select_struct_fields(
-                nested_type, entry, selected_struct_fields)
-            final_list.append(value_with_selected_fields)
-
-        return final_list
-    else:
-        return value
+        return finalList;
+    } else {
+        return value;
+    }
+}

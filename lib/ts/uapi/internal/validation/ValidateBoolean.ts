@@ -1,14 +1,11 @@
-from typing import TYPE_CHECKING
-from uapi.internal.types.UBoolean import _BOOLEAN_NAME
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { get_type_unexpected_validation_failure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { _BOOLEAN_NAME } from 'uapi/internal/types/UBoolean';
 
-if TYPE_CHECKING:
-    from uapi.internal.validation.ValidationFailure import ValidationFailure
-
-
-def validate_boolean(value: object) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-
-    if isinstance(value, bool):
-        return []
-    else:
-        return get_type_unexpected_validation_failure([], value, _BOOLEAN_NAME)
+export function validateBoolean(value: any): ValidationFailure[] {
+    if (typeof value === 'boolean') {
+        return [];
+    } else {
+        return get_type_unexpected_validation_failure([], value, _BOOLEAN_NAME);
+    }
+}

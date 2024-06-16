@@ -1,23 +1,22 @@
-from typing import TYPE_CHECKING
-from uapi.Message import Message
+import { UUnion } from 'uapi/internal/types/UUnion';
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { mapValidationFailuresToInvalidFieldCases } from 'uapi/internal/validation/MapValidationFailuresToInvalidFieldCases';
+import { validateResult } from 'uapi/internal/validation/ValidateResult';
+import { Message } from 'uapi/Message';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UUnion import UUnion
-    from uapi.internal.validation.ValidationFailure import ValidationFailure
+export function getInvalidErrorMessage(
+    error: string,
+    validationFailures: ValidationFailure[],
+    resultUnionType: UUnion,
+    responseHeaders: { [key: string]: any },
+): Message {
+    const validationFailureCases = mapValidationFailuresToInvalidFieldCases(validationFailures);
+    const newErrorResult: { [key: string]: any } = {
+        [error]: {
+            cases: validationFailureCases,
+        },
+    };
 
-
-def get_invalid_error_message(error: str, validation_failures: list['ValidationFailure'],
-                              result_union_type: 'UUnion', response_headers: dict[str, object]) -> 'Message':
-    from uapi.internal.validation.MapValidationFailuresToInvalidFieldCases import map_validation_failures_to_invalid_field_cases
-    from uapi.internal.validation.ValidateResult import validate_result
-
-    validation_failure_cases = map_validation_failures_to_invalid_field_cases(
-        validation_failures)
-    new_error_result: dict[str, object] = {
-        error: {
-            "cases": validation_failure_cases
-        }
-    }
-
-    validate_result(result_union_type, new_error_result)
-    return Message(response_headers, new_error_result)
+    validateResult(resultUnionType, newErrorResult);
+    return new Message(responseHeaders, newErrorResult);
+}

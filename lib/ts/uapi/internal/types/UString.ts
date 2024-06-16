@@ -5,7 +5,7 @@ import { UType } from 'uapi/internal/types/UType';
 import { validate_string } from 'uapi/internal/validation/ValidateString';
 import { generate_random_string } from 'uapi/internal/generation/GenerateRandomString';
 
-const _STRING_NAME: string = 'String';
+export const _STRING_NAME: string = 'String';
 
 export class UString extends UType {
     get_type_parameter_count(): number {

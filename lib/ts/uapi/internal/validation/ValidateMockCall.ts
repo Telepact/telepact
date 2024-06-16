@@ -1,48 +1,56 @@
-from typing import TYPE_CHECKING, cast
-from uapi.internal.validation.ValidationFailure import ValidationFailure
-import re
+import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { UType } from 'uapi/internal/types/UType';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { UFn } from 'uapi/internal/types/UFn';
+import re from 're';
 
-if TYPE_CHECKING:
-    from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
-    from uapi.internal.types.UType import UType
+export function validateMockCall(
+    givenObj: any,
+    select: Record<string, any> | null,
+    fn: string | null,
+    typeParameters: UTypeDeclaration[],
+    generics: UTypeDeclaration[],
+    types: Record<string, UType>,
+): ValidationFailure[] {
+    if (!(givenObj instanceof Object)) {
+        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
+    }
 
+    const givenMap = givenObj;
 
-def validate_mock_call(given_obj: object, select: dict[str, object] | None, fn: str | None,
-                       type_parameters: list['UTypeDeclaration'],
-                       generics: list['UTypeDeclaration'], types: dict[str, 'UType']) -> list['ValidationFailure']:
-    from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
-    from uapi.internal.types.UFn import UFn
+    const regexString = '^fn\\..*$';
 
-    if not isinstance(given_obj, dict):
-        return get_type_unexpected_validation_failure([], given_obj, "Object")
+    const keys = Object.keys(givenMap).sort();
 
-    given_map = given_obj
+    const matches = keys.filter((k) => re.match(regexString, k));
+    if (matches.length !== 1) {
+        return [
+            new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
+                regex: regexString,
+                actual: matches.length,
+                expected: 1,
+                keys,
+            }),
+        ];
+    }
 
-    regex_string = "^fn\\..*$"
+    const functionName = matches[0];
+    const functionDef = types[functionName] as UFn;
+    const input = givenMap[functionName];
 
-    keys = sorted(given_map.keys())
+    const functionDefCall = functionDef.call;
+    const functionDefName = functionDef.name;
+    const functionDefCallCases = functionDefCall.cases;
 
-    matches = [k for k in keys if re.match(regex_string, k)]
-    if len(matches) != 1:
-        return [ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected",
-                                  {"regex": regex_string, "actual": len(matches), "expected": 1, "keys": keys})]
+    const inputFailures = functionDefCallCases[functionDefName].validate(input, select, fn, [], []);
 
-    function_name = matches[0]
-    function_def = cast(UFn, types[function_name])
-    input = given_map[function_name]
+    const inputFailuresWithPath: ValidationFailure[] = [];
+    for (const failure of inputFailures) {
+        const newPath = [functionName, ...failure.path];
 
-    function_def_call = function_def.call
-    function_def_name = function_def.name
-    function_def_call_cases = function_def_call.cases
+        inputFailuresWithPath.push(new ValidationFailure(newPath, failure.reason, failure.data));
+    }
 
-    input_failures = function_def_call_cases[function_def_name].validate(
-        input, select, fn, [], [])
-
-    input_failures_with_path = []
-    for f in input_failures:
-        new_path = [function_name] + f.path
-
-        input_failures_with_path.append(
-            ValidationFailure(new_path, f.reason, f.data))
-
-    return [f for f in input_failures_with_path if f.reason != "RequiredObjectKeyMissing"]
+    return inputFailuresWithPath.filter((failure) => failure.reason !== 'RequiredObjectKeyMissing');
+}

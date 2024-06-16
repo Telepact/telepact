@@ -1,56 +1,56 @@
-from datetime import datetime
-import threading
-from threading import Lock
+import { ClientBinaryStrategy } from 'uapi/ClientBinaryStrategy';
 
+export class Checksum {
+    constructor(
+        public value: number,
+        public expiration: number,
+    ) {}
+}
 
-from uapi.ClientBinaryStrategy import ClientBinaryStrategy
+export class DefaultClientBinaryStrategy implements ClientBinaryStrategy {
+    private primary: Checksum | null = null;
+    private secondary: Checksum | null = null;
+    private lastUpdate: Date = new Date();
 
+    updateChecksum(newChecksum: number): void {
+        if (!this.primary) {
+            this.primary = new Checksum(newChecksum, 0);
+            return;
+        }
 
-class Checksum:
-    def __init__(self, value: int, expiration: int) -> None:
-        self.value = value
-        self.expiration = expiration
+        if (this.primary.value !== newChecksum) {
+            this.secondary = this.primary;
+            this.primary = new Checksum(newChecksum, 0);
+            if (this.secondary) {
+                this.secondary.expiration += 1;
+            }
+            return;
+        }
 
+        this.lastUpdate = new Date();
+    }
 
-class DefaultClientBinaryStrategy(ClientBinaryStrategy):
+    getCurrentChecksums(): number[] {
+        if (!this.primary) {
+            return [];
+        } else if (!this.secondary) {
+            return [this.primary.value];
+        } else {
+            const minutesSinceLastUpdate = (Date.now() - this.lastUpdate.getTime()) / (1000 * 60);
 
-    def __init__(self) -> None:
-        self.primary: Checksum | None = None
-        self.secondary: Checksum | None = None
-        self.last_update = datetime.now()
-        self.lock = Lock()
+            // Every 10 minute interval of non-use is a penalty point
+            const penalty = Math.floor(minutesSinceLastUpdate / 10) + 1;
 
-    def update_checksum(self, new_checksum: int) -> None:
-        with self.lock:
-            if self.primary is None:
-                self.primary = Checksum(new_checksum, 0)
-                return
+            if (this.secondary) {
+                this.secondary.expiration += 1 * penalty;
+            }
 
-            if self.primary.value != new_checksum:
-                self.secondary = self.primary
-                self.primary = Checksum(new_checksum, 0)
-                self.secondary.expiration += 1
-                return
-
-            self.last_update = datetime.now()
-
-    def get_current_checksums(self) -> list[int]:
-        with self.lock:
-            if self.primary is None:
-                return []
-            elif self.secondary is None:
-                return [self.primary.value]
-            else:
-                minutes_since_last_update = (
-                    datetime.now() - self.last_update).total_seconds() / 60
-
-                # Every 10 minute interval of non-use is a penalty point
-                penalty = int(minutes_since_last_update // 10) + 1
-
-                self.secondary.expiration += 1 * penalty
-
-                if self.secondary.expiration > 5:
-                    self.secondary = None
-                    return [self.primary.value]
-                else:
-                    return [self.primary.value, self.secondary.value]
+            if (this.secondary && this.secondary.expiration > 5) {
+                this.secondary = null;
+                return [this.primary.value];
+            } else {
+                return [this.primary.value, this.secondary.value];
+            }
+        }
+    }
+}
