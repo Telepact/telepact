@@ -16,8 +16,6 @@ def client_binary_encode(message: list[object], recent_binary_encoders: dict[int
     force_send_json = headers.pop("_forceSendJson", None)
 
     headers["bin_"] = binary_checksum_strategy.get_current_checksums()
-    print('bin_:')
-    print(headers["bin_"])
 
     if force_send_json == True:
         raise BinaryEncoderUnavailableError()
