@@ -1,7 +1,7 @@
 export class Message {
     constructor(
-        private header: Record<string, any>,
-        private body: Record<string, any>,
+        public header: Record<string, any>,
+        public body: Record<string, any>,
     ) {}
 
     getBodyTarget(): string {

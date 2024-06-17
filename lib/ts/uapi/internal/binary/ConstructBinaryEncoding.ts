@@ -14,13 +14,17 @@ export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding 
 
         if (value instanceof UStruct) {
             const structFields: Record<string, UFieldDeclaration> = value.fields;
-            allKeys.add(...Object.keys(structFields));
+            for (const structFieldKey of Object.keys(structFields)) {
+                allKeys.add(structFieldKey);
+            }
         } else if (value instanceof UUnion) {
             const unionCases: Record<string, UStruct> = value.cases;
             for (const [caseKey, caseValue] of Object.entries(unionCases)) {
                 allKeys.add(caseKey);
                 const structFields = caseValue.fields;
-                allKeys.add(...Object.keys(structFields));
+                for (const structFieldKey of Object.keys(structFields)) {
+                    allKeys.add(structFieldKey);
+                }
             }
         } else if (value instanceof UFn) {
             const fnCallCases: Record<string, UStruct> = value.call.cases;
@@ -29,21 +33,25 @@ export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding 
             for (const [caseKey, caseValue] of Object.entries(fnCallCases)) {
                 allKeys.add(caseKey);
                 const structFields = caseValue.fields;
-                allKeys.add(...Object.keys(structFields));
+                for (const structFieldKey of Object.keys(structFields)) {
+                    allKeys.add(structFieldKey);
+                }
             }
 
             for (const [caseKey, caseValue] of Object.entries(fnResultCases)) {
                 allKeys.add(caseKey);
                 const structFields = caseValue.fields;
-                allKeys.add(...Object.keys(structFields));
+                for (const structFieldKey of Object.keys(structFields)) {
+                    allKeys.add(structFieldKey);
+                }
             }
         }
     }
 
     const sortedAllKeys = Array.from(allKeys).sort();
-    const binaryEncoding: Record<string, number> = {};
+    const binaryEncoding = new Map<string, number>();
     sortedAllKeys.forEach((key, index) => {
-        binaryEncoding[key] = index;
+        binaryEncoding.set(key, index);
     });
 
     const finalString = sortedAllKeys.join('\n');

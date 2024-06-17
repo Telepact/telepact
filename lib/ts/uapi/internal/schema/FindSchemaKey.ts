@@ -1,15 +1,14 @@
 import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
 import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import * as re from 're';
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
-    const regex = '^(errors|((fn|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)';
+    const regex = /^(errors|((fn|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\..*)/;
     const matches: string[] = [];
 
     const keys = Object.keys(definition).sort();
 
     for (const e of keys) {
-        if (re.match(regex, e)) {
+        if (regex.test(e)) {
             matches.push(e);
         }
     }
@@ -21,7 +20,7 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
             [index],
             'ObjectKeyRegexMatchCountUnexpected',
             {
-                regex: regex,
+                regex: regex.toString(),
                 actual: matches.length,
                 expected: 1,
                 keys: keys,

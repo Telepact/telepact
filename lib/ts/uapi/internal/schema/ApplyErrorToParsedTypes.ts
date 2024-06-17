@@ -1,7 +1,5 @@
 import { UError } from 'uapi/internal/types/UError';
-import { UStruct } from 'uapi/internal/types/UStruct';
 import { UType } from 'uapi/internal/types/UType';
-import { UUnion } from 'uapi/internal/types/UUnion';
 import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
 import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
 import { UFn } from 'uapi/internal/types/UFn';

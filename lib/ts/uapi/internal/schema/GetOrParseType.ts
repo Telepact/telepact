@@ -14,7 +14,7 @@ import { parseStructType } from 'uapi/internal/schema/ParseStructType';
 import { parseUnionType } from 'uapi/internal/schema/ParseUnionType';
 
 export function getOrParseType(
-    path: object[],
+    path: any[],
     typeName: string,
     thisTypeParameterCount: number,
     uApiSchemaPseudoJson: object[],

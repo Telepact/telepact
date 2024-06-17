@@ -2,10 +2,10 @@ import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 
 export function mapValidationFailuresToInvalidFieldCases(
     argumentValidationFailures: ValidationFailure[],
-): { path: string; reason: { [key: string]: any } }[] {
-    const validationFailureCases: { path: string; reason: { [key: string]: any } }[] = [];
+): Record<string, any>[] {
+    const validationFailureCases: Record<string, any>[] = [];
     for (const validationFailure of argumentValidationFailures) {
-        const validationFailureCase: { path: string; reason: { [key: string]: any } } = {
+        const validationFailureCase = {
             path: validationFailure.path,
             reason: { [validationFailure.reason]: validationFailure.data },
         };

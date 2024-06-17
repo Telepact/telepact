@@ -1,5 +1,3 @@
-import * as re from 're';
-import { TYPE_CHECKING } from 'typing';
 import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { UType } from 'uapi/internal/types/UType';
@@ -8,17 +6,14 @@ import { getOrParseType } from 'uapi/internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
 import { UGeneric } from 'uapi/internal/types/UGeneric';
 
-if (TYPE_CHECKING) {
-}
-
 export function parseTypeDeclaration(
     path: any[],
     typeDeclarationArray: any[],
     thisTypeParameterCount: number,
     uapiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
-    parsedTypes: { [key: string]: any },
-    typeExtensions: { [key: string]: any },
+    parsedTypes: { [key: string]: UType },
+    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UTypeDeclaration {
@@ -36,18 +31,18 @@ export function parseTypeDeclaration(
 
     const rootTypeString = baseType;
 
-    const regexString = '^(.+?)(\\?)?$';
-    const regex = new re.Regex(regexString);
+    const regexString = /^(.+?)(\?)?$/;
+    const regex = new RegExp(regexString);
 
-    const matcher = regex.match(rootTypeString);
+    const matcher = rootTypeString.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
             new SchemaParseFailure(basePath, 'StringRegexMatchFailed', { regex: regexString }, null),
         ]);
     }
 
-    const typeName = matcher.group(1);
-    const nullable = !!matcher.group(2);
+    const typeName = matcher[1];
+    const nullable = !!matcher[2];
 
     const type_ = getOrParseType(
         basePath,

@@ -2,11 +2,11 @@ import { RandomGenerator } from 'uapi/RandomGenerator';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UType } from 'uapi/internal/types/UType';
-import { validate_select } from 'uapi/internal/validation/ValidateSelect';
+import { validateSelect } from 'uapi/internal/validation/ValidateSelect';
 
 export type USelectTypes = Record<string, UType>;
 
-const _SELECT: string = 'Object';
+export const select: string = 'Object';
 
 export class USelect implements UType {
     types: USelectTypes;
@@ -15,33 +15,33 @@ export class USelect implements UType {
         this.types = types;
     }
 
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 0;
     }
 
     validate(
-        given_obj: any,
+        givenObj: any,
         select: Record<string, any> | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validate_select(given_obj, select, fn, type_parameters, generics, this.types);
+        return validateSelect(givenObj, select, fn, typeParameters, generics, this.types);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
         throw new Error('Not implemented');
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        return _SELECT;
+    getName(generics: UTypeDeclaration[]): string {
+        return select;
     }
 }

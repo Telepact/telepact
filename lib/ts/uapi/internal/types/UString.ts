@@ -2,13 +2,13 @@ import { RandomGenerator } from 'uapi/RandomGenerator';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UType } from 'uapi/internal/types/UType';
-import { validate_string } from 'uapi/internal/validation/ValidateString';
-import { generate_random_string } from 'uapi/internal/generation/GenerateRandomString';
+import { validateString } from 'uapi/internal/validation/ValidateString';
+import { generateRandomString } from 'uapi/internal/generation/GenerateRandomString';
 
-export const _STRING_NAME: string = 'String';
+export const stringName: string = 'String';
 
 export class UString extends UType {
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 0;
     }
 
@@ -16,25 +16,25 @@ export class UString extends UType {
         value: any,
         select: { [key: string]: any } | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validate_string(value);
+        return validateString(value);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        return generate_random_string(blueprint_value, use_blueprint_value, random_generator);
+        return generateRandomString(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        return _STRING_NAME;
+    getName(generics: UTypeDeclaration[]): string {
+        return stringName;
     }
 }

@@ -1,23 +1,21 @@
-import { BinaryEncoding } from 'uapi.internal.binary.BinaryEncoding';
+import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
 
-export function encodeKeys(given: any, binaryEncoding: BinaryEncoding): any {
+export function encodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     if (given === null || given === undefined) {
         return given;
-    } else if (typeof given === 'object') {
-        const newObject: { [key: string]: any } = {};
+    } else if (typeof given === 'object' && !Array.isArray(given)) {
+        const newMap = new Map<any, any>();
 
-        for (const key in given) {
-            if (given.hasOwnProperty(key)) {
-                const finalKey = binaryEncoding.encodeMap[key] || key;
-                const encodedValue = encodeKeys(given[key], binaryEncoding);
+        for (const [key, value] of Object.entries(given)) {
+            const finalKey = binaryEncoder.encodeMap.has(key) ? binaryEncoder.encodeMap.get(key) : key;
+            const encodedValue = encodeKeys(value, binaryEncoder);
 
-                newObject[finalKey] = encodedValue;
-            }
+            newMap.set(finalKey, encodedValue);
         }
 
-        return newObject;
+        return newMap;
     } else if (Array.isArray(given)) {
-        return given.map((item) => encodeKeys(item, binaryEncoding));
+        return given.map((value) => encodeKeys(value, binaryEncoder));
     } else {
         return given;
     }

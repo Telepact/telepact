@@ -2,13 +2,13 @@ import { RandomGenerator } from 'uapi/RandomGenerator';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { UType } from 'uapi/internal/types/UType';
-import { validate_array } from 'uapi/internal/validation/ValidateArray';
-import { generate_random_array } from 'uapi/internal/generation/GenerateRandomArray';
+import { validateArray } from 'uapi/internal/validation/ValidateArray';
+import { generateRandomArray } from 'uapi/internal/generation/GenerateRandomArray';
 
-const _ARRAY_NAME = 'Array';
+export const arrayName = 'Array';
 
 export class UArray extends UType {
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 1;
     }
 
@@ -16,33 +16,33 @@ export class UArray extends UType {
         value: any,
         select: { [key: string]: any } | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validate_array(value, select, fn, type_parameters, generics);
+        return validateArray(value, select, fn, typeParameters, generics);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        return generate_random_array(
-            blueprint_value,
-            use_blueprint_value,
-            include_optional_fields,
-            randomize_optional_fields,
-            type_parameters,
+        return generateRandomArray(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
+            typeParameters,
             generics,
-            random_generator,
+            randomGenerator,
         );
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        return _ARRAY_NAME;
+    getName(generics: UTypeDeclaration[]): string {
+        return arrayName;
     }
 }

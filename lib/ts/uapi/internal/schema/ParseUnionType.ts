@@ -1,118 +1,118 @@
-import re from 're';
 import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
 import { UUnion } from 'uapi/internal/types/UUnion';
 import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { get_type_unexpected_parse_failure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parse_struct_fields } from 'uapi/internal/schema/ParseStructFields';
+import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
+import { parseStructFields } from 'uapi/internal/schema/ParseStructFields';
 import { UStruct } from 'uapi/internal/types/UStruct';
 import { UType } from 'uapi/internal/types/UType';
 
-export function parse_union_type(
+export function parseUnionType(
     path: any[],
-    union_definition_as_pseudo_json: { [key: string]: any },
-    schema_key: string,
-    ignore_keys: string[],
-    required_keys: string[],
-    type_parameter_count: number,
-    u_api_schema_pseudo_json: any[],
-    schema_keys_to_index: { [key: string]: number },
-    parsed_types: { [key: string]: any },
-    type_extensions: { [key: string]: any },
-    all_parse_failures: SchemaParseFailure[],
-    failed_types: Set<string>,
+    unionDefinitionAsPseudoJson: { [key: string]: any },
+    schemaKey: string,
+    ignoreKeys: string[],
+    requiredKeys: string[],
+    typeParameterCount: number,
+    uApiSchemaPseudoJson: any[],
+    schemaKeysToIndex: { [key: string]: number },
+    parsedTypes: { [key: string]: UType },
+    typeExtensions: { [key: string]: UType },
+    allParseFailures: SchemaParseFailure[],
+    failedTypes: Set<string>,
 ): UUnion {
-    const parse_failures: SchemaParseFailure[] = [];
+    const parseFailures: SchemaParseFailure[] = [];
 
-    const other_keys = new Set(Object.keys(union_definition_as_pseudo_json));
-    other_keys.delete(schema_key);
-    other_keys.delete('///');
-    for (const ignore_key of ignore_keys) {
-        other_keys.delete(ignore_key);
+    const otherKeys = new Set(Object.keys(unionDefinitionAsPseudoJson));
+    otherKeys.delete(schemaKey);
+    otherKeys.delete('///');
+    for (const ignoreKey of ignoreKeys) {
+        otherKeys.delete(ignoreKey);
     }
 
-    if (other_keys.size > 0) {
-        for (const k of other_keys) {
-            const loop_path = path.concat(k);
-            parse_failures.push(new SchemaParseFailure(loop_path, 'ObjectKeyDisallowed', {}, null));
+    if (otherKeys.size > 0) {
+        for (const k of otherKeys) {
+            const loopPath = path.concat(k);
+            parseFailures.push(new SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
         }
     }
 
-    const this_path = path.concat(schema_key);
-    const def_init = union_definition_as_pseudo_json[schema_key];
+    const thisPath = path.concat(schemaKey);
+    const defInit = unionDefinitionAsPseudoJson[schemaKey];
 
-    if (!Array.isArray(def_init)) {
-        const final_parse_failures = get_type_unexpected_parse_failure(this_path, def_init, 'Array');
-        parse_failures.push(...final_parse_failures);
-        throw new UApiSchemaParseError(parse_failures);
+    if (!Array.isArray(defInit)) {
+        const finalParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit, 'Array');
+        parseFailures.push(...finalParseFailures);
+        throw new UApiSchemaParseError(parseFailures);
     }
 
-    const definition2 = def_init;
+    const definition2 = defInit;
     const definition = [];
     let index = -1;
     for (const element of definition2) {
         index += 1;
-        const loop_path = this_path.concat(index);
+        const loopPath = thisPath.concat(index);
         if (typeof element !== 'object' || Array.isArray(element)) {
-            const this_parse_failures = get_type_unexpected_parse_failure(loop_path, element, 'Object');
-            parse_failures.push(...this_parse_failures);
+            const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, element, 'Object');
+            parseFailures.push(...thisParseFailures);
             continue;
         }
         definition.push(element);
     }
 
-    if (parse_failures.length > 0) {
-        throw new UApiSchemaParseError(parse_failures);
+    if (parseFailures.length > 0) {
+        throw new UApiSchemaParseError(parseFailures);
     }
 
-    if (definition.length === 0 && required_keys.length === 0) {
-        parse_failures.push(new SchemaParseFailure(this_path, 'EmptyArrayDisallowed', {}, null));
+    if (definition.length === 0 && requiredKeys.length === 0) {
+        parseFailures.push(new SchemaParseFailure(thisPath, 'EmptyArrayDisallowed', {}, null));
     } else {
-        for (const required_key of required_keys) {
+        for (const requiredKey of requiredKeys) {
             let found = false;
             for (const element of definition) {
-                const case_keys = new Set(Object.keys(element));
-                case_keys.delete('///');
-                if (case_keys.has(required_key)) {
+                const caseKeys = new Set(Object.keys(element));
+                caseKeys.delete('///');
+                if (caseKeys.has(requiredKey)) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                const branch_path = this_path.concat(0, required_key);
-                parse_failures.push(new SchemaParseFailure(branch_path, 'RequiredObjectKeyMissing', {}, null));
+                const branchPath = thisPath.concat(0, requiredKey);
+                parseFailures.push(new SchemaParseFailure(branchPath, 'RequiredObjectKeyMissing', {}, null));
             }
         }
     }
 
     const cases: { [key: string]: UStruct } = {};
-    const case_indices: { [key: string]: number } = {};
+    const caseIndices: { [key: string]: number } = {};
 
     for (let i = 0; i < definition.length; i++) {
         const element = definition[i];
-        const loop_path = this_path.concat(i);
-        const map_init = element;
-        const map = Object.fromEntries(map_init);
+        const loopPath = thisPath.concat(i);
+        const mapInit = element;
+        const map = Object.fromEntries(mapInit);
         delete map['///'];
         const keys = Object.keys(map);
 
-        const regex_string = '^([A-Z][a-zA-Z0-9_]*)$';
+        const regexString = '^([A-Z][a-zA-Z0-9_]*)$';
 
-        const matches = keys.filter((k) => re.match(regex_string, k));
+        const regex = new RegExp(regexString);
+        const matches = keys.filter((k) => regex.test(k));
         if (matches.length !== 1) {
-            parse_failures.push(
+            parseFailures.push(
                 new SchemaParseFailure(
-                    loop_path,
+                    loopPath,
                     'ObjectKeyRegexMatchCountUnexpected',
-                    { regex: regex_string, actual: matches.length, expected: 1, keys: keys },
+                    { regex: regexString, actual: matches.length, expected: 1, keys: keys },
                     null,
                 ),
             );
             continue;
         }
         if (Object.keys(map).length !== 1) {
-            parse_failures.push(
+            parseFailures.push(
                 new SchemaParseFailure(
-                    loop_path,
+                    loopPath,
                     'ObjectSizeUnexpected',
                     { expected: 1, actual: Object.keys(map).length },
                     null,
@@ -122,41 +122,41 @@ export function parse_union_type(
         }
 
         const entry = Object.entries(map)[0];
-        const union_case = entry[0];
-        const union_key_path = loop_path.concat(union_case);
+        const unionCase = entry[0];
+        const unionKeyPath = loopPath.concat(unionCase);
 
         if (typeof entry[1] !== 'object' || Array.isArray(entry[1])) {
-            const this_parse_failures = get_type_unexpected_parse_failure(union_key_path, entry[1], 'Object');
-            parse_failures.push(...this_parse_failures);
+            const thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath, entry[1], 'Object');
+            parseFailures.push(...thisParseFailures);
             continue;
         }
-        const union_case_struct = entry[1];
+        const unionCaseStruct = entry[1];
 
         try {
-            const fields = parse_struct_fields(
-                union_case_struct,
-                union_key_path,
-                type_parameter_count,
-                u_api_schema_pseudo_json,
-                schema_keys_to_index,
-                parsed_types,
-                type_extensions,
-                all_parse_failures,
-                failed_types,
+            const fields = parseStructFields(
+                unionCaseStruct,
+                unionKeyPath,
+                typeParameterCount,
+                uApiSchemaPseudoJson,
+                schemaKeysToIndex,
+                parsedTypes,
+                typeExtensions,
+                allParseFailures,
+                failedTypes,
             );
-            const union_struct = new UStruct(`${schema_key}.${union_case}`, fields, type_parameter_count);
-            cases[union_case] = union_struct;
-            case_indices[union_case] = i;
+            const unionStruct = new UStruct(`${schemaKey}.${unionCase}`, fields, typeParameterCount);
+            cases[unionCase] = unionStruct;
+            caseIndices[unionCase] = i;
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
-                parse_failures.push(...e.schema_parse_failures);
+                parseFailures.push(...e.schemaParseFailures);
             }
         }
     }
 
-    if (parse_failures.length > 0) {
-        throw new UApiSchemaParseError(parse_failures);
+    if (parseFailures.length > 0) {
+        throw new UApiSchemaParseError(parseFailures);
     }
 
-    return new UUnion(schema_key, cases, case_indices, type_parameter_count);
+    return new UUnion(schemaKey, cases, caseIndices, typeParameterCount);
 }

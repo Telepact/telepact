@@ -1,11 +1,11 @@
 import { pack } from './Pack';
 
-export function packBody(body: Record<string, any>): Record<string, any> {
-    const result: Record<string, any> = {};
+export function packBody(body: Map<any, any>): Map<any, any> {
+    const result: Map<any, any> = new Map();
 
-    for (const [key, value] of Object.entries(body)) {
+    for (const [key, value] of body.entries()) {
         const packedValue = pack(value);
-        result[key] = packedValue;
+        result.set(key, packedValue);
     }
 
     return result;

@@ -4,7 +4,7 @@ import { pack } from './Pack';
 import { addExtension } from 'msgpackr';
 
 const UNDEFINED_BYTE = 18;
-class MsgpackUndefined {
+export class MsgpackUndefined {
     toString() {
         return 'UNDEFINED';
     }

@@ -11,7 +11,7 @@ export class UGeneric extends UType {
         this.index = index;
     }
 
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 0;
     }
 
@@ -19,35 +19,35 @@ export class UGeneric extends UType {
         value: any,
         select: { [key: string]: any } | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        const type_declaration = generics[this.index];
-        return type_declaration.validate(value, select, fn, []);
+        const typeDeclaration = generics[this.index];
+        return typeDeclaration.validate(value, select, fn, []);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        const generic_type_declaration = generics[this.index];
-        return generic_type_declaration.generate_random_value(
-            blueprint_value,
-            use_blueprint_value,
-            include_optional_fields,
-            randomize_optional_fields,
+        const genericTypeDeclaration = generics[this.index];
+        return genericTypeDeclaration.generateRandomValue(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
             [],
-            random_generator,
+            randomGenerator,
         );
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        const type_declaration = generics[this.index];
-        return type_declaration.type.get_name(generics);
+    getName(generics: UTypeDeclaration[]): string {
+        const typeDeclaration = generics[this.index];
+        return typeDeclaration.type.getName(generics);
     }
 }

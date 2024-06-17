@@ -3,25 +3,25 @@ import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { UUnion } from 'uapi/internal/types/UUnion';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UType } from 'uapi/internal/types/UType';
-import { generate_random_fn } from 'uapi/internal/generation/GenerateRandomFn';
+import { generateRandomFn } from 'uapi/internal/generation/GenerateRandomFn';
 
-const _FN_NAME = 'Object';
+const FN_NAME = 'Object';
 
 export class UFn extends UType {
     name: string;
     call: UUnion;
     result: UUnion;
-    errors_regex: string;
+    errorsRegex: string;
 
-    constructor(name: string, call: UUnion, output: UUnion, errors_regex: string) {
+    constructor(name: string, call: UUnion, output: UUnion, errorsRegex: string) {
         super();
         this.name = name;
         this.call = call;
         this.result = output;
-        this.errors_regex = errors_regex;
+        this.errorsRegex = errorsRegex;
     }
 
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 0;
     }
 
@@ -29,34 +29,34 @@ export class UFn extends UType {
         value: any,
         select: { [key: string]: any } | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return this.call.validate(value, select, fn, type_parameters, generics);
+        return this.call.validate(value, select, fn, typeParameters, generics);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        return generate_random_fn(
-            blueprint_value,
-            use_blueprint_value,
-            include_optional_fields,
-            randomize_optional_fields,
-            type_parameters,
+        return generateRandomFn(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
+            typeParameters,
             generics,
-            random_generator,
+            randomGenerator,
             this.call.cases,
         );
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        return _FN_NAME;
+    getName(generics: UTypeDeclaration[]): string {
+        return FN_NAME;
     }
 }

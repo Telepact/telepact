@@ -1,30 +1,29 @@
-import { ExtType } from 'msgpack';
-import { PACKED_BYTE } from './PackList';
+import { MsgpackPacked } from './PackList';
 import { unpack } from './Unpack';
 import { unpackMap } from './UnpackMap';
 
-export function unpackList(lst: any[]): any[] {
-    if (!lst.length) {
-        return lst;
+export function unpackList(list: any[]): any[] {
+    if (list.length === 0) {
+        return list;
     }
 
-    if (!(lst[0] instanceof ExtType) || lst[0].code !== PACKED_BYTE) {
-        const newLst: any[] = [];
-        for (const item of lst) {
-            newLst.push(unpack(item));
+    if (!(list[0] instanceof MsgpackPacked)) {
+        const newList: any[] = [];
+        for (const e of list) {
+            newList.push(unpack(e));
         }
-        return newLst;
+        return newList;
     }
 
-    const unpackedLst: any[] = [];
-    const headers = lst[1] as any[];
+    const unpackedList: any[] = [];
+    const headers: any[] = list[1];
 
-    for (let i = 2; i < lst.length; i++) {
-        const row = lst[i] as any[];
+    for (let i = 2; i < list.length; i += 1) {
+        const row: any[] = list[i];
         const m = unpackMap(row, headers);
 
-        unpackedLst.push(m);
+        unpackedList.push(m);
     }
 
-    return unpackedLst;
+    return unpackedList;
 }

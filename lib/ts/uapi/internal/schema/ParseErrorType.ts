@@ -1,6 +1,6 @@
-import { SchemaParseFailure } from '../SchemaParseFailure';
-import { UError } from '../UError';
-import { UType } from '../UType';
+import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
+import { UError } from 'uapi/internal/types/UError';
+import { UType } from 'uapi/internal/types/UType';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { parseUnionType } from './ParseUnionType';
 

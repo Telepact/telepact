@@ -22,7 +22,7 @@ export function parseHeadersType(
     const typeDeclarationValue = headersDefinitionAsParsedJson[schemaKey];
 
     if (!Array.isArray(typeDeclarationValue)) {
-        throw new UApiSchemaParseError(get_type_unexpected_parse_failure(path, typeDeclarationValue, 'Array'));
+        throw new UApiSchemaParseError(getTypeUnexpectedParseFailure(path, typeDeclarationValue, 'Array'));
     }
 
     const typeDeclarationArray = typeDeclarationValue;
@@ -30,7 +30,7 @@ export function parseHeadersType(
     const typeParameterCount = 0;
 
     try {
-        const typeDeclaration = parse_type_declaration(
+        const typeDeclaration = parseTypeDeclaration(
             path,
             typeDeclarationArray,
             typeParameterCount,

@@ -6,33 +6,37 @@ import { packBody } from 'uapi/internal/binary/PackBody';
 
 export function clientBinaryEncode(
     message: any[],
-    recentBinaryEncoders: { [key: number]: BinaryEncoding },
+    recentBinaryEncoders: Map<number, BinaryEncoding>,
     binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
-    const headers: { [key: string]: any } = message[0];
-    const messageBody: { [key: string]: any } = message[1];
-    const forceSendJson: boolean | null | undefined = headers._forceSendJson;
-    delete headers._forceSendJson;
+    const headers = message[0] as Record<string, any>;
+    const messageBody = message[1] as Record<string, any>;
+    const forceSendJson = headers['_forceSendJson'];
 
-    headers.bin_ = binaryChecksumStrategy.getCurrentChecksums();
+    headers['bin_'] = binaryChecksumStrategy.getCurrentChecksums();
 
     if (forceSendJson === true) {
         throw new BinaryEncoderUnavailableError();
     }
 
-    if (Object.keys(recentBinaryEncoders).length > 1) {
+    if (recentBinaryEncoders.size > 1) {
         throw new BinaryEncoderUnavailableError();
     }
 
-    const binaryEncoderOptional = Object.values(recentBinaryEncoders)[0] || null;
-    if (!binaryEncoderOptional) {
+    const binaryEncoder = [...recentBinaryEncoders.values()][0];
+
+    if (!binaryEncoder) {
         throw new BinaryEncoderUnavailableError();
     }
-    const binaryEncoder = binaryEncoderOptional;
 
     const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
-    const finalEncodedMessageBody = headers._pac === true ? packBody(encodedMessageBody) : encodedMessageBody;
+    let finalEncodedMessageBody: Map<any, any>;
+    if (headers['_pac'] === true) {
+        finalEncodedMessageBody = packBody(encodedMessageBody);
+    } else {
+        finalEncodedMessageBody = encodedMessageBody;
+    }
 
     return [headers, finalEncodedMessageBody];
 }

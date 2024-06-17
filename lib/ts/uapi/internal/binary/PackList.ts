@@ -4,9 +4,9 @@ import { packMap } from './PackMap';
 import { CannotPack } from './CannotPack';
 import { addExtension } from 'msgpackr';
 
-export const PACKED_BYTE = 17;
+const PACKED_BYTE = 17;
 
-class MsgpackPacked {
+export class MsgpackPacked {
     toString() {
         return 'PACKED';
     }

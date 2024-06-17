@@ -2,12 +2,12 @@ import { RandomGenerator } from 'uapi/RandomGenerator';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UType } from 'uapi/internal/types/UType';
-import { generate_random_any } from 'uapi/internal/generation/GenerateRandomAny';
+import { generateRandomAny } from 'uapi/internal/generation/GenerateRandomAny';
 
-const _ANY_NAME = 'Any';
+const anyName = 'Any';
 
 export class UAny extends UType {
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 0;
     }
 
@@ -15,25 +15,25 @@ export class UAny extends UType {
         value: any,
         select: { [key: string]: any } | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
         return [];
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        return generate_random_any(random_generator);
+        return generateRandomAny(randomGenerator);
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        return _ANY_NAME;
+    getName(generics: UTypeDeclaration[]): string {
+        return anyName;
     }
 }

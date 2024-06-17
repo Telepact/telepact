@@ -1,8 +1,8 @@
 import { UApiSchema } from 'uapi/UApiSchema';
 import { UType } from 'uapi/internal/types/UType';
 import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/getTypeUnexpectedParseFailure';
-import { parseUapiSchema } from 'uapi/internal/schema/parseUApiSchema';
+import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
+import { parseUapiSchema } from 'uapi/internal/schema/ParseUApiSchema';
 import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
 
 export function newUapiSchema(uapiSchemaJson: string, typeExtensions: { [key: string]: UType }): UApiSchema {

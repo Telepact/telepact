@@ -1,6 +1,6 @@
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { get_type_unexpected_validation_failure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { _INTEGER_NAME } from 'uapi/internal/types/UInteger';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { integerName } from 'uapi/internal/types/UInteger';
 
 export function validateInteger(value: any): ValidationFailure[] {
     if (typeof value === 'number' && !isNaN(value) && !Number.isInteger(value)) {
@@ -11,5 +11,5 @@ export function validateInteger(value: any): ValidationFailure[] {
         }
     }
 
-    return get_type_unexpected_validation_failure([], value, _INTEGER_NAME);
+    return getTypeUnexpectedValidationFailure([], value, integerName);
 }

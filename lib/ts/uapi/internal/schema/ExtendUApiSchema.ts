@@ -1,10 +1,9 @@
 import { UApiSchema } from 'uapi/UApiSchema';
 import { UType } from 'uapi/internal/types/UType';
 import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { get_type_unexpected_parse_failure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parse_uapi_schema } from 'uapi/internal/schema/ParseUApiSchema';
+import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
+import { parseUapiSchema } from 'uapi/internal/schema/ParseUApiSchema';
 import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import * as json from 'json';
 
 export function extendUapiSchema(
     first: UApiSchema,
@@ -13,13 +12,13 @@ export function extendUapiSchema(
 ): UApiSchema {
     let secondUapiSchemaPseudoJsonInit;
     try {
-        secondUapiSchemaPseudoJsonInit = json.loads(secondUapiSchemaJson);
+        secondUapiSchemaPseudoJsonInit = JSON.parse(secondUapiSchemaJson);
     } catch (e) {
         throw new UApiSchemaParseError([new SchemaParseFailure([], 'JsonInvalid', {}, null)], e);
     }
 
     if (!Array.isArray(secondUapiSchemaPseudoJsonInit)) {
-        const thisParseFailure = get_type_unexpected_parse_failure([], secondUapiSchemaPseudoJsonInit, 'Array');
+        const thisParseFailure = getTypeUnexpectedParseFailure([], secondUapiSchemaPseudoJsonInit, 'Array');
         throw new UApiSchemaParseError(thisParseFailure);
     }
 
@@ -32,5 +31,5 @@ export function extendUapiSchema(
 
     const typeExtensions = { ...firstTypeExtensions, ...secondTypeExtensions };
 
-    return parse_uapi_schema(original, typeExtensions, firstOriginal.length);
+    return parseUapiSchema(original, typeExtensions, firstOriginal.length);
 }

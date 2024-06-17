@@ -1,9 +1,9 @@
 export class MockStub {
-    private whenFunction: string;
-    private whenArgument: Record<string, any>;
-    private thenResult: Record<string, any>;
-    private allowArgumentPartialMatch: boolean;
-    private count: number;
+    public whenFunction: string;
+    public whenArgument: Record<string, any>;
+    public thenResult: Record<string, any>;
+    public allowArgumentPartialMatch: boolean;
+    public count: number;
 
     constructor(
         whenFunction: string,

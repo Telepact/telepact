@@ -1,14 +1,15 @@
 export class BinaryEncoding {
-    encodeMap: Record<string, number>;
-    decodeMap: Record<number, string>;
-    checksum: number;
+    public readonly encodeMap: Map<string, number>;
+    public readonly decodeMap: Map<number, string>;
+    public readonly checksum: number;
 
-    constructor(binaryEncodingMap: Record<string, number>, checksum: number) {
+    constructor(binaryEncodingMap: Map<string, number>, checksum: number) {
         this.encodeMap = binaryEncodingMap;
-        this.decodeMap = {};
-        for (const [key, value] of Object.entries(binaryEncodingMap)) {
-            this.decodeMap[value] = key;
-        }
+        const decodeList: [number, string][] = [...binaryEncodingMap.entries()].map((e: [string, number]) => [
+            e[1],
+            e[0],
+        ]);
+        this.decodeMap = new Map(decodeList);
         this.checksum = checksum;
     }
 }

@@ -1,7 +1,7 @@
-import { TYPE_CHECKING } from 'typing';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { arrayName } from '../types/UArray';
 
 export function validateArray(
     value: any,
@@ -10,10 +10,6 @@ export function validateArray(
     typeParameters: UTypeDeclaration[],
     generics: UTypeDeclaration[],
 ): ValidationFailure[] {
-    if (TYPE_CHECKING) {
-        // Add type checking related code here
-    }
-
     if (Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0];
 
@@ -35,6 +31,6 @@ export function validateArray(
 
         return validationFailures;
     } else {
-        return getTypeUnexpectedValidationFailure([], value, _ARRAY_NAME);
+        return getTypeUnexpectedValidationFailure([], value, arrayName);
     }
 }

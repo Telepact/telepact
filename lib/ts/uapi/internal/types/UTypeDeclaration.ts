@@ -1,18 +1,18 @@
 import { RandomGenerator } from 'uapi/RandomGenerator';
 import { UType } from 'uapi/internal/types/UType';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { validate_value_of_type } from 'uapi/internal/validation/ValidateValueOfType';
-import { generate_random_value_of_type } from 'uapi/internal/generation/GenerateRandomValueOfType';
+import { validateValueOfType } from 'uapi/internal/validation/ValidateValueOfType';
+import { generateRandomValueOfType } from 'uapi/internal/generation/GenerateRandomValueOfType';
 
 export class UTypeDeclaration {
     type: UType;
     nullable: boolean;
-    type_parameters: UTypeDeclaration[];
+    typeParameters: UTypeDeclaration[];
 
-    constructor(type: UType, nullable: boolean, type_parameters: UTypeDeclaration[]) {
+    constructor(type: UType, nullable: boolean, typeParameters: UTypeDeclaration[]) {
         this.type = type;
         this.nullable = nullable;
-        this.type_parameters = type_parameters;
+        this.typeParameters = typeParameters;
     }
 
     validate(
@@ -21,27 +21,27 @@ export class UTypeDeclaration {
         fn: string | null,
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validate_value_of_type(value, select, fn, generics, this.type, this.nullable, this.type_parameters);
+        return validateValueOfType(value, select, fn, generics, this.type, this.nullable, this.typeParameters);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        return generate_random_value_of_type(
-            blueprint_value,
-            use_blueprint_value,
-            include_optional_fields,
-            randomize_optional_fields,
+        return generateRandomValueOfType(
+            blueprintValue,
+            useBlueprintValue,
+            includeOptionalFields,
+            randomizeOptionalFields,
             generics,
-            random_generator,
+            randomGenerator,
             this.type,
             this.nullable,
-            this.type_parameters,
+            this.typeParameters,
         );
     }
 }

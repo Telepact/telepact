@@ -2,13 +2,13 @@ import { RandomGenerator } from 'uapi/RandomGenerator';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { UType } from 'uapi/internal/types/UType';
-import { validate_boolean } from 'uapi/internal/validation/ValidateBoolean';
-import { generate_random_boolean } from 'uapi/internal/generation/GenerateRandomBoolean';
+import { validateBoolean } from 'uapi/internal/validation/ValidateBoolean';
+import { generateRandomBoolean } from 'uapi/internal/generation/GenerateRandomBoolean';
 
-const _BOOLEAN_NAME: string = 'Boolean';
+export const booleanName: string = 'Boolean';
 
 export class UBoolean extends UType {
-    get_type_parameter_count(): number {
+    getTypeParameterCount(): number {
         return 0;
     }
 
@@ -16,25 +16,25 @@ export class UBoolean extends UType {
         value: any,
         select: { [key: string]: any } | null,
         fn: string | null,
-        type_parameters: UTypeDeclaration[],
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validate_boolean(value);
+        return validateBoolean(value);
     }
 
-    generate_random_value(
-        blueprint_value: any,
-        use_blueprint_value: boolean,
-        include_optional_fields: boolean,
-        randomize_optional_fields: boolean,
-        type_parameters: UTypeDeclaration[],
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        includeOptionalFields: boolean,
+        randomizeOptionalFields: boolean,
+        typeParameters: UTypeDeclaration[],
         generics: UTypeDeclaration[],
-        random_generator: RandomGenerator,
+        randomGenerator: RandomGenerator,
     ): any {
-        return generate_random_boolean(blueprint_value, use_blueprint_value, random_generator);
+        return generateRandomBoolean(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
-    get_name(generics: UTypeDeclaration[]): string {
-        return _BOOLEAN_NAME;
+    getName(generics: UTypeDeclaration[]): string {
+        return booleanName;
     }
 }

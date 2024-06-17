@@ -1,30 +1,26 @@
-import { ExtType } from 'msgpack';
-import { UNDEFINED_BYTE } from './PackMap';
+import { MsgpackUndefined } from './PackMap';
 import { unpack } from './Unpack';
 
-export function unpackMap(row: any[], header: any[]): { [key: number]: any } {
-    const finalMap: { [key: number]: any } = {};
+export function unpackMap(row: any[], header: any[]): Map<any, any> {
+    const finalMap = new Map<any, any>();
 
-    for (let j = 0; j < row.length; j++) {
+    for (let j = 0; j < row.length; j += 1) {
         const key = header[j + 1];
         const value = row[j];
 
-        if (value instanceof ExtType && value.code === UNDEFINED_BYTE) {
+        if (value instanceof MsgpackUndefined) {
             continue;
         }
 
         if (Array.isArray(key)) {
-            const nestedHeader = key;
+            const nestedHeader = key as any[];
             const nestedRow = value as any[];
             const m = unpackMap(nestedRow, nestedHeader);
-            const i = nestedHeader[0];
-
-            finalMap[i] = m;
+            const i = nestedHeader[0] as number;
+            finalMap.set(i, m);
         } else {
-            const i = key;
             const unpackedValue = unpack(value);
-
-            finalMap[i] = unpackedValue;
+            finalMap.set(key, unpackedValue);
         }
     }
 

@@ -2,43 +2,43 @@ import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
 import { ClientBinaryStrategy } from 'uapi/ClientBinaryStrategy';
 import { decodeBody } from 'uapi/internal/binary/DecodeBody';
 import { unpackBody } from 'uapi/internal/binary/UnpackBody';
+import { convertMapsToObjects } from './ConvertMapsToObjects';
 
 export function clientBinaryDecode(
     message: any[],
-    recentBinaryEncoders: Record<number, BinaryEncoding>,
+    recentBinaryEncoders: Map<number, BinaryEncoding>,
     binaryChecksumStrategy: ClientBinaryStrategy,
 ): any[] {
-    const headers = message[0];
-    const encodedMessageBody = message[1];
-    const binaryChecksums: number[] = headers['bin_'] || [];
-    const binaryChecksum = binaryChecksums[0];
+    const headers = message[0] as Map<string, any>;
+    const encodedMessageBody = message[1] as Map<any, any>;
+    const binaryChecksums = headers.get('bin_') as number[];
+    const binaryChecksum = binaryChecksums[0]!;
 
-    // If there is a binary encoding included on this message, cache it
-    if ('enc_' in headers) {
-        const binaryEncoding = headers['enc_'];
+    if (headers.has('enc_')) {
+        const binaryEncoding = headers.get('enc_') as Map<string, number>;
         const newBinaryEncoder = new BinaryEncoding(binaryEncoding, binaryChecksum);
-
-        recentBinaryEncoders[binaryChecksum] = newBinaryEncoder;
+        recentBinaryEncoders.set(binaryChecksum, newBinaryEncoder);
     }
 
     binaryChecksumStrategy.updateChecksum(binaryChecksum);
     const newCurrentChecksumStrategy = binaryChecksumStrategy.getCurrentChecksums();
 
-    for (const key in recentBinaryEncoders) {
-        if (!(key in newCurrentChecksumStrategy)) {
-            delete recentBinaryEncoders[key];
+    for (const [key, value] of recentBinaryEncoders) {
+        if (!newCurrentChecksumStrategy.includes(key)) {
+            recentBinaryEncoders.delete(key);
         }
     }
 
-    const binaryEncoder = recentBinaryEncoders[binaryChecksum];
+    const binaryEncoder = recentBinaryEncoders.get(binaryChecksum)!;
 
-    let finalEncodedMessageBody: Record<any, any>;
-    if (headers['_pac'] === true) {
+    let finalEncodedMessageBody: Map<any, any>;
+    if (headers.get('_pac') === true) {
         finalEncodedMessageBody = unpackBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;
     }
 
+    const messageHeader = convertMapsToObjects(headers);
     const messageBody = decodeBody(finalEncodedMessageBody, binaryEncoder);
-    return [headers, messageBody];
+    return [messageHeader, messageBody];
 }

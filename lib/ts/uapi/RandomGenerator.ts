@@ -14,7 +14,7 @@ function findStack() {
     throw new Error();
 }
 
-export class _RandomGenerator {
+export class RandomGenerator {
     seed: number;
     private collectionLengthMin: number;
     private collectionLengthMax: number;

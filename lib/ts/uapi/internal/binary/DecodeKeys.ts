@@ -1,32 +1,24 @@
-import { BinaryEncoding } from 'uapi.internal.binary.BinaryEncoding';
-import { BinaryEncodingMissing } from 'uapi.internal.binary.BinaryEncodingMissing';
+import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
+import { BinaryEncodingMissing } from 'uapi/internal/binary/BinaryEncodingMissing';
 
 export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
-    if (typeof given === 'object' && given !== null) {
-        const newDict: { [key: string]: any } = {};
+    if (given instanceof Map) {
+        const newMap: { [key: string]: any } = {};
 
-        for (const [key, value] of Object.entries(given)) {
-            let newKey: string;
+        for (const [key, value] of given.entries()) {
+            const finalKey = typeof key === 'string' ? key : binaryEncoder.decodeMap.get(key);
 
-            if (typeof key === 'string') {
-                newKey = key;
-            } else {
-                const possibleNewKey = binaryEncoder.decodeMap.get(key);
-
-                if (possibleNewKey === undefined) {
-                    throw new BinaryEncodingMissing(key);
-                }
-
-                newKey = possibleNewKey;
+            if (finalKey === undefined) {
+                throw new BinaryEncodingMissing(key);
             }
 
-            const encodedValue = decodeKeys(value, binaryEncoder);
-            newDict[newKey] = encodedValue;
+            const decodedValue = decodeKeys(value, binaryEncoder);
+            newMap[finalKey] = decodedValue;
         }
 
-        return newDict;
+        return newMap;
     } else if (Array.isArray(given)) {
-        return given.map((item) => decodeKeys(item, binaryEncoder));
+        return given.map((value) => decodeKeys(value, binaryEncoder));
     } else {
         return given;
     }

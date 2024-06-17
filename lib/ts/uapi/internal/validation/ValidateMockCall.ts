@@ -3,7 +3,6 @@ import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { UType } from 'uapi/internal/types/UType';
 import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
 import { UFn } from 'uapi/internal/types/UFn';
-import re from 're';
 
 export function validateMockCall(
     givenObj: any,
@@ -19,15 +18,15 @@ export function validateMockCall(
 
     const givenMap = givenObj;
 
-    const regexString = '^fn\\..*$';
+    const regexString = /^fn\..*$/;
 
     const keys = Object.keys(givenMap).sort();
 
-    const matches = keys.filter((k) => re.match(regexString, k));
+    const matches = keys.filter((k) => regexString.test(k));
     if (matches.length !== 1) {
         return [
             new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
-                regex: regexString,
+                regex: regexString.toString(),
                 actual: matches.length,
                 expected: 1,
                 keys,

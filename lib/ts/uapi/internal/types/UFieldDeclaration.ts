@@ -1,13 +1,13 @@
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 
 export class UFieldDeclaration {
-    field_name: string;
-    type_declaration: UTypeDeclaration;
+    fieldName: string;
+    typeDeclaration: UTypeDeclaration;
     optional: boolean;
 
-    constructor(field_name: string, type_declaration: UTypeDeclaration, optional: boolean) {
-        this.field_name = field_name;
-        this.type_declaration = type_declaration;
+    constructor(fieldName: string, typeDeclaration: UTypeDeclaration, optional: boolean) {
+        this.fieldName = fieldName;
+        this.typeDeclaration = typeDeclaration;
         this.optional = optional;
     }
 }
