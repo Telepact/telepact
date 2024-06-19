@@ -56,7 +56,7 @@ export async function handleMessage(
 
     const requestHeaderValidationFailures: ValidationFailure[] = validateHeaders(
         requestHeaders,
-        uApiSchema.parsed_request_headers,
+        uApiSchema.parsedRequestHeaders,
         functionType,
     );
     if (requestHeaderValidationFailures.length > 0) {
@@ -155,7 +155,7 @@ export async function handleMessage(
         }
         const responseHeaderValidationFailures: ValidationFailure[] = validateHeaders(
             finalResponseHeaders,
-            uApiSchema.parsed_response_headers,
+            uApiSchema.parsedResponseHeaders,
             functionType,
         );
         if (responseHeaderValidationFailures.length > 0) {

@@ -8,6 +8,7 @@ import { verify } from 'uapi/internal/mock/Verify';
 import { verifyNoMoreInteractions } from 'uapi/internal/mock/VerifyNoMoreInteractions';
 import { UApiError } from 'uapi/UApiError';
 import { UFn } from 'uapi/internal/types/UFn';
+import { objectsAreEqual } from 'uapi/internal/ObjectsAreEqual';
 
 export async function mockHandle(
     requestMessage: Message,
@@ -92,7 +93,7 @@ export async function mockHandle(
                         return new Message({}, result);
                     }
                 } else {
-                    if (stub.whenArgument === argument) {
+                    if (objectsAreEqual(stub.whenArgument, argument)) {
                         const useBlueprintValue = true;
                         const includeOptionalFields = false;
                         const resultInit = definition.result.generateRandomValue(

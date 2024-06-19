@@ -7,7 +7,7 @@ import { InvalidMessage } from 'uapi/internal/validation/InvalidMessage';
 import { InvalidMessageBody } from 'uapi/internal/validation/InvalidMessageBody';
 
 export function parseRequestMessage(
-    requestMessageBytes: Buffer,
+    requestMessageBytes: Uint8Array,
     serializer: Serializer,
     uapiSchema: UApiSchema,
     onError: (error: Error) => void,

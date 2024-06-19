@@ -1,6 +1,6 @@
 export class SerializationError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'SerializationError';
+    constructor(cause: Error) {
+        super(cause.message);
+        Object.setPrototypeOf(this, SerializationError.prototype);
     }
 }

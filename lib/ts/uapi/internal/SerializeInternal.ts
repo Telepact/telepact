@@ -1,4 +1,3 @@
-import { BinaryEncoderUnavailableError } from 'uapi/internal/binary/BinaryEncoderUnavailableError';
 import { SerializationError } from 'uapi/SerializationError';
 import { Serialization } from 'uapi/Serialization';
 import { Message } from 'uapi/Message';
@@ -34,6 +33,6 @@ export function serializeInternal(
             return serializer.toJson(messageAsPseudoJson);
         }
     } catch (error) {
-        throw new SerializationError();
+        throw new SerializationError(error as Error);
     }
 }

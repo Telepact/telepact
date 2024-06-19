@@ -1,4 +1,3 @@
-import { Callable, Awaitable } from 'concurrent.futures';
 import { DefaultClientBinaryStrategy } from 'uapi/DefaultClientBinaryStrategy';
 import { DefaultSerialization } from 'uapi/DefaultSerialization';
 import { Serializer } from 'uapi/Serializer';

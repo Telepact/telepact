@@ -1,7 +1,15 @@
 import { Message } from 'uapi/Message';
 import { Serializer } from 'uapi/Serializer';
 import { UApiError } from 'uapi/UApiError';
-import { timeout } from 'util';
+import { objectsAreEqual } from 'uapi/internal/ObjectsAreEqual';
+
+function timeoutPromise(timeoutMs: number): Promise<never> {
+    return new Promise((_resolve, reject) => {
+        setTimeout(() => {
+            reject(new Error('Promise timed out'));
+        }, timeoutMs);
+    });
+}
 
 export async function processRequestObject(
     requestMessage: Message,
@@ -23,17 +31,21 @@ export async function processRequestObject(
 
         const timeoutMs = header['tim_'] as number;
 
-        const responseMessage = await timeout(timeoutMs / 1000, adapter(requestMessage, serializer));
+        const responseMessage = await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);
 
-        if (responseMessage.body === { ErrorParseFailure_: { reasons: [{ IncompatibleBinaryEncoding: {} }] } }) {
+        if (
+            objectsAreEqual(responseMessage.body, {
+                ErrorParseFailure_: { reasons: [{ IncompatibleBinaryEncoding: {} }] },
+            })
+        ) {
             header['_binary'] = true;
             header['_forceSendJson'] = true;
 
-            return await timeout(timeoutMs / 1000, adapter(requestMessage, serializer));
+            return await Promise.race([adapter(requestMessage, serializer), timeoutPromise(timeoutMs)]);
         }
 
         return responseMessage;
     } catch (e) {
-        throw new UApiError();
+        throw new UApiError(e as Error);
     }
 }
