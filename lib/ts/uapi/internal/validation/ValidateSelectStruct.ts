@@ -20,7 +20,7 @@ export function validateSelectStruct(
 
         if (typeof field !== 'string') {
             const thisPath = [...basePath, i];
-            validationFailures.push(getTypeUnexpectedValidationFailure(thisPath, field, 'String'));
+            validationFailures.push(...getTypeUnexpectedValidationFailure(thisPath, field, 'String'));
             continue;
         }
 

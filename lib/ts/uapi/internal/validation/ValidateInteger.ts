@@ -3,13 +3,15 @@ import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/Get
 import { integerName } from 'uapi/internal/types/UInteger';
 
 export function validateInteger(value: any): ValidationFailure[] {
-    if (typeof value === 'number' && !isNaN(value) && !Number.isInteger(value)) {
-        if (value > 2 ** 63 - 1 || value < -(2 ** 63)) {
-            return [new ValidationFailure([], 'NumberOutOfRange', {})];
-        } else {
-            return [];
+    if (typeof value === 'number' && Number.isInteger(value)) {
+        if (value === 9223372036854776000 || value === -9223372036854776000) {
+            return [
+                new ValidationFailure([], 'NumberOutOfRange', {}),
+                new ValidationFailure([], 'NumberTruncated', {}),
+            ];
         }
+        return [];
+    } else {
+        return getTypeUnexpectedValidationFailure([], value, integerName);
     }
-
-    return getTypeUnexpectedValidationFailure([], value, integerName);
 }

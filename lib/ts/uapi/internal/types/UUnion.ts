@@ -6,7 +6,7 @@ import { validateUnion } from 'uapi/internal/validation/ValidateUnion';
 import { generateRandomUnion } from 'uapi/internal/generation/GenerateRandomUnion';
 import { UType } from 'uapi/internal/types/UType';
 
-export const UNION_NAME: string = 'Object';
+export const unionName: string = 'Object';
 
 export class UUnion implements UType {
     name: string;
@@ -62,6 +62,6 @@ export class UUnion implements UType {
     }
 
     getName(generics: UTypeDeclaration[]): string {
-        return UNION_NAME;
+        return unionName;
     }
 }

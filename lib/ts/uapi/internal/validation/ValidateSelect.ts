@@ -16,7 +16,7 @@ export function validateSelect(
     types: Record<string, UType>,
 ): ValidationFailure[] {
     if (!(givenObj instanceof Object)) {
-        return [getTypeUnexpectedValidationFailure([], givenObj, 'Object')];
+        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
     const selectStructFieldsHeader = givenObj;

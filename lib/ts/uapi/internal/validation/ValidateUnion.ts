@@ -3,6 +3,7 @@ import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateUnionCases } from 'uapi/internal/validation/ValidateUnionCases';
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { unionName } from '../types/UUnion';
 
 export function validateUnion(
     value: any,
@@ -22,6 +23,6 @@ export function validateUnion(
         }
         return validateUnionCases(cases, selectedCases, value, select, fn, typeParameters);
     } else {
-        return getTypeUnexpectedValidationFailure([], value, _UNION_NAME);
+        return getTypeUnexpectedValidationFailure([], value, unionName);
     }
 }

@@ -22,7 +22,7 @@ export function validateValueOfType(
         }
 
         if (!isNullable) {
-            return [getTypeUnexpectedValidationFailure([], value, thisType.getName(generics))];
+            return getTypeUnexpectedValidationFailure([], value, thisType.getName(generics));
         } else {
             return [];
         }

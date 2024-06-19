@@ -4,7 +4,7 @@ import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UType } from 'uapi/internal/types/UType';
 
 export class UGeneric extends UType {
-    private index: number;
+    public index: number;
 
     constructor(index: number) {
         super();

@@ -4,6 +4,7 @@ import { UStruct } from 'uapi/internal/types/UStruct';
 import { UType } from 'uapi/internal/types/UType';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
 import { UUnion } from 'uapi/internal/types/UUnion';
+import { UFn } from 'uapi/internal/types/UFn';
 
 export function validateMockStub(
     givenObj: any,
@@ -21,11 +22,11 @@ export function validateMockStub(
 
     const givenMap: { [key: string]: any } = givenObj;
 
-    const regexString = '^fn\\..*$';
+    const regexString = /^fn\..*$/;
 
     const keys = Object.keys(givenMap).sort();
 
-    const matches = keys.filter((k) => re.match(regexString, k));
+    const matches = keys.filter((k) => regexString.test(k));
     if (matches.length !== 1) {
         return [
             new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {

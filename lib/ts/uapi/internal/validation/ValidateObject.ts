@@ -1,6 +1,7 @@
 import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
 import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { get_type_unexpected_validation_failure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
+import { objectName } from 'uapi/internal/types/UObject';
 
 export function validateObject(
     value: any,
@@ -28,6 +29,6 @@ export function validateObject(
 
         return validationFailures;
     } else {
-        return get_type_unexpected_validation_failure([], value, _OBJECT_NAME);
+        return getTypeUnexpectedValidationFailure([], value, objectName);
     }
 }
