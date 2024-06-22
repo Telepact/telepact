@@ -1,17 +1,17 @@
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { UObject } from 'uapi/internal/types/UObject';
-import { UArray } from 'uapi/internal/types/UArray';
-import { UBoolean } from 'uapi/internal/types/UBoolean';
-import { UGeneric } from 'uapi/internal/types/UGeneric';
-import { UInteger } from 'uapi/internal/types/UInteger';
-import { UNumber } from 'uapi/internal/types/UNumber';
-import { UString } from 'uapi/internal/types/UString';
-import { UAny } from 'uapi/internal/types/UAny';
-import { parseFunctionType } from 'uapi/internal/schema/ParseFunctionType';
-import { parseStructType } from 'uapi/internal/schema/ParseStructType';
-import { parseUnionType } from 'uapi/internal/schema/ParseUnionType';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UType } from '../../internal/types/UType';
+import { UObject } from '../../internal/types/UObject';
+import { UArray } from '../../internal/types/UArray';
+import { UBoolean } from '../../internal/types/UBoolean';
+import { UGeneric } from '../../internal/types/UGeneric';
+import { UInteger } from '../../internal/types/UInteger';
+import { UNumber } from '../../internal/types/UNumber';
+import { UString } from '../../internal/types/UString';
+import { UAny } from '../../internal/types/UAny';
+import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
+import { parseStructType } from '../../internal/schema/ParseStructType';
+import { parseUnionType } from '../../internal/schema/ParseUnionType';
 
 export function getOrParseType(
     path: any[],

@@ -1,10 +1,10 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { validateStruct } from 'uapi/internal/validation/ValidateStruct';
-import { generateRandomStruct } from 'uapi/internal/generation/GenerateRandomStruct';
+import { RandomGenerator } from '../../RandomGenerator';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UType } from '../../internal/types/UType';
+import { validateStruct } from '../../internal/validation/ValidateStruct';
+import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
 
 export const structName: string = 'Object';
 

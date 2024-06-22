@@ -1,9 +1,9 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { validateInteger } from 'uapi/internal/validation/ValidateInteger';
-import { generateRandomInteger } from 'uapi/internal/generation/GenerateRandomInteger';
+import { RandomGenerator } from '../../RandomGenerator';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UType } from '../../internal/types/UType';
+import { validateInteger } from '../../internal/validation/ValidateInteger';
+import { generateRandomInteger } from '../../internal/generation/GenerateRandomInteger';
 
 export const integerName: string = 'Integer';
 

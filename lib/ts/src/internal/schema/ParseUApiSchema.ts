@@ -1,17 +1,17 @@
-import { UApiSchema } from 'uapi/UApiSchema';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { applyErrorToParsedTypes } from 'uapi/internal/schema/ApplyErrorToParsedTypes';
-import { catchErrorCollisions } from 'uapi/internal/schema/CatchErrorCollisions';
-import { findMatchingSchemaKey } from 'uapi/internal/schema/FindMatchingSchemaKey';
-import { findSchemaKey } from 'uapi/internal/schema/FindSchemaKey';
-import { getOrParseType } from 'uapi/internal/schema/GetOrParseType';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { offsetSchemaIndex } from 'uapi/internal/schema/OffsetSchemaIndex';
-import { parseErrorType } from 'uapi/internal/schema/ParseErrorType';
-import { parseHeadersType } from 'uapi/internal/schema/ParseHeadersType';
+import { UApiSchema } from '../../UApiSchema';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UType } from '../../internal/types/UType';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { applyErrorToParsedTypes } from '../../internal/schema/ApplyErrorToParsedTypes';
+import { catchErrorCollisions } from '../../internal/schema/CatchErrorCollisions';
+import { findMatchingSchemaKey } from '../../internal/schema/FindMatchingSchemaKey';
+import { findSchemaKey } from '../../internal/schema/FindSchemaKey';
+import { getOrParseType } from '../../internal/schema/GetOrParseType';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { offsetSchemaIndex } from '../../internal/schema/OffsetSchemaIndex';
+import { parseErrorType } from '../../internal/schema/ParseErrorType';
+import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 
 export function parseUapiSchema(
     uApiSchemaPseudoJson: any[],

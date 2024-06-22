@@ -1,4 +1,4 @@
-import { UUnion } from 'uapi/internal/types/UUnion';
+import { UUnion } from '../../internal/types/UUnion';
 
 export class UError {
     name: string;

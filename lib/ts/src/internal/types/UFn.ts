@@ -1,9 +1,9 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { generateRandomFn } from 'uapi/internal/generation/GenerateRandomFn';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UUnion } from '../../internal/types/UUnion';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UType } from '../../internal/types/UType';
+import { generateRandomFn } from '../../internal/generation/GenerateRandomFn';
 
 const FN_NAME = 'Object';
 

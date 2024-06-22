@@ -1,14 +1,14 @@
-import { Message } from 'uapi/Message';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { UApiSchema } from 'uapi/UApiSchema';
-import { selectStructFields } from 'uapi/internal/SelectStructFields';
-import { getInvalidErrorMessage } from 'uapi/internal/validation/GetInvalidErrorMessage';
-import { validateHeaders } from 'uapi/internal/validation/ValidateHeaders';
-import { validateResult } from 'uapi/internal/validation/ValidateResult';
-import { UFn } from 'uapi/internal/types/UFn';
+import { Message } from '../Message';
+import { UTypeDeclaration } from '../internal/types/UTypeDeclaration';
+import { UUnion } from '../internal/types/UUnion';
+import { ValidationFailure } from '../internal/validation/ValidationFailure';
+import { UType } from '../internal/types/UType';
+import { UApiSchema } from '../UApiSchema';
+import { selectStructFields } from '../internal/SelectStructFields';
+import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
+import { validateHeaders } from '../internal/validation/ValidateHeaders';
+import { validateResult } from '../internal/validation/ValidateResult';
+import { UFn } from '../internal/types/UFn';
 
 export async function handleMessage(
     requestMessage: Message,

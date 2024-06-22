@@ -1,8 +1,8 @@
-import { Serializer } from 'uapi/Serializer';
-import { UApiSchema } from 'uapi/UApiSchema';
-import { Message } from 'uapi/Message';
-import { handleMessage } from 'uapi/internal/HandleMessage';
-import { parseRequestMessage } from 'uapi/internal/ParseRequestMessage';
+import { Serializer } from '../Serializer';
+import { UApiSchema } from '../UApiSchema';
+import { Message } from '../Message';
+import { handleMessage } from '../internal/HandleMessage';
+import { parseRequestMessage } from '../internal/ParseRequestMessage';
 
 export type ErrorHandler = (error: any) => void;
 export type RequestHandler = (message: Message) => void;

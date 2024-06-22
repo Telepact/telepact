@@ -1,7 +1,7 @@
-import { Message } from 'uapi/Message';
-import { Serializer } from 'uapi/Serializer';
-import { UApiError } from 'uapi/UApiError';
-import { objectsAreEqual } from 'uapi/internal/ObjectsAreEqual';
+import { Message } from '../Message';
+import { Serializer } from '../Serializer';
+import { UApiError } from '../UApiError';
+import { objectsAreEqual } from '../internal/ObjectsAreEqual';
 
 function timeoutPromise(timeoutMs: number): Promise<never> {
     return new Promise((_resolve, reject) => {

@@ -1,7 +1,7 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UType } from '../../internal/types/UType';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { getTypeUnexpectedParseFailure } from './GetTypeUnexpectedParseFailure';
 import { parseTypeDeclaration } from './ParseTypeDeclaration';
 

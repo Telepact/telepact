@@ -1,7 +1,7 @@
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { newUapiSchema } from 'uapi/internal/schema/NewUApiSchema';
-import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
+import { UFieldDeclaration } from './internal/types/UFieldDeclaration';
+import { UType } from './internal/types/UType';
+import { newUapiSchema } from './internal/schema/NewUApiSchema';
+import { extendUapiSchema } from './internal/schema/ExtendUApiSchema';
 
 export class UApiSchema {
     /**

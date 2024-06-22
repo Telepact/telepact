@@ -1,8 +1,8 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UType } from 'uapi/internal/types/UType';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { validateValueOfType } from 'uapi/internal/validation/ValidateValueOfType';
-import { generateRandomValueOfType } from 'uapi/internal/generation/GenerateRandomValueOfType';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UType } from '../../internal/types/UType';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { validateValueOfType } from '../../internal/validation/ValidateValueOfType';
+import { generateRandomValueOfType } from '../../internal/generation/GenerateRandomValueOfType';
 
 export class UTypeDeclaration {
     type: UType;

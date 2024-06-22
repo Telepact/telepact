@@ -1,7 +1,7 @@
-import { SerializationError } from 'uapi/SerializationError';
-import { Serialization } from 'uapi/Serialization';
-import { Message } from 'uapi/Message';
-import { BinaryEncoder } from 'uapi/internal/binary/BinaryEncoder';
+import { SerializationError } from '../SerializationError';
+import { Serialization } from '../Serialization';
+import { Message } from '../Message';
+import { BinaryEncoder } from '../internal/binary/BinaryEncoder';
 
 export function serializeInternal(
     message: Message,

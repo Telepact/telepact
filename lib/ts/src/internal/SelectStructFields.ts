@@ -1,9 +1,9 @@
-import { UArray } from 'uapi/internal/types/UArray';
-import { UFn } from 'uapi/internal/types/UFn';
-import { UObject } from 'uapi/internal/types/UObject';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { UArray } from '../internal/types/UArray';
+import { UFn } from '../internal/types/UFn';
+import { UObject } from '../internal/types/UObject';
+import { UStruct } from '../internal/types/UStruct';
+import { UUnion } from '../internal/types/UUnion';
+import { UTypeDeclaration } from '../internal/types/UTypeDeclaration';
 
 export function selectStructFields(
     typeDeclaration: UTypeDeclaration,

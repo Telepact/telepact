@@ -1,5 +1,5 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { getType } from 'uapi/internal/types/GetType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { getType } from '../../internal/types/GetType';
 
 export function getTypeUnexpectedParseFailure(path: any[], value: any, expectedType: string): SchemaParseFailure[] {
     const actualType = getType(value);

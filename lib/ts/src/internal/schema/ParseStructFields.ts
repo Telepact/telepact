@@ -1,8 +1,8 @@
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { parseField } from 'uapi/internal/schema/ParseField';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UType } from '../../internal/types/UType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { parseField } from '../../internal/schema/ParseField';
 
 export function parseStructFields(
     referenceStruct: { [key: string]: any },

@@ -1,4 +1,4 @@
-import { ClientBinaryStrategy } from 'uapi/ClientBinaryStrategy';
+import { ClientBinaryStrategy } from './ClientBinaryStrategy';
 
 export class Checksum {
     constructor(

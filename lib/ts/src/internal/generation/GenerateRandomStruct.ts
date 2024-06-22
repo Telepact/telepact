@@ -1,7 +1,7 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { constructRandomStruct } from 'uapi/internal/generation/ConstructRandomStruct';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { constructRandomStruct } from '../../internal/generation/ConstructRandomStruct';
 
 export function generateRandomStruct(
     blueprintValue: any,

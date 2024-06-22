@@ -1,5 +1,5 @@
-import { isSubMap } from 'uapi/internal/mock/IsSubMap';
-import { partiallyMatches } from 'uapi/internal/mock/PartiallyMatches';
+import { isSubMap } from '../../internal/mock/IsSubMap';
+import { partiallyMatches } from '../../internal/mock/PartiallyMatches';
 
 export function isSubMapEntryEqual(partValue: any, wholeValue: any): boolean {
     if (typeof partValue === 'object' && typeof wholeValue === 'object') {

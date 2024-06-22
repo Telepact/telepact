@@ -1,7 +1,7 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { constructRandomUnion } from 'uapi/internal/generation/ConstructRandomUnion';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UStruct } from '../../internal/types/UStruct';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { constructRandomUnion } from '../../internal/generation/ConstructRandomUnion';
 
 export function generateRandomFn(
     blueprintValue: any,

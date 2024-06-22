@@ -1,9 +1,9 @@
-import { DefaultClientBinaryStrategy } from 'uapi/DefaultClientBinaryStrategy';
-import { DefaultSerialization } from 'uapi/DefaultSerialization';
-import { Serializer } from 'uapi/Serializer';
-import { ClientBinaryEncoder } from 'uapi/internal/binary/ClientBinaryEncoder';
-import { Message } from 'uapi/Message';
-import { processRequestObject } from 'uapi/internal/ProcessRequestObject';
+import { DefaultClientBinaryStrategy } from './DefaultClientBinaryStrategy';
+import { DefaultSerialization } from './DefaultSerialization';
+import { Serializer } from './Serializer';
+import { ClientBinaryEncoder } from './internal/binary/ClientBinaryEncoder';
+import { Message } from './Message';
+import { processRequestObject } from './internal/ProcessRequestObject';
 
 export class Client {
     private adapter: (message: Message, serializer: Serializer) => Promise<Message>;

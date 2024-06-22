@@ -1,15 +1,15 @@
-import { DefaultSerialization } from 'uapi/DefaultSerialization';
-import { Serializer } from 'uapi/Serializer';
-import { ServerBinaryEncoder } from 'uapi/internal/binary/ServerBinaryEncoder';
-import { USelect } from 'uapi/internal/types/USelect';
-import { Message } from 'uapi/Message';
-import { UApiSchema } from 'uapi/UApiSchema';
-import { UType } from 'uapi/internal/types/UType';
-import { constructBinaryEncoding } from 'uapi/internal/binary/ConstructBinaryEncoding';
-import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
-import { getInternalUApiJson } from 'uapi/internal/schema/GetInternalUApiJson';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { processBytes } from 'uapi/internal/ProcessBytes';
+import { DefaultSerialization } from './DefaultSerialization';
+import { Serializer } from './Serializer';
+import { ServerBinaryEncoder } from './internal/binary/ServerBinaryEncoder';
+import { USelect } from './internal/types/USelect';
+import { Message } from './Message';
+import { UApiSchema } from './UApiSchema';
+import { UType } from './internal/types/UType';
+import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding';
+import { extendUapiSchema } from './internal/schema/ExtendUApiSchema';
+import { getInternalUApiJson } from './internal/schema/GetInternalUApiJson';
+import { UStruct } from './internal/types/UStruct';
+import { processBytes } from './internal/ProcessBytes';
 
 export class Server {
     handler: (message: Message) => Promise<Message>;

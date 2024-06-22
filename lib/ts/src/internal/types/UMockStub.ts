@@ -1,8 +1,8 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { validateMockStub } from 'uapi/internal/validation/ValidateMockStub';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UType } from '../../internal/types/UType';
+import { validateMockStub } from '../../internal/validation/ValidateMockStub';
 
 export const mockStubName: string = '_ext.Stub_';
 

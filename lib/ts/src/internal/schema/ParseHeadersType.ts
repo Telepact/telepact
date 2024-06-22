@@ -1,9 +1,9 @@
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parseTypeDeclaration } from 'uapi/internal/schema/ParseTypeDeclaration';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UType } from 'uapi/internal/types/UType';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseTypeDeclaration } from '../../internal/schema/ParseTypeDeclaration';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UType } from '../../internal/types/UType';
 
 export function parseHeadersType(
     headersDefinitionAsParsedJson: { [key: string]: any },

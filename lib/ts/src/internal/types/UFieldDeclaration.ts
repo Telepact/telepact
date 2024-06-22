@@ -1,4 +1,4 @@
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 
 export class UFieldDeclaration {
     fieldName: string;

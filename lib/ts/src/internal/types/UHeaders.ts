@@ -1,4 +1,4 @@
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 
 export class UHeaders {
     name: string;

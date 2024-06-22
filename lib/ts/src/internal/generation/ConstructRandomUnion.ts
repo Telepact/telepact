@@ -1,7 +1,7 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { constructRandomStruct } from 'uapi/internal/generation/ConstructRandomStruct';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UStruct } from '../../internal/types/UStruct';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { constructRandomStruct } from '../../internal/generation/ConstructRandomStruct';
 
 export function constructRandomUnion(
     unionCasesReference: Record<string, UStruct>,

@@ -1,6 +1,6 @@
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { UStruct } from '../../internal/types/UStruct';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 
 export function validateSelectStruct(
     structReference: UStruct,

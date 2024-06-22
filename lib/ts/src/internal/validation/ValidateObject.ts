@@ -1,7 +1,7 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { objectName } from 'uapi/internal/types/UObject';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { objectName } from '../../internal/types/UObject';
 
 export function validateObject(
     value: any,

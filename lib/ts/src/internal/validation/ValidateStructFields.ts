@@ -1,6 +1,6 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 
 export function validateStructFields(
     fields: Record<string, UFieldDeclaration>,

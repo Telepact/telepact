@@ -1,6 +1,6 @@
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UFn } from 'uapi/internal/types/UFn';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UFn } from '../../internal/types/UFn';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 
 export function validateHeaders(
     headers: Record<string, any>,

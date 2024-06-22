@@ -1,6 +1,6 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UType } from 'uapi/internal/types/UType';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UType } from '../../internal/types/UType';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 
 export function generateRandomValueOfType(
     blueprintValue: any,

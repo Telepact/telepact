@@ -1,6 +1,6 @@
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UApiError } from 'uapi/UApiError';
-import { mapValidationFailuresToInvalidFieldCases } from 'uapi/internal/validation/MapValidationFailuresToInvalidFieldCases';
+import { UUnion } from '../../internal/types/UUnion';
+import { UApiError } from '../../UApiError';
+import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validation/MapValidationFailuresToInvalidFieldCases';
 
 export function validateResult(resultUnionType: UUnion, errorResult: any): void {
     const newErrorResultValidationFailures = resultUnionType.validate(errorResult, null, null, [], []);

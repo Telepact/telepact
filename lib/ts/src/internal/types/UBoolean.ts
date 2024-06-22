@@ -1,9 +1,9 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { validateBoolean } from 'uapi/internal/validation/ValidateBoolean';
-import { generateRandomBoolean } from 'uapi/internal/generation/GenerateRandomBoolean';
+import { RandomGenerator } from '../../RandomGenerator';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UType } from '../../internal/types/UType';
+import { validateBoolean } from '../../internal/validation/ValidateBoolean';
+import { generateRandomBoolean } from '../../internal/generation/GenerateRandomBoolean';
 
 export const booleanName: string = 'Boolean';
 

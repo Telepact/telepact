@@ -1,8 +1,8 @@
-import { Message } from 'uapi/Message';
-import { Serialization } from 'uapi/Serialization';
-import { BinaryEncoder } from 'uapi/internal/binary/BinaryEncoder';
-import { serializeInternal } from 'uapi/internal/SerializeInternal';
-import { deserializeInternal } from 'uapi/internal/DeserializeInternal';
+import { Message } from './Message';
+import { Serialization } from './Serialization';
+import { BinaryEncoder } from './internal/binary/BinaryEncoder';
+import { serializeInternal } from './internal/SerializeInternal';
+import { deserializeInternal } from './internal/DeserializeInternal';
 
 export class Serializer {
     /**

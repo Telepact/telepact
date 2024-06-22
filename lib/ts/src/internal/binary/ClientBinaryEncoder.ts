@@ -1,6 +1,6 @@
-import { ClientBinaryStrategy } from 'uapi/ClientBinaryStrategy';
-import { clientBinaryEncode } from 'uapi/internal/binary/ClientBinaryEncode';
-import { clientBinaryDecode } from 'uapi/internal/binary/ClientBinaryDecode';
+import { ClientBinaryStrategy } from '../../ClientBinaryStrategy';
+import { clientBinaryEncode } from '../../internal/binary/ClientBinaryEncode';
+import { clientBinaryDecode } from '../../internal/binary/ClientBinaryDecode';
 import { BinaryEncoder } from './BinaryEncoder';
 import { BinaryEncoding } from './BinaryEncoding';
 

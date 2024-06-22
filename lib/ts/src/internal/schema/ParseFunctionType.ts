@@ -1,11 +1,11 @@
-import { UFn } from 'uapi/internal/types/UFn';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UType } from 'uapi/internal/types/UType';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parseStructType } from 'uapi/internal/schema/ParseStructType';
-import { parseUnionType } from 'uapi/internal/schema/ParseUnionType';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
+import { UFn } from '../../internal/types/UFn';
+import { UUnion } from '../../internal/types/UUnion';
+import { UType } from '../../internal/types/UType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseStructType } from '../../internal/schema/ParseStructType';
+import { parseUnionType } from '../../internal/schema/ParseUnionType';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 
 export function parseFunctionType(
     path: any[],

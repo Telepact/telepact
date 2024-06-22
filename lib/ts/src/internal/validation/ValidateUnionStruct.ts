@@ -1,7 +1,7 @@
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { validateStructFields } from 'uapi/internal/validation/ValidateStructFields';
+import { UStruct } from '../../internal/types/UStruct';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { validateStructFields } from '../../internal/validation/ValidateStructFields';
 
 export function validateUnionStruct(
     unionStruct: UStruct,

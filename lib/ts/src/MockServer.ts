@@ -1,14 +1,14 @@
-import { UApiSchema } from 'uapi/UApiSchema';
-import { MockInvocation } from 'uapi/internal/mock/MockInvocation';
-import { MockStub } from 'uapi/internal/mock/MockStub';
-import { UType } from 'uapi/internal/types/UType';
-import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
-import { getMockUApiJson } from 'uapi/internal/schema/GetMockUApiJson';
-import { Server, ServerOptions as ServerOptions } from 'uapi/Server';
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UMockCall } from 'uapi/internal/types/UMockCall';
-import { UMockStub } from 'uapi/internal/types/UMockStub';
-import { mockHandle } from 'uapi/internal/mock/MockHandle';
+import { UApiSchema } from './UApiSchema';
+import { MockInvocation } from './internal/mock/MockInvocation';
+import { MockStub } from './internal/mock/MockStub';
+import { UType } from './internal/types/UType';
+import { extendUapiSchema } from './internal/schema/ExtendUApiSchema';
+import { getMockUApiJson } from './internal/schema/GetMockUApiJson';
+import { Server, ServerOptions as ServerOptions } from './Server';
+import { RandomGenerator } from './RandomGenerator';
+import { UMockCall } from './internal/types/UMockCall';
+import { UMockStub } from './internal/types/UMockStub';
+import { mockHandle } from './internal/mock/MockHandle';
 
 export class MockServer {
     /**

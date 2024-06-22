@@ -1,14 +1,14 @@
-import { Message } from 'uapi/Message';
-import { MockInvocation } from 'uapi/internal/mock/MockInvocation';
-import { MockStub } from 'uapi/internal/mock/MockStub';
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UApiSchema } from 'uapi/UApiSchema';
-import { isSubMap } from 'uapi/internal/mock/IsSubMap';
-import { verify } from 'uapi/internal/mock/Verify';
-import { verifyNoMoreInteractions } from 'uapi/internal/mock/VerifyNoMoreInteractions';
-import { UApiError } from 'uapi/UApiError';
-import { UFn } from 'uapi/internal/types/UFn';
-import { objectsAreEqual } from 'uapi/internal/ObjectsAreEqual';
+import { Message } from '../../Message';
+import { MockInvocation } from '../../internal/mock/MockInvocation';
+import { MockStub } from '../../internal/mock/MockStub';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UApiSchema } from '../../UApiSchema';
+import { isSubMap } from '../../internal/mock/IsSubMap';
+import { verify } from '../../internal/mock/Verify';
+import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions';
+import { UApiError } from '../../UApiError';
+import { UFn } from '../../internal/types/UFn';
+import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
 
 export async function mockHandle(
     requestMessage: Message,

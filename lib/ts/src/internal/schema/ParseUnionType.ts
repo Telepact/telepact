@@ -1,10 +1,10 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parseStructFields } from 'uapi/internal/schema/ParseStructFields';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UType } from 'uapi/internal/types/UType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UUnion } from '../../internal/types/UUnion';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseStructFields } from '../../internal/schema/ParseStructFields';
+import { UStruct } from '../../internal/types/UStruct';
+import { UType } from '../../internal/types/UType';
 
 export function parseUnionType(
     path: any[],

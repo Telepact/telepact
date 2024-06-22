@@ -1,4 +1,4 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
+import { RandomGenerator } from '../../RandomGenerator';
 
 export function generateRandomAny(randomGenerator: RandomGenerator): any {
     const selectType = randomGenerator.nextIntWithCeiling(3);

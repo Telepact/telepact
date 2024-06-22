@@ -1,4 +1,4 @@
-import internalUApi from 'inc/internal.uapi.json';
+import internalUApi from '../../../inc/internal.uapi.json';
 
 export function getInternalUApiJson(): string {
     return JSON.stringify(internalUApi);

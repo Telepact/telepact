@@ -1,9 +1,9 @@
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { validateStructFields } from 'uapi/internal/validation/ValidateStructFields';
-import { structName } from 'uapi/internal/types/UStruct';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { validateStructFields } from '../../internal/validation/ValidateStructFields';
+import { structName } from '../../internal/types/UStruct';
 
 export function validateStruct(
     value: any,

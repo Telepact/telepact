@@ -1,8 +1,8 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { UGeneric } from 'uapi/internal/types/UGeneric';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UType } from '../../internal/types/UType';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { UGeneric } from '../../internal/types/UGeneric';
 
 export function validateValueOfType(
     value: any,

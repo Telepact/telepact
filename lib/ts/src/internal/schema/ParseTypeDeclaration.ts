@@ -1,10 +1,10 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { getOrParseType } from 'uapi/internal/schema/GetOrParseType';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { UGeneric } from 'uapi/internal/types/UGeneric';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UType } from '../../internal/types/UType';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { getOrParseType } from '../../internal/schema/GetOrParseType';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { UGeneric } from '../../internal/types/UGeneric';
 
 export function parseTypeDeclaration(
     path: any[],

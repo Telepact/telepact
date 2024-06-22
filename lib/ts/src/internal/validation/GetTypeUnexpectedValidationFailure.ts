@@ -1,5 +1,5 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { getType } from 'uapi/internal/types/GetType';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getType } from '../../internal/types/GetType';
 
 export function getTypeUnexpectedValidationFailure(path: any[], value: any, expectedType: string): ValidationFailure[] {
     const actualType = getType(value);

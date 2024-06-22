@@ -1,9 +1,9 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UType } from 'uapi/internal/types/UType';
-import { validateString } from 'uapi/internal/validation/ValidateString';
-import { generateRandomString } from 'uapi/internal/generation/GenerateRandomString';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UType } from '../../internal/types/UType';
+import { validateString } from '../../internal/validation/ValidateString';
+import { generateRandomString } from '../../internal/generation/GenerateRandomString';
 
 export const stringName: string = 'String';
 

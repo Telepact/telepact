@@ -1,4 +1,4 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 
 export function mapValidationFailuresToInvalidFieldCases(
     argumentValidationFailures: ValidationFailure[],

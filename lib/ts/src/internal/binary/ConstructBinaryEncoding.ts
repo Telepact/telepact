@@ -1,10 +1,10 @@
-import { UApiSchema } from 'uapi/UApiSchema';
-import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
-import { createChecksum } from 'uapi/internal/binary/CreateChecksum';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UFn } from 'uapi/internal/types/UFn';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
+import { UApiSchema } from '../../UApiSchema';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { createChecksum } from '../../internal/binary/CreateChecksum';
+import { UUnion } from '../../internal/types/UUnion';
+import { UStruct } from '../../internal/types/UStruct';
+import { UFn } from '../../internal/types/UFn';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 
 export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();

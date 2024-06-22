@@ -1,10 +1,10 @@
-import { Serializer } from 'uapi/Serializer';
-import { UApiSchema } from 'uapi/UApiSchema';
-import { Message } from 'uapi/Message';
-import { BinaryEncoderUnavailableError } from 'uapi/internal/binary/BinaryEncoderUnavailableError';
-import { BinaryEncodingMissing } from 'uapi/internal/binary/BinaryEncodingMissing';
-import { InvalidMessage } from 'uapi/internal/validation/InvalidMessage';
-import { InvalidMessageBody } from 'uapi/internal/validation/InvalidMessageBody';
+import { Serializer } from '../Serializer';
+import { UApiSchema } from '../UApiSchema';
+import { Message } from '../Message';
+import { BinaryEncoderUnavailableError } from '../internal/binary/BinaryEncoderUnavailableError';
+import { BinaryEncodingMissing } from '../internal/binary/BinaryEncodingMissing';
+import { InvalidMessage } from '../internal/validation/InvalidMessage';
+import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
 
 export function parseRequestMessage(
     requestMessageBytes: Uint8Array,

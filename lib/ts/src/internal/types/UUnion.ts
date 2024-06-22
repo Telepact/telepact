@@ -1,10 +1,10 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { validateUnion } from 'uapi/internal/validation/ValidateUnion';
-import { generateRandomUnion } from 'uapi/internal/generation/GenerateRandomUnion';
-import { UType } from 'uapi/internal/types/UType';
+import { RandomGenerator } from '../../RandomGenerator';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UStruct } from '../../internal/types/UStruct';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { validateUnion } from '../../internal/validation/ValidateUnion';
+import { generateRandomUnion } from '../../internal/generation/GenerateRandomUnion';
+import { UType } from '../../internal/types/UType';
 
 export const unionName: string = 'Object';
 

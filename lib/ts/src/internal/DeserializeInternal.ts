@@ -1,8 +1,8 @@
-import { Serialization } from 'uapi/Serialization';
-import { BinaryEncoder } from 'uapi/internal/binary/BinaryEncoder';
-import { Message } from 'uapi/Message';
-import { InvalidMessage } from 'uapi/internal/validation/InvalidMessage';
-import { InvalidMessageBody } from 'uapi/internal/validation/InvalidMessageBody';
+import { Serialization } from '../Serialization';
+import { BinaryEncoder } from '../internal/binary/BinaryEncoder';
+import { Message } from '../Message';
+import { InvalidMessage } from '../internal/validation/InvalidMessage';
+import { InvalidMessageBody } from '../internal/validation/InvalidMessageBody';
 
 export function deserializeInternal(
     messageBytes: Uint8Array,

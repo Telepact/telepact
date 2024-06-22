@@ -1,8 +1,8 @@
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { validateUnionCases } from 'uapi/internal/validation/ValidateUnionCases';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
+import { UStruct } from '../../internal/types/UStruct';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { validateUnionCases } from '../../internal/validation/ValidateUnionCases';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { unionName } from '../types/UUnion';
 
 export function validateUnion(

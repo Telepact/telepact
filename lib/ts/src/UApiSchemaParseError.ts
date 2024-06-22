@@ -1,5 +1,5 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { mapSchemaParseFailuresToPseudoJson } from 'uapi/internal/schema/MapSchemaParseFailuresToPseudoJson';
+import { SchemaParseFailure } from './internal/schema/SchemaParseFailure';
+import { mapSchemaParseFailuresToPseudoJson } from './internal/schema/MapSchemaParseFailuresToPseudoJson';
 
 export class UApiSchemaParseError extends Error {
     /**

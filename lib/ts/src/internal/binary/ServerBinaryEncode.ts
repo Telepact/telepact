@@ -1,6 +1,6 @@
-import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
-import { encodeBody } from 'uapi/internal/binary/EncodeBody';
-import { packBody } from 'uapi/internal/binary/PackBody';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { encodeBody } from '../../internal/binary/EncodeBody';
+import { packBody } from '../../internal/binary/PackBody';
 
 export function serverBinaryEncode(message: any[], binaryEncoder: BinaryEncoding): any[] {
     const headers: { [key: string]: any } = message[0];

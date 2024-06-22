@@ -3,7 +3,7 @@
     "version": "1.0.2",
     "description": "",
     "main": "index.js",
-    "types": "lib/uapi/mod.d.ts",
+    "types": "lib/src/mod.d.ts",
     "scripts": {
         "prepare": "mkdir -p inc && cp ../../common/* ./inc/",
         "build": "tsc && npm pack"

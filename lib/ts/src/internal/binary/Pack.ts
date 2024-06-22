@@ -1,4 +1,4 @@
-import { packList } from 'uapi/internal/binary/PackList';
+import { packList } from '../../internal/binary/PackList';
 
 export function pack(value: any): any {
     if (Array.isArray(value)) {

@@ -1,4 +1,4 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function mapSchemaParseFailuresToPseudoJson(schemaParseFailures: SchemaParseFailure[]): any[] {
     const pseudoJsonList: any[] = [];

@@ -1,11 +1,11 @@
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { validateSelectStruct } from 'uapi/internal/validation/ValidateSelectStruct';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UFn } from 'uapi/internal/types/UFn';
-import { UStruct } from 'uapi/internal/types/UStruct';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UType } from '../../internal/types/UType';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { validateSelectStruct } from '../../internal/validation/ValidateSelectStruct';
+import { UUnion } from '../../internal/types/UUnion';
+import { UFn } from '../../internal/types/UFn';
+import { UStruct } from '../../internal/types/UStruct';
 
 export function validateSelect(
     givenObj: any,

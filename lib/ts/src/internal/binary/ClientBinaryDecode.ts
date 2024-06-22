@@ -1,7 +1,7 @@
-import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
-import { ClientBinaryStrategy } from 'uapi/ClientBinaryStrategy';
-import { decodeBody } from 'uapi/internal/binary/DecodeBody';
-import { unpackBody } from 'uapi/internal/binary/UnpackBody';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { ClientBinaryStrategy } from '../../ClientBinaryStrategy';
+import { decodeBody } from '../../internal/binary/DecodeBody';
+import { unpackBody } from '../../internal/binary/UnpackBody';
 import { convertMapsToObjects } from './ConvertMapsToObjects';
 
 export function clientBinaryDecode(

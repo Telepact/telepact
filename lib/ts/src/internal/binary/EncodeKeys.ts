@@ -1,4 +1,4 @@
-import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
 
 export function encodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     if (given === null || given === undefined) {

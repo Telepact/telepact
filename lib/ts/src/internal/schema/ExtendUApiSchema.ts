@@ -1,9 +1,9 @@
-import { UApiSchema } from 'uapi/UApiSchema';
-import { UType } from 'uapi/internal/types/UType';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parseUapiSchema } from 'uapi/internal/schema/ParseUApiSchema';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
+import { UApiSchema } from '../../UApiSchema';
+import { UType } from '../../internal/types/UType';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseUapiSchema } from '../../internal/schema/ParseUApiSchema';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function extendUapiSchema(
     first: UApiSchema,

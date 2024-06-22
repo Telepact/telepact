@@ -1,9 +1,9 @@
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UType } from 'uapi/internal/types/UType';
-import { getTypeUnexpectedParseFailure } from 'uapi/internal/schema/GetTypeUnexpectedParseFailure';
-import { parseStructFields } from 'uapi/internal/schema/ParseStructFields';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UStruct } from '../../internal/types/UStruct';
+import { UType } from '../../internal/types/UType';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { parseStructFields } from '../../internal/schema/ParseStructFields';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 
 export function parseStructType(
     path: any[],

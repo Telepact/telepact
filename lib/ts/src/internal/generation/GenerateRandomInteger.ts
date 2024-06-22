@@ -1,4 +1,4 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
+import { RandomGenerator } from '../../RandomGenerator';
 
 export function generateRandomInteger(
     blueprintValue: any,

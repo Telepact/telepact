@@ -1,4 +1,4 @@
-import { isSubMapEntryEqual } from 'uapi/internal/mock/IsSubMapEntryEqual';
+import { isSubMapEntryEqual } from '../../internal/mock/IsSubMapEntryEqual';
 
 export function isSubMap(part: Record<string, any>, whole: Record<string, any>): boolean {
     for (const partKey in part) {

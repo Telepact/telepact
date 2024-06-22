@@ -1,8 +1,8 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UType } from 'uapi/internal/types/UType';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { UFn } from 'uapi/internal/types/UFn';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UType } from '../../internal/types/UType';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { UFn } from '../../internal/types/UFn';
 
 export function validateMockCall(
     givenObj: any,

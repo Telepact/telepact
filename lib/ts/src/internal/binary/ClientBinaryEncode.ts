@@ -1,8 +1,8 @@
-import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
-import { BinaryEncoderUnavailableError } from 'uapi/internal/binary/BinaryEncoderUnavailableError';
-import { ClientBinaryStrategy } from 'uapi/ClientBinaryStrategy';
-import { encodeBody } from 'uapi/internal/binary/EncodeBody';
-import { packBody } from 'uapi/internal/binary/PackBody';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError';
+import { ClientBinaryStrategy } from '../../ClientBinaryStrategy';
+import { encodeBody } from '../../internal/binary/EncodeBody';
+import { packBody } from '../../internal/binary/PackBody';
 
 export function clientBinaryEncode(
     message: any[],

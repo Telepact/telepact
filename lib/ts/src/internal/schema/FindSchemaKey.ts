@@ -1,5 +1,5 @@
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
     const regex = /^(errors|((fn|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\..*)/;

@@ -1,6 +1,6 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { integerName } from 'uapi/internal/types/UInteger';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { integerName } from '../../internal/types/UInteger';
 
 export function validateInteger(value: any): ValidationFailure[] {
     if (typeof value === 'number' && Number.isInteger(value)) {

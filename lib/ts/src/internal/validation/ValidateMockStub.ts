@@ -1,10 +1,10 @@
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { UStruct } from 'uapi/internal/types/UStruct';
-import { UType } from 'uapi/internal/types/UType';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
-import { UUnion } from 'uapi/internal/types/UUnion';
-import { UFn } from 'uapi/internal/types/UFn';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { UStruct } from '../../internal/types/UStruct';
+import { UType } from '../../internal/types/UType';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { UUnion } from '../../internal/types/UUnion';
+import { UFn } from '../../internal/types/UFn';
 
 export function validateMockStub(
     givenObj: any,

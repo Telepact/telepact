@@ -1,6 +1,6 @@
-import { RandomGenerator } from 'uapi/RandomGenerator';
-import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from 'uapi/internal/types/UTypeDeclaration';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 
 export function constructRandomStruct(
     referenceStruct: Record<string, UFieldDeclaration>,

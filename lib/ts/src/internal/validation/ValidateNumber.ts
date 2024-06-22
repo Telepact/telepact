@@ -1,6 +1,6 @@
-import { getTypeUnexpectedValidationFailure } from 'uapi/internal/validation/GetTypeUnexpectedValidationFailure';
-import { ValidationFailure } from 'uapi/internal/validation/ValidationFailure';
-import { numberName } from 'uapi/internal/types/UNumber';
+import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { numberName } from '../../internal/types/UNumber';
 
 export function validateNumber(value: any): Array<ValidationFailure> {
     if (typeof value === 'number') {

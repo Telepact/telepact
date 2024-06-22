@@ -1,5 +1,5 @@
-import { BinaryEncoding } from 'uapi/internal/binary/BinaryEncoding';
-import { BinaryEncodingMissing } from 'uapi/internal/binary/BinaryEncodingMissing';
+import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
+import { BinaryEncodingMissing } from '../../internal/binary/BinaryEncodingMissing';
 
 export function decodeKeys(given: any, binaryEncoder: BinaryEncoding): any {
     if (given instanceof Map) {

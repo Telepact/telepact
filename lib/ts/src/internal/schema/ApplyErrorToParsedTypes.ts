@@ -1,8 +1,8 @@
-import { UError } from 'uapi/internal/types/UError';
-import { UType } from 'uapi/internal/types/UType';
-import { SchemaParseFailure } from 'uapi/internal/schema/SchemaParseFailure';
-import { UApiSchemaParseError } from 'uapi/UApiSchemaParseError';
-import { UFn } from 'uapi/internal/types/UFn';
+import { UError } from '../../internal/types/UError';
+import { UType } from '../../internal/types/UType';
+import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { UApiSchemaParseError } from '../../UApiSchemaParseError';
+import { UFn } from '../../internal/types/UFn';
 
 export function applyErrorToParsedTypes(
     errorIndex: number,
