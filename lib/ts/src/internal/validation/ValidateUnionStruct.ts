@@ -12,7 +12,7 @@ export function validateUnionStruct(
     fn: string | null,
     typeParameters: UTypeDeclaration[],
 ): ValidationFailure[] {
-    const selectedFields = selectedCases?.[unionCase] as string[] | undefined;
+    const selectedFields = (selectedCases?.[unionCase] as string[] | undefined) ?? null;
 
     return validateStructFields(unionStruct.fields, selectedFields, actual, select, fn, typeParameters);
 }
