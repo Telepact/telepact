@@ -90,7 +90,7 @@ export function parseUnionType(
         const element = definition[i];
         const loopPath = thisPath.concat(i);
         const mapInit = element;
-        const map = Object.fromEntries(mapInit);
+        const map = Object.fromEntries(Object.entries(mapInit));
         delete map['///'];
         const keys = Object.keys(map);
 

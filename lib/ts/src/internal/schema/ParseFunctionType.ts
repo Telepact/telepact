@@ -69,6 +69,9 @@ export function parseFunctionType(
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
+            } else {
+                console.log(e);
+                parseFailures.push(new SchemaParseFailure(resPath, 'UnknownError', {}, null));
             }
         }
     }

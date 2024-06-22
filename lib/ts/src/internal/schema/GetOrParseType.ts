@@ -38,7 +38,7 @@ export function getOrParseType(
             ? `|(T.([0-${thisTypeParameterCount - 1}]${thisTypeParameterCount > 1 ? '' : '0'})`
             : '';
 
-    const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\.([a-zA-Z_]\w*)${genericRegex})$`;
+    const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)${genericRegex})$`;
     const regex = new RegExp(regexString);
 
     const matcher = typeName.match(regex);
