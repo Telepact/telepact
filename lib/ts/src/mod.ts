@@ -1,7 +1,7 @@
 export * from 'uapi/RandomGenerator';
-export { Client, Options as ClientOptions } from 'uapi/Client';
-export { Server, Options as ServerOptions } from 'uapi/Server';
-export { MockServer, Options as MockServerOptions } from 'uapi/MockServer';
+export * from 'uapi/Client';
+export * from 'uapi/Server';
+export * from 'uapi/MockServer';
 export * from 'uapi/Message';
 export * from 'uapi/Serializer';
 export * from 'uapi/DefaultClientBinaryStrategy';

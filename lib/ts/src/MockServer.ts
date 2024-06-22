@@ -4,7 +4,7 @@ import { MockStub } from 'uapi/internal/mock/MockStub';
 import { UType } from 'uapi/internal/types/UType';
 import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
 import { getMockUApiJson } from 'uapi/internal/schema/GetMockUApiJson';
-import { Server, Options as ServerOptions } from 'uapi/Server';
+import { Server, ServerOptions as ServerOptions } from 'uapi/Server';
 import { RandomGenerator } from 'uapi/RandomGenerator';
 import { UMockCall } from 'uapi/internal/types/UMockCall';
 import { UMockStub } from 'uapi/internal/types/UMockStub';
@@ -17,7 +17,7 @@ export class MockServer {
 
     constructor(
         private uApiSchema: UApiSchema,
-        private options: Options,
+        private options: MockServerOptions,
     ) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
@@ -79,7 +79,7 @@ export class MockServer {
     };
 }
 
-export class Options {
+export class MockServerOptions {
     /**
      * Options for the MockServer.
      */

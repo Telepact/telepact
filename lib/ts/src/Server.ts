@@ -19,7 +19,7 @@ export class Server {
     uApiSchema: UApiSchema;
     serializer: Serializer;
 
-    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: Options) {
+    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: ServerOptions) {
         this.handler = handler;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
@@ -61,7 +61,7 @@ export class Server {
     }
 }
 
-export class Options {
+export class ServerOptions {
     onError: (error: any) => void;
     onRequest: (message: Message) => void;
     onResponse: (message: Message) => void;

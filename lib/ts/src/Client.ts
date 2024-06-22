@@ -11,7 +11,7 @@ export class Client {
     private timeoutMsDefault: number;
     private serializer: Serializer;
 
-    constructor(adapter: (message: Message, serializer: Serializer) => Promise<Message>, options: Options) {
+    constructor(adapter: (message: Message, serializer: Serializer) => Promise<Message>, options: ClientOptions) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;
@@ -29,7 +29,7 @@ export class Client {
     }
 }
 
-export class Options {
+export class ClientOptions {
     useBinary: boolean;
     timeoutMsDefault: number;
     serializationImpl: DefaultSerialization;

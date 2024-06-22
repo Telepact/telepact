@@ -1,9 +1,9 @@
 {
     "name": "uapi",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "",
     "main": "index.js",
-    "types": "lib/src/mod.d.ts",
+    "types": "lib/uapi/mod.d.ts",
     "scripts": {
         "prepare": "mkdir -p inc && cp ../../common/* ./inc/",
         "build": "tsc && npm pack"
