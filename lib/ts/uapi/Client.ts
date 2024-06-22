@@ -6,12 +6,12 @@ import { Message } from 'uapi/Message';
 import { processRequestObject } from 'uapi/internal/ProcessRequestObject';
 
 export class Client {
-    private adapter: Callable<[Message, Serializer], Awaitable<Message>>;
+    private adapter: (message: Message, serializer: Serializer) => Promise<Message>;
     private useBinaryDefault: boolean;
     private timeoutMsDefault: number;
     private serializer: Serializer;
 
-    constructor(adapter: Callable<[Message, Serializer], Awaitable<Message>>, options: Options) {
+    constructor(adapter: (message: Message, serializer: Serializer) => Promise<Message>, options: Options) {
         this.adapter = adapter;
         this.useBinaryDefault = options.useBinary;
         this.timeoutMsDefault = options.timeoutMsDefault;

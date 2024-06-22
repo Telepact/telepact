@@ -1,3 +1,6 @@
+/*
+ * For debeugging.
+ */
 function findStack() {
     const e = new Error();
     const stack = e.stack.split('\n');

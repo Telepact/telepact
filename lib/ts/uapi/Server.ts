@@ -7,7 +7,7 @@ import { UApiSchema } from 'uapi/UApiSchema';
 import { UType } from 'uapi/internal/types/UType';
 import { constructBinaryEncoding } from 'uapi/internal/binary/ConstructBinaryEncoding';
 import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
-import { getInternalUapiJson } from 'uapi/internal/schema/GetInternalUapiJson';
+import { getInternalUApiJson } from 'uapi/internal/schema/GetInternalUApiJson';
 import { UStruct } from 'uapi/internal/types/UStruct';
 import { processBytes } from 'uapi/internal/ProcessBytes';
 
@@ -19,7 +19,7 @@ export class Server {
     uApiSchema: UApiSchema;
     serializer: Serializer;
 
-    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: Server.Options) {
+    constructor(uApiSchema: UApiSchema, handler: (message: Message) => Promise<Message>, options: Options) {
         this.handler = handler;
         this.onError = options.onError;
         this.onRequest = options.onRequest;
@@ -30,7 +30,7 @@ export class Server {
             '_ext.Select_': new USelect(parsedTypes),
         };
 
-        this.uApiSchema = extendUapiSchema(uApiSchema, getInternalUapiJson(), typeExtensions);
+        this.uApiSchema = extendUapiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
 
         Object.assign(parsedTypes, this.uApiSchema.parsed);
 
@@ -38,7 +38,10 @@ export class Server {
         const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serialization, binaryEncoder);
 
-        if ((<UStruct>this.uApiSchema.parsed['struct.Auth_']).fields.length === 0 && options.authRequired) {
+        if (
+            Object.keys((this.uApiSchema.parsed['struct.Auth_'] as UStruct).fields).length === 0 &&
+            options.authRequired
+        ) {
             throw new Error(
                 'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.',
             );

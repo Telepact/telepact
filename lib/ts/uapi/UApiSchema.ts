@@ -1,7 +1,7 @@
 import { UFieldDeclaration } from 'uapi/internal/types/UFieldDeclaration';
 import { UType } from 'uapi/internal/types/UType';
-import { newUApiSchema } from 'uapi/internal/schema/NewUApiSchema';
-import { extendUApiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
+import { newUapiSchema } from 'uapi/internal/schema/NewUApiSchema';
+import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
 
 export class UApiSchema {
     /**
@@ -29,10 +29,10 @@ export class UApiSchema {
     }
 
     static fromJson(json: string): UApiSchema {
-        return newUApiSchema(json, {});
+        return newUapiSchema(json, {});
     }
 
     static extend(base: UApiSchema, json: string): UApiSchema {
-        return extendUApiSchema(base, json, {});
+        return extendUapiSchema(base, json, {});
     }
 }

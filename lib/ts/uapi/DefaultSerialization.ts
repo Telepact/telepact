@@ -1,6 +1,7 @@
 import { Packr, Unpackr } from 'msgpackr';
+import { Serialization } from 'uapi/Serialization';
 
-export class _DefaultSerializationImpl {
+export class DefaultSerialization implements Serialization {
     private packr = new Packr({ mapsAsObjects: false, useRecords: false });
     private unpackr = new Unpackr({ mapsAsObjects: false, useRecords: false });
 
@@ -9,7 +10,7 @@ export class _DefaultSerializationImpl {
         return new TextEncoder().encode(jsonStr);
     }
 
-    public toMsgPack(uapiMessage: any): Uint8Array {
+    public toMsgpack(uapiMessage: any): Uint8Array {
         return this.packr.encode(uapiMessage);
     }
 
@@ -18,7 +19,7 @@ export class _DefaultSerializationImpl {
         return JSON.parse(jsonStr);
     }
 
-    public fromMsgPack(bytes: Uint8Array): any {
+    public fromMsgpack(bytes: Uint8Array): any {
         return this.unpackr.decode(bytes);
     }
 }

@@ -5,7 +5,7 @@ import { InvalidMessage } from 'uapi/internal/validation/InvalidMessage';
 import { InvalidMessageBody } from 'uapi/internal/validation/InvalidMessageBody';
 
 export function deserializeInternal(
-    messageBytes: Buffer,
+    messageBytes: Uint8Array,
     serializer: Serialization,
     binaryEncoder: BinaryEncoder,
 ): Message {

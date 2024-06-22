@@ -2,9 +2,9 @@ import { UApiSchema } from 'uapi/UApiSchema';
 import { MockInvocation } from 'uapi/internal/mock/MockInvocation';
 import { MockStub } from 'uapi/internal/mock/MockStub';
 import { UType } from 'uapi/internal/types/UType';
-import { extendUApiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
+import { extendUapiSchema } from 'uapi/internal/schema/ExtendUApiSchema';
 import { getMockUApiJson } from 'uapi/internal/schema/GetMockUApiJson';
-import { Server } from 'uapi/Server';
+import { Server, Options as ServerOptions } from 'uapi/Server';
 import { RandomGenerator } from 'uapi/RandomGenerator';
 import { UMockCall } from 'uapi/internal/types/UMockCall';
 import { UMockStub } from 'uapi/internal/types/UMockStub';
@@ -33,9 +33,9 @@ export class MockServer {
         typeExtensions['_ext.Call_'] = new UMockCall(parsedTypes);
         typeExtensions['_ext.Stub_'] = new UMockStub(parsedTypes);
 
-        const combinedUApiSchema: UApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(), typeExtensions);
+        const combinedUApiSchema: UApiSchema = extendUapiSchema(uApiSchema, getMockUApiJson(), typeExtensions);
 
-        const serverOptions = new Server.Options();
+        const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
@@ -55,7 +55,7 @@ export class MockServer {
     private invocations: MockInvocation[];
     private server: Server;
 
-    async process(message: Buffer): Promise<Buffer> {
+    async process(message: Uint8Array): Promise<Uint8Array> {
         /**
          * Process a given uAPI Request Message into a uAPI Response Message.
          *
