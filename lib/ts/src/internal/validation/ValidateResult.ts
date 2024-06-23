@@ -4,9 +4,9 @@ import { mapValidationFailuresToInvalidFieldCases } from '../../internal/validat
 
 export function validateResult(resultUnionType: UUnion, errorResult: any): void {
     const newErrorResultValidationFailures = resultUnionType.validate(errorResult, null, null, [], []);
-    if (newErrorResultValidationFailures) {
+    if (newErrorResultValidationFailures.length !== 0) {
         throw new UApiError(
-            `Failed internal uAPI validation: ${mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures)}`,
+            `Failed internal uAPI validation: ${JSON.stringify(mapValidationFailuresToInvalidFieldCases(newErrorResultValidationFailures))}`,
         );
     }
 }
