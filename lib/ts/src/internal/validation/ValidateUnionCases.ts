@@ -28,7 +28,7 @@ export function validateUnionCases(
         return [new ValidationFailure([unionTarget], 'ObjectKeyDisallowed', {})];
     }
 
-    if (typeof unionPayload === 'object') {
+    if (typeof unionPayload === 'object' && !Array.isArray(unionPayload)) {
         const nestedValidationFailures = validateUnionStruct(
             referenceStruct,
             unionTarget,
@@ -47,6 +47,6 @@ export function validateUnionCases(
 
         return nestedValidationFailuresWithPath;
     } else {
-        return getTypeUnexpectedValidationFailure([unionTarget], unionPayload, 'object');
+        return getTypeUnexpectedValidationFailure([unionTarget], unionPayload, 'Object');
     }
 }
