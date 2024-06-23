@@ -14,7 +14,7 @@ export function validateStruct(
     name: string,
     fields: Record<string, UFieldDeclaration>,
 ): ValidationFailure[] {
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
         const selectedFields = select?.[name] ?? null;
         return validateStructFields(fields, selectedFields, value, select, fn, typeParameters);
     } else {

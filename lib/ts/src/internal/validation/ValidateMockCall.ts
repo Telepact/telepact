@@ -12,7 +12,7 @@ export function validateMockCall(
     generics: UTypeDeclaration[],
     types: Record<string, UType>,
 ): ValidationFailure[] {
-    if (!(givenObj instanceof Object)) {
+    if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
         return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 

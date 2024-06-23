@@ -16,7 +16,7 @@ export function validateMockStub(
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
 
-    if (!(givenObj instanceof Object)) {
+    if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
         return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 

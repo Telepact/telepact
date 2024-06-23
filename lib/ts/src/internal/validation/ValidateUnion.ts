@@ -14,7 +14,7 @@ export function validateUnion(
     name: string,
     cases: Record<string, UStruct>,
 ): ValidationFailure[] {
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
         let selectedCases: Record<string, any>;
         if (name.startsWith('fn.')) {
             selectedCases = { [name]: select?.[name] ?? null };
