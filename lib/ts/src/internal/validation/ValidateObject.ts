@@ -10,7 +10,7 @@ export function validateObject(
     typeParameters: UTypeDeclaration[],
     generics: UTypeDeclaration[],
 ): ValidationFailure[] {
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0];
 
         const validationFailures: ValidationFailure[] = [];
