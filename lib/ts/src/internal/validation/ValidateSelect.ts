@@ -15,7 +15,7 @@ export function validateSelect(
     generics: UTypeDeclaration[],
     types: Record<string, UType>,
 ): ValidationFailure[] {
-    if (!(givenObj instanceof Object)) {
+    if (typeof givenObj !== 'object' || Array.isArray(givenObj)) {
         return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
@@ -40,7 +40,7 @@ export function validateSelect(
 
         if (typeReference instanceof UUnion) {
             const u = typeReference;
-            if (!(selectValue instanceof Object)) {
+            if (typeof selectValue !== 'object' || Array.isArray(selectValue)) {
                 validationFailures.push(...getTypeUnexpectedValidationFailure([type], selectValue, 'Object'));
                 continue;
             }
