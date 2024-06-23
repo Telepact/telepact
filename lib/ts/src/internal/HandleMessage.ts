@@ -9,6 +9,7 @@ import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMe
 import { validateHeaders } from '../internal/validation/ValidateHeaders';
 import { validateResult } from '../internal/validation/ValidateResult';
 import { UFn } from '../internal/types/UFn';
+import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
 
 export async function handleMessage(
     requestMessage: Message,
@@ -99,8 +100,23 @@ export async function handleMessage(
 
     const functionTypeCall: UUnion = functionType.call;
 
-    const callValidationFailures: ValidationFailure[] = functionTypeCall.validate(requestBody, null, null, [], []);
+    const warnings: ValidationFailure[] = [];
+    const filterOutWarnings = (e: ValidationFailure) => {
+        const r = e.reason == 'NumberTruncated';
+        if (r) {
+            warnings.push(e);
+        }
+        return !r;
+    };
+
+    const callValidationFailures: ValidationFailure[] = functionTypeCall
+        .validate(requestBody, null, null, [], [])
+        .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
+        if (warnings.length > 0) {
+            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
+        }
+
         return getInvalidErrorMessage(
             'ErrorInvalidRequestBody_',
             callValidationFailures,
@@ -138,13 +154,14 @@ export async function handleMessage(
 
     const skipResultValidation: boolean = unsafeResponseEnabled;
     if (!skipResultValidation) {
-        const resultValidationFailures: ValidationFailure[] = resultUnionType.validate(
-            resultUnion,
-            selectStructFieldsHeader,
-            null,
-            [],
-            [],
-        );
+        const resultValidationFailures: ValidationFailure[] = resultUnionType
+            .validate(resultUnion, selectStructFieldsHeader, null, [], [])
+            .filter(filterOutWarnings);
+
+        if (warnings.length > 0) {
+            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
+        }
+
         if (resultValidationFailures.length > 0) {
             return getInvalidErrorMessage(
                 'ErrorInvalidResponseBody_',

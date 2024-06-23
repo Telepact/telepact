@@ -14,7 +14,7 @@ export function validateUnionCases(
 ): ValidationFailure[] {
     if (Object.keys(actual).length !== 1) {
         return [
-            new ValidationFailure([], 'objectSizeUnexpected', {
+            new ValidationFailure([], 'ObjectSizeUnexpected', {
                 actual: Object.keys(actual).length,
                 expected: 1,
             }),
@@ -25,7 +25,7 @@ export function validateUnionCases(
 
     const referenceStruct = referenceCases[unionTarget];
     if (referenceStruct === undefined) {
-        return [new ValidationFailure([unionTarget], 'objectKeyDisallowed', {})];
+        return [new ValidationFailure([unionTarget], 'ObjectKeyDisallowed', {})];
     }
 
     if (typeof unionPayload === 'object') {

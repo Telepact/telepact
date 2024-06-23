@@ -120,7 +120,7 @@
         },
         "uapi": {
             "hashes": [
-                "sha256:593a652a069cd3a53756b6a2dc0c1d6e5b609f5f3afd24fa8a3f2876fd264bad"
+                "sha256:d7f403c25890f85fd8592c7f2e0cc9d940cb98e8c47b647e47d8faf7cfff3212"
             ],
             "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
             "version": "==0.0.1"
