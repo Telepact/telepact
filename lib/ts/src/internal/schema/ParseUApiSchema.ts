@@ -68,6 +68,8 @@ export function parseUapiSchema(
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
+            } else {
+                throw e;
             }
         }
     }
@@ -109,6 +111,8 @@ export function parseUapiSchema(
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
+            } else {
+                throw e;
             }
         }
     }
@@ -139,12 +143,16 @@ export function parseUapiSchema(
             } catch (e) {
                 if (e instanceof UApiSchemaParseError) {
                     parseFailures.push(...e.schemaParseFailures);
+                } else {
+                    throw e;
                 }
             }
         }
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
     }
 
@@ -179,6 +187,8 @@ export function parseUapiSchema(
             } catch (e) {
                 if (e instanceof UApiSchemaParseError) {
                     parseFailures.push(...e.schemaParseFailures);
+                } else {
+                    throw e;
                 }
             }
         }
@@ -205,12 +215,16 @@ export function parseUapiSchema(
             } catch (e) {
                 if (e instanceof UApiSchemaParseError) {
                     parseFailures.push(...e.schemaParseFailures);
+                } else {
+                    throw e;
                 }
             }
         }
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
     }
 

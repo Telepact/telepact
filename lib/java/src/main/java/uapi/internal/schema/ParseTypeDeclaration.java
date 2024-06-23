@@ -82,11 +82,10 @@ public class ParseTypeDeclaration {
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
-            final List<Object> l = (List<Object>) e;
 
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {
-                typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, l, thisTypeParameterCount,
+                typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, (List<Object>) e, thisTypeParameterCount,
                         uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
                         failedTypes);
 

@@ -29,7 +29,9 @@ export function validateStructFields(
 
     for (const [fieldName, fieldValue] of Object.entries(actualStruct)) {
         const referenceField = fields[fieldName];
+        console.log(`validateStructFields: fieldName: ${fieldName}`);
         if (referenceField === undefined) {
+            console.log(`validateStructFields: FAILURE. Available fields: ${Object.keys(fields)}`);
             const validationFailure = new ValidationFailure([fieldName], 'ObjectKeyDisallowed', {});
 
             validationFailures.push(validationFailure);

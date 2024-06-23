@@ -29,14 +29,20 @@ export function getOrParseType(
     }
 
     const existingType = parsedTypes[typeName];
-    if (existingType) {
+    if (existingType !== undefined) {
+        console.log(`Returning cached type for ${typeName}`);
         return existingType;
     }
 
-    const genericRegex =
-        thisTypeParameterCount > 0
-            ? `|(T.([0-${thisTypeParameterCount - 1}]${thisTypeParameterCount > 1 ? '' : '0'})`
-            : '';
+    let genericRegex: string;
+    if (thisTypeParameterCount > 0) {
+        genericRegex = `|(T.([%s]))`.replace(
+            '%s',
+            thisTypeParameterCount > 1 ? '0-%d'.replace('%d', String(thisTypeParameterCount - 1)) : '0',
+        );
+    } else {
+        genericRegex = '';
+    }
 
     const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)${genericRegex})$`;
     const regex = new RegExp(regexString);
@@ -64,9 +70,12 @@ export function getOrParseType(
 
     if (thisTypeParameterCount > 0) {
         const genericParameterIndexString = matcher[9];
-        if (genericParameterIndexString) {
+        console.log(`getOrParseType: genericParameterIndexString: ${genericParameterIndexString}`);
+        if (genericParameterIndexString !== undefined) {
             const genericParameterIndex = parseInt(genericParameterIndexString);
             return new UGeneric(genericParameterIndex);
+        } else {
+            console.log('getOrParseType: Did not create generic');
         }
     }
 
@@ -79,6 +88,9 @@ export function getOrParseType(
 
     const typeParameterCountString = matcher[6];
     const typeParameterCount = typeParameterCountString ? parseInt(typeParameterCountString) : 0;
+
+    console.log(`getOrParseType: customTypeName: ${customTypeName}`);
+    console.log(`getOrParseType: typeParameterCount: ${typeParameterCount}`);
 
     let type: UType;
     try {

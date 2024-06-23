@@ -68,10 +68,8 @@ def parse_type_declaration(path: list[object], type_declaration_array: list[obje
             parse_failures.extend(this_parse_failures)
             continue
 
-        l = e
-
         try:
-            type_parameter_type_declaration = parse_type_declaration(loop_path, l, this_type_parameter_count,
+            type_parameter_type_declaration = parse_type_declaration(loop_path, e, this_type_parameter_count,
                                                                      uapi_schema_pseudo_json, schema_keys_to_index,
                                                                      parsed_types, type_extensions, all_parse_failures,
                                                                      failed_types)

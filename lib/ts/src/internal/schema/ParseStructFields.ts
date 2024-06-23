@@ -47,6 +47,8 @@ export function parseStructFields(
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
+            } else {
+                throw e;
             }
         }
     }

@@ -40,6 +40,8 @@ export function parseFunctionType(
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
         }
     }
 
@@ -70,8 +72,7 @@ export function parseFunctionType(
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
             } else {
-                console.log(e);
-                parseFailures.push(new SchemaParseFailure(resPath, 'UnknownError', {}, null));
+                throw e;
             }
         }
     }

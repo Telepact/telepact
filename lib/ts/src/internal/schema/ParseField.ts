@@ -17,6 +17,8 @@ export function parseField(
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UFieldDeclaration {
+    console.log(`parseField: attempting fieldDeclaration: ${fieldDeclaration}`);
+
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regex = new RegExp(regexString);
 
@@ -49,6 +51,10 @@ export function parseField(
         allParseFailures,
         failedTypes,
     );
+
+    console.log(`parseField: fieldDeclaration: ${fieldDeclaration}`);
+    console.log(`parseField: typeParameters: ${JSON.stringify(typeDeclaration.typeParameters.length)}`);
+    console.log(`parseField: optional: ${optional}`);
 
     return new UFieldDeclaration(fieldName, typeDeclaration, optional);
 }

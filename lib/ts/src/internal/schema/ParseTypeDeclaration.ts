@@ -80,6 +80,7 @@ export function parseTypeDeclaration(
 
     for (let index = 1; index <= givenTypeParameters.length; index++) {
         const e = givenTypeParameters[index - 1];
+        console.log(`parseTypeDeclaration: Attempting typeParameter: ${JSON.stringify(e)}`);
         const loopPath = path.concat([index]);
 
         if (!Array.isArray(e)) {
@@ -88,12 +89,10 @@ export function parseTypeDeclaration(
             continue;
         }
 
-        const l = e;
-
         try {
             const typeParameterTypeDeclaration = parseTypeDeclaration(
                 loopPath,
-                l,
+                e,
                 thisTypeParameterCount,
                 uapiSchemaPseudoJson,
                 schemaKeysToIndex,
@@ -109,7 +108,7 @@ export function parseTypeDeclaration(
         }
     }
 
-    if (parseFailures.length) {
+    if (parseFailures.length > 0) {
         throw new UApiSchemaParseError(parseFailures);
     }
 

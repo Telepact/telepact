@@ -24,7 +24,7 @@ export function validateUnionCases(
     const [unionTarget, unionPayload] = Object.entries(actual)[0];
 
     const referenceStruct = referenceCases[unionTarget];
-    if (!referenceStruct) {
+    if (referenceStruct === undefined) {
         return [new ValidationFailure([unionTarget], 'objectKeyDisallowed', {})];
     }
 

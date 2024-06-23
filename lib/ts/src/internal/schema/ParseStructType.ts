@@ -18,6 +18,7 @@ export function parseStructType(
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UStruct {
+    console.log(`parseStructType: attempting schemaKey: ${schemaKey}`);
     const parseFailures: SchemaParseFailure[] = [];
     const otherKeys = new Set(Object.keys(structDefinitionAsPseudoJson));
 
