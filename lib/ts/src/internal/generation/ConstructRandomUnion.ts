@@ -11,7 +11,7 @@ export function constructRandomUnion(
     typeParameters: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
 ): Record<string, any> {
-    if (!startingUnion) {
+    if (Object.keys(startingUnion).length === 0) {
         const sortedUnionCasesReference = Object.entries(unionCasesReference).sort((a, b) => a[0].localeCompare(b[0]));
         const randomIndex = randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.length - 1);
         const [unionCase, unionData] = sortedUnionCasesReference[randomIndex];
