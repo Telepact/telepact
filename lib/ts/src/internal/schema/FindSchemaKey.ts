@@ -20,7 +20,7 @@ export function findSchemaKey(definition: Record<string, any>, index: number): s
             [index],
             'ObjectKeyRegexMatchCountUnexpected',
             {
-                regex: regex.toString(),
+                regex: regex.toString().slice(1, -1),
                 actual: matches.length,
                 expected: 1,
                 keys: keys,
