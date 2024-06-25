@@ -42,13 +42,13 @@ export function deserializeInternal(
         finalMessageAsPseudoJsonList = messageAsPseudoJsonList;
     }
 
-    if (typeof finalMessageAsPseudoJsonList[0] !== 'object') {
+    if (typeof finalMessageAsPseudoJsonList[0] !== 'object' || Array.isArray(finalMessageAsPseudoJsonList[0])) {
         throw new InvalidMessage();
     }
 
     const headers: { [key: string]: any } = finalMessageAsPseudoJsonList[0];
 
-    if (typeof finalMessageAsPseudoJsonList[1] !== 'object') {
+    if (typeof finalMessageAsPseudoJsonList[1] !== 'object' || Array.isArray(finalMessageAsPseudoJsonList[1])) {
         throw new InvalidMessage();
     }
 
