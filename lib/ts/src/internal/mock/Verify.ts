@@ -1,3 +1,4 @@
+import { objectsAreEqual } from '../ObjectsAreEqual';
 import { isSubMap } from './IsSubMap';
 import { isSubMapEntryEqual } from './IsSubMapEntryEqual';
 import { MockInvocation } from './MockInvocation';
@@ -13,7 +14,7 @@ export function verify(
     for (const invocation of invocations) {
         if (invocation.functionName === functionName) {
             if (exactMatch) {
-                if (isSubMapEntryEqual(invocation.functionArgument, argument)) {
+                if (objectsAreEqual(invocation.functionArgument, argument)) {
                     invocation.verified = true;
                     matchesFound += 1;
                 }
