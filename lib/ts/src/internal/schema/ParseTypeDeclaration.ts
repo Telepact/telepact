@@ -37,7 +37,12 @@ export function parseTypeDeclaration(
     const matcher = rootTypeString.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(basePath, 'StringRegexMatchFailed', { regex: regexString }, null),
+            new SchemaParseFailure(
+                basePath,
+                'StringRegexMatchFailed',
+                { regex: regexString.toString().slice(1, -1) },
+                null,
+            ),
         ]);
     }
 
@@ -58,7 +63,7 @@ export function parseTypeDeclaration(
 
     if (type_ instanceof UGeneric && nullable) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(basePath, 'StringRegexMatchFailed', { regex: '^(.+?)[^?]$' }, null),
+            new SchemaParseFailure(basePath, 'StringRegexMatchFailed', { regex: '^(.+?)[^\\?]$' }, null),
         ]);
     }
 
