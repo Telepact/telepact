@@ -51,7 +51,7 @@ export function parseUnionType(
     for (const element of definition2) {
         index += 1;
         const loopPath = thisPath.concat(index);
-        if (typeof element !== 'object' || Array.isArray(element)) {
+        if (typeof element !== 'object' || Array.isArray(element) || element === null || element === undefined) {
             const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, element, 'Object');
             parseFailures.push(...thisParseFailures);
             continue;
