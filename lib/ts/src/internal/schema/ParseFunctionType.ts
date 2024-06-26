@@ -85,7 +85,7 @@ export function parseFunctionType(
     if (errorsRegexKey in functionDefinitionAsParsedJson && !schemaKey.endsWith('_')) {
         parseFailures.push(new SchemaParseFailure(regexPath, 'ObjectKeyDisallowed', {}, null));
     } else {
-        const errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey] || '^.*$';
+        const errorsRegexInit = functionDefinitionAsParsedJson[errorsRegexKey] ?? '^.*$';
 
         if (typeof errorsRegexInit !== 'string') {
             const thisParseFailures = getTypeUnexpectedParseFailure(regexPath, errorsRegexInit, 'String');
