@@ -4,14 +4,10 @@
 function findStack() {
     const e = new Error();
     const stack = e.stack.split('\n');
-    let i = 0;
-    for (const line of stack) {
-        i += 1;
-        if (i < 3) {
-            continue;
-        }
+    for (let i = 3; i < stack.length; i += 1) {
+        const line = stack[i].split('(')[0];
         if (!line.includes('RandomGenerator')) {
-            return line;
+            return line + stack[i - 1].split('(')[0];
         }
     }
     throw new Error();

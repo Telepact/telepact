@@ -4,14 +4,11 @@ from ctypes import c_int32
 
 
 def _find_stack() -> str:
-    i = 0
-    for stack in inspect.stack():
-        i += 1
-        if i == 1:
-            continue
-        stack_str = f'{stack}'
+    stack = inspect.stack()
+    for i in range(1, len(stack)):
+        stack_str = f'{stack[i]}'
         if 'RandomGenerator' not in stack_str:
-            return f'{stack.function}'
+            return f'{stack[i].function} {stack[i-1].function}'
     return 'unknown'
 
 

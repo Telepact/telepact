@@ -10,7 +10,21 @@ export function constructRandomStruct(
     typeParameters: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
 ): Record<string, any> {
-    const sortedReferenceStruct = Object.entries(referenceStruct).sort((a, b) => a[0].localeCompare(b[0]));
+    const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => {
+        const a = e1[0];
+        const b = e2[0];
+        for (let i = 0; i < Math.min(a.length, b.length); i++) {
+            const charCodeA = a.charCodeAt(i);
+            const charCodeB = b.charCodeAt(i);
+            if (charCodeA !== charCodeB) {
+                // If the characters are different, return the comparison result
+                // where lowercase letters are considered greater than uppercase letters
+                return charCodeA - charCodeB;
+            }
+        }
+        // If one string is a prefix of the other, the shorter string comes first
+        return a.length - b.length;
+    });
 
     const obj: Record<string, any> = {};
     for (const [fieldName, fieldDeclaration] of sortedReferenceStruct) {
