@@ -58,7 +58,7 @@ export function deserializeInternal(
         throw new InvalidMessageBody();
     }
 
-    if (typeof Object.values(body)[0] !== 'object') {
+    if (typeof Object.values(body)[0] !== 'object' || Array.isArray(Object.values(body)[0])) {
         throw new InvalidMessageBody();
     }
 

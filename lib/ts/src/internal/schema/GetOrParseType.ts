@@ -24,7 +24,7 @@ export function getOrParseType(
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UType {
-    if (typeName in failedTypes) {
+    if (failedTypes.has(typeName)) {
         throw new UApiSchemaParseError([]);
     }
 

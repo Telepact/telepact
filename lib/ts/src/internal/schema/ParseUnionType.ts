@@ -125,7 +125,7 @@ export function parseUnionType(
         const unionCase = entry[0];
         const unionKeyPath = loopPath.concat(unionCase);
 
-        if (typeof entry[1] !== 'object' || Array.isArray(entry[1])) {
+        if (typeof entry[1] !== 'object' || Array.isArray(entry[1]) || entry[1] === null || entry[1] === undefined) {
             const thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath, entry[1], 'Object');
             parseFailures.push(...thisParseFailures);
             continue;

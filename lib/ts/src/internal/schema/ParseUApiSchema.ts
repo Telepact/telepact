@@ -30,7 +30,12 @@ export function parseUapiSchema(
         index += 1;
         const loopPath = [index];
 
-        if (typeof definition !== 'object') {
+        if (
+            typeof definition !== 'object' ||
+            Array.isArray(definition) ||
+            definition === null ||
+            definition === undefined
+        ) {
             const thisParseFailures = getTypeUnexpectedParseFailure(loopPath as any[], definition, 'Object');
             parseFailures.push(...thisParseFailures);
             continue;
