@@ -30,7 +30,7 @@ export function validateMockStub(
     if (matches.length !== 1) {
         return [
             new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
-                regex: regexString,
+                regex: regexString.toString().slice(1, -1),
                 actual: matches.length,
                 expected: 1,
                 keys: keys,

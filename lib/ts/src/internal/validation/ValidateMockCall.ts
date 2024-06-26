@@ -26,7 +26,7 @@ export function validateMockCall(
     if (matches.length !== 1) {
         return [
             new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
-                regex: regexString.toString(),
+                regex: regexString.toString().slice(1, -1),
                 actual: matches.length,
                 expected: 1,
                 keys,
