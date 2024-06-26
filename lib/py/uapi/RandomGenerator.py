@@ -10,7 +10,7 @@ def _find_stack() -> str:
         if i == 1:
             continue
         stack_str = f'{stack}'
-        if not '_util_types.py' in stack_str:
+        if 'RandomGenerator' not in stack_str:
             return f'{stack.function}'
     return 'unknown'
 
@@ -33,7 +33,7 @@ class RandomGenerator:
         self.seed = c_int32((x.value & 0x7ffffffe) + 1)
         self.count += 1
         result = self.seed.value
-        # print(f'{self.count} {result} {_find_stack()}')
+        print(f'{self.count} {result} {_find_stack()}')
         return result
 
     def next_int_with_ceiling(self, ceiling: int) -> int:

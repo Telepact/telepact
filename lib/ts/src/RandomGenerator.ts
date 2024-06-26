@@ -10,7 +10,7 @@ function findStack() {
         if (i < 3) {
             continue;
         }
-        if (!line.includes('_RandomGenerator')) {
+        if (!line.includes('RandomGenerator')) {
             return line;
         }
     }
@@ -41,7 +41,7 @@ export class RandomGenerator {
         this.seed = (x & 0x7ffffffe) + 1;
         this.count += 1;
         const result = this.seed;
-        // console.log(`${this.count} ${result} ${findStack()}`);
+        console.log(`${this.count} ${result} ${findStack()}`);
         return result;
     }
 
