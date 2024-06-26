@@ -40,7 +40,7 @@ export function parseStructType(
     const defInit = structDefinitionAsPseudoJson[schemaKey];
 
     let definition: { [key: string]: any } | null = null;
-    if (typeof defInit !== 'object' || defInit === null) {
+    if (typeof defInit !== 'object' || Array.isArray(defInit) || defInit === null || defInit === undefined) {
         const branchParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit, 'Object');
         parseFailures.push(...branchParseFailures);
     } else {

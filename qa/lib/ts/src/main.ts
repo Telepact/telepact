@@ -222,7 +222,7 @@ function startSchemaTestServer(
             if (extendSchemaJson != null) {
                 UApiSchema.extend(schema, extendSchemaJson);
             }
-            return new Message({}, { Ok: {} });
+            return new Message({}, { Ok_: {} });
         } catch (e) {
             console.error(e);
             return new Message(
