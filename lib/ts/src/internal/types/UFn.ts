@@ -12,6 +12,7 @@ export class UFn extends UType {
     call: UUnion;
     result: UUnion;
     errorsRegex: string;
+    inheritedErrors: string[] = [];
 
     constructor(name: string, call: UUnion, output: UUnion, errorsRegex: string) {
         super();

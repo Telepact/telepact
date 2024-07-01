@@ -51,6 +51,7 @@ export function applyErrorToParsedTypes(
             }
 
             fnResultCases[newKey] = errorCase;
+            f.inheritedErrors.push(newKey);
         }
     }
 
