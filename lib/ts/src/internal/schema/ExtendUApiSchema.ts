@@ -5,11 +5,7 @@ import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnex
 import { parseUapiSchema } from '../../internal/schema/ParseUApiSchema';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
-export function extendUapiSchema(
-    first: UApiSchema,
-    secondUapiSchemaJson: string,
-    secondTypeExtensions: { [key: string]: UType },
-): UApiSchema {
+export function extendUapiSchema(first: UApiSchema, secondUapiSchemaJson: string): UApiSchema {
     let secondUapiSchemaPseudoJsonInit;
     try {
         secondUapiSchemaPseudoJsonInit = JSON.parse(secondUapiSchemaJson);
@@ -25,11 +21,8 @@ export function extendUapiSchema(
     const secondUapiSchemaPseudoJson = secondUapiSchemaPseudoJsonInit;
 
     const firstOriginal = first.original;
-    const firstTypeExtensions = first.typeExtensions;
 
     const original = firstOriginal.concat(secondUapiSchemaPseudoJson);
 
-    const typeExtensions = { ...firstTypeExtensions, ...secondTypeExtensions };
-
-    return parseUapiSchema(original, typeExtensions, firstOriginal.length);
+    return parseUapiSchema(original, firstOriginal.length);
 }

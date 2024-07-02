@@ -16,7 +16,6 @@ export function parseUnionType(
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UUnion {
@@ -140,7 +139,6 @@ export function parseUnionType(
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );

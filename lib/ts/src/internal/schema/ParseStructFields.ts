@@ -11,7 +11,6 @@ export function parseStructFields(
     uapiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): { [key: string]: UFieldDeclaration } {
@@ -38,7 +37,6 @@ export function parseStructFields(
                 uapiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );

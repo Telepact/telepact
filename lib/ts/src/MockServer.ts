@@ -27,24 +27,13 @@ export class MockServer {
         this.stubs = [];
         this.invocations = [];
 
-        const parsedTypes: { [key: string]: UType } = {};
-        const typeExtensions: { [key: string]: UType } = {};
-
-        typeExtensions['_ext.Call_'] = new UMockCall(parsedTypes);
-        typeExtensions['_ext.Stub_'] = new UMockStub(parsedTypes);
-
-        const combinedUApiSchema: UApiSchema = extendUapiSchema(uApiSchema, getMockUApiJson(), typeExtensions);
+        const combinedUApiSchema: UApiSchema = extendUapiSchema(uApiSchema, getMockUApiJson());
 
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
         this.server = new Server(combinedUApiSchema, this.handle, serverOptions);
-
-        const finalUApiSchema: UApiSchema = this.server.uApiSchema;
-        const finalParsedUApiSchema = finalUApiSchema.parsed;
-
-        Object.assign(parsedTypes, finalParsedUApiSchema);
     }
 
     private random: RandomGenerator;

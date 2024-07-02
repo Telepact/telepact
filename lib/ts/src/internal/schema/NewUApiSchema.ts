@@ -1,11 +1,10 @@
 import { UApiSchema } from '../../UApiSchema';
-import { UType } from '../../internal/types/UType';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseUapiSchema } from '../../internal/schema/ParseUApiSchema';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
-export function newUapiSchema(uapiSchemaJson: string, typeExtensions: { [key: string]: UType }): UApiSchema {
+export function newUapiSchema(uapiSchemaJson: string): UApiSchema {
     let uapiSchemaPseudoJsonInit: any;
 
     try {
@@ -21,5 +20,5 @@ export function newUapiSchema(uapiSchemaJson: string, typeExtensions: { [key: st
 
     const uapiSchemaPseudoJson = uapiSchemaPseudoJsonInit;
 
-    return parseUapiSchema(uapiSchemaPseudoJson, typeExtensions, 0);
+    return parseUapiSchema(uapiSchemaPseudoJson, 0);
 }

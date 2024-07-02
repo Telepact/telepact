@@ -13,7 +13,6 @@ export function parseField(
     uapiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UFieldDeclaration {
@@ -45,7 +44,6 @@ export function parseField(
         uapiSchemaPseudoJson,
         schemaKeysToIndex,
         parsedTypes,
-        typeExtensions,
         allParseFailures,
         failedTypes,
     );

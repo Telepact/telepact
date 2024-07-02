@@ -14,7 +14,6 @@ export function parseStructType(
     uapiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UStruct {
@@ -57,7 +56,6 @@ export function parseStructType(
         uapiSchemaPseudoJson,
         schemaKeysToIndex,
         parsedTypes,
-        typeExtensions,
         allParseFailures,
         failedTypes,
     );

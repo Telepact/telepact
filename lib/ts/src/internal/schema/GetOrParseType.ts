@@ -12,6 +12,9 @@ import { UAny } from '../../internal/types/UAny';
 import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
 import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
+import { USelect } from '../../internal/types/USelect';
+import { UMockCall } from '../../internal/types/UMockCall';
+import { UMockStub } from '../../internal/types/UMockStub';
 
 export function getOrParseType(
     path: any[],
@@ -20,7 +23,6 @@ export function getOrParseType(
     uApiSchemaPseudoJson: object[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UType {
@@ -97,7 +99,6 @@ export function getOrParseType(
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );
@@ -112,7 +113,6 @@ export function getOrParseType(
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );
@@ -124,13 +124,16 @@ export function getOrParseType(
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );
         } else {
-            const possibleType = typeExtensions[customTypeName];
-            if (!possibleType) {
+            const possibleTypeExtension = {
+                '_ext.Select_': new USelect(parsedTypes),
+                '_ext.Call_': new UMockCall(parsedTypes),
+                '_ext.Stub_': new UMockStub(parsedTypes),
+            }[customTypeName];
+            if (!possibleTypeExtension) {
                 throw new UApiSchemaParseError([
                     new SchemaParseFailure(
                         [index],
@@ -140,7 +143,7 @@ export function getOrParseType(
                     ),
                 ]);
             }
-            type = possibleType;
+            type = possibleTypeExtension;
         }
 
         parsedTypes[customTypeName] = type;

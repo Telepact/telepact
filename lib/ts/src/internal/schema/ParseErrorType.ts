@@ -10,7 +10,6 @@ export function parseErrorType(
     index: number,
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UError {
@@ -44,7 +43,6 @@ export function parseErrorType(
         uApiSchemaPseudoJson,
         schemaKeysToIndex,
         parsedTypes,
-        typeExtensions,
         allParseFailures,
         failedTypes,
     );

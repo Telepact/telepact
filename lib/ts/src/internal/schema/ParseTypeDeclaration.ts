@@ -13,7 +13,6 @@ export function parseTypeDeclaration(
     uapiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UTypeDeclaration {
@@ -56,7 +55,6 @@ export function parseTypeDeclaration(
         uapiSchemaPseudoJson,
         schemaKeysToIndex,
         parsedTypes,
-        typeExtensions,
         allParseFailures,
         failedTypes,
     );
@@ -101,7 +99,6 @@ export function parseTypeDeclaration(
                 uapiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );

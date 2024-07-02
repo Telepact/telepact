@@ -25,14 +25,7 @@ export class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        const parsedTypes: { [key: string]: UType } = {};
-        const typeExtensions: { [key: string]: UType } = {
-            '_ext.Select_': new USelect(parsedTypes),
-        };
-
-        this.uApiSchema = extendUapiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
-
-        Object.assign(parsedTypes, this.uApiSchema.parsed);
+        this.uApiSchema = extendUapiSchema(uApiSchema, getInternalUApiJson());
 
         const binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);

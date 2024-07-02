@@ -13,11 +13,7 @@ import { offsetSchemaIndex } from '../../internal/schema/OffsetSchemaIndex';
 import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 
-export function parseUapiSchema(
-    uApiSchemaPseudoJson: any[],
-    typeExtensions: { [key: string]: any },
-    pathOffset: number,
-): UApiSchema {
+export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number): UApiSchema {
     const parsedTypes: { [key: string]: any } = {};
     const parseFailures: SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
@@ -109,7 +105,6 @@ export function parseUapiSchema(
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 parseFailures,
                 failedTypes,
             );
@@ -140,7 +135,6 @@ export function parseUapiSchema(
                     thisIndex,
                     schemaKeysToIndex,
                     parsedTypes,
-                    typeExtensions,
                     parseFailures,
                     failedTypes,
                 );
@@ -184,7 +178,6 @@ export function parseUapiSchema(
                     uApiSchemaPseudoJson,
                     schemaKeysToIndex,
                     parsedTypes,
-                    typeExtensions,
                     parseFailures,
                     failedTypes,
                 );
@@ -212,7 +205,6 @@ export function parseUapiSchema(
                     uApiSchemaPseudoJson,
                     schemaKeysToIndex,
                     parsedTypes,
-                    typeExtensions,
                     parseFailures,
                     failedTypes,
                 );
@@ -238,5 +230,5 @@ export function parseUapiSchema(
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
-    return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, requestHeaders, responseHeaders, typeExtensions);
+    return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, requestHeaders, responseHeaders);
 }

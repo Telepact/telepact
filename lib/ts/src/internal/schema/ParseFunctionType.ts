@@ -14,7 +14,6 @@ export function parseFunctionType(
     uApiSchemaPseudoJson: any[],
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
-    typeExtensions: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UFn {
@@ -32,7 +31,6 @@ export function parseFunctionType(
             uApiSchemaPseudoJson,
             schemaKeysToIndex,
             parsedTypes,
-            typeExtensions,
             allParseFailures,
             failedTypes,
         );
@@ -64,7 +62,6 @@ export function parseFunctionType(
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions,
                 allParseFailures,
                 failedTypes,
             );

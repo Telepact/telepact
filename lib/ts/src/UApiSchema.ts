@@ -12,27 +12,24 @@ export class UApiSchema {
     parsed: Record<string, UType>;
     parsedRequestHeaders: Record<string, UFieldDeclaration>;
     parsedResponseHeaders: Record<string, UFieldDeclaration>;
-    typeExtensions: Record<string, UType>;
 
     constructor(
         original: any[],
         parsed: Record<string, UType>,
         parsedRequestHeaders: Record<string, UFieldDeclaration>,
         parsedResponseHeaders: Record<string, UFieldDeclaration>,
-        typeExtensions: Record<string, UType>,
     ) {
         this.original = original;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;
         this.parsedResponseHeaders = parsedResponseHeaders;
-        this.typeExtensions = typeExtensions;
     }
 
     static fromJson(json: string): UApiSchema {
-        return newUapiSchema(json, {});
+        return newUapiSchema(json);
     }
 
     static extend(base: UApiSchema, json: string): UApiSchema {
-        return extendUapiSchema(base, json, {});
+        return extendUapiSchema(base, json);
     }
 }
