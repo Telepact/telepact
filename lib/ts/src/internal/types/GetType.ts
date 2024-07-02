@@ -12,7 +12,6 @@ export function getType(value: any): string {
     } else if (typeof value === 'object') {
         return 'Object';
     } else {
-        console.log(`UNKNOWN: ${JSON.stringify(value)}`);
         return 'Unknown';
     }
 }

@@ -85,7 +85,6 @@ export function parseTypeDeclaration(
 
     for (let index = 1; index <= givenTypeParameters.length; index++) {
         const e = givenTypeParameters[index - 1];
-        console.log(`parseTypeDeclaration: Attempting typeParameter: ${JSON.stringify(e)}`);
         const loopPath = path.concat([index]);
 
         if (!Array.isArray(e)) {

@@ -30,7 +30,6 @@ export function getOrParseType(
 
     const existingType = parsedTypes[typeName];
     if (existingType !== undefined) {
-        console.log(`Returning cached type for ${typeName}`);
         return existingType;
     }
 
@@ -70,12 +69,9 @@ export function getOrParseType(
 
     if (thisTypeParameterCount > 0) {
         const genericParameterIndexString = matcher[9];
-        console.log(`getOrParseType: genericParameterIndexString: ${genericParameterIndexString}`);
         if (genericParameterIndexString !== undefined) {
             const genericParameterIndex = parseInt(genericParameterIndexString);
             return new UGeneric(genericParameterIndex);
-        } else {
-            console.log('getOrParseType: Did not create generic');
         }
     }
 
@@ -88,9 +84,6 @@ export function getOrParseType(
 
     const typeParameterCountString = matcher[6];
     const typeParameterCount = typeParameterCountString ? parseInt(typeParameterCountString) : 0;
-
-    console.log(`getOrParseType: customTypeName: ${customTypeName}`);
-    console.log(`getOrParseType: typeParameterCount: ${typeParameterCount}`);
 
     let type: UType;
     try {
