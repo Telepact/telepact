@@ -5,15 +5,11 @@ import static uapi.internal.binary.ConstructBinaryEncoding.constructBinaryEncodi
 import static uapi.internal.schema.ExtendUApiSchema.extendUApiSchema;
 import static uapi.internal.schema.GetInternalUApiJson.getInternalUApiJson;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import uapi.internal.binary.ServerBinaryEncoder;
-import uapi.internal.types.USelect;
 import uapi.internal.types.UStruct;
-import uapi.internal.types.UType;
 
 /**
  * A uAPI Server.
@@ -74,14 +70,7 @@ public class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        final Map<String, UType> parsedTypes = new HashMap<>();
-        final Map<String, UType> typeExtensions = new HashMap<>();
-
-        typeExtensions.put("_ext.Select_", new USelect(parsedTypes));
-
-        this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson(), typeExtensions);
-
-        parsedTypes.putAll(this.uApiSchema.parsed);
+        this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson());
 
         final var binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);

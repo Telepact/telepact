@@ -16,7 +16,7 @@ import uapi.internal.types.UType;
 public class ParseField {
     static UFieldDeclaration parseField(List<Object> path, String fieldDeclaration, Object typeDeclarationValue,
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
         final var regex = Pattern.compile(regexString);
@@ -47,7 +47,7 @@ public class ParseField {
                 uApiSchemaPseudoJson,
                 schemaKeysToIndex,
                 parsedTypes,
-                typeExtensions, allParseFailures, failedTypes);
+                allParseFailures, failedTypes);
 
         return new UFieldDeclaration(fieldName, typeDeclaration, optional);
     }

@@ -15,7 +15,7 @@ public class ParseHeadersType {
     static UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey,
             String headerField,
             int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final List<Object> path = List.of(index, schemaKey);
 
@@ -35,7 +35,7 @@ public class ParseHeadersType {
                     uApiSchemaPseudoJson,
                     schemaKeysToIndex,
                     parsedTypes,
-                    typeExtensions, allParseFailures, failedTypes);
+                    allParseFailures, failedTypes);
 
             return new UFieldDeclaration(headerField, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {

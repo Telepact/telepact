@@ -19,25 +19,22 @@ public class UApiSchema {
     public final Map<String, UType> parsed;
     public final Map<String, UFieldDeclaration> parsedRequestHeaders;
     public final Map<String, UFieldDeclaration> parsedResponseHeaders;
-    public final Map<String, UType> typeExtensions;
 
     public UApiSchema(List<Object> original,
             Map<String, UType> parsed,
             Map<String, UFieldDeclaration> parsedRequestHeaders,
-            Map<String, UFieldDeclaration> parsedResponseHeaders,
-            Map<String, UType> typeExtensions) {
+            Map<String, UFieldDeclaration> parsedResponseHeaders) {
         this.original = original;
         this.parsed = parsed;
         this.parsedRequestHeaders = parsedRequestHeaders;
         this.parsedResponseHeaders = parsedResponseHeaders;
-        this.typeExtensions = typeExtensions;
     }
 
     public static UApiSchema fromJson(String json) {
-        return newUApiSchema(json, new HashMap<>());
+        return newUApiSchema(json);
     }
 
     public static UApiSchema extend(UApiSchema base, String json) {
-        return extendUApiSchema(base, json, new HashMap<>());
+        return extendUApiSchema(base, json);
     }
 }

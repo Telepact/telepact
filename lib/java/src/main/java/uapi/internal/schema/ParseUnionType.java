@@ -21,7 +21,6 @@ public class ParseUnionType {
             List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount,
             List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
 
@@ -150,7 +149,7 @@ public class ParseUnionType {
             final Map<String, UFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
-                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
                         failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);

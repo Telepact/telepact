@@ -17,7 +17,7 @@ import uapi.internal.types.UTypeDeclaration;
 public class ParseTypeDeclaration {
     static UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
             int thisTypeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.isEmpty()) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
@@ -49,7 +49,7 @@ public class ParseTypeDeclaration {
         final var nullable = matcher.group(2) != null;
 
         final UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, uApiSchemaPseudoJson,
-                schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
+                schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
 
         if (type instanceof UGeneric && nullable) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
@@ -86,7 +86,7 @@ public class ParseTypeDeclaration {
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, (List<Object>) e, thisTypeParameterCount,
-                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
                         failedTypes);
 
                 typeParameters.add(typeParameterTypeDeclaration);

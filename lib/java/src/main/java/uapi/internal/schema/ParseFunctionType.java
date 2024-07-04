@@ -19,7 +19,7 @@ public class ParseFunctionType {
 
     static UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var typeParameterCount = 0;
@@ -29,7 +29,6 @@ public class ParseFunctionType {
             final UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
                     schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
                     parsedTypes,
-                    typeExtensions,
                     allParseFailures, failedTypes);
             callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0), typeParameterCount);
         } catch (UApiSchemaParseError e) {
@@ -49,7 +48,7 @@ public class ParseFunctionType {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
                         resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
                         typeParameterCount, uApiSchemaPseudoJson,
-                        schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures, failedTypes);
+                        schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }

@@ -15,7 +15,7 @@ import uapi.internal.types.UType;
 public class ParseStructFields {
     static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
             int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes, Map<String, UType> typeExtensions,
+            Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, UFieldDeclaration>();
@@ -46,7 +46,7 @@ public class ParseStructFields {
                 parsedField = parseField(path, fieldDeclaration,
                         typeDeclarationValue, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
                         parsedTypes,
-                        typeExtensions, allParseFailures, failedTypes);
+                        allParseFailures, failedTypes);
                 final String fieldName = parsedField.fieldName;
 
                 fields.put(fieldName, parsedField);

@@ -12,10 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uapi.UApiSchema;
 import uapi.UApiSchemaParseError;
-import uapi.internal.types.UType;
 
 public class NewUApiSchema {
-    public static UApiSchema newUApiSchema(String uApiSchemaJson, Map<String, UType> typeExtensions) {
+    public static UApiSchema newUApiSchema(String uApiSchemaJson) {
         final var objectMapper = new ObjectMapper();
 
         final Object uApiSchemaPseudoJsonInit;
@@ -35,6 +34,6 @@ public class NewUApiSchema {
         }
         final List<Object> uApiSchemaPseudoJson = (List<Object>) uApiSchemaPseudoJsonInit;
 
-        return parseUApiSchema(uApiSchemaPseudoJson, typeExtensions, 0);
+        return parseUApiSchema(uApiSchemaPseudoJson, 0);
     }
 }

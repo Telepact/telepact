@@ -17,7 +17,7 @@ public class ParseErrorType {
     public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
             List<Object> uApiSchemaPseudoJson, int index, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         final var schemaKey = "errors";
         final List<Object> basePath = List.of(index);
@@ -45,7 +45,7 @@ public class ParseErrorType {
         final var typeParameterCount = 0;
 
         final UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey, List.of(), List.of(),
-                typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
+                typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                 allParseFailures, failedTypes);
 
         return new UError(schemaKey, error);

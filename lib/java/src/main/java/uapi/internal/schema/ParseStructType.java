@@ -17,7 +17,6 @@ public class ParseStructType {
     static UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey, List<String> ignoreKeys, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
             Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var otherKeys = new HashSet<>(structDefinitionAsPseudoJson.keySet());
@@ -58,7 +57,7 @@ public class ParseStructType {
         }
 
         final var fields = parseStructFields(definition, thisPath, typeParameterCount,
-                uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
                 failedTypes);
 
         return new UStruct(schemaKey, fields, typeParameterCount);

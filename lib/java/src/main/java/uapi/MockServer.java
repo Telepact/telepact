@@ -81,25 +81,13 @@ public class MockServer {
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
         this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
-        final var parsedTypes = new HashMap<String, UType>();
-        final var typeExtensions = new HashMap<String, UType>();
-
-        typeExtensions.put("_ext.Call_", new UMockCall(parsedTypes));
-        typeExtensions.put("_ext.Stub_", new UMockStub(parsedTypes));
-
-        final var combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson(),
-                typeExtensions);
+        final var combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson());
 
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
         this.server = new Server(combinedUApiSchema, this::handle, serverOptions);
-
-        final UApiSchema finalUApiSchema = this.server.uApiSchema;
-        final Map<String, UType> finalParsedUApiSchema = finalUApiSchema.parsed;
-
-        parsedTypes.putAll(finalParsedUApiSchema);
     }
 
     /**

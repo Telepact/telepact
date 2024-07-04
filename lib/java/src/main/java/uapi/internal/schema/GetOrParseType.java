@@ -4,6 +4,8 @@ import static uapi.internal.schema.ParseFunctionType.parseFunctionType;
 import static uapi.internal.schema.ParseStructType.parseStructType;
 import static uapi.internal.schema.ParseUnionType.parseUnionType;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,8 +17,11 @@ import uapi.internal.types.UArray;
 import uapi.internal.types.UBoolean;
 import uapi.internal.types.UGeneric;
 import uapi.internal.types.UInteger;
+import uapi.internal.types.UMockCall;
+import uapi.internal.types.UMockStub;
 import uapi.internal.types.UNumber;
 import uapi.internal.types.UObject;
+import uapi.internal.types.USelect;
 import uapi.internal.types.UString;
 import uapi.internal.types.UType;
 
@@ -24,7 +29,7 @@ public class GetOrParseType {
     static UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
             List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
-            Map<String, UType> typeExtensions, List<SchemaParseFailure> allParseFailures,
+            List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
         if (failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
@@ -94,22 +99,42 @@ public class GetOrParseType {
             final UType type;
             if (customTypeName.startsWith("struct")) {
                 type = parseStructType(List.of(index), definition, customTypeName, List.of(),
-                        typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions,
+                        typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
                 type = parseUnionType(List.of(index), definition, customTypeName, List.of(), List.of(),
                         typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
-                        typeExtensions, allParseFailures, failedTypes);
+                        allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
                 type = parseFunctionType(List.of(index), definition, customTypeName,
-                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, typeExtensions, allParseFailures,
+                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
                         failedTypes);
             } else {
-                type = typeExtensions.get(customTypeName);
-                if (type == null) {
-                    throw new UApiSchemaParseError(List.of(new SchemaParseFailure(List.of(index),
-                            "TypeExtensionImplementationMissing", Map.of("name", customTypeName), null)));
+                UType possibleTypeExtension;
+                switch (customTypeName) {
+                    case "_ext.Select_":
+                        possibleTypeExtension = new USelect(parsedTypes);
+                        break;
+                    case "_ext.Call_":
+                        possibleTypeExtension = new UMockCall(parsedTypes);
+                        break;
+                    case "_ext.Stub_":
+                        possibleTypeExtension = new UMockStub(parsedTypes);
+                        break;
+                    default:
+                        possibleTypeExtension = null;
                 }
+
+                if (possibleTypeExtension == null) {
+                    throw new UApiSchemaParseError(Arrays.asList(
+                            new SchemaParseFailure(
+                                    Collections.singletonList(index),
+                                    "TypeExtensionImplementationMissing",
+                                    Collections.singletonMap("name", customTypeName),
+                                    null)));
+                }
+
+                type = possibleTypeExtension;
             }
 
             parsedTypes.put(customTypeName, type);
