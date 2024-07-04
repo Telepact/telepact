@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from uapi.UApiSchema import UApiSchema
     from uapi.internal.mock.MockInvocation import MockInvocation
     from uapi.internal.mock.MockStub import MockStub
-    from uapi.internal.types.UType import UType
 
 
 class MockServer:
@@ -31,8 +30,6 @@ class MockServer:
         from uapi.internal.schema.GetMockUApiJson import get_mock_uapi_json
         from uapi.Server import Server
         from uapi.RandomGenerator import RandomGenerator
-        from uapi.internal.types.UMockCall import UMockCall
-        from uapi.internal.types.UMockStub import UMockStub
 
         self.random: RandomGenerator = RandomGenerator(
             options.generated_collection_length_min, options.generated_collection_length_max)
@@ -43,14 +40,8 @@ class MockServer:
         self.stubs: list[MockStub] = []
         self.invocations: list[MockInvocation] = []
 
-        parsed_types: dict[str, UType] = {}
-        type_extensions: dict[str, UType] = {}
-
-        type_extensions["_ext.Call_"] = UMockCall(parsed_types)
-        type_extensions["_ext.Stub_"] = UMockStub(parsed_types)
-
         combined_u_api_schema: UApiSchema = extend_uapi_schema(
-            u_api_schema, get_mock_uapi_json(), type_extensions)
+            u_api_schema, get_mock_uapi_json())
 
         server_options = Server.Options()
         server_options.on_error = options.on_error
@@ -58,11 +49,6 @@ class MockServer:
 
         self.server = Server(
             combined_u_api_schema, self._handle, server_options)
-
-        final_u_api_schema: UApiSchema = self.server.u_api_schema
-        final_parsed_u_api_schema = final_u_api_schema.parsed
-
-        parsed_types.update(final_parsed_u_api_schema)
 
     async def process(self, message: bytes) -> bytes:
         """

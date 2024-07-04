@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict[str, object],
                       schema_key: str, ignore_keys: list[str], type_parameter_count: int,
                       uapi_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
-                      parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
+                      parsed_types: dict[str, 'UType'],
                       all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> 'UStruct':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructFields import parse_struct_fields
@@ -46,7 +46,7 @@ def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict
         raise UApiSchemaParseError(parse_failures)
 
     fields = parse_struct_fields(definition, this_path, type_parameter_count, uapi_schema_pseudo_json,
-                                 schema_keys_to_index, parsed_types, type_extensions, all_parse_failures,
+                                 schema_keys_to_index, parsed_types, all_parse_failures,
                                  failed_types)
 
     return UStruct(schema_key, fields, type_parameter_count)

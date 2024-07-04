@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 
 def parse_uapi_schema(
     u_api_schema_pseudo_json: list[object],
-    type_extensions: dict[str, 'UType'],
     path_offset: int
 ) -> 'UApiSchema':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -103,7 +102,6 @@ def parse_uapi_schema(
                 u_api_schema_pseudo_json,
                 schema_keys_to_index,
                 parsed_types,
-                type_extensions,
                 parse_failures,
                 failed_types,
             )
@@ -130,7 +128,6 @@ def parse_uapi_schema(
                     this_index,
                     schema_keys_to_index,
                     parsed_types,
-                    type_extensions,
                     parse_failures,
                     failed_types,
                 )
@@ -161,7 +158,6 @@ def parse_uapi_schema(
                     u_api_schema_pseudo_json,
                     schema_keys_to_index,
                     parsed_types,
-                    type_extensions,
                     parse_failures,
                     failed_types,
                 )
@@ -184,7 +180,6 @@ def parse_uapi_schema(
                     u_api_schema_pseudo_json,
                     schema_keys_to_index,
                     parsed_types,
-                    type_extensions,
                     parse_failures,
                     failed_types,
                 )
@@ -204,6 +199,5 @@ def parse_uapi_schema(
         u_api_schema_pseudo_json,
         parsed_types,
         request_headers,
-        response_headers,
-        type_extensions,
+        response_headers
     )

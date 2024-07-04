@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 def parse_type_declaration(path: list[object], type_declaration_array: list[object],
                            this_type_parameter_count: int, uapi_schema_pseudo_json: list[object],
                            schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
-                           type_extensions: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
+                           all_parse_failures: list['SchemaParseFailure'],
                            failed_types: set[str]) -> 'UTypeDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetOrParseType import get_or_parse_type
@@ -43,7 +43,7 @@ def parse_type_declaration(path: list[object], type_declaration_array: list[obje
     nullable = bool(matcher.group(2))
 
     type_ = get_or_parse_type(base_path, type_name, this_type_parameter_count, uapi_schema_pseudo_json,
-                              schema_keys_to_index, parsed_types, type_extensions, all_parse_failures, failed_types)
+                              schema_keys_to_index, parsed_types, all_parse_failures, failed_types)
 
     if isinstance(type_, UGeneric) and nullable:
         raise UApiSchemaParseError([SchemaParseFailure(
@@ -71,7 +71,7 @@ def parse_type_declaration(path: list[object], type_declaration_array: list[obje
         try:
             type_parameter_type_declaration = parse_type_declaration(loop_path, e, this_type_parameter_count,
                                                                      uapi_schema_pseudo_json, schema_keys_to_index,
-                                                                     parsed_types, type_extensions, all_parse_failures,
+                                                                     parsed_types, all_parse_failures,
                                                                      failed_types)
 
             type_parameters.append(type_parameter_type_declaration)

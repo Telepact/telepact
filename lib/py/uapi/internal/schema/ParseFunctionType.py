@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 def parse_function_type(path: list[object], function_definition_as_parsed_json: dict[str, object],
                         schema_key: str, u_api_schema_pseudo_json: list[object],
                         schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
-                        type_extensions: dict[str, 'UType'], all_parse_failures: list[SchemaParseFailure],
+                        all_parse_failures: list[SchemaParseFailure],
                         failed_types: set[str]) -> 'UFn':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructType import parse_struct_type
@@ -27,7 +27,7 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
                                      schema_key, [
                                          "->", "_errors"], type_parameter_count,
                                      u_api_schema_pseudo_json, schema_keys_to_index,
-                                     parsed_types, type_extensions,
+                                     parsed_types,
                                      all_parse_failures, failed_types)
         call_type = UUnion(schema_key, {schema_key: arg_type}, {
                            schema_key: 0}, type_parameter_count)
@@ -48,7 +48,7 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
                                            result_schema_key, list(
                                                function_definition_as_parsed_json.keys()),
                                            ["Ok_"], type_parameter_count, u_api_schema_pseudo_json,
-                                           schema_keys_to_index, parsed_types, type_extensions,
+                                           schema_keys_to_index, parsed_types,
                                            all_parse_failures, failed_types)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)

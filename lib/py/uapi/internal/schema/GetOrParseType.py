@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_count: int,
                       u_api_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
-                      parsed_types: dict[str, 'UType'], type_extensions: dict[str, 'UType'],
-                      all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> 'UType':
+                      parsed_types: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
+                      failed_types: set[str]) -> 'UType':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.types.UObject import UObject
     from uapi.internal.types.UArray import UArray
@@ -20,6 +20,9 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     from uapi.internal.types.UNumber import UNumber
     from uapi.internal.types.UObject import UObject
     from uapi.internal.types.UString import UString
+    from uapi.internal.types.UMockCall import UMockCall
+    from uapi.internal.types.UMockStub import UMockStub
+    from uapi.internal.types.USelect import USelect
     from uapi.internal.types.UAny import UAny
     from uapi.internal.schema.ParseFunctionType import parse_function_type
     from uapi.internal.schema.ParseStructType import parse_struct_type
@@ -78,22 +81,34 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     try:
         if custom_type_name.startswith("struct"):
             type = parse_struct_type([index], definition, custom_type_name, [], type_parameter_count,
-                                     u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
+                                     u_api_schema_pseudo_json, schema_keys_to_index, parsed_types,
                                      all_parse_failures, failed_types)
         elif custom_type_name.startswith("union"):
             type = parse_union_type([index], definition, custom_type_name, [], [], type_parameter_count,
-                                    u_api_schema_pseudo_json, schema_keys_to_index, parsed_types, type_extensions,
+                                    u_api_schema_pseudo_json, schema_keys_to_index, parsed_types,
                                     all_parse_failures, failed_types)
         elif custom_type_name.startswith("fn"):
             type = parse_function_type([index], definition, custom_type_name, u_api_schema_pseudo_json,
-                                       schema_keys_to_index, parsed_types, type_extensions, all_parse_failures,
+                                       schema_keys_to_index, parsed_types, all_parse_failures,
                                        failed_types)
         else:
-            possible_type = type_extensions.get(custom_type_name)
-            if possible_type is None:
-                raise UApiSchemaParseError([SchemaParseFailure(
-                    [index], "TypeExtensionImplementationMissing", {"name": custom_type_name}, None)])
-            type = possible_type
+            possible_type_extension = {
+                '_ext.Select_': USelect(parsed_types),
+                '_ext.Call_': UMockCall(parsed_types),
+                '_ext.Stub_': UMockStub(parsed_types),
+            }.get(custom_type_name)
+
+            if not possible_type_extension:
+                raise UApiSchemaParseError([
+                    SchemaParseFailure(
+                        [index],
+                        'TypeExtensionImplementationMissing',
+                        {'name': custom_type_name},
+                        None,
+                    ),
+                ])
+
+            type = possible_type_extension
 
         parsed_types[custom_type_name] = type
 

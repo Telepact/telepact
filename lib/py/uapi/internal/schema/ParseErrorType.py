@@ -11,7 +11,6 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
                      index: int,
                      schema_keys_to_index: dict[str, int],
                      parsed_types: dict[str, 'UType'],
-                     type_extensions: dict[str, 'UType'],
                      all_parse_failures: list['SchemaParseFailure'],
                      failed_types: set[str]) -> 'UError':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -39,6 +38,6 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
 
     error = parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [],
                              type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
-                             parsed_types, type_extensions, all_parse_failures, failed_types)
+                             parsed_types, all_parse_failures, failed_types)
 
     return UError(schema_key, error)

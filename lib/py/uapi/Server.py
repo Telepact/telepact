@@ -3,12 +3,10 @@ from typing import Callable, TYPE_CHECKING, Awaitable, cast
 from uapi.DefaultSerialization import DefaultSerialization
 from uapi.Serializer import Serializer
 from uapi.internal.binary.ServerBinaryEncoder import ServerBinaryEncoder
-from uapi.internal.types.USelect import USelect
 
 if TYPE_CHECKING:
     from uapi.Message import Message
     from uapi.UApiSchema import UApiSchema
-    from uapi.internal.types.UType import UType
 
 
 class Server:
@@ -41,14 +39,8 @@ class Server:
         self.on_request = options.on_request
         self.on_response = options.on_response
 
-        parsed_types: dict[str, UType] = {}
-        type_extensions: dict[str, UType] = {
-            "_ext.Select_": USelect(parsed_types)}
-
         self.u_api_schema = extend_uapi_schema(
-            u_api_schema, get_internal_uapi_json(), type_extensions)
-
-        parsed_types.update(self.u_api_schema.parsed)
+            u_api_schema, get_internal_uapi_json())
 
         binary_encoding = construct_binary_encoding(self.u_api_schema)
         binary_encoder = ServerBinaryEncoder(binary_encoding)
