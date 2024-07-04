@@ -2,7 +2,7 @@ from typing import cast
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
-def offset_schema_index(initial_failures: list['SchemaParseFailure'], offset: int, schema_keys_to_index: dict[str, int], error_indices: set[int]) -> list['SchemaParseFailure']:
+def offset_schema_index(initial_failures: list['SchemaParseFailure'], offset: int, schema_keys_to_index: dict[str, int]) -> list['SchemaParseFailure']:
     final_list = []
 
     index_to_schema_key = {v: k for k, v in schema_keys_to_index.items()}
@@ -23,11 +23,7 @@ def offset_schema_index(initial_failures: list['SchemaParseFailure'], offset: in
         else:
             final_data = data
 
-        schema_key: str | None
-        if original_index in error_indices:
-            schema_key = "errors"
-        else:
-            schema_key = index_to_schema_key.get(original_index, None)
+        schema_key: str | None = index_to_schema_key.get(original_index, None)
 
         final_list.append(SchemaParseFailure(
             new_path, reason, final_data, schema_key))

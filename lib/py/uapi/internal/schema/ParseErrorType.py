@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 def parse_error_type(error_definition_as_parsed_json: dict[str, object],
                      u_api_schema_pseudo_json: list[object],
+                     schema_key: str,
                      index: int,
                      schema_keys_to_index: dict[str, int],
                      parsed_types: dict[str, 'UType'],
@@ -16,7 +17,6 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseUnionType import parse_union_type
 
-    schema_key = "errors"
     base_path: list[object] = [index]
 
     parse_failures = []

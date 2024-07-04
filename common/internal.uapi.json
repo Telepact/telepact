@@ -166,7 +166,8 @@
         }
     },
     {
-        "errors": [{
+        "///": " A standard error. ",
+        "errors.Standard_": [{
             "///": " The server implementation raised an unknown error. ",
             "ErrorUnknown_": {}
         }, {

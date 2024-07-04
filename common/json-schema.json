@@ -304,16 +304,42 @@
                 "minProperties": 1,
                 "patternProperties": {
                     "^errors\\.[a-zA-Z_]\\w*": {
-                        "type": "object",
-                        "patternProperties": {
-                            "^[a-zA-Z_]\\w*?$": {
-                                "type": "object",
-                                "additionalProperties": false,
-                                "patternProperties": {
-                                    "^[a-zA-Z_]\\w*!?$": {
-                                        "$ref": "#/$defs/typeDeclaration"
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "description": "An union with 1 or more fields huzzah.",
+                            "minProperties": 1,
+                            "patternProperties": {
+                                "^[a-zA-Z_]\\w*?$": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "patternProperties": {
+                                        "^[a-zA-Z_]\\w*!?$": {
+                                            "$ref": "#/$defs/typeDeclaration"
+                                        }
                                     }
                                 }
+                            },
+                            "if": {
+                                "properties": {
+                                    "///": {
+                                        "type": ["string", "array"]
+                                    }
+                                }
+                            },
+                            "then": {
+                                "maxProperties": 2,
+                                "properties": {
+                                    "///": {
+                                        "anyOf": [
+                                            { "type": "string" },
+                                            { "type": "array", "items": { "type": "string" } }
+                                        ]
+                                    }
+                                }
+                            },
+                            "else": {
+                                "maxProperties": 1
                             }
                         }
                     }

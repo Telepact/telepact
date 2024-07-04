@@ -126,7 +126,7 @@
         "_errors": "^.*[^_]_$"
     },
     {
-        "errors": [{
+        "errors.Mock_": [{
             "///": " The mock could not return a result due to no matching stub being available. ",
             "ErrorNoMatchingStub__": {}
         }]

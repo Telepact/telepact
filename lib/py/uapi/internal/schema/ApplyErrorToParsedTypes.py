@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UUnion import UUnion
 
 
-def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types: dict[str, 'UType'], schema_keys_to_index: dict[str, int]) -> None:
+def apply_error_to_parsed_types(error_key: str, error_index: int, error: 'UError', parsed_types: dict[str, 'UType'], schema_keys_to_index: dict[str, int]) -> None:
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.types.UFn import UFn
@@ -41,7 +41,7 @@ def apply_error_to_parsed_types(error_index: int, error: 'UError', parsed_types:
                 error_case_index = error.errors.case_indices[new_key]
                 fn_error_case_index = f.result.case_indices[new_key]
                 parse_failures.append(SchemaParseFailure(
-                    [error_index, "errors", error_case_index, new_key],
+                    [error_index, error_key, error_case_index, new_key],
                     "PathCollision",
                     {"other": [other_path_index, "->",
                                fn_error_case_index, new_key]},
