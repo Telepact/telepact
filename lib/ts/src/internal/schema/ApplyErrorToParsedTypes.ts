@@ -5,6 +5,7 @@ import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { UFn } from '../../internal/types/UFn';
 
 export function applyErrorToParsedTypes(
+    errorKey: string,
     errorIndex: number,
     error: UError,
     parsedTypes: { [key: string]: UType },
@@ -42,7 +43,7 @@ export function applyErrorToParsedTypes(
                 const fnErrorCaseIndex = f.result.caseIndices[newKey];
                 parseFailures.push(
                     new SchemaParseFailure(
-                        [errorIndex, 'errors', errorCaseIndex, newKey],
+                        [errorIndex, errorKey, errorCaseIndex, newKey],
                         'PathCollision',
                         { other: [otherPathIndex, '->', fnErrorCaseIndex, newKey] },
                         null,
@@ -51,7 +52,6 @@ export function applyErrorToParsedTypes(
             }
 
             fnResultCases[newKey] = errorCase;
-            f.inheritedErrors.push(newKey);
         }
     }
 

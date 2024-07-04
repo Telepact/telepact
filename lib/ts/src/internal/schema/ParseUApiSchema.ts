@@ -14,12 +14,11 @@ import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 
 export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number): UApiSchema {
-    const parsedTypes: { [key: string]: any } = {};
+    const parsedTypes: { [key: string]: UType } = {};
     const parseFailures: SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
     const schemaKeysToIndex: { [key: string]: number } = {};
     const schemaKeys: Set<string> = new Set();
-    const errorIndices: Set<number> = new Set();
 
     let index = -1;
     for (const definition of uApiSchemaPseudoJson) {
@@ -41,11 +40,6 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
 
         try {
             const schemaKey = findSchemaKey(def_, index);
-            if (schemaKey === 'errors') {
-                errorIndices.add(index);
-                continue;
-            }
-
             const ignoreIfDuplicate = def_['_ignoreIfDuplicate'] || false;
             const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
             if (matchingSchemaKey !== null) {
@@ -76,12 +70,13 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, errorIndices);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
     const requestHeaderKeys: Set<string> = new Set();
     const responseHeaderKeys: Set<string> = new Set();
+    const errorKeys: Set<string> = new Set();
     const rootTypeParameterCount = 0;
 
     for (const schemaKey of schemaKeys) {
@@ -92,6 +87,9 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
             continue;
         } else if (schemaKey.startsWith('responseHeader.')) {
             responseHeaderKeys.add(schemaKey);
+            continue;
+        } else if (schemaKey.startsWith('errors.')) {
+            errorKeys.add(schemaKey);
             continue;
         }
 
@@ -118,27 +116,29 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, errorIndices);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
     try {
-        catchErrorCollisions(uApiSchemaPseudoJson, errorIndices, schemaKeysToIndex);
+        catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex);
 
-        for (const thisIndex of errorIndices) {
+        for (const thisKey of errorKeys) {
+            const thisIndex = schemaKeysToIndex[thisKey];
             const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
 
             try {
                 const error = parseErrorType(
                     def_,
                     uApiSchemaPseudoJson,
+                    thisKey,
                     thisIndex,
                     schemaKeysToIndex,
                     parsedTypes,
                     parseFailures,
                     failedTypes,
                 );
-                applyErrorToParsedTypes(thisIndex, error, parsedTypes, schemaKeysToIndex);
+                applyErrorToParsedTypes(thisKey, thisIndex, error, parsedTypes, schemaKeysToIndex);
             } catch (e) {
                 if (e instanceof UApiSchemaParseError) {
                     parseFailures.push(...e.schemaParseFailures);
@@ -156,7 +156,7 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, errorIndices);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 
@@ -226,7 +226,7 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex, errorIndices);
+        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
         throw new UApiSchemaParseError(offsetParseFailures);
     }
 

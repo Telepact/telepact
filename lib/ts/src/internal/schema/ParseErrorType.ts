@@ -7,13 +7,13 @@ import { parseUnionType } from './ParseUnionType';
 export function parseErrorType(
     errorDefinitionAsParsedJson: { [key: string]: any },
     uApiSchemaPseudoJson: any[],
+    schemaKey: string,
     index: number,
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UError {
-    const schemaKey = 'errors';
     const basePath: any[] = [index];
 
     const parseFailures: SchemaParseFailure[] = [];

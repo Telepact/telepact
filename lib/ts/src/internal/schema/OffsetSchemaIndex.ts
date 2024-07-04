@@ -4,7 +4,6 @@ export function offsetSchemaIndex(
     initialFailures: SchemaParseFailure[],
     offset: number,
     schemaKeysToIndex: { [key: string]: number },
-    errorIndices: Set<number>,
 ): SchemaParseFailure[] {
     const finalList: SchemaParseFailure[] = [];
 
@@ -31,12 +30,7 @@ export function offsetSchemaIndex(
             finalData = data;
         }
 
-        let schemaKey: string | null;
-        if (errorIndices.has(originalIndex)) {
-            schemaKey = 'errors';
-        } else {
-            schemaKey = indexToSchemaKey[originalIndex] || null;
-        }
+        const schemaKey = indexToSchemaKey[originalIndex] || null;
 
         finalList.push(new SchemaParseFailure(newPath, reason, finalData, schemaKey));
     }
