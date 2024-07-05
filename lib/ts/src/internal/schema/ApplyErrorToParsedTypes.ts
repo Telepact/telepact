@@ -28,14 +28,15 @@ export function applyErrorToParsedTypes(
         const errorErrors = error.errors;
         const errorCases = errorErrors.cases;
 
+        const matcher = regex.exec(errorKey);
+
+        if (!matcher) {
+            continue;
+        }
+
         for (const errorCaseName in errorCases) {
             const errorCase = errorCases[errorCaseName];
             const newKey = errorCaseName;
-            const matcher = regex.exec(newKey);
-
-            if (!matcher) {
-                continue;
-            }
 
             if (newKey in fnResultCases) {
                 const otherPathIndex = schemaKeysToIndex[fnName];

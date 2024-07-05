@@ -63,7 +63,7 @@ def parse_function_type(path: list[object], function_definition_as_parsed_json: 
             regex_path, "ObjectKeyDisallowed", {}, None))
     else:
         errors_regex_init = function_definition_as_parsed_json.get(
-            errors_regex_key, "^.*$")
+            errors_regex_key, "^errors\\..*$")
 
         if not isinstance(errors_regex_init, str):
             this_parse_failures = get_type_unexpected_parse_failure(

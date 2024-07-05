@@ -5,7 +5,7 @@
         "->": [{
             "Ok_": {}
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Get the uAPI `schema` of this server. ",
@@ -15,7 +15,7 @@
                 "api": ["array", ["object", ["any"]]]
             }
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "struct.Auth_": {},
@@ -167,7 +167,7 @@
     },
     {
         "///": " A standard error. ",
-        "errors.Standard_": [{
+        "errors.Validation_": [{
             "///": " The server implementation raised an unknown error. ",
             "ErrorUnknown_": {}
         }, {
@@ -195,7 +195,11 @@
             "ErrorParseFailure_": {
                 "reasons": ["array", ["union.ParseFailure_"]]
             }
-        }, {
+        }]
+    },
+    {
+        "///": " A standard error. ",
+        "errors.Auth_": [{
             "///": " The credentials in the `_auth` header were missing or invalid. ",
             "ErrorUnauthenticated_": {
                 "message!": ["string"]

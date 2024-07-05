@@ -61,7 +61,7 @@
         "->": [{
             "Ok_": {}
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "///": [
@@ -82,7 +82,7 @@
                 "reason": ["union.VerificationFailure_"]
             }
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "///": [
@@ -97,7 +97,7 @@
                 "additionalUnverifiedCalls": ["array", ["_ext.Call_"]]
             }
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Clear all stub conditions. ",
@@ -105,7 +105,7 @@
         "->": [{
             "Ok_": {}
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Clear all call data. ",
@@ -113,7 +113,7 @@
         "->": [{
             "Ok_": {}
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Set the seed of the random generator. ",
@@ -123,7 +123,7 @@
         "->": [{
             "Ok_": {}
         }],
-        "_errors": "^.*[^_]_$"
+        "_errors": "^errors\\.Validation_$"
     },
     {
         "errors.Mock_": [{

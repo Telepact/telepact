@@ -29,12 +29,12 @@ def apply_error_to_parsed_types(error_key: str, error_index: int, error: 'UError
         error_errors = error.errors
         error_cases = error_errors.cases
 
+        matcher = regex.match(error_key)
+        if not matcher:
+            continue
+
         for error_case_name, error_case in error_cases.items():
             new_key = error_case_name
-
-            matcher = regex.match(new_key)
-            if not matcher:
-                continue
 
             if new_key in fn_result_cases:
                 other_path_index = schema_keys_to_index[fn_name]

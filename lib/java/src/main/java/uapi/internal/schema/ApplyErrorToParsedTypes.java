@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import uapi.internal.schema.SchemaParseFailure;
 import uapi.internal.types.UError;
 import uapi.internal.types.UFn;
 import uapi.internal.types.UType;
-import uapi.internal.types.UUnion;
 import uapi.UApiSchemaParseError;
 
 public class ApplyErrorToParsedTypes {
@@ -32,15 +30,15 @@ public class ApplyErrorToParsedTypes {
             var errorErrors = error.errors;
             var errorCases = errorErrors.cases;
 
+            var matcher = regex.matcher(errorKey);
+            if (!matcher.matches()) {
+                continue;
+            }
+
             for (var errorCaseEntry : errorCases.entrySet()) {
                 var errorCaseName = errorCaseEntry.getKey();
                 var errorCase = errorCaseEntry.getValue();
                 var newKey = errorCaseName;
-
-                var matcher = regex.matcher(newKey);
-                if (!matcher.matches()) {
-                    continue;
-                }
 
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);

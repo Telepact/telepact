@@ -64,7 +64,7 @@ public class ParseFunctionType {
             parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
-                    "^.*$");
+                    "^errors\\..*$");
 
             if (!(errorsRegexInit instanceof String)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
