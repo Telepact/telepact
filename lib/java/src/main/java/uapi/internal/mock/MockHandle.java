@@ -120,7 +120,7 @@ public class MockHandle {
                 }
 
                 if (!enableGeneratedDefaultStub && !enableGenerationStub) {
-                    return new Message(Map.of(), Map.of("ErrorNoMatchingStub__", Map.of()));
+                    return new Message(Map.of(), Map.of("ErrorNoMatchingStub_", Map.of()));
                 }
 
                 if (definition != null) {

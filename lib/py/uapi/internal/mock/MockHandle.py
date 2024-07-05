@@ -104,7 +104,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         return Message({}, result)
 
         if not enable_generated_default_stub and not enable_generation_stub:
-            return Message({}, {"ErrorNoMatchingStub__": {}})
+            return Message({}, {"ErrorNoMatchingStub_": {}})
 
         if definition is not None:
             result_union = definition.result

@@ -128,7 +128,7 @@
     {
         "errors.Mock_": [{
             "///": " The mock could not return a result due to no matching stub being available. ",
-            "ErrorNoMatchingStub__": {}
+            "ErrorNoMatchingStub_": {}
         }]
     }
 ]
