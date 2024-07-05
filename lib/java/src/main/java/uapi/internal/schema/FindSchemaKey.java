@@ -10,7 +10,7 @@ import uapi.UApiSchemaParseError;
 public class FindSchemaKey {
 
     public static String findSchemaKey(Map<String, Object> definition, int index) {
-        final var regex = "^(errors|((fn|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
+        final var regex = "^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
         final var matches = new ArrayList<String>();
 
         final var keys = definition.keySet().stream().sorted().toList();

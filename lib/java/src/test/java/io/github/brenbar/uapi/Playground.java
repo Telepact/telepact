@@ -3,6 +3,8 @@ package io.github.brenbar.uapi;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -16,59 +18,74 @@ import uapi.UApiSchemaParseError;
 
 public class Playground {
     public static void main(String[] args) throws IOException {
-        var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
-                "binary.uapi.json"));
-        var uApi = UApiSchema.fromJson(json);
-        System.out.println("Done!");
+        final var regex = "^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
+        final var matches = new ArrayList<String>();
 
-        var objectMapper = new ObjectMapper();
+        final var keys = List.of("///", "fn.test");
 
-        Function<Message, Message> handler = (requestMessage) -> {
-            var requestBody = requestMessage.body;
-
-            var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
-            var schemaPseudoJson = arg.get("schema");
-            var extendSchemaJson = (String) arg.get("extend!");
-
-            var serializeSchema = (Boolean) requestMessage.header.getOrDefault("_serializeSchema", true);
-
-            String schemaJson;
-            if (serializeSchema) {
-                try {
-                    var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
-                    schemaJson = new String(schemaJsonBytes);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                schemaJson = (String) schemaPseudoJson;
+        for (final var e : keys) {
+            if (e.matches(regex)) {
+                matches.add(e);
             }
+        }
 
-            try {
-                var schema = UApiSchema.fromJson(schemaJson);
-                if (extendSchemaJson != null) {
-                    UApiSchema.extend(schema, extendSchemaJson);
-                }
-                return new Message(Map.of(), Map.of("Ok_", Map.of()));
-            } catch (UApiSchemaParseError e) {
-                e.printStackTrace();
-                System.err.flush();
-                return new Message(Map.of(),
-                        Map.of("ErrorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
-            }
-        };
+        System.out.println(matches);
 
-        var options = new Server.Options();
-        options.authRequired = false;
-        var server = new Server(uApi, handler, options);
+        // var json = Files.readString(FileSystems.getDefault().getPath("../../qa/test",
+        // "binary.uapi.json"));
+        // var uApi = UApiSchema.fromJson(json);
+        // System.out.println("Done!");
 
-        var result = server.process(
-                """
-                        [{"bin_": [{}]}, {"fn.ping_": {}}]
-                                """
-                        .getBytes());
+        // var objectMapper = new ObjectMapper();
 
-        System.out.println(new String(result));
+        // Function<Message, Message> handler = (requestMessage) -> {
+        // var requestBody = requestMessage.body;
+
+        // var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
+        // var schemaPseudoJson = arg.get("schema");
+        // var extendSchemaJson = (String) arg.get("extend!");
+
+        // var serializeSchema = (Boolean)
+        // requestMessage.header.getOrDefault("_serializeSchema", true);
+
+        // String schemaJson;
+        // if (serializeSchema) {
+        // try {
+        // var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
+        // schemaJson = new String(schemaJsonBytes);
+        // } catch (JsonProcessingException e) {
+        // throw new RuntimeException(e);
+        // }
+        // } else {
+        // schemaJson = (String) schemaPseudoJson;
+        // }
+
+        // try {
+        // var schema = UApiSchema.fromJson(schemaJson);
+        // if (extendSchemaJson != null) {
+        // UApiSchema.extend(schema, extendSchemaJson);
+        // }
+        // return new Message(Map.of(), Map.of("Ok_", Map.of()));
+        // } catch (UApiSchemaParseError e) {
+        // e.printStackTrace();
+        // System.err.flush();
+        // return new Message(Map.of(),
+        // Map.of("ErrorValidationFailure", Map.of("cases",
+        // e.schemaParseFailuresPseudoJson)));
+        // }
+        // };
+
+        // var options = new Server.Options();
+        // options.authRequired = false;
+        // var server = new Server(uApi, handler, options);
+
+        // var result = server.process(
+        // """
+        // [{"bin_": [{}]}, {"fn.ping_": {}}]
+        // """
+        // .getBytes());
+
+        // System.out.println(new String(result));
 
         // server.process(
         // """

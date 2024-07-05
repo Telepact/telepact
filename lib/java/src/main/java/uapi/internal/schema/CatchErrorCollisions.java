@@ -1,47 +1,62 @@
 package uapi.internal.schema;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import uapi.UApiSchemaParseError;
+import uapi.internal.schema.SchemaParseFailure;
 
 public class CatchErrorCollisions {
-    static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<Integer> errorIndices,
+    public static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<String> errorKeys,
             Map<String, Integer> keysToIndex) {
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        List<SchemaParseFailure> parseFailures = new ArrayList<>();
 
-        final var indices = errorIndices.stream().sorted().toList();
+        List<Integer> indices = new ArrayList<>();
+        for (String key : errorKeys) {
+            indices.add(keysToIndex.get(key));
+        }
+        indices.sort(Integer::compareTo);
 
-        for (var i = 0; i < indices.size(); i += 1) {
-            for (var j = i + 1; j < indices.size(); j += 1) {
-                final var index = indices.get(i);
-                final var otherIndex = indices.get(j);
+        Map<Integer, String> indexToKeys = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : keysToIndex.entrySet()) {
+            indexToKeys.put(entry.getValue(), entry.getKey());
+        }
 
-                final var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
-                final var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
+        for (int i = 0; i < indices.size(); i++) {
+            for (int j = i + 1; j < indices.size(); j++) {
+                int index = indices.get(i);
+                int otherIndex = indices.get(j);
 
-                final var errDef = (List<Object>) def.get("errors");
-                final var otherErrDef = (List<Object>) otherDef.get("errors");
+                var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
+                var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
 
-                for (int k = 0; k < errDef.size(); k += 1) {
-                    final var thisErrDef = (Map<String, Object>) errDef.get(k);
-                    final var thisErrDefKeys = new HashSet<>(thisErrDef.keySet());
+                String defKey = indexToKeys.get(index);
+                String otherDefKey = indexToKeys.get(otherIndex);
+
+                var errDef = (List<Object>) def.get(defKey);
+                var otherErrDef = (List<Object>) otherDef.get(otherDefKey);
+
+                for (int k = 0; k < errDef.size(); k++) {
+                    var thisErrDef = (Map<String, Object>) errDef.get(k);
+                    var thisErrDefKeys = new HashSet<>(thisErrDef.keySet());
                     thisErrDefKeys.remove("///");
 
-                    for (int l = 0; l < otherErrDef.size(); l += 1) {
-                        final var thisOtherErrDef = (Map<String, Object>) otherErrDef.get(l);
-                        final var thisOtherErrDefKeys = new HashSet<>(thisOtherErrDef.keySet());
+                    for (int l = 0; l < otherErrDef.size(); l++) {
+                        var thisOtherErrDef = (Map<String, Object>) otherErrDef.get(l);
+                        var thisOtherErrDefKeys = new HashSet<>(thisOtherErrDef.keySet());
                         thisOtherErrDefKeys.remove("///");
 
                         if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
-                            final var thisErrorDefKey = thisErrDefKeys.stream().findFirst().get();
-                            final var thisOtherErrorDefKey = thisOtherErrDefKeys.stream().findFirst().get();
+                            String thisErrorDefKey = thisErrDefKeys.iterator().next();
+                            String thisOtherErrorDefKey = thisOtherErrDefKeys.iterator().next();
                             parseFailures.add(new SchemaParseFailure(
-                                    List.of(otherIndex, "errors", l, thisOtherErrorDefKey), "PathCollision",
-                                    Map.of("other", List.of(index, "errors", k, thisErrorDefKey)), "errors"));
+                                    List.of(otherIndex, otherDefKey, l, thisOtherErrorDefKey),
+                                    "PathCollision",
+                                    Map.of("other", List.of(index, defKey, k, thisErrorDefKey)),
+                                    otherDefKey));
                         }
                     }
                 }

@@ -3,6 +3,7 @@ package uapi.internal.schema;
 import static uapi.internal.schema.ParseUnionType.parseUnionType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,37 +16,41 @@ import uapi.internal.types.UUnion;
 
 public class ParseErrorType {
     public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
-            List<Object> uApiSchemaPseudoJson, int index, Map<String, Integer> schemaKeysToIndex,
+            List<Object> uApiSchemaPseudoJson,
+            String schemaKey,
+            int index,
+            Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
-        final var schemaKey = "errors";
-        final List<Object> basePath = List.of(index);
+        List<Object> basePath = new ArrayList<>();
+        basePath.add(index);
 
-        final var parseFailures = new ArrayList<SchemaParseFailure>();
+        List<SchemaParseFailure> parseFailures = new ArrayList<>();
 
-        final var otherKeys = new HashSet<>(errorDefinitionAsParsedJson.keySet());
-
+        Set<String> otherKeys = new HashSet<>(errorDefinitionAsParsedJson.keySet());
         otherKeys.remove(schemaKey);
         otherKeys.remove("///");
 
-        if (otherKeys.size() > 0) {
-            for (final var k : otherKeys) {
-                final List<Object> loopPath = new ArrayList<>(basePath);
+        if (!otherKeys.isEmpty()) {
+            for (String k : otherKeys) {
+                List<Object> loopPath = new ArrayList<>(basePath);
                 loopPath.add(k);
-
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new HashMap<>(), null));
             }
         }
 
-        if (parseFailures.size() > 0) {
+        if (!parseFailures.isEmpty()) {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        final var typeParameterCount = 0;
+        int typeParameterCount = 0;
 
-        final UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey, List.of(), List.of(),
-                typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+        // Assuming parseUnionType is adapted to Java and returns UError or its
+
+        UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey,
+                new ArrayList<>(),
+                new ArrayList<>(), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
                 allParseFailures, failedTypes);
 
         return new UError(schemaKey, error);

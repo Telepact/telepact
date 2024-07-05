@@ -2,7 +2,7 @@ import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function findSchemaKey(definition: Record<string, any>, index: number): string {
-    const regex = /^((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?)\..*)/;
+    const regex = /^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\..*)/;
     const matches: string[] = [];
 
     const keys = Object.keys(definition).sort();
