@@ -1,0 +1,14 @@
+[
+    {
+        "struct.Example1": {
+            "field1": ["integer"],
+            "field2": ["string"]
+        }
+    },
+    {
+        "struct.Example2": {
+            "field1": ["boolean"],
+            "field2": ["array", ["number"]]
+        }
+    }
+]
