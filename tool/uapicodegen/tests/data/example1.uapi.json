@@ -8,7 +8,7 @@
     {
         "struct.Example2": {
             "field1": ["boolean"],
-            "field2": ["array", ["number"]]
+            "field2": ["array", ["string"]]
         }
     }
 ]

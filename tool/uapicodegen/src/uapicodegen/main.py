@@ -12,6 +12,8 @@ from pathlib import Path
 @click.option('--out', help='Output directory')
 def main(schema: str, lang: str, out: str) -> None:
 
+    print('Starting cli...')
+
     # read the schema data from file
     with open(schema, "r") as f:
         # load file into string variable
@@ -31,6 +33,8 @@ def convert_to_java_type(data_type: str) -> str:
         "boolean?": "Boolean",
         "integer": "int",
         "integer?": "Integer",
+        "number": "double",
+        "number?": "Double",
         "string": "String",
         "string?": "String",
         "array": "List",
@@ -42,28 +46,40 @@ def convert_to_java_type(data_type: str) -> str:
     }[data_type]
 
 
-def generate(schmea_data: list[dict[str, object]], target: str, output_dir: str) -> None:
+def generate(schema_data: list[dict[str, object]], target: str, output_dir: str) -> None:
 
     if "java" == target:
 
-        for schema_entry in schmea_data:
+        for schema_entry in schema_data:
             # get first key in dict
-            name = list(schema_entry.keys())[0]
+            schema_name = list(schema_entry.keys())[0]
 
-            if name.startswith("struct."):
+            if schema_name.startswith("struct."):
+
+                name = schema_name.replace("struct.", "S_")
+
+                fields = cast(dict[str, object], schema_entry[schema_name])
 
                 # Load jinja template from file
                 # Adjust the path to your template directory if necessary
                 template_loader = jinja2.PackageLoader(
                     'src.uapicodegen', 'templates')
                 template_env = jinja2.Environment(loader=template_loader)
-                template = template_env.get_template(
-                    'java_struct.j2')  # Specify your template file name
 
                 template_env.filters['to_java'] = convert_to_java_type
 
+                template = template_env.get_template(
+                    'java_struct.j2')  # Specify your template file name
+
+                translated_entry = {
+                    'name': name,
+                    'fields': [{'name': k, 'type': v} for k, v in fields.items()],
+                }
+
                 # Render the template with context
-                output = template.render(schema_entry)
+                print(f'Using schema entry: {translated_entry}')
+
+                output = template.render(translated_entry)
 
                 print(output)
 

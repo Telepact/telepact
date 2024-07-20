@@ -23,6 +23,8 @@ def test_command(runner: CliRunner) -> None:
         traceback_str = ''.join(traceback.format_exception(*result.exc_info))
         print(traceback_str)
 
+    print(f'Output: {result.output}')
+
     assert result.exit_code == 0
 
     # open the generated file and check if it contains the expected content

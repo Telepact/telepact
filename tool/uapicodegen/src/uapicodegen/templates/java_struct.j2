@@ -1,9 +1,20 @@
+{% macro translate(type) -%}
+    {% if type is iterable and type | length == 1 %}
+        {{- type[0] | to_java -}}
+    {% elif type is iterable and type | length == 2 -%}
+        {% set generic_type = type[0] | to_java -%}
+        {% set type_parameter = type[1] -%}
+        {{- generic_type }}<{{ translate(type_parameter) -}}>
+    {%- else %}
+        // Handle error or unexpected format
+    {%- endif %}
+{%- endmacro -%}
 public class {{ name }} {
     {% for field in fields %}
-    private {{ field.data_type }} {{ field.name }};
+    private {{ translate(field.type) }} {{ field.name }};
     {% endfor %}
 
-    public {{ name }}({% for field in fields %}{{ field.data_type }} {{ field.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
+    public {{ name }}({% for field in fields %}{{ translate(field.type) }} {{ field.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
         {% for field in fields %}
         this.{{ field.name }} = {{ field.name }};
         {% endfor %}
