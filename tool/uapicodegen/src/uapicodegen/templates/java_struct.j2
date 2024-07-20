@@ -1,14 +1,64 @@
-{% macro translate(type) -%}
-    {% if type is iterable and type | length == 1 %}
-        {{- type[0] | to_java -}}
-    {% elif type is iterable and type | length == 2 -%}
-        {% set generic_type = type[0] | to_java -%}
-        {% set type_parameter = type[1] -%}
-        {{- generic_type }}<{{ translate(type_parameter) -}}>
+{% set import_types = [] -%}
+
+{%- macro get_imports_rec(field_types) %}
+    {%- set field_type = field_types[0] | replace('?', '') %}
+    {%- if field_type == 'array' -%}
+        {% do import_types.append('java.util.List') %}
+    {%- elif field_type == 'object' %}
+        {% do import_types.append('java.util.Map') %}
+    {%- endif %}
+    {%- for t in field_types[1:] %}
+        {{ get_imports_rec(t) }}
+    {%- endfor %}
+{%- endmacro -%}
+
+{%- macro get_imports(fields) %}
+    {%- for field in fields %}
+        {{- get_imports_rec(field.type) }}
+    {%- endfor %}
+{%- endmacro -%}
+
+{{- get_imports(fields) -}}
+
+{%- set seen = [] %}
+{%- for import_type in import_types %}
+    {%- if import_type not in seen %}
+import {{ import_type }};
+        {%- do seen.append(import_type) %}
+    {%- endif %}
+{%- endfor -%}
+
+{%- macro to_java_type(t) %}
+    {%- set typ = t | replace('?', '') %}
+    {%- if typ == 'array' %}
+        {{- 'List' -}}
+    {%- elif typ == 'object' %}
+        {{- 'Map' -}}
+    {%- elif typ == 'boolean' %}
+        {{- 'Boolean' -}}
+    {%- elif typ == 'integer' %}
+        {{- 'Integer' -}}
+    {%- elif typ == 'number' %}
+        {{- 'Number' -}}
+    {%- elif typ == 'string' %}
+        {{- 'String' -}}
     {%- else %}
-        // Handle error or unexpected format
+        {{- t -}}
     {%- endif %}
 {%- endmacro -%}
+
+{%- macro translate(type) -%}
+    {{- to_java_type(type[0]) -}}
+    {%- if type | length > 1 -%}
+        {{- '<' -}}
+        {%- for t in type[1:] -%}
+            {{- translate(t) -}}{{ ", " if not loop.last -}}
+        {%- endfor -%}
+        {{- '>' -}}
+    {%- endif -%}
+{%- endmacro %}
+
+
 public class {{ name }} {
     {% for field in fields %}
     private {{ translate(field.type) }} {{ field.name }};

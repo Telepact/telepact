@@ -64,7 +64,8 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str)
                 # Adjust the path to your template directory if necessary
                 template_loader = jinja2.PackageLoader(
                     'src.uapicodegen', 'templates')
-                template_env = jinja2.Environment(loader=template_loader)
+                template_env = jinja2.Environment(
+                    loader=template_loader, extensions=['jinja2.ext.do'])
 
                 template_env.filters['to_java'] = convert_to_java_type
 
