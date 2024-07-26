@@ -33,9 +33,9 @@ import java.util.Map;
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro struct(data, schema_key, implements) %}
+{%- macro struct(data, schema_key, alt_name, modifier, implements) %}
     {%- set fields = data[schema_key] %}
-    {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
     {%- if '///' in data %}
 /**
 {%- for line in data['///'] %}
@@ -43,7 +43,7 @@ import java.util.Map;
 {%- endfor %}
  */
 {%- endif %}
-public final class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %}{% if implements %} implements {{ implements }} {% endif %}{
+public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
     public final {{ translate(field_type) }} {{ field_name }};
     {%- endfor %}
@@ -58,6 +58,9 @@ public final class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% eli
 
 {%- macro union(data, schema_key) %}
     {%- set cases = data[schema_key] %}
+    {%- if schema_key == '->' %}
+        {%- set schema_key = 'Output' %}
+    {%- endif %}
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if '///' in data %}
 /**
@@ -68,22 +71,36 @@ public final class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% eli
 {%- endif %}
 public sealed interface {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
 
-    {{ struct({'Unknown_': {} }, 'Unknown_', java_name) | indent }}
+    {{ struct({'NO_MATCH_': {} }, 'NO_MATCH_', None, 'final ', java_name) | indent }}
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}
-        {{ struct(case_entry, case_key, java_name) | indent }}
+        {{ struct(case_entry, case_key, None, 'final ', java_name) | indent }}
     {%- endfor %}
 }
 {%- endmacro %}
 
+{%- macro function(data, schema_key) %}
+    {%- set fields = data[schema_key] %}
+    {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
+public final class {{ java_name }} {
+
+    {{ struct(data, schema_key, 'Input', 'static ', None) | indent }}
+
+    {% do data.pop('///') %}
+
+    {{ union (data, '->') | indent }}
+}
+{%- endmacro %}
 
 
 {%- set schema_key = data | find_schema_key %}
 
 {%- if schema_key.startswith('struct') %}
-    {{ struct(data, schema_key, None) }}
+    {{ struct(data, schema_key, None, "", None) }}
 {%- elif schema_key.startswith('union') %}
     {{ union(data, schema_key) }}
+{%- elif schema_key.startswith('fn') %}
+    {{ function(data, schema_key) }}
 {%- endif %}
 

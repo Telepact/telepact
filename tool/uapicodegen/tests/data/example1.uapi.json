@@ -53,15 +53,51 @@
         }
     },
     {
+        "///": [
+            " A union             ",
+            "                     ",
+            " This is the result. "
+        ],
         "union.Un1": [{
+            "///": [
+                " First union entry   ",
+                "                     ",
+                " This is first.      "
+            ],
             "First": {
                 "field1": ["integer"], 
                 "field2": ["boolean"]
             }
         }, {
+            "///": [
+                " Second union entry  ",
+                "                     ",
+                " This is second.     "
+            ],
             "Second": {
                 "field1": ["string"], 
                 "field2": ["boolean"]
+            }
+        }]
+    },
+    {
+        "///": [
+            " A function         ",
+            "                     ",
+            " This is the result. "
+        ],
+        "fn.test": {
+            "field1": ["integer"],
+            "field2": ["boolean"]
+        },
+        "->": [{
+            "Ok_": {
+                "field1": ["integer"],
+                "field2": ["boolean"]
+            }
+        }, {
+            "Err": {
+                "error": ["string"]
             }
         }]
     }
