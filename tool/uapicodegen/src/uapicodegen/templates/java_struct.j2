@@ -62,7 +62,7 @@ import {{ import_type }};
 {%- endmacro %}
 
 
-public class {{ java_name }} {% if '<1>' in name %}{{ '<T0>' }}{% elif '2' in name %}{{ '<T0, T1>'}}{% elif '<2>' in name %}{{ '<T0, T1, T2>' }}{% endif %} {
+public class {{ java_name }}{% if '<1>' in name %}{{ '<T0>' }}{% elif '2' in name %}{{ '<T0, T1>'}}{% elif '<2>' in name %}{{ '<T0, T1, T2>' }}{% endif %} {
     {%- for field in fields %}
     private {{ translate(field.type) }} {{ field.name }};
     {%- endfor %}

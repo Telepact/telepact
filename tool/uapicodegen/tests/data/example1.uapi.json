@@ -37,8 +37,8 @@
     },
     {
         "struct<2>.Example7": {
-            "field1": ["T.0"],
-            "field2": ["T.1"]
+            "field1": ["T0"],
+            "field2": ["T1"]
         }
     },
     {
