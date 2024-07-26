@@ -6,11 +6,20 @@ import click
 from pathlib import Path
 
 
+def validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
+    lang = ctx.params.get('lang')
+    if lang == 'java' and not value:
+        raise click.BadParameter(
+            '--package is required when --lang is java')
+    return value
+
+
 @click.command()
 @click.option('--schema', help='uAPI schema')
 @click.option('--lang', help='Language target')
 @click.option('--out', help='Output directory')
-def main(schema: str, lang: str, out: str) -> None:
+@click.option('--package', help='Java package', callback=validate_package)
+def main(schema: str, lang: str, out: str, package: str) -> None:
 
     print('Starting cli...')
 
@@ -24,7 +33,7 @@ def main(schema: str, lang: str, out: str) -> None:
     output_directory = out
 
     # Call the generate function
-    generate(schema_data, target, output_directory)
+    generate(schema_data, target, output_directory, package)
 
 
 def convert_to_java_type(data_type: str) -> str:
@@ -46,7 +55,7 @@ def convert_to_java_type(data_type: str) -> str:
     }[data_type]
 
 
-def generate(schema_data: list[dict[str, object]], target: str, output_dir: str) -> None:
+def generate(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
 
     if "java" == target:
 
@@ -73,6 +82,7 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str)
                     'java_struct.j2')  # Specify your template file name
 
                 translated_entry = {
+                    'package': java_package,
                     'name': name,
                     'fields': [{'name': k, 'type': v} for k, v in fields.items()],
                 }

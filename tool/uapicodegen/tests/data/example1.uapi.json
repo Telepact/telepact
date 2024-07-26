@@ -10,5 +10,23 @@
             "field1": ["boolean"],
             "field2": ["array", ["string"]]
         }
-    }
+    },
+    {
+        "struct.Example3": {
+            "field1": ["boolean"],
+            "field2": ["array", ["array", ["string"]]]
+        }
+    },
+    {
+        "struct.Example4": {
+            "field1": ["boolean"],
+            "field2": ["object", ["boolean"]]
+        }
+    },
+    {
+        "struct.Example5": {
+            "field1": ["array", ["boolean"]],
+            "field2": ["object", ["object", ["boolean"]]]
+        }
+    }          
 ]

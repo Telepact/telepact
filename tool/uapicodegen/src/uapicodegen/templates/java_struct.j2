@@ -1,31 +1,33 @@
+package {{ package }};
 {% set import_types = [] -%}
 
-{%- macro get_imports_rec(field_types) %}
-    {%- set field_type = field_types[0] | replace('?', '') %}
+{%- macro get_imports_rec(field_types) -%}
+    {%- set field_type = field_types[0] | replace('?', '') -%}
     {%- if field_type == 'array' -%}
-        {% do import_types.append('java.util.List') %}
-    {%- elif field_type == 'object' %}
-        {% do import_types.append('java.util.Map') %}
-    {%- endif %}
-    {%- for t in field_types[1:] %}
+        {%- do import_types.append('java.util.List') -%}
+    {%- elif field_type == 'object' -%}
+        {%- do import_types.append('java.util.Map') -%}
+        {%- do field_types.insert(1, ['string']) -%}
+    {%- endif -%}
+    {%- for t in field_types[1:] -%}
         {{ get_imports_rec(t) }}
-    {%- endfor %}
+    {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro get_imports(fields) %}
-    {%- for field in fields %}
+{%- macro get_imports(fields) -%}
+    {%- for field in fields -%}
         {{- get_imports_rec(field.type) }}
-    {%- endfor %}
+    {%- endfor -%}
 {%- endmacro -%}
 
 {{- get_imports(fields) -}}
 
-{%- set seen = [] %}
-{%- for import_type in import_types %}
+{% set seen = [] -%}
+{%- for import_type in import_types -%}
     {%- if import_type not in seen %}
 import {{ import_type }};
-        {%- do seen.append(import_type) %}
-    {%- endif %}
+        {%- do seen.append(import_type) -%}
+    {%- endif -%}
 {%- endfor -%}
 
 {%- macro to_java_type(t) %}
@@ -60,13 +62,13 @@ import {{ import_type }};
 
 
 public class {{ name }} {
-    {% for field in fields %}
+    {%- for field in fields %}
     private {{ translate(field.type) }} {{ field.name }};
-    {% endfor %}
+    {%- endfor %}
 
     public {{ name }}({% for field in fields %}{{ translate(field.type) }} {{ field.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
-        {% for field in fields %}
+        {%- for field in fields %}
         this.{{ field.name }} = {{ field.name }};
-        {% endfor %}
+        {%- endfor %}
     }
 }
