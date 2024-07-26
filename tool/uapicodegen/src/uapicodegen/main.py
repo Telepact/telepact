@@ -1,9 +1,10 @@
 import argparse
 import json
-from typing import cast
+from typing import cast, Pattern
 import jinja2
 import click
 from pathlib import Path
+import re
 
 
 def validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
@@ -36,6 +37,12 @@ def main(schema: str, lang: str, out: str, package: str) -> None:
     generate(schema_data, target, output_directory, package)
 
 
+# Define the custom filter
+def regex_replace(s: str, find: str, replace: str) -> str:
+    """A custom Jinja2 filter to perform regex replacement."""
+    return re.sub(find, replace, s)
+
+
 def generate(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
 
     if "java" == target:
@@ -44,9 +51,9 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
             # get first key in dict
             schema_name = list(schema_entry.keys())[0]
 
-            if schema_name.startswith("struct."):
+            if schema_name.startswith("struct"):
 
-                name = schema_name.replace("struct.", "S_")
+                name = schema_name.split(".")[1]
 
                 fields = cast(dict[str, object], schema_entry[schema_name])
 
@@ -57,12 +64,14 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
                 template_env = jinja2.Environment(
                     loader=template_loader, extensions=['jinja2.ext.do'])
 
+                template_env.filters['regex_replace'] = regex_replace
+
                 template = template_env.get_template(
                     'java_struct.j2')  # Specify your template file name
 
                 translated_entry = {
                     'package': java_package,
-                    'name': name,
+                    'name': schema_name,
                     'fields': [{'name': k, 'type': v} for k, v in fields.items()],
                 }
 

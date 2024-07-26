@@ -1,5 +1,6 @@
 package {{ package }};
 {% set import_types = [] -%}
+{% set java_name = name | regex_replace('^.*\\.', '') %}
 
 {%- macro get_imports_rec(field_types) -%}
     {%- set field_type = field_types[0] | replace('?', '') -%}
@@ -45,7 +46,7 @@ import {{ import_type }};
     {%- elif typ == 'string' %}
         {{- 'String' -}}
     {%- else %}
-        {{- t -}}
+        {{- t | regex_replace('^.*\\.', '') -}}
     {%- endif %}
 {%- endmacro -%}
 
@@ -61,12 +62,12 @@ import {{ import_type }};
 {%- endmacro %}
 
 
-public class {{ name }} {
+public class {{ java_name }} {
     {%- for field in fields %}
     private {{ translate(field.type) }} {{ field.name }};
     {%- endfor %}
 
-    public {{ name }}({% for field in fields %}{{ translate(field.type) }} {{ field.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
+    public {{ java_name }}({% for field in fields %}{{ translate(field.type) }} {{ field.name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
         {%- for field in fields %}
         this.{{ field.name }} = {{ field.name }};
         {%- endfor %}
