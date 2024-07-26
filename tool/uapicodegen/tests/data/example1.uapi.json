@@ -28,5 +28,11 @@
             "field1": ["array", ["boolean"]],
             "field2": ["object", ["object", ["boolean"]]]
         }
-    }          
+    },
+    {
+        "struct.Example6": {
+            "field1": ["boolean"],
+            "field2": ["struct.Example1"]
+        }
+    } 
 ]

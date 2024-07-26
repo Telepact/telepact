@@ -36,25 +36,6 @@ def main(schema: str, lang: str, out: str, package: str) -> None:
     generate(schema_data, target, output_directory, package)
 
 
-def convert_to_java_type(data_type: str) -> str:
-    return {
-        "boolean": "boolean",
-        "boolean?": "Boolean",
-        "integer": "int",
-        "integer?": "Integer",
-        "number": "double",
-        "number?": "Double",
-        "string": "String",
-        "string?": "String",
-        "array": "List",
-        "array?": "List",
-        "object": "Map",
-        "object?": "Map",
-        "any": "Object",
-        "any?": "Object"
-    }[data_type]
-
-
 def generate(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
 
     if "java" == target:
@@ -75,8 +56,6 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
                     'src.uapicodegen', 'templates')
                 template_env = jinja2.Environment(
                     loader=template_loader, extensions=['jinja2.ext.do'])
-
-                template_env.filters['to_java'] = convert_to_java_type
 
                 template = template_env.get_template(
                     'java_struct.j2')  # Specify your template file name
