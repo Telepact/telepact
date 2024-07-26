@@ -72,7 +72,7 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
                 translated_entry = {
                     'package': java_package,
                     'name': schema_name,
-                    'fields': [{'name': k, 'type': v} for k, v in fields.items()],
+                    'fields': fields,
                 }
 
                 # Render the template with context
