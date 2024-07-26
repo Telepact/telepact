@@ -1,8 +1,13 @@
 [
     {
+        "///": [
+            " hello world         ",
+            "                     ",
+            " This is the result. "
+        ],
         "struct.Example1": {
             "field1": ["integer"],
-            "field2": ["string"]
+            "field2": ["boolean"]
         }
     },
     {

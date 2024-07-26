@@ -62,107 +62,53 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
     if "java" == target:
 
         for schema_entry in schema_data:
-            # get first key in dict
-            schema_name = list(schema_entry.keys())[0]
+            schema_key = find_schema_key(schema_entry)
 
-            if schema_name.startswith("struct"):
+            # Load jinja template from file
+            # Adjust the path to your template directory if necessary
+            template_loader = jinja2.PackageLoader(
+                'src.uapicodegen', 'templates')
+            template_env = jinja2.Environment(
+                loader=template_loader, extensions=['jinja2.ext.do'])
 
-                name = schema_name.split(".")[1]
+            template_env.filters['regex_replace'] = regex_replace
+            template_env.filters['find_schema_key'] = find_schema_key
+            template_env.filters['find_case_key'] = find_case_key
 
-                fields = cast(dict[str, object], schema_entry[schema_name])
+            template = template_env.get_template(
+                'java_struct.j2')  # Specify your template file name
 
-                # Load jinja template from file
-                # Adjust the path to your template directory if necessary
-                template_loader = jinja2.PackageLoader(
-                    'src.uapicodegen', 'templates')
-                template_env = jinja2.Environment(
-                    loader=template_loader, extensions=['jinja2.ext.do'])
+            translated_entry = {
+                'package': java_package,
+                'data': schema_entry
+            }
 
-                template_env.filters['regex_replace'] = regex_replace
-                template_env.filters['find_schema_key'] = find_schema_key
-                template_env.filters['find_case_key'] = find_case_key
+            # Render the template with context
+            print(f'Using schema entry: {translated_entry}')
 
-                template = template_env.get_template(
-                    'java_struct.j2')  # Specify your template file name
+            output = template.render(translated_entry)
 
-                translated_entry = {
-                    'package': java_package,
-                    'data': schema_entry
-                }
+            print(output)
 
-                # Render the template with context
-                print(f'Using schema entry: {translated_entry}')
+            # Write the output to a file
+            if output_dir:
+                # Create the Path object for the directory
+                output_path = Path(output_dir)
 
-                output = template.render(translated_entry)
+                # Ensure the directory exists
+                output_path.mkdir(parents=True, exist_ok=True)
 
+                # Use the / operator provided by pathlib to concatenate paths
+                file_name = schema_key.split('.')[1]
+
+                file_path = output_path / f"{file_name}.java"
+
+                # Open the file for writing
+                with file_path.open("w") as f:
+                    f.write(output)
+
+            else:
                 print(output)
-
-                # Write the output to a file
-                if output_dir:
-                    # Create the Path object for the directory
-                    output_path = Path(output_dir)
-
-                    # Ensure the directory exists
-                    output_path.mkdir(parents=True, exist_ok=True)
-
-                    # Use the / operator provided by pathlib to concatenate paths
-                    file_path = output_path / f"{name}.java"
-
-                    # Open the file for writing
-                    with file_path.open("w") as f:
-                        f.write(output)
-
-                else:
-                    print(output)
-
-            if schema_name.startswith("union"):
-
-                name = schema_name.split(".")[1]
-
-                cases = cast(dict[str, object], schema_entry[schema_name])
-
-                # Load jinja template from file
-                # Adjust the path to your template directory if necessary
-                template_loader = jinja2.PackageLoader(
-                    'src.uapicodegen', 'templates')
-                template_env = jinja2.Environment(
-                    loader=template_loader, extensions=['jinja2.ext.do'])
-
-                template_env.filters['regex_replace'] = regex_replace
-
-                template = template_env.get_template(
-                    'java_union.j2')  # Specify your template file name
-
-                translated_entry = {
-                    'package': java_package,
-                    'name': schema_name,
-                    'cases': cases,
-                }
-
-                # Render the template with context
-                print(f'Using schema entry: {translated_entry}')
-
-                output = template.render(translated_entry)
-
-                print(output)
-
-                # Write the output to a file
-                if output_dir:
-                    # Create the Path object for the directory
-                    output_path = Path(output_dir)
-
-                    # Ensure the directory exists
-                    output_path.mkdir(parents=True, exist_ok=True)
-
-                    # Use the / operator provided by pathlib to concatenate paths
-                    file_path = output_path / f"{name}.java"
-
-                    # Open the file for writing
-                    with file_path.open("w") as f:
-                        f.write(output)
-
-                else:
-                    print(output)
 
 
 if __name__ == '__main__':

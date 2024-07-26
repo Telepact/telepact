@@ -31,19 +31,18 @@ import java.util.Map;
         {%- endfor -%}
         {{- '>' -}}
     {%- endif -%}
-{%- endmacro %}
-
+{%- endmacro -%}
 
 {%- macro struct(data, schema_key) %}
-    {% set fields = data[schema_key] %}
+    {%- set fields = data[schema_key] %}
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if '///' in data %}
-        /**
-        {%- for line in data['///'] %}
-         * {{ line }}
-        {%- endfor %}
-         */
-    {% endif %}
+/**
+{%- for line in data['///'] %}
+ *{{ line }}
+{%- endfor %}
+ */
+{%- endif %}
 public class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
     private {{ translate(field_type) }} {{ field_name }};
@@ -57,9 +56,9 @@ public class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' 
 }
 {%- endmacro %}
 
-{% set schema_key = data | find_schema_key %}
+{%- set schema_key = data | find_schema_key %}
 
-{% if schema_key.startswith('struct') %}
+{%- if schema_key.startswith('struct') %}
     {{ struct(data, schema_key) }}
-{% endif %}
+{%- endif %}
 
