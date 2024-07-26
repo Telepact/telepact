@@ -24,8 +24,12 @@ import java.util.Map;
 
 {%- macro translate(type) -%}
     {{- to_java_type(type[0]) -}}
+    {%- set typ = type[0] | replace('?', '') -%}
     {%- if type | length > 1 -%}
         {{- '<' -}}
+        {%- if typ == 'object' %}
+            {{- 'String, ' -}}
+        {%- endif %}
         {%- for t in type[1:] -%}
             {{- translate(t) -}}{{ ", " if not loop.last -}}
         {%- endfor -%}
