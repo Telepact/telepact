@@ -1,20 +1,20 @@
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UType } from '../../internal/types/UType';
-import { UObject } from '../../internal/types/UObject';
-import { UArray } from '../../internal/types/UArray';
-import { UBoolean } from '../../internal/types/UBoolean';
-import { UGeneric } from '../../internal/types/UGeneric';
-import { UInteger } from '../../internal/types/UInteger';
-import { UNumber } from '../../internal/types/UNumber';
-import { UString } from '../../internal/types/UString';
-import { UAny } from '../../internal/types/UAny';
-import { parseFunctionType } from '../../internal/schema/ParseFunctionType';
-import { parseStructType } from '../../internal/schema/ParseStructType';
-import { parseUnionType } from '../../internal/schema/ParseUnionType';
-import { USelect } from '../../internal/types/USelect';
-import { UMockCall } from '../../internal/types/UMockCall';
-import { UMockStub } from '../../internal/types/UMockStub';
+import { UApiSchemaParseError } from "../../UApiSchemaParseError";
+import { SchemaParseFailure } from "../../internal/schema/SchemaParseFailure";
+import { UType } from "../../internal/types/UType";
+import { UObject } from "../../internal/types/UObject";
+import { UArray } from "../../internal/types/UArray";
+import { UBoolean } from "../../internal/types/UBoolean";
+import { UGeneric } from "../../internal/types/UGeneric";
+import { UInteger } from "../../internal/types/UInteger";
+import { UNumber } from "../../internal/types/UNumber";
+import { UString } from "../../internal/types/UString";
+import { UAny } from "../../internal/types/UAny";
+import { parseFunctionType } from "../../internal/schema/ParseFunctionType";
+import { parseStructType } from "../../internal/schema/ParseStructType";
+import { parseUnionType } from "../../internal/schema/ParseUnionType";
+import { USelect } from "../../internal/types/USelect";
+import { UMockCall } from "../../internal/types/UMockCall";
+import { UMockStub } from "../../internal/types/UMockStub";
 
 export function getOrParseType(
     path: any[],
@@ -37,12 +37,12 @@ export function getOrParseType(
 
     let genericRegex: string;
     if (thisTypeParameterCount > 0) {
-        genericRegex = `|(T.([%s]))`.replace(
-            '%s',
-            thisTypeParameterCount > 1 ? '0-%d'.replace('%d', String(thisTypeParameterCount - 1)) : '0',
+        genericRegex = `|(T([%s]))`.replace(
+            "%s",
+            thisTypeParameterCount > 1 ? "0-%d".replace("%d", String(thisTypeParameterCount - 1)) : "0",
         );
     } else {
-        genericRegex = '';
+        genericRegex = "";
     }
 
     const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)${genericRegex})$`;
@@ -51,7 +51,7 @@ export function getOrParseType(
     const matcher = typeName.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(path, 'StringRegexMatchFailed', { regex: regexString }, null),
+            new SchemaParseFailure(path, "StringRegexMatchFailed", { regex: regexString }, null),
         ]);
     }
 
@@ -80,7 +80,7 @@ export function getOrParseType(
     const customTypeName = matcher[2];
     const index = schemaKeysToIndex[customTypeName];
     if (index === undefined) {
-        throw new UApiSchemaParseError([new SchemaParseFailure(path, 'TypeUnknown', { name: customTypeName }, null)]);
+        throw new UApiSchemaParseError([new SchemaParseFailure(path, "TypeUnknown", { name: customTypeName }, null)]);
     }
     const definition = uApiSchemaPseudoJson[index] as { [key: string]: object };
 
@@ -89,7 +89,7 @@ export function getOrParseType(
 
     let type: UType;
     try {
-        if (customTypeName.startsWith('struct')) {
+        if (customTypeName.startsWith("struct")) {
             type = parseStructType(
                 [index],
                 definition,
@@ -102,7 +102,7 @@ export function getOrParseType(
                 allParseFailures,
                 failedTypes,
             );
-        } else if (customTypeName.startsWith('union')) {
+        } else if (customTypeName.startsWith("union")) {
             type = parseUnionType(
                 [index],
                 definition,
@@ -116,7 +116,7 @@ export function getOrParseType(
                 allParseFailures,
                 failedTypes,
             );
-        } else if (customTypeName.startsWith('fn')) {
+        } else if (customTypeName.startsWith("fn")) {
             type = parseFunctionType(
                 [index],
                 definition,
@@ -129,15 +129,15 @@ export function getOrParseType(
             );
         } else {
             const possibleTypeExtension = {
-                '_ext.Select_': new USelect(parsedTypes),
-                '_ext.Call_': new UMockCall(parsedTypes),
-                '_ext.Stub_': new UMockStub(parsedTypes),
+                "_ext.Select_": new USelect(parsedTypes),
+                "_ext.Call_": new UMockCall(parsedTypes),
+                "_ext.Stub_": new UMockStub(parsedTypes),
             }[customTypeName];
             if (!possibleTypeExtension) {
                 throw new UApiSchemaParseError([
                     new SchemaParseFailure(
                         [index],
-                        'TypeExtensionImplementationMissing',
+                        "TypeExtensionImplementationMissing",
                         { name: customTypeName },
                         null,
                     ),

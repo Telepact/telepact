@@ -186,7 +186,7 @@
     },
     {
         "struct<1>.PStr": {
-            "wrap": ["T.0"]
+            "wrap": ["T0"]
         }
     },
     {
@@ -196,8 +196,8 @@
     },
     {
         "struct<2>.P2Str": {
-            "wrap": ["T.0"],
-            "nest": ["array", ["T.1"]]
+            "wrap": ["T0"],
+            "nest": ["array", ["T1"]]
         }
     },
     {
@@ -205,7 +205,7 @@
             "One": {}
         }, {
             "Two": {
-                "ewrap": ["T.0"]
+                "ewrap": ["T0"]
             }
         }]
     },
@@ -214,8 +214,8 @@
             "One": {}
         }, {
             "Two": {
-                "ewrap": ["T.0"],
-                "enest": ["array", ["T.1"]]
+                "ewrap": ["T0"],
+                "enest": ["array", ["T1"]]
             }
         }]
     },

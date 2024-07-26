@@ -36,7 +36,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
         return existing_type
 
     if this_type_parameter_count > 0:
-        generic_regex = "|(T.([%s]))" % (
+        generic_regex = "|(T([%s]))" % (
             "0-%d" % (this_type_parameter_count - 1) if this_type_parameter_count > 1 else "0")
     else:
         generic_regex = ""

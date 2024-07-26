@@ -42,7 +42,7 @@ public class GetOrParseType {
 
         final String genericRegex;
         if (thisTypeParameterCount > 0) {
-            genericRegex = "|(T.([%s]))"
+            genericRegex = "|(T([%s]))"
                     .formatted(thisTypeParameterCount > 1 ? "0-%d".formatted(thisTypeParameterCount - 1) : "0");
         } else {
             genericRegex = "";

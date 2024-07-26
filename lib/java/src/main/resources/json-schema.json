@@ -452,7 +452,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|T0)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ]
             },
@@ -460,7 +460,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|T\\.0)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|T0)|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ],
                 "items": false,
@@ -531,7 +531,7 @@
                             "prefixItems": [
                                 {
                                     "type": "string",
-                                    "pattern": "^((boolean|integer|number|string|any|T\\.0|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                                    "pattern": "^((boolean|integer|number|string|any|T0|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                                 }
                             ]
                         }
@@ -545,7 +545,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|T[0-1])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ]
             },
@@ -553,7 +553,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|T\\.[0-1])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|T[0-1])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ],
                 "items": false,
@@ -624,7 +624,7 @@
                             "prefixItems": [
                                 {
                                     "type": "string",
-                                    "pattern": "^((boolean|integer|number|string|any|T\\.[0-1]|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                                    "pattern": "^((boolean|integer|number|string|any|T[0-1]|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                                 }
                             ]
                         }
@@ -638,7 +638,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|T[0-2])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ]
             },
@@ -646,7 +646,7 @@
                 "prefixItems": [
                     {
                         "type": "string",
-                        "pattern": "^((boolean|integer|number|string|any|T\\.[0-2])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                        "pattern": "^((boolean|integer|number|string|any|T[0-2])|(fn|union|struct)\\.([a-zA-Z_]\\w*))(\\?)?$"
                     }
                 ],
                 "items": false,
@@ -717,7 +717,7 @@
                             "prefixItems": [
                                 {
                                     "type": "string",
-                                    "pattern": "^((boolean|integer|number|string|any|T\\.[0-2]|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
+                                    "pattern": "^((boolean|integer|number|string|any|T[0-2]|array|object)|(fn|(union|struct)(<[0-3]>)?)\\.([a-zA-Z_]\\w*))(\\?)?$"
                                 }
                             ]
                         }
