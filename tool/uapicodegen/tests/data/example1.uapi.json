@@ -51,5 +51,18 @@
             "field1": ["struct<2>.Example7", ["integer"], ["string"]],
             "field2": ["boolean"]
         }
+    },
+    {
+        "union.Un1": [{
+            "First": {
+                "field1": ["integer"], 
+                "field2": ["boolean"]
+            }
+        }, {
+            "Second": {
+                "field1": ["string"], 
+                "field2": ["boolean"]
+            }
+        }]
     }
 ]

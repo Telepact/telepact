@@ -33,7 +33,7 @@ import java.util.Map;
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro struct(data, schema_key) %}
+{%- macro struct(data, schema_key, implements) %}
     {%- set fields = data[schema_key] %}
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if '///' in data %}
@@ -43,9 +43,9 @@ import java.util.Map;
 {%- endfor %}
  */
 {%- endif %}
-public class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
+public final class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %}{% if implements %} implements {{ implements }} {% endif %}{
     {%- for field_name, field_type in fields.items() %}
-    private {{ translate(field_type) }} {{ field_name }};
+    public final {{ translate(field_type) }} {{ field_name }};
     {%- endfor %}
 
     public {{ java_name }}({% for field_name, field_type in fields.items() %}{{ translate(field_type) }} {{ field_name }}{% if not loop.last %}, {% endif %}{% endfor %}) {
@@ -56,9 +56,34 @@ public class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' 
 }
 {%- endmacro %}
 
+{%- macro union(data, schema_key) %}
+    {%- set cases = data[schema_key] %}
+    {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- if '///' in data %}
+/**
+{%- for line in data['///'] %}
+ *{{ line }}
+{%- endfor %}
+ */
+{%- endif %}
+public sealed interface {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
+
+    {{ struct({'Unknown_': {} }, 'Unknown_', java_name) | indent }}
+
+    {%- for case_entry in cases %}
+        {% set case_key = case_entry | find_case_key %}
+        {{ struct(case_entry, case_key, java_name) | indent }}
+    {%- endfor %}
+}
+{%- endmacro %}
+
+
+
 {%- set schema_key = data | find_schema_key %}
 
 {%- if schema_key.startswith('struct') %}
-    {{ struct(data, schema_key) }}
+    {{ struct(data, schema_key, None) }}
+{%- elif schema_key.startswith('union') %}
+    {{ union(data, schema_key) }}
 {%- endif %}
 
