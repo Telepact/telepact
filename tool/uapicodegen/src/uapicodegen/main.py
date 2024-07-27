@@ -78,7 +78,7 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
             schema_key = find_schema_key(schema_entry)
 
             if schema_key.startswith("fn"):
-                functions.append(schema_entry)
+                functions.append(schema_key)
 
             type_template = template_env.get_template(
                 'java_type.j2')  # Specify your template file name
@@ -89,8 +89,6 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
             }
 
             output = type_template.render(translated_entry)
-
-            print(output)
 
             # Write the output to a file
             if output_dir:
@@ -117,6 +115,26 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
 
         output = server_template.render(
             {'package': java_package, 'functions': functions})
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Use the / operator provided by pathlib to concatenate paths
+            file_name = schema_key.split('.')[1]
+
+            file_path = output_path / f"ServerHandler.java"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(output)
+
+        else:
+            print(output)
 
 
 if __name__ == '__main__':
