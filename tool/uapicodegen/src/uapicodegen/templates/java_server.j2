@@ -1,0 +1,21 @@
+import org.uapi.Message;
+
+public abstract class ServerHandler {
+
+    {%- for function_name in functions %}
+    public abstract {{ function_name }}.Output {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input);
+    {%- endfor %}
+
+    public Message handler(Message message) {
+        var functionName = message.body.entrySet().stream().findAny().get();
+        switch (functionName) {
+            {%- for function_name in functions %}
+            case "fn.{{ function_name }}":
+                return this.{{ function_name }}(message.header, ({{ function_name }}.Input(message.body)));
+            {%- endfor %}
+            default:
+                throw new IllegalArgumentException("Unknown function: " + functionName);
+        }
+    }
+
+}

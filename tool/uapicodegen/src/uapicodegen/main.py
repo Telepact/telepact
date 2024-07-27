@@ -59,34 +59,36 @@ def find_case_key(case_data: dict[str, object]) -> str:
 
 def generate(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
 
+    # Load jinja template from file
+    # Adjust the path to your template directory if necessary
+    template_loader = jinja2.PackageLoader(
+        'src.uapicodegen', 'templates')
+    template_env = jinja2.Environment(
+        loader=template_loader, extensions=['jinja2.ext.do'])
+
+    template_env.filters['regex_replace'] = regex_replace
+    template_env.filters['find_schema_key'] = find_schema_key
+    template_env.filters['find_case_key'] = find_case_key
+
     if "java" == target:
+
+        functions = []
 
         for schema_entry in schema_data:
             schema_key = find_schema_key(schema_entry)
 
-            # Load jinja template from file
-            # Adjust the path to your template directory if necessary
-            template_loader = jinja2.PackageLoader(
-                'src.uapicodegen', 'templates')
-            template_env = jinja2.Environment(
-                loader=template_loader, extensions=['jinja2.ext.do'])
+            if schema_key.startswith("fn"):
+                functions.append(schema_entry)
 
-            template_env.filters['regex_replace'] = regex_replace
-            template_env.filters['find_schema_key'] = find_schema_key
-            template_env.filters['find_case_key'] = find_case_key
-
-            template = template_env.get_template(
-                'java_struct.j2')  # Specify your template file name
+            type_template = template_env.get_template(
+                'java_type.j2')  # Specify your template file name
 
             translated_entry = {
                 'package': java_package,
                 'data': schema_entry
             }
 
-            # Render the template with context
-            print(f'Using schema entry: {translated_entry}')
-
-            output = template.render(translated_entry)
+            output = type_template.render(translated_entry)
 
             print(output)
 
@@ -109,6 +111,12 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
 
             else:
                 print(output)
+
+        server_template = template_env.get_template(
+            'java_server.j2')
+
+        output = server_template.render(
+            {'package': java_package, 'functions': functions})
 
 
 if __name__ == '__main__':

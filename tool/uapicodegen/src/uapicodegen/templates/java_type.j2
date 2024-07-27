@@ -1,7 +1,11 @@
 package {{ package }};
 
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.function.Function;
+
 
 {%- macro to_java_type(t) %}
     {%- set typ = t | replace('?', '') %}
@@ -21,6 +25,36 @@ import java.util.Map;
         {{- t | regex_replace('^.*\\.', '') -}}
     {%- endif %}
 {%- endmacro -%}
+
+{%- macro marshall_java_type(t, depth) -%}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        ((List<Object>) {{ caller() }}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList()
+    {%- elif typ == 'object' -%}
+        ((Map<String, Object>) {{ caller() }}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+    {%- elif typ == 'boolean' -%}
+        ({{- 'Boolean' -}}) {{ caller() }}
+    {%- elif typ == 'integer' -%}
+        ({{- 'Integer' -}}) {{ caller() }}
+    {%- elif typ == 'number' -%}
+        ({{- 'Number' -}}) {{ caller() }}
+    {%- elif typ == 'string' -%}
+        ({{- 'String' -}}) {{ caller() }}
+    {%- elif typ == 'T0' %}
+        (T0) t0Mapper.apply({{ caller() }})
+    {%- elif typ == 'T1' %}
+        (T1) t0Mapper.apply({{ caller() }})
+    {%- elif typ == 'T2' %}
+        (T2) t0Mapper.apply({{ caller() }})
+    {%- else -%}
+        new {{ translate(t) }}((Map<String, Object>) {{ caller() -}}
+            {%- for t2 in t[1:] -%}
+                , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
+            {%- endfor -%}
+            )
+    {%- endif -%}
+{%- endmacro -%}
+
 
 {%- macro translate(type) -%}
     {{- to_java_type(type[0]) -}}
@@ -56,6 +90,16 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
         {%- for field_name, field_type in fields.items() %}
         this.{{ field_name }} = {{ field_name }};
         {%- endfor %}
+    }
+
+    public {{ java_name -}}
+        (Map<String, Object> map
+        {%- if '<1>' in schema_key %}, Function<Object, T0> t0Mapper{% endif %}
+        {%- if '<2>' in schema_key %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper{% endif %}
+        {%- if '<3>' in schema_key %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper, Function<Object, T2> t2Mapper{% endif %}) {
+            {%- for field_name, field_type in fields.items() %}
+            this.{{ field_name }} = {% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %};
+            {%- endfor %}
     }
 }
 {%- endmacro %}
