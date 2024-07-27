@@ -159,7 +159,7 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
 {%- endif %}
 public sealed interface {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '2' in schema_key %}{{ '<T0, T1>'}}{% elif '<2>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
 
-    {{ struct({'NO_MATCH_': {} }, 'NO_MATCH_', None, 'final ', java_name) | indent }}
+    {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name) | indent }}
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}

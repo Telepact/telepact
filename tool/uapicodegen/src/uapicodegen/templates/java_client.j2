@@ -2,7 +2,7 @@ import org.uapi.Message;
 import org.uapi.Client;
 import java.util.Map;
 
-public abstract class ClientHandler {
+public abstract class ClientInterface_ {
 
     private final Client client;
 
@@ -13,7 +13,7 @@ public abstract class ClientHandler {
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     public abstract {{ function_name }}.Output {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input) {
-        var output = this.client.request("{{ fn }}", headers, input);
+        var output = this.client.request("{{ fn }}", headers, input.toPsuedoJson());
         return new {{ function_name }}.Output(output);
     }
     {%- endfor %}

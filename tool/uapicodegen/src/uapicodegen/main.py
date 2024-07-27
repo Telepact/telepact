@@ -113,7 +113,7 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
         server_template = template_env.get_template(
             'java_server.j2')
 
-        output = server_template.render(
+        server_output = server_template.render(
             {'package': java_package, 'functions': functions})
 
         # Write the output to a file
@@ -127,14 +127,40 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
             # Use the / operator provided by pathlib to concatenate paths
             file_name = schema_key.split('.')[1]
 
-            file_path = output_path / f"ServerHandler.java"
+            file_path = output_path / f"ServerHandler_.java"
 
             # Open the file for writing
             with file_path.open("w") as f:
-                f.write(output)
+                f.write(server_output)
 
         else:
-            print(output)
+            print(server_output)
+
+        client_template = template_env.get_template(
+            'java_client.j2')
+
+        client_output = client_template.render(
+            {'package': java_package, 'functions': functions})
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Use the / operator provided by pathlib to concatenate paths
+            file_name = schema_key.split('.')[1]
+
+            file_path = output_path / f"ClientInterface_.java"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(client_output)
+
+        else:
+            print(server_output)
 
 
 if __name__ == '__main__':
