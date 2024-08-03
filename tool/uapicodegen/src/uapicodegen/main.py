@@ -1,5 +1,6 @@
 import argparse
 import json
+import shutil
 from typing import cast, Pattern
 import jinja2
 import click
@@ -161,6 +162,9 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
 
         else:
             print(server_output)
+
+        # Copy file to the output directory
+        shutil.copy2('src/uapicodegen/templates/Optional_.java', output_dir)
 
 
 if __name__ == '__main__':

@@ -7,7 +7,8 @@
         ],
         "struct.Example1": {
             "field1": ["integer"],
-            "field2": ["boolean"]
+            "field2": ["boolean"],
+            "field3!": ["string"]
         }
     },
     {
@@ -55,7 +56,8 @@
     {
         "struct.Example8": {
             "field1": ["array", ["struct<2>.Example7", ["array", ["integer"]], ["string"]]],
-            "field2": ["boolean"]
+            "field2": ["boolean"],
+            "field3!": ["array", ["struct<2>.Example7", ["array", ["integer"]], ["string"]]]
         }
     },
     {
