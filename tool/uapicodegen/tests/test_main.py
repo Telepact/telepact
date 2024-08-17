@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 # Adjust the import path according to your project structure
-from uapicodegen.main import main
+from uapicodegen.gen import generate
 import traceback
 
 
@@ -12,7 +12,7 @@ def runner() -> CliRunner:
 
 def test_command(runner: CliRunner) -> None:
     result = runner.invoke(
-        main, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'java', '--out', 'tests/output', '--package', 'output'])
+        generate, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'java', '--out', 'tests/output', '--package', 'output'])
 
     # print stack trace
     import traceback

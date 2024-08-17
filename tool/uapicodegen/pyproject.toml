@@ -32,5 +32,10 @@ include = [
   "uapicodegen"
 ]
 
+
+[tool.hatch.metadata]
+package-data = { uapicodegen = ["templates/*.java"] }
+
+
 [tool.hatch.scripts]
-uapicodegen = "uapicodegen.main:main"
+uapicodegen = "uapicodegen.gen:generate"

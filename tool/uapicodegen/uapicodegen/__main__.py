@@ -1,4 +1,4 @@
-from .main import main
+from .gen import generate
 
 if __name__ == "__main__":
-    main()
+    generate()

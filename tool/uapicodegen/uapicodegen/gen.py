@@ -6,9 +6,10 @@ import jinja2
 import click
 from pathlib import Path
 import re
+from pkg_resources import resource_filename
 
 
-def validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
+def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
     lang = ctx.params.get('lang')
     if lang == 'java' and not value:
         raise click.BadParameter(
@@ -17,11 +18,11 @@ def validate_package(ctx: click.Context, param: click.Parameter, value: str) -> 
 
 
 @click.command()
-@click.option('--schema', help='uAPI schema')
-@click.option('--lang', help='Language target')
-@click.option('--out', help='Output directory')
-@click.option('--package', help='Java package', callback=validate_package)
-def main(schema: str, lang: str, out: str, package: str) -> None:
+@click.option('--schema', help='uAPI schema', required=True)
+@click.option('--lang', help='Language target', required=True)
+@click.option('--out', help='Output directory', required=True)
+@click.option('--package', help='Java package', callback=_validate_package)
+def generate(schema: str, lang: str, out: str, package: str) -> None:
 
     print('Starting cli...')
 
@@ -35,30 +36,30 @@ def main(schema: str, lang: str, out: str, package: str) -> None:
     output_directory = out
 
     # Call the generate function
-    generate(schema_data, target, output_directory, package)
+    _generate_internal(schema_data, target, output_directory, package)
 
 
 # Define the custom filter
-def regex_replace(s: str, find: str, replace: str) -> str:
+def _regex_replace(s: str, find: str, replace: str) -> str:
     """A custom Jinja2 filter to perform regex replacement."""
     return re.sub(find, replace, s)
 
 
-def find_schema_key(schema_data: dict[str, object]) -> str:
+def _find_schema_key(schema_data: dict[str, object]) -> str:
     for key in schema_data:
-        if key.startswith("struct") or key.startswith("union") or key.startswith("fn"):
+        if key.startswith("struct") or key.startswith("union") or key.startswith("fn") or key.startswith("requestHeader") or key.startswith("responseHeader") or key.startswith('info'):
             return key
-    raise Exception("No schema key found")
+    raise Exception("No schema key found for " + str(schema_data.keys()))
 
 
-def find_case_key(case_data: dict[str, object]) -> str:
+def _find_case_key(case_data: dict[str, object]) -> str:
     for key in case_data:
         if key != '///':
             return key
     raise Exception("No case key found")
 
 
-def generate(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
+def _generate_internal(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
 
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
@@ -67,16 +68,18 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
     template_env = jinja2.Environment(
         loader=template_loader, extensions=['jinja2.ext.do'])
 
-    template_env.filters['regex_replace'] = regex_replace
-    template_env.filters['find_schema_key'] = find_schema_key
-    template_env.filters['find_case_key'] = find_case_key
+    template_env.filters['regex_replace'] = _regex_replace
+    template_env.filters['find_schema_key'] = _find_schema_key
+    template_env.filters['find_case_key'] = _find_case_key
 
     if "java" == target:
 
         functions = []
 
         for schema_entry in schema_data:
-            schema_key = find_schema_key(schema_entry)
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('info'):
+                continue
 
             if schema_key.startswith("fn"):
                 functions.append(schema_key)
@@ -164,4 +167,6 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
             print(server_output)
 
         # Copy file to the output directory
-        shutil.copy2('uapicodegen/templates/Optional_.java', output_dir)
+        template_path = resource_filename(
+            'uapicodegen', 'templates/Optional_.java')
+        shutil.copy2(template_path, output_dir)

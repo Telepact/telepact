@@ -202,7 +202,7 @@ public final class {{ java_name }} {
 
     {{ struct(data, schema_key, 'Input', 'static ', None) | indent }}
 
-    {% do data.pop('///') %}
+    {% do data.pop('///', None) %}
 
     {{ union (data, '->') | indent }}
 }
