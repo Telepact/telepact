@@ -210,7 +210,7 @@ simpler developer experience during the API design phase as well as the unique
 privilege of allowing clients to leverage binary serialization without generated
 code.
 
-### Why can't I have a other non-error result union values?
+### Why can't I have other non-error result union values?
 
 The only required value for the function result union is `ok`. All other values
 in the result union that are not `ok` are, by definition, "not okay", and will

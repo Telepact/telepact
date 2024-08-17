@@ -1,5 +1,5 @@
 [project]
-name = "uapicodgen"
+name = "uapicodegen"
 version = "0.0.1"
 authors = [
   { name="Example Author", email="author@example.com" },
@@ -11,14 +11,26 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+  "click>=8.1.7,<9.0.0",
+  "jinja2>=3.1.4,<4.0.0"
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build.targets]
-wheel = { packages = { include = ["src"] } }
-sdist = { packages = { include = ["src"] } }
+[tool.hatch.build.targets.sdist]
+ignore-vcs = true
+include = [
+  "uapicodegen"
+]
+
+[tool.hatch.build.targets.wheel]
+ignore-vcs = true
+include = [
+  "uapicodegen"
+]
 
 [tool.hatch.scripts]
-uapicodegen = "uapicodgen.main:main"
+uapicodegen = "uapicodegen.main:main"

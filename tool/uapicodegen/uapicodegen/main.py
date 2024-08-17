@@ -63,7 +63,7 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
     # Load jinja template from file
     # Adjust the path to your template directory if necessary
     template_loader = jinja2.PackageLoader(
-        'src.uapicodegen', 'templates')
+        'uapicodegen', 'templates')
     template_env = jinja2.Environment(
         loader=template_loader, extensions=['jinja2.ext.do'])
 
@@ -164,8 +164,4 @@ def generate(schema_data: list[dict[str, object]], target: str, output_dir: str,
             print(server_output)
 
         # Copy file to the output directory
-        shutil.copy2('src/uapicodegen/templates/Optional_.java', output_dir)
-
-
-if __name__ == '__main__':
-    main()
+        shutil.copy2('uapicodegen/templates/Optional_.java', output_dir)
