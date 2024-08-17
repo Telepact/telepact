@@ -92,6 +92,21 @@ import java.util.function.Function;
     {%- if '!' in field_name %}new Optional_<>({{ caller() }}){% else %}{{ caller ()}}{% endif %}
 {%- endmacro -%}
 
+{%- macro docstring(data) -%}
+    {%- if '///' in data %}
+/**
+        {%- set doc = data['///'] -%}
+        {%- if doc is iterable and doc is not string -%}
+            {%- for line in doc %}
+ *{{ line }}
+            {%- endfor %}
+        {%- else %}
+ *{{ doc }}
+        {%- endif %}
+ */
+    {%- endif %}
+{%- endmacro %}
+
 
 {%- macro translate(type, optional) -%}
     {%- if optional %}
@@ -117,18 +132,7 @@ import java.util.function.Function;
 {%- macro struct(data, schema_key, alt_name, modifier, implements) %}
     {%- set fields = data[schema_key] %}
     {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
-    {%- if '///' in data %}
-/**
-        {%- set doc = data['///'] -%}
-        {%- if doc is iterable and doc is not string -%}
-            {%- for line in doc %}
- *{{ line }}
-            {%- endfor %}
-        {%- else %}
- *{{ doc }}
-        {%- endif %}
- */
-    {%- endif %}
+    {{ docstring(data) }}
 public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
     public {{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '')}};
@@ -182,18 +186,7 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
         {%- set schema_key = 'Output' %}
     {%- endif %}
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
-    {%- if '///' in data %}
-/**
-        {%- set doc = data['///'] -%}
-        {%- if doc is iterable and doc is not string -%}
-            {%- for line in doc %}
- *{{ line }}
-            {%- endfor %}
-        {%- else -%}
- *{{ doc }}
-        {%- endif %}
- */
-    {%- endif %}
+    {{ docstring(data) }}
 public sealed interface {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
 
     {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name) | indent }}
