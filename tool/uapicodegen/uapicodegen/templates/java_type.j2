@@ -105,8 +105,11 @@ import java.util.function.Function;
         {%- endif %}
  */
     {%- endif %}
-{%- endmacro %}
+{%- endmacro -%}
 
+{%- macro generics(schema_key) -%}
+    {%- if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif -%}
+{%- endmacro -%}
 
 {%- macro translate(type, optional) -%}
     {%- if optional %}
@@ -129,11 +132,12 @@ import java.util.function.Function;
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro struct(data, schema_key, alt_name, modifier, implements) %}
+{%- macro struct(data, schema_key, alt_name, modifier, implements, genericStr) %}
+    {%- set finalGenericString = genericStr if genericStr else ''%}
     {%- set fields = data[schema_key] %}
     {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
     {{ docstring(data) }}
-public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %}{% if implements %} implements {{ implements }}{% endif %} {
+public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
     public {{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '')}};
     {%- endfor %}
@@ -146,18 +150,20 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
 
     public {{ java_name -}}
         (Map<String, Object> map
-        {%- if '<1>' in schema_key %}, Function<Object, T0> t0Mapper{% endif %}
-        {%- if '<2>' in schema_key %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper{% endif %}
-        {%- if '<3>' in schema_key %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper, Function<Object, T2> t2Mapper{% endif %}) {
+        {%- if 'T2' in genericStr %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper, Function<Object, T2> t2Mapper
+        {%- elif 'T1' in genericStr %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper
+        {%- elif 'T0' in genericStr %}, Function<Object, T0> t0Mapper
+        {%- endif %}) {
             {%- for field_name, field_type in fields.items() %}
             this.{{ field_name | replace('!', '') }} = {{ marshall_java_type_maybe_opt(field_name, field_type) }};
             {%- endfor %}
     }
 
     public Map<String, Object> toPseudoJson(
-        {%- if '<1>' in schema_key %}Function<T0, Object> t0Mapper{% endif %}
-        {%- if '<2>' in schema_key %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper{% endif %}
-        {%- if '<3>' in schema_key %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper, Function<T2, Object> t2Mapper{% endif %}) {
+        {%- if 'T2' in genericStr %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper, Function<T2, Object> t2Mapper
+        {%- elif 'T1' in genericStr %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper
+        {%- elif 'T0' in genericStr %}Function<T0, Object> t0Mapper
+        {%- endif %}) {
         return Map.ofEntries(
             {%- for field_name, field_type in fields.items() if '!' not in field_name %}
             Map.entry("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ field_name }}{% endcall %}){% if not loop.last %},{% endif %}
@@ -166,7 +172,7 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
     }
 
     {%- for field_name, field_type in fields.items() %}
-    public {{ java_name }} {{ field_name | replace('!', '')}}({{ translate(field_type, false) }} {{ field_name | replace('!', '')}}) {
+    public {{ java_name + finalGenericString }} {{ field_name | replace('!', '')}}({{ translate(field_type, false) }} {{ field_name | replace('!', '')}}) {
         this.{{ field_name | replace('!', '') }} = {% call setter_maybe_opt(field_name) %}{{ field_name | replace('!', '')}}{% endcall %};
         return this;
     }
@@ -186,14 +192,15 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
         {%- set schema_key = 'Output' %}
     {%- endif %}
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- set genericStr = schema_key | regex_replace('^\\..*', '') | regex_replace('^.*[^<]*', '') %}
     {{ docstring(data) }}
-public sealed interface {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
+public sealed interface {{ java_name }}{{ generics(schema_key) }} {
 
     {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name) | indent }}
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}
-        {{ struct(case_entry, case_key, None, 'final ', java_name) | indent }}
+        {{ struct(case_entry, case_key, None, 'final ', java_name + generics(schema_key), generics(schema_key)) | indent }}
     {%- endfor %}
 }
 {%- endmacro %}
@@ -215,7 +222,7 @@ public final class {{ java_name }} {
 {%- set schema_key = data | find_schema_key %}
 
 {%- if schema_key.startswith('struct') %}
-    {{ struct(data, schema_key, None, "", None) }}
+    {{ struct(data, schema_key, None, "", None, generics(schema_key)) }}
 {%- elif schema_key.startswith('union') %}
     {{ union(data, schema_key) }}
 {%- elif schema_key.startswith('fn') %}

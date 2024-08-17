@@ -95,6 +95,30 @@
         }]
     },
     {
+        "///": " A union             ",
+        "union<1>.Un2": [{
+            "///": [
+                " First union entry   ",
+                "                     ",
+                " This is first.      "
+            ],
+            "First": {
+                "field1": ["integer"], 
+                "field2": ["T0"]
+            }
+        }, {
+            "///": [
+                " Second union entry  ",
+                "                     ",
+                " This is second.     "
+            ],
+            "Second": {
+                "field1": ["string"], 
+                "field2": ["boolean"]
+            }
+        }]
+    },    
+    {
         "///": [
             " A function         ",
             "                     ",
