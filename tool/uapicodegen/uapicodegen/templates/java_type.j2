@@ -119,11 +119,16 @@ import java.util.function.Function;
     {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
     {%- if '///' in data %}
 /**
-{%- for line in data['///'] %}
+        {%- set doc = data['///'] -%}
+        {%- if doc is iterable and doc is not string -%}
+            {%- for line in doc %}
  *{{ line }}
-{%- endfor %}
+            {%- endfor %}
+        {%- else %}
+ *{{ doc }}
+        {%- endif %}
  */
-{%- endif %}
+    {%- endif %}
 public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
     public {{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '')}};
@@ -179,11 +184,16 @@ public {{ modifier }}class {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' 
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if '///' in data %}
 /**
-{%- for line in data['///'] %}
+        {%- set doc = data['///'] -%}
+        {%- if doc is iterable and doc is not string -%}
+            {%- for line in doc %}
  *{{ line }}
-{%- endfor %}
+            {%- endfor %}
+        {%- else -%}
+ *{{ doc }}
+        {%- endif %}
  */
-{%- endif %}
+    {%- endif %}
 public sealed interface {{ java_name }}{% if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif %} {
 
     {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name) | indent }}
