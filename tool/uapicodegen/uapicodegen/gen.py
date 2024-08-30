@@ -6,7 +6,6 @@ import jinja2
 import click
 from pathlib import Path
 import re
-from pkg_resources import resource_filename
 
 
 def _validate_package(ctx: click.Context, param: click.Parameter, value: str) -> str:
@@ -59,6 +58,10 @@ def _find_case_key(case_data: dict[str, object]) -> str:
     raise Exception("No case key found")
 
 
+def _raise_error(message: str) -> None:
+    raise Exception(message)
+
+
 def _generate_internal(schema_data: list[dict[str, object]], target: str, output_dir: str, java_package: str) -> None:
 
     # Load jinja template from file
@@ -71,6 +74,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
     template_env.filters['regex_replace'] = _regex_replace
     template_env.filters['find_schema_key'] = _find_schema_key
     template_env.filters['find_case_key'] = _find_case_key
+    template_env.filters['raise_error'] = _raise_error
 
     if "java" == target:
 

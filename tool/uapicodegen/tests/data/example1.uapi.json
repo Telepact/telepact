@@ -9,7 +9,8 @@
             "field1": ["integer"],
             "int": ["boolean?"],
             "long!": ["string"],
-            "field4": ["any"]
+            "field4": ["any"],
+            "field5": ["union.Un1"]
         }
     },
     {

@@ -50,12 +50,20 @@ import java.util.function.Function;
         (T1) t1Mapper.apply({{ caller() }})
     {%- elif typ == 'T2' -%}
         (T2) t2Mapper.apply({{ caller() }})
-    {%- else -%}
+    {%- elif typ.startswith('struct') -%}
         new {{ translate(t) }}((Map<String, Object>) {{ caller() -}}
             {%- for t2 in t[1:] -%}
                 , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
             {%- endfor -%}
             )
+    {%- elif typ.startswith('union') -%}
+        {{ translate(t) }}.fromUnionPsuedoJson((Map<String, Object>) {{ caller() -}}
+            {%- for t2 in t[1:] -%}
+                , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
+            {%- endfor -%}
+            )
+    {%- else -%}
+        {{- ('Unknown type: ' + typ) | raise_error -}}
     {%- endif -%}
 {%- endmacro -%}
 
