@@ -24,7 +24,7 @@ import java.util.function.Function;
     {%- elif typ == 'any' %}
         {{- 'Object' -}}
     {%- else %}
-        {{- t | regex_replace('^.*\\.', '') -}}
+        {{- typ | regex_replace('^.*\\.', '') -}}
     {%- endif %}
 {%- endmacro -%}
 

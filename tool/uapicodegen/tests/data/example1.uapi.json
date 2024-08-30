@@ -39,7 +39,8 @@
     {
         "struct.Example6": {
             "field1": ["boolean"],
-            "field2": ["struct.Example1"]
+            "field2": ["struct.Example1"],
+            "field3": ["struct.Example1?"]
         }
     },
     {
