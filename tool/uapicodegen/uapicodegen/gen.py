@@ -166,7 +166,28 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
         else:
             print(server_output)
 
-        # Copy file to the output directory
-        template_path = resource_filename(
-            'uapicodegen', 'templates/Optional_.java')
-        shutil.copy2(template_path, output_dir)
+        opt_template = template_env.get_template(
+            'java_optional.j2')
+
+        opt_output = opt_template.render(
+            {'package': java_package})
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Use the / operator provided by pathlib to concatenate paths
+            file_name = schema_key.split('.')[1]
+
+            file_path = output_path / f"Optional_.java"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(opt_output)
+
+        else:
+            print(server_output)
