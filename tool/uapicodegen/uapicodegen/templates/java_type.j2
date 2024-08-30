@@ -129,7 +129,7 @@ import java.util.function.Function;
 
 {%- macro sanitize_field_name(field_name) -%}
     {%- set sanitized_name =  field_name | replace('!', '') -%}
-    {%- set java_keywords = ["while", "volatile", "strictfp", "void", "try", "transient", "throws", "throw", "this", "synchronized", "switch", "super", "static", "short", "return", "public", "protected", "private", "package", "new", "native", "long", "interface", "int", "instanceof", "import", "implements", "if", "goto", "final", "finally", "float", "extends", "enum", "else", "double", "do", "default", "continue", "const", "class", "char", "catch", "case", "byte", "break", "boolean", "assert", "abstract"] %}
+    {%- set java_keywords = ["build", "while", "volatile", "strictfp", "void", "try", "transient", "throws", "throw", "this", "synchronized", "switch", "super", "static", "short", "return", "public", "protected", "private", "package", "new", "native", "long", "interface", "int", "instanceof", "import", "implements", "if", "goto", "final", "finally", "float", "extends", "enum", "else", "double", "do", "default", "continue", "const", "class", "char", "catch", "case", "byte", "break", "boolean", "assert", "abstract"] %}
     {%- if sanitized_name in java_keywords -%}
         {{- sanitized_name + '_' -}}
     {%- else -%}
@@ -165,8 +165,14 @@ import java.util.function.Function;
     {{ docstring(data) }}
 public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
-    public {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name) }};
+    public final {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name) }};
     {%- endfor %}
+
+    public {{ java_name }}(Builder{{ finalGenericString }} b) {
+        {%- for field_name, field_type in fields.items() %}
+        this.{{ sanitize_field_name(field_name) }} = b.{{ sanitize_field_name(field_name) }};
+        {%- endfor %}
+    }
 
     public {{ java_name -}}
         (Map<String, Object> map
@@ -198,18 +204,25 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
     }
     {%- endif %}
 
-    {%- for field_name, field_type in fields.items() %}
-    public {{ java_name + finalGenericString }} {{ sanitize_field_name(field_name) }}({{ translate(field_type, false) }} {{ sanitize_field_name(field_name) }}) {
-        this.{{ sanitize_field_name(field_name) }} = {% call setter_maybe_opt(field_name) %}{{ sanitize_field_name(field_name) }}{% endcall %};
-        return this;
+    public static class Builder{{ finalGenericString }} {
+        {%- for field_name, field_type in fields.items() %}
+        private {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name) }}{% if '!' in field_name %} = new Optional_<>(){% endif %};
+        {%- endfor %}
+
+        public Builder() {
+        }
+
+        {%- for field_name, field_type in fields.items() %}
+        public Builder{{ finalGenericString }} {{ sanitize_field_name(field_name) }}({{ translate(field_type, false) }} {{ sanitize_field_name(field_name) }}) {
+            this.{{ sanitize_field_name(field_name) }} = {% call setter_maybe_opt(field_name) %}{{ sanitize_field_name(field_name) }}{% endcall %};
+            return this;
+        }
+        {%- endfor %}
+
+        public {{ java_name + finalGenericString }} build() {
+            return new {{ java_name + finalGenericString }}(this);
+        }
     }
-    {%- endfor %}
-    
-    {%- for field_name, field_type in fields.items() %}
-    public {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name)  }}() {
-        return this.{{ sanitize_field_name(field_name) }};
-    }
-    {%- endfor %}
 }
 {%- endmacro %}
 
