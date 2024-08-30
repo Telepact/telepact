@@ -169,14 +169,14 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
             Map.entry("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ field_name }}{% endcall %}){% if not loop.last %},{% endif %}
             {%- endfor %}
         );
-        {%- if unionCase %}
-        return Map.ofEntries(
-            Map.entry("{{ unionCase }}", fields)
-        );
-        {%- else %}
         return fields;
-        {%- endif %}
     }
+
+    {%- if unionCase %}
+    public String getCase() {
+        return "{{ unionCase }}";
+    }
+    {%- endif %}
 
     {%- for field_name, field_type in fields.items() %}
     public {{ java_name + finalGenericString }} {{ field_name | replace('!', '')}}({{ translate(field_type, false) }} {{ field_name | replace('!', '')}}) {
@@ -203,6 +203,8 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
     {{ docstring(data) }}
 public sealed interface {{ java_name }}{{ generics(schema_key) }} {
 
+    {%- set genericStr2 = generics(schema_key) %}
+
     {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name + generics(schema_key), generics(schema_key), 'NoMatch_') | indent }}
 
     {%- for case_entry in cases %}
@@ -210,13 +212,54 @@ public sealed interface {{ java_name }}{{ generics(schema_key) }} {
         {{ struct(case_entry, case_key, None, 'final ', java_name + generics(schema_key), generics(schema_key), case_key) | indent }}
     {%- endfor %}
 
-    {%- set genericStr2 = generics(schema_key) %}
+    public static {{ genericStr2 }} {{ java_name }}{{ generics(schema_key) }} fromUnionPsuedoJson(Map<String, Object> map
+        {%- if 'T2' in genericStr2 %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper, Function<Object, T2> t2Mapper
+        {%- elif 'T1' in genericStr2 %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper
+        {%- elif 'T0' in genericStr2 %}, Function<Object, T0> t0Mapper
+        {%- endif %}) {
+        var entry = map.entrySet().stream().findAny().get();
+        var caseName = entry.getKey();
+        var payload = (Map<String, Object>) entry.getValue();        
+        switch (caseName) {
+            {%- for case_entry in cases %}
+                {% set case_key = case_entry | find_case_key %}
+            case "{{ case_key }}":
+                return new {{ case_entry | find_case_key }}{{ genericStr2 }}(
+                    payload
+                    {%- if 'T2' in genericStr2 %}, t0Mapper, t1Mapper, t2Mapper
+                    {%- elif 'T1' in genericStr2 %}, t0Mapper, t1Mapper
+                    {%- elif 'T0' in genericStr2 %}, t0Mapper
+                    {%- endif %}
+                );
+            {%- endfor %}
+            default:
+                return new NoMatch_{{ genericStr2 }}();
+        }
+    }
 
     public Map<String, Object> toPseudoJson(
         {%- if 'T2' in genericStr2 %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper, Function<T2, Object> t2Mapper
         {%- elif 'T1' in genericStr2 %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper
         {%- elif 'T0' in genericStr2 %}Function<T0, Object> t0Mapper
         {%- endif %});
+
+    public String getCase();
+
+    public default Map<String, Object> toUnionPseudoJson(
+        {%- if 'T2' in genericStr2 %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper, Function<T2, Object> t2Mapper
+        {%- elif 'T1' in genericStr2 %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper
+        {%- elif 'T0' in genericStr2 %}Function<T0, Object> t0Mapper
+        {%- endif %}) {
+        return Map.ofEntries(
+            Map.entry(this.getCase(), this.toPseudoJson(
+                {%- if 'T2' in genericStr2 %}t0Mapper, t1Mapper, t2Mapper
+                {%- elif 'T1' in genericStr2 %}t0Mapper, t1Mapper
+                {%- elif 'T0' in genericStr2 %}t0Mapper
+                {%- endif %})
+            )
+        );        
+    }
+
 }
 {%- endmacro %}
 
