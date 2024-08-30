@@ -23,6 +23,8 @@ import java.util.function.Function;
         {{- 'String' -}}
     {%- elif typ == 'any' %}
         {{- 'Object' -}}
+    {%- elif typ.startswith('fn.') %}
+        {{- typ | regex_replace('^.*\\.', '') -}}.Input
     {%- else %}
         {{- typ | regex_replace('^.*\\.', '') -}}
     {%- endif %}
@@ -50,7 +52,7 @@ import java.util.function.Function;
         (T1) t1Mapper.apply({{ caller() }})
     {%- elif typ == 'T2' -%}
         (T2) t2Mapper.apply({{ caller() }})
-    {%- elif typ.startswith('struct') -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
         new {{ translate(t) }}((Map<String, Object>) {{ caller() -}}
             {%- for t2 in t[1:] -%}
                 , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}

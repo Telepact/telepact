@@ -10,7 +10,8 @@
             "int": ["boolean?"],
             "long!": ["string"],
             "field4": ["any"],
-            "field5": ["union.Un1"]
+            "field5": ["union.Un1"],
+            "field6": ["fn.test2"]
         }
     },
     {
