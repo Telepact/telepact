@@ -7,8 +7,9 @@
         ],
         "struct.Example1": {
             "field1": ["integer"],
-            "field2": ["boolean"],
-            "field3!": ["string"]
+            "field2": ["boolean?"],
+            "field3!": ["string"],
+            "field4": ["any"]
         }
     },
     {

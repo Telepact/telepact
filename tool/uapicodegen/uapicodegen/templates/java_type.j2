@@ -21,6 +21,8 @@ import java.util.function.Function;
         {{- 'Number' -}}
     {%- elif typ == 'string' %}
         {{- 'String' -}}
+    {%- elif typ == 'any' %}
+        {{- 'Object' -}}
     {%- else %}
         {{- t | regex_replace('^.*\\.', '') -}}
     {%- endif %}
@@ -40,6 +42,8 @@ import java.util.function.Function;
         ({{- 'Number' -}}) {{ caller() }}
     {%- elif typ == 'string' -%}
         ({{- 'String' -}}) {{ caller() }}
+    {%- elif typ == 'any' -%}
+        ({{- 'Object' -}}) {{ caller() }}
     {%- elif typ == 'T0' -%}
         (T0) t0Mapper.apply({{ caller() }})
     {%- elif typ == 'T1' -%}
@@ -68,6 +72,8 @@ import java.util.function.Function;
     {%- elif typ == 'number' -%}
         {{ caller() }}
     {%- elif typ == 'string' -%}
+        {{ caller() }}
+    {%- elif typ == 'any' -%}
         {{ caller() }}
     {%- elif typ == 'T0' -%}
         t0Mapper.apply({{ caller() }})
@@ -141,12 +147,6 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
     {%- for field_name, field_type in fields.items() %}
     public {{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '')}};
     {%- endfor %}
-
-    public {{ java_name }}({% for field_name, field_type in fields.items() %}{{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '') }}{% if not loop.last %}, {% endif %}{% endfor %}) {
-        {%- for field_name, field_type in fields.items() %}
-        this.{{ field_name | replace('!', '') }} = {{ field_name | replace('!', '') }};
-        {%- endfor %}
-    }
 
     public {{ java_name -}}
         (Map<String, Object> map
@@ -233,7 +233,13 @@ public sealed interface {{ java_name }}{{ generics(schema_key) }} {
                 );
             {%- endfor %}
             default:
-                return new NoMatch_{{ genericStr2 }}();
+                return new NoMatch_{{ genericStr2 }}(
+                    payload
+                    {%- if 'T2' in genericStr2 %}, t0Mapper, t1Mapper, t2Mapper
+                    {%- elif 'T1' in genericStr2 %}, t0Mapper, t1Mapper
+                    {%- elif 'T0' in genericStr2 %}, t0Mapper
+                    {%- endif %}
+                );
         }
     }
 
