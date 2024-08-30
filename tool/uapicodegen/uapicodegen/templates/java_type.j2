@@ -117,6 +117,16 @@ import java.util.function.Function;
     {%- if '<1>' in schema_key %}{{ '<T0>' }}{% elif '<2>' in schema_key %}{{ '<T0, T1>'}}{% elif '<3>' in schema_key %}{{ '<T0, T1, T2>' }}{% endif -%}
 {%- endmacro -%}
 
+{%- macro sanitize_field_name(field_name) -%}
+    {%- set sanitized_name =  field_name | replace('!', '') -%}
+    {%- set java_keywords = ["while", "volatile", "strictfp", "void", "try", "transient", "throws", "throw", "this", "synchronized", "switch", "super", "static", "short", "return", "public", "protected", "private", "package", "new", "native", "long", "interface", "int", "instanceof", "import", "implements", "if", "goto", "final", "finally", "float", "extends", "enum", "else", "double", "do", "default", "continue", "const", "class", "char", "catch", "case", "byte", "break", "boolean", "assert", "abstract"] %}
+    {%- if sanitized_name in java_keywords -%}
+        {{- sanitized_name + '_' -}}
+    {%- else -%}
+        {{- sanitized_name -}}
+    {%- endif -%}
+{%- endmacro -%}
+
 {%- macro translate(type, optional) -%}
     {%- if optional %}
         {{- 'Optional_<' -}}
@@ -145,7 +155,7 @@ import java.util.function.Function;
     {{ docstring(data) }}
 public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
-    public {{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '')}};
+    public {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name) }};
     {%- endfor %}
 
     public {{ java_name -}}
@@ -155,7 +165,7 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
         {%- elif 'T0' in genericStr %}, Function<Object, T0> t0Mapper
         {%- endif %}) {
             {%- for field_name, field_type in fields.items() %}
-            this.{{ field_name | replace('!', '') }} = {{ marshall_java_type_maybe_opt(field_name, field_type) }};
+            this.{{ sanitize_field_name(field_name) }} = {{ marshall_java_type_maybe_opt(field_name, field_type) }};
             {%- endfor %}
     }
 
@@ -166,7 +176,7 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
         {%- endif %}) {
         Map<String, Object> fields = Map.ofEntries(
             {%- for field_name, field_type in fields.items() if '!' not in field_name %}
-            Map.entry("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ field_name }}{% endcall %}){% if not loop.last %},{% endif %}
+            Map.entry("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ sanitize_field_name(field_name) }}{% endcall %}){% if not loop.last %},{% endif %}
             {%- endfor %}
         );
         return fields;
@@ -179,15 +189,15 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
     {%- endif %}
 
     {%- for field_name, field_type in fields.items() %}
-    public {{ java_name + finalGenericString }} {{ field_name | replace('!', '')}}({{ translate(field_type, false) }} {{ field_name | replace('!', '')}}) {
-        this.{{ field_name | replace('!', '') }} = {% call setter_maybe_opt(field_name) %}{{ field_name | replace('!', '')}}{% endcall %};
+    public {{ java_name + finalGenericString }} {{ sanitize_field_name(field_name) }}({{ translate(field_type, false) }} {{ sanitize_field_name(field_name) }}) {
+        this.{{ sanitize_field_name(field_name) }} = {% call setter_maybe_opt(field_name) %}{{ sanitize_field_name(field_name) }}{% endcall %};
         return this;
     }
     {%- endfor %}
     
     {%- for field_name, field_type in fields.items() %}
-    public {{ translate(field_type, '!' in field_name) }} {{ field_name | replace('!', '') }}() {
-        return this.{{ field_name | replace('!', '')}};
+    public {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name)  }}() {
+        return this.{{ sanitize_field_name(field_name) }};
     }
     {%- endfor %}
 }
