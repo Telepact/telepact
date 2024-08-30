@@ -132,7 +132,7 @@ import java.util.function.Function;
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro struct(data, schema_key, alt_name, modifier, implements, genericStr) %}
+{%- macro struct(data, schema_key, alt_name, modifier, implements, genericStr, unionCase) %}
     {%- set finalGenericString = genericStr if genericStr else ''%}
     {%- set fields = data[schema_key] %}
     {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
@@ -164,11 +164,18 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
         {%- elif 'T1' in genericStr %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper
         {%- elif 'T0' in genericStr %}Function<T0, Object> t0Mapper
         {%- endif %}) {
-        return Map.ofEntries(
+        Map<String, Object> fields = Map.ofEntries(
             {%- for field_name, field_type in fields.items() if '!' not in field_name %}
             Map.entry("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ field_name }}{% endcall %}){% if not loop.last %},{% endif %}
             {%- endfor %}
         );
+        {%- if unionCase %}
+        return Map.ofEntries(
+            Map.entry("{{ unionCase }}", fields)
+        );
+        {%- else %}
+        return fields;
+        {%- endif %}
     }
 
     {%- for field_name, field_type in fields.items() %}
@@ -196,12 +203,20 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
     {{ docstring(data) }}
 public sealed interface {{ java_name }}{{ generics(schema_key) }} {
 
-    {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name) | indent }}
+    {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name + generics(schema_key), generics(schema_key), 'NoMatch_') | indent }}
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}
-        {{ struct(case_entry, case_key, None, 'final ', java_name + generics(schema_key), generics(schema_key)) | indent }}
+        {{ struct(case_entry, case_key, None, 'final ', java_name + generics(schema_key), generics(schema_key), case_key) | indent }}
     {%- endfor %}
+
+    {%- set genericStr2 = generics(schema_key) %}
+
+    public Map<String, Object> toPseudoJson(
+        {%- if 'T2' in genericStr2 %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper, Function<T2, Object> t2Mapper
+        {%- elif 'T1' in genericStr2 %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper
+        {%- elif 'T0' in genericStr2 %}Function<T0, Object> t0Mapper
+        {%- endif %});
 }
 {%- endmacro %}
 
@@ -210,7 +225,7 @@ public sealed interface {{ java_name }}{{ generics(schema_key) }} {
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
 public final class {{ java_name }} {
 
-    {{ struct(data, schema_key, 'Input', 'static ', None) | indent }}
+    {{ struct(data, schema_key, 'Input', 'static ', None, '', None) | indent }}
 
     {% do data.pop('///', None) %}
 
@@ -222,7 +237,7 @@ public final class {{ java_name }} {
 {%- set schema_key = data | find_schema_key %}
 
 {%- if schema_key.startswith('struct') %}
-    {{ struct(data, schema_key, None, "", None, generics(schema_key)) }}
+    {{ struct(data, schema_key, None, "", None, generics(schema_key), None) }}
 {%- elif schema_key.startswith('union') %}
     {{ union(data, schema_key) }}
 {%- elif schema_key.startswith('fn') %}

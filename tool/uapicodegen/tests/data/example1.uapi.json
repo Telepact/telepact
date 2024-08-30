@@ -117,7 +117,29 @@
                 "field2": ["boolean"]
             }
         }]
-    },    
+    },
+    {
+        "///": " A union             ",
+        "union<2>.Result": [{
+            "///": [
+                " First union entry   ",
+                "                     ",
+                " This is first.      "
+            ],
+            "Ok": {
+                "value": ["T0"]
+            }
+        }, {
+            "///": [
+                " Second union entry  ",
+                "                     ",
+                " This is second.     "
+            ],
+            "Err": {
+                "value": ["T1"]
+            }
+        }]
+    },      
     {
         "///": [
             " A function         ",
