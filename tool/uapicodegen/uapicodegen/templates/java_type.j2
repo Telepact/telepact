@@ -59,7 +59,7 @@ import java.util.function.Function;
             {%- endfor -%}
             )
     {%- elif typ.startswith('union') -%}
-        {{ translate(t) }}.fromUnionPsuedoJson((Map<String, Object>) {{ caller() -}}
+        {{ to_java_type(t[0]) }}.fromUnionPsuedoJson((Map<String, Object>) {{ caller() -}}
             {%- for t2 in t[1:] -%}
                 , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
             {%- endfor -%}
