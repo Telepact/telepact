@@ -91,7 +91,7 @@ import java.util.function.Function;
 {%- endmacro -%}
 
 {%- macro marshall_java_type_maybe_opt(field_name, field_type) -%}
-    {%- if '!' in field_name %}map.containsKey("{{ field_name }}") ? new Optional_<>({% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}) : new Optional_<>(){% else %}{% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}{% endif -%}
+    {%- if '!' in field_name %}map.containsKey("{{ field_name }}") ? new Optional_<{{ translate(field_type, False) }}>({% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}) : new Optional_<>(){% else %}{% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}{% endif -%}
 {%- endmacro -%}
 
 {%- macro setter_maybe_opt(field_name) -%}
