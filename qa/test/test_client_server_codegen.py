@@ -49,6 +49,7 @@ def test_client_server_codegen_case(loop, client_server_codegen_proc, nats_clien
     topics = client_server_codegen_proc
 
     async def t():
+        # TODO: Don't use headers, instead pass flag through the server props above
         this_req = dc(req)
         this_req[0]['useCodeGen'] = True
         await verify_client_case(nats_client, dc(req), dc(res), *topics)
