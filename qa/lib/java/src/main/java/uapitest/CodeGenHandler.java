@@ -275,10 +275,6 @@ public class CodeGenHandler extends ServerHandler_ {
                 outputBuilder.value(new Value.Builder().arrP2StrAny(mapArrP2Str(v)).build());
             });
 
-            //
-            // TODO: Need to keep going vvv
-            //
-
             top.struct.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().struct(mapStruct(v)).build());
             });
@@ -356,173 +352,122 @@ public class CodeGenHandler extends ServerHandler_ {
                         new Value.Builder().arrP2StrUnion(mapArr(v, p2 -> mapP2Str(p2, u -> mapUnion(u)))).build());
             });
             top.fn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().fn(v).build());
+                outputBuilder.value(new Value.Builder().fn(mapFn(v)).build());
             });
             top.nullFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullFn(v).build());
+                outputBuilder.value(new Value.Builder().nullFn(mapFn(v)).build());
             });
             top.arrFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().arrFn(list).build());
+                outputBuilder.value(new Value.Builder().arrFn(mapArr(v, f -> mapFn(f))).build());
             });
             top.arrNullFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().arrNullFn(list).build());
+                outputBuilder.value(new Value.Builder().arrNullFn(mapArr(v, f -> mapFn(f))).build());
             });
             top.objFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().objFn(list).build());
+                outputBuilder.value(new Value.Builder().objFn(mapObj(v, f -> mapFn(f))).build());
             });
             top.objNullFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().objNullFn(list).build());
+                outputBuilder.value(new Value.Builder().objNullFn(mapObj(v, f -> mapFn(f))).build());
             });
             top.pStrFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().pStrFn(list).build());
+                outputBuilder.value(new Value.Builder().pStrFn(mapPStr(v, f -> mapFn(f))).build());
             });
             top.pStrNullFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().pStrNullFn(list).build());
+                outputBuilder.value(new Value.Builder().pStrNullFn(mapPStr(v, f -> mapFn(f))).build());
             });
             top.pUnionFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().pUnionFn(list).build());
+                outputBuilder.value(new Value.Builder().pUnionFn(mapPUnion(v, f -> mapFn(f))).build());
             });
             top.pUnionNullFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().pUnionNullFn(list).build());
+                outputBuilder.value(new Value.Builder().pUnionNullFn(mapPUnion(v, f -> mapFn(f))).build());
             });
             top.arrPStrFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().arrPStrFn(list).build());
+                outputBuilder.value(new Value.Builder().arrPStrFn(mapArr(v, p -> mapPStr(p, f -> mapFn(f)))).build());
             });
             top.arrP2StrFn.ifPresent(v -> {
-                List<example.Input> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new example.Input.Builder();
-                            v1.optional.ifPresent(b1::optional);
-                            b1.required(v1.required);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().arrP2StrFn(list).build());
+                outputBuilder
+                        .value(new Value.Builder().arrP2StrFn(mapArr(v, p2 -> mapP2Str(p2, f -> mapFn(f)))).build());
             });
             top.p2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().p2Str(v).build());
+                outputBuilder.value(new Value.Builder().p2Str(mapP2Str(v)).build());
             });
             top.nullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullP2Str(v).build());
+                outputBuilder.value(new Value.Builder().nullP2Str(mapP2Str(v)).build());
             });
             top.arrP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2Str(v).build());
+                outputBuilder.value(new Value.Builder().arrP2Str(mapArr(v, p -> mapP2Str(p))).build());
             });
             top.arrNullP2Str.ifPresent(v -> {
-                List<P2Str<Boolean, Integer>> list = v.stream()
-                        .map(v1 -> {
-                            var b1 = new P2Str.Builder<Boolean, Integer>();
-                            b1.wrap(v1.wrap);
-                            b1.nest(v1.nest);
-                            return b1.build();
-                        })
-                        .toList();
-                outputBuilder.value(new Value.Builder().arrNullP2Str(list).build());
+                outputBuilder.value(new Value.Builder().arrNullP2Str(mapArr(v, p -> mapP2Str(p))).build());
             });
             top.objP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objP2Str(v).build());
+                outputBuilder.value(new Value.Builder().objP2Str(mapObj(v, p -> mapP2Str(p))).build());
             });
             top.objNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullP2Str(v).build());
+                outputBuilder.value(new Value.Builder().objNullP2Str(mapObj(v, p -> mapP2Str(p))).build());
             });
             top.pStrP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrP2Str(v).build());
+                outputBuilder.value(new Value.Builder().pStrP2Str(mapPStr(v, p -> mapP2Str(p))).build());
             });
             top.pStrNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullP2Str(v).build());
+                outputBuilder.value(new Value.Builder().pStrNullP2Str(mapPStr(v, p -> mapP2Str(p))).build());
             });
             top.pUnionP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionP2Str(v).build());
+                outputBuilder.value(new Value.Builder().pUnionP2Str(mapPUnion(v, p -> mapP2Str(p))).build());
             });
             top.pUnionNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullP2Str(v).build());
+                outputBuilder.value(new Value.Builder().pUnionNullP2Str(mapPUnion(v, p -> mapP2Str(p))).build());
             });
             top.arrPStrP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrP2Str(v).build());
+                outputBuilder.value(
+                        new Value.Builder().arrPStrP2Str(mapArr(v, p -> mapPStr(p, p2 -> mapP2Str(p2)))).build());
             });
             top.arrP2StrP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrP2Str(v).build());
+                outputBuilder.value(
+                        new Value.Builder().arrP2StrP2Str(mapArr(v, p2 -> mapP2Str(p2, p22 -> mapP2Str(p22)))).build());
             });
             top.p2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().p2Union(v).build());
+                outputBuilder.value(new Value.Builder().p2Union(mapP2Union(v)).build());
             });
             top.nullP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullP2Union(v).build());
+                outputBuilder.value(new Value.Builder().nullP2Union(mapP2Union(v)).build());
             });
             top.arrP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2Union(v).build());
+                outputBuilder.value(new Value.Builder().arrP2Union(mapArr(v, p -> mapP2Union(p))).build());
+            });
+
+            top.arrNullP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().arrNullP2Union(mapArr(v, p -> mapP2Union(p))).build());
+            });
+            top.objP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().objP2Union(mapObj(v, p -> mapP2Union(p))).build());
+            });
+            top.objNullP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().objNullP2Union(mapObj(v, p -> mapP2Union(p))).build());
+            });
+            top.pStrP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().pStrP2Union(mapPStr(v, p -> mapP2Union(p))).build());
+            });
+            top.pStrNullP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().pStrNullP2Union(mapPStr(v, p -> mapP2Union(p))).build());
+            });
+            top.pUnionP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().pUnionP2Union(mapPUnion(v, p -> mapP2Union(p))).build());
+            });
+            top.pUnionNullP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder().pUnionNullP2Union(mapPUnion(v, p -> mapP2Union(p))).build());
+            });
+            top.arrPStrP2Union.ifPresent(v -> {
+                outputBuilder.value(
+                        new Value.Builder().arrPStrP2Union(mapArr(v, p -> mapPStr(p, p2 -> mapP2Union(p2)))).build());
+            });
+            top.arrP2StrP2Union.ifPresent(v -> {
+                outputBuilder.value(new Value.Builder()
+                        .arrP2StrP2Union(mapArr(v, p2 -> mapP2Str(p2, p22 -> mapP2Union(p22)))).build());
+            });
+            top.pdStr.ifPresent(v -> {
+                PdStr<PStr<Boolean>> pdStr = new PdStr.Builder<PStr<Boolean>>().dwrap(v.dwrap).build();
+                outputBuilder.value(new Value.Builder().pdStr(pdStr).build());
             });
 
         });
@@ -591,12 +536,27 @@ public class CodeGenHandler extends ServerHandler_ {
         };
     }
 
+    private static example.Input mapFn(example.Input f) {
+        var b = new example.Input.Builder();
+        f.optional.ifPresent(b::optional);
+        b.required(f.required);
+        return b.build();
+    }
+
     private static <T> List<T> mapArr(List<T> l, Function<T, T> mapper) {
         return l.stream().map(e -> mapper.apply(e)).toList();
     }
 
     private static <T> Map<String, T> mapObj(Map<String, T> m, Function<T, T> mapper) {
         return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> mapper.apply(e.getValue())));
+    }
+
+    private static <T, U> P2Union<T, U> mapP2Union(P2Union<T, U> u) {
+        return switch (u) {
+            case P2Union.NoMatch_<T, U> v -> new P2Union.NoMatch_.Builder<T, U>().build();
+            case P2Union.One<T, U> v -> new P2Union.One.Builder<T, U>().build();
+            case P2Union.Two<T, U> v -> new P2Union.Two.Builder<T, U>().ewrap(v.ewrap).enest(v.enest).build();
+        };
     }
 
     @Override
