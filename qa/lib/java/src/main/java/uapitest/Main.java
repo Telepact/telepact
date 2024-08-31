@@ -84,6 +84,8 @@ public class Main {
         options.useBinary = defaultBinary;
         var client = new Client(adapter, options);
 
+        var generatedClient = new ClientInterface_(client);
+
         var dispatcher = connection.createDispatcher((msg) -> {
             try {
                 var requestBytes = msg.getData();
@@ -97,8 +99,15 @@ public class Main {
                 var request = new Message(requestHeaders, requestBody);
 
                 Message response;
-                try (var time = timers.time()) {
-                    response = client.request(request);
+
+                if (Objects.equals(requestHeaders.get("_useCodeGen"), true)) {
+                    var output = generatedClient.test(requestHeaders, new test.Input(requestBody));
+                    response = new Message(new HashMap<>(), output.toUnionPseudoJson());
+                } else {
+
+                    try (var time = timers.time()) {
+                        response = client.request(request);
+                    }
                 }
 
                 var responsePseudoJson = List.of(response.header, response.body);
@@ -256,6 +265,8 @@ public class Main {
 
         var serveAlternateServer = new AtomicBoolean();
 
+        CodeGenHandler codeGenHandler = new CodeGenHandler();
+
         class ThisError extends RuntimeException {
         }
 
@@ -266,23 +277,32 @@ public class Main {
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
-                System.out.println("    <-s %s".formatted(new String(requestBytes)));
-                System.out.flush();
+                Message message;
+                if (Objects.equals(requestHeaders.get("_useCodeGen"), true)) {
 
-                io.nats.client.Message natsResponseMessage;
-                try {
-                    natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    message = codeGenHandler.handler(requestMessage);
+                } else {
+                    System.out.println("    <-s %s".formatted(new String(requestBytes)));
+                    System.out.flush();
+
+                    io.nats.client.Message natsResponseMessage;
+                    try {
+                        natsResponseMessage = connection.request(backdoorTopic, requestBytes, Duration.ofSeconds(5));
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    var responseBytes = natsResponseMessage.getData();
+
+                    System.out.println("    ->s %s".formatted(new String(responseBytes)));
+                    System.out.flush();
+
+                    var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
+                    var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
+                    var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
+
+                    message = new Message(responseHeaders, responseBody);
+
                 }
-                var responseBytes = natsResponseMessage.getData();
-
-                System.out.println("    ->s %s".formatted(new String(responseBytes)));
-                System.out.flush();
-
-                var responsePseudoJson = objectMapper.readValue(responseBytes, List.class);
-                var responseHeaders = (Map<String, Object>) responsePseudoJson.get(0);
-                var responseBody = (Map<String, Object>) responsePseudoJson.get(1);
 
                 var toggleAlternateServer = requestHeaders.get("_toggleAlternateServer");
                 if (Objects.equals(true, toggleAlternateServer)) {
@@ -294,7 +314,7 @@ public class Main {
                     throw new ThisError();
                 }
 
-                return new Message(responseHeaders, responseBody);
+                return message;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
