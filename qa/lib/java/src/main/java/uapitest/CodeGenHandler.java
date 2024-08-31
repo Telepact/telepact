@@ -2,6 +2,8 @@ package uapitest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import uapitest.ServerHandler_;
 import uapitest.example.Input;
@@ -278,76 +280,80 @@ public class CodeGenHandler extends ServerHandler_ {
             //
 
             top.struct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().struct(v).build());
+                outputBuilder.value(new Value.Builder().struct(mapStruct(v)).build());
             });
             top.nullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullStruct(v).build());
+                outputBuilder.value(new Value.Builder().nullStruct(mapStruct(v)).build());
             });
             top.arrStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrStruct(v).build());
+                outputBuilder.value(new Value.Builder().arrStruct(mapArr(v, s -> mapStruct(s))).build());
             });
             top.arrNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullStruct(v).build());
+                outputBuilder.value(new Value.Builder().arrNullStruct(mapArr(v, s -> mapStruct(s))).build());
             });
             top.objStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objStruct(v).build());
+                outputBuilder.value(new Value.Builder().objStruct(mapObj(v, s -> mapStruct(s))).build());
             });
             top.objNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullStruct(v).build());
+                outputBuilder.value(new Value.Builder().objNullStruct(mapObj(v, s -> mapStruct(s))).build());
             });
             top.pStrStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrStruct(v).build());
+                outputBuilder.value(new Value.Builder().pStrStruct(mapPStr(v, s -> mapStruct(s))).build());
             });
             top.pStrNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullStruct(v).build());
+                outputBuilder.value(new Value.Builder().pStrNullStruct(mapPStr(v, s -> mapStruct(s))).build());
             });
             top.pUnionStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionStruct(v).build());
+                outputBuilder.value(new Value.Builder().pUnionStruct(mapPUnion(v, s -> mapStruct(s))).build());
             });
             top.pUnionNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullStruct(v).build());
+                outputBuilder.value(new Value.Builder().pUnionNullStruct(mapPUnion(v, s -> mapStruct(s))).build());
             });
             top.arrPStrStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrStruct(v).build());
+                outputBuilder.value(
+                        new Value.Builder().arrPStrStruct(mapArr(v, p -> mapPStr(p, s -> mapStruct(s)))).build());
             });
             top.arrP2StrStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrStruct(v).build());
+                outputBuilder.value(
+                        new Value.Builder().arrP2StrStruct(mapArr(v, p2 -> mapP2Str(p2, s -> mapStruct(s)))).build());
             });
             top.union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().union(v).build());
+                outputBuilder.value(new Value.Builder().union(mapUnion(v)).build());
             });
             top.nullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullUnion(v).build());
+                outputBuilder.value(new Value.Builder().nullUnion(mapUnion(v)).build());
             });
             top.arrUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrUnion(v).build());
+                outputBuilder.value(new Value.Builder().arrUnion(mapArr(v, u -> mapUnion(u))).build());
             });
             top.arrNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullUnion(v).build());
+                outputBuilder.value(new Value.Builder().arrNullUnion(mapArr(v, u -> mapUnion(u))).build());
             });
             top.objUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objUnion(v).build());
+                outputBuilder.value(new Value.Builder().objUnion(mapObj(v, u -> mapUnion(u))).build());
             });
             top.objNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullUnion(v).build());
+                outputBuilder.value(new Value.Builder().objNullUnion(mapObj(v, u -> mapUnion(u))).build());
             });
             top.pStrUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrUnion(v).build());
+                outputBuilder.value(new Value.Builder().pStrUnion(mapPStr(v, u -> mapUnion(u))).build());
             });
             top.pStrNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullUnion(v).build());
+                outputBuilder.value(new Value.Builder().pStrNullUnion(mapPStr(v, u -> mapUnion(u))).build());
             });
             top.pUnionUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionUnion(v).build());
+                outputBuilder.value(new Value.Builder().pUnionUnion(mapPUnion(v, u -> mapUnion(u))).build());
             });
             top.pUnionNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullUnion(v).build());
+                outputBuilder.value(new Value.Builder().pUnionNullUnion(mapPUnion(v, u -> mapUnion(u))).build());
             });
             top.arrPStrUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrUnion(v).build());
+                outputBuilder
+                        .value(new Value.Builder().arrPStrUnion(mapArr(v, p -> mapPStr(p, u -> mapUnion(u)))).build());
             });
             top.arrP2StrUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrUnion(v).build());
+                outputBuilder.value(
+                        new Value.Builder().arrP2StrUnion(mapArr(v, p2 -> mapP2Str(p2, u -> mapUnion(u)))).build());
             });
             top.fn.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().fn(v).build());
@@ -528,7 +534,15 @@ public class CodeGenHandler extends ServerHandler_ {
         return new PStr.Builder<T>().wrap(s.wrap).build();
     }
 
+    private static <T> PStr<T> mapPStr(PStr<T> s, Function<T, T> mapper) {
+        return new PStr.Builder<T>().wrap(mapper.apply(s.wrap)).build();
+    }
+
     private static <T, U> P2Str<T, U> mapP2Str(P2Str<T, U> s) {
+        return new P2Str.Builder<T, U>().wrap(s.wrap).nest(s.nest).build();
+    }
+
+    private static <T, U> P2Str<T, U> mapP2Str(P2Str<T, U> s, Function<U, U> mapper) {
         return new P2Str.Builder<T, U>().wrap(s.wrap).nest(s.nest).build();
     }
 
@@ -540,12 +554,49 @@ public class CodeGenHandler extends ServerHandler_ {
         };
     }
 
+    private static <T> PUnion<T> mapPUnion(PUnion<T> u, Function<T, T> mapper) {
+        return switch (u) {
+            case PUnion.NoMatch_<T> v -> new PUnion.NoMatch_<T>(new PUnion.NoMatch_.Builder<>());
+            case PUnion.One<T> v -> new PUnion.One.Builder<T>().build();
+            case PUnion.Two<T> v -> new PUnion.Two.Builder<T>().ewrap(mapper.apply(v.ewrap)).build();
+        };
+    }
+
     private static <T> List<PStr<T>> mapArrPStr(List<PStr<T>> l) {
         return l.stream().map(v -> mapPStr(v)).toList();
     }
 
     private static <T> List<P2Str<Boolean, T>> mapArrP2Str(List<P2Str<Boolean, T>> l) {
         return l.stream().map(v -> mapP2Str(v)).toList();
+    }
+
+    private static ExStruct mapStruct(ExStruct s) {
+        var b = new ExStruct.Builder();
+        b.required(s.required);
+        s.optional.ifPresent(b::optional);
+        s.optional2.ifPresent(b::optional2);
+        return b.build();
+    }
+
+    private static ExUnion mapUnion(ExUnion u) {
+        return switch (u) {
+            case ExUnion.NoMatch_ v -> new ExUnion.NoMatch_(new ExUnion.NoMatch_.Builder());
+            case ExUnion.One v -> new ExUnion.One.Builder().build();
+            case ExUnion.Two v -> {
+                var b = new ExUnion.Two.Builder();
+                b.required(v.required);
+                v.optional.ifPresent(b::optional);
+                yield b.build();
+            }
+        };
+    }
+
+    private static <T> List<T> mapArr(List<T> l, Function<T, T> mapper) {
+        return l.stream().map(e -> mapper.apply(e)).toList();
+    }
+
+    private static <T> Map<String, T> mapObj(Map<String, T> m, Function<T, T> mapper) {
+        return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> mapper.apply(e.getValue())));
     }
 
     @Override
