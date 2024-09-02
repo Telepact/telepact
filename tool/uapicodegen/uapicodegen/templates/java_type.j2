@@ -3,6 +3,7 @@ package {{ package }};
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.function.Function;
 
@@ -33,9 +34,9 @@ import java.util.function.Function;
 {%- macro marshall_java_type(t, depth) -%}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
-        ((List<Object>) {{ caller() }}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList()
+        ((List<?>) {{ caller() }}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList()
     {%- elif typ == 'object' -%}
-        ((Map<String, Object>) {{ caller() }}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        ((Map<String, ?>) {{ caller() }}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
     {%- elif typ == 'boolean' -%}
         ({{- 'Boolean' -}}) {{ caller() }}
     {%- elif typ == 'integer' -%}
@@ -190,11 +191,16 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
         {%- elif 'T1' in genericStr %}Function<T0, Object> t0Mapper, Function<T1, Object> t1Mapper
         {%- elif 'T0' in genericStr %}Function<T0, Object> t0Mapper
         {%- endif %}) {
-        Map<String, Object> fields = Map.ofEntries(
-            {%- for field_name, field_type in fields.items() if '!' not in field_name %}
-            Map.entry("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ sanitize_field_name(field_name) }}{% endcall %}){% if not loop.last %},{% endif %}
-            {%- endfor %}
-        );
+        Map<String, Object> fields = new HashMap<>();
+        {%- for field_name, field_type in fields.items() %}
+            {%- if '!' in field_name %}
+        this.{{ sanitize_field_name(field_name) }}.ifPresent(f -> {
+            fields.put("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}f{% endcall %});
+        });
+            {%- else %}
+        fields.put("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ sanitize_field_name(field_name) }}{% endcall %});
+            {%- endif %}
+        {%- endfor %}
         return fields;
     }
 

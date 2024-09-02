@@ -36,7 +36,7 @@ import io.nats.client.Options;
 public class Main {
     public static Dispatcher startClientTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String clientFrontdoorTopic,
-            String clientBackdoorTopic, boolean defaultBinary)
+            String clientBackdoorTopic, boolean defaultBinary, boolean useCodeGen)
             throws IOException, InterruptedException {
         var objectMapper = new ObjectMapper();
 
@@ -100,8 +100,9 @@ public class Main {
 
                 Message response;
 
-                if (Objects.equals(requestHeaders.get("_useCodeGen"), true)) {
-                    var output = generatedClient.test(requestHeaders, new test.Input(requestBody));
+                if (useCodeGen) {
+                    var argument = (Map<String, Object>) requestBody.get("fn.test");
+                    var output = generatedClient.test(requestHeaders, new test.Input(argument));
                     response = new Message(new HashMap<>(), output.toUnionPseudoJson());
                 } else {
 
@@ -248,7 +249,7 @@ public class Main {
     public static Dispatcher startTestServer(io.nats.client.Connection connection, MetricRegistry metrics,
             String apiSchemaPath,
             String frontdoorTopic,
-            String backdoorTopic, boolean authRequired)
+            String backdoorTopic, boolean authRequired, boolean useCodeGen)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
         var uApi = UApiSchema.fromJson(json);
@@ -278,8 +279,7 @@ public class Main {
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
 
                 Message message;
-                if (Objects.equals(requestHeaders.get("_useCodeGen"), true)) {
-
+                if (useCodeGen) {
                     message = codeGenHandler.handler(requestMessage);
                 } else {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
@@ -432,9 +432,10 @@ public class Main {
                             var frontdoorTopic = (String) payload.get("frontdoorTopic");
                             var backdoorTopic = (String) payload.get("backdoorTopic");
                             var authRequired = (Boolean) payload.getOrDefault("authRequired!", false);
+                            var useCodeGen = (Boolean) payload.getOrDefault("useCodeGen", false);
 
                             var d = startTestServer(connection, metrics, apiSchemaPath, frontdoorTopic,
-                                    backdoorTopic, authRequired);
+                                    backdoorTopic, authRequired, useCodeGen);
 
                             servers.put(id, d);
                         }
@@ -443,10 +444,11 @@ public class Main {
                             var clientFrontdoorTopic = (String) payload.get("clientFrontdoorTopic");
                             var clientBackdoorTopic = (String) payload.get("clientBackdoorTopic");
                             var useBinary = (Boolean) payload.getOrDefault("useBinary", false);
+                            var useCodeGen = (Boolean) payload.getOrDefault("useCodeGen", false);
 
                             var d = startClientTestServer(connection, metrics, clientFrontdoorTopic,
                                     clientBackdoorTopic,
-                                    useBinary);
+                                    useBinary, useCodeGen);
 
                             servers.put(id, d);
                         }

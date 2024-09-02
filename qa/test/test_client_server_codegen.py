@@ -18,10 +18,10 @@ def client_server_codegen_proc(loop, nats_client, dispatcher_server):
 
     async def t():
         req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path,
-                         'frontdoorTopic': topics[2], 'backdoorTopic': topics[3]}}])
+                         'frontdoorTopic': topics[2], 'backdoorTopic': topics[3], 'useCodeGen': True}}])
         await nats_client.request(lib_name, req.encode(), timeout=1)
         req2 = json.dumps([{}, {'StartClientServer': {
-                          'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1]}}])
+                          'id': cserver_id, 'clientFrontdoorTopic': topics[0], 'clientBackdoorTopic': topics[1], 'useCodeGen': True}}])
         await nats_client.request(lib_name, req2.encode(), timeout=1)
 
     loop.run_until_complete(t())
@@ -49,9 +49,6 @@ def test_client_server_codegen_case(loop, client_server_codegen_proc, nats_clien
     topics = client_server_codegen_proc
 
     async def t():
-        # TODO: Don't use headers, instead pass flag through the server props above
-        this_req = dc(req)
-        this_req[0]['useCodeGen'] = True
         await verify_client_case(nats_client, dc(req), dc(res), *topics)
 
     loop.run_until_complete(t())
