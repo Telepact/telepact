@@ -19,7 +19,7 @@ public abstract class ServerHandler_ {
             {%- set function_name = fn | replace('fn.', '') %}
             case "{{ fn }}" -> {
                 var output = this.{{ function_name }}(message.header, new {{ function_name }}.Input(input));
-                return new Message(Map.of(), output.toPseudoJson());
+                return new Message(Map.of(), output.toUnionPseudoJson());
             }
             {%- endfor %}
             default -> throw new IllegalArgumentException("Unknown function: " + functionName);

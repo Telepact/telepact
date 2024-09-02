@@ -98,10 +98,13 @@ public class Main {
                 var requestBody = (Map<String, Object>) requestPseudoJson.get(1);
                 var request = new Message(requestHeaders, requestBody);
 
+                var entry = requestBody.entrySet().stream().findAny().get();
+                var functionName = entry.getKey();
+                var argument = (Map<String, Object>) entry.getValue();
+
                 Message response;
 
-                if (useCodeGen) {
-                    var argument = (Map<String, Object>) requestBody.get("fn.test");
+                if (useCodeGen && "test".equals(functionName)) {
                     var output = generatedClient.test(requestHeaders, new test.Input(argument));
                     response = new Message(new HashMap<>(), output.toUnionPseudoJson());
                 } else {
@@ -280,6 +283,7 @@ public class Main {
 
                 Message message;
                 if (useCodeGen) {
+                    System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
                     message = codeGenHandler.handler(requestMessage);
                 } else {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));

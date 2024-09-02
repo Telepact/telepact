@@ -134,7 +134,7 @@ def generate_basic_cases(given_field: str, the_type, correct_values, additional_
             if has_too_many_keys(correct_value):
                 expected_response_header['_assert'] = {'skipFieldIdCheck': True}
             
-            case = [[{'Ok_': {'value!': {field: correct_value}}}, {'fn.test': {'value!': {field: correct_value}}}], [expected_response_header, {'Ok_': {'value!': {field: correct_value}}}]]
+            case = [[{'good_': True, 'Ok_': {'value!': {field: correct_value}}}, {'fn.test': {'value!': {field: correct_value}}}], [expected_response_header, {'Ok_': {'value!': {field: correct_value}}}]]
 
             yield case
 
