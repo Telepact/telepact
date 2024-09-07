@@ -24,6 +24,13 @@ public class CodeGenHandler extends ServerHandler_ {
     public uapitest.test.Output test(Map<String, Object> headers, uapitest.test.Input input) {
         var outputBuilder = new uapitest.test.Output.Ok_.Builder();
 
+        try {
+            System.out.println("input: " + new ObjectMapper().writeValueAsString(input.toPseudoJson()));
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         input.value.ifPresent(top -> {
             top.bool.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().bool(v).build());

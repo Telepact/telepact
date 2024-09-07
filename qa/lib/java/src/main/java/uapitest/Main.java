@@ -106,7 +106,7 @@ public class Main {
 
                 if (useCodeGen && "test".equals(functionName)) {
                     var output = generatedClient.test(requestHeaders, new test.Input(argument));
-                    response = new Message(new HashMap<>(), output.toUnionPseudoJson());
+                    response = new Message(new HashMap<>(), output.toPseudoJson());
                 } else {
 
                     try (var time = timers.time()) {
