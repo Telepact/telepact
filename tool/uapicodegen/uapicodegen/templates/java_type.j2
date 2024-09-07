@@ -54,11 +54,11 @@ import java.util.function.Function;
     {%- elif typ == 'T2' -%}
         (T2) t2Mapper.apply({{ caller() }})
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
-        new {{ translate(t) }}((Map<String, Object>) {{ caller() -}}
+        Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ translate(t) }}((Map<String, Object>) d{{ depth }}
             {%- for t2 in t[1:] -%}
                 , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
             {%- endfor -%}
-            )
+            ))
     {%- elif typ.startswith('union') -%}
         {{ to_java_type(t[0]) }}.fromPsuedoJson((Map<String, Object>) {{ caller() -}}
             {%- for t2 in t[1:] -%}
@@ -93,11 +93,11 @@ import java.util.function.Function;
     {%- elif typ == 'T2' -%}
         t2Mapper.apply({{ caller() }})
     {%- else -%}
-        {{ caller() -}}.toPseudoJson(
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.toPseudoJson(
             {%- for t2 in t[1:] -%}
                 t{{ depth }} -> {% call unmarshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}{% if not loop.last %}, {% endif %}
             {%- endfor -%}
-            )
+            ))
     {%- endif -%}
 {%- endmacro -%}
 

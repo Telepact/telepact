@@ -25,4 +25,14 @@ public class Optional_<T> {
             return false;
         }
     }
+
+    public boolean ifPresentOrElse(Consumer<T> consumer, Runnable emptyAction) {
+        if (this.isPresent) {
+            consumer.accept(this.value);
+            return true;
+        } else {
+            emptyAction.run();
+            return false;
+        }
+    }
 }

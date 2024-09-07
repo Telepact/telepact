@@ -486,22 +486,37 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static <T> PStr<T> mapPStr(PStr<T> s) {
+        if (s == null) {
+            return null;
+        }
         return new PStr.Builder<T>().wrap(s.wrap).build();
     }
 
     private static <T> PStr<T> mapPStr(PStr<T> s, Function<T, T> mapper) {
+        if (s == null) {
+            return null;
+        }
         return new PStr.Builder<T>().wrap(mapper.apply(s.wrap)).build();
     }
 
     private static <T, U> P2Str<T, U> mapP2Str(P2Str<T, U> s) {
+        if (s == null) {
+            return null;
+        }
         return new P2Str.Builder<T, U>().wrap(s.wrap).nest(s.nest).build();
     }
 
     private static <T, U> P2Str<T, U> mapP2Str(P2Str<T, U> s, Function<U, U> mapper) {
+        if (s == null) {
+            return null;
+        }
         return new P2Str.Builder<T, U>().wrap(s.wrap).nest(s.nest).build();
     }
 
     private static <T> PUnion<T> mapPUnion(PUnion<T> u) {
+        if (u == null) {
+            return null;
+        }
         return switch (u) {
             case PUnion.NoMatch_<T> v -> new PUnion.NoMatch_<T>(new PUnion.NoMatch_.Builder<>());
             case PUnion.One<T> v -> new PUnion.One.Builder<T>().build();
@@ -510,6 +525,9 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static <T> PUnion<T> mapPUnion(PUnion<T> u, Function<T, T> mapper) {
+        if (u == null) {
+            return null;
+        }
         return switch (u) {
             case PUnion.NoMatch_<T> v -> new PUnion.NoMatch_<T>(new PUnion.NoMatch_.Builder<>());
             case PUnion.One<T> v -> new PUnion.One.Builder<T>().build();
@@ -518,14 +536,23 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static <T> List<PStr<T>> mapArrPStr(List<PStr<T>> l) {
+        if (l == null) {
+            return null;
+        }
         return l.stream().map(v -> mapPStr(v)).toList();
     }
 
     private static <T> List<P2Str<Boolean, T>> mapArrP2Str(List<P2Str<Boolean, T>> l) {
+        if (l == null) {
+            return null;
+        }
         return l.stream().map(v -> mapP2Str(v)).toList();
     }
 
     private static ExStruct mapStruct(ExStruct s) {
+        if (s == null) {
+            return null;
+        }
         var b = new ExStruct.Builder();
         b.required(s.required);
         s.optional.ifPresent(b::optional);
@@ -534,6 +561,9 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static ExUnion mapUnion(ExUnion u) {
+        if (u == null) {
+            return null;
+        }
         return switch (u) {
             case ExUnion.NoMatch_ v -> new ExUnion.NoMatch_(new ExUnion.NoMatch_.Builder());
             case ExUnion.One v -> new ExUnion.One.Builder().build();
@@ -547,6 +577,9 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static example.Input mapFn(example.Input f) {
+        if (f == null) {
+            return null;
+        }
         var b = new example.Input.Builder();
         f.optional.ifPresent(b::optional);
         b.required(f.required);
@@ -554,10 +587,16 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static <T> List<T> mapArr(List<T> l, Function<T, T> mapper) {
+        if (l == null) {
+            return null;
+        }
         return l.stream().map(e -> mapper.apply(e)).toList();
     }
 
     private static <T> Map<String, T> mapObj(Map<String, T> m, Function<T, T> mapper) {
+        if (m == null) {
+            return null;
+        }
         return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> mapper.apply(e.getValue())));
     }
 
