@@ -36,7 +36,7 @@ import java.util.function.Function;
     {%- if typ == 'array' -%}
         ((List<?>) {{ caller() }}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList()
     {%- elif typ == 'object' -%}
-        ((Map<String, ?>) {{ caller() }}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        ((Map<String, ?>) {{ caller() }}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ translate(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll)
     {%- elif typ == 'boolean' -%}
         ({{- 'Boolean' -}}) {{ caller() }}
     {%- elif typ == 'integer' -%}
@@ -75,7 +75,7 @@ import java.util.function.Function;
     {%- if typ == 'array' -%}
         {{ caller() }}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList()
     {%- elif typ == 'object' -%}
-        {{ caller() }}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        {{ caller() }}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll)
     {%- elif typ == 'boolean' -%}
         {{ caller() }}
     {%- elif typ == 'integer' -%}
