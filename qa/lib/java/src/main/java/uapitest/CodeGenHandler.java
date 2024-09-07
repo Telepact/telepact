@@ -605,6 +605,9 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     private static <T, U> P2Union<T, U> mapP2Union(P2Union<T, U> u) {
+        if (u == null) {
+            return null;
+        }
         return switch (u) {
             case P2Union.NoMatch_<T, U> v -> new P2Union.NoMatch_.Builder<T, U>().build();
             case P2Union.One<T, U> v -> new P2Union.One.Builder<T, U>().build();
