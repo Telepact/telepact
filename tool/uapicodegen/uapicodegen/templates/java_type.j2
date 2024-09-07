@@ -60,11 +60,11 @@ import java.util.function.Function;
             {%- endfor -%}
             ))
     {%- elif typ.startswith('union') -%}
-        {{ to_java_type(t[0]) }}.fromPsuedoJson((Map<String, Object>) {{ caller() -}}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : {{ to_java_type(t[0]) }}.fromPsuedoJson((Map<String, Object>) d{{depth}}
             {%- for t2 in t[1:] -%}
                 , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
             {%- endfor -%}
-            )
+            ))
     {%- else -%}
         {{- ('Unknown type: ' + typ) | raise_error -}}
     {%- endif -%}
@@ -159,7 +159,7 @@ import java.util.function.Function;
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro struct(data, schema_key, alt_name, modifier, implements, genericStr, unionCase) %}
+{%- macro struct(data, schema_key, alt_name, modifier, implements, genericStr, unionCase, forFn) %}
     {%- set finalGenericString = genericStr if genericStr else ''%}
     {%- set fields = data[schema_key] %}
     {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
@@ -176,14 +176,17 @@ public {{ modifier }}class {{ java_name + finalGenericString }}{% if implements 
     }
 
     public {{ java_name -}}
-        (Map<String, Object> map
+        (Map<String, Object> map{% if forFn %}Init{% endif %}
         {%- if 'T2' in genericStr %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper, Function<Object, T2> t2Mapper
         {%- elif 'T1' in genericStr %}, Function<Object, T0> t0Mapper, Function<Object, T1> t1Mapper
         {%- elif 'T0' in genericStr %}, Function<Object, T0> t0Mapper
         {%- endif %}) {
-            {%- for field_name, field_type in fields.items() %}
-            this.{{ sanitize_field_name(field_name) }} = {{ marshall_java_type_maybe_opt(field_name, field_type) }};
-            {%- endfor %}
+        {%- if forFn %}
+        var map = (Map<String, Object>) mapInit.get("{{ unionCase }}");
+        {%- endif %}
+        {%- for field_name, field_type in fields.items() %}
+        this.{{ sanitize_field_name(field_name) }} = {{ marshall_java_type_maybe_opt(field_name, field_type) }};
+        {%- endfor %}
     }
 
     public Map<String, Object> toPseudoJson(
@@ -296,7 +299,7 @@ public sealed interface {{ java_name }}{{ generics(schema_key) }} {
     {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
 public final class {{ java_name }} {
 
-    {{ struct(data, schema_key, 'Input', 'static ', None, '', None) | indent }}
+    {{ struct(data, schema_key, 'Input', 'static ', None, '', schema_key, True) | indent }}
 
     {% do data.pop('///', None) %}
 
