@@ -2,6 +2,7 @@ package uapitest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -597,7 +598,10 @@ public class CodeGenHandler extends ServerHandler_ {
         if (m == null) {
             return null;
         }
-        return m.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> mapper.apply(e.getValue())));
+        return m.entrySet().stream().collect(() -> {
+            Map<String, T> r = new HashMap<>();
+            return r;
+        }, (m2, e) -> m2.put(e.getKey(), mapper.apply(e.getValue())), Map::putAll);
     }
 
     private static <T, U> P2Union<T, U> mapP2Union(P2Union<T, U> u) {
