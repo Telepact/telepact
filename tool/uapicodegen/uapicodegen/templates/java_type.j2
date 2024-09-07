@@ -17,7 +17,7 @@ import java.util.function.Function;
     {%- elif typ == 'boolean' %}
         {{- 'Boolean' -}}
     {%- elif typ == 'integer' %}
-        {{- 'Integer' -}}
+        {{- 'Long' -}}
     {%- elif typ == 'number' %}
         {{- 'Number' -}}
     {%- elif typ == 'string' %}
@@ -40,7 +40,7 @@ import java.util.function.Function;
     {%- elif typ == 'boolean' -%}
         ({{- 'Boolean' -}}) {{ caller() }}
     {%- elif typ == 'integer' -%}
-        ({{- 'Integer' -}}) {{ caller() }}
+        ({{- 'Long' -}}) Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
     {%- elif typ == 'number' -%}
         ({{- 'Number' -}}) {{ caller() }}
     {%- elif typ == 'string' -%}
