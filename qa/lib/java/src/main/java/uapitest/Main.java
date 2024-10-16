@@ -207,9 +207,11 @@ public class Main {
             }
 
             try {
-                var schema = UApiSchema.fromJson(schemaJson);
-                if (extendSchemaJson != null) {
-                    UApiSchema.extend(schema, extendSchemaJson);
+                UApiSchema schema;
+                if (extendSchemaJson == null) {
+                    schema = UApiSchema.fromJson(schemaJson);
+                } else {
+                    schema = UApiSchema.fromJsonDocuments(List.of(schemaJson, extendSchemaJson));
                 }
                 return new Message(Map.of(), Map.of("Ok_", Map.of()));
             } catch (UApiSchemaParseError e) {
@@ -255,14 +257,14 @@ public class Main {
             String backdoorTopic, boolean authRequired, boolean useCodeGen)
             throws IOException, InterruptedException {
         var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var uApi = UApiSchema.fromJson(json);
-        var alternateUApi = UApiSchema.extend(uApi, """
+        var uApi = UApiSchema.fromJsonDocuments(List.of(json));
+        var alternateUApi = UApiSchema.fromJsonDocuments(List.of(json, """
                 [
                     {
                         "struct.BackwardsCompatibleChange": {}
                     }
                 ]
-                """);
+                """));
         var objectMapper = new ObjectMapper();
 
         var timers = metrics.timer(frontdoorTopic);

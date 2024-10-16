@@ -2,8 +2,6 @@ package uapi;
 
 import static uapi.internal.ProcessBytes.processBytes;
 import static uapi.internal.binary.ConstructBinaryEncoding.constructBinaryEncoding;
-import static uapi.internal.schema.ExtendUApiSchema.extendUApiSchema;
-import static uapi.internal.schema.GetInternalUApiJson.getInternalUApiJson;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -69,8 +67,7 @@ public class Server {
         this.onError = options.onError;
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
-
-        this.uApiSchema = extendUApiSchema(uApiSchema, getInternalUApiJson());
+        this.uApiSchema = uApiSchema;
 
         final var binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
