@@ -18,7 +18,9 @@ import uapi.internal.types.UUnion;
 public class ParseFunctionType {
 
     static UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
-            String schemaKey, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            String schemaKey, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
+            Map<String, String> schemaKeysToDocumentName,
+            Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -27,7 +29,9 @@ public class ParseFunctionType {
         UUnion callType = null;
         try {
             final UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
-                    schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
+                    schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaDocumentNamesToPseudoJson,
+                    schemaKeysToDocumentName,
+                    schemaKeysToIndex,
                     parsedTypes,
                     allParseFailures, failedTypes);
             callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0), typeParameterCount);
@@ -47,7 +51,7 @@ public class ParseFunctionType {
             try {
                 resultType = parseUnionType(path, functionDefinitionAsParsedJson,
                         resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
-                        typeParameterCount, uApiSchemaPseudoJson,
+                        typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
                         schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);

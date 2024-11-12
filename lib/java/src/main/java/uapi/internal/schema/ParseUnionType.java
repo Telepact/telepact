@@ -19,7 +19,7 @@ import uapi.internal.types.UUnion;
 public class ParseUnionType {
     static UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount,
-            List<Object> uApiSchemaPseudoJson,
+            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -149,7 +149,8 @@ public class ParseUnionType {
             final Map<String, UFieldDeclaration> fields;
             try {
                 fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
-                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
+                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
+                        allParseFailures,
                         failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);

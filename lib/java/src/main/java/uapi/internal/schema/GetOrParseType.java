@@ -26,8 +26,9 @@ import uapi.internal.types.UString;
 import uapi.internal.types.UType;
 
 public class GetOrParseType {
-    static UType getOrParseType(List<Object> path, String typeName, int thisTypeParameterCount,
-            List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+    static UType getOrParseType(String documentName, List<Object> path, String typeName, int thisTypeParameterCount,
+            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
+            Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures,
             Set<String> failedTypes) {
@@ -80,12 +81,14 @@ public class GetOrParseType {
         }
 
         final var customTypeName = matcher.group(2);
-        final var index = schemaKeysToIndex.get(customTypeName);
-        if (index == null) {
+        final var thisIndex = schemaKeysToIndex.get(customTypeName);
+        final var thisDocumentName = schemaKeysToDocumentName.get(customTypeName);
+        if (thisIndex == null) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
                     "TypeUnknown", Map.of("name", customTypeName), null)));
         }
-        final var definition = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
+        final var definition = (Map<String, Object>) uApiSchemaDocumentNamesToPseudoJson.get(thisDocumentName)
+                .get(thisIndex);
 
         final var typeParameterCountString = matcher.group(6);
         final int typeParameterCount;
@@ -98,16 +101,22 @@ public class GetOrParseType {
         try {
             final UType type;
             if (customTypeName.startsWith("struct")) {
-                type = parseStructType(List.of(index), definition, customTypeName, List.of(),
-                        typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                type = parseStructType(thisDocumentName, List.of(thisIndex), definition, customTypeName, List.of(),
+                        typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                        schemaKeysToIndex,
+                        parsedTypes,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
-                type = parseUnionType(List.of(index), definition, customTypeName, List.of(), List.of(),
-                        typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                type = parseUnionType(thisDocumentName, List.of(thisIndex), definition, customTypeName, List.of(),
+                        List.of(),
+                        typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                        schemaKeysToIndex,
+                        parsedTypes,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("fn")) {
-                type = parseFunctionType(List.of(index), definition, customTypeName,
-                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
+                type = parseFunctionType(thisDocumentName, List.of(thisIndex), definition, customTypeName,
+                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
+                        allParseFailures,
                         failedTypes);
             } else {
                 UType possibleTypeExtension;
@@ -128,7 +137,7 @@ public class GetOrParseType {
                 if (possibleTypeExtension == null) {
                     throw new UApiSchemaParseError(Arrays.asList(
                             new SchemaParseFailure(
-                                    Collections.singletonList(index),
+                                    Collections.singletonList(thisIndex),
                                     "TypeExtensionImplementationMissing",
                                     Collections.singletonMap("name", customTypeName),
                                     null)));

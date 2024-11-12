@@ -13,8 +13,10 @@ import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UType;
 
 public class ParseStructFields {
-    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, List<Object> path,
-            int typeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, String documentName,
+            List<Object> path,
+            int typeParameterCount, Map<String, List<Object>> uApiSchemaDocumentsToPseudoJson,
+            Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -34,8 +36,8 @@ public class ParseStructFields {
                     finalOtherPath.add(existingField);
 
                     parseFailures
-                            .add(new SchemaParseFailure(finalPath, "PathCollision",
-                                    Map.of("other", finalOtherPath), null));
+                            .add(new SchemaParseFailure(documentName, finalPath, "PathCollision",
+                                    Map.of("other", finalOtherPath)));
                 }
             }
 
@@ -43,8 +45,9 @@ public class ParseStructFields {
 
             final UFieldDeclaration parsedField;
             try {
-                parsedField = parseField(path, fieldDeclaration,
-                        typeDeclarationValue, typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex,
+                parsedField = parseField(documentName, path, fieldDeclaration,
+                        typeDeclarationValue, typeParameterCount, uApiSchemaDocumentsToPseudoJson,
+                        schemaKeysToDocumentName, schemaKeysToIndex,
                         parsedTypes,
                         allParseFailures, failedTypes);
                 final String fieldName = parsedField.fieldName;

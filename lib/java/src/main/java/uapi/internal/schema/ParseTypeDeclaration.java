@@ -15,8 +15,10 @@ import uapi.internal.types.UType;
 import uapi.internal.types.UTypeDeclaration;
 
 public class ParseTypeDeclaration {
-    static UTypeDeclaration parseTypeDeclaration(List<Object> path, List<Object> typeDeclarationArray,
-            int thisTypeParameterCount, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+    static UTypeDeclaration parseTypeDeclaration(String documentName, List<Object> path,
+            List<Object> typeDeclarationArray,
+            int thisTypeParameterCount, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
+            Map<String, String> schemaKeysToDocumentNames, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.isEmpty()) {
@@ -48,8 +50,9 @@ public class ParseTypeDeclaration {
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final UType type = getOrParseType(basePath, typeName, thisTypeParameterCount, uApiSchemaPseudoJson,
-                schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
+        final UType type = getOrParseType(documentName, basePath, typeName, thisTypeParameterCount,
+                uApiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
 
         if (type instanceof UGeneric && nullable) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
@@ -85,8 +88,10 @@ public class ParseTypeDeclaration {
 
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {
-                typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, (List<Object>) e, thisTypeParameterCount,
-                        uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
+                typeParameterTypeDeclaration = parseTypeDeclaration(documentName, loopPath, (List<Object>) e,
+                        thisTypeParameterCount,
+                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes,
+                        allParseFailures,
                         failedTypes);
 
                 typeParameters.add(typeParameterTypeDeclaration);

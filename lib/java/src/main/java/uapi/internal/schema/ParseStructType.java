@@ -14,8 +14,10 @@ import uapi.internal.types.UStruct;
 import uapi.internal.types.UType;
 
 public class ParseStructType {
-    static UStruct parseStructType(List<Object> path, Map<String, Object> structDefinitionAsPseudoJson,
-            String schemaKey, List<String> ignoreKeys, int typeParameterCount, List<Object> uApiSchemaPseudoJson,
+    static UStruct parseStructType(String documentName, List<Object> path,
+            Map<String, Object> structDefinitionAsPseudoJson,
+            String schemaKey, List<String> ignoreKeys, int typeParameterCount,
+            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -56,8 +58,9 @@ public class ParseStructType {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        final var fields = parseStructFields(definition, thisPath, typeParameterCount,
-                uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes, allParseFailures,
+        final var fields = parseStructFields(definition, documentName, thisPath, typeParameterCount,
+                uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
+                allParseFailures,
                 failedTypes);
 
         return new UStruct(schemaKey, fields, typeParameterCount);
