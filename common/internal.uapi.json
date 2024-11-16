@@ -18,22 +18,11 @@
         "_errors": "^errors\\.Validation_$"
     },
     {
-        "struct.Auth_": {},
-        "_ignoreIfDuplicate": true
-    },
-    {
         "_ext.Select_": {}
     },
     {
         "///": " The timeout in milliseconds set by the client ",
         "requestHeader.time_": ["integer"]
-    },
-    {
-        "///": [
-            " The conventional location for sending credentials to the server for the         ",
-            " purpose of authentication and authorization.                                    "
-        ],
-        "requestHeader.auth_": ["struct.Auth_"]
     },
     {
         "///": " If set to `true`, response validation by the server will be disabled. ",
@@ -194,20 +183,6 @@
             "///": " The request could not be parsed as a uAPI Message. ",
             "ErrorParseFailure_": {
                 "reasons": ["array", ["union.ParseFailure_"]]
-            }
-        }]
-    },
-    {
-        "///": " A standard error. ",
-        "errors.Auth_": [{
-            "///": " The credentials in the `_auth` header were missing or invalid. ",
-            "ErrorUnauthenticated_": {
-                "message!": ["string"]
-            }
-        }, {
-            "///": " The credentials in the `_auth` header were insufficient to run the function. ",
-            "ErrorUnauthorized_": {
-                "message!": ["string"]
             }
         }]
     }

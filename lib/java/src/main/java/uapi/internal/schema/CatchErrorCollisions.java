@@ -10,8 +10,8 @@ import uapi.UApiSchemaParseError;
 import uapi.internal.schema.SchemaParseFailure;
 
 public class CatchErrorCollisions {
-    public static void catchErrorCollisions(List<Object> uApiSchemaPseudoJson, Set<String> errorKeys,
-            Map<String, Integer> keysToIndex) {
+    public static void catchErrorCollisions(Map<String, List<Object>> uApiSchemaNameToPseudoJson, Set<String> errorKeys,
+            Map<String, Integer> keysToIndex, Map<String, String> schemaKeysToDocumentName) {
         List<SchemaParseFailure> parseFailures = new ArrayList<>();
 
         List<Integer> indices = new ArrayList<>();
@@ -30,11 +30,17 @@ public class CatchErrorCollisions {
                 int index = indices.get(i);
                 int otherIndex = indices.get(j);
 
-                var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
-                var otherDef = (Map<String, Object>) uApiSchemaPseudoJson.get(otherIndex);
+                var defKey = indexToKeys.get(index);
+                var otherDefKey = indexToKeys.get(otherIndex);
 
-                String defKey = indexToKeys.get(index);
-                String otherDefKey = indexToKeys.get(otherIndex);
+                var documentName = schemaKeysToDocumentName.get(defKey);
+                var otherDocumentName = schemaKeysToDocumentName.get(otherDefKey);
+
+                var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(documentName);
+                var otherUApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(otherDocumentName);
+
+                var def = (Map<String, Object>) uApiSchemaPseudoJson.get(index);
+                var otherDef = (Map<String, Object>) otherUApiSchemaPseudoJson.get(otherIndex);
 
                 var errDef = (List<Object>) def.get(defKey);
                 var otherErrDef = (List<Object>) otherDef.get(otherDefKey);
@@ -53,10 +59,11 @@ public class CatchErrorCollisions {
                             String thisErrorDefKey = thisErrDefKeys.iterator().next();
                             String thisOtherErrorDefKey = thisOtherErrDefKeys.iterator().next();
                             parseFailures.add(new SchemaParseFailure(
+                                    otherDocumentName,
                                     List.of(otherIndex, otherDefKey, l, thisOtherErrorDefKey),
                                     "PathCollision",
-                                    Map.of("other", List.of(index, defKey, k, thisErrorDefKey)),
-                                    otherDefKey));
+                                    Map.of("path", List.of(index, defKey, k, thisErrorDefKey), "document",
+                                            documentName)));
                         }
                     }
                 }

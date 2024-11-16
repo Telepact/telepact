@@ -55,11 +55,11 @@ public class ParseUApiSchema {
                             var finalPath = new ArrayList<>(loopPath);
                             finalPath.add(schemaKey);
                             parseFailures.add(new SchemaParseFailure(
+                                    documentName,
                                     finalPath,
                                     "PathCollision",
                                     Map.of("other", List.of(otherPathIndex, matchingSchemaKey), "otherDocument",
-                                            otherDocumentName),
-                                    documentName));
+                                            otherDocumentName)));
                         }
                         continue;
                     }
@@ -97,6 +97,7 @@ public class ParseUApiSchema {
 
             try {
                 getOrParseType(
+                        thisDocumentName,
                         Collections.singletonList(thisIndex),
                         schemaKey,
                         rootTypeParameterCount,
@@ -113,15 +114,16 @@ public class ParseUApiSchema {
         }
 
         if (!parseFailures.isEmpty()) {
-            var offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
-            throw new UApiSchemaParseError(offsetParseFailures);
+            throw new UApiSchemaParseError(parseFailures);
         }
 
         try {
-            catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex);
+            catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName);
 
             for (String thisKey : errorKeys) {
                 var thisIndex = schemaKeysToIndex.get(thisKey);
+                var thisDocumentName = schemaKeysToDocumentName.get(thisKey);
+                var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(thisDocumentName);
                 var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
 
                 try {
@@ -150,6 +152,8 @@ public class ParseUApiSchema {
         try {
             for (String requestHeaderKey : requestHeaderKeys) {
                 var thisIndex = schemaKeysToIndex.get(requestHeaderKey);
+                var thisDocumentName = schemaKeysToDocumentName.get(requestHeaderKey);
+                var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(thisDocumentName);
                 var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
                 var headerField = requestHeaderKey.substring("requestHeader.".length());
 
@@ -172,6 +176,8 @@ public class ParseUApiSchema {
 
             for (String responseHeaderKey : responseHeaderKeys) {
                 var thisIndex = schemaKeysToIndex.get(responseHeaderKey);
+                var thisDocumentName = schemaKeysToDocumentName.get(responseHeaderKey);
+                var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(thisDocumentName);
                 var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
                 var headerField = responseHeaderKey.substring("responseHeader.".length());
 
