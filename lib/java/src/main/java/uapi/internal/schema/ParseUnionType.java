@@ -17,7 +17,8 @@ import uapi.internal.types.UType;
 import uapi.internal.types.UUnion;
 
 public class ParseUnionType {
-    static UUnion parseUnionType(List<Object> path, Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
+    static UUnion parseUnionType(String documentName, List<Object> path,
+            Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount,
             Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
@@ -37,7 +38,7 @@ public class ParseUnionType {
                 final List<Object> loopPath = new ArrayList<>(path);
                 loopPath.add(k);
 
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(documentName, loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
@@ -79,7 +80,7 @@ public class ParseUnionType {
         }
 
         if (definition.isEmpty() && requiredKeys.isEmpty()) {
-            parseFailures.add(new SchemaParseFailure(thisPath, "EmptyArrayDisallowed", Map.of(), null));
+            parseFailures.add(new SchemaParseFailure(documentName, thisPath, "EmptyArrayDisallowed", Map.of()));
         } else {
             outerLoop: for (final var requiredKey : requiredKeys) {
                 for (final var element : definition) {
@@ -95,7 +96,8 @@ public class ParseUnionType {
                 branchPath.add(0);
                 branchPath.add(requiredKey);
 
-                parseFailures.add(new SchemaParseFailure(branchPath, "RequiredObjectKeyMissing", Map.of(), null));
+                parseFailures
+                        .add(new SchemaParseFailure(documentName, branchPath, "RequiredObjectKeyMissing", Map.of()));
             }
         }
 
@@ -118,16 +120,15 @@ public class ParseUnionType {
             final var matches = keys.stream().filter(k -> k.matches(regexString)).toList();
             if (matches.size() != 1) {
                 parseFailures.add(
-                        new SchemaParseFailure(loopPath,
+                        new SchemaParseFailure(documentName, loopPath,
                                 "ObjectKeyRegexMatchCountUnexpected",
                                 Map.of("regex", regexString, "actual",
-                                        matches.size(), "expected", 1, "keys", keys),
-                                null));
+                                        matches.size(), "expected", 1, "keys", keys)));
                 continue;
             }
             if (map.size() != 1) {
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectSizeUnexpected",
-                        Map.of("expected", 1, "actual", map.size()), null));
+                parseFailures.add(new SchemaParseFailure(documentName, loopPath, "ObjectSizeUnexpected",
+                        Map.of("expected", 1, "actual", map.size())));
                 continue;
             }
 
@@ -148,7 +149,7 @@ public class ParseUnionType {
 
             final Map<String, UFieldDeclaration> fields;
             try {
-                fields = parseStructFields(unionCaseStruct, unionKeyPath, typeParameterCount,
+                fields = parseStructFields(unionCaseStruct, documentName, unionKeyPath, typeParameterCount,
                         uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
                         allParseFailures,
                         failedTypes);

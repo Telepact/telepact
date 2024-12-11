@@ -15,10 +15,11 @@ import uapi.internal.types.UType;
 import uapi.internal.types.UUnion;
 
 public class ParseErrorType {
-    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
-            List<Object> uApiSchemaPseudoJson,
+    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String documentName,
+            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
             String schemaKey,
             int index,
+            Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures,
@@ -36,7 +37,8 @@ public class ParseErrorType {
             for (String k : otherKeys) {
                 List<Object> loopPath = new ArrayList<>(basePath);
                 loopPath.add(k);
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", new HashMap<>(), null));
+                parseFailures
+                        .add(new SchemaParseFailure(documentName, loopPath, "ObjectKeyDisallowed", new HashMap<>()));
             }
         }
 
@@ -48,9 +50,10 @@ public class ParseErrorType {
 
         // Assuming parseUnionType is adapted to Java and returns UError or its
 
-        UUnion error = parseUnionType(basePath, errorDefinitionAsParsedJson, schemaKey,
+        UUnion error = parseUnionType(documentName, basePath, errorDefinitionAsParsedJson, schemaKey,
                 new ArrayList<>(),
-                new ArrayList<>(), typeParameterCount, uApiSchemaPseudoJson, schemaKeysToIndex, parsedTypes,
+                new ArrayList<>(), typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                schemaKeysToIndex, parsedTypes,
                 allParseFailures, failedTypes);
 
         return new UError(schemaKey, error);

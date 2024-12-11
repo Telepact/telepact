@@ -35,7 +35,7 @@ public class ParseStructType {
                 final List<Object> loopPath = new ArrayList<>(path);
                 loopPath.add(k);
 
-                parseFailures.add(new SchemaParseFailure(loopPath, "ObjectKeyDisallowed", Map.of(), null));
+                parseFailures.add(new SchemaParseFailure(documentName, loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 

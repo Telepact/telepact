@@ -12,9 +12,11 @@ import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UType;
 
 public class ParseHeadersType {
-    static UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson, String schemaKey,
+    static UFieldDeclaration parseHeadersType(String documentName, Map<String, Object> headersDefinitionAsParsedJson,
+            String schemaKey,
             String headerField,
-            int index, List<Object> uApiSchemaPseudoJson, Map<String, Integer> schemaKeysToIndex,
+            int index, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
+            Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final List<Object> path = List.of(index, schemaKey);
@@ -30,9 +32,10 @@ public class ParseHeadersType {
         final var typeParameterCount = 0;
 
         try {
-            final var typeDeclaration = parseTypeDeclaration(path,
+            final var typeDeclaration = parseTypeDeclaration(documentName, path,
                     typeDeclarationArray, typeParameterCount,
-                    uApiSchemaPseudoJson,
+                    uApiSchemaDocumentNamesToPseudoJson,
+                    schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
                     allParseFailures, failedTypes);

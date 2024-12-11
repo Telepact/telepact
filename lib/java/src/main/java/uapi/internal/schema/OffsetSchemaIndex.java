@@ -15,7 +15,7 @@ public class OffsetSchemaIndex {
             var data = (Map<String, Object>) failure.data;
             var newPath = new ArrayList<>(path);
 
-            finalList.add(new SchemaParseFailure(newPath, reason, data, documentName));
+            finalList.add(new SchemaParseFailure(documentName, newPath, reason, data));
         }
 
         return finalList;

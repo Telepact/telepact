@@ -18,12 +18,13 @@ public class ParseTypeDeclaration {
     static UTypeDeclaration parseTypeDeclaration(String documentName, List<Object> path,
             List<Object> typeDeclarationArray,
             int thisTypeParameterCount, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
-            Map<String, String> schemaKeysToDocumentNames, Map<String, Integer> schemaKeysToIndex,
+            Map<String, String> schemaKeysToDocumentNames,
+            Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         if (typeDeclarationArray.isEmpty()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "EmptyArrayDisallowed", Map.of(), null)));
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+                    "EmptyArrayDisallowed", Map.of())));
         }
 
         final List<Object> basePath = new ArrayList<>(path);
@@ -43,8 +44,8 @@ public class ParseTypeDeclaration {
 
         final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "StringRegexMatchFailed", Map.of("regex", regexString), null)));
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, basePath,
+                    "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         final var typeName = matcher.group(1);
@@ -55,16 +56,15 @@ public class ParseTypeDeclaration {
                 schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
 
         if (type instanceof UGeneric && nullable) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(basePath,
-                    "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"), null)));
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, basePath,
+                    "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
         }
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
                     "ArrayLengthUnexpected",
-                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1),
-                    null)));
+                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
         }
 
         final var parseFailures = new ArrayList<SchemaParseFailure>();

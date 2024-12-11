@@ -29,8 +29,8 @@ public class ParseField {
             final List<Object> finalPath = new ArrayList<>(path);
             finalPath.add(fieldDeclaration);
 
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(finalPath,
-                    "KeyRegexMatchFailed", Map.of("regex", regexString), null)));
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, finalPath,
+                    "KeyRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         final var fieldName = matcher.group(0);
@@ -45,7 +45,7 @@ public class ParseField {
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
-        final var typeDeclaration = parseTypeDeclaration(thisPath,
+        final var typeDeclaration = parseTypeDeclaration(documentName, thisPath,
                 typeDeclarationArray, typeParameterCount,
                 uApiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentName,

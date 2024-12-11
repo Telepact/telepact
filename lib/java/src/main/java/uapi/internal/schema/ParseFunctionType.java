@@ -17,7 +17,8 @@ import uapi.internal.types.UUnion;
 
 public class ParseFunctionType {
 
-    static UFn parseFunctionType(List<Object> path, Map<String, Object> functionDefinitionAsParsedJson,
+    static UFn parseFunctionType(String documentName, List<Object> path,
+            Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
             Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex,
@@ -28,7 +29,7 @@ public class ParseFunctionType {
 
         UUnion callType = null;
         try {
-            final UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
+            final UStruct argType = parseStructType(documentName, path, functionDefinitionAsParsedJson,
                     schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaDocumentNamesToPseudoJson,
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
@@ -46,10 +47,10 @@ public class ParseFunctionType {
 
         UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new SchemaParseFailure(resPath, "RequiredObjectKeyMissing", Map.of(), null));
+            parseFailures.add(new SchemaParseFailure(documentName, resPath, "RequiredObjectKeyMissing", Map.of()));
         } else {
             try {
-                resultType = parseUnionType(path, functionDefinitionAsParsedJson,
+                resultType = parseUnionType(documentName, path, functionDefinitionAsParsedJson,
                         resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
                         typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
                         schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
@@ -65,7 +66,7 @@ public class ParseFunctionType {
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.endsWith("_")) {
-            parseFailures.add(new SchemaParseFailure(regexPath, "ObjectKeyDisallowed", Map.of(), null));
+            parseFailures.add(new SchemaParseFailure(documentName, regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^errors\\..*$");
