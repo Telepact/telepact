@@ -10,11 +10,9 @@ public class MapSchemaParseFailuresToPseudoJson {
         return (List<Object>) schemaParseFailures.stream()
                 .map(f -> (Object) new TreeMap<>() {
                     {
+                        put("document", f.documentName);
                         put("path", f.path);
                         put("reason", Map.of(f.reason, f.data));
-                        if (f.key != null) {
-                            put("key!", f.key);
-                        }
                     }
                 })
                 .toList();

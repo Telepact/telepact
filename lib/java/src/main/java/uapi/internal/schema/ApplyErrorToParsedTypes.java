@@ -10,7 +10,7 @@ import uapi.internal.types.UType;
 import uapi.UApiSchemaParseError;
 
 public class ApplyErrorToParsedTypes {
-    public static void applyErrorToParsedTypes(String errorKey, int errorIndex, UError error,
+    public static void applyErrorToParsedTypes(String documentName, String errorKey, int errorIndex, UError error,
             Map<String, UType> parsedTypes, Map<String, Integer> schemaKeysToIndex) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
@@ -44,11 +44,10 @@ public class ApplyErrorToParsedTypes {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
                     var errorCaseIndex = error.errors.caseIndices.get(newKey);
                     var fnErrorCaseIndex = f.result.caseIndices.get(newKey);
-                    parseFailures.add(new SchemaParseFailure(
+                    parseFailures.add(new SchemaParseFailure(documentName,
                             List.of(errorIndex, errorKey, errorCaseIndex, newKey),
                             "PathCollision",
-                            Map.of("other", List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey)),
-                            null));
+                            Map.of("other", List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey))));
                 }
                 fnResultCases.put(newKey, errorCase);
             }

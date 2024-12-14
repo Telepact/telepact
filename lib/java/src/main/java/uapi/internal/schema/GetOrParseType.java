@@ -55,8 +55,8 @@ public class GetOrParseType {
 
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "StringRegexMatchFailed", Map.of("regex", regexString), null)));
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+                    "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         final var standardTypeName = matcher.group(1);
@@ -84,8 +84,8 @@ public class GetOrParseType {
         final var thisIndex = schemaKeysToIndex.get(customTypeName);
         final var thisDocumentName = schemaKeysToDocumentName.get(customTypeName);
         if (thisIndex == null) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(path,
-                    "TypeUnknown", Map.of("name", customTypeName), null)));
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+                    "TypeUnknown", Map.of("name", customTypeName))));
         }
         final var definition = (Map<String, Object>) uApiSchemaDocumentNamesToPseudoJson.get(thisDocumentName)
                 .get(thisIndex);
@@ -137,10 +137,10 @@ public class GetOrParseType {
                 if (possibleTypeExtension == null) {
                     throw new UApiSchemaParseError(Arrays.asList(
                             new SchemaParseFailure(
+                                    documentName,
                                     Collections.singletonList(thisIndex),
                                     "TypeExtensionImplementationMissing",
-                                    Collections.singletonMap("name", customTypeName),
-                                    null)));
+                                    Collections.singletonMap("name", customTypeName))));
                 }
 
                 type = possibleTypeExtension;

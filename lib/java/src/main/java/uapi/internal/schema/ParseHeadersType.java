@@ -25,7 +25,7 @@ public class ParseHeadersType {
 
         if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(
-                    getTypeUnexpectedParseFailure(path, typeDeclarationValue, "Array"));
+                    getTypeUnexpectedParseFailure(documentName, path, typeDeclarationValue, "Array"));
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 

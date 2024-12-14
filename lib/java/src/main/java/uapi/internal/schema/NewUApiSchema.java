@@ -4,6 +4,7 @@ import static uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpect
 import static uapi.internal.schema.ParseUApiSchema.parseUApiSchema;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,26 +15,34 @@ import uapi.UApiSchema;
 import uapi.UApiSchemaParseError;
 
 public class NewUApiSchema {
-    public static UApiSchema newUApiSchema(String uApiSchemaJson) {
+    public static UApiSchema newUApiSchema(Map<String, List<String>> uApiSchemaJsonDocuments) {
         final var objectMapper = new ObjectMapper();
+        final var finalPseudoJson = new HashMap<String, List<Object>>();
 
-        final Object uApiSchemaPseudoJsonInit;
-        try {
-            uApiSchemaPseudoJsonInit = objectMapper.readValue(uApiSchemaJson, new TypeReference<>() {
-            });
-        } catch (IOException e) {
-            throw new UApiSchemaParseError(
-                    List.of(new SchemaParseFailure(List.of(), "JsonInvalid", Map.of(), null)),
-                    e);
+        for (var uApiSchemaJson : uApiSchemaJsonDocuments.entrySet()) {
+            var documentName = uApiSchemaJson.getKey();
+
+            final Object uApiSchemaPseudoJsonInit;
+            try {
+                uApiSchemaPseudoJsonInit = objectMapper.readValue(uApiSchemaJson.getValue().get(0),
+                        new TypeReference<>() {
+                        });
+            } catch (IOException e) {
+                throw new UApiSchemaParseError(
+                        List.of(new SchemaParseFailure(documentName, List.of(), "JsonInvalid", Map.of())),
+                        e);
+            }
+
+            if (!(uApiSchemaPseudoJsonInit instanceof List)) {
+                final List<SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(documentName, List.of(),
+                        uApiSchemaPseudoJsonInit, "Array");
+                throw new UApiSchemaParseError(thisParseFailure);
+            }
+            final List<Object> uApiSchemaPseudoJson = (List<Object>) uApiSchemaPseudoJsonInit;
+
+            finalPseudoJson.put(documentName, uApiSchemaPseudoJson);
         }
 
-        if (!(uApiSchemaPseudoJsonInit instanceof List)) {
-            final List<SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(List.of(),
-                    uApiSchemaPseudoJsonInit, "Array");
-            throw new UApiSchemaParseError(thisParseFailure);
-        }
-        final List<Object> uApiSchemaPseudoJson = (List<Object>) uApiSchemaPseudoJsonInit;
-
-        return parseUApiSchema(uApiSchemaPseudoJson, 0);
+        return parseUApiSchema(finalPseudoJson);
     }
 }

@@ -46,7 +46,7 @@ public class ParseStructType {
 
         Map<String, Object> definition = null;
         if (!(defInit instanceof Map)) {
-            final List<SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(thisPath,
+            final List<SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(documentName, thisPath,
                     defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);

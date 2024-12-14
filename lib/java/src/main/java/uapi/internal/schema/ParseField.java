@@ -41,7 +41,7 @@ public class ParseField {
 
         if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(
-                    getTypeUnexpectedParseFailure(thisPath, typeDeclarationValue, "Array"));
+                    getTypeUnexpectedParseFailure(documentName, thisPath, typeDeclarationValue, "Array"));
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 

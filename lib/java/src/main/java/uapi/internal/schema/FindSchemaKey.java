@@ -9,7 +9,7 @@ import uapi.UApiSchemaParseError;
 
 public class FindSchemaKey {
 
-    public static String findSchemaKey(Map<String, Object> definition, int index) {
+    public static String findSchemaKey(String documentName, Map<String, Object> definition, int index) {
         final var regex = "^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)";
         final var matches = new ArrayList<String>();
 
@@ -24,11 +24,10 @@ public class FindSchemaKey {
         if (matches.size() == 1) {
             return matches.get(0);
         } else {
-            final var parseFailure = new SchemaParseFailure(List.of(index),
+            final var parseFailure = new SchemaParseFailure(documentName, List.of(index),
                     "ObjectKeyRegexMatchCountUnexpected",
                     new TreeMap<>(
-                            Map.of("regex", regex, "actual", matches.size(), "expected", 1, "keys", keys)),
-                    null);
+                            Map.of("regex", regex, "actual", matches.size(), "expected", 1, "keys", keys)));
             throw new UApiSchemaParseError(List.of(parseFailure));
         }
     }

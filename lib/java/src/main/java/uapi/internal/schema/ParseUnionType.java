@@ -48,7 +48,7 @@ public class ParseUnionType {
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
 
         if (!(defInit instanceof List)) {
-            final List<SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(thisPath,
+            final List<SchemaParseFailure> finalParseFailures = getTypeUnexpectedParseFailure(documentName, thisPath,
                     defInit, "Array");
 
             parseFailures.addAll(finalParseFailures);
@@ -65,7 +65,7 @@ public class ParseUnionType {
             loopPath.add(index);
 
             if (!(element instanceof Map)) {
-                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath,
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(documentName, loopPath,
                         element, "Object");
 
                 parseFailures.addAll(thisParseFailures);
@@ -139,7 +139,8 @@ public class ParseUnionType {
             unionKeyPath.add(unionCase);
 
             if (!(entry.getValue() instanceof Map)) {
-                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath,
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(documentName,
+                        unionKeyPath,
                         entry.getValue(), "Object");
 
                 parseFailures.addAll(thisParseFailures);

@@ -33,7 +33,7 @@ public class ParseTypeDeclaration {
         final var baseType = typeDeclarationArray.get(0);
 
         if (!(baseType instanceof String)) {
-            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(basePath,
+            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(documentName, basePath,
                     baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
@@ -79,7 +79,8 @@ public class ParseTypeDeclaration {
             loopPath.add(index);
 
             if (!(e instanceof List)) {
-                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e,
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(documentName, loopPath,
+                        e,
                         "Array");
 
                 parseFailures.addAll(thisParseFailures);

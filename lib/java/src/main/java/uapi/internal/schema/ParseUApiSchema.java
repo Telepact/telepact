@@ -18,8 +18,7 @@ import java.util.*;
 
 public class ParseUApiSchema {
 
-    public static UApiSchema parseUApiSchema(Map<String, List<Object>> uApiSchemaNameToPseudoJson,
-            List<String> documentOrder) {
+    public static UApiSchema parseUApiSchema(Map<String, List<Object>> uApiSchemaNameToPseudoJson) {
         final var originalSchema = new ArrayList<Object>();
         final var parsedTypes = new HashMap<String, UType>();
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -28,8 +27,9 @@ public class ParseUApiSchema {
         final var schemaKeysToDocumentName = new HashMap<String, String>();
         final var schemaKeys = new HashSet<String>();
 
-        for (var documentName : documentOrder) {
-            var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(documentName);
+        for (var entry : uApiSchemaNameToPseudoJson.entrySet()) {
+            var documentName = entry.getKey();
+            var uApiSchemaPseudoJson = entry.getValue();
 
             int index = -1;
             for (Object definition : uApiSchemaPseudoJson) {
@@ -38,7 +38,7 @@ public class ParseUApiSchema {
 
                 if (!(definition instanceof Map)) {
                     var thisParseFailures = getTypeUnexpectedParseFailure(
-                            (List<Object>) loopPath, definition, "Object");
+                            documentName, (List<Object>) loopPath, definition, "Object");
                     parseFailures.addAll(thisParseFailures);
                     continue;
                 }
@@ -46,7 +46,7 @@ public class ParseUApiSchema {
                 var def = (Map<String, Object>) definition;
 
                 try {
-                    var schemaKey = findSchemaKey(def, index);
+                    var schemaKey = findSchemaKey(documentName, def, index);
                     var ignoreIfDuplicate = (boolean) def.getOrDefault("_ignoreIfDuplicate", false);
                     var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
                     if (matchingSchemaKey != null) {
@@ -131,15 +131,17 @@ public class ParseUApiSchema {
                 try {
                     var error = parseErrorType(
                             def,
-                            uApiSchemaPseudoJson,
+                            thisDocumentName,
+                            uApiSchemaNameToPseudoJson,
                             thisKey,
                             thisIndex,
+                            schemaKeysToDocumentName,
                             schemaKeysToIndex,
                             parsedTypes,
                             parseFailures,
                             failedTypes);
                     applyErrorToParsedTypes(
-                            thisKey, thisIndex, error, parsedTypes, schemaKeysToIndex);
+                            thisDocumentName, thisKey, thisIndex, error, parsedTypes, schemaKeysToIndex);
                 } catch (UApiSchemaParseError e) {
                     var offsetParseFailures = offsetSchemaIndex(e.schemaParseFailures, thisDocumentName);
                     parseFailures.addAll(offsetParseFailures);
@@ -161,11 +163,13 @@ public class ParseUApiSchema {
 
             try {
                 var requestHeaderType = parseHeadersType(
+                        thisDocumentName,
                         def,
                         requestHeaderKey,
                         headerField,
                         thisIndex,
-                        uApiSchemaPseudoJson,
+                        uApiSchemaNameToPseudoJson,
+                        schemaKeysToDocumentName,
                         schemaKeysToIndex,
                         parsedTypes,
                         parseFailures,
@@ -186,11 +190,13 @@ public class ParseUApiSchema {
 
             try {
                 var responseHeaderType = parseHeadersType(
+                        thisDocumentName,
                         def,
                         responseHeaderKey,
                         headerField,
                         thisIndex,
-                        uApiSchemaPseudoJson,
+                        uApiSchemaNameToPseudoJson,
+                        schemaKeysToDocumentName,
                         schemaKeysToIndex,
                         parsedTypes,
                         parseFailures,

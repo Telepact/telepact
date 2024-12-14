@@ -73,7 +73,7 @@ public class ParseFunctionType {
 
             if (!(errorsRegexInit instanceof String)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
-                        regexPath, errorsRegexInit, "String");
+                        documentName, regexPath, errorsRegexInit, "String");
 
                 parseFailures
                         .addAll(thisParseFailures);
