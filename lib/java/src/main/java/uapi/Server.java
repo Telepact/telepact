@@ -73,9 +73,9 @@ public class Server {
         final var binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serialization, binaryEncoder);
 
-        if (((UStruct) this.uApiSchema.parsed.get("struct.Auth_")).fields.size() == 0 && options.authRequired) {
+        if (!this.uApiSchema.parsed.containsKey("struct.Auth_") && options.authRequired) {
             throw new RuntimeException(
-                    "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.");
+                    "Unauthenticated server. Either define a `struct._Auth` in your schema or set `options.authRequired` to `false`.");
         }
     }
 

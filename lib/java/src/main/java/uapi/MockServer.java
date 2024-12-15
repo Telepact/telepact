@@ -1,20 +1,13 @@
 package uapi;
 
 import static uapi.internal.mock.MockHandle.mockHandle;
-import static uapi.internal.schema.ExtendUApiSchema.extendUApiSchema;
-import static uapi.internal.schema.GetMockUApiJson.getMockUApiJson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import uapi.internal.mock.MockInvocation;
 import uapi.internal.mock.MockStub;
-import uapi.internal.types.UMockCall;
-import uapi.internal.types.UMockStub;
-import uapi.internal.types.UType;
 
 /**
  * A Mock instance of a uAPI server.
@@ -75,19 +68,20 @@ public class MockServer {
      * 
      * @param uApiSchemaAsJson
      */
-    public MockServer(UApiSchema uApiSchema, Options options) {
+    public MockServer(MockUApiSchema mockUApiSchema, Options options) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
         this.enableGeneratedDefaultStub = options.enableMessageResponseGeneration;
         this.enableOptionalFieldGeneration = options.enableOptionalFieldGeneration;
         this.randomizeOptionalFieldGeneration = options.randomizeOptionalFieldGeneration;
 
-        final var combinedUApiSchema = extendUApiSchema(uApiSchema, getMockUApiJson());
-
         final var serverOptions = new Server.Options();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
-        this.server = new Server(combinedUApiSchema, this::handle, serverOptions);
+        final var uApiSchema = new UApiSchema(mockUApiSchema.original, mockUApiSchema.parsed,
+                mockUApiSchema.parsedRequestHeaders, mockUApiSchema.parsedResponseHeaders);
+
+        this.server = new Server(uApiSchema, this::handle, serverOptions);
     }
 
     /**

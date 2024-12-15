@@ -9,10 +9,10 @@ import java.util.Map;
 import uapi.UApiSchema;
 
 public class CreateUApiSchemaFromJsonDocuments {
-    public static UApiSchema createUApiSchemaFromJsonDocuments(Map<String, List<String>> jsonDocuments) {
-        var finalJsonDocuments = new HashMap<String, List<String>>();
+    public static UApiSchema createUApiSchemaFromJsonDocuments(Map<String, String> jsonDocuments) {
+        var finalJsonDocuments = new HashMap<String, String>();
         finalJsonDocuments.putAll(jsonDocuments);
-        finalJsonDocuments.put("internal", List.of(getInternalUApiJson()));
+        finalJsonDocuments.put("internal", getInternalUApiJson());
 
         var uapiSchema = newUApiSchema(finalJsonDocuments);
 

@@ -15,7 +15,7 @@ import uapi.UApiSchema;
 import uapi.UApiSchemaParseError;
 
 public class NewUApiSchema {
-    public static UApiSchema newUApiSchema(Map<String, List<String>> uApiSchemaJsonDocuments) {
+    public static UApiSchema newUApiSchema(Map<String, String> uApiSchemaJsonDocuments) {
         final var objectMapper = new ObjectMapper();
         final var finalPseudoJson = new HashMap<String, List<Object>>();
 
@@ -24,7 +24,7 @@ public class NewUApiSchema {
 
             final Object uApiSchemaPseudoJsonInit;
             try {
-                uApiSchemaPseudoJsonInit = objectMapper.readValue(uApiSchemaJson.getValue().get(0),
+                uApiSchemaPseudoJsonInit = objectMapper.readValue(uApiSchemaJson.getValue(),
                         new TypeReference<>() {
                         });
             } catch (IOException e) {
