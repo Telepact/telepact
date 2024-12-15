@@ -24,11 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uapi.Client;
 import uapi.Message;
 import uapi.MockServer;
+import uapi.MockUApiSchema;
 import uapi.SerializationError;
 import uapi.Serializer;
 import uapi.Server;
 import uapi.UApiSchema;
 import uapi.UApiSchemaParseError;
+import uapi.internal.schema.GetSchemaFileMap;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
@@ -137,8 +139,7 @@ public class Main {
             String frontdoorTopic,
             Map<String, Object> config)
             throws IOException, InterruptedException {
-        var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var uApi = UApiSchema.fromJson(json);
+        var uApi = MockUApiSchema.fromDirectory(apiSchemaPath);
 
         var options = new MockServer.Options();
         options.onError = (e) -> e.printStackTrace();
@@ -179,8 +180,7 @@ public class Main {
             String apiSchemaPath,
             String frontdoorTopic)
             throws IOException, InterruptedException {
-        var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var uApi = UApiSchema.fromJson(json);
+        var uApi = UApiSchema.fromDirectory(apiSchemaPath);
         var objectMapper = new ObjectMapper();
 
         var timers = metrics.timer(frontdoorTopic);
@@ -211,7 +211,7 @@ public class Main {
                 if (extendSchemaJson == null) {
                     schema = UApiSchema.fromJson(schemaJson);
                 } else {
-                    schema = UApiSchema.fromJsonDocuments(List.of(schemaJson, extendSchemaJson));
+                    schema = UApiSchema.fromFileJsonMap(Map.of("original", schemaJson, "extend", extendSchemaJson));
                 }
                 return new Message(Map.of(), Map.of("Ok_", Map.of()));
             } catch (UApiSchemaParseError e) {
@@ -256,15 +256,19 @@ public class Main {
             String frontdoorTopic,
             String backdoorTopic, boolean authRequired, boolean useCodeGen)
             throws IOException, InterruptedException {
-        var json = Files.readString(FileSystems.getDefault().getPath(apiSchemaPath));
-        var uApi = UApiSchema.fromJsonDocuments(List.of(json));
-        var alternateUApi = UApiSchema.fromJsonDocuments(List.of(json, """
+        var map = GetSchemaFileMap.getSchemaFileMap(apiSchemaPath);
+        var alternateMap = new HashMap<>(map);
+        alternateMap.put("backwardsCompatibleChange",  """
                 [
                     {
                         "struct.BackwardsCompatibleChange": {}
                     }
                 ]
-                """));
+                """);
+
+        var uApi = UApiSchema.fromFileJsonMap(map);
+        var alternateUApi = UApiSchema.fromFileJsonMap(alternateMap);
+
         var objectMapper = new ObjectMapper();
 
         var timers = metrics.timer(frontdoorTopic);

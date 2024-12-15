@@ -10,7 +10,7 @@ import java.util.Map;
 import uapi.MockUApiSchema;
 
 public class CreateMockUApiSchemaFromJsonDocuments {
-    public static MockUApiSchema createMockUApiSchemaFromJsonDocuments(Map<String, String> jsonDocuments) {
+    public static MockUApiSchema createMockUApiSchemaFromFileJsonMap(Map<String, String> jsonDocuments) {
         var finalJsonDocuments = new HashMap<String, String>();
         finalJsonDocuments.putAll(jsonDocuments);
         finalJsonDocuments.put("internal", getInternalUApiJson());

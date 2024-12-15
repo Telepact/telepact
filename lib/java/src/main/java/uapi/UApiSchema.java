@@ -1,6 +1,7 @@
 package uapi;
 
-import static uapi.internal.schema.CreateUApiSchemaFromJsonDocuments.createUApiSchemaFromJsonDocuments;
+import static uapi.internal.schema.CreateUApiSchemaFromJsonDocuments.createUApiSchemaFromFileJsonMap;
+import static uapi.internal.schema.GetSchemaFileMap.getSchemaFileMap;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,15 @@ public class UApiSchema {
     }
 
     public static UApiSchema fromJson(String json) {
-        return createUApiSchemaFromJsonDocuments(Map.of("auto_", json));
+        return createUApiSchemaFromFileJsonMap(Map.of("auto_", json));
     }
 
-    public static UApiSchema fromJsonDocuments(Map<String, String> jsonDocuments) {
-        return createUApiSchemaFromJsonDocuments(jsonDocuments);
+    public static UApiSchema fromFileJsonMap(Map<String, String> fileJsonMap) {
+        return createUApiSchemaFromFileJsonMap(fileJsonMap);
+    }
+
+    public static UApiSchema fromDirectory(String directory) {
+        final var map = getSchemaFileMap(directory);
+        return createUApiSchemaFromFileJsonMap(map);
     }
 }

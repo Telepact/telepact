@@ -1,6 +1,7 @@
 package uapi;
 
-import static uapi.internal.mock.CreateMockUApiSchemaFromJsonDocuments.createMockUApiSchemaFromJsonDocuments;
+import static uapi.internal.mock.CreateMockUApiSchemaFromJsonDocuments.createMockUApiSchemaFromFileJsonMap;
+import static uapi.internal.schema.GetSchemaFileMap.getSchemaFileMap;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,15 @@ public class MockUApiSchema {
     }
 
     public static MockUApiSchema fromJson(String json) {
-        return createMockUApiSchemaFromJsonDocuments(Map.of("auto_", json));
+        return createMockUApiSchemaFromFileJsonMap(Map.of("auto_", json));
     }
 
-    public static MockUApiSchema fromJsonDocuments(Map<String, String> jsonDocuments) {
-        return createMockUApiSchemaFromJsonDocuments(jsonDocuments);
+    public static MockUApiSchema fromFileJsonMap(Map<String, String> fileJsonMap) {
+        return createMockUApiSchemaFromFileJsonMap(fileJsonMap);
+    }
+
+    public static MockUApiSchema fromDirectory(String directory) {
+        final var map = getSchemaFileMap(directory);
+        return createMockUApiSchemaFromFileJsonMap(map);
     }
 }
