@@ -160,7 +160,15 @@ public class ParseUApiSchema {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName);
+        try {
+            catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName);
+        } catch (UApiSchemaParseError e) {
+            parseFailures.addAll(e.schemaParseFailures);
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
 
         for (var error : errors) {
             try {
