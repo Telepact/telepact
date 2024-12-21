@@ -37,7 +37,7 @@ public class ParseStructFields {
 
                     parseFailures
                             .add(new SchemaParseFailure(documentName, finalPath, "PathCollision",
-                                    Map.of("other", finalOtherPath)));
+                                    Map.of("document", documentName, "path", finalOtherPath)));
                 }
             }
 

@@ -1,6 +1,7 @@
 cases = {
     'schema': [
-        [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {}}, {'struct.Example': {}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [1, 'struct.Example'], 'reason': {'PathCollision': {'other': [0, 'struct.Example']}}}]}}]],
+        [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {}}, {'struct.Example': {}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'auto_', 'path': [1, 'struct.Example'], 'reason': {'PathCollision': {'document': 'auto_', 'path': [0, 'struct.Example']}}}]}}]],
+
         [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {'field': ['boolean'], 'field!': ['integer']}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'key!': 'struct.Example', 'path': [0, 'struct.Example', 'field!'], 'reason': {'PathCollision': {'other': [0, 'struct.Example', 'field']}}}]}}]],
         [[{}, {'fn.validateSchema': {'schema': [{'struct.Example': {'field!': ['boolean'], 'field': ['integer']}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'key!': 'struct.Example', 'path': [0, 'struct.Example', 'field'], 'reason': {'PathCollision': {'other': [0, 'struct.Example', 'field!']}}}]}}]],
         [[{}, {'fn.validateSchema': {'schema': [{'invalid.Example': {}}]}}], [{}, {'ErrorValidationFailure': {'cases': [{'path': [0], 'reason': {'ObjectKeyRegexMatchCountUnexpected': {'regex': '^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\\..*)', 'actual': 0, 'expected': 1, 'keys': ['invalid.Example']}}}]}}]],

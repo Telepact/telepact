@@ -11,7 +11,8 @@ import uapi.UApiSchemaParseError;
 
 public class ApplyErrorToParsedTypes {
     public static void applyErrorToParsedTypes(String documentName, String errorKey, int errorIndex, UError error,
-            Map<String, UType> parsedTypes, Map<String, Integer> schemaKeysToIndex) {
+            Map<String, UType> parsedTypes, Map<String, String> schemaKeysToDocumentNames,
+            Map<String, Integer> schemaKeysToIndex) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         for (var entry : parsedTypes.entrySet()) {
@@ -43,11 +44,13 @@ public class ApplyErrorToParsedTypes {
                 if (fnResultCases.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
                     var errorCaseIndex = error.errors.caseIndices.get(newKey);
+                    var otherDocumentName = schemaKeysToDocumentNames.get(fnName);
                     var fnErrorCaseIndex = f.result.caseIndices.get(newKey);
                     parseFailures.add(new SchemaParseFailure(documentName,
                             List.of(errorIndex, errorKey, errorCaseIndex, newKey),
                             "PathCollision",
-                            Map.of("other", List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey))));
+                            Map.of("document", otherDocumentName, "path",
+                                    List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey))));
                 }
                 fnResultCases.put(newKey, errorCase);
             }

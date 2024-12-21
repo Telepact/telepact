@@ -69,8 +69,8 @@ public class ParseUApiSchema {
                                     documentName,
                                     finalPath,
                                     "PathCollision",
-                                    Map.of("other", List.of(otherPathIndex, matchingSchemaKey), "otherDocument",
-                                            otherDocumentName)));
+                                    Map.of("document", otherDocumentName, "path",
+                                            List.of(otherPathIndex, matchingSchemaKey))));
                         }
                         continue;
                     }
@@ -153,7 +153,8 @@ public class ParseUApiSchema {
                             parseFailures,
                             failedTypes);
                     applyErrorToParsedTypes(
-                            thisDocumentName, thisKey, thisIndex, error, parsedTypes, schemaKeysToIndex);
+                            thisDocumentName, thisKey, thisIndex, error, parsedTypes, schemaKeysToDocumentName,
+                            schemaKeysToIndex);
                 } catch (UApiSchemaParseError e) {
                     var offsetParseFailures = offsetSchemaIndex(e.schemaParseFailures, thisDocumentName);
                     parseFailures.addAll(offsetParseFailures);

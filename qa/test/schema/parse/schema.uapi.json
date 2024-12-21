@@ -79,9 +79,9 @@
     },
     {
         "struct.ValidationFailure": {
+            "document": ["string"],
             "path": ["array", ["any"]],
-            "reason": ["union.ValidationFailureReason"],
-            "key!": ["string"]
+            "reason": ["union.ValidationFailureReason"]
         }
     },
     {

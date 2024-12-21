@@ -62,8 +62,8 @@ public class CatchErrorCollisions {
                                     otherDocumentName,
                                     List.of(otherIndex, otherDefKey, l, thisOtherErrorDefKey),
                                     "PathCollision",
-                                    Map.of("path", List.of(index, defKey, k, thisErrorDefKey), "document",
-                                            documentName)));
+                                    Map.of("document", documentName, "path",
+                                            List.of(index, defKey, k, thisErrorDefKey))));
                         }
                     }
                 }
