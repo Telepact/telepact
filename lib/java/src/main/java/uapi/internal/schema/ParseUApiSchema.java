@@ -6,7 +6,6 @@ import static uapi.internal.schema.FindMatchingSchemaKey.findMatchingSchemaKey;
 import static uapi.internal.schema.FindSchemaKey.findSchemaKey;
 import static uapi.internal.schema.GetOrParseType.getOrParseType;
 import static uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
-import static uapi.internal.schema.OffsetSchemaIndex.offsetSchemaIndex;
 import static uapi.internal.schema.ParseErrorType.parseErrorType;
 import static uapi.internal.schema.ParseHeadersType.parseHeadersType;
 
@@ -122,8 +121,7 @@ public class ParseUApiSchema {
                         parseFailures,
                         failedTypes);
             } catch (UApiSchemaParseError e) {
-                var offsetParseFailures = offsetSchemaIndex(parseFailures, thisDocumentName);
-                parseFailures.addAll(offsetParseFailures);
+                parseFailures.addAll(e.schemaParseFailures);
             }
         }
 
@@ -156,8 +154,7 @@ public class ParseUApiSchema {
                             thisDocumentName, thisKey, thisIndex, error, parsedTypes, schemaKeysToDocumentName,
                             schemaKeysToIndex);
                 } catch (UApiSchemaParseError e) {
-                    var offsetParseFailures = offsetSchemaIndex(e.schemaParseFailures, thisDocumentName);
-                    parseFailures.addAll(offsetParseFailures);
+                    parseFailures.addAll(e.schemaParseFailures);
                 }
             }
         } catch (UApiSchemaParseError e) {
@@ -189,8 +186,7 @@ public class ParseUApiSchema {
                         failedTypes);
                 requestHeaders.put(requestHeaderType.fieldName, requestHeaderType);
             } catch (UApiSchemaParseError e) {
-                var offsetParseFailures = offsetSchemaIndex(e.schemaParseFailures, thisDocumentName);
-                parseFailures.addAll(offsetParseFailures);
+                parseFailures.addAll(e.schemaParseFailures);
             }
         }
 
@@ -216,8 +212,7 @@ public class ParseUApiSchema {
                         failedTypes);
                 responseHeaders.put(responseHeaderType.fieldName, responseHeaderType);
             } catch (UApiSchemaParseError e) {
-                var offsetParseFailures = offsetSchemaIndex(e.schemaParseFailures, thisDocumentName);
-                parseFailures.addAll(offsetParseFailures);
+                parseFailures.addAll(e.schemaParseFailures);
             }
         }
 

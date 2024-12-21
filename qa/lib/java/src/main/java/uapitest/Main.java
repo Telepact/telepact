@@ -258,7 +258,7 @@ public class Main {
             throws IOException, InterruptedException {
         var map = GetSchemaFileMap.getSchemaFileMap(apiSchemaPath);
         var alternateMap = new HashMap<>(map);
-        alternateMap.put("backwardsCompatibleChange",  """
+        alternateMap.put("backwardsCompatibleChange", """
                 [
                     {
                         "struct.BackwardsCompatibleChange": {}
