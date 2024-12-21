@@ -2,8 +2,8 @@ package uapi.internal.binary;
 
 import static uapi.internal.binary.CreateChecksum.createChecksum;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import uapi.UApiSchema;
@@ -51,7 +51,7 @@ public class ConstructBinaryEncoding {
             }
         }
         var i = 0;
-        final var binaryEncodingMap = new HashMap<String, Integer>();
+        final var binaryEncodingMap = new TreeMap<String, Integer>();
         for (final var key : allKeys) {
             binaryEncodingMap.put(key, i);
             i += 1;
