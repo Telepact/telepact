@@ -1,6 +1,6 @@
 package uapi;
 
-import static uapi.internal.mock.CreateMockUApiSchemaFromJsonDocuments.createMockUApiSchemaFromFileJsonMap;
+import static uapi.internal.schema.CreateMockUApiSchemaFromJsonDocuments.createMockUApiSchemaFromFileJsonMap;
 import static uapi.internal.schema.GetSchemaFileMap.getSchemaFileMap;
 
 import java.util.List;

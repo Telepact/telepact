@@ -19,7 +19,17 @@ import java.util.*;
 public class ParseUApiSchema {
 
     public static UApiSchema parseUApiSchema(Map<String, List<Object>> uApiSchemaNameToPseudoJson) {
-        final var originalSchema = new ArrayList<Object>();
+        final var originalSchema = new TreeMap<String, Object>((k1, k2) -> {
+            if (k1.equals(k2)) {
+                return 0;
+            } else if (k1.startsWith("info.")) {
+                return -1;
+            } else if (k2.startsWith("info.")) {
+                return 1;
+            } else {
+                return k1.compareTo(k2);
+            }
+        });
         final var parsedTypes = new HashMap<String, UType>();
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var failedTypes = new HashSet<String>();
@@ -68,7 +78,9 @@ public class ParseUApiSchema {
                     schemaKeys.add(schemaKey);
                     schemaKeysToIndex.put(schemaKey, index);
                     schemaKeysToDocumentName.put(schemaKey, documentName);
-                    originalSchema.add(def);
+                    if (!documentName.endsWith("_")) {
+                        originalSchema.put(schemaKey, def);
+                    }
                 } catch (UApiSchemaParseError e) {
                     parseFailures.addAll(e.schemaParseFailures);
                 }
@@ -212,8 +224,10 @@ public class ParseUApiSchema {
             throw new UApiSchemaParseError(parseFailures);
         }
 
+        final var finalOriginalSchema = new ArrayList<>(originalSchema.values());
+
         return new UApiSchema(
-                originalSchema,
+                finalOriginalSchema,
                 parsedTypes,
                 requestHeaders,
                 responseHeaders);

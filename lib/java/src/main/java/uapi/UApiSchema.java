@@ -1,6 +1,6 @@
 package uapi;
 
-import static uapi.internal.schema.CreateUApiSchemaFromJsonDocuments.createUApiSchemaFromFileJsonMap;
+import static uapi.internal.schema.CreateUApiSchemaFromFileJsonMap.createUApiSchemaFromFileJsonMap;
 import static uapi.internal.schema.GetSchemaFileMap.getSchemaFileMap;
 
 import java.util.List;

@@ -56,6 +56,7 @@ $ python uapi_ws.py '["function.sub", {"Authorization": "Bearer <token>"}, {"x":
 | Compact and efficient data serialization protocol         | ❌      | ✅   | ❌      | ✅   |
 | Built-in dynamic response shaping                         | ❌      | ❌   | ✅      | ✅   |
 | No ABI                                                    | ✅      | ❌   | ✅      | ✅   |
+| Expressive distinction between null and undefined         | ❌      | ❌   | ❌      | ✅   |
 | Built-in API documentation distribution                   | ❌      | ❌   | ❌      | ✅   |
 | Generic Types                                             | ❌      | ❌   | ❌      | ✅   |
 | Built-in mocking for tests                                | ❌      | ❌   | ❌      | ✅   |
@@ -218,11 +219,29 @@ be interpreted as an error in all circumstances. API designers are encouraged to
 prefix additional result union values with `error` or equivalent to improve
 readability and recognition of errors.
 
+### Why can't I associate a union tag to something besides a struct?
+
+In simpler data design situations, a designer might want to treat a union tag
+like a struct field, and associate any data type with a tag. However, in uAPI,
+all tags in unions are associated with structs, which means you can't associate
+union tags with simpler data types, like booleans or strings.
+
+This restriction is in place to uphold uAPI's value of prioritizing effective
+software evolution. Unions, like functions, are entrypoints to unique
+execution paths in software, so if software evolves such that an execution
+path requires a new "argument" like a integer, that requirement will percolate
+up to the entrypoint. If the previous API designer chose to associate the
+union tag directly a boolean, the API would require a breaking change to make
+room for this new integer "argument." In contrast, uAPI establishing the
+expectation that all union tags are associated with structs means the backwards
+compatible option of adding a new struct field is always available to
+software designers dealing with the needs of evolving software.
+
 ### Is adding a new union value a backwards compatible change?
 
 Many API technologies will classify adding a new union value to an existing
 union as a backwards incompatible change. This is due to the potential risk of a
-client driving critical code paths off an union value, and the emergence of a
+client driving critical code paths off a union value, and the emergence of a
 new union value begets undefined behavior in that critical path, which invites
 bugs. And some technologies may suffer build-time failures due to the fact that
 many API technologies integrate directly with programming languages through
@@ -233,10 +252,10 @@ or `match` statement until that new value has a handling procedure implemented.
 uAPI takes the stance that adding a new union value to an existing union _is_ a
 backwards compatible change, on the basis of the following:
 
--   Unions are powerful typing constructs that replace otherwise type unsafe
-    patterns, and classifying evolution of an union as backwards incompatible
-    discourages use in favor of far more flimsy data types like strings, violating
-    uAPI's core principles of encouraging the strongest of type patterns.
+-   Unions are powerful typing constructs, and classifying evolution of an union as
+    backwards incompatible discourages use in favor of far more flimsy data types
+    like strings, violating uAPI's core principles of encouraging the strongest of
+    type patterns.
 -   uAPI does not run the risk of build-time failures with unions since uAPI
     unions are represented as special objects in generated code rather than native
     unions.
