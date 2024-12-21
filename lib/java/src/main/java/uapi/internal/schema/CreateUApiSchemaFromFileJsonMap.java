@@ -6,6 +6,7 @@ import static uapi.internal.schema.GetAuthUApiJson.getAuthUApiJson;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import uapi.UApiSchema;
 
@@ -17,8 +18,9 @@ public class CreateUApiSchemaFromFileJsonMap {
 
         // Determine if we need to add the auth schema
         for (var json : jsonDocuments.values()) {
-
-            if (json.matches("\"struct\\.Auth_\"[\\s]*")) {
+            var regex = Pattern.compile("\"struct\\.Auth_\"\\s*:");
+            var matcher = regex.matcher(json);
+            if (matcher.find()) {
                 finalJsonDocuments.put("auth_", getAuthUApiJson());
                 break;
             }

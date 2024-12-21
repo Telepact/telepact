@@ -75,7 +75,7 @@ public class Server {
 
         if (!this.uApiSchema.parsed.containsKey("struct.Auth_") && options.authRequired) {
             throw new RuntimeException(
-                    "Unauthenticated server. Either define a `struct._Auth` in your schema or set `options.authRequired` to `false`.");
+                    "Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.authRequired` to `false`.");
         }
     }
 
