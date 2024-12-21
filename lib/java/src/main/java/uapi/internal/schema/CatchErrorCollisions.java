@@ -17,7 +17,7 @@ public class CatchErrorCollisions {
         errorKeysList.sort((k1, k2) -> {
             var index1 = keysToIndex.get(k1);
             var index2 = keysToIndex.get(k2);
-            return index2 - index1;
+            return index1 - index2;
         });
 
         for (var i = 0; i < errorKeysList.size(); i++) {

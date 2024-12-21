@@ -11,6 +11,7 @@ import static uapi.internal.schema.ParseHeadersType.parseHeadersType;
 
 import uapi.UApiSchema;
 import uapi.UApiSchemaParseError;
+import uapi.internal.types.UError;
 import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UType;
 import java.util.*;
@@ -129,36 +130,44 @@ public class ParseUApiSchema {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        try {
-            catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName);
+        var errors = new ArrayList<UError>();
 
-            for (String thisKey : errorKeys) {
-                var thisIndex = schemaKeysToIndex.get(thisKey);
-                var thisDocumentName = schemaKeysToDocumentName.get(thisKey);
-                var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(thisDocumentName);
-                var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
+        for (String thisKey : errorKeys) {
+            var thisIndex = schemaKeysToIndex.get(thisKey);
+            var thisDocumentName = schemaKeysToDocumentName.get(thisKey);
+            var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(thisDocumentName);
+            var def = (Map<String, Object>) uApiSchemaPseudoJson.get(thisIndex);
 
-                try {
-                    var error = parseErrorType(
-                            def,
-                            thisDocumentName,
-                            uApiSchemaNameToPseudoJson,
-                            thisKey,
-                            thisIndex,
-                            schemaKeysToDocumentName,
-                            schemaKeysToIndex,
-                            parsedTypes,
-                            parseFailures,
-                            failedTypes);
-                    applyErrorToParsedTypes(
-                            thisDocumentName, thisKey, thisIndex, error, parsedTypes, schemaKeysToDocumentName,
-                            schemaKeysToIndex);
-                } catch (UApiSchemaParseError e) {
-                    parseFailures.addAll(e.schemaParseFailures);
-                }
+            try {
+                var error = parseErrorType(
+                        def,
+                        thisDocumentName,
+                        uApiSchemaNameToPseudoJson,
+                        thisKey,
+                        thisIndex,
+                        schemaKeysToDocumentName,
+                        schemaKeysToIndex,
+                        parsedTypes,
+                        parseFailures,
+                        failedTypes);
+                errors.add(error);
+            } catch (UApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
             }
-        } catch (UApiSchemaParseError e) {
-            parseFailures.addAll(e.schemaParseFailures);
+        }
+
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
+
+        catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName);
+
+        for (var error : errors) {
+            try {
+                applyErrorToParsedTypes(error, parsedTypes, schemaKeysToDocumentName, schemaKeysToIndex);
+            } catch (UApiSchemaParseError e) {
+                parseFailures.addAll(e.schemaParseFailures);
+            }
         }
 
         var requestHeaders = new HashMap<String, UFieldDeclaration>();

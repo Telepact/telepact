@@ -10,10 +10,14 @@ import uapi.internal.types.UType;
 import uapi.UApiSchemaParseError;
 
 public class ApplyErrorToParsedTypes {
-    public static void applyErrorToParsedTypes(String documentName, String errorKey, int errorIndex, UError error,
+    public static void applyErrorToParsedTypes(UError error,
             Map<String, UType> parsedTypes, Map<String, String> schemaKeysToDocumentNames,
             Map<String, Integer> schemaKeysToIndex) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
+
+        var errorKey = error.name;
+        var errorIndex = schemaKeysToIndex.get(errorKey);
+        var documentName = schemaKeysToDocumentNames.get(errorKey);
 
         for (var entry : parsedTypes.entrySet()) {
             var parsedTypeName = entry.getKey();
