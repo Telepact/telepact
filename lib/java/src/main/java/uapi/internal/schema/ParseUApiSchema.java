@@ -37,9 +37,10 @@ public class ParseUApiSchema {
         final var schemaKeysToDocumentName = new HashMap<String, String>();
         final var schemaKeys = new HashSet<String>();
 
-        for (var entry : uApiSchemaNameToPseudoJson.entrySet()) {
-            var documentName = entry.getKey();
-            var uApiSchemaPseudoJson = entry.getValue();
+        final var orderedDocuments = new TreeSet<>(uApiSchemaNameToPseudoJson.keySet());
+
+        for (var documentName : orderedDocuments) {
+            var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(documentName);
 
             int index = -1;
             for (Object definition : uApiSchemaPseudoJson) {

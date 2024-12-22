@@ -190,7 +190,8 @@ public class Main {
 
             var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
             var schemaPseudoJson = arg.get("schema");
-            var extendSchemaJson = (String) arg.get("extend!");
+            var extendPseudoJson = arg.get("extend!");
+            var extendSchemaJson = (String) arg.get("extendJson!");
 
             var serializeSchema = (Boolean) requestMessage.header.getOrDefault("_serializeSchema", true);
 
@@ -208,10 +209,23 @@ public class Main {
 
             try {
                 UApiSchema schema;
-                if (extendSchemaJson == null) {
+                if (extendPseudoJson != null) {
+                    String extendJson;
+                    if (serializeSchema) {
+                        try {
+                            var extendJsonBytes = objectMapper.writeValueAsBytes(extendPseudoJson);
+                            extendJson = new String(extendJsonBytes);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        extendJson = (String) schemaPseudoJson;
+                    }
+                    schema = UApiSchema.fromFileJsonMap(Map.of("default", schemaJson, "extend", extendJson));
+                } else if (extendSchemaJson == null) {
                     schema = UApiSchema.fromJson(schemaJson);
                 } else {
-                    schema = UApiSchema.fromFileJsonMap(Map.of("original", schemaJson, "extend", extendSchemaJson));
+                    schema = UApiSchema.fromFileJsonMap(Map.of("default", schemaJson, "extend", extendSchemaJson));
                 }
                 return new Message(Map.of(), Map.of("Ok_", Map.of()));
             } catch (UApiSchemaParseError e) {

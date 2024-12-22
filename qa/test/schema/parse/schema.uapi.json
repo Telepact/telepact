@@ -87,7 +87,8 @@
     {
         "fn.validateSchema": {
             "schema": ["any?"],
-            "extend!": ["any?"]
+            "extend!": ["any"],
+            "extendJson!": ["any?"]
         },
         "->": [{
             "Ok_": {}
