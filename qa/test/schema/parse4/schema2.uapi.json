@@ -1,0 +1,11 @@
+[
+    {
+        "fn.example": {},
+        "->": [{
+            "Ok_": {
+                "result": ["struct.Example"],
+                "extra": "string"
+            }
+        }]
+    }
+]

@@ -85,10 +85,24 @@
         }
     },
     {
+        "union.SchemaInput": [{
+            "PseudoJson": {
+                "schema": ["any?"],
+                "extend!": ["any?"]
+            }
+        }, {
+            "Json": {
+                "schema": ["string"]
+            }
+        }, {
+            "Directory": {
+                "schemaDirectory": ["string"]
+            }
+        }]
+    },
+    {
         "fn.validateSchema": {
-            "schema": ["any?"],
-            "extend!": ["any"],
-            "extendJson!": ["any?"]
+            "input": ["union.SchemaInput"]
         },
         "->": [{
             "Ok_": {}

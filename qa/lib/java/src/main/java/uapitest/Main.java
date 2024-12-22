@@ -189,51 +189,55 @@ public class Main {
             var requestBody = requestMessage.body;
 
             var arg = (Map<String, Object>) requestBody.get("fn.validateSchema");
-            var schemaPseudoJson = arg.get("schema");
-            var extendPseudoJson = arg.get("extend!");
-            var extendSchemaJson = (String) arg.get("extendJson!");
+            var input = (Map<String, Object>) arg.get("input");
 
-            var serializeSchema = (Boolean) requestMessage.header.getOrDefault("_serializeSchema", true);
-
-            String schemaJson;
-            if (serializeSchema) {
-                try {
-                    var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
-                    schemaJson = new String(schemaJsonBytes);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                schemaJson = (String) schemaPseudoJson;
-            }
+            var inputTag = input.keySet().iterator().next();
 
             try {
-                UApiSchema schema;
-                if (extendPseudoJson != null) {
-                    String extendJson;
-                    if (serializeSchema) {
+                if (inputTag.equals("PseudoJson")) {
+                    var unionValue = (Map<String, Object>) input.get(inputTag);
+                    var schemaPseudoJson = unionValue.get("schema");
+                    var extendPseudoJson = unionValue.get("extend!");
+
+                    String schemaJson;
+                    try {
+                        var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
+                        schemaJson = new String(schemaJsonBytes);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (extendPseudoJson != null) {
+                        String extendJson;
                         try {
                             var extendJsonBytes = objectMapper.writeValueAsBytes(extendPseudoJson);
                             extendJson = new String(extendJsonBytes);
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }
+                        UApiSchema.fromFileJsonMap(Map.of("default", schemaJson, "extend", extendJson));
                     } else {
-                        extendJson = (String) schemaPseudoJson;
+                        UApiSchema.fromJson(schemaJson);
                     }
-                    schema = UApiSchema.fromFileJsonMap(Map.of("default", schemaJson, "extend", extendJson));
-                } else if (extendSchemaJson == null) {
-                    schema = UApiSchema.fromJson(schemaJson);
+                } else if (inputTag.equals("Json")) {
+                    var unionValue = (Map<String, Object>) input.get(inputTag);
+                    var schemaJson = (String) unionValue.get("schema");
+                    UApiSchema.fromJson(schemaJson);
+                } else if (inputTag.equals("Directory")) {
+                    var unionValue = (Map<String, Object>) input.get(inputTag);
+                    var schemaPath = (String) unionValue.get("schemaDirectory");
+                    UApiSchema.fromDirectory(schemaPath);
                 } else {
-                    schema = UApiSchema.fromFileJsonMap(Map.of("default", schemaJson, "extend", extendSchemaJson));
+                    throw new RuntimeException("unknown input tag");
                 }
-                return new Message(Map.of(), Map.of("Ok_", Map.of()));
             } catch (UApiSchemaParseError e) {
                 e.printStackTrace();
                 System.err.flush();
                 return new Message(Map.of(),
                         Map.of("ErrorValidationFailure", Map.of("cases", e.schemaParseFailuresPseudoJson)));
             }
+
+            return new Message(Map.of(), Map.of("Ok_", Map.of()));
         };
 
         var options = new Server.Options();
