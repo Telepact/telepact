@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 
-def find_schema_key(definition: dict[str, object], index: int) -> str:
+def find_schema_key(document_name: str, definition: dict[str, object], index: int) -> str:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
     import re
@@ -18,9 +18,8 @@ def find_schema_key(definition: dict[str, object], index: int) -> str:
     if len(matches) == 1:
         return matches[0]
     else:
-        parse_failure = SchemaParseFailure([index],
+        parse_failure = SchemaParseFailure(document_name, [index],
                                            "ObjectKeyRegexMatchCountUnexpected",
                                            {"regex": regex, "actual": len(
-                                               matches), "expected": 1, "keys": keys},
-                                           None)
+                                               matches), "expected": 1, "keys": keys})
         raise UApiSchemaParseError([parse_failure])

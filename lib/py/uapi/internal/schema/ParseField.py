@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def parse_field(path: list[object], field_declaration: str, type_declaration_value: object,
-                type_parameter_count: int, uapi_schema_pseudo_json: list[object],
-                schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
+def parse_field(document_name: str, path: list[object], field_declaration: str, type_declaration_value: object,
+                type_parameter_count: int, uapi_schema_document_names_to_pseudo_json: dict[str, list[object]],
+                schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
                 all_parse_failures: list['SchemaParseFailure'],
                 failed_types: set[str]) -> 'UFieldDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -22,10 +22,9 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
     matcher = regex.match(field_declaration)
     if not matcher:
         final_path = path + [field_declaration]
-        raise UApiSchemaParseError([SchemaParseFailure(final_path,
+        raise UApiSchemaParseError([SchemaParseFailure(document_name, final_path,
                                                        "KeyRegexMatchFailed",
-                                                       {"regex": regex_string},
-                                                       None)])
+                                                       {"regex": regex_string})])
 
     field_name = matcher.group(0)
     optional = bool(matcher.group(2))
@@ -33,15 +32,19 @@ def parse_field(path: list[object], field_declaration: str, type_declaration_val
     this_path = path + [field_name]
 
     if not isinstance(type_declaration_value, list):
-        raise UApiSchemaParseError(get_type_unexpected_parse_failure(this_path,
-                                                                     type_declaration_value,
-                                                                     "Array"))
+        raise UApiSchemaParseError(get_type_unexpected_parse_failure(
+            document_name,
+            this_path,
+            type_declaration_value,
+            "Array"))
     type_declaration_array = type_declaration_value
 
-    type_declaration = parse_type_declaration(this_path,
+    type_declaration = parse_type_declaration(document_name,
+                                              this_path,
                                               type_declaration_array,
                                               type_parameter_count,
-                                              uapi_schema_pseudo_json,
+                                              uapi_schema_document_names_to_pseudo_json,
+                                              schema_keys_to_document_names,
                                               schema_keys_to_index,
                                               parsed_types,
                                               all_parse_failures,

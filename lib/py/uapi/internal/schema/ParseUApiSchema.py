@@ -10,8 +10,7 @@ if TYPE_CHECKING:
 
 
 def parse_uapi_schema(
-    u_api_schema_pseudo_json: list[object],
-    path_offset: int
+    u_api_schema_document_name_to_pseudo_json: dict[str, list[object]]
 ) -> 'UApiSchema':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ApplyErrorToParsedTypes import apply_error_to_parsed_types
@@ -20,58 +19,63 @@ def parse_uapi_schema(
     from uapi.internal.schema.FindSchemaKey import find_schema_key
     from uapi.internal.schema.GetOrParseType import get_or_parse_type
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-    from uapi.internal.schema.OffsetSchemaIndex import offset_schema_index
     from uapi.internal.schema.ParseErrorType import parse_error_type
     from uapi.internal.schema.ParseHeadersType import parse_headers_type
 
+    original_schema: dict[str, object] = {}
     parsed_types: dict[str, UType] = {}
     parse_failures: list[SchemaParseFailure] = []
     failed_types: set[str] = set()
+    schema_keys_to_document_names: dict[str, str] = {}
     schema_keys_to_index: dict[str, int] = {}
     schema_keys: set[str] = set()
 
-    index = -1
-    for definition in u_api_schema_pseudo_json:
-        index += 1
-        loop_path = [index]
+    ordered_document_names = sorted(
+        list(u_api_schema_document_name_to_pseudo_json.keys()))
 
-        if not isinstance(definition, dict):
-            this_parse_failures = get_type_unexpected_parse_failure(
-                cast(list[object], loop_path), definition, "Object")
-            parse_failures.extend(this_parse_failures)
-            continue
+    for document_name in ordered_document_names:
+        u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[document_name]
 
-        def_ = definition
+        index = -1
+        for definition in u_api_schema_pseudo_json:
 
-        try:
-            schema_key = find_schema_key(def_, index)
-        except UApiSchemaParseError as e:
-            parse_failures.extend(e.schema_parse_failures)
-            continue
+            index += 1
+            loop_path = [index]
 
-        ignore_if_duplicate = def_.get("_ignoreIfDuplicate", False)
-        matching_schema_key = find_matching_schema_key(schema_keys, schema_key)
-        if matching_schema_key is not None:
-            if not ignore_if_duplicate:
-                other_path_index = schema_keys_to_index[matching_schema_key]
-                final_path = loop_path + [schema_key]
-                parse_failures.append(
-                    SchemaParseFailure(
-                        cast(list[object], final_path),
-                        "PathCollision",
-                        {"other": [other_path_index, matching_schema_key]},
-                        schema_key,
+            if not isinstance(definition, dict):
+                this_parse_failures = get_type_unexpected_parse_failure(
+                    document_name, cast(list[object], loop_path), definition, "Object")
+                parse_failures.extend(this_parse_failures)
+                continue
+
+            def_ = definition
+
+            try:
+                schema_key = find_schema_key(document_name, def_, index)
+
+                matching_schema_key = find_matching_schema_key(
+                    schema_keys, schema_key)
+                if matching_schema_key is not None:
+                    other_path_index = schema_keys_to_index[matching_schema_key]
+                    other_document_name = schema_keys_to_document_names[matching_schema_key]
+                    final_path = loop_path + [schema_key]
+                    parse_failures.append(
+                        SchemaParseFailure(
+                            document_name, cast(list[object], final_path),
+                            "PathCollision",
+                            {"document": other_document_name, "path": [other_path_index, matching_schema_key]})
                     )
-                )
-            continue
+                    continue
 
-        schema_keys.add(schema_key)
-        schema_keys_to_index[schema_key] = index
+                schema_keys.add(schema_key)
+                schema_keys_to_index[schema_key] = index
+
+            except UApiSchemaParseError as e:
+                parse_failures.extend(e.schema_parse_failures)
+                continue
 
     if parse_failures:
-        offset_parse_failures = offset_schema_index(
-            parse_failures, path_offset, schema_keys_to_index)
-        raise UApiSchemaParseError(offset_parse_failures)
+        raise UApiSchemaParseError(parse_failures)
 
     request_header_keys: set[str] = set()
     response_header_keys: set[str] = set()
@@ -95,10 +99,12 @@ def parse_uapi_schema(
 
         try:
             get_or_parse_type(
+                document_name,
                 [this_index],
                 schema_key,
                 root_type_parameter_count,
-                u_api_schema_pseudo_json,
+                u_api_schema_document_name_to_pseudo_json,
+                schema_keys_to_document_names,
                 schema_keys_to_index,
                 parsed_types,
                 parse_failures,

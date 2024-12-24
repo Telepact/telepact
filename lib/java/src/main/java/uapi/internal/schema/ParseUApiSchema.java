@@ -58,21 +58,18 @@ public class ParseUApiSchema {
 
                 try {
                     var schemaKey = findSchemaKey(documentName, def, index);
-                    var ignoreIfDuplicate = (boolean) def.getOrDefault("_ignoreIfDuplicate", false);
                     var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
                     if (matchingSchemaKey != null) {
-                        if (!ignoreIfDuplicate) {
-                            var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
-                            var otherDocumentName = schemaKeysToDocumentName.get(matchingSchemaKey);
-                            var finalPath = new ArrayList<>(loopPath);
-                            finalPath.add(schemaKey);
-                            parseFailures.add(new SchemaParseFailure(
-                                    documentName,
-                                    finalPath,
-                                    "PathCollision",
-                                    Map.of("document", otherDocumentName, "path",
-                                            List.of(otherPathIndex, matchingSchemaKey))));
-                        }
+                        var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
+                        var otherDocumentName = schemaKeysToDocumentName.get(matchingSchemaKey);
+                        var finalPath = new ArrayList<>(loopPath);
+                        finalPath.add(schemaKey);
+                        parseFailures.add(new SchemaParseFailure(
+                                documentName,
+                                finalPath,
+                                "PathCollision",
+                                Map.of("document", otherDocumentName, "path",
+                                        List.of(otherPathIndex, matchingSchemaKey))));
                         continue;
                     }
 

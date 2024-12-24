@@ -7,9 +7,11 @@ if TYPE_CHECKING:
 
 
 def parse_error_type(error_definition_as_parsed_json: dict[str, object],
-                     u_api_schema_pseudo_json: list[object],
+                     document_name: str,
+                     u_api_schema_document_names_to_pseudo_json: dict[str, list[object]],
                      schema_key: str,
                      index: int,
+                     schema_keys_to_document_names: dict[str, str],
                      schema_keys_to_index: dict[str, int],
                      parsed_types: dict[str, 'UType'],
                      all_parse_failures: list['SchemaParseFailure'],
@@ -29,15 +31,15 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
         for k in other_keys:
             loop_path = base_path + [k]
             parse_failures.append(SchemaParseFailure(
-                cast(list[object], loop_path), "ObjectKeyDisallowed", {}, None))
+                document_name, cast(list[object], loop_path), "ObjectKeyDisallowed", {}))
 
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
     type_parameter_count = 0
 
-    error = parse_union_type(base_path, error_definition_as_parsed_json, schema_key, [], [],
-                             type_parameter_count, u_api_schema_pseudo_json, schema_keys_to_index,
+    error = parse_union_type(document_name, base_path, error_definition_as_parsed_json, schema_key, [], [],
+                             type_parameter_count, u_api_schema_document_names_to_pseudo_json, schema_keys_to_document_names, schema_keys_to_index,
                              parsed_types, all_parse_failures, failed_types)
 
     return UError(schema_key, error)

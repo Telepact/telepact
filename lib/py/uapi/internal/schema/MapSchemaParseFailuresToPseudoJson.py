@@ -7,9 +7,8 @@ def map_schema_parse_failures_to_pseudo_json(schema_parse_failures: list['Schema
     pseudo_json_list = []
     for f in schema_parse_failures:
         pseudo_json: dict[str, object] = {}
+        pseudo_json["document_name"] = f.document_name
         pseudo_json["path"] = f.path
         pseudo_json["reason"] = {f.reason: f.data}
-        if f.key is not None:
-            pseudo_json["key!"] = f.key
         pseudo_json_list.append(dict(pseudo_json))
     return pseudo_json_list

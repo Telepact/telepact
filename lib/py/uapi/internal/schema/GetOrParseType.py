@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_count: int,
-                      u_api_schema_pseudo_json: list[object], schema_keys_to_index: dict[str, int],
-                      parsed_types: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
+def get_or_parse_type(document_name: str, path: list[object], type_name: str, this_type_parameter_count: int,
+                      u_api_schema_document_names_to_pseudo_json: dict[str, list[object]], schema_keys_to_document_name: dict[str, str],
+                      schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
                       failed_types: set[str]) -> 'UType':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.types.UObject import UObject
@@ -47,7 +47,7 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     matcher = regex.match(type_name)
     if not matcher:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(path, "StringRegexMatchFailed", {"regex": regex_string}, None)])
+            [SchemaParseFailure(document_name, path, "StringRegexMatchFailed", {"regex": regex_string})])
 
     standard_type_name = matcher.group(1)
     if standard_type_name is not None:
@@ -67,11 +67,16 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
             return UGeneric(generic_parameter_index)
 
     custom_type_name = matcher.group(2)
-    index = schema_keys_to_index.get(custom_type_name)
-    if index is None:
+    this_index = schema_keys_to_index.get(custom_type_name)
+    this_document_name = cast(
+        str, schema_keys_to_document_name.get(custom_type_name))
+    if this_index is None:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(path, "TypeUnknown", {"name": custom_type_name}, None)])
-    definition = cast(dict[str, object], u_api_schema_pseudo_json[index])
+            [SchemaParseFailure(document_name, path, "TypeUnknown", {"name": custom_type_name})])
+    u_api_schema_pseudo_json = cast(
+        list[object], u_api_schema_document_names_to_pseudo_json.get(this_document_name))
+    definition = cast(
+        dict[str, object], u_api_schema_pseudo_json[this_index])
 
     type_parameter_count_string = matcher.group(6)
     type_parameter_count = int(
@@ -80,16 +85,16 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
     type: 'UType'
     try:
         if custom_type_name.startswith("struct"):
-            type = parse_struct_type([index], definition, custom_type_name, [], type_parameter_count,
-                                     u_api_schema_pseudo_json, schema_keys_to_index, parsed_types,
+            type = parse_struct_type(this_document_name, [this_index], definition, custom_type_name, [], type_parameter_count,
+                                     u_api_schema_document_names_to_pseudo_json, schema_keys_to_document_name, schema_keys_to_index, parsed_types,
                                      all_parse_failures, failed_types)
         elif custom_type_name.startswith("union"):
-            type = parse_union_type([index], definition, custom_type_name, [], [], type_parameter_count,
-                                    u_api_schema_pseudo_json, schema_keys_to_index, parsed_types,
+            type = parse_union_type(this_document_name, [this_index], definition, custom_type_name, [], [], type_parameter_count,
+                                    u_api_schema_document_names_to_pseudo_json, schema_keys_to_document_name, schema_keys_to_index, parsed_types,
                                     all_parse_failures, failed_types)
         elif custom_type_name.startswith("fn"):
-            type = parse_function_type([index], definition, custom_type_name, u_api_schema_pseudo_json,
-                                       schema_keys_to_index, parsed_types, all_parse_failures,
+            type = parse_function_type(this_document_name, [this_index], definition, custom_type_name, u_api_schema_document_names_to_pseudo_json,
+                                       schema_keys_to_document_name, schema_keys_to_index, parsed_types, all_parse_failures,
                                        failed_types)
         else:
             possible_type_extension = {
@@ -101,10 +106,10 @@ def get_or_parse_type(path: list[object], type_name: str, this_type_parameter_co
             if not possible_type_extension:
                 raise UApiSchemaParseError([
                     SchemaParseFailure(
-                        [index],
+                        document_name,
+                        [this_index],
                         'TypeExtensionImplementationMissing',
-                        {'name': custom_type_name},
-                        None,
+                        {'name': custom_type_name}
                     ),
                 ])
 

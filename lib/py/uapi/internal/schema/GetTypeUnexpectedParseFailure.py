@@ -1,7 +1,7 @@
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
 
-def get_type_unexpected_parse_failure(path: list[object], value: object, expected_type: str) -> list[SchemaParseFailure]:
+def get_type_unexpected_parse_failure(document_name: str, path: list[object], value: object, expected_type: str) -> list[SchemaParseFailure]:
     from uapi.internal.types.GetType import get_type
 
     actual_type = get_type(value)
@@ -10,5 +10,5 @@ def get_type_unexpected_parse_failure(path: list[object], value: object, expecte
         "expected": {expected_type: {}}
     }
     return [
-        SchemaParseFailure(path, "TypeUnexpected", data, None)
+        SchemaParseFailure(document_name, path, "TypeUnexpected", data)
     ]
