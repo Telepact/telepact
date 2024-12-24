@@ -39,16 +39,15 @@ class Server:
         self.on_request = options.on_request
         self.on_response = options.on_response
 
-        self.u_api_schema = extend_uapi_schema(
-            u_api_schema, get_internal_uapi_json())
+        self.u_api_schema = u_api_schema
 
         binary_encoding = construct_binary_encoding(self.u_api_schema)
         binary_encoder = ServerBinaryEncoder(binary_encoding)
         self.serializer = Serializer(options.serialization, binary_encoder)
 
-        if len(cast(UStruct, self.u_api_schema.parsed["struct.Auth_"]).fields) == 0 and options.auth_required:
+        if "struct.Auth_" not in self.u_api_schema.parsed and options.auth_required:
             raise RuntimeError(
-                "Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.auth_required` to `false`."
+                "Unauthenticated server. Either define a `struct.Auth_` in your schema or set `options.auth_required` to `false`."
             )
 
     async def process(self, request_message_bytes: bytes) -> bytes:

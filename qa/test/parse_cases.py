@@ -148,6 +148,5 @@ cases = {
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../test/schema/parse2'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema.uapi.json', 'path': [], 'reason': {'JsonInvalid': {}}}]}}]],
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../test/schema/parse3'}}}}], [{}, {'Ok_': {}}]],
         [[{}, {'fn.validateSchema': {'input': {'Directory': {'schemaDirectory': '../../test/schema/parse4'}}}}], [{}, {'ErrorValidationFailure': {'cases': [{'document': 'schema1.uapi.json', 'path': [0, 'struct.Example', 'field1', 0], 'reason': {'StringRegexMatchFailed': {'regex': '^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*))$'}}},{'document': 'schema2.uapi.json', 'path': [0, '->', 0, 'Ok_', 'extra'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Array': {}}}}}]}}]],
-
     ]
 }

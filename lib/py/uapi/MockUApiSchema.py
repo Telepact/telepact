@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-class UApiSchema:
+class MockUApiSchema:
     """
     A parsed uAPI schema.
     """
@@ -18,18 +18,18 @@ class UApiSchema:
         self.parsed_response_headers = parsed_response_headers
 
     @staticmethod
-    def from_json(json: str) -> 'UApiSchema':
-        from uapi.internal.schema.CreateUApiSchemaFromFileJsonMap import create_uapi_schema_from_file_json_map
-        return create_uapi_schema_from_file_json_map({"auto_": json})
+    def from_json(json: str) -> 'MockUApiSchema':
+        from uapi.internal.schema.CreateMockUApiSchemaFromFileJsonMap import create_mock_uapi_schema_from_file_json_map
+        return create_mock_uapi_schema_from_file_json_map({"auto_": json})
 
     @staticmethod
-    def from_file_json_map(file_json_map: dict[str, str]) -> 'UApiSchema':
-        from uapi.internal.schema.CreateUApiSchemaFromFileJsonMap import create_uapi_schema_from_file_json_map
-        return create_uapi_schema_from_file_json_map(file_json_map)
+    def from_file_json_map(file_json_map: dict[str, str]) -> 'MockUApiSchema':
+        from uapi.internal.schema.CreateMockUApiSchemaFromFileJsonMap import create_mock_uapi_schema_from_file_json_map
+        return create_mock_uapi_schema_from_file_json_map(file_json_map)
 
     @staticmethod
-    def from_directory(directory: str) -> 'UApiSchema':
-        from uapi.internal.schema.CreateUApiSchemaFromFileJsonMap import create_uapi_schema_from_file_json_map
+    def from_directory(directory: str) -> 'MockUApiSchema':
+        from uapi.internal.schema.CreateMockUApiSchemaFromFileJsonMap import create_mock_uapi_schema_from_file_json_map
         from uapi.internal.schema.GetSchemaFileMap import get_schema_file_map
         schema_file_map = get_schema_file_map(directory)
-        return create_uapi_schema_from_file_json_map(schema_file_map)
+        return create_mock_uapi_schema_from_file_json_map(schema_file_map)

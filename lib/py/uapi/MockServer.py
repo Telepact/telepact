@@ -2,7 +2,7 @@ from typing import Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from uapi.Message import Message
-    from uapi.UApiSchema import UApiSchema
+    from uapi.MockUApiSchema import MockUApiSchema
     from uapi.internal.mock.MockInvocation import MockInvocation
     from uapi.internal.mock.MockStub import MockStub
 
@@ -25,11 +25,10 @@ class MockServer:
             self.generated_collection_length_min: int = 0
             self.generated_collection_length_max: int = 3
 
-    def __init__(self, u_api_schema: 'UApiSchema', options: Options) -> None:
-        from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
-        from uapi.internal.schema.GetMockUApiJson import get_mock_uapi_json
+    def __init__(self, mock_uapi_schema: 'MockUApiSchema', options: Options) -> None:
         from uapi.Server import Server
         from uapi.RandomGenerator import RandomGenerator
+        from uapi.UApiSchema import UApiSchema
 
         self.random: RandomGenerator = RandomGenerator(
             options.generated_collection_length_min, options.generated_collection_length_max)
@@ -40,15 +39,15 @@ class MockServer:
         self.stubs: list[MockStub] = []
         self.invocations: list[MockInvocation] = []
 
-        combined_u_api_schema: UApiSchema = extend_uapi_schema(
-            u_api_schema, get_mock_uapi_json())
-
         server_options = Server.Options()
         server_options.on_error = options.on_error
         server_options.auth_required = False
 
+        uapi_schema = UApiSchema(mock_uapi_schema.original, mock_uapi_schema.parsed,
+                                 mock_uapi_schema.parsed_request_headers, mock_uapi_schema.parsed_response_headers)
+
         self.server = Server(
-            combined_u_api_schema, self._handle, server_options)
+            uapi_schema, self._handle, server_options)
 
     async def process(self, message: bytes) -> bytes:
         """
