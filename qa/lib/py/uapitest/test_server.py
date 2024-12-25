@@ -25,8 +25,10 @@ from uapi.Serializer import Serializer
 from uapi.Client import Client
 from uapi.Server import Server
 from uapi.UApiSchema import UApiSchema
+from uapi.MockUApiSchema import MockUApiSchema
 from uapi.MockServer import MockServer
 from uapi.UApiSchemaParseError import UApiSchemaParseError
+from uapi.internal.schema.GetSchemaFileMap import get_schema_file_map
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -101,8 +103,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
 async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schema_path: str,
                                  frontdoor_topic: str, config: Dict[str, Any]) -> Subscription:
-    api_schema_content = Path(api_schema_path).read_text()
-    u_api = UApiSchema.from_json(api_schema_content)
+    u_api = MockUApiSchema.from_directory(api_schema_path)
 
     options = MockServer.Options()
     options.on_error = on_err
@@ -140,8 +141,7 @@ async def start_mock_test_server(connection: NatsClient, metrics: Any, api_schem
 
 
 async def start_schema_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str) -> Subscription:
-    json_data = Path(api_schema_path).read_text()
-    u_api = UApiSchema.from_json(json_data)
+    u_api = UApiSchema.from_directory(api_schema_path)
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
@@ -150,27 +150,44 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
         request_body = request_message.body
 
         arg = request_body.get("fn.validateSchema", {})
-        schema_pseudo_json = arg.get("schema")
-        extend_schema_json = arg.get("extend!")
+        input = arg.get("input")
 
-        serialize_schema = request_message.header.get("_serializeSchema", True)
-
-        if serialize_schema:
-
-            schema_json_bytes = json.dumps(
-                schema_pseudo_json).encode('utf-8')
-            schema_json = schema_json_bytes.decode('utf-8')
-        else:
-            schema_json = schema_pseudo_json
+        input_tag = next(iter(input.keys()))
 
         try:
-            schema = UApiSchema.from_json(schema_json)
-            if extend_schema_json:
-                UApiSchema.extend(schema, extend_schema_json)
-            return Message({}, {"Ok_": {}})
+            if input_tag == 'PseudoJson':
+                union_value = input[input_tag]
+                schema_pseudo_json = union_value.get("schema")
+                extend_schema_json = union_value.get("extend!")
+
+                schema_json_bytes = json.dumps(
+                    schema_pseudo_json).encode('utf-8')
+                schema_json = schema_json_bytes.decode('utf-8')
+
+                if extend_schema_json:
+                    extend_json_bytes = json.dumps(
+                        extend_schema_json).encode('utf-8')
+                    extend_json = extend_json_bytes.decode('utf-8')
+
+                    UApiSchema.from_file_json_map(
+                        {'default': schema_json, 'extend': extend_json})
+                else:
+                    UApiSchema.from_json(schema_json)
+            elif input_tag == 'Json':
+                union_value = input[input_tag]
+                schema_json = union_value.get("schema")
+                UApiSchema.from_json(schema_json)
+            elif input_tag == 'Directory':
+                union_value = input[input_tag]
+                schema_path = union_value.get("schemaDirectory")
+                UApiSchema.from_directory(schema_path)
+            else:
+                raise RuntimeError("no matching schema input")
         except UApiSchemaParseError as e:
             on_err(e)
             return Message({}, {"ErrorValidationFailure": {"cases": e.schema_parse_failures_pseudo_json}})
+
+        return Message({}, {"Ok_": {}})
 
     options = Server.Options()
     options.on_error = on_err
@@ -199,15 +216,18 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
 
 async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool) -> Subscription:
-    json_data = Path(api_schema_path).read_text()
-    u_api = UApiSchema.from_json(json_data)
-    alternate_u_api = UApiSchema.extend(u_api, """
+    m = get_schema_file_map(api_schema_path)
+    alternate_map = m.copy()
+    alternate_map["backwardsCompatibleChange"] = """
             [
                 {
                     "struct.BackwardsCompatibleChange": {}
                 }
             ]
-            """)
+            """
+
+    u_api = UApiSchema.from_file_json_map(m)
+    alternate_u_api = UApiSchema.from_file_json_map(alternate_map)
 
     timers = Summary(frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)

@@ -73,6 +73,7 @@ def get_or_parse_type(document_name: str, path: list[object], type_name: str, th
     if this_index is None:
         raise UApiSchemaParseError(
             [SchemaParseFailure(document_name, path, "TypeUnknown", {"name": custom_type_name})])
+
     u_api_schema_pseudo_json = cast(
         list[object], u_api_schema_document_names_to_pseudo_json.get(this_document_name))
     definition = cast(
