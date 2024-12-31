@@ -246,6 +246,10 @@ async def verify_flat_case(nats_client, request, expected_response, frontdoor_to
     response = await send_case(nats_client, request, expected_response, frontdoor_topic)
 
     if expected_response:
+        if assert_rules.get('setCompare', False):
+            expected_response = convert_lists_to_sets(expected_response)
+            response = convert_lists_to_sets(response)
+
         assert expected_response == response
 
 
