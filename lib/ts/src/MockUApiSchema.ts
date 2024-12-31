@@ -1,9 +1,9 @@
-import { createUApiSchemaFromFileJsonMap } from './internal/schema/CreateUApiSchemaFromFileJsonMap';
-import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
 import { UFieldDeclaration } from './internal/types/UFieldDeclaration';
 import { UType } from './internal/types/UType';
+import { createMockUApiSchemaFromFileJsonMap } from './internal/schema/CreateMockUApiSchemaFromFileJsonMap';
+import { getSchemaFileMap } from './internal/schema/GetSchemaFileMap';
 
-export class UApiSchema {
+export class MockUApiSchema {
     /**
      * A parsed uAPI schema.
      */
@@ -25,16 +25,16 @@ export class UApiSchema {
         this.parsedResponseHeaders = parsedResponseHeaders;
     }
 
-    static fromJson(json: string): UApiSchema {
-        return createUApiSchemaFromFileJsonMap({ auto_: json });
+    static fromJson(json: string): MockUApiSchema {
+        return createMockUApiSchemaFromFileJsonMap({ auto_: json });
     }
 
-    static fromFileJsonMap(fileJsonMap: Record<string, string>): UApiSchema {
-        return createUApiSchemaFromFileJsonMap(fileJsonMap);
+    static fromFileJsonMap(jsonDocuments: Record<string, string>): MockUApiSchema {
+        return createMockUApiSchemaFromFileJsonMap(jsonDocuments);
     }
 
-    static fromDirectory(directory: string): UApiSchema {
+    static fromDirectory(directory: string): MockUApiSchema {
         const m = getSchemaFileMap(directory);
-        return createUApiSchemaFromFileJsonMap(m);
+        return createMockUApiSchemaFromFileJsonMap(m);
     }
 }

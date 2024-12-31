@@ -1,14 +1,9 @@
 import { DefaultSerialization } from './DefaultSerialization';
 import { Serializer } from './Serializer';
 import { ServerBinaryEncoder } from './internal/binary/ServerBinaryEncoder';
-import { USelect } from './internal/types/USelect';
 import { Message } from './Message';
 import { UApiSchema } from './UApiSchema';
-import { UType } from './internal/types/UType';
 import { constructBinaryEncoding } from './internal/binary/ConstructBinaryEncoding';
-import { extendUapiSchema } from './internal/schema/ExtendUApiSchema';
-import { getInternalUApiJson } from './internal/schema/GetInternalUApiJson';
-import { UStruct } from './internal/types/UStruct';
 import { processBytes } from './internal/ProcessBytes';
 
 export class Server {
@@ -25,16 +20,13 @@ export class Server {
         this.onRequest = options.onRequest;
         this.onResponse = options.onResponse;
 
-        this.uApiSchema = extendUapiSchema(uApiSchema, getInternalUApiJson());
+        this.uApiSchema = uApiSchema;
 
         const binaryEncoding = constructBinaryEncoding(this.uApiSchema);
         const binaryEncoder = new ServerBinaryEncoder(binaryEncoding);
         this.serializer = new Serializer(options.serialization, binaryEncoder);
 
-        if (
-            Object.keys((this.uApiSchema.parsed['struct.Auth_'] as UStruct).fields).length === 0 &&
-            options.authRequired
-        ) {
+        if (!('struct.Auth_' in this.uApiSchema.parsed) && options.authRequired) {
             throw new Error(
                 'Unauthenticated server. Either define a non-empty `struct._Auth` in your schema or set `options.authRequired` to `false`.',
             );

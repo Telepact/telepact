@@ -1,14 +1,10 @@
 import { UApiSchema } from './UApiSchema';
 import { MockInvocation } from './internal/mock/MockInvocation';
 import { MockStub } from './internal/mock/MockStub';
-import { UType } from './internal/types/UType';
-import { extendUapiSchema } from './internal/schema/ExtendUApiSchema';
-import { getMockUApiJson } from './internal/schema/GetMockUApiJson';
 import { Server, ServerOptions as ServerOptions } from './Server';
 import { RandomGenerator } from './RandomGenerator';
-import { UMockCall } from './internal/types/UMockCall';
-import { UMockStub } from './internal/types/UMockStub';
 import { mockHandle } from './internal/mock/MockHandle';
+import { MockUApiSchema } from './MockUApiSchema';
 
 export class MockServer {
     /**
@@ -16,7 +12,7 @@ export class MockServer {
      */
 
     constructor(
-        private uApiSchema: UApiSchema,
+        private mockUApiSchema: MockUApiSchema,
         private options: MockServerOptions,
     ) {
         this.random = new RandomGenerator(options.generatedCollectionLengthMin, options.generatedCollectionLengthMax);
@@ -27,13 +23,18 @@ export class MockServer {
         this.stubs = [];
         this.invocations = [];
 
-        const combinedUApiSchema: UApiSchema = extendUapiSchema(uApiSchema, getMockUApiJson());
-
         const serverOptions = new ServerOptions();
         serverOptions.onError = options.onError;
         serverOptions.authRequired = false;
 
-        this.server = new Server(combinedUApiSchema, this.handle, serverOptions);
+        const uApiSchema = new UApiSchema(
+            mockUApiSchema.original,
+            mockUApiSchema.parsed,
+            mockUApiSchema.parsedRequestHeaders,
+            mockUApiSchema.parsedResponseHeaders,
+        );
+
+        this.server = new Server(uApiSchema, this.handle, serverOptions);
     }
 
     private random: RandomGenerator;

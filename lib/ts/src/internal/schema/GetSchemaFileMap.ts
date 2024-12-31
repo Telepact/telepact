@@ -1,0 +1,17 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
+export function getSchemaFileMap(directory: string): Record<string, string> {
+    const finalJsonDocuments: Record<string, string> = {};
+
+    const paths = fs.readdirSync(directory).map((file) => path.join(directory, file));
+    for (const filePath of paths) {
+        if (filePath.endsWith('.uapi.json')) {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const relativePath = path.relative(directory, filePath);
+            finalJsonDocuments[relativePath] = content;
+        }
+    }
+
+    return finalJsonDocuments;
+}
