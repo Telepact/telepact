@@ -101,6 +101,7 @@ def parse_uapi_schema(
             continue
 
         this_index = schema_keys_to_index[schema_key]
+        document_name = schema_keys_to_document_names[schema_key]
 
         try:
             get_or_parse_type(
