@@ -57,7 +57,6 @@ public class ConstructBinaryEncoding {
             i += 1;
         }
         final var finalString = String.join("\n", allKeys);
-        System.out.println(finalString);
         final int checksum = createChecksum(finalString);
         return new BinaryEncoding(binaryEncodingMap, checksum);
     }
