@@ -1,4 +1,4 @@
-from typing import Callable, TYPE_CHECKING, Awaitable, cast
+from typing import Callable, TYPE_CHECKING, Awaitable
 
 from uapi.DefaultSerialization import DefaultSerialization
 from uapi.Serializer import Serializer
@@ -30,9 +30,6 @@ class Server:
         Create a server with the given uAPI schema and handler.
         """
         from uapi.internal.binary.ConstructBinaryEncoding import construct_binary_encoding
-        from uapi.internal.schema.ExtendUApiSchema import extend_uapi_schema
-        from uapi.internal.schema.GetInternalUApiJson import get_internal_uapi_json
-        from uapi.internal.types.UStruct import UStruct
 
         self.handler = handler
         self.on_error = options.on_error

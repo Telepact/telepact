@@ -198,6 +198,9 @@ def parse_uapi_schema(
 
     for response_header_key in response_header_keys:
         this_index = schema_keys_to_index[response_header_key]
+        this_document_name = schema_keys_to_document_names[response_header_key]
+        u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[
+            this_document_name]
         def_ = cast(dict[str, object],
                     u_api_schema_pseudo_json[this_index])
         header_field = response_header_key[len("responseHeader."):]
