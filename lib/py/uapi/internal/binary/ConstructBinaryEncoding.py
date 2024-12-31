@@ -45,5 +45,6 @@ def construct_binary_encoding(u_api_schema: 'UApiSchema') -> BinaryEncoding:
     sorted_all_keys = sorted(all_keys)
     binary_encoding = {key: i for i, key in enumerate(sorted_all_keys)}
     final_string = "\n".join(sorted_all_keys)
+    print(final_string)
     checksum = create_checksum(final_string)
     return BinaryEncoding(binary_encoding, checksum)
