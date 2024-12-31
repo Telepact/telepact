@@ -7,10 +7,8 @@ def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[obje
 
     parse_failures = []
     error_keys_list = list(error_keys)
-    error_keys_list.sort(key=lambda k: keys_to_index[k])
-
-    indices = sorted([keys_to_index[key] for key in error_keys])
-    index_to_keys = {v: k for k, v in keys_to_index.items()}
+    error_keys_list.sort(key=lambda k: (
+        schema_keys_to_document_name[k], keys_to_index[k]))
 
     for i in range(len(error_keys_list)):
         for j in range(i + 1, len(error_keys_list)):

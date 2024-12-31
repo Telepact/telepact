@@ -15,9 +15,15 @@ public class CatchErrorCollisions {
         var errorKeysList = new ArrayList<>(errorKeys);
 
         errorKeysList.sort((k1, k2) -> {
-            var index1 = keysToIndex.get(k1);
-            var index2 = keysToIndex.get(k2);
-            return index1 - index2;
+            var documentName1 = schemaKeysToDocumentName.get(k1);
+            var documentName2 = schemaKeysToDocumentName.get(k2);
+            if (!documentName1.equals(documentName2)) {
+                return documentName1.compareTo(documentName2);
+            } else {
+                var index1 = keysToIndex.get(k1);
+                var index2 = keysToIndex.get(k2);
+                return index1 - index2;
+            }
         });
 
         for (var i = 0; i < errorKeysList.size(); i++) {
