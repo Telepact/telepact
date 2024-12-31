@@ -144,6 +144,7 @@ def parse_uapi_schema(
                 parse_failures,
                 failed_types,
             )
+            errors.append(error)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
@@ -227,7 +228,7 @@ def parse_uapi_schema(
         raise UApiSchemaParseError(parse_failures)
 
     final_original_schema = [original_schema[k]
-                             for k in sorted(original_schema.keys())]
+                             for k in sorted(original_schema.keys(), key=lambda k: (not k.startswith("info."), k))]
 
     return UApiSchema(
         final_original_schema,
