@@ -2,7 +2,6 @@ package uapi.internal.generation;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -13,7 +12,7 @@ import uapi.internal.types.UTypeDeclaration;
 public class ConstructRandomStruct {
     static Map<String, Object> constructRandomStruct(
             Map<String, UFieldDeclaration> referenceStruct, Map<String, Object> startingStruct,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
+            boolean includeOptionalFields, boolean randomizeOptionalFields,
             RandomGenerator randomGenerator) {
 
         final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
@@ -30,17 +29,17 @@ public class ConstructRandomStruct {
             final Object value;
             if (useBlueprintValue) {
                 value = typeDeclaration.generateRandomValue(blueprintValue, useBlueprintValue,
-                        includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
+                        includeOptionalFields, randomizeOptionalFields, randomGenerator);
             } else {
                 if (!fieldDeclaration.optional) {
                     value = typeDeclaration.generateRandomValue(null, false,
-                            includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
+                            includeOptionalFields, randomizeOptionalFields, randomGenerator);
                 } else {
                     if (!includeOptionalFields || (randomizeOptionalFields && randomGenerator.nextBoolean())) {
                         continue;
                     }
                     value = typeDeclaration.generateRandomValue(null, false,
-                            includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator);
+                            includeOptionalFields, randomizeOptionalFields, randomGenerator);
                 }
             }
 

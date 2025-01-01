@@ -15,8 +15,7 @@ import uapi.internal.types.UUnion;
 
 public class ValidateMockStub {
     public static List<ValidationFailure> validateMockStub(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, Map<String, UType> types) {
+            List<UTypeDeclaration> typeParameters, Map<String, UType> types) {
         final var validationFailures = new ArrayList<ValidationFailure>();
 
         if (!(givenObj instanceof Map)) {
@@ -45,8 +44,7 @@ public class ValidateMockStub {
         final UUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
         final Map<String, UStruct> functionDefCallCases = functionDefCall.cases;
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of(),
-                List.of());
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of());
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (final var f : inputFailures) {
@@ -69,7 +67,7 @@ public class ValidateMockStub {
                     Map.of()));
         } else {
             final var output = givenMap.get(resultDefKey);
-            final var outputFailures = functionDef.result.validate(output, select, fn, List.of(), List.of());
+            final var outputFailures = functionDef.result.validate(output, select, fn, List.of());
 
             final var outputFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : outputFailures) {

@@ -19,20 +19,19 @@ public class UInteger implements UType {
 
     @Override
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+            List<UTypeDeclaration> typeParameters) {
         return validateInteger(value);
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, RandomGenerator randomGenerator) {
+            RandomGenerator randomGenerator) {
         return generateRandomInteger(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName() {
         return _INTEGER_NAME;
     }
 }

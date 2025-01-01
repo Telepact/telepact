@@ -46,13 +46,11 @@ public class ParseErrorType {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        int typeParameterCount = 0;
-
         // Assuming parseUnionType is adapted to Java and returns UError or its
 
         UUnion error = parseUnionType(documentName, basePath, errorDefinitionAsParsedJson, schemaKey,
                 new ArrayList<>(),
-                new ArrayList<>(), typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                new ArrayList<>(), uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
                 schemaKeysToIndex, parsedTypes,
                 allParseFailures, failedTypes);
 

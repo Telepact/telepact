@@ -46,7 +46,7 @@ public class ParseField {
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
         final var typeDeclaration = parseTypeDeclaration(documentName, thisPath,
-                typeDeclarationArray, typeParameterCount,
+                typeDeclarationArray,
                 uApiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentName,
                 schemaKeysToIndex,

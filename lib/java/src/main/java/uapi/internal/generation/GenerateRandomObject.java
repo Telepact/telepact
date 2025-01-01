@@ -10,7 +10,7 @@ import uapi.internal.types.UTypeDeclaration;
 public class GenerateRandomObject {
     public static Object generateRandomObject(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, RandomGenerator randomGenerator) {
+            RandomGenerator randomGenerator) {
         final var nestedTypeDeclaration = typeParameters.get(0);
 
         if (useBlueprintValue) {
@@ -21,7 +21,7 @@ public class GenerateRandomObject {
                 final var key = startingObjEntry.getKey();
                 final var startingObjValue = startingObjEntry.getValue();
                 final var value = nestedTypeDeclaration.generateRandomValue(startingObjValue, true,
-                        includeOptionalFields, randomizeOptionalFields, generics, randomGenerator);
+                        includeOptionalFields, randomizeOptionalFields, randomGenerator);
                 obj.put(key, value);
             }
 
@@ -34,7 +34,7 @@ public class GenerateRandomObject {
                 final var key = randomGenerator.nextString();
                 final var value = nestedTypeDeclaration.generateRandomValue(null, false, includeOptionalFields,
                         randomizeOptionalFields,
-                        generics, randomGenerator);
+                        randomGenerator);
                 obj.put(key, value);
             }
 

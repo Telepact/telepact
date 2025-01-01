@@ -10,14 +10,13 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import uapi.UApiSchemaParseError;
-import uapi.internal.types.UGeneric;
 import uapi.internal.types.UType;
 import uapi.internal.types.UTypeDeclaration;
 
 public class ParseTypeDeclaration {
     static UTypeDeclaration parseTypeDeclaration(String documentName, List<Object> path,
             List<Object> typeDeclarationArray,
-            int thisTypeParameterCount, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
+            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
             Map<String, String> schemaKeysToDocumentNames,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
@@ -51,14 +50,9 @@ public class ParseTypeDeclaration {
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final UType type = getOrParseType(documentName, basePath, typeName, thisTypeParameterCount,
+        final UType type = getOrParseType(documentName, basePath, typeName,
                 uApiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
-
-        if (type instanceof UGeneric && nullable) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, basePath,
-                    "StringRegexMatchFailed", Map.of("regex", "^(.+?)[^\\?]$"))));
-        }
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
@@ -90,7 +84,6 @@ public class ParseTypeDeclaration {
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {
                 typeParameterTypeDeclaration = parseTypeDeclaration(documentName, loopPath, (List<Object>) e,
-                        thisTypeParameterCount,
                         uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes,
                         allParseFailures,
                         failedTypes);

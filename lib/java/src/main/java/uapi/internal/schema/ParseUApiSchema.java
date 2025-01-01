@@ -92,7 +92,6 @@ public class ParseUApiSchema {
         var requestHeaderKeys = new HashSet<String>();
         var responseHeaderKeys = new HashSet<String>();
         var errorKeys = new HashSet<String>();
-        var rootTypeParameterCount = 0;
 
         for (String schemaKey : schemaKeys) {
             if (schemaKey.startsWith("info.")) {
@@ -116,7 +115,6 @@ public class ParseUApiSchema {
                         thisDocumentName,
                         Collections.singletonList(thisIndex),
                         schemaKey,
-                        rootTypeParameterCount,
                         uApiSchemaNameToPseudoJson,
                         schemaKeysToDocumentName,
                         schemaKeysToIndex,

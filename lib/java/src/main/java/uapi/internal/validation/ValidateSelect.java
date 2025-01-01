@@ -15,8 +15,7 @@ import uapi.internal.types.UUnion;
 
 public class ValidateSelect {
     public static List<ValidationFailure> validateSelect(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, Map<String, UType> types) {
+            List<UTypeDeclaration> typeParameters, Map<String, UType> types) {
 
         if (!(givenObj instanceof Map)) {
             return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
@@ -42,7 +41,6 @@ public class ValidateSelect {
                 }
                 typeReference = possibleTypeReference;
             }
-
 
             if (typeReference instanceof final UUnion u) {
                 if (!(selectValue instanceof Map)) {

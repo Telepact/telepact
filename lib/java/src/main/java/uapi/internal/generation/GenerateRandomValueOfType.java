@@ -8,7 +8,7 @@ import uapi.internal.types.UTypeDeclaration;
 
 public class GenerateRandomValueOfType {
     public static Object generateRandomValueOfType(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> generics,
+            boolean includeOptionalFields, boolean randomizeOptionalFields,
             RandomGenerator randomGenerator, UType thisType, boolean nullable,
             List<UTypeDeclaration> typeParameters) {
         if (nullable && !useBlueprintValue && randomGenerator.nextBoolean()) {
@@ -16,7 +16,7 @@ public class GenerateRandomValueOfType {
         } else {
             return thisType.generateRandomValue(blueprintValue, useBlueprintValue, includeOptionalFields,
                     randomizeOptionalFields,
-                    typeParameters, generics, randomGenerator);
+                    typeParameters, randomGenerator);
         }
     }
 }

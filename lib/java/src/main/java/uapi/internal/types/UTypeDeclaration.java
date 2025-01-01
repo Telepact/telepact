@@ -22,16 +22,14 @@ public class UTypeDeclaration {
         this.typeParameters = typeParameters;
     }
 
-    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> generics) {
-        return validateValueOfType(value, select, fn, generics, this.type, this.nullable, this.typeParameters);
+    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn) {
+        return validateValueOfType(value, select, fn, this.type, this.nullable, this.typeParameters);
     }
 
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> generics,
-            RandomGenerator randomGenerator) {
+            boolean includeOptionalFields, boolean randomizeOptionalFields, RandomGenerator randomGenerator) {
         return generateRandomValueOfType(blueprintValue, useBlueprintValue,
                 includeOptionalFields, randomizeOptionalFields,
-                generics, randomGenerator, this.type, this.nullable, this.typeParameters);
+                randomGenerator, this.type, this.nullable, this.typeParameters);
     }
 }

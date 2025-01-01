@@ -20,145 +20,60 @@
             "arrNullBool!": ["array", ["boolean?"]],
             "objBool!": ["object", ["boolean"]],
             "objNullBool!": ["object", ["boolean?"]],
-            "pStrBool!": ["struct<1>.PStr", ["boolean"]],
-            "pStrNullBool!": ["struct<1>.PStr", ["boolean?"]],
-            "pUnionBool!": ["union<1>.PUnion", ["boolean"]],
-            "pUnionNullBool!": ["union<1>.PUnion", ["boolean?"]],
-            "arrPStrBool!": ["array", ["struct<1>.PStr", ["boolean"]]],
-            "arrP2StrBool!": ["array", ["struct<2>.P2Str", ["boolean"], ["boolean"]]],
             "int!": ["integer"],
             "nullInt!": ["integer?"],
             "arrInt!": ["array", ["integer"]],
             "arrNullInt!": ["array", ["integer?"]],
             "objInt!": ["object", ["integer"]],
             "objNullInt!": ["object", ["integer?"]],
-            "pStrInt!": ["struct<1>.PStr", ["integer"]],
-            "pStrNullInt!": ["struct<1>.PStr", ["integer?"]],
-            "pUnionInt!": ["union<1>.PUnion", ["integer"]],
-            "pUnionNullInt!": ["union<1>.PUnion", ["integer?"]],
-            "arrPStrInt!": ["array", ["struct<1>.PStr", ["integer"]]],
-            "arrP2StrInt!": ["array", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
             "num!": ["number"],
             "nullNum!": ["number?"],
             "arrNum!": ["array", ["number"]],
             "arrNullNum!": ["array", ["number?"]],
             "objNum!": ["object", ["number"]],
             "objNullNum!": ["object", ["number?"]],
-            "pStrNum!": ["struct<1>.PStr", ["number"]],
-            "pStrNullNum!": ["struct<1>.PStr", ["number?"]],
-            "pUnionNum!": ["union<1>.PUnion", ["number"]],
-            "pUnionNullNum!": ["union<1>.PUnion", ["number?"]],
-            "arrPStrNum!": ["array", ["struct<1>.PStr", ["number"]]],
-            "arrP2StrNum!": ["array", ["struct<2>.P2Str", ["boolean"], ["number"]]],
             "str!": ["string"],
             "nullStr!": ["string?"],
             "arrStr!": ["array", ["string"]],
             "arrNullStr!": ["array", ["string?"]],
             "objStr!": ["object", ["string"]],
             "objNullStr!": ["object", ["string?"]],
-            "pStrStr!": ["struct<1>.PStr", ["string"]],
-            "pStrNullStr!": ["struct<1>.PStr", ["string?"]],
-            "pUnionStr!": ["union<1>.PUnion", ["string"]],
-            "pUnionNullStr!": ["union<1>.PUnion", ["string?"]],
-            "arrPStrStr!": ["array", ["struct<1>.PStr", ["string"]]],
-            "arrP2StrStr!": ["array", ["struct<2>.P2Str", ["boolean"], ["string"]]],
             "arr!": ["array", ["any"]],
             "nullArr!": ["array?", ["any"]],
             "arrArr!": ["array", ["array", ["any"]]],
             "arrNullArr!": ["array", ["array?", ["any"]]],
             "objArr!": ["object", ["array", ["any"]]],
             "objNullArr!": ["object", ["array?", ["any"]]],
-            "pStrArr!": ["struct<1>.PStr", ["array", ["any"]]],
-            "pStrNullArr!": ["struct<1>.PStr", ["array?", ["any"]]],
-            "pUnionArr!": ["union<1>.PUnion", ["array", ["any"]]],
-            "pUnionNullArr!": ["union<1>.PUnion", ["array?", ["any"]]],
-            "arrPStrArr!": ["array", ["struct<1>.PStr", ["array", ["any"]]]],
-            "arrP2StrArr!": ["array", ["struct<2>.P2Str", ["boolean"], ["array", ["any"]]]],
             "obj!": ["object", ["any"]],
             "nullObj!": ["object?", ["any"]],
             "arrObj!": ["array", ["object", ["any"]]],
             "arrNullObj!": ["array", ["object?", ["any"]]],
             "objObj!": ["object", ["object", ["any"]]],
             "objNullObj!": ["object", ["object?", ["any"]]],
-            "pStrObj!": ["struct<1>.PStr", ["object", ["any"]]],
-            "pStrNullObj!": ["struct<1>.PStr", ["object?", ["any"]]],
-            "pUnionObj!": ["union<1>.PUnion", ["object", ["any"]]],
-            "pUnionNullObj!": ["union<1>.PUnion", ["object?", ["any"]]],
-            "arrPStrObj!": ["array", ["struct<1>.PStr", ["object", ["any"]]]],
-            "arrP2StrObj!": ["array", ["struct<2>.P2Str", ["boolean"], ["object", ["any"]]]],
             "any!": ["any"],
             "nullAny!": ["any?"],
             "arrAny!": ["array", ["any"]],
             "arrNullAny!": ["array", ["any?"]],
             "objAny!": ["object", ["any"]],
             "objNullAny!": ["object", ["any?"]],
-            "pStrAny!": ["struct<1>.PStr", ["any"]],
-            "pStrNullAny!": ["struct<1>.PStr", ["any?"]],
-            "pUnionAny!": ["union<1>.PUnion", ["any"]],
-            "pUnionNullAny!": ["union<1>.PUnion", ["any?"]],
-            "arrPStrAny!": ["array", ["struct<1>.PStr", ["any"]]],
-            "arrP2StrAny!": ["array", ["struct<2>.P2Str", ["boolean"], ["any"]]],
             "struct!": ["struct.ExStruct"],
             "nullStruct!": ["struct.ExStruct?"],
             "arrStruct!": ["array", ["struct.ExStruct"]],
             "arrNullStruct!": ["array", ["struct.ExStruct?"]],
             "objStruct!": ["object", ["struct.ExStruct"]],
             "objNullStruct!": ["object", ["struct.ExStruct?"]],
-            "pStrStruct!": ["struct<1>.PStr", ["struct.ExStruct"]],
-            "pStrNullStruct!": ["struct<1>.PStr", ["struct.ExStruct?"]],
-            "pUnionStruct!": ["union<1>.PUnion", ["struct.ExStruct"]],
-            "pUnionNullStruct!": ["union<1>.PUnion", ["struct.ExStruct?"]],
-            "arrPStrStruct!": ["array", ["struct<1>.PStr", ["struct.ExStruct"]]],
-            "arrP2StrStruct!": ["array", ["struct<2>.P2Str", ["boolean"], ["struct.ExStruct"]]],
             "union!": ["union.ExUnion"],
             "nullUnion!": ["union.ExUnion?"],
             "arrUnion!": ["array", ["union.ExUnion"]],
             "arrNullUnion!": ["array", ["union.ExUnion?"]],
             "objUnion!": ["object", ["union.ExUnion"]],
             "objNullUnion!": ["object", ["union.ExUnion?"]],
-            "pStrUnion!": ["struct<1>.PStr", ["union.ExUnion"]],
-            "pStrNullUnion!": ["struct<1>.PStr", ["union.ExUnion?"]],
-            "pUnionUnion!": ["union<1>.PUnion", ["union.ExUnion"]],
-            "pUnionNullUnion!": ["union<1>.PUnion", ["union.ExUnion?"]],
-            "arrPStrUnion!": ["array", ["struct<1>.PStr", ["union.ExUnion"]]],
-            "arrP2StrUnion!": ["array", ["struct<2>.P2Str", ["boolean"], ["union.ExUnion"]]],
             "fn!": ["fn.example"],
             "nullFn!": ["fn.example?"],
             "arrFn!": ["array", ["fn.example"]],
             "arrNullFn!": ["array", ["fn.example?"]],
             "objFn!": ["object", ["fn.example"]],
-            "objNullFn!": ["object", ["fn.example?"]],
-            "pStrFn!": ["struct<1>.PStr", ["fn.example"]],
-            "pStrNullFn!": ["struct<1>.PStr", ["fn.example?"]],
-            "pUnionFn!": ["union<1>.PUnion", ["fn.example"]],
-            "pUnionNullFn!": ["union<1>.PUnion", ["fn.example?"]],
-            "arrPStrFn!": ["array", ["struct<1>.PStr", ["fn.example"]]],
-            "arrP2StrFn!": ["array", ["struct<2>.P2Str", ["boolean"], ["fn.example"]]],
-            "p2Str!": ["struct<2>.P2Str", ["boolean"], ["integer"]],
-            "nullP2Str!": ["struct<2>.P2Str?", ["boolean"], ["integer"]],
-            "arrP2Str!": ["array", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
-            "arrNullP2Str!": ["array", ["struct<2>.P2Str?", ["boolean"], ["integer"]]],
-            "objP2Str!": ["object", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
-            "objNullP2Str!": ["object", ["struct<2>.P2Str?", ["boolean"], ["integer"]]],
-            "pStrP2Str!": ["struct<1>.PStr", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
-            "pStrNullP2Str!": ["struct<1>.PStr", ["struct<2>.P2Str?", ["boolean"], ["integer"]]],
-            "pUnionP2Str!": ["union<1>.PUnion", ["struct<2>.P2Str", ["boolean"], ["integer"]]],
-            "pUnionNullP2Str!": ["union<1>.PUnion", ["struct<2>.P2Str?", ["boolean"], ["integer"]]],
-            "arrPStrP2Str!": ["array", ["struct<1>.PStr", ["struct<2>.P2Str", ["boolean"], ["integer"]]]],
-            "arrP2StrP2Str!": ["array", ["struct<2>.P2Str", ["boolean"], ["struct<2>.P2Str", ["boolean"], ["integer"]]]],
-            "p2Union!": ["union<2>.P2Union", ["boolean"], ["integer"]],
-            "nullP2Union!": ["union<2>.P2Union?", ["boolean"], ["integer"]],
-            "arrP2Union!": ["array", ["union<2>.P2Union", ["boolean"], ["integer"]]],
-            "arrNullP2Union!": ["array", ["union<2>.P2Union?", ["boolean"], ["integer"]]],
-            "objP2Union!": ["object", ["union<2>.P2Union", ["boolean"], ["integer"]]],
-            "objNullP2Union!": ["object", ["union<2>.P2Union?", ["boolean"], ["integer"]]],
-            "pStrP2Union!": ["struct<1>.PStr", ["union<2>.P2Union", ["boolean"], ["integer"]]],
-            "pStrNullP2Union!": ["struct<1>.PStr", ["union<2>.P2Union?", ["boolean"], ["integer"]]],
-            "pUnionP2Union!": ["union<1>.PUnion", ["union<2>.P2Union", ["boolean"], ["integer"]]],
-            "pUnionNullP2Union!": ["union<1>.PUnion", ["union<2>.P2Union?", ["boolean"], ["integer"]]],
-            "arrPStrP2Union!": ["array", ["struct<1>.PStr", ["union<2>.P2Union", ["boolean"], ["integer"]]]],
-            "arrP2StrP2Union!": ["array", ["struct<2>.P2Str", ["boolean"], ["union<2>.P2Union", ["boolean"], ["integer"]]]],
-            "pdStr!": ["struct<1>.PdStr", ["struct<1>.PStr", ["boolean"]]]
+            "objNullFn!": ["object", ["fn.example?"]]
         }
     },
     {
@@ -181,41 +96,6 @@
             "Two": {
                 "required": ["boolean"],
                 "optional!": ["boolean"]
-            }
-        }]
-    },
-    {
-        "struct<1>.PStr": {
-            "wrap": ["T0"]
-        }
-    },
-    {
-        "struct<1>.PdStr": {
-            "dwrap": ["struct<1>.PStr", ["boolean"]]
-        }
-    },
-    {
-        "struct<2>.P2Str": {
-            "wrap": ["T0"],
-            "nest": ["array", ["T1"]]
-        }
-    },
-    {
-        "union<1>.PUnion": [{
-            "One": {}
-        }, {
-            "Two": {
-                "ewrap": ["T0"]
-            }
-        }]
-    },
-    {
-        "union<2>.P2Union": [{
-            "One": {}
-        }, {
-            "Two": {
-                "ewrap": ["T0"],
-                "enest": ["array", ["T1"]]
             }
         }]
     },

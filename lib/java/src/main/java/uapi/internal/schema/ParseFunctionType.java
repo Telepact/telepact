@@ -25,17 +25,16 @@ public class ParseFunctionType {
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
-        final var typeParameterCount = 0;
 
         UUnion callType = null;
         try {
             final UStruct argType = parseStructType(documentName, path, functionDefinitionAsParsedJson,
-                    schemaKey, List.of("->", "_errors"), typeParameterCount, uApiSchemaDocumentNamesToPseudoJson,
+                    schemaKey, List.of("->", "_errors"), uApiSchemaDocumentNamesToPseudoJson,
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
                     allParseFailures, failedTypes);
-            callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0), typeParameterCount);
+            callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0));
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
@@ -52,7 +51,7 @@ public class ParseFunctionType {
             try {
                 resultType = parseUnionType(documentName, path, functionDefinitionAsParsedJson,
                         resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
-                        typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
                         schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);

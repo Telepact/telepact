@@ -15,12 +15,13 @@ import uapi.internal.types.UType;
 public class ParseStructFields {
     static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, String documentName,
             List<Object> path,
-            int typeParameterCount, Map<String, List<Object>> uApiSchemaDocumentsToPseudoJson,
+            Map<String, List<Object>> uApiSchemaDocumentsToPseudoJson,
             Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, UFieldDeclaration>();
+        final var typeParameterCount = 0;
 
         for (final var structEntry : referenceStruct.entrySet()) {
             final var fieldDeclaration = structEntry.getKey();

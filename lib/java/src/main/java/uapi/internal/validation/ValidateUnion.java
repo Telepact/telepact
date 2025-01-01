@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.types.UStruct;
-import uapi.internal.types.UTypeDeclaration;
 
 public class ValidateUnion {
     public static List<ValidationFailure> validateUnion(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, String name, Map<String, UStruct> cases) {
+            String name, Map<String, UStruct> cases) {
         if (value instanceof Map<?, ?> m) {
             Map<String, Object> selectedCases;
             if (name.startsWith("fn.")) {
@@ -23,7 +21,7 @@ public class ValidateUnion {
             } else {
                 selectedCases = select == null ? null : (Map<String, Object>) select.get(name);
             }
-            return validateUnionCases(cases, selectedCases, m, select, fn, typeParameters);
+            return validateUnionCases(cases, selectedCases, m, select, fn);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _UNION_NAME);
         }

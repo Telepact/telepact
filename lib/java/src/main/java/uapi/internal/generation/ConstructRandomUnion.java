@@ -5,18 +5,15 @@ import static uapi.internal.generation.ConstructRandomStruct.constructRandomStru
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import uapi.RandomGenerator;
 import uapi.internal.types.UStruct;
-import uapi.internal.types.UTypeDeclaration;
 
 public class ConstructRandomUnion {
     static Map<String, Object> constructRandomUnion(Map<String, UStruct> unionCasesReference,
             Map<String, Object> startingUnion,
             boolean includeOptionalFields, boolean randomizeOptionalFields,
-            List<UTypeDeclaration> typeParameters,
             RandomGenerator randomGenerator) {
         if (!startingUnion.isEmpty()) {
             final var entry = startingUnion.entrySet().stream().findAny().get();
@@ -25,7 +22,7 @@ public class ConstructRandomUnion {
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
             return Map.of(unionCase, constructRandomStruct(unionStructType.fields, unionStartingStruct,
-                    includeOptionalFields, randomizeOptionalFields, typeParameters, randomGenerator));
+                    includeOptionalFields, randomizeOptionalFields, randomGenerator));
         } else {
             final var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
 
@@ -39,7 +36,7 @@ public class ConstructRandomUnion {
             return Map.of(unionCase,
                     constructRandomStruct(unionData.fields, new HashMap<>(), includeOptionalFields,
                             randomizeOptionalFields,
-                            typeParameters, randomGenerator));
+                            randomGenerator));
         }
     }
 }

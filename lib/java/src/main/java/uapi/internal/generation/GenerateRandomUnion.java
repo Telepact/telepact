@@ -12,16 +12,15 @@ import uapi.internal.types.UTypeDeclaration;
 
 public class GenerateRandomUnion {
     public static Object generateRandomUnion(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
+            boolean includeOptionalFields, boolean randomizeOptionalFields,
             RandomGenerator randomGenerator, Map<String, UStruct> cases) {
         if (useBlueprintValue) {
             final var startingUnionCase = (Map<String, Object>) blueprintValue;
             return constructRandomUnion(cases, startingUnionCase, includeOptionalFields, randomizeOptionalFields,
-                    typeParameters, randomGenerator);
+                    randomGenerator);
         } else {
             return constructRandomUnion(cases, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
-                    typeParameters, randomGenerator);
+                    randomGenerator);
         }
     }
 }

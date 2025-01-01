@@ -9,12 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.types.UStruct;
-import uapi.internal.types.UTypeDeclaration;
 
 public class ValidateUnionCases {
     static List<ValidationFailure> validateUnionCases(
             Map<String, UStruct> referenceCases, Map<String, Object> selectedCases,
-            Map<?, ?> actual, Map<String, Object> select, String fn, List<UTypeDeclaration> typeParameters) {
+            Map<?, ?> actual, Map<String, Object> select, String fn) {
         if (actual.size() != 1) {
             return List.of(
                     new ValidationFailure(new ArrayList<Object>(),
@@ -34,7 +33,7 @@ public class ValidateUnionCases {
 
         if (unionPayload instanceof Map<?, ?> m2) {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
-                    (Map<String, Object>) m2, selectedCases, select, fn, typeParameters);
+                    (Map<String, Object>) m2, selectedCases, select, fn);
 
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {

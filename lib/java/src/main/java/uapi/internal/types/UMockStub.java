@@ -25,20 +25,19 @@ public class UMockStub implements UType {
 
     @Override
     public List<ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
-        return validateMockStub(givenObj, select, fn, typeParameters, generics, this.types);
+            List<UTypeDeclaration> typeParameters) {
+        return validateMockStub(givenObj, select, fn, typeParameters, this.types);
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, RandomGenerator randomGenerator) {
+            RandomGenerator randomGenerator) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName() {
         return _MOCK_STUB_NAME;
     }
 

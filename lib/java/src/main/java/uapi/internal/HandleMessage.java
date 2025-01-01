@@ -93,7 +93,7 @@ public class HandleMessage {
 
         final UUnion functionTypeCall = functionType.call;
 
-        final var callValidationFailures = functionTypeCall.validate(requestBody, null, null, List.of(), List.of());
+        final var callValidationFailures = functionTypeCall.validate(requestBody, null, null, List.of());
         if (!callValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidRequestBody_", callValidationFailures, resultUnionType,
                     responseHeaders);
@@ -129,7 +129,7 @@ public class HandleMessage {
         final var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
             final var resultValidationFailures = resultUnionType.validate(
-                    resultUnion, selectStructFieldsHeader, null, List.of(), List.of());
+                    resultUnion, selectStructFieldsHeader, null, List.of());
             if (!resultValidationFailures.isEmpty()) {
                 return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
                         responseHeaders);

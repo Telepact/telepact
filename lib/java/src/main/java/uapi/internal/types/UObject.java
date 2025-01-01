@@ -20,22 +20,21 @@ public class UObject implements UType {
 
     @Override
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
-        return validateObject(value, select, fn, typeParameters, generics);
+            List<UTypeDeclaration> typeParameters) {
+        return validateObject(value, select, fn, typeParameters);
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, RandomGenerator randomGenerator) {
+            RandomGenerator randomGenerator) {
         return generateRandomObject(blueprintValue, useBlueprintValue, includeOptionalFields,
                 randomizeOptionalFields,
-                typeParameters, generics, randomGenerator);
+                typeParameters, randomGenerator);
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName() {
         return _OBJECT_NAME;
     }
 

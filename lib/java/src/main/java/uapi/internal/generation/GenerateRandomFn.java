@@ -14,14 +14,14 @@ public class GenerateRandomFn {
 
     public static Object generateRandomFn(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics, RandomGenerator randomGenerator, Map<String, UStruct> callCases) {
+            RandomGenerator randomGenerator, Map<String, UStruct> callCases) {
         if (useBlueprintValue) {
             final var startingFnValue = (Map<String, Object>) blueprintValue;
             return constructRandomUnion(callCases, startingFnValue, includeOptionalFields, randomizeOptionalFields,
-                    List.of(), randomGenerator);
+                    randomGenerator);
         } else {
             return constructRandomUnion(callCases, new HashMap<>(), includeOptionalFields, randomizeOptionalFields,
-                    List.of(), randomGenerator);
+                    randomGenerator);
         }
     }
 }

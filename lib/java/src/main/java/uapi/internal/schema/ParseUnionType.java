@@ -19,7 +19,7 @@ import uapi.internal.types.UUnion;
 public class ParseUnionType {
     static UUnion parseUnionType(String documentName, List<Object> path,
             Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
-            List<String> ignoreKeys, List<String> requiredKeys, int typeParameterCount,
+            List<String> ignoreKeys, List<String> requiredKeys,
             Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
@@ -150,7 +150,7 @@ public class ParseUnionType {
 
             final Map<String, UFieldDeclaration> fields;
             try {
-                fields = parseStructFields(unionCaseStruct, documentName, unionKeyPath, typeParameterCount,
+                fields = parseStructFields(unionCaseStruct, documentName, unionKeyPath,
                         uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
                         allParseFailures,
                         failedTypes);
@@ -159,7 +159,7 @@ public class ParseUnionType {
                 continue;
             }
 
-            final var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields, typeParameterCount);
+            final var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields);
 
             cases.put(unionCase, unionStruct);
             caseIndices.put(unionCase, i);
@@ -169,6 +169,6 @@ public class ParseUnionType {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        return new UUnion(schemaKey, cases, caseIndices, typeParameterCount);
+        return new UUnion(schemaKey, cases, caseIndices);
     }
 }

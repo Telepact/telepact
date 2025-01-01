@@ -95,7 +95,7 @@ public class MockHandle {
                                 final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
-                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(),
+                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
                                         random);
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -108,7 +108,7 @@ public class MockHandle {
                                 final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         stub.thenResult, useBlueprintValue,
-                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(),
+                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
                                         random);
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -129,7 +129,7 @@ public class MockHandle {
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;
                     final var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
-                            includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), List.of(), random);
+                            includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), random);
                     return new Message(Map.of(), Map.of("Ok_", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));

@@ -15,7 +15,6 @@ import uapi.UApiSchemaParseError;
 import uapi.internal.types.UAny;
 import uapi.internal.types.UArray;
 import uapi.internal.types.UBoolean;
-import uapi.internal.types.UGeneric;
 import uapi.internal.types.UInteger;
 import uapi.internal.types.UMockCall;
 import uapi.internal.types.UMockStub;
@@ -26,7 +25,7 @@ import uapi.internal.types.UString;
 import uapi.internal.types.UType;
 
 public class GetOrParseType {
-    static UType getOrParseType(String documentName, List<Object> path, String typeName, int thisTypeParameterCount,
+    static UType getOrParseType(String documentName, List<Object> path, String typeName,
             Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
@@ -41,16 +40,8 @@ public class GetOrParseType {
             return existingType;
         }
 
-        final String genericRegex;
-        if (thisTypeParameterCount > 0) {
-            genericRegex = "|(T([%s]))"
-                    .formatted(thisTypeParameterCount > 1 ? "0-%d".formatted(thisTypeParameterCount - 1) : "0");
-        } else {
-            genericRegex = "";
-        }
+        final var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$";
 
-        final var regexString = "^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)%s)$"
-                .formatted(genericRegex);
         final var regex = Pattern.compile(regexString);
 
         final var matcher = regex.matcher(typeName);
@@ -72,14 +63,6 @@ public class GetOrParseType {
             };
         }
 
-        if (thisTypeParameterCount > 0) {
-            final var genericParameterIndexString = matcher.group(9);
-            if (genericParameterIndexString != null) {
-                final var genericParameterIndex = Integer.parseInt(genericParameterIndexString);
-                return new UGeneric(genericParameterIndex);
-            }
-        }
-
         final var customTypeName = matcher.group(2);
         final var thisIndex = schemaKeysToIndex.get(customTypeName);
         final var thisDocumentName = schemaKeysToDocumentName.get(customTypeName);
@@ -90,26 +73,18 @@ public class GetOrParseType {
         final var definition = (Map<String, Object>) uApiSchemaDocumentNamesToPseudoJson.get(thisDocumentName)
                 .get(thisIndex);
 
-        final var typeParameterCountString = matcher.group(6);
-        final int typeParameterCount;
-        if (typeParameterCountString != null) {
-            typeParameterCount = Integer.parseInt(typeParameterCountString);
-        } else {
-            typeParameterCount = 0;
-        }
-
         try {
             final UType type;
             if (customTypeName.startsWith("struct")) {
                 type = parseStructType(thisDocumentName, List.of(thisIndex), definition, customTypeName, List.of(),
-                        typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
                         schemaKeysToIndex,
                         parsedTypes,
                         allParseFailures, failedTypes);
             } else if (customTypeName.startsWith("union")) {
                 type = parseUnionType(thisDocumentName, List.of(thisIndex), definition, customTypeName, List.of(),
                         List.of(),
-                        typeParameterCount, uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
+                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
                         schemaKeysToIndex,
                         parsedTypes,
                         allParseFailures, failedTypes);

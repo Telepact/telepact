@@ -10,7 +10,7 @@ import uapi.internal.types.UUnion;
 public class ValidateResult {
     public static void validateResult(UUnion resultUnionType, Object errorResult) {
         final var newErrorResultValidationFailures = resultUnionType.validate(
-                errorResult, null, null, List.of(), List.of());
+                errorResult, null, null, List.of());
         if (!newErrorResultValidationFailures.isEmpty()) {
             throw new UApiError(
                     "Failed internal uAPI validation: "

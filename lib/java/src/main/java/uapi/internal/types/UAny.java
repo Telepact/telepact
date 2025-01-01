@@ -19,21 +19,19 @@ public class UAny implements UType {
 
     @Override
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+            List<UTypeDeclaration> typeParameters) {
         return List.of();
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
         return generateRandomAny(randomGenerator);
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName() {
         return _ANY_NAME;
     }
 }

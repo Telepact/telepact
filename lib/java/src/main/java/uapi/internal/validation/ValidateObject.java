@@ -12,8 +12,7 @@ import uapi.internal.types.UTypeDeclaration;
 public class ValidateObject {
 
     public static List<ValidationFailure> validateObject(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
+            List<UTypeDeclaration> typeParameters) {
         if (value instanceof final Map<?, ?> m) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
@@ -21,7 +20,7 @@ public class ValidateObject {
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 final var k = (String) entry.getKey();
                 final var v = entry.getValue();
-                final var nestedValidationFailures = nestedTypeDeclaration.validate(v, select, fn, generics);
+                final var nestedValidationFailures = nestedTypeDeclaration.validate(v, select, fn);
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
                 for (var f : nestedValidationFailures) {

@@ -29,11 +29,9 @@ public class ParseHeadersType {
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
-        final var typeParameterCount = 0;
-
         try {
             final var typeDeclaration = parseTypeDeclaration(documentName, path,
-                    typeDeclarationArray, typeParameterCount,
+                    typeDeclarationArray,
                     uApiSchemaDocumentNamesToPseudoJson,
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,

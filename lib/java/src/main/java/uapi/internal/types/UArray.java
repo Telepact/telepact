@@ -20,23 +20,21 @@ public class UArray implements UType {
 
     @Override
     public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics) {
-        return validateArray(value, select, fn, typeParameters, generics);
+            List<UTypeDeclaration> typeParameters) {
+        return validateArray(value, select, fn, typeParameters);
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            List<UTypeDeclaration> generics,
             RandomGenerator randomGenerator) {
         return generateRandomArray(blueprintValue, useBlueprintValue, includeOptionalFields,
                 randomizeOptionalFields,
-                typeParameters, generics, randomGenerator);
+                typeParameters, randomGenerator);
     }
 
     @Override
-    public String getName(List<UTypeDeclaration> generics) {
+    public String getName() {
         return _ARRAY_NAME;
     }
 }

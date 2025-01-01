@@ -11,8 +11,7 @@ public class ValidateStructFields {
     static List<ValidationFailure> validateStructFields(
             Map<String, UFieldDeclaration> fields,
             List<String> selectedFields,
-            Map<String, Object> actualStruct, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
+            Map<String, Object> actualStruct, Map<String, Object> select, String fn) {
         final var validationFailures = new ArrayList<ValidationFailure>();
 
         final var missingFields = new ArrayList<String>();
@@ -49,8 +48,7 @@ public class ValidateStructFields {
 
             final UTypeDeclaration refFieldTypeDeclaration = referenceField.typeDeclaration;
 
-            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn,
-                    typeParameters);
+            final var nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn);
 
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {
