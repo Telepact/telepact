@@ -10,12 +10,14 @@ import {
     MockServer,
     MockServerOptions,
     UApiSchema,
+    MockUApiSchema,
     getSchemaFileMap,
 } from "uapi";
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
 import { kMaxLength } from "buffer";
+import { MockUApiSchema } from "uapi/lib/src/MockUApiSchema";
 
 class Timer {
     public values: number[] = [];
@@ -146,7 +148,7 @@ function startMockTestServer(
     frontdoorTopic: string,
     config: Record<string, any>,
 ): Subscription {
-    const uApi: UApiSchema = UApiSchema.fromDirectory(apiSchemaPath);
+    const uApi: UApiSchema = MockUApiSchema.fromDirectory(apiSchemaPath);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);

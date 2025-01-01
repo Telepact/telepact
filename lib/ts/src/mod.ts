@@ -9,6 +9,7 @@ export * from './ClientBinaryStrategy';
 export * from './SerializationError';
 export * from './Serialization';
 export * from './UApiSchema';
+export * from './MockUApiSchema';
 export * from './UApiSchemaParseError';
 export * from './internal/schema/GetSchemaFileMap';
 export { default as jsonSchema } from '../inc/json-schema.json';
