@@ -6,9 +6,11 @@ import { parseField } from '../../internal/schema/ParseField';
 
 export function parseStructFields(
     referenceStruct: { [key: string]: any },
+    documentName: string,
     path: any[],
     typeParameterCount: number,
-    uapiSchemaPseudoJson: any[],
+    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
@@ -24,17 +26,24 @@ export function parseStructFields(
             if (fieldNoOpt === existingFieldNoOpt) {
                 const finalPath = [...path, fieldDeclaration];
                 const finalOtherPath = [...path, existingField];
-                parseFailures.push(new SchemaParseFailure(finalPath, 'PathCollision', { other: finalOtherPath }, null));
+                parseFailures.push(
+                    new SchemaParseFailure(documentName, finalPath, 'PathCollision', {
+                        document: documentName,
+                        path: finalOtherPath,
+                    }),
+                );
             }
         }
 
         try {
             const parsedField = parseField(
+                documentName,
                 path,
                 fieldDeclaration,
                 referenceStruct[fieldDeclaration],
                 typeParameterCount,
-                uapiSchemaPseudoJson,
+                uapiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex,
                 parsedTypes,
                 allParseFailures,

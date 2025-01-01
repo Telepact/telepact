@@ -4,21 +4,25 @@ import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnex
 import { parseUapiSchema } from '../../internal/schema/ParseUApiSchema';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
-export function newUapiSchema(uapiSchemaJson: string): UApiSchema {
-    let uapiSchemaPseudoJsonInit: any;
+export function newUapiSchema(uApiSchemaFilesToJson: Record<string, string>): UApiSchema {
+    const finalPseudoJson: Record<string, any[]> = {};
 
-    try {
-        uapiSchemaPseudoJsonInit = JSON.parse(uapiSchemaJson);
-    } catch (e) {
-        throw new UApiSchemaParseError([new SchemaParseFailure([], 'JsonInvalid', {}, null)]);
+    for (const [documentName, jsonValue] of Object.entries(uApiSchemaFilesToJson)) {
+        let uApiSchemaPseudoJsonInit: any;
+        try {
+            uApiSchemaPseudoJsonInit = JSON.parse(jsonValue);
+        } catch (e) {
+            throw new UApiSchemaParseError([new SchemaParseFailure(documentName, [], 'JsonInvalid', {})], e as Error);
+        }
+
+        if (!Array.isArray(uApiSchemaPseudoJsonInit)) {
+            const thisParseFailure = getTypeUnexpectedParseFailure(documentName, [], uApiSchemaPseudoJsonInit, 'Array');
+            throw new UApiSchemaParseError(thisParseFailure);
+        }
+        const uApiSchemaPseudoJson: any[] = uApiSchemaPseudoJsonInit;
+
+        finalPseudoJson[documentName] = uApiSchemaPseudoJson;
     }
 
-    if (!Array.isArray(uapiSchemaPseudoJsonInit)) {
-        const thisParseFailure = getTypeUnexpectedParseFailure([], uapiSchemaPseudoJsonInit, 'Array');
-        throw new UApiSchemaParseError(thisParseFailure);
-    }
-
-    const uapiSchemaPseudoJson = uapiSchemaPseudoJsonInit;
-
-    return parseUapiSchema(uapiSchemaPseudoJson, 0);
+    return parseUapiSchema(finalPseudoJson);
 }

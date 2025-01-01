@@ -6,11 +6,13 @@ import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { UType } from '../../internal/types/UType';
 
 export function parseHeadersType(
+    documentName: string,
     headersDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     headerField: string,
     index: number,
-    uapiSchemaPseudoJson: any[],
+    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
@@ -21,7 +23,9 @@ export function parseHeadersType(
     const typeDeclarationValue = headersDefinitionAsParsedJson[schemaKey];
 
     if (!Array.isArray(typeDeclarationValue)) {
-        throw new UApiSchemaParseError(getTypeUnexpectedParseFailure(path, typeDeclarationValue, 'Array'));
+        throw new UApiSchemaParseError(
+            getTypeUnexpectedParseFailure(documentName, path, typeDeclarationValue, 'Array'),
+        );
     }
 
     const typeDeclarationArray = typeDeclarationValue;
@@ -30,10 +34,12 @@ export function parseHeadersType(
 
     try {
         const typeDeclaration = parseTypeDeclaration(
+            documentName,
             path,
             typeDeclarationArray,
             typeParameterCount,
-            uapiSchemaPseudoJson,
+            uapiSchemaDocumentNamesToPseudoJson,
+            schemaKeysToDocumentName,
             schemaKeysToIndex,
             parsedTypes,
             allParseFailures,

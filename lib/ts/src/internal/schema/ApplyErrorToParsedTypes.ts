@@ -5,13 +5,16 @@ import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { UFn } from '../../internal/types/UFn';
 
 export function applyErrorToParsedTypes(
-    errorKey: string,
-    errorIndex: number,
     error: UError,
     parsedTypes: { [key: string]: UType },
+    schemaKeysToDocumentNames: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
 ): void {
     const parseFailures: SchemaParseFailure[] = [];
+
+    const errorKey = error.name;
+    const errorIndex = schemaKeysToIndex[errorKey];
+    const documentName = schemaKeysToDocumentNames[errorKey];
 
     for (const parsedTypeName in parsedTypes) {
         const parsedType = parsedTypes[parsedTypeName];
@@ -41,13 +44,14 @@ export function applyErrorToParsedTypes(
             if (newKey in fnResultCases) {
                 const otherPathIndex = schemaKeysToIndex[fnName];
                 const errorCaseIndex = error.errors.caseIndices[newKey];
+                const otherDocumentName = schemaKeysToDocumentNames[fnName];
                 const fnErrorCaseIndex = f.result.caseIndices[newKey];
                 parseFailures.push(
                     new SchemaParseFailure(
+                        documentName,
                         [errorIndex, errorKey, errorCaseIndex, newKey],
                         'PathCollision',
-                        { other: [otherPathIndex, '->', fnErrorCaseIndex, newKey] },
-                        null,
+                        { document: otherDocumentName, path: [otherPathIndex, '->', fnErrorCaseIndex, newKey] },
                     ),
                 );
             }

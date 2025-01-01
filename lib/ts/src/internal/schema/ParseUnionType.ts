@@ -7,13 +7,15 @@ import { UStruct } from '../../internal/types/UStruct';
 import { UType } from '../../internal/types/UType';
 
 export function parseUnionType(
+    documentName: string,
     path: any[],
     unionDefinitionAsPseudoJson: { [key: string]: any },
     schemaKey: string,
     ignoreKeys: string[],
     requiredKeys: string[],
     typeParameterCount: number,
-    uApiSchemaPseudoJson: any[],
+    uApiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
@@ -31,7 +33,7 @@ export function parseUnionType(
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
             const loopPath = path.concat(k);
-            parseFailures.push(new SchemaParseFailure(loopPath, 'ObjectKeyDisallowed', {}, null));
+            parseFailures.push(new SchemaParseFailure(documentName, loopPath, 'ObjectKeyDisallowed', {}));
         }
     }
 
@@ -39,7 +41,7 @@ export function parseUnionType(
     const defInit = unionDefinitionAsPseudoJson[schemaKey];
 
     if (!Array.isArray(defInit)) {
-        const finalParseFailures = getTypeUnexpectedParseFailure(thisPath, defInit, 'Array');
+        const finalParseFailures = getTypeUnexpectedParseFailure(documentName, thisPath, defInit, 'Array');
         parseFailures.push(...finalParseFailures);
         throw new UApiSchemaParseError(parseFailures);
     }
@@ -51,7 +53,7 @@ export function parseUnionType(
         index += 1;
         const loopPath = thisPath.concat(index);
         if (typeof element !== 'object' || Array.isArray(element) || element === null || element === undefined) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, element, 'Object');
+            const thisParseFailures = getTypeUnexpectedParseFailure(documentName, loopPath, element, 'Object');
             parseFailures.push(...thisParseFailures);
             continue;
         }
@@ -63,7 +65,7 @@ export function parseUnionType(
     }
 
     if (definition.length === 0 && requiredKeys.length === 0) {
-        parseFailures.push(new SchemaParseFailure(thisPath, 'EmptyArrayDisallowed', {}, null));
+        parseFailures.push(new SchemaParseFailure(documentName, thisPath, 'EmptyArrayDisallowed', {}));
     } else {
         for (const requiredKey of requiredKeys) {
             let found = false;
@@ -77,7 +79,7 @@ export function parseUnionType(
             }
             if (!found) {
                 const branchPath = thisPath.concat(0, requiredKey);
-                parseFailures.push(new SchemaParseFailure(branchPath, 'RequiredObjectKeyMissing', {}, null));
+                parseFailures.push(new SchemaParseFailure(documentName, branchPath, 'RequiredObjectKeyMissing', {}));
             }
         }
     }
@@ -99,23 +101,21 @@ export function parseUnionType(
         const matches = keys.filter((k) => regex.test(k));
         if (matches.length !== 1) {
             parseFailures.push(
-                new SchemaParseFailure(
-                    loopPath,
-                    'ObjectKeyRegexMatchCountUnexpected',
-                    { regex: regexString, actual: matches.length, expected: 1, keys: keys },
-                    null,
-                ),
+                new SchemaParseFailure(documentName, loopPath, 'ObjectKeyRegexMatchCountUnexpected', {
+                    regex: regexString,
+                    actual: matches.length,
+                    expected: 1,
+                    keys: keys,
+                }),
             );
             continue;
         }
         if (Object.keys(map).length !== 1) {
             parseFailures.push(
-                new SchemaParseFailure(
-                    loopPath,
-                    'ObjectSizeUnexpected',
-                    { expected: 1, actual: Object.keys(map).length },
-                    null,
-                ),
+                new SchemaParseFailure(documentName, loopPath, 'ObjectSizeUnexpected', {
+                    expected: 1,
+                    actual: Object.keys(map).length,
+                }),
             );
             continue;
         }
@@ -125,7 +125,7 @@ export function parseUnionType(
         const unionKeyPath = loopPath.concat(unionCase);
 
         if (typeof entry[1] !== 'object' || Array.isArray(entry[1]) || entry[1] === null || entry[1] === undefined) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(unionKeyPath, entry[1], 'Object');
+            const thisParseFailures = getTypeUnexpectedParseFailure(documentName, unionKeyPath, entry[1], 'Object');
             parseFailures.push(...thisParseFailures);
             continue;
         }
@@ -134,9 +134,11 @@ export function parseUnionType(
         try {
             const fields = parseStructFields(
                 unionCaseStruct,
+                documentName,
                 unionKeyPath,
                 typeParameterCount,
-                uApiSchemaPseudoJson,
+                uApiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex,
                 parsedTypes,
                 allParseFailures,

@@ -6,9 +6,11 @@ import { parseUnionType } from './ParseUnionType';
 
 export function parseErrorType(
     errorDefinitionAsParsedJson: { [key: string]: any },
-    uApiSchemaPseudoJson: any[],
+    documentName: string,
+    uApiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
     schemaKey: string,
     index: number,
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
@@ -23,7 +25,7 @@ export function parseErrorType(
     if (otherKeys.length > 0) {
         for (const k of otherKeys) {
             const loopPath = basePath.concat(k);
-            parseFailures.push(new SchemaParseFailure(loopPath as any[], 'ObjectKeyDisallowed', {}, null));
+            parseFailures.push(new SchemaParseFailure(documentName, loopPath as any[], 'ObjectKeyDisallowed', {}));
         }
     }
 
@@ -34,13 +36,15 @@ export function parseErrorType(
     const typeParameterCount = 0;
 
     const error = parseUnionType(
+        documentName,
         basePath,
         errorDefinitionAsParsedJson,
         schemaKey,
         [],
         [],
         typeParameterCount,
-        uApiSchemaPseudoJson,
+        uApiSchemaDocumentNamesToPseudoJson,
+        schemaKeysToDocumentName,
         schemaKeysToIndex,
         parsedTypes,
         allParseFailures,

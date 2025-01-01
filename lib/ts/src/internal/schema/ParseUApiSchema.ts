@@ -9,7 +9,6 @@ import { findMatchingSchemaKey } from '../../internal/schema/FindMatchingSchemaK
 import { findSchemaKey } from '../../internal/schema/FindSchemaKey';
 import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { offsetSchemaIndex } from '../../internal/schema/OffsetSchemaIndex';
 import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 

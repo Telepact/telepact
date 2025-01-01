@@ -2,28 +2,43 @@ import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
 export function catchErrorCollisions(
-    uApiSchemaPseudoJson: any[],
+    uApiSchemaNameToPseudoJson: Record<string, any[]>,
     errorKeys: Set<string>,
     keysToIndex: Record<string, number>,
+    schemaKeysToDocumentNames: Record<string, string>,
 ): void {
     const parseFailures: SchemaParseFailure[] = [];
 
-    const indices = Array.from(errorKeys, (key) => keysToIndex[key]).sort();
-    const indexToKeys: Record<number, string> = {};
-    for (const [key, value] of Object.entries(keysToIndex)) {
-        indexToKeys[value] = key;
-    }
+    const errorKeysList = [...errorKeys];
 
-    for (let i = 0; i < indices.length; i++) {
-        for (let j = i + 1; j < indices.length; j++) {
-            const index = indices[i];
-            const otherIndex = indices[j];
+    errorKeysList.sort((k1, k2) => {
+        const documentName1 = schemaKeysToDocumentNames[k1];
+        const documentName2 = schemaKeysToDocumentNames[k2];
+        if (documentName1 !== documentName2) {
+            return documentName1.localeCompare(documentName2);
+        } else {
+            const index1 = keysToIndex[k1];
+            const index2 = keysToIndex[k2];
+            return index1 - index2;
+        }
+    });
+
+    for (let i = 0; i < errorKeysList.length; i++) {
+        for (let j = i + 1; j < errorKeysList.length; j++) {
+            const defKey = errorKeysList[i];
+            const otherDefKey = errorKeysList[j];
+
+            const index = keysToIndex[defKey];
+            const otherIndex = keysToIndex[otherDefKey];
+
+            const documentName = schemaKeysToDocumentNames[defKey];
+            const otherDocumentName = schemaKeysToDocumentNames[otherDefKey];
+
+            const uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson[documentName];
+            const otherUApiSchemaPseudoJson = uApiSchemaNameToPseudoJson[otherDocumentName];
 
             const def = uApiSchemaPseudoJson[index] as Record<string, object>;
-            const otherDef = uApiSchemaPseudoJson[otherIndex] as Record<string, object>;
-
-            const defKey = indexToKeys[index];
-            const otherDefKey = indexToKeys[otherIndex];
+            const otherDef = otherUApiSchemaPseudoJson[otherIndex] as Record<string, object>;
 
             const errDef = def[defKey] as object[];
             const otherErrDef = otherDef[otherDefKey] as object[];
@@ -46,10 +61,10 @@ export function catchErrorCollisions(
                         const thisOtherErrorDefKey = thisOtherErrDefKeys.values().next().value as string;
                         parseFailures.push(
                             new SchemaParseFailure(
+                                otherDocumentName,
                                 [otherIndex, otherDefKey, l, thisOtherErrorDefKey],
                                 'PathCollision',
-                                { other: [index, defKey, k, thisErrorDefKey] },
-                                otherDefKey,
+                                { document: documentName, path: [index, defKey, k, thisErrorDefKey] },
                             ),
                         );
                     }

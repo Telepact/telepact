@@ -8,10 +8,12 @@ import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 
 export function parseFunctionType(
+    documentName: string,
     path: any[],
     functionDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
-    uApiSchemaPseudoJson: any[],
+    uApiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
@@ -23,12 +25,14 @@ export function parseFunctionType(
     let callType: UUnion | null = null;
     try {
         const argType = parseStructType(
+            documentName,
             path,
             functionDefinitionAsParsedJson,
             schemaKey,
             ['->', '_errors'],
             typeParameterCount,
-            uApiSchemaPseudoJson,
+            uApiSchemaDocumentNamesToPseudoJson,
+            schemaKeysToDocumentName,
             schemaKeysToIndex,
             parsedTypes,
             allParseFailures,
@@ -49,17 +53,19 @@ export function parseFunctionType(
 
     let resultType: UUnion | null = null;
     if (!(resultSchemaKey in functionDefinitionAsParsedJson)) {
-        parseFailures.push(new SchemaParseFailure(resPath, 'RequiredObjectKeyMissing', {}, null));
+        parseFailures.push(new SchemaParseFailure(documentName, resPath, 'RequiredObjectKeyMissing', {}));
     } else {
         try {
             resultType = parseUnionType(
+                documentName,
                 path,
                 functionDefinitionAsParsedJson,
                 resultSchemaKey,
                 Object.keys(functionDefinitionAsParsedJson),
                 ['Ok_'],
                 typeParameterCount,
-                uApiSchemaPseudoJson,
+                uApiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex,
                 parsedTypes,
                 allParseFailures,
@@ -80,7 +86,7 @@ export function parseFunctionType(
 
     let errorsRegex: string | null = null;
     if (errorsRegexKey in functionDefinitionAsParsedJson && !schemaKey.endsWith('_')) {
-        parseFailures.push(new SchemaParseFailure(regexPath, 'ObjectKeyDisallowed', {}, null));
+        parseFailures.push(new SchemaParseFailure(documentName, regexPath, 'ObjectKeyDisallowed', {}));
     } else {
         const errorsRegexInit =
             errorsRegexKey in functionDefinitionAsParsedJson
@@ -88,7 +94,7 @@ export function parseFunctionType(
                 : '^errors\\..*$';
 
         if (typeof errorsRegexInit !== 'string') {
-            const thisParseFailures = getTypeUnexpectedParseFailure(regexPath, errorsRegexInit, 'String');
+            const thisParseFailures = getTypeUnexpectedParseFailure(documentName, regexPath, errorsRegexInit, 'String');
             parseFailures.push(...thisParseFailures);
         } else {
             errorsRegex = errorsRegexInit;

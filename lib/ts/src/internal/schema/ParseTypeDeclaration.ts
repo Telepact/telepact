@@ -7,24 +7,26 @@ import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnex
 import { UGeneric } from '../../internal/types/UGeneric';
 
 export function parseTypeDeclaration(
+    documentName: string,
     path: any[],
     typeDeclarationArray: any[],
     thisTypeParameterCount: number,
-    uapiSchemaPseudoJson: any[],
+    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
     failedTypes: Set<string>,
 ): UTypeDeclaration {
     if (!typeDeclarationArray.length) {
-        throw new UApiSchemaParseError([new SchemaParseFailure(path, 'EmptyArrayDisallowed', {}, null)]);
+        throw new UApiSchemaParseError([new SchemaParseFailure(documentName, path, 'EmptyArrayDisallowed', {})]);
     }
 
     const basePath = path.concat([0]);
     const baseType = typeDeclarationArray[0];
 
     if (typeof baseType !== 'string') {
-        const thisParseFailures = getTypeUnexpectedParseFailure(basePath, baseType, 'String');
+        const thisParseFailures = getTypeUnexpectedParseFailure(documentName, basePath, baseType, 'String');
         throw new UApiSchemaParseError(thisParseFailures);
     }
 
@@ -36,12 +38,9 @@ export function parseTypeDeclaration(
     const matcher = rootTypeString.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(
-                basePath,
-                'StringRegexMatchFailed',
-                { regex: regexString.toString().slice(1, -1) },
-                null,
-            ),
+            new SchemaParseFailure(documentName, basePath, 'StringRegexMatchFailed', {
+                regex: regexString.toString().slice(1, -1),
+            }),
         ]);
     }
 
@@ -49,10 +48,12 @@ export function parseTypeDeclaration(
     const nullable = !!matcher[2];
 
     const type_ = getOrParseType(
+        documentName,
         basePath,
         typeName,
         thisTypeParameterCount,
-        uapiSchemaPseudoJson,
+        uapiSchemaDocumentNamesToPseudoJson,
+        schemaKeysToDocumentName,
         schemaKeysToIndex,
         parsedTypes,
         allParseFailures,
@@ -61,19 +62,17 @@ export function parseTypeDeclaration(
 
     if (type_ instanceof UGeneric && nullable) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(basePath, 'StringRegexMatchFailed', { regex: '^(.+?)[^\\?]$' }, null),
+            new SchemaParseFailure(documentName, basePath, 'StringRegexMatchFailed', { regex: '^(.+?)[^\\?]$' }),
         ]);
     }
 
     const givenTypeParameterCount = typeDeclarationArray.length - 1;
     if (type_.getTypeParameterCount() !== givenTypeParameterCount) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(
-                path,
-                'ArrayLengthUnexpected',
-                { actual: typeDeclarationArray.length, expected: type_.getTypeParameterCount() + 1 },
-                null,
-            ),
+            new SchemaParseFailure(documentName, path, 'ArrayLengthUnexpected', {
+                actual: typeDeclarationArray.length,
+                expected: type_.getTypeParameterCount() + 1,
+            }),
         ]);
     }
 
@@ -86,17 +85,19 @@ export function parseTypeDeclaration(
         const loopPath = path.concat([index]);
 
         if (!Array.isArray(e)) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(loopPath, e, 'Array');
+            const thisParseFailures = getTypeUnexpectedParseFailure(documentName, loopPath, e, 'Array');
             parseFailures.push(...thisParseFailures);
             continue;
         }
 
         try {
             const typeParameterTypeDeclaration = parseTypeDeclaration(
+                documentName,
                 loopPath,
                 e,
                 thisTypeParameterCount,
-                uapiSchemaPseudoJson,
+                uapiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex,
                 parsedTypes,
                 allParseFailures,
