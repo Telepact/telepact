@@ -16,8 +16,6 @@ import {
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
-import { kMaxLength } from "buffer";
-import { MockUApiSchema } from "uapi/lib/src/MockUApiSchema";
 
 class Timer {
     public values: number[] = [];

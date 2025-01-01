@@ -12,7 +12,6 @@ import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnex
 import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 import { UError } from '../types/UError';
-import { request } from 'http';
 
 export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<string, object[]>): UApiSchema {
     const originalSchema: { [key: string]: object } = uApiSchemaDocumentNamesToPseudoJson;
@@ -56,10 +55,12 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                 const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
                 if (matchingSchemaKey !== null) {
                     const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
+                    const otherDocumentName = schemaKeysToDocumentName[matchingSchemaKey];
                     const finalPath = [...loopPath, schemaKey];
                     parseFailures.push(
                         new SchemaParseFailure(documentName, finalPath as any[], 'PathCollision', {
-                            other: [otherPathIndex, matchingSchemaKey],
+                            document: otherDocumentName,
+                            path: [otherPathIndex, matchingSchemaKey],
                         }),
                     );
                     continue;
