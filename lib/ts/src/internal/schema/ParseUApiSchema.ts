@@ -11,66 +11,78 @@ import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
+import { UError } from '../types/UError';
+import { request } from 'http';
 
-export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number): UApiSchema {
+export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<string, object[]>): UApiSchema {
+    const originalSchema: { [key: string]: object } = uApiSchemaDocumentNamesToPseudoJson;
     const parsedTypes: { [key: string]: UType } = {};
     const parseFailures: SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
     const schemaKeysToIndex: { [key: string]: number } = {};
+    const schemaKeysToDocumentName: { [key: string]: string } = {};
     const schemaKeys: Set<string> = new Set();
 
-    let index = -1;
-    for (const definition of uApiSchemaPseudoJson) {
-        index += 1;
-        const loopPath = [index];
+    const orderedDocumentNames = Object.keys(uApiSchemaDocumentNamesToPseudoJson).sort();
 
-        if (
-            typeof definition !== 'object' ||
-            Array.isArray(definition) ||
-            definition === null ||
-            definition === undefined
-        ) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(loopPath as any[], definition, 'Object');
-            parseFailures.push(...thisParseFailures);
-            continue;
-        }
+    for (const documentName of orderedDocumentNames) {
+        const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[documentName];
 
-        const def_ = definition;
+        let index = -1;
+        for (const definition of uApiSchemaPseudoJson) {
+            index += 1;
+            const loopPath = [index];
 
-        try {
-            const schemaKey = findSchemaKey(def_, index);
-            const ignoreIfDuplicate = def_['_ignoreIfDuplicate'] || false;
-            const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
-            if (matchingSchemaKey !== null) {
-                if (!ignoreIfDuplicate) {
-                    const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
-                    const finalPath = [...loopPath, schemaKey];
-                    parseFailures.push(
-                        new SchemaParseFailure(
-                            finalPath as any[],
-                            'PathCollision',
-                            { other: [otherPathIndex, matchingSchemaKey] },
-                            schemaKey,
-                        ),
-                    );
-                }
+            if (
+                typeof definition !== 'object' ||
+                Array.isArray(definition) ||
+                definition === null ||
+                definition === undefined
+            ) {
+                const thisParseFailures = getTypeUnexpectedParseFailure(
+                    documentName,
+                    loopPath as any[],
+                    definition,
+                    'Object',
+                );
+                parseFailures.push(...thisParseFailures);
                 continue;
             }
 
-            schemaKeys.add(schemaKey);
-            schemaKeysToIndex[schemaKey] = index;
-        } catch (e) {
-            if (e instanceof UApiSchemaParseError) {
-                parseFailures.push(...e.schemaParseFailures);
-            } else {
-                throw e;
+            const def_ = definition;
+
+            try {
+                const schemaKey = findSchemaKey(documentName, def_, index);
+                const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
+                if (matchingSchemaKey !== null) {
+                    const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
+                    const finalPath = [...loopPath, schemaKey];
+                    parseFailures.push(
+                        new SchemaParseFailure(documentName, finalPath as any[], 'PathCollision', {
+                            other: [otherPathIndex, matchingSchemaKey],
+                        }),
+                    );
+                    continue;
+                }
+
+                schemaKeys.add(schemaKey);
+                schemaKeysToIndex[schemaKey] = index;
+                schemaKeysToDocumentName[schemaKey] = documentName;
+                if (!documentName.endsWith('_')) {
+                    originalSchema[schemaKey] = def_;
+                }
+            } catch (e) {
+                if (e instanceof UApiSchemaParseError) {
+                    parseFailures.push(...e.schemaParseFailures);
+                } else {
+                    throw e;
+                }
             }
         }
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
-        throw new UApiSchemaParseError(offsetParseFailures);
+        throw new UApiSchemaParseError(parseFailures);
     }
 
     const requestHeaderKeys: Set<string> = new Set();
@@ -93,13 +105,16 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
         }
 
         const thisIndex = schemaKeysToIndex[schemaKey];
+        const thisDocumentName = schemaKeysToDocumentName[schemaKey];
 
         try {
             getOrParseType(
+                thisDocumentName,
                 [thisIndex],
                 schemaKey,
                 rootTypeParameterCount,
-                uApiSchemaPseudoJson,
+                uApiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex,
                 parsedTypes,
                 parseFailures,
@@ -115,29 +130,32 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
-        throw new UApiSchemaParseError(offsetParseFailures);
+        throw new UApiSchemaParseError(parseFailures);
     }
 
-    try {
-        catchErrorCollisions(uApiSchemaPseudoJson, errorKeys, schemaKeysToIndex);
+    const errors: UError[] = [];
 
+    try {
         for (const thisKey of errorKeys) {
             const thisIndex = schemaKeysToIndex[thisKey];
+            const thisDocumentName = schemaKeysToDocumentName[thisKey];
+            const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[thisDocumentName];
             const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
 
             try {
                 const error = parseErrorType(
                     def_,
-                    uApiSchemaPseudoJson,
+                    thisDocumentName,
+                    uApiSchemaDocumentNamesToPseudoJson,
                     thisKey,
                     thisIndex,
+                    schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
                     parseFailures,
                     failedTypes,
                 );
-                applyErrorToParsedTypes(thisKey, thisIndex, error, parsedTypes, schemaKeysToIndex);
+                errors.push(error);
             } catch (e) {
                 if (e instanceof UApiSchemaParseError) {
                     parseFailures.push(...e.schemaParseFailures);
@@ -155,79 +173,116 @@ export function parseUapiSchema(uApiSchemaPseudoJson: any[], pathOffset: number)
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
-        throw new UApiSchemaParseError(offsetParseFailures);
+        throw new UApiSchemaParseError(parseFailures);
+    }
+
+    try {
+        catchErrorCollisions(
+            uApiSchemaDocumentNamesToPseudoJson,
+            errorKeys,
+            schemaKeysToIndex,
+            schemaKeysToDocumentName,
+        );
+    } catch (e) {
+        if (e instanceof UApiSchemaParseError) {
+            parseFailures.push(...e.schemaParseFailures);
+        } else {
+            throw e;
+        }
+    }
+
+    if (parseFailures.length > 0) {
+        throw new UApiSchemaParseError(parseFailures);
+    }
+
+    for (const error of errors) {
+        try {
+            applyErrorToParsedTypes(error, parsedTypes, schemaKeysToDocumentName, schemaKeysToIndex);
+        } catch (e) {
+            if (e instanceof UApiSchemaParseError) {
+                parseFailures.push(...e.schemaParseFailures);
+            } else {
+                throw e;
+            }
+        }
     }
 
     const requestHeaders: { [key: string]: UFieldDeclaration } = {};
     const responseHeaders: { [key: string]: UFieldDeclaration } = {};
 
-    try {
-        for (const requestHeaderKey of requestHeaderKeys) {
-            const thisIndex = schemaKeysToIndex[requestHeaderKey];
-            const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
-            const headerField = requestHeaderKey.slice('requestHeader.'.length);
+    for (const requestHeaderKey of requestHeaderKeys) {
+        const thisIndex = schemaKeysToIndex[requestHeaderKey];
+        const thisDocumentName = schemaKeysToDocumentName[requestHeaderKey];
+        const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[thisDocumentName];
+        const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
+        const headerField = requestHeaderKey.slice('requestHeader.'.length);
 
-            try {
-                const requestHeaderType = parseHeadersType(
-                    def_,
-                    requestHeaderKey,
-                    headerField,
-                    thisIndex,
-                    uApiSchemaPseudoJson,
-                    schemaKeysToIndex,
-                    parsedTypes,
-                    parseFailures,
-                    failedTypes,
-                );
-                requestHeaders[requestHeaderType.fieldName] = requestHeaderType;
-            } catch (e) {
-                if (e instanceof UApiSchemaParseError) {
-                    parseFailures.push(...e.schemaParseFailures);
-                } else {
-                    throw e;
-                }
+        try {
+            const requestHeaderType = parseHeadersType(
+                thisDocumentName,
+                def_,
+                requestHeaderKey,
+                headerField,
+                thisIndex,
+                uApiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
+                schemaKeysToIndex,
+                parsedTypes,
+                parseFailures,
+                failedTypes,
+            );
+            requestHeaders[requestHeaderType.fieldName] = requestHeaderType;
+        } catch (e) {
+            if (e instanceof UApiSchemaParseError) {
+                parseFailures.push(...e.schemaParseFailures);
+            } else {
+                throw e;
             }
         }
+    }
 
-        for (const responseHeaderKey of responseHeaderKeys) {
-            const thisIndex = schemaKeysToIndex[responseHeaderKey];
-            const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
-            const headerField = responseHeaderKey.slice('responseHeader.'.length);
+    for (const responseHeaderKey of responseHeaderKeys) {
+        const thisIndex = schemaKeysToIndex[responseHeaderKey];
+        const thisDocumentName = schemaKeysToDocumentName[responseHeaderKey];
+        const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[thisDocumentName];
+        const def_ = uApiSchemaPseudoJson[thisIndex] as { [key: string]: any };
+        const headerField = responseHeaderKey.slice('responseHeader.'.length);
 
-            try {
-                const responseHeaderType = parseHeadersType(
-                    def_,
-                    responseHeaderKey,
-                    headerField,
-                    thisIndex,
-                    uApiSchemaPseudoJson,
-                    schemaKeysToIndex,
-                    parsedTypes,
-                    parseFailures,
-                    failedTypes,
-                );
-                responseHeaders[responseHeaderType.fieldName] = responseHeaderType;
-            } catch (e) {
-                if (e instanceof UApiSchemaParseError) {
-                    parseFailures.push(...e.schemaParseFailures);
-                } else {
-                    throw e;
-                }
+        try {
+            const responseHeaderType = parseHeadersType(
+                thisDocumentName,
+                def_,
+                responseHeaderKey,
+                headerField,
+                thisIndex,
+                uApiSchemaDocumentNamesToPseudoJson,
+                schemaKeysToDocumentName,
+                schemaKeysToIndex,
+                parsedTypes,
+                parseFailures,
+                failedTypes,
+            );
+            responseHeaders[responseHeaderType.fieldName] = responseHeaderType;
+        } catch (e) {
+            if (e instanceof UApiSchemaParseError) {
+                parseFailures.push(...e.schemaParseFailures);
+            } else {
+                throw e;
             }
-        }
-    } catch (e) {
-        if (e instanceof UApiSchemaParseError) {
-            parseFailures.push(...e.schemaParseFailures);
-        } else {
-            throw e;
         }
     }
 
     if (parseFailures.length > 0) {
-        const offsetParseFailures = offsetSchemaIndex(parseFailures, pathOffset, schemaKeysToIndex);
-        throw new UApiSchemaParseError(offsetParseFailures);
+        throw new UApiSchemaParseError(parseFailures);
     }
 
-    return new UApiSchema(uApiSchemaPseudoJson, parsedTypes, requestHeaders, responseHeaders);
+    const sortedSchemaKeys = Array.from(Object.keys(originalSchema)).sort();
+
+    const finalOriginalSchema: object[] = [];
+
+    for (const schemaKey of sortedSchemaKeys) {
+        finalOriginalSchema.push(originalSchema[schemaKey]);
+    }
+
+    return new UApiSchema(finalOriginalSchema, parsedTypes, requestHeaders, responseHeaders);
 }

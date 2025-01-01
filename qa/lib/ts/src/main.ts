@@ -10,10 +10,12 @@ import {
     MockServer,
     MockServerOptions,
     UApiSchema,
+    getSchemaFileMap,
 } from "uapi";
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
+import { kMaxLength } from "buffer";
 
 class Timer {
     public values: number[] = [];
@@ -144,8 +146,7 @@ function startMockTestServer(
     frontdoorTopic: string,
     config: Record<string, any>,
 ): Subscription {
-    const json = fs.readFileSync(apiSchemaPath, "utf-8");
-    const uApi: UApiSchema = UApiSchema.fromJson(json);
+    const uApi: UApiSchema = UApiSchema.fromDirectory(apiSchemaPath);
 
     const options: MockServerOptions = new MockServerOptions();
     options.onError = (e: Error) => console.error(e);
@@ -192,8 +193,7 @@ function startSchemaTestServer(
     frontdoorTopic: string,
     config?: Record<string, any>,
 ): Subscription {
-    const json = fs.readFileSync(apiSchemaPath, "utf-8");
-    const uApi: UApiSchema = UApiSchema.fromJson(json);
+    const uApi: UApiSchema = UApiSchema.fromDirectory(apiSchemaPath);
 
     const timer = registry.createTimer(frontdoorTopic);
 
@@ -201,28 +201,35 @@ function startSchemaTestServer(
         const requestBody = requestMessage.body;
 
         const arg: { [key: string]: any } = requestBody["fn.validateSchema"];
-        const schemaPseudoJson = arg["schema"];
-        const extendSchemaJson = arg["extend!"];
 
-        const serializeSchema = requestMessage.header["_serializeSchema"] !== false;
-
-        let schemaJson: string;
-        if (serializeSchema) {
-            try {
-                schemaJson = JSON.stringify(schemaPseudoJson);
-            } catch (e) {
-                throw e;
-            }
-        } else {
-            schemaJson = schemaPseudoJson;
-        }
+        const input: { [key: string]: any } = arg["input"];
+        const inputTag = Object.keys(input)[0];
 
         try {
-            const schema = UApiSchema.fromJson(schemaJson);
-            if (extendSchemaJson != null) {
-                UApiSchema.extend(schema, extendSchemaJson);
+            if (inputTag === "PseudoJson") {
+                const unionValue: { [key: string]: any } = input[inputTag];
+                const schemaPseudoJson = unionValue["schema"];
+                const extendSchemaJson = unionValue["extend!"];
+
+                let schemaJson = JSON.stringify(schemaPseudoJson);
+
+                if (extendSchemaJson != null) {
+                    let extendJson = JSON.stringify(extendSchemaJson);
+                    UApiSchema.fromFileJsonMap({'default': schemaJson, 'extend': extendJson});
+                } else {
+                    UApiSchema.fromJson(schemaJson);
+                }
+            } else if (inputTag === "Json") {
+                const unionValue = input[inputTag];
+                const schemaJson = unionValue["schema"];
+                UApiSchema.fromJson(schemaJson);
+            } else if (inputTag === "Directory") {
+                const unionValue = input[inputTag];
+                const schemaDirectory = unionValue["schemaDirectory"];
+                UApiSchema.fromDirectory(schemaDirectory);
+            } else {
+                throw new Error("Invalid input tag");
             }
-            return new Message({}, { Ok_: {} });
         } catch (e) {
             console.error(e);
             return new Message(
@@ -234,6 +241,8 @@ function startSchemaTestServer(
                 },
             );
         }
+
+        return new Message({}, { Ok_: {} });
     };
 
     const options: ServerOptions = new ServerOptions();
@@ -274,18 +283,18 @@ function startTestServer(
     backdoorTopic: string,
     authRequired: boolean,
 ): Subscription {
-    const json = fs.readFileSync(apiSchemaPath, "utf-8");
-    let uApi: UApiSchema = UApiSchema.fromJson(json);
-    const alternateUApi: UApiSchema = UApiSchema.extend(
-        uApi,
-        `
+    const m: Record<string, string> = getSchemaFileMap(apiSchemaPath);
+    const alternateMap: Record<string, string> = { ...m };
+    alternateMap['backwardsCompatibleChange'] = `
         [
             {
                 "struct.BackwardsCompatibleChange": {}
             }
         ]
-    `,
-    );
+    `;
+
+    const uApi: UApiSchema = UApiSchema.fromFileJsonMap(m);
+    const alternateUApi: UApiSchema = UApiSchema.fromFileJsonMap(alternateMap);
 
     const timer = registry.createTimer(frontdoorTopic);
     const serveAlternateServer = { value: false };

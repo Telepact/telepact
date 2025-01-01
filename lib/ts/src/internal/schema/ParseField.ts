@@ -6,11 +6,13 @@ import { getTypeUnexpectedParseFailure } from './GetTypeUnexpectedParseFailure';
 import { parseTypeDeclaration } from './ParseTypeDeclaration';
 
 export function parseField(
+    documentName: string,
     path: any[],
     fieldDeclaration: string,
     typeDeclarationValue: any,
     typeParameterCount: number,
-    uapiSchemaPseudoJson: any[],
+    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+    schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
     parsedTypes: { [key: string]: UType },
     allParseFailures: SchemaParseFailure[],
@@ -23,7 +25,7 @@ export function parseField(
     if (!matcher) {
         const finalPath = [...path, fieldDeclaration];
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(finalPath, 'KeyRegexMatchFailed', { regex: regexString }, null),
+            new SchemaParseFailure(documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString }),
         ]);
     }
 
@@ -33,15 +35,19 @@ export function parseField(
     const thisPath = [...path, fieldName];
 
     if (!Array.isArray(typeDeclarationValue)) {
-        throw new UApiSchemaParseError(getTypeUnexpectedParseFailure(thisPath, typeDeclarationValue, 'Array'));
+        throw new UApiSchemaParseError(
+            getTypeUnexpectedParseFailure(documentName, thisPath, typeDeclarationValue, 'Array'),
+        );
     }
     const typeDeclarationArray = typeDeclarationValue;
 
     const typeDeclaration = parseTypeDeclaration(
+        documentName,
         thisPath,
         typeDeclarationArray,
         typeParameterCount,
-        uapiSchemaPseudoJson,
+        uapiSchemaDocumentNamesToPseudoJson,
+        schemaKeysToDocumentName,
         schemaKeysToIndex,
         parsedTypes,
         allParseFailures,

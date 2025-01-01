@@ -85,6 +85,10 @@ public class ParseUApiSchema {
             }
         }
 
+        if (!parseFailures.isEmpty()) {
+            throw new UApiSchemaParseError(parseFailures);
+        }
+
         var requestHeaderKeys = new HashSet<String>();
         var responseHeaderKeys = new HashSet<String>();
         var errorKeys = new HashSet<String>();
