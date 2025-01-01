@@ -282,8 +282,10 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
         const bStartsWithInfo = b.startsWith('info.');
         if (aStartsWithInfo && !bStartsWithInfo) return -1;
         if (!aStartsWithInfo && bStartsWithInfo) return 1;
-        return a.localeCompare(b, 'en', { sensitivity: 'case' });
+        return a < b ? -1 : a > b ? 1 : 0;
     });
+
+    console.log(sortedSchemaKeys);
 
     const finalOriginalSchema: Record<string, object>[] = sortedSchemaKeys.map((key) => originalSchema[key]);
 
