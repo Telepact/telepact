@@ -14,7 +14,7 @@ import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 import { UError } from '../types/UError';
 
 export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<string, object[]>): UApiSchema {
-    const originalSchema: { [key: string]: object } = uApiSchemaDocumentNamesToPseudoJson;
+    const originalSchema: { [key: string]: Record<string, object> } = {};
     const parsedTypes: { [key: string]: UType } = {};
     const parseFailures: SchemaParseFailure[] = [];
     const failedTypes: Set<string> = new Set();
@@ -48,7 +48,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                 continue;
             }
 
-            const def_ = definition;
+            const def_: Record<string, object> = definition as Record<string, object>;
 
             try {
                 const schemaKey = findSchemaKey(documentName, def_, index);
@@ -277,13 +277,15 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
         throw new UApiSchemaParseError(parseFailures);
     }
 
-    const sortedSchemaKeys = Array.from(Object.keys(originalSchema)).sort();
+    const sortedSchemaKeys = Object.keys(originalSchema).sort((a, b) => {
+        const aStartsWithInfo = a.startsWith('info.');
+        const bStartsWithInfo = b.startsWith('info.');
+        if (aStartsWithInfo && !bStartsWithInfo) return -1;
+        if (!aStartsWithInfo && bStartsWithInfo) return 1;
+        return a.localeCompare(b, 'en', { sensitivity: 'case' });
+    });
 
-    const finalOriginalSchema: object[] = [];
-
-    for (const schemaKey of sortedSchemaKeys) {
-        finalOriginalSchema.push(originalSchema[schemaKey]);
-    }
+    const finalOriginalSchema: Record<string, object>[] = sortedSchemaKeys.map((key) => originalSchema[key]);
 
     return new UApiSchema(finalOriginalSchema, parsedTypes, requestHeaders, responseHeaders);
 }
