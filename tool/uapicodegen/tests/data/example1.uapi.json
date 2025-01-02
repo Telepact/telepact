@@ -11,7 +11,7 @@
             "long!": ["string"],
             "field4": ["any"],
             "field5": ["union.Un1"],
-            "field6": ["fn.test2"],
+            "field6": ["fn.test"],
             "build": ["array", ["integer"]]
         }
     },
@@ -47,31 +47,6 @@
         }
     },
     {
-        "struct<2>.Example7": {
-            "field1": ["T0"],
-            "field2": ["T1"]
-        }
-    },
-    {
-        "struct.Example8": {
-            "field1": ["struct<2>.Example7", ["integer"], ["string"]],
-            "field2": ["boolean"]
-        }
-    },
-    {
-        "struct.Example8": {
-            "field1": ["array", ["struct<2>.Example7", ["array", ["integer"]], ["string"]]],
-            "field2": ["boolean"],
-            "field3!": ["array", ["struct<2>.Example7", ["array", ["integer"]], ["string"]]]
-        }
-    },
-    {
-        "struct.Example9": {
-            "field1": ["object", ["struct<2>.Example7", ["array", ["struct<2>.Example7", ["integer"], ["boolean"]]], ["string"]]],
-            "field2": ["boolean"]
-        }
-    },
-    {
         "///": [
             " A union             ",
             "                     ",
@@ -98,52 +73,6 @@
                 "field2": ["boolean"]
             }
         }]
-    },
-    {
-        "///": " A union             ",
-        "union<1>.Un2": [{
-            "///": [
-                " First union entry   ",
-                "                     ",
-                " This is first.      "
-            ],
-            "First": {
-                "field1": ["integer"], 
-                "field2": ["T0"]
-            }
-        }, {
-            "///": [
-                " Second union entry  ",
-                "                     ",
-                " This is second.     "
-            ],
-            "Second": {
-                "field1": ["string"], 
-                "field2": ["boolean"]
-            }
-        }]
-    },
-    {
-        "///": " A union             ",
-        "union<2>.Result": [{
-            "///": [
-                " First union entry   ",
-                "                     ",
-                " This is first.      "
-            ],
-            "Ok": {
-                "value": ["T0"]
-            }
-        }, {
-            "///": [
-                " Second union entry  ",
-                "                     ",
-                " This is second.     "
-            ],
-            "Err": {
-                "value": ["T1"]
-            }
-        }]
     },      
     {
         "///": [
@@ -165,26 +94,5 @@
                 "error": ["string"]
             }
         }]
-    },
-    {
-        "///": [
-            " A function         ",
-            "                     ",
-            " This is the result. "
-        ],
-        "fn.test2": {
-            "field1": ["integer"],
-            "field2": ["boolean"]
-        },
-        "->": [{
-            "Ok_": {
-                "field1": ["object", ["struct<2>.Example7", ["array", ["struct<2>.Example7", ["integer"], ["boolean"]]], ["string"]]],
-                "field2": ["boolean"]
-            }
-        }, {
-            "Err": {
-                "error": ["string"]
-            }
-        }]
-    }    
+    } 
 ]
