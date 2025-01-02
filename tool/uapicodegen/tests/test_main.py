@@ -12,7 +12,7 @@ def runner() -> CliRunner:
 
 def test_command(runner: CliRunner) -> None:
     result = runner.invoke(
-        generate, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'java', '--out', 'tests/output', '--package', 'output'])
+        generate, ['--schema', 'tests/data/example1.uapi.json', '--lang', 'java', '--out', 'tests/output/java', '--package', 'output'])
 
     # print stack trace
     import traceback
