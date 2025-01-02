@@ -7,8 +7,7 @@ if TYPE_CHECKING:
 
 
 def validate_union_cases(reference_cases: dict[str, 'UStruct'], selected_cases: dict[str, object],
-                         actual: dict[object, object], select: dict[str, object] | None, fn: str | None,
-                         type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                         actual: dict[object, object], select: dict[str, object] | None, fn: str | None) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateUnionStruct import validate_union_struct
 
@@ -29,7 +28,7 @@ def validate_union_cases(reference_cases: dict[str, 'UStruct'], selected_cases: 
 
     if isinstance(union_payload, dict):
         nested_validation_failures = validate_union_struct(reference_struct, union_target,
-                                                           union_payload, selected_cases, select, fn, type_parameters)
+                                                           union_payload, selected_cases, select, fn)
 
         nested_validation_failures_with_path = []
         for failure in nested_validation_failures:

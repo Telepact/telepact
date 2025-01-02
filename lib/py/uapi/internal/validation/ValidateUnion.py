@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 
 def validate_union(value: object, select: dict[str, object] | None, fn: str | None,
-                   type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
                    name: str, cases: dict[str, 'UStruct']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateUnionCases import validate_union_cases
@@ -20,6 +19,6 @@ def validate_union(value: object, select: dict[str, object] | None, fn: str | No
         else:
             selected_cases = cast(
                 dict[str, object], select.get(name) if select else None)
-        return validate_union_cases(cases, selected_cases, value, select, fn, type_parameters)
+        return validate_union_cases(cases, selected_cases, value, select, fn)
     else:
         return get_type_unexpected_validation_failure([], value, _UNION_NAME)

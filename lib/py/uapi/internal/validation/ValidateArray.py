@@ -7,8 +7,7 @@ if TYPE_CHECKING:
 
 
 def validate_array(value: object, select: dict[str, object] | None, fn: str | None,
-                   type_parameters: list['UTypeDeclaration'],
-                   generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                   type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if isinstance(value, list):
@@ -17,7 +16,7 @@ def validate_array(value: object, select: dict[str, object] | None, fn: str | No
         validation_failures = []
         for i, element in enumerate(value):
             nested_validation_failures = nested_type_declaration.validate(
-                element, select, fn, generics)
+                element, select, fn)
             index = i
 
             nested_validation_failures_with_path = []

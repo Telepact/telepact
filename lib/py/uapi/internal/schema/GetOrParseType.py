@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def get_or_parse_type(document_name: str, path: list[object], type_name: str, this_type_parameter_count: int,
+def get_or_parse_type(document_name: str, path: list[object], type_name: str,
                       u_api_schema_document_names_to_pseudo_json: dict[str, list[object]], schema_keys_to_document_name: dict[str, str],
                       schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'], all_parse_failures: list['SchemaParseFailure'],
                       failed_types: set[str]) -> 'UType':
@@ -15,7 +15,6 @@ def get_or_parse_type(document_name: str, path: list[object], type_name: str, th
     from uapi.internal.types.UObject import UObject
     from uapi.internal.types.UArray import UArray
     from uapi.internal.types.UBoolean import UBoolean
-    from uapi.internal.types.UGeneric import UGeneric
     from uapi.internal.types.UInteger import UInteger
     from uapi.internal.types.UNumber import UNumber
     from uapi.internal.types.UObject import UObject
@@ -35,13 +34,7 @@ def get_or_parse_type(document_name: str, path: list[object], type_name: str, th
     if existing_type is not None:
         return existing_type
 
-    if this_type_parameter_count > 0:
-        generic_regex = "|(T([%s]))" % (
-            "0-%d" % (this_type_parameter_count - 1) if this_type_parameter_count > 1 else "0")
-    else:
-        generic_regex = ""
-
-    regex_string = r"^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\.([a-zA-Z_]\w*)%s)$" % generic_regex
+    regex_string = r"^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
     regex = re.compile(regex_string)
 
     matcher = regex.match(type_name)
@@ -60,12 +53,6 @@ def get_or_parse_type(document_name: str, path: list[object], type_name: str, th
             "object": UObject()
         }.get(standard_type_name, UAny())
 
-    if this_type_parameter_count > 0:
-        generic_parameter_index_string = matcher.group(9)
-        if generic_parameter_index_string is not None:
-            generic_parameter_index = int(generic_parameter_index_string)
-            return UGeneric(generic_parameter_index)
-
     custom_type_name = matcher.group(2)
     this_index = schema_keys_to_index.get(custom_type_name)
     this_document_name = cast(
@@ -79,18 +66,14 @@ def get_or_parse_type(document_name: str, path: list[object], type_name: str, th
     definition = cast(
         dict[str, object], u_api_schema_pseudo_json[this_index])
 
-    type_parameter_count_string = matcher.group(6)
-    type_parameter_count = int(
-        type_parameter_count_string) if type_parameter_count_string else 0
-
     type: 'UType'
     try:
         if custom_type_name.startswith("struct"):
-            type = parse_struct_type(this_document_name, [this_index], definition, custom_type_name, [], type_parameter_count,
+            type = parse_struct_type(this_document_name, [this_index], definition, custom_type_name, [],
                                      u_api_schema_document_names_to_pseudo_json, schema_keys_to_document_name, schema_keys_to_index, parsed_types,
                                      all_parse_failures, failed_types)
         elif custom_type_name.startswith("union"):
-            type = parse_union_type(this_document_name, [this_index], definition, custom_type_name, [], [], type_parameter_count,
+            type = parse_union_type(this_document_name, [this_index], definition, custom_type_name, [], [],
                                     u_api_schema_document_names_to_pseudo_json, schema_keys_to_document_name, schema_keys_to_index, parsed_types,
                                     all_parse_failures, failed_types)
         elif custom_type_name.startswith("fn"):

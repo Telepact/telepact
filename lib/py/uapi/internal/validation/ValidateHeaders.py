@@ -13,7 +13,7 @@ def validate_headers(headers: dict[str, object], parsed_request_headers: dict[st
         field = parsed_request_headers.get(header)
         if field:
             this_validation_failures = field.type_declaration.validate(
-                header_value, None, function_type.name, [])
+                header_value, None, function_type.name)
             this_validation_failures_path = [
                 ValidationFailure([header] + e.path, e.reason, e.data)
                 for e in this_validation_failures

@@ -11,8 +11,7 @@ def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
                            selected_fields: list[str] | None,
                            actual_struct: dict[str, object],
                            select: dict[str, object] | None,
-                           fn: str | None,
-                           type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                           fn: str | None) -> list['ValidationFailure']:
     validation_failures = []
 
     missing_fields = []
@@ -40,7 +39,7 @@ def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
         ref_field_type_declaration = reference_field.type_declaration
 
         nested_validation_failures = ref_field_type_declaration.validate(
-            field_value, select, fn, type_parameters)
+            field_value, select, fn)
 
         nested_validation_failures_with_path = []
         for failure in nested_validation_failures:

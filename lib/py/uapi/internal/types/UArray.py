@@ -17,17 +17,17 @@ class UArray(UType):
         return 1
 
     def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateArray import validate_array
-        return validate_array(value, select, fn, type_parameters, generics)
+        return validate_array(value, select, fn, type_parameters)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
                               include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                              type_parameters: list['UTypeDeclaration'],
                               random_generator: 'RandomGenerator') -> object:
         from uapi.internal.generation.GenerateRandomArray import generate_random_array
         return generate_random_array(blueprint_value, use_blueprint_value, include_optional_fields,
-                                     randomize_optional_fields, type_parameters, generics, random_generator)
+                                     randomize_optional_fields, type_parameters, random_generator)
 
-    def get_name(self, generics: list['UTypeDeclaration']) -> str:
+    def get_name(self) -> str:
         return _ARRAY_NAME

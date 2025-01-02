@@ -20,15 +20,15 @@ class USelect(UType):
         return 0
 
     def validate(self, given_obj: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateSelect import validate_select
-        return validate_select(given_obj, select, fn, type_parameters, generics, self.types)
+        return validate_select(given_obj, select, fn, type_parameters, self.types)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
                               include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                              type_parameters: list['UTypeDeclaration'],
                               random_generator: 'RandomGenerator') -> object:
         raise NotImplementedError("Not implemented")
 
-    def get_name(self, generics: list['UTypeDeclaration']) -> str:
+    def get_name(self) -> str:
         return _SELECT

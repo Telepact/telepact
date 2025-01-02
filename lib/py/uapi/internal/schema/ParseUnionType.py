@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 def parse_union_type(document_name: str, path: list[object], union_definition_as_pseudo_json: dict[str, object], schema_key: str,
-                     ignore_keys: list[str], required_keys: list[str], type_parameter_count: int,
+                     ignore_keys: list[str], required_keys: list[str],
                      u_api_schema_document_name_to_pseudo_json: dict[str, list[object]],
                      schema_keys_to_document_name: dict[str, str], schema_keys_to_index: dict[str, int],
                      parsed_types: dict[str, 'UType'],
@@ -107,7 +107,7 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
         union_case_struct = entry[1]
 
         try:
-            fields = parse_struct_fields(union_case_struct, document_name, union_key_path, type_parameter_count,
+            fields = parse_struct_fields(union_case_struct, document_name, union_key_path,
                                          u_api_schema_document_name_to_pseudo_json, schema_keys_to_document_name, schema_keys_to_index, parsed_types,
                                          all_parse_failures, failed_types)
         except UApiSchemaParseError as e:
@@ -115,7 +115,7 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
             continue
 
         union_struct = UStruct(
-            f"{schema_key}.{union_case}", fields, type_parameter_count)
+            f"{schema_key}.{union_case}", fields)
 
         cases[union_case] = union_struct
         case_indices[union_case] = i
@@ -123,4 +123,4 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
-    return UUnion(schema_key, cases, case_indices, type_parameter_count)
+    return UUnion(schema_key, cases, case_indices)

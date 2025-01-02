@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 def validate_select(given_obj: object, select: dict[str, object] | None, fn: str | None,
-                    type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                    type_parameters: list['UTypeDeclaration'],
                     types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateSelectStruct import validate_select_struct

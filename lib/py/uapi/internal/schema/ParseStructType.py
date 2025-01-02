@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 def parse_struct_type(document_name: str, path: list[object], struct_definition_as_pseudo_json: dict[str, object],
-                      schema_key: str, ignore_keys: list[str], type_parameter_count: int,
+                      schema_key: str, ignore_keys: list[str],
                       uapi_schema_document_names_to_pseudo_json: dict[str, list[object]],
                       schema_keys_to_document_name: dict[str, str], schema_keys_to_index: dict[str, int],
                       parsed_types: dict[str, 'UType'],
@@ -46,8 +46,8 @@ def parse_struct_type(document_name: str, path: list[object], struct_definition_
     if parse_failures:
         raise UApiSchemaParseError(parse_failures)
 
-    fields = parse_struct_fields(definition, document_name, this_path, type_parameter_count, uapi_schema_document_names_to_pseudo_json,
+    fields = parse_struct_fields(definition, document_name, this_path, uapi_schema_document_names_to_pseudo_json,
                                  schema_keys_to_document_name, schema_keys_to_index, parsed_types, all_parse_failures,
                                  failed_types)
 
-    return UStruct(schema_key, fields, type_parameter_count)
+    return UStruct(schema_key, fields)

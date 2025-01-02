@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 def parse_field(document_name: str, path: list[object], field_declaration: str, type_declaration_value: object,
-                type_parameter_count: int, uapi_schema_document_names_to_pseudo_json: dict[str, list[object]],
+                uapi_schema_document_names_to_pseudo_json: dict[str, list[object]],
                 schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
                 all_parse_failures: list['SchemaParseFailure'],
                 failed_types: set[str]) -> 'UFieldDeclaration':
@@ -42,7 +42,6 @@ def parse_field(document_name: str, path: list[object], field_declaration: str, 
     type_declaration = parse_type_declaration(document_name,
                                               this_path,
                                               type_declaration_array,
-                                              type_parameter_count,
                                               uapi_schema_document_names_to_pseudo_json,
                                               schema_keys_to_document_names,
                                               schema_keys_to_index,

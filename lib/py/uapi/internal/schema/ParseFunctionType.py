@@ -19,19 +19,18 @@ def parse_function_type(document_name: str, path: list[object], function_definit
     from uapi.internal.types.UUnion import UUnion
 
     parse_failures = []
-    type_parameter_count = 0
 
     call_type = None
     try:
         arg_type = parse_struct_type(document_name, path, function_definition_as_parsed_json,
                                      schema_key, [
-                                         "->", "_errors"], type_parameter_count,
+                                         "->", "_errors"],
                                      u_api_schema_document_names_to_pseudo_json,
                                      schema_keys_to_document_names, schema_keys_to_index,
                                      parsed_types,
                                      all_parse_failures, failed_types)
         call_type = UUnion(schema_key, {schema_key: arg_type}, {
-                           schema_key: 0}, type_parameter_count)
+                           schema_key: 0})
     except UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
 
@@ -48,7 +47,7 @@ def parse_function_type(document_name: str, path: list[object], function_definit
             result_type = parse_union_type(document_name, path, function_definition_as_parsed_json,
                                            result_schema_key, list(
                                                function_definition_as_parsed_json.keys()),
-                                           ["Ok_"], type_parameter_count, u_api_schema_document_names_to_pseudo_json,
+                                           ["Ok_"], u_api_schema_document_names_to_pseudo_json,
                                            schema_keys_to_document_names, schema_keys_to_index, parsed_types,
                                            all_parse_failures, failed_types)
         except UApiSchemaParseError as e:

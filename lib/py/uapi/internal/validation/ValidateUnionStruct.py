@@ -12,8 +12,7 @@ def validate_union_struct(
     actual: dict[str, object],
     selected_cases: dict[str, object],
     select: dict[str, object] | None,
-    fn: str | None,
-    type_parameters: list['UTypeDeclaration']
+    fn: str | None
 ) -> list['ValidationFailure']:
     selected_fields = cast(list[str], selected_cases.get(
         union_case)) if selected_cases else None
@@ -24,6 +23,5 @@ def validate_union_struct(
         selected_fields,
         actual,
         select,
-        fn,
-        type_parameters
+        fn
     )

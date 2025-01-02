@@ -10,7 +10,6 @@ def construct_random_struct(reference_struct: dict[str, 'UFieldDeclaration'],
                             starting_struct: dict[str, object],
                             include_optional_fields: bool,
                             randomize_optional_fields: bool,
-                            type_parameters: list['UTypeDeclaration'],
                             random_generator: 'RandomGenerator') -> dict[str, object]:
 
     sorted_reference_struct = sorted(
@@ -25,18 +24,18 @@ def construct_random_struct(reference_struct: dict[str, 'UFieldDeclaration'],
         if use_blueprint_value:
             value = type_declaration.generate_random_value(blueprint_value, use_blueprint_value,
                                                            include_optional_fields, randomize_optional_fields,
-                                                           type_parameters, random_generator)
+                                                           random_generator)
         else:
             if not field_declaration.optional:
                 value = type_declaration.generate_random_value(None, False,
                                                                include_optional_fields, randomize_optional_fields,
-                                                               type_parameters, random_generator)
+                                                               random_generator)
             else:
                 if not include_optional_fields or (randomize_optional_fields and random_generator.next_boolean()):
                     continue
                 value = type_declaration.generate_random_value(None, False,
                                                                include_optional_fields, randomize_optional_fields,
-                                                               type_parameters, random_generator)
+                                                               random_generator)
 
         obj[field_name] = value
 

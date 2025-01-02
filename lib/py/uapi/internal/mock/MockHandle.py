@@ -85,7 +85,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
-                                                                              [], [], random)
+                                                                              [], random)
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
@@ -97,7 +97,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
-                                                                              [], [], random)
+                                                                              [], random)
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
@@ -114,7 +114,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
             random_ok_struct_init = ok_struct_ref.generate_random_value({}, use_blueprint_value,
                                                                         include_optional_fields,
                                                                         randomize_optional_field_generation,
-                                                                        [], [], random)
+                                                                        [], random)
             random_ok_struct = cast(dict[str, object], random_ok_struct_init)
             return Message({}, {"Ok_": random_ok_struct})
         else:

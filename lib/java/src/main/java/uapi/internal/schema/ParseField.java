@@ -16,7 +16,7 @@ import uapi.internal.types.UType;
 public class ParseField {
     static UFieldDeclaration parseField(String documentName, List<Object> path, String fieldDeclaration,
             Object typeDeclarationValue,
-            int typeParameterCount, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
+            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
             Map<String, String> schemaKeysToDocumentName,
             Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,

@@ -21,7 +21,6 @@ public class ParseStructFields {
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, UFieldDeclaration>();
-        final var typeParameterCount = 0;
 
         for (final var structEntry : referenceStruct.entrySet()) {
             final var fieldDeclaration = structEntry.getKey();
@@ -47,7 +46,7 @@ public class ParseStructFields {
             final UFieldDeclaration parsedField;
             try {
                 parsedField = parseField(documentName, path, fieldDeclaration,
-                        typeDeclarationValue, typeParameterCount, uApiSchemaDocumentsToPseudoJson,
+                        typeDeclarationValue, uApiSchemaDocumentsToPseudoJson,
                         schemaKeysToDocumentName, schemaKeysToIndex,
                         parsedTypes,
                         allParseFailures, failedTypes);

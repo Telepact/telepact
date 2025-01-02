@@ -17,16 +17,16 @@ class UInteger(UType):
         return 0
 
     def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateInteger import validate_integer
         return validate_integer(value)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
                               include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                              type_parameters: list['UTypeDeclaration'],
                               random_generator: 'RandomGenerator') -> object:
         from uapi.internal.generation.GenerateRandomInteger import generate_random_integer
         return generate_random_integer(blueprint_value, use_blueprint_value, random_generator)
 
-    def get_name(self, generics: list['UTypeDeclaration']) -> str:
+    def get_name(self) -> str:
         return _INTEGER_NAME

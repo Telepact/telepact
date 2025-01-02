@@ -16,15 +16,15 @@ class UAny(UType):
         return 0
 
     def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
         return []
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
                               include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                              type_parameters: list['UTypeDeclaration'],
                               random_generator: 'RandomGenerator') -> object:
         from uapi.internal.generation.GenerateRandomAny import generate_random_any
         return generate_random_any(random_generator)
 
-    def get_name(self, generics: list['UTypeDeclaration']) -> str:
+    def get_name(self) -> str:
         return _ANY_NAME

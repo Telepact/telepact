@@ -85,7 +85,6 @@ def parse_uapi_schema(
     request_header_keys: set[str] = set()
     response_header_keys: set[str] = set()
     error_keys: set[str] = set()
-    root_type_parameter_count = 0
 
     for schema_key in schema_keys:
         if schema_key.startswith("info."):
@@ -108,7 +107,6 @@ def parse_uapi_schema(
                 document_name,
                 [this_index],
                 schema_key,
-                root_type_parameter_count,
                 u_api_schema_document_name_to_pseudo_json,
                 schema_keys_to_document_names,
                 schema_keys_to_index,

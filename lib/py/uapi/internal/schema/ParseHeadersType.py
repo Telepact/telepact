@@ -25,10 +25,8 @@ def parse_headers_type(document_name: str, headers_definition_as_parsed_json: di
 
     type_declaration_array = type_declaration_value
 
-    type_parameter_count = 0
-
     try:
-        type_declaration = parse_type_declaration(document_name, path, type_declaration_array, type_parameter_count,
+        type_declaration = parse_type_declaration(document_name, path, type_declaration_array,
                                                   uapi_schema_document_names_to_pseudo_json,
                                                   schema_keys_to_document_names, schema_keys_to_index,
                                                   parsed_types, all_parse_failures, failed_types)

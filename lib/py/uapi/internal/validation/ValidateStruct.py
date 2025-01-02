@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 
 def validate_struct(value: object, select: dict[str, object] | None, fn: str | None,
-                    type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
                     name: str, fields: dict[str, 'UFieldDeclaration']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.validation.ValidateStructFields import validate_struct_fields
@@ -16,6 +15,6 @@ def validate_struct(value: object, select: dict[str, object] | None, fn: str | N
     if isinstance(value, dict):
         selected_fields = cast(
             list[str], select.get(name) if select else None)
-        return validate_struct_fields(fields, selected_fields, value, select, fn, type_parameters)
+        return validate_struct_fields(fields, selected_fields, value, select, fn)
     else:
         return get_type_unexpected_validation_failure([], value, _STRUCT_NAME)

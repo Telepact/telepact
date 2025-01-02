@@ -19,15 +19,15 @@ class UMockStub(UType):
         return 0
 
     def validate(self, given_obj: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration']) -> list['ValidationFailure']:
+                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateMockStub import validate_mock_stub
-        return validate_mock_stub(given_obj, select, fn, type_parameters, generics, self.types)
+        return validate_mock_stub(given_obj, select, fn, type_parameters, self.types)
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
                               include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                              type_parameters: list['UTypeDeclaration'],
                               random_generator: 'RandomGenerator') -> object:
         raise NotImplementedError("Not implemented")
 
-    def get_name(self, generics: list['UTypeDeclaration']) -> str:
+    def get_name(self) -> str:
         return _MOCK_STUB_NAME

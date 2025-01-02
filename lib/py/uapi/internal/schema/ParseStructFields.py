@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def parse_struct_fields(reference_struct: dict[str, object], document_name: str, path: list[object], type_parameter_count: int,
+def parse_struct_fields(reference_struct: dict[str, object], document_name: str, path: list[object],
                         uapi_schema_document_names_to_pseudo_json: dict[str, list[object]], schema_keys_to_document_name: dict[str, str],
                         schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
                         all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> dict[str, 'UFieldDeclaration']:
@@ -28,7 +28,7 @@ def parse_struct_fields(reference_struct: dict[str, object], document_name: str,
                     document_name, final_path, "PathCollision", {"document": document_name, "path": final_other_path}))
 
         try:
-            parsed_field = parse_field(document_name, path, field_declaration, type_declaration_value, type_parameter_count,
+            parsed_field = parse_field(document_name, path, field_declaration, type_declaration_value,
                                        uapi_schema_document_names_to_pseudo_json,
                                        schema_keys_to_document_name, schema_keys_to_index, parsed_types,
                                        all_parse_failures, failed_types)

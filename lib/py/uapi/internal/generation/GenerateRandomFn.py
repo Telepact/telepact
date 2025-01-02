@@ -7,8 +7,7 @@ if TYPE_CHECKING:
 
 
 def generate_random_fn(blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool,
-                       randomize_optional_fields: bool, type_parameters: list['UTypeDeclaration'],
-                       generics: list['UTypeDeclaration'], random_generator: 'RandomGenerator',
+                       randomize_optional_fields: bool, random_generator: 'RandomGenerator',
                        call_cases: dict[str, 'UStruct']) -> object:
     from uapi.internal.generation.ConstructRandomUnion import construct_random_union
 
@@ -16,7 +15,7 @@ def generate_random_fn(blueprint_value: object, use_blueprint_value: bool, inclu
         # Assuming blueprint_value is already a dictionary
         starting_fn_value = cast(dict[str, object], blueprint_value)
         return construct_random_union(call_cases, starting_fn_value, include_optional_fields,
-                                      randomize_optional_fields, [], random_generator)
+                                      randomize_optional_fields, random_generator)
     else:
         return construct_random_union(call_cases, {}, include_optional_fields, randomize_optional_fields,
-                                      [], random_generator)
+                                      random_generator)

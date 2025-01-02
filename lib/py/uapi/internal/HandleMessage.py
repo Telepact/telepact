@@ -101,7 +101,7 @@ async def handle_message(
     function_type_call: UUnion = function_type.call
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
-        request_body, None, None, [], []
+        request_body, None, None, []
     )
     if call_validation_failures:
         return get_invalid_error_message(
@@ -139,7 +139,7 @@ async def handle_message(
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:
         result_validation_failures: list[ValidationFailure] = result_union_type.validate(
-            result_union, select_struct_fields_header, None, [], []
+            result_union, select_struct_fields_header, None, []
         )
         if result_validation_failures:
             return get_invalid_error_message(

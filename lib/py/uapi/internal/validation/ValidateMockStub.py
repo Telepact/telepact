@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 def validate_mock_stub(given_obj: object, select: dict[str, object] | None, fn: str | None,
-                       type_parameters: list['UTypeDeclaration'], generics: list['UTypeDeclaration'],
+                       type_parameters: list['UTypeDeclaration'],
                        types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.types.UFn import UFn
@@ -42,7 +42,7 @@ def validate_mock_stub(given_obj: object, select: dict[str, object] | None, fn: 
     function_def_name: str = function_def.name
     function_def_call_cases: dict[str, UStruct] = function_def_call.cases
     input_failures = function_def_call_cases[function_def_name].validate(
-        input, select, fn, [], [])
+        input, select, fn, [])
 
     input_failures_with_path = []
     for f in input_failures:
@@ -65,7 +65,7 @@ def validate_mock_stub(given_obj: object, select: dict[str, object] | None, fn: 
     else:
         output = given_map[result_def_key]
         output_failures = function_def.result.validate(
-            output, select, fn, [], [])
+            output, select, fn, [])
 
         output_failures_with_path: list[ValidationFailure] = []
         for f in output_failures:

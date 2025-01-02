@@ -8,14 +8,13 @@ if TYPE_CHECKING:
 
 
 def parse_type_declaration(document_name: str, path: list[object], type_declaration_array: list[object],
-                           this_type_parameter_count: int, uapi_schema_document_name_to_pseudo_json: dict[str, list[object]],
+                           uapi_schema_document_name_to_pseudo_json: dict[str, list[object]],
                            schema_keys_to_document_name: dict[str, str], schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
                            all_parse_failures: list['SchemaParseFailure'],
                            failed_types: set[str]) -> 'UTypeDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetOrParseType import get_or_parse_type
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
-    from uapi.internal.types.UGeneric import UGeneric
 
     if not type_declaration_array:
         raise UApiSchemaParseError(
@@ -42,12 +41,8 @@ def parse_type_declaration(document_name: str, path: list[object], type_declarat
     type_name = matcher.group(1)
     nullable = bool(matcher.group(2))
 
-    type_ = get_or_parse_type(document_name, base_path, type_name, this_type_parameter_count, uapi_schema_document_name_to_pseudo_json,
+    type_ = get_or_parse_type(document_name, base_path, type_name, uapi_schema_document_name_to_pseudo_json,
                               schema_keys_to_document_name, schema_keys_to_index, parsed_types, all_parse_failures, failed_types)
-
-    if isinstance(type_, UGeneric) and nullable:
-        raise UApiSchemaParseError([SchemaParseFailure(
-            document_name, base_path, "StringRegexMatchFailed", {"regex": r"^(.+?)[^\?]$"})])
 
     given_type_parameter_count = len(type_declaration_array) - 1
     if type_.get_type_parameter_count() != given_type_parameter_count:
@@ -69,7 +64,7 @@ def parse_type_declaration(document_name: str, path: list[object], type_declarat
             continue
 
         try:
-            type_parameter_type_declaration = parse_type_declaration(document_name, loop_path, e, this_type_parameter_count,
+            type_parameter_type_declaration = parse_type_declaration(document_name, loop_path, e,
                                                                      uapi_schema_document_name_to_pseudo_json,
                                                                      schema_keys_to_document_name, schema_keys_to_index,
                                                                      parsed_types, all_parse_failures,

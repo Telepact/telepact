@@ -8,8 +8,7 @@ if TYPE_CHECKING:
 
 
 def validate_mock_call(given_obj: object, select: dict[str, object] | None, fn: str | None,
-                       type_parameters: list['UTypeDeclaration'],
-                       generics: list['UTypeDeclaration'], types: dict[str, 'UType']) -> list['ValidationFailure']:
+                       type_parameters: list['UTypeDeclaration'], types: dict[str, 'UType']) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
     from uapi.internal.types.UFn import UFn
 
@@ -36,7 +35,7 @@ def validate_mock_call(given_obj: object, select: dict[str, object] | None, fn: 
     function_def_call_cases = function_def_call.cases
 
     input_failures = function_def_call_cases[function_def_name].validate(
-        input, select, fn, [], [])
+        input, select, fn, [])
 
     input_failures_with_path = []
     for f in input_failures:
