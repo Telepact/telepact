@@ -7,7 +7,6 @@ export function generateRandomValueOfType(
     useBlueprintValue: boolean,
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
-    generics: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
     thisType: UType,
     nullable: boolean,
@@ -22,7 +21,6 @@ export function generateRandomValueOfType(
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            generics,
             randomGenerator,
         );
     }

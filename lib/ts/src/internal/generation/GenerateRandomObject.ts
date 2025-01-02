@@ -7,7 +7,6 @@ export function generateRandomObject(
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
     typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
 ): any {
     const nestedTypeDeclaration = typeParameters[0];
@@ -22,7 +21,6 @@ export function generateRandomObject(
                 true,
                 includeOptionalFields,
                 randomizeOptionalFields,
-                generics,
                 randomGenerator,
             );
             obj[key] = value;
@@ -40,7 +38,6 @@ export function generateRandomObject(
                 false,
                 includeOptionalFields,
                 randomizeOptionalFields,
-                generics,
                 randomGenerator,
             );
             obj[key] = value;

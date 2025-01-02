@@ -110,7 +110,7 @@ export async function handleMessage(
     };
 
     const callValidationFailures: ValidationFailure[] = functionTypeCall
-        .validate(requestBody, null, null, [], [])
+        .validate(requestBody, null, null, [])
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
@@ -155,7 +155,7 @@ export async function handleMessage(
     const skipResultValidation: boolean = unsafeResponseEnabled;
     if (!skipResultValidation) {
         const resultValidationFailures: ValidationFailure[] = resultUnionType
-            .validate(resultUnion, selectStructFieldsHeader, null, [], [])
+            .validate(resultUnion, selectStructFieldsHeader, null, [])
             .filter(filterOutWarnings);
 
         if (warnings.length > 0) {

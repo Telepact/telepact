@@ -1,4 +1,3 @@
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UType } from '../../internal/types/UType';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
@@ -11,8 +10,6 @@ export function validateSelect(
     givenObj: any,
     select: Record<string, any> | null,
     fn: string | null,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     types: Record<string, UType>,
 ): ValidationFailure[] {
     if (typeof givenObj !== 'object' || Array.isArray(givenObj) || givenObj === null || givenObj === undefined) {

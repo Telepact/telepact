@@ -33,8 +33,6 @@ export function parseErrorType(
         throw new UApiSchemaParseError(parseFailures);
     }
 
-    const typeParameterCount = 0;
-
     const error = parseUnionType(
         documentName,
         basePath,
@@ -42,7 +40,6 @@ export function parseErrorType(
         schemaKey,
         [],
         [],
-        typeParameterCount,
         uApiSchemaDocumentNamesToPseudoJson,
         schemaKeysToDocumentName,
         schemaKeysToIndex,

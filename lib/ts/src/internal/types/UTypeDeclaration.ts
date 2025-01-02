@@ -15,13 +15,8 @@ export class UTypeDeclaration {
         this.typeParameters = typeParameters;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        generics: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateValueOfType(value, select, fn, generics, this.type, this.nullable, this.typeParameters);
+    validate(value: any, select: { [key: string]: any } | null, fn: string | null): ValidationFailure[] {
+        return validateValueOfType(value, select, fn, this.type, this.nullable, this.typeParameters);
     }
 
     generateRandomValue(
@@ -29,7 +24,6 @@ export class UTypeDeclaration {
         useBlueprintValue: boolean,
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         return generateRandomValueOfType(
@@ -37,7 +31,6 @@ export class UTypeDeclaration {
             useBlueprintValue,
             includeOptionalFields,
             randomizeOptionalFields,
-            generics,
             randomGenerator,
             this.type,
             this.nullable,

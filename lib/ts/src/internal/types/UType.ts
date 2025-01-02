@@ -10,7 +10,6 @@ export abstract class UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[];
 
     abstract generateRandomValue(
@@ -19,9 +18,8 @@ export abstract class UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any;
 
-    abstract getName(generics: UTypeDeclaration[]): string;
+    abstract getName(): string;
 }

@@ -1,13 +1,11 @@
 import { RandomGenerator } from '../../RandomGenerator';
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 
 export function constructRandomStruct(
     referenceStruct: Record<string, UFieldDeclaration>,
     startingStruct: Record<string, any>,
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
 ): Record<string, any> {
     const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => {
@@ -39,7 +37,6 @@ export function constructRandomStruct(
                 useBlueprintValue,
                 includeOptionalFields,
                 randomizeOptionalFields,
-                typeParameters,
                 randomGenerator,
             );
         } else {
@@ -49,7 +46,6 @@ export function constructRandomStruct(
                     false,
                     includeOptionalFields,
                     randomizeOptionalFields,
-                    typeParameters,
                     randomGenerator,
                 );
             } else {
@@ -61,7 +57,6 @@ export function constructRandomStruct(
                     false,
                     includeOptionalFields,
                     randomizeOptionalFields,
-                    typeParameters,
                     randomGenerator,
                 );
             }

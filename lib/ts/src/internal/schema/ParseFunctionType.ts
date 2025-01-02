@@ -20,7 +20,6 @@ export function parseFunctionType(
     failedTypes: Set<string>,
 ): UFn {
     const parseFailures: SchemaParseFailure[] = [];
-    const typeParameterCount = 0;
 
     let callType: UUnion | null = null;
     try {
@@ -30,7 +29,6 @@ export function parseFunctionType(
             functionDefinitionAsParsedJson,
             schemaKey,
             ['->', '_errors'],
-            typeParameterCount,
             uApiSchemaDocumentNamesToPseudoJson,
             schemaKeysToDocumentName,
             schemaKeysToIndex,
@@ -38,7 +36,7 @@ export function parseFunctionType(
             allParseFailures,
             failedTypes,
         );
-        callType = new UUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 }, typeParameterCount);
+        callType = new UUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
             parseFailures.push(...e.schemaParseFailures);
@@ -63,7 +61,6 @@ export function parseFunctionType(
                 resultSchemaKey,
                 Object.keys(functionDefinitionAsParsedJson),
                 ['Ok_'],
-                typeParameterCount,
                 uApiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentName,
                 schemaKeysToIndex,

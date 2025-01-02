@@ -8,14 +8,13 @@ export function validateObject(
     select: Record<string, any> | null,
     fn: string | null,
     typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
 ): ValidationFailure[] {
     if (typeof value === 'object' && !Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0];
 
         const validationFailures: ValidationFailure[] = [];
         for (const [k, v] of Object.entries(value)) {
-            const nestedValidationFailures = nestedTypeDeclaration.validate(v, select, fn, generics);
+            const nestedValidationFailures = nestedTypeDeclaration.validate(v, select, fn);
 
             const nestedValidationFailuresWithPath: ValidationFailure[] = [];
             for (const f of nestedValidationFailures) {

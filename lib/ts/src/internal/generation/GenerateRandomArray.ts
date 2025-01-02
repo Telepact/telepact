@@ -7,7 +7,6 @@ export function generateRandomArray(
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
     typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
 ): any[] {
     const nestedTypeDeclaration = typeParameters[0];
@@ -22,7 +21,6 @@ export function generateRandomArray(
                 true,
                 includeOptionalFields,
                 randomizeOptionalFields,
-                generics,
                 randomGenerator,
             );
 
@@ -40,7 +38,6 @@ export function generateRandomArray(
                 false,
                 includeOptionalFields,
                 randomizeOptionalFields,
-                generics,
                 randomGenerator,
             );
 

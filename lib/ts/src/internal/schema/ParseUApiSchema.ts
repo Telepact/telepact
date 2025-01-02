@@ -89,7 +89,6 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     const requestHeaderKeys: Set<string> = new Set();
     const responseHeaderKeys: Set<string> = new Set();
     const errorKeys: Set<string> = new Set();
-    const rootTypeParameterCount = 0;
 
     for (const schemaKey of schemaKeys) {
         if (schemaKey.startsWith('info.')) {
@@ -113,7 +112,6 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                 thisDocumentName,
                 [thisIndex],
                 schemaKey,
-                rootTypeParameterCount,
                 uApiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentName,
                 schemaKeysToIndex,

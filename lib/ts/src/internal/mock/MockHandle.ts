@@ -1,14 +1,14 @@
-import { Message } from "../../Message";
-import { MockInvocation } from "../../internal/mock/MockInvocation";
-import { MockStub } from "../../internal/mock/MockStub";
-import { RandomGenerator } from "../../RandomGenerator";
-import { UApiSchema } from "../../UApiSchema";
-import { isSubMap } from "../../internal/mock/IsSubMap";
-import { verify } from "../../internal/mock/Verify";
-import { verifyNoMoreInteractions } from "../../internal/mock/VerifyNoMoreInteractions";
-import { UApiError } from "../../UApiError";
-import { UFn } from "../../internal/types/UFn";
-import { objectsAreEqual } from "../../internal/ObjectsAreEqual";
+import { Message } from '../../Message';
+import { MockInvocation } from '../../internal/mock/MockInvocation';
+import { MockStub } from '../../internal/mock/MockStub';
+import { RandomGenerator } from '../../RandomGenerator';
+import { UApiSchema } from '../../UApiSchema';
+import { isSubMap } from '../../internal/mock/IsSubMap';
+import { verify } from '../../internal/mock/Verify';
+import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreInteractions';
+import { UApiError } from '../../UApiError';
+import { UFn } from '../../internal/types/UFn';
+import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
 
 export async function mockHandle(
     requestMessage: Message,
@@ -26,39 +26,39 @@ export async function mockHandle(
     const functionName = requestMessage.getBodyTarget();
     const argument = requestMessage.getBodyPayload();
 
-    if (functionName === "fn.createStub_") {
+    if (functionName === 'fn.createStub_') {
         const givenStub = argument.stub as Record<string, any>;
 
-        const stubCall = Object.entries(givenStub).find(([key]) => key.startsWith("fn."));
+        const stubCall = Object.entries(givenStub).find(([key]) => key.startsWith('fn.'));
         const [stubFunctionName, stubArg] = stubCall as [string, Record<string, any>];
-        const stubResult = givenStub["->"] as Record<string, any>;
-        const allowArgumentPartialMatch = !argument["strictMatch!"] || false;
-        const stubCount = argument["count!"] || -1;
+        const stubResult = givenStub['->'] as Record<string, any>;
+        const allowArgumentPartialMatch = !argument['strictMatch!'] || false;
+        const stubCount = argument['count!'] || -1;
 
         const stub = new MockStub(stubFunctionName, stubArg, stubResult, allowArgumentPartialMatch, stubCount);
 
         stubs.unshift(stub);
         return new Message({}, { Ok_: {} });
-    } else if (functionName === "fn.verify_") {
+    } else if (functionName === 'fn.verify_') {
         const givenCall = argument.call as Record<string, any>;
 
-        const call = Object.entries(givenCall).find(([key]) => key.startsWith("fn."));
+        const call = Object.entries(givenCall).find(([key]) => key.startsWith('fn.'));
         const [callFunctionName, callArg] = call as [string, Record<string, any>];
-        const verifyTimes = argument["count!"] || { AtLeast: { times: 1 } };
-        const strictMatch = argument["strictMatch!"] || false;
+        const verifyTimes = argument['count!'] || { AtLeast: { times: 1 } };
+        const strictMatch = argument['strictMatch!'] || false;
 
         const verificationResult = verify(callFunctionName, callArg, strictMatch, verifyTimes, invocations);
         return new Message({}, verificationResult);
-    } else if (functionName === "fn.verifyNoMoreInteractions_") {
+    } else if (functionName === 'fn.verifyNoMoreInteractions_') {
         const verificationResult = verifyNoMoreInteractions(invocations);
         return new Message({}, verificationResult);
-    } else if (functionName === "fn.clearCalls_") {
+    } else if (functionName === 'fn.clearCalls_') {
         invocations.length = 0;
         return new Message({}, { Ok_: {} });
-    } else if (functionName === "fn.clearStubs_") {
+    } else if (functionName === 'fn.clearStubs_') {
         stubs.length = 0;
         return new Message({}, { Ok_: {} });
-    } else if (functionName === "fn.setRandomSeed_") {
+    } else if (functionName === 'fn.setRandomSeed_') {
         const givenSeed = argument.seed as number;
 
         random.setSeed(givenSeed);
@@ -83,7 +83,6 @@ export async function mockHandle(
                             includeOptionalFields,
                             randomizeOptionalFieldGeneration,
                             [],
-                            [],
                             random,
                         );
                         const result = resultInit as Record<string, any>;
@@ -101,7 +100,6 @@ export async function mockHandle(
                             useBlueprintValue,
                             includeOptionalFields,
                             randomizeOptionalFieldGeneration,
-                            [],
                             [],
                             random,
                         );
@@ -121,7 +119,7 @@ export async function mockHandle(
 
         if (definition) {
             const resultUnion = definition.result;
-            const okStructRef = resultUnion.cases["Ok_"];
+            const okStructRef = resultUnion.cases['Ok_'];
             const useBlueprintValue = true;
             const includeOptionalFields = true;
             const randomOkStructInit = okStructRef.generateRandomValue(
@@ -129,7 +127,6 @@ export async function mockHandle(
                 useBlueprintValue,
                 includeOptionalFields,
                 randomizeOptionalFieldGeneration,
-                [],
                 [],
                 random,
             );

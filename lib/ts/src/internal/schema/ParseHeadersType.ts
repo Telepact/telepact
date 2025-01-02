@@ -30,14 +30,11 @@ export function parseHeadersType(
 
     const typeDeclarationArray = typeDeclarationValue;
 
-    const typeParameterCount = 0;
-
     try {
         const typeDeclaration = parseTypeDeclaration(
             documentName,
             path,
             typeDeclarationArray,
-            typeParameterCount,
             uapiSchemaDocumentNamesToPseudoJson,
             schemaKeysToDocumentName,
             schemaKeysToIndex,

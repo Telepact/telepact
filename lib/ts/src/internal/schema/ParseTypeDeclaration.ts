@@ -4,13 +4,11 @@ import { UType } from '../../internal/types/UType';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
-import { UGeneric } from '../../internal/types/UGeneric';
 
 export function parseTypeDeclaration(
     documentName: string,
     path: any[],
     typeDeclarationArray: any[],
-    thisTypeParameterCount: number,
     uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
     schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
@@ -51,7 +49,6 @@ export function parseTypeDeclaration(
         documentName,
         basePath,
         typeName,
-        thisTypeParameterCount,
         uapiSchemaDocumentNamesToPseudoJson,
         schemaKeysToDocumentName,
         schemaKeysToIndex,
@@ -59,12 +56,6 @@ export function parseTypeDeclaration(
         allParseFailures,
         failedTypes,
     );
-
-    if (type_ instanceof UGeneric && nullable) {
-        throw new UApiSchemaParseError([
-            new SchemaParseFailure(documentName, basePath, 'StringRegexMatchFailed', { regex: '^(.+?)[^\\?]$' }),
-        ]);
-    }
 
     const givenTypeParameterCount = typeDeclarationArray.length - 1;
     if (type_.getTypeParameterCount() !== givenTypeParameterCount) {
@@ -95,7 +86,6 @@ export function parseTypeDeclaration(
                 documentName,
                 loopPath,
                 e,
-                thisTypeParameterCount,
                 uapiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentName,
                 schemaKeysToIndex,

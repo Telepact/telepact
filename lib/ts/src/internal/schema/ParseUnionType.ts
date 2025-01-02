@@ -13,7 +13,6 @@ export function parseUnionType(
     schemaKey: string,
     ignoreKeys: string[],
     requiredKeys: string[],
-    typeParameterCount: number,
     uApiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
     schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
@@ -136,7 +135,6 @@ export function parseUnionType(
                 unionCaseStruct,
                 documentName,
                 unionKeyPath,
-                typeParameterCount,
                 uApiSchemaDocumentNamesToPseudoJson,
                 schemaKeysToDocumentName,
                 schemaKeysToIndex,
@@ -144,7 +142,7 @@ export function parseUnionType(
                 allParseFailures,
                 failedTypes,
             );
-            const unionStruct = new UStruct(`${schemaKey}.${unionCase}`, fields, typeParameterCount);
+            const unionStruct = new UStruct(`${schemaKey}.${unionCase}`, fields);
             cases[unionCase] = unionStruct;
             caseIndices[unionCase] = i;
         } catch (e) {
@@ -160,5 +158,5 @@ export function parseUnionType(
         throw new UApiSchemaParseError(parseFailures);
     }
 
-    return new UUnion(schemaKey, cases, caseIndices, typeParameterCount);
+    return new UUnion(schemaKey, cases, caseIndices);
 }

@@ -4,7 +4,6 @@ import { UType } from '../../internal/types/UType';
 import { UObject } from '../../internal/types/UObject';
 import { UArray } from '../../internal/types/UArray';
 import { UBoolean } from '../../internal/types/UBoolean';
-import { UGeneric } from '../../internal/types/UGeneric';
 import { UInteger } from '../../internal/types/UInteger';
 import { UNumber } from '../../internal/types/UNumber';
 import { UString } from '../../internal/types/UString';
@@ -20,7 +19,6 @@ export function getOrParseType(
     documentName: string,
     path: any[],
     typeName: string,
-    thisTypeParameterCount: number,
     uApiSchemaDocumentNameToPseudoJson: { [key: string]: object[] },
     schemaKeysToDocumentNames: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
@@ -37,17 +35,7 @@ export function getOrParseType(
         return existingType;
     }
 
-    let genericRegex: string;
-    if (thisTypeParameterCount > 0) {
-        genericRegex = `|(T([%s]))`.replace(
-            '%s',
-            thisTypeParameterCount > 1 ? '0-%d'.replace('%d', String(thisTypeParameterCount - 1)) : '0',
-        );
-    } else {
-        genericRegex = '';
-    }
-
-    const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext)(<([1-3])>)?)\\.([a-zA-Z_]\\w*)${genericRegex})$`;
+    const regexString = `^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\\.([a-zA-Z_]\\w*))$`;
     const regex = new RegExp(regexString);
 
     const matcher = typeName.match(regex);
@@ -71,14 +59,6 @@ export function getOrParseType(
         );
     }
 
-    if (thisTypeParameterCount > 0) {
-        const genericParameterIndexString = matcher[9];
-        if (genericParameterIndexString !== undefined) {
-            const genericParameterIndex = parseInt(genericParameterIndexString);
-            return new UGeneric(genericParameterIndex);
-        }
-    }
-
     const customTypeName = matcher[2];
     const thisIndex = schemaKeysToIndex[customTypeName];
     const thisDocumentName = schemaKeysToDocumentNames[customTypeName];
@@ -89,9 +69,6 @@ export function getOrParseType(
     }
     const definition = uApiSchemaDocumentNameToPseudoJson[thisDocumentName][thisIndex] as { [key: string]: object };
 
-    const typeParameterCountString = matcher[6];
-    const typeParameterCount = typeParameterCountString ? parseInt(typeParameterCountString) : 0;
-
     let type: UType;
     try {
         if (customTypeName.startsWith('struct')) {
@@ -101,7 +78,6 @@ export function getOrParseType(
                 definition,
                 customTypeName,
                 [],
-                typeParameterCount,
                 uApiSchemaDocumentNameToPseudoJson,
                 schemaKeysToDocumentNames,
                 schemaKeysToIndex,
@@ -117,7 +93,6 @@ export function getOrParseType(
                 customTypeName,
                 [],
                 [],
-                typeParameterCount,
                 uApiSchemaDocumentNameToPseudoJson,
                 schemaKeysToDocumentNames,
                 schemaKeysToIndex,

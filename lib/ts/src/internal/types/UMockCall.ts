@@ -23,9 +23,8 @@ export class UMockCall extends UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validateMockCall(givenObj, select, fn, typeParameters, generics, this.types);
+        return validateMockCall(givenObj, select, fn, this.types);
     }
 
     public generateRandomValue(
@@ -34,13 +33,12 @@ export class UMockCall extends UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         throw new Error('Not implemented');
     }
 
-    public getName(generics: UTypeDeclaration[]): string {
+    public getName(): string {
         return mockCallName;
     }
 }

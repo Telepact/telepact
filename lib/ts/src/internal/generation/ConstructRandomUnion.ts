@@ -1,6 +1,5 @@
 import { RandomGenerator } from '../../RandomGenerator';
 import { UStruct } from '../../internal/types/UStruct';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { constructRandomStruct } from '../../internal/generation/ConstructRandomStruct';
 
 export function constructRandomUnion(
@@ -8,7 +7,6 @@ export function constructRandomUnion(
     startingUnion: Record<string, any>,
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
 ): Record<string, any> {
     if (Object.keys(startingUnion).length === 0) {
@@ -21,7 +19,6 @@ export function constructRandomUnion(
                 {},
                 includeOptionalFields,
                 randomizeOptionalFields,
-                typeParameters,
                 randomGenerator,
             ),
         };
@@ -34,7 +31,6 @@ export function constructRandomUnion(
                 unionStartingStruct,
                 includeOptionalFields,
                 randomizeOptionalFields,
-                typeParameters,
                 randomGenerator,
             ),
         };

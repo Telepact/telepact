@@ -1,5 +1,4 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UType } from '../../internal/types/UType';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { UFn } from '../../internal/types/UFn';
@@ -8,8 +7,6 @@ export function validateMockCall(
     givenObj: any,
     select: Record<string, any> | null,
     fn: string | null,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     types: Record<string, UType>,
 ): ValidationFailure[] {
     if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
@@ -42,7 +39,7 @@ export function validateMockCall(
     const functionDefName = functionDef.name;
     const functionDefCallCases = functionDefCall.cases;
 
-    const inputFailures = functionDefCallCases[functionDefName].validate(input, select, fn, [], []);
+    const inputFailures = functionDefCallCases[functionDefName].validate(input, select, fn, []);
 
     const inputFailuresWithPath: ValidationFailure[] = [];
     for (const failure of inputFailures) {

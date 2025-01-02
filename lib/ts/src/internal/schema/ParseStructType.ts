@@ -11,7 +11,6 @@ export function parseStructType(
     structDefinitionAsPseudoJson: { [key: string]: any },
     schemaKey: string,
     ignoreKeys: string[],
-    typeParameterCount: number,
     uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
     schemaKeysToDocumentName: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
@@ -55,7 +54,6 @@ export function parseStructType(
         definition,
         documentName,
         thisPath,
-        typeParameterCount,
         uapiSchemaDocumentNamesToPseudoJson,
         schemaKeysToDocumentName,
         schemaKeysToIndex,
@@ -64,5 +62,5 @@ export function parseStructType(
         failedTypes,
     );
 
-    return new UStruct(schemaKey, fields, typeParameterCount);
+    return new UStruct(schemaKey, fields);
 }

@@ -11,16 +11,14 @@ export const structName: string = 'Object';
 export class UStruct implements UType {
     name: string;
     fields: { [key: string]: UFieldDeclaration };
-    typeParameterCount: number;
 
-    constructor(name: string, fields: { [key: string]: UFieldDeclaration }, typeParameterCount: number) {
+    constructor(name: string, fields: { [key: string]: UFieldDeclaration }) {
         this.name = name;
         this.fields = fields;
-        this.typeParameterCount = typeParameterCount;
     }
 
     getTypeParameterCount(): number {
-        return this.typeParameterCount;
+        return 0;
     }
 
     validate(
@@ -28,9 +26,8 @@ export class UStruct implements UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validateStruct(value, select, fn, typeParameters, generics, this.name, this.fields);
+        return validateStruct(value, select, fn, this.name, this.fields);
     }
 
     generateRandomValue(
@@ -39,7 +36,6 @@ export class UStruct implements UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         random: RandomGenerator,
     ): any {
         return generateRandomStruct(
@@ -47,14 +43,12 @@ export class UStruct implements UType {
             useBlueprintValue,
             includeOptionalFields,
             randomizeOptionalFields,
-            typeParameters,
-            generics,
             random,
             this.fields,
         );
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return structName;
     }
 }

@@ -17,7 +17,6 @@ export class UBoolean extends UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
         return validateBoolean(value);
     }
@@ -28,13 +27,12 @@ export class UBoolean extends UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         return generateRandomBoolean(blueprintValue, useBlueprintValue, randomGenerator);
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return booleanName;
     }
 }

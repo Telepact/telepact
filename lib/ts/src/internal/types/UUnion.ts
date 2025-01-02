@@ -12,22 +12,15 @@ export class UUnion implements UType {
     name: string;
     cases: { [key: string]: UStruct };
     caseIndices: { [key: string]: number };
-    typeParameterCount: number;
 
-    constructor(
-        name: string,
-        cases: { [key: string]: UStruct },
-        caseIndices: { [key: string]: number },
-        typeParameterCount: number,
-    ) {
+    constructor(name: string, cases: { [key: string]: UStruct }, caseIndices: { [key: string]: number }) {
         this.name = name;
         this.cases = cases;
         this.caseIndices = caseIndices;
-        this.typeParameterCount = typeParameterCount;
     }
 
     getTypeParameterCount(): number {
-        return this.typeParameterCount;
+        return 0;
     }
 
     validate(
@@ -35,9 +28,8 @@ export class UUnion implements UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validateUnion(value, select, fn, typeParameters, generics, this.name, this.cases);
+        return validateUnion(value, select, fn, this.name, this.cases);
     }
 
     generateRandomValue(
@@ -46,7 +38,6 @@ export class UUnion implements UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         random: RandomGenerator,
     ): any {
         return generateRandomUnion(
@@ -54,14 +45,12 @@ export class UUnion implements UType {
             useBlueprintValue,
             includeOptionalFields,
             randomizeOptionalFields,
-            typeParameters,
-            generics,
             random,
             this.cases,
         );
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return unionName;
     }
 }

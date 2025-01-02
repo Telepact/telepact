@@ -17,9 +17,8 @@ export class UArray extends UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validateArray(value, select, fn, typeParameters, generics);
+        return validateArray(value, select, fn, typeParameters);
     }
 
     generateRandomValue(
@@ -28,7 +27,6 @@ export class UArray extends UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         return generateRandomArray(
@@ -37,12 +35,11 @@ export class UArray extends UType {
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            generics,
             randomGenerator,
         );
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return arrayName;
     }
 }

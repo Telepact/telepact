@@ -16,7 +16,6 @@ export class UAny extends UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
         return [];
     }
@@ -27,13 +26,12 @@ export class UAny extends UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         return generateRandomAny(randomGenerator);
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return anyName;
     }
 }

@@ -17,9 +17,8 @@ export class UObject implements UType {
         select: { [key: string]: any } | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validateObject(value, select, fn, typeParameters, generics);
+        return validateObject(value, select, fn, typeParameters);
     }
 
     generateRandomValue(
@@ -28,7 +27,6 @@ export class UObject implements UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         return generateRandomObject(
@@ -37,12 +35,11 @@ export class UObject implements UType {
             includeOptionalFields,
             randomizeOptionalFields,
             typeParameters,
-            generics,
             randomGenerator,
         );
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return objectName;
     }
 }

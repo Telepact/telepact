@@ -24,9 +24,8 @@ export class USelect implements UType {
         select: Record<string, any> | null,
         fn: string | null,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
     ): ValidationFailure[] {
-        return validateSelect(givenObj, select, fn, typeParameters, generics, this.types);
+        return validateSelect(givenObj, select, fn, this.types);
     }
 
     generateRandomValue(
@@ -35,13 +34,12 @@ export class USelect implements UType {
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
         typeParameters: UTypeDeclaration[],
-        generics: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ): any {
         throw new Error('Not implemented');
     }
 
-    getName(generics: UTypeDeclaration[]): string {
+    getName(): string {
         return select;
     }
 }

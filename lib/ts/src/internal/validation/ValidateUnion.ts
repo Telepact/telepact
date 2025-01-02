@@ -1,5 +1,4 @@
 import { UStruct } from '../../internal/types/UStruct';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateUnionCases } from '../../internal/validation/ValidateUnionCases';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
@@ -9,8 +8,6 @@ export function validateUnion(
     value: any,
     select: Record<string, any> | null,
     fn: string | null,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     name: string,
     cases: Record<string, UStruct>,
 ): ValidationFailure[] {
@@ -21,7 +18,7 @@ export function validateUnion(
         } else {
             selectedCases = select?.[name] ?? null;
         }
-        return validateUnionCases(cases, selectedCases, value, select, fn, typeParameters);
+        return validateUnionCases(cases, selectedCases, value, select, fn);
     } else {
         return getTypeUnexpectedValidationFailure([], value, unionName);
     }

@@ -1,6 +1,5 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UStruct } from '../../internal/types/UStruct';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateUnionStruct } from '../../internal/validation/ValidateUnionStruct';
 
@@ -10,7 +9,6 @@ export function validateUnionCases(
     actual: Record<any, any>,
     select: Record<string, any> | null,
     fn: string | null,
-    typeParameters: UTypeDeclaration[],
 ): ValidationFailure[] {
     if (Object.keys(actual).length !== 1) {
         return [
@@ -36,7 +34,6 @@ export function validateUnionCases(
             selectedCases,
             select,
             fn,
-            typeParameters,
         );
 
         const nestedValidationFailuresWithPath: ValidationFailure[] = [];

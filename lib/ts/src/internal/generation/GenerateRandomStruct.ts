@@ -1,6 +1,5 @@
 import { RandomGenerator } from '../../RandomGenerator';
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { constructRandomStruct } from '../../internal/generation/ConstructRandomStruct';
 
 export function generateRandomStruct(
@@ -8,8 +7,6 @@ export function generateRandomStruct(
     useBlueprintValue: boolean,
     includeOptionalFields: boolean,
     randomizeOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     randomGenerator: RandomGenerator,
     fields: { [key: string]: UFieldDeclaration },
 ): any {
@@ -21,17 +18,9 @@ export function generateRandomStruct(
             startingStructValue,
             includeOptionalFields,
             randomizeOptionalFields,
-            typeParameters,
             randomGenerator,
         );
     } else {
-        return constructRandomStruct(
-            fields,
-            {},
-            includeOptionalFields,
-            randomizeOptionalFields,
-            typeParameters,
-            randomGenerator,
-        );
+        return constructRandomStruct(fields, {}, includeOptionalFields, randomizeOptionalFields, randomGenerator);
     }
 }

@@ -2,7 +2,6 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { UStruct } from '../../internal/types/UStruct';
 import { UType } from '../../internal/types/UType';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UUnion } from '../../internal/types/UUnion';
 import { UFn } from '../../internal/types/UFn';
 
@@ -10,8 +9,6 @@ export function validateMockStub(
     givenObj: any,
     select: { [key: string]: any } | null,
     fn: string | null,
-    typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
     types: { [key: string]: UType },
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
@@ -45,7 +42,7 @@ export function validateMockStub(
     const functionDefCall: UUnion = functionDef.call;
     const functionDefName: string = functionDef.name;
     const functionDefCallCases: { [key: string]: UStruct } = functionDefCall.cases;
-    const inputFailures = functionDefCallCases[functionDefName].validate(input, select, fn, [], []);
+    const inputFailures = functionDefCallCases[functionDefName].validate(input, select, fn, []);
 
     const inputFailuresWithPath: ValidationFailure[] = [];
     for (const f of inputFailures) {
@@ -66,7 +63,7 @@ export function validateMockStub(
         validationFailures.push(new ValidationFailure([resultDefKey], 'RequiredObjectKeyMissing', {}));
     } else {
         const output = givenMap[resultDefKey];
-        const outputFailures = functionDef.result.validate(output, select, fn, [], []);
+        const outputFailures = functionDef.result.validate(output, select, fn, []);
 
         const outputFailuresWithPath: ValidationFailure[] = [];
         for (const f of outputFailures) {

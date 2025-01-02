@@ -13,7 +13,7 @@ export function validateHeaders(
         const headerValue = headers[header];
         const field = parsedRequestHeaders[header];
         if (field) {
-            const thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name, []);
+            const thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name);
             const thisValidationFailuresPath = thisValidationFailures.map(
                 (e) => new ValidationFailure([header, ...e.path], e.reason, e.data),
             );

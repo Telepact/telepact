@@ -8,7 +8,6 @@ export function validateArray(
     select: Record<string, any> | null,
     fn: string | null,
     typeParameters: UTypeDeclaration[],
-    generics: UTypeDeclaration[],
 ): ValidationFailure[] {
     if (Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0];
@@ -16,7 +15,7 @@ export function validateArray(
         const validationFailures: ValidationFailure[] = [];
         for (let i = 0; i < value.length; i++) {
             const element = value[i];
-            const nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn, generics);
+            const nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn);
             const index = i;
 
             const nestedValidationFailuresWithPath: ValidationFailure[] = [];
