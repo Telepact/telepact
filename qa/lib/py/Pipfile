@@ -7,8 +7,8 @@ build = "*"
 msgpack = "*"
 nats-py = "*"
 prometheus-client = "*"
-uapi = {path = "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl"}
 uapicodegen = {path = "./../../../tool/uapicodegen/dist/uapicodegen-0.0.1-py3-none-any.whl"}
+uapi = {path = "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl"}
 
 [pipenv]
 allow_prereleases = true

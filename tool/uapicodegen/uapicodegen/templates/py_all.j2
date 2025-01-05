@@ -80,12 +80,16 @@ class Undefined:
     {%- elif typ == 'any' -%}
         {{ caller() }}
     {%- else -%}
-        util_let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.to_pseudo_json())
+        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else d{{depth}}.to_pseudo_json())
     {%- endif -%}
 {%- endmacro -%}
 
 {%- macro marshall_py_type_maybe_opt(field_name, field_type) -%}
-    {% call marshall_py_type(field_type, 0) %}map_.get("{{ field_name }}", Undefined()){% endcall %}
+    {%- if '!' in field_name -%}
+        Undefined() if '{{- field_name }}' not in map_ else {% call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
+    {%- else %}
+        {%- call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro setter_maybe_opt(field_name) -%}
@@ -162,9 +166,9 @@ class {{ py_name }}:
         {%- for field_name, field_type in fields.items() %}
             {%- if '!' in field_name %}
         if not isinstance(self.{{ sanitize_field_name(field_name) }}, Undefined):
-            fields["{{ field_name }}"] = self.{{ sanitize_field_name(field_name) }}
+            fields["{{ field_name }}"] =  {% call unmarshall_py_type(field_type, 0) %}self.{{ sanitize_field_name(field_name) }}{% endcall %}
             {%- else %}
-        fields["{{ field_name }}"] = self.{{ sanitize_field_name(field_name) }}
+        fields["{{ field_name }}"] =  {% call unmarshall_py_type(field_type, 0) %}self.{{ sanitize_field_name(field_name) }}{% endcall %}
             {%- endif %}
         {%- endfor %}
         {%- if unionCase %}

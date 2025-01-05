@@ -32,6 +32,7 @@ from uapi.internal.schema.GetSchemaFileMap import get_schema_file_map
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from uapitest.code_gen_handler import CodeGenHandler
 
 
 def on_err(e):
@@ -215,7 +216,7 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
     return dispatcher
 
 
-async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool) -> Subscription:
+async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool, use_codegen: bool) -> Subscription:
     m = get_schema_file_map(api_schema_path)
     alternate_map = m.copy()
     alternate_map["backwardsCompatibleChange"] = """
@@ -234,6 +235,8 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
     serve_alternate_server = False
 
+    code_gen_handler = CodeGenHandler()
+
     executor = ThreadPoolExecutor()
 
     class ThisError(RuntimeError):
@@ -248,30 +251,36 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         request_pseudo_json = [request_headers, request_body]
         request_bytes = json.dumps(request_pseudo_json).encode('utf-8')
 
-        print(f"    <-s {request_bytes}")
+        if use_codegen:
+            print(f"     :H {request_bytes}")
+            message = code_gen_handler.handler(request_message)
+        else:
+            print(f"    <-s {request_bytes}")
 
-        nats_response_message: Msg = await connection.request(
-            backdoor_topic, request_bytes, timeout=5)
+            nats_response_message: Msg = await connection.request(
+                backdoor_topic, request_bytes, timeout=5)
 
-        response_bytes = nats_response_message.data
+            response_bytes = nats_response_message.data
 
-        print(f"    ->s {response_bytes}")
+            print(f"    ->s {response_bytes}")
 
-        response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
+            response_pseudo_json = json.loads(response_bytes.decode('utf-8'))
 
-        response_headers = response_pseudo_json[0]
-        response_body = response_pseudo_json[1]
+            response_headers = response_pseudo_json[0]
+            response_body = response_pseudo_json[1]
 
-        toggle_alternate_server = request_headers.get(
-            "_toggleAlternateServer")
-        if toggle_alternate_server == True:
-            serve_alternate_server = not serve_alternate_server
+            toggle_alternate_server = request_headers.get(
+                "_toggleAlternateServer")
+            if toggle_alternate_server == True:
+                serve_alternate_server = not serve_alternate_server
 
-        throw_error = request_headers.get("_throwError")
-        if throw_error == True:
-            raise ThisError()
+            throw_error = request_headers.get("_throwError")
+            if throw_error == True:
+                raise ThisError()
 
-        return Message(response_headers, response_body)
+            message = Message(response_headers, response_body)
+
+        return message
 
     options = Server.Options()
 
@@ -366,8 +375,9 @@ async def run_dispatcher_server():
                 frontdoor_topic = payload["frontdoorTopic"]
                 backdoor_topic = payload["backdoorTopic"]
                 auth_required = payload.get('authRequired', False)
+                use_codegen = payload.get('useCodeGen', False)
                 server = await start_test_server(
-                    connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic, auth_required)
+                    connection, metrics, api_schema_path, frontdoor_topic, backdoor_topic, auth_required, use_codegen)
                 servers[server_id] = server
             elif target == "StartClientServer":
                 server_id = payload["id"]

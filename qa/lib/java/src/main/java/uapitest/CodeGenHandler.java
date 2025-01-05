@@ -51,24 +51,6 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullBool.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullBool(v).build());
             });
-            top.pStrBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrBool(mapPStr(v)).build());
-            });
-            top.pStrNullBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullBool(mapPStr(v)).build());
-            });
-            top.pUnionBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionBool(mapPUnion(v)).build());
-            });
-            top.pUnionNullBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullBool(mapPUnion(v)).build());
-            });
-            top.arrPStrBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrBool(mapArrPStr(v)).build());
-            });
-            top.arrP2StrBool.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrBool(mapArrP2Str(v)).build());
-            });
             top.int_.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().int_(v).build());
             });
@@ -86,24 +68,6 @@ public class CodeGenHandler extends ServerHandler_ {
             });
             top.objNullInt.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullInt(v).build());
-            });
-            top.pStrInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrInt(mapPStr(v)).build());
-            });
-            top.pStrNullInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullInt(mapPStr(v)).build());
-            });
-            top.pUnionInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionInt(mapPUnion(v)).build());
-            });
-            top.pUnionNullInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullInt(mapPUnion(v)).build());
-            });
-            top.arrPStrInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrInt(mapArrPStr(v)).build());
-            });
-            top.arrP2StrInt.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrInt(mapArrP2Str(v)).build());
             });
             top.num.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().num(v).build());
@@ -123,24 +87,6 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullNum.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullNum(v).build());
             });
-            top.pStrNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNum(mapPStr(v)).build());
-            });
-            top.pStrNullNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullNum(mapPStr(v)).build());
-            });
-            top.pUnionNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNum(mapPUnion(v)).build());
-            });
-            top.pUnionNullNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullNum(mapPUnion(v)).build());
-            });
-            top.arrPStrNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrNum(mapArrPStr(v)).build());
-            });
-            top.arrP2StrNum.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrNum(mapArrP2Str(v)).build());
-            });
             top.str.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().str(v).build());
             });
@@ -158,24 +104,6 @@ public class CodeGenHandler extends ServerHandler_ {
             });
             top.objNullStr.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullStr(v).build());
-            });
-            top.pStrStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrStr(mapPStr(v)).build());
-            });
-            top.pStrNullStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullStr(mapPStr(v)).build());
-            });
-            top.pUnionStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionStr(mapPUnion(v)).build());
-            });
-            top.pUnionNullStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullStr(mapPUnion(v)).build());
-            });
-            top.arrPStrStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrStr(mapArrPStr(v)).build());
-            });
-            top.arrP2StrStr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrStr(mapArrP2Str(v)).build());
             });
             top.arr.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().arr(v).build());
@@ -195,24 +123,6 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullArr.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullArr(v).build());
             });
-            top.pStrArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrArr(mapPStr(v)).build());
-            });
-            top.pStrNullArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullArr(mapPStr(v)).build());
-            });
-            top.pUnionArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionArr(mapPUnion(v)).build());
-            });
-            top.pUnionNullArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullArr(mapPUnion(v)).build());
-            });
-            top.arrPStrArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrArr(mapArrPStr(v)).build());
-            });
-            top.arrP2StrArr.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrArr(mapArrP2Str(v)).build());
-            });
             top.obj.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().obj(v).build());
             });
@@ -231,24 +141,6 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullObj.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullObj(v).build());
             });
-            top.pStrObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrObj(mapPStr(v)).build());
-            });
-            top.pStrNullObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullObj(mapPStr(v)).build());
-            });
-            top.pUnionObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionObj(mapPUnion(v)).build());
-            });
-            top.pUnionNullObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullObj(mapPUnion(v)).build());
-            });
-            top.arrPStrObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrObj(mapArrPStr(v)).build());
-            });
-            top.arrP2StrObj.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrObj(mapArrP2Str(v)).build());
-            });
             top.any.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().any(v).build());
             });
@@ -266,24 +158,6 @@ public class CodeGenHandler extends ServerHandler_ {
             });
             top.objNullAny.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullAny(v).build());
-            });
-            top.pStrAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrAny(mapPStr(v)).build());
-            });
-            top.pStrNullAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullAny(mapPStr(v)).build());
-            });
-            top.pUnionAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionAny(mapPUnion(v)).build());
-            });
-            top.pUnionNullAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullAny(mapPUnion(v)).build());
-            });
-            top.arrPStrAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrAny(mapArrPStr(v)).build());
-            });
-            top.arrP2StrAny.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2StrAny(mapArrP2Str(v)).build());
             });
 
             top.struct.ifPresent(v -> {
@@ -304,26 +178,6 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullStruct.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullStruct(mapObj(v, s -> mapStruct(s))).build());
             });
-            top.pStrStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrStruct(mapPStr(v, s -> mapStruct(s))).build());
-            });
-            top.pStrNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullStruct(mapPStr(v, s -> mapStruct(s))).build());
-            });
-            top.pUnionStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionStruct(mapPUnion(v, s -> mapStruct(s))).build());
-            });
-            top.pUnionNullStruct.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullStruct(mapPUnion(v, s -> mapStruct(s))).build());
-            });
-            top.arrPStrStruct.ifPresent(v -> {
-                outputBuilder.value(
-                        new Value.Builder().arrPStrStruct(mapArr(v, p -> mapPStr(p, s -> mapStruct(s)))).build());
-            });
-            top.arrP2StrStruct.ifPresent(v -> {
-                outputBuilder.value(
-                        new Value.Builder().arrP2StrStruct(mapArr(v, p2 -> mapP2Str(p2, s -> mapStruct(s)))).build());
-            });
             top.union.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().union(mapUnion(v)).build());
             });
@@ -341,26 +195,6 @@ public class CodeGenHandler extends ServerHandler_ {
             });
             top.objNullUnion.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullUnion(mapObj(v, u -> mapUnion(u))).build());
-            });
-            top.pStrUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrUnion(mapPStr(v, u -> mapUnion(u))).build());
-            });
-            top.pStrNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullUnion(mapPStr(v, u -> mapUnion(u))).build());
-            });
-            top.pUnionUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionUnion(mapPUnion(v, u -> mapUnion(u))).build());
-            });
-            top.pUnionNullUnion.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullUnion(mapPUnion(v, u -> mapUnion(u))).build());
-            });
-            top.arrPStrUnion.ifPresent(v -> {
-                outputBuilder
-                        .value(new Value.Builder().arrPStrUnion(mapArr(v, p -> mapPStr(p, u -> mapUnion(u)))).build());
-            });
-            top.arrP2StrUnion.ifPresent(v -> {
-                outputBuilder.value(
-                        new Value.Builder().arrP2StrUnion(mapArr(v, p2 -> mapP2Str(p2, u -> mapUnion(u)))).build());
             });
             top.fn.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().fn(mapFn(v)).build());
@@ -380,174 +214,9 @@ public class CodeGenHandler extends ServerHandler_ {
             top.objNullFn.ifPresent(v -> {
                 outputBuilder.value(new Value.Builder().objNullFn(mapObj(v, f -> mapFn(f))).build());
             });
-            top.pStrFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrFn(mapPStr(v, f -> mapFn(f))).build());
-            });
-            top.pStrNullFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullFn(mapPStr(v, f -> mapFn(f))).build());
-            });
-            top.pUnionFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionFn(mapPUnion(v, f -> mapFn(f))).build());
-            });
-            top.pUnionNullFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullFn(mapPUnion(v, f -> mapFn(f))).build());
-            });
-            top.arrPStrFn.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrPStrFn(mapArr(v, p -> mapPStr(p, f -> mapFn(f)))).build());
-            });
-            top.arrP2StrFn.ifPresent(v -> {
-                outputBuilder
-                        .value(new Value.Builder().arrP2StrFn(mapArr(v, p2 -> mapP2Str(p2, f -> mapFn(f)))).build());
-            });
-            top.p2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().p2Str(mapP2Str(v)).build());
-            });
-            top.nullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullP2Str(mapP2Str(v)).build());
-            });
-            top.arrP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2Str(mapArr(v, p -> mapP2Str(p))).build());
-            });
-            top.arrNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullP2Str(mapArr(v, p -> mapP2Str(p))).build());
-            });
-            top.objP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objP2Str(mapObj(v, p -> mapP2Str(p))).build());
-            });
-            top.objNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullP2Str(mapObj(v, p -> mapP2Str(p))).build());
-            });
-            top.pStrP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrP2Str(mapPStr(v, p -> mapP2Str(p))).build());
-            });
-            top.pStrNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullP2Str(mapPStr(v, p -> mapP2Str(p))).build());
-            });
-            top.pUnionP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionP2Str(mapPUnion(v, p -> mapP2Str(p))).build());
-            });
-            top.pUnionNullP2Str.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullP2Str(mapPUnion(v, p -> mapP2Str(p))).build());
-            });
-            top.arrPStrP2Str.ifPresent(v -> {
-                outputBuilder.value(
-                        new Value.Builder().arrPStrP2Str(mapArr(v, p -> mapPStr(p, p2 -> mapP2Str(p2)))).build());
-            });
-            top.arrP2StrP2Str.ifPresent(v -> {
-                outputBuilder.value(
-                        new Value.Builder().arrP2StrP2Str(mapArr(v, p2 -> mapP2Str(p2, p22 -> mapP2Str(p22)))).build());
-            });
-            top.p2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().p2Union(mapP2Union(v)).build());
-            });
-            top.nullP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().nullP2Union(mapP2Union(v)).build());
-            });
-            top.arrP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrP2Union(mapArr(v, p -> mapP2Union(p))).build());
-            });
-
-            top.arrNullP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().arrNullP2Union(mapArr(v, p -> mapP2Union(p))).build());
-            });
-            top.objP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objP2Union(mapObj(v, p -> mapP2Union(p))).build());
-            });
-            top.objNullP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().objNullP2Union(mapObj(v, p -> mapP2Union(p))).build());
-            });
-            top.pStrP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrP2Union(mapPStr(v, p -> mapP2Union(p))).build());
-            });
-            top.pStrNullP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pStrNullP2Union(mapPStr(v, p -> mapP2Union(p))).build());
-            });
-            top.pUnionP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionP2Union(mapPUnion(v, p -> mapP2Union(p))).build());
-            });
-            top.pUnionNullP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder().pUnionNullP2Union(mapPUnion(v, p -> mapP2Union(p))).build());
-            });
-            top.arrPStrP2Union.ifPresent(v -> {
-                outputBuilder.value(
-                        new Value.Builder().arrPStrP2Union(mapArr(v, p -> mapPStr(p, p2 -> mapP2Union(p2)))).build());
-            });
-            top.arrP2StrP2Union.ifPresent(v -> {
-                outputBuilder.value(new Value.Builder()
-                        .arrP2StrP2Union(mapArr(v, p2 -> mapP2Str(p2, p22 -> mapP2Union(p22)))).build());
-            });
-            top.pdStr.ifPresent(v -> {
-                PdStr<PStr<Boolean>> pdStr = new PdStr.Builder<PStr<Boolean>>().dwrap(v.dwrap).build();
-                outputBuilder.value(new Value.Builder().pdStr(pdStr).build());
-            });
-
         });
 
         return outputBuilder.build();
-    }
-
-    private static <T> PStr<T> mapPStr(PStr<T> s) {
-        if (s == null) {
-            return null;
-        }
-        return new PStr.Builder<T>().wrap(s.wrap).build();
-    }
-
-    private static <T> PStr<T> mapPStr(PStr<T> s, Function<T, T> mapper) {
-        if (s == null) {
-            return null;
-        }
-        return new PStr.Builder<T>().wrap(mapper.apply(s.wrap)).build();
-    }
-
-    private static <T, U> P2Str<T, U> mapP2Str(P2Str<T, U> s) {
-        if (s == null) {
-            return null;
-        }
-        return new P2Str.Builder<T, U>().wrap(s.wrap).nest(s.nest).build();
-    }
-
-    private static <T, U> P2Str<T, U> mapP2Str(P2Str<T, U> s, Function<U, U> mapper) {
-        if (s == null) {
-            return null;
-        }
-        return new P2Str.Builder<T, U>().wrap(s.wrap).nest(s.nest).build();
-    }
-
-    private static <T> PUnion<T> mapPUnion(PUnion<T> u) {
-        if (u == null) {
-            return null;
-        }
-        return switch (u) {
-            case PUnion.NoMatch_<T> v -> new PUnion.NoMatch_<T>(new PUnion.NoMatch_.Builder<>());
-            case PUnion.One<T> v -> new PUnion.One.Builder<T>().build();
-            case PUnion.Two<T> v -> new PUnion.Two.Builder<T>().ewrap(v.ewrap).build();
-        };
-    }
-
-    private static <T> PUnion<T> mapPUnion(PUnion<T> u, Function<T, T> mapper) {
-        if (u == null) {
-            return null;
-        }
-        return switch (u) {
-            case PUnion.NoMatch_<T> v -> new PUnion.NoMatch_<T>(new PUnion.NoMatch_.Builder<>());
-            case PUnion.One<T> v -> new PUnion.One.Builder<T>().build();
-            case PUnion.Two<T> v -> new PUnion.Two.Builder<T>().ewrap(mapper.apply(v.ewrap)).build();
-        };
-    }
-
-    private static <T> List<PStr<T>> mapArrPStr(List<PStr<T>> l) {
-        if (l == null) {
-            return null;
-        }
-        return l.stream().map(v -> mapPStr(v)).toList();
-    }
-
-    private static <T> List<P2Str<Boolean, T>> mapArrP2Str(List<P2Str<Boolean, T>> l) {
-        if (l == null) {
-            return null;
-        }
-        return l.stream().map(v -> mapP2Str(v)).toList();
     }
 
     private static ExStruct mapStruct(ExStruct s) {
@@ -602,17 +271,6 @@ public class CodeGenHandler extends ServerHandler_ {
             Map<String, T> r = new HashMap<>();
             return r;
         }, (m2, e) -> m2.put(e.getKey(), mapper.apply(e.getValue())), Map::putAll);
-    }
-
-    private static <T, U> P2Union<T, U> mapP2Union(P2Union<T, U> u) {
-        if (u == null) {
-            return null;
-        }
-        return switch (u) {
-            case P2Union.NoMatch_<T, U> v -> new P2Union.NoMatch_.Builder<T, U>().build();
-            case P2Union.One<T, U> v -> new P2Union.One.Builder<T, U>().build();
-            case P2Union.Two<T, U> v -> new P2Union.Two.Builder<T, U>().ewrap(v.ewrap).enest(v.enest).build();
-        };
     }
 
     @Override
