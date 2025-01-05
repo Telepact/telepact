@@ -1,0 +1,28 @@
+from uapi import Message;
+
+class ServerHandler_:
+
+    {%- for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> {{ function_name }}.Output:
+        raise NotImplementedError()
+    {%- endfor %}
+
+    def handler(self, message: Message) -> Message:
+        var functionName = message.body.keySet().stream().findAny().get();
+        function_name = next(iter(message.body.keys()))
+
+        {%- for fn in functions %}
+        {%- set function_name = fn | replace('fn.', '') %}
+        {% if loop.first %}
+        if function_name == "{{ fn }}":
+            output = self.{{ function_name }}(message.header, {{ function_name }}.Input(message.body))
+            return Message({}, output.to_pseudo_json())
+        {% else %}
+        elif function_name == "{{ fn }}":
+            output = self.{{ function_name }}(message.header, {{ function_name }}.Input(message.body))
+            return Message({}, output.to_pseudo_json())
+        {% endif %}
+        {%- endfor %}
+
+        raise Exception("Unknown function: " + function_name)

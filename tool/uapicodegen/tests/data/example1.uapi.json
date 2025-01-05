@@ -12,7 +12,9 @@
             "field4": ["any"],
             "field5": ["union.Un1"],
             "field6": ["fn.test"],
-            "build": ["array", ["integer"]]
+            "build": ["array", ["integer"]],
+            "field7!": ["union.Un1"],
+            "field8!": ["struct.Example6"]
         }
     },
     {

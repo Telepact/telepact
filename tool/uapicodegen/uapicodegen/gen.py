@@ -221,3 +221,97 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
         else:
             print(util_output)
+
+    elif 'py':
+
+        functions = []
+
+        schema_entries: list[dict[str, object]] = []
+        for schema_entry in schema_data:
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
+                continue
+
+            if schema_key.startswith("fn"):
+                functions.append(schema_key)
+
+            schema_entries.append(schema_entry)
+
+        type_template = template_env.get_template(
+            'py_type.j2')  # Specify your template file name
+
+        output = type_template.render({
+            'input': schema_entries
+        })
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Use the / operator provided by pathlib to concatenate paths
+            file_name = schema_key.split('.')[1]
+
+            file_path = output_path / f"types_.py"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(output)
+
+        else:
+            print(output)
+
+        server_template = template_env.get_template(
+            'py_server.j2')
+
+        server_output = server_template.render(
+            {'package': java_package, 'functions': functions})
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Use the / operator provided by pathlib to concatenate paths
+            file_name = schema_key.split('.')[1]
+
+            file_path = output_path / f"ServerHandler_.py"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(server_output)
+
+        else:
+            print(server_output)
+
+        client_template = template_env.get_template(
+            'py_client.j2')
+
+        client_output = client_template.render(
+            {'package': java_package, 'functions': functions})
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            # Use the / operator provided by pathlib to concatenate paths
+            file_name = schema_key.split('.')[1]
+
+            file_path = output_path / f"ClientInterface_.py"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(client_output)
+
+        else:
+            print(client_output)

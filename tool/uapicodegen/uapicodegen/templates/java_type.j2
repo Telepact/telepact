@@ -48,17 +48,9 @@ import java.util.function.Function;
     {%- elif typ == 'any' -%}
         ({{- 'Object' -}}) {{ caller() }}
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
-        Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ translate(t) }}((Map<String, Object>) d{{ depth }}
-            {%- for t2 in t[1:] -%}
-                , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
-            {%- endfor -%}
-            ))
+        Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(typ) }}((Map<String, Object>) d{{ depth }}))
     {%- elif typ.startswith('union') -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : {{ to_java_type(t[0]) }}.fromPsuedoJson((Map<String, Object>) d{{depth}}
-            {%- for t2 in t[1:] -%}
-                , t{{ depth }} -> {% call marshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}
-            {%- endfor -%}
-            ))
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : {{ to_java_type(typ) }}.fromPseudoJson((Map<String, Object>) d{{depth}}))
     {%- else -%}
         {{- ('Unknown type: ' + typ) | raise_error -}}
     {%- endif -%}
@@ -81,11 +73,7 @@ import java.util.function.Function;
     {%- elif typ == 'any' -%}
         {{ caller() }}
     {%- else -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.toPseudoJson(
-            {%- for t2 in t[1:] -%}
-                t{{ depth }} -> {% call unmarshall_java_type(t2, depth + 1) -%}t{{ depth }}{% endcall %}{% if not loop.last %}, {% endif %}
-            {%- endfor -%}
-            ))
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.toPseudoJson())
     {%- endif -%}
 {%- endmacro -%}
 
@@ -226,7 +214,7 @@ public sealed interface {{ java_name }} {
         {{ struct(case_entry, case_key, None, 'final ', java_name, case_key) | indent }}
     {%- endfor %}
 
-    public static {{ java_name }} fromPsuedoJson(Map<String, Object> map) {
+    public static {{ java_name }} fromPseudoJson(Map<String, Object> map) {
         var entry = map.entrySet().stream().findAny().get();
         var caseName = entry.getKey();
         var payload = (Map<String, Object>) entry.getValue();        

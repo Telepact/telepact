@@ -1,0 +1,19 @@
+package {{ package }};
+
+import uapi.Message;
+import uapi.Client;
+import java.util.Map;
+
+class ClientInterface_:
+
+    client: Client;
+
+    def __init__(self, client: Client):
+        this.client = client
+
+    {%- for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> {{ function_name }}.Output:
+        message = self.client.request(Message(headers, input.to_pseudo_json()))
+        return {{ function_name }}.Output.from_pseudo_json(message.body)
+    {%- endfor %}
