@@ -119,6 +119,7 @@ class Undefined:
 
 {%- macro translate(type, optional) -%}
     {{- to_py_type(type[0]) -}}
+    {%- set nullable = '?' in type[0] %}
     {%- set typ = type[0] | replace('?', '') -%}
     {%- if type | length > 1 -%}
         {{- '[' -}}
@@ -130,13 +131,14 @@ class Undefined:
         {%- endfor -%}
         {{- ']' -}}
     {%- endif -%}
+    {%- if nullable %} | None{%- endif %}
     {%- if optional %} | Undefined{%- endif %}
 {%- endmacro -%}
 
 {%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, fn, typ_pref) %}
     {%- set fields = data[schema_key] %}
     {%- set py_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
-    {%- set type_str = type_pref + py_name if type_pref else py_name %}
+    {%- set type_str = typ_pref + py_name if typ_pref else py_name %}
     {{ docstring(data) }}
 @dataclass
 class {{ py_name }}{% if implements %}({{ implements }}){% endif %}:
@@ -184,17 +186,17 @@ class {{ py_name }}{% if implements %}({{ implements }}){% endif %}:
     {%- set typ_pref = fn + '.Output.' if fn else py_name + '.'%}
     {{ docstring(data) }}
 class {{ py_name }}:
-    {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', super_class, 'NoMatch_', fn, typ_pref) | indent }}
+    {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', py_name, 'NoMatch_', fn, typ_pref) | indent }}
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}
-        {{ struct(case_entry, case_key, None, 'final ', super_class, case_key, fn, typ_pref) | indent }}
+        {{ struct(case_entry, case_key, None, 'final ', py_name, case_key, fn, typ_pref) | indent }}
     {%- endfor %}
 
     {%- set final_fn = fn + '.' if fn else '' %}
 
     @staticmethod
-    def from_pseudo_json(map_: dict[str, object]) -> {{ final_fn + py_name }}:
+    def from_pseudo_json(map_: dict[str, object]) -> '{{ final_fn + py_name }}':
         entry = next(iter(map_.items()))
         case_name = entry[0]
         payload = entry[1]
@@ -208,8 +210,8 @@ class {{ py_name }}:
         else:
             return {{ final_fn + py_name }}.NoMatch_(payload)
     
-    def to_pseudo_json(self):
-        pass
+    def to_pseudo_json(self) -> dict[str, object]:
+        raise NotImplementedError()
 
 {%- endmacro %}
 
@@ -224,16 +226,6 @@ class {{ py_name }}:
 
     {{ union (data, '->', py_name) | indent }}
 {%- endmacro %}
-
-{%- for schema_entry in input %}
-    {%- set schema_key = schema_entry | find_schema_key %}
-    {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
-    {%- if schema_key.startswith('union') %}
-{{- py_name }}_type_ = ForwardRef('{{ py_name }}')
-    {%- elif schema_key.startswith('fn') %}
-{{- py_name }}_output_type_ = ForwardRef('{{ py_name }}.Output')
-    {%- endif %}
-{% endfor %}
 
 {%- for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
