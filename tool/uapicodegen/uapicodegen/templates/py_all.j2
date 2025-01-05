@@ -216,7 +216,7 @@ class {{ py_name }}:
 
 {{ py_name | indent(0) }}.NoMatch_ = type('{{ py_name }}.NoMatch_', ({{ py_name }}, {{ py_name }}.NoMatch_), {{ py_name }}.NoMatch_.__dict__.copy()) # type: ignore
 {%- for case_entry in cases %}
-{% set case_key = case_entry | find_case_key %}
+{% set case_key = case_entry | find_case_key -%}
 {{- py_name | indent(0) }}.{{ case_key }} = type('{{ py_name }}.{{ case_key }}', ({{ py_name }}, {{ py_name }}.{{ case_key }}), {{ py_name }}.{{ case_key }}.__dict__.copy()) # type: ignore
 {%- endfor %}
 {%- endmacro %}
