@@ -231,7 +231,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     alternate_u_api = UApiSchema.from_file_json_map(alternate_map)
 
     timers = Summary(frontdoor_topic.replace(
-        '.', '_').replace('-', '_'), '', registry=metrics)
+        '.', '_').replace('-', '_') + '' if not use_codegen else '_codegen', '', registry=metrics)
 
     serve_alternate_server = False
 

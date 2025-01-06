@@ -8,13 +8,13 @@ from copy import deepcopy as dc
 def client_server_codegen_proc(loop, nats_client, dispatcher_server):
     lib_name = dispatcher_server
 
-    init_topics = ['client-frontdoor',
-                   'client-backdoor', 'frontdoor', 'backdoor']
+    init_topics = ['codegen-client-frontdoor',
+                   'codegen-client-backdoor', 'codegen-frontdoor', 'codegen-backdoor']
     topics = tuple('{}.{}.{}'.format(lib_name, 'client-server', t)
                    for t in init_topics)
 
-    cserver_id = '{}.{}'.format(lib_name, 'client-server-client')
-    server_id = '{}.{}'.format(lib_name, 'client-server-server')
+    cserver_id = '{}.{}'.format(lib_name, 'codegen-client-server-client')
+    server_id = '{}.{}'.format(lib_name, 'codegen-client-server-server')
 
     async def t():
         req = json.dumps([{}, {'StartServer': {'id': server_id, 'apiSchemaPath': c.example_api_path,
