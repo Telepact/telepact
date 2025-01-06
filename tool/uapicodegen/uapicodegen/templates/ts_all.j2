@@ -1,0 +1,288 @@
+function utilLet<T, U>(value: T, f: (value: T) => U): U {
+    return f(value);
+}
+
+class Undefined {
+}
+
+
+{%- macro to_ts_type(t) %}
+    {%- set typ = t | replace('?', '') %}
+    {%- if typ == 'array' %}
+        {{- 'Array' -}}
+    {%- elif typ == 'object' %}
+        {{- 'Record<string, any>' -}}
+    {%- elif typ == 'boolean' %}
+        {{- 'boolean' -}}
+    {%- elif typ == 'integer' %}
+        {{- 'number' -}}
+    {%- elif typ == 'number' %}
+        {{- 'number' -}}
+    {%- elif typ == 'string' %}
+        {{- 'string' -}}
+    {%- elif typ == 'any' %}
+        {{- 'any' -}}
+    {%- elif typ.startswith('fn.') -%}
+        {{ typ | regex_replace('^.*\\.', '') -}}Input
+    {%- else -%}
+        {{ typ | regex_replace('^.*\\.', '') -}}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro marshall_ts_type(t, depth) -%}
+    {%- set nullable = '?' in t[0] %}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        utilLet({{ caller() }} as any[], d{{depth}} => {% if nullable %}d{{depth}} === null ? null : {% endif %}d{{depth}}.map(e{{ depth }} => {% call marshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))
+    {%- elif typ == 'object' -%}
+        utilLet({{ caller() }} as Record<string, any>, d{{depth}} => {% if nullable %}d{{depth}} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{depth}}).map(([k{{depth}}, v{{depth}}]) => [k{{depth}}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))
+    {%- elif typ == 'boolean' -%}
+        {{ caller() }} as boolean
+    {%- elif typ == 'integer' or typ == 'number' -%}
+        {{ caller() }} as number
+    {%- elif typ == 'string' -%}
+        {{ caller() }} as string
+    {%- elif typ == 'any' -%}
+        {{ caller() }} as any
+    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
+        utilLet({{ caller() }}, d{{ depth }} => {% if nullable %}d{{depth}} === null ? null : {% endif %}new {{ to_ts_type(typ) }}().fromPseudoJson(d{{ depth }} as Record<string, any>))
+    {%- elif typ.startswith('union') -%}
+        utilLet({{ caller() }}, d{{ depth }} => {% if nullable %}d{{depth}} === null ? null : {% endif %}{{ to_ts_type(typ) }}.fromPseudoJson(d{{depth}} as Record<string, any>))
+    {%- else -%}
+        {{- ('Unknown type: ' + typ) | raise_error -}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{# Keep going below. Copilot is actually doing alright in chunks. #}
+
+{%- macro unmarshall_py_type(t, depth) -%}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else [{% call unmarshall_py_type(t[1:][0], depth + 1 )%}e{{ depth }}{% endcall %} for e{{depth}} in d{{depth}}])
+    {%- elif typ == 'object' -%}
+        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else { k{{depth}}: {%- call unmarshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items()})
+    {%- elif typ == 'boolean' -%}
+        {{ caller() }}
+    {%- elif typ == 'integer' -%}
+        {{ caller() }}
+    {%- elif typ == 'number' -%}
+        {{ caller() }}
+    {%- elif typ == 'string' -%}
+        {{ caller() }}
+    {%- elif typ == 'any' -%}
+        {{ caller() }}
+    {%- else -%}
+        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else d{{depth}}.to_pseudo_json())
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro marshall_py_type_maybe_opt(field_name, field_type) -%}
+    {%- if '!' in field_name -%}
+        Undefined() if '{{- field_name }}' not in map_ else {% call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
+    {%- else %}
+        {%- call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro setter_maybe_opt(field_name) -%}
+    {{ caller() }}
+{%- endmacro -%}
+
+{%- macro docstring(data) -%}
+    {%- if '///' in data %}
+'''
+        {%- set doc = data['///'] -%}
+        {%- if doc is iterable and doc is not string -%}
+            {%- for line in doc %}
+ {{ line }}
+            {%- endfor %}
+        {%- else %}
+ {{ doc }}
+        {%- endif %}
+ '''
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro sanitize_field_name(field_name) -%}
+    {%- set sanitized_name =  field_name | replace('!', '') -%}
+    {%- set py_keywords = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
+    {%- if sanitized_name in py_keywords -%}
+        {{- sanitized_name + '_' -}}
+    {%- else -%}
+        {{- sanitized_name -}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro translate(type, optional) -%}
+    {{- to_py_type(type[0]) -}}
+    {%- set nullable = '?' in type[0] %}
+    {%- set typ = type[0] | replace('?', '') -%}
+    {%- if type | length > 1 -%}
+        {{- '[' -}}
+        {%- if typ == 'object' %}
+            {{- 'str, ' -}}
+        {%- endif %}
+        {%- for t in type[1:] -%}
+            {{- translate(t) -}}{{ ", " if not loop.last -}}
+        {%- endfor -%}
+        {{- ']' -}}
+    {%- endif -%}
+    {%- if nullable %} | None{%- endif %}
+    {%- if optional %} | Undefined{%- endif %}
+{%- endmacro -%}
+
+{%- macro case_type_display(type_display, case_key) %}
+    {{- type_display + ('_' if type_display.endswith('_') else '__') + case_key }}
+{%- endmacro %}
+
+{%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, fn, typ_pref, type_display) %}
+    {%- set fields = data[schema_key] %}
+    {%- set py_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
+    {%- set type_str = typ_pref + py_name if typ_pref else py_name %}
+@dataclass
+class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
+    {{ docstring(data) | indent }}
+
+    {%- for field_name, field_type in fields.items() %}
+    {{ sanitize_field_name(field_name) }}: '{{ translate(field_type, '!' in field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %} # type: ignore
+    {%- endfor %}
+
+    @classmethod
+    def from_pseudo_json(cls, map_{% if fn %}init{% endif %}: dict[str, object]) -> '{{ type_display }}':
+        {%- if fn %}
+        map_ = cast(dict[str, object], map_init["{{ unionCase }}"])
+        {%- endif %}
+        return cls(
+            {%- for field_name, field_type in fields.items() %}
+            {{ sanitize_field_name(field_name) }} = {{ marshall_py_type_maybe_opt(field_name, field_type) }},
+            {%- endfor %}
+        )
+
+    def to_pseudo_json(self) -> dict[str, object]:
+        fields: dict[str, object] = {}
+        {%- for field_name, field_type in fields.items() %}
+            {%- if '!' in field_name %}
+        if not isinstance(self.{{ sanitize_field_name(field_name) }}, Undefined):
+            fields["{{ field_name }}"] =  {% call unmarshall_py_type(field_type, 0) %}self.{{ sanitize_field_name(field_name) }}{% endcall %}
+            {%- else %}
+        fields["{{ field_name }}"] =  {% call unmarshall_py_type(field_type, 0) %}self.{{ sanitize_field_name(field_name) }}{% endcall %}
+            {%- endif %}
+        {%- endfor %}
+        {%- if unionCase %}
+        return {
+            "{{ unionCase }}": fields
+        }
+        {%- else %}
+        return fields
+        {%- endif %}
+{%- endmacro %}
+
+{%- macro union(data, schema_key, fn, type_display) %}
+    {%- set cases = data[schema_key] %}
+    {%- if schema_key == '->' %}
+        {%- set schema_key = 'Output' %}
+    {%- endif %}
+    {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- set super_class = fn + '_output_type_' if fn else py_name + '_type_' %}
+    {%- set typ_pref = fn + '__Output__' if fn else py_name + '__'%}
+    {%- set type_str = typ_pref + py_name %}
+
+class {{ type_display }}(ABC):
+    {{ docstring(data) | indent }}
+
+    {%- set final_fn = fn + '.' if fn else '' %}
+
+    @staticmethod
+    def from_pseudo_json(map_: dict[str, object]) -> '{{ type_display }}':
+        entry = next(iter(map_.items()))
+        case_name = entry[0]
+        payload = cast(dict[str, object], entry[1])
+        if case_name == "NoMatch_":
+            return cast({{ type_display }}, {{ case_type_display(type_display, 'NoMatch_') }}.from_pseudo_json(payload))
+        {%- for case_entry in cases %}
+            {% set case_key = case_entry | find_case_key %}
+        elif case_name == "{{ case_key }}":
+            return cast({{ type_display }}, {{ case_type_display(type_display, case_key) }}.from_pseudo_json(payload))
+        {%- endfor %}
+        else:
+            return cast({{ type_display }}, {{ case_type_display(type_display, 'NoMatch_') }}.from_pseudo_json(payload))
+    
+    @abstractmethod
+    def to_pseudo_json(self) -> dict[str, object]:
+        raise NotImplementedError()
+
+{{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', type_display, 'NoMatch_', fn, typ_pref, case_type_display(type_display, 'NoMatch_'))}}
+
+{%- for case_entry in cases %}
+    {% set case_key = case_entry | find_case_key %}
+    {% set case_type_display_res = case_type_display(type_display, case_key) %}
+    {{ struct(case_entry, case_key, None, 'final ', type_display, case_key, fn, typ_pref, case_type_display_res) }}
+{%- endfor %}
+{%- endmacro %}
+
+{%- macro function(data, schema_key, type_display) %}
+    {%- set fields = data[schema_key] %}
+    {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
+    {% do data.pop('///', None) %}
+
+    {{ struct(data, schema_key, 'Input', 'static ', None, schema_key, py_name, py_name + '.', type_display + '__Input_') }}
+
+    {{ union (data, '->', py_name, py_name + '__Output_')}}
+{%- endmacro %}
+
+{%- for schema_entry in input %}
+    {%- set schema_key = schema_entry | find_schema_key %}
+
+    {% set py_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- if schema_key.startswith('struct') %}
+        {{- struct(schema_entry, schema_key, None, "", None, None, None, None, py_name) }}
+    {%- elif schema_key.startswith('union') %}
+        {{- union(schema_entry, schema_key, None, py_name) }}
+    {%- elif schema_key.startswith('fn') %}
+        {{ function(schema_entry, schema_key, py_name) }}
+    {%- endif %}
+{% endfor %}
+
+import uapi.Message
+import uapi.Client
+
+class ClientInterface_:
+
+    client: uapi.Client.Client
+
+    def __init__(self, client: uapi.Client.Client):
+        self.client = client
+
+    {% for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
+        message = self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
+        return {{ function_name }}__Output_.from_pseudo_json(message.body)
+    {%- endfor %}
+
+
+class ServerHandler_:
+
+    {%- for fn in functions %}
+    {%- set function_name = fn | replace('fn.', '') %}
+    def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
+        raise NotImplementedError()
+    {%- endfor %}
+
+    def handler(self, message: uapi.Message.Message) -> uapi.Message.Message:
+        function_name = next(iter(message.body.keys()))
+
+        {%- for fn in functions %}
+        {%- set function_name = fn | replace('fn.', '') %}
+        {% if loop.first %}
+        if function_name == "{{ fn }}":
+            output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
+            return uapi.Message.Message({}, output.to_pseudo_json())
+        {% else %}
+        elif function_name == "{{ fn }}":
+            output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
+            return uapi.Message.Message({}, output.to_pseudo_json())
+        {% endif %}
+        {%- endfor %}
+
+        raise Exception("Unknown function: " + function_name)
