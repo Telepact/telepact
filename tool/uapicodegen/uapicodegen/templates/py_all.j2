@@ -252,13 +252,14 @@ class {{ type_display }}(ABC):
     {%- endif %}
 {% endfor %}
 
-import uapi
+import uapi.Message
+import uapi.Client
 
 class ClientInterface_:
 
-    client: Client
+    client: uapi.Client.Client
 
-    def __init__(self, client: Client):
+    def __init__(self, client: uapi.Client.Client):
         self.client = client
 
     {% for fn in functions %}
