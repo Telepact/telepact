@@ -262,5 +262,10 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
             with file_path.open("w") as f:
                 f.write(output)
 
+            init_file_path = output_path / f"__init__.py"
+
+            with init_file_path.open("w") as f:
+                f.write('')
+
         else:
             print(output)
