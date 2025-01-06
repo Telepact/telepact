@@ -2,6 +2,7 @@ import keyword
 from typing import Callable, TypeVar
 from dataclasses import dataclass
 from typing import cast, ForwardRef
+from abc import ABC, abstractmethod
 
 
 T = TypeVar('T')
@@ -195,7 +196,7 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
     {%- set typ_pref = fn + '__Output__' if fn else py_name + '__'%}
     {%- set type_str = typ_pref + py_name %}
 
-class {{ type_display }}:
+class {{ type_display }}(ABC):
     {{ docstring(data) | indent }}
 
     {%- set final_fn = fn + '.' if fn else '' %}
@@ -215,6 +216,7 @@ class {{ type_display }}:
         else:
             return cast({{ type_display }}, {{ case_type_display(type_display, 'NoMatch_') }}.from_pseudo_json(payload))
     
+    @abstractmethod
     def to_pseudo_json(self) -> dict[str, object]:
         raise NotImplementedError()
 
@@ -250,8 +252,7 @@ class {{ type_display }}:
     {%- endif %}
 {% endfor %}
 
-
-from uapi import Message, Client
+import uapi
 
 class ClientInterface_:
 
@@ -263,7 +264,7 @@ class ClientInterface_:
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
-        message = self.client.request(Message(headers, input.to_pseudo_json()))
+        message = self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
         return {{ function_name }}__Output_.from_pseudo_json(message.body)
     {%- endfor %}
 
@@ -276,7 +277,7 @@ class ServerHandler_:
         raise NotImplementedError()
     {%- endfor %}
 
-    def handler(self, message: Message) -> Message:
+    def handler(self, message: uapi.Message.Message) -> uapi.Message.Message:
         function_name = next(iter(message.body.keys()))
 
         {%- for fn in functions %}
@@ -284,11 +285,11 @@ class ServerHandler_:
         {% if loop.first %}
         if function_name == "{{ fn }}":
             output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
-            return Message({}, output.to_pseudo_json())
+            return uapi.Message.Message({}, output.to_pseudo_json())
         {% else %}
         elif function_name == "{{ fn }}":
             output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
-            return Message({}, output.to_pseudo_json())
+            return uapi.Message.Message({}, output.to_pseudo_json())
         {% endif %}
         {%- endfor %}
 

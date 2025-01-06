@@ -1,17 +1,15 @@
 import json
 from typing import Any, Dict, List, Optional, TypeVar, Callable
-from uapitest.gen.all_ import example as fn_example, test, Value, ExStruct, ExUnion, ServerHandler_, getBigList, Undefined
+from uapitest.gen.all_ import example__Input_, example__Output_, test__Input_, test__Output_, test__Output__Ok_, Value, ServerHandler_, getBigList__Input_, getBigList__Output_, Undefined, ExUnion__NoMatch_, ExUnion__One, ExUnion__Two, ExUnion, ExStruct
 
 
 class CodeGenHandler(ServerHandler_):
 
-    def example(self, headers: dict[str, object], input: fn_example.Input) -> fn_example.Output:
+    def example(self, headers: dict[str, object], input: example__Input_) -> example__Output_:
         raise NotImplementedError("Unimplemented method 'example'")
 
-    def test(self, headers: dict[str, object], input: test.Input) -> test.Output:
-        output = test.Output.Ok_()
-
-        a: bool = 'a'
+    def test(self, headers: dict[str, object], input: test__Input_) -> test__Output_:
+        output = test__Output__Ok_()
 
         try:
             print("input: " + json.dumps(input.to_pseudo_json()))
@@ -163,45 +161,46 @@ class CodeGenHandler(ServerHandler_):
         b = ExStruct(
             required=s.required
         )
-        if s.optional:
+        if not isinstance(s.optional, Undefined):
             b.optional = s.optional
-        if s.optional2:
+        if not isinstance(s.optional2, Undefined):
             b.optional2 = s.optional2
         return b
 
     def map_union(self, u: ExUnion) -> ExUnion:
         if u is None:
             return None
-        if isinstance(u, ExUnion.NoMatch_):
-            return ExUnion.NoMatch_(ExUnion.NoMatch_())
-        elif isinstance(u, ExUnion.One):
-            return ExUnion.One()
-        elif isinstance(u, ExUnion.Two):
-            b = ExUnion.Two()
-            b.required = u.required
-            if u.optional:
+        if isinstance(u, ExUnion__NoMatch_):
+            return ExUnion__NoMatch_()
+        elif isinstance(u, ExUnion__One):
+            return ExUnion__One()
+        elif isinstance(u, ExUnion__Two):
+            b = ExUnion__Two(
+                required=u.required
+            )
+            if not isinstance(u.optional, Undefined):
                 b.optional = u.optional
             return b
 
-    def map_fn(self, f: fn_example.Input) -> fn_example.Input:
+    def map_fn(self, f: example__Input_) -> example__Input_:
         if f is None:
             return None
-        b = fn_example.Input(required=f.required)
-        if f.optional:
+        b = example__Input_(required=f.required)
+        if not isinstance(f.optional, Undefined):
             b.optional = f.optional
         return b
 
     T = TypeVar('T')
 
-    def map_arr(l: list[T], mapper: Callable[[T], T]) -> list[T]:
+    def map_arr(self, l: list[T], mapper: Callable[[T], T]) -> list[T]:
         if l is None:
             return None
         return [mapper(e) for e in l]
 
-    def map_obj(m: dict[str, T], mapper: Callable[[T], T]) -> dict[str, T]:
+    def map_obj(self, m: dict[str, T], mapper: Callable[[T], T]) -> dict[str, T]:
         if m is None:
             return None
         return {k: mapper(v) for k, v in m.items()}
 
-    def get_big_list(self, headers: dict[str, object], input: getBigList.Input) -> getBigList.Output:
+    def get_big_list(self, headers: dict[str, object], input: getBigList__Input_) -> getBigList__Output_:
         raise NotImplementedError("Unimplemented method 'getBigList'")
