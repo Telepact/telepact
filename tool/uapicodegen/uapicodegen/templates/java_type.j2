@@ -4,29 +4,27 @@ import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.stream.Collectors;
-import java.util.function.Function;
 
 
-{%- macro to_java_type(t) %}
-    {%- set typ = t | replace('?', '') %}
-    {%- if typ == 'array' %}
-        {{- 'List' -}}
-    {%- elif typ == 'object' %}
-        {{- 'Map' -}}
-    {%- elif typ == 'boolean' %}
-        {{- 'Boolean' -}}
-    {%- elif typ == 'integer' %}
-        {{- 'Long' -}}
-    {%- elif typ == 'number' %}
-        {{- 'Number' -}}
-    {%- elif typ == 'string' %}
-        {{- 'String' -}}
-    {%- elif typ == 'any' %}
-        {{- 'Object' -}}
-    {%- elif typ.startswith('fn.') %}
+{%- macro to_java_type(t, wildcard) %}
+    {%- set typ = t[0] | replace('?', '') %}
+    {%- if typ == 'array' -%}
+        List<{% if wildcard %}?{% else %}{{ to_java_type(t[1:][0]) }}{% endif %}>
+    {%- elif typ == 'object' -%}
+        Map<String, {% if wildcard %}?{% else %}{{ to_java_type(t[1:][0]) }}{% endif %}>
+    {%- elif typ == 'boolean' -%}
+        Boolean
+    {%- elif typ == 'integer' -%}
+        Long
+    {%- elif typ == 'number' -%}
+        Number
+    {%- elif typ == 'string' -%}
+        String
+    {%- elif typ == 'any' -%}
+        Object
+    {%- elif typ.startswith('fn.') -%}
         {{- typ | regex_replace('^.*\\.', '') -}}.Input
-    {%- else %}
+    {%- else -%}
         {{- typ | regex_replace('^.*\\.', '') -}}
     {%- endif %}
 {%- endmacro -%}
@@ -34,25 +32,17 @@ import java.util.function.Function;
 {%- macro marshall_java_type(t, depth) -%}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : ((List<?>) d{{depth}}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).stream().map(e{{ depth }} -> {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
     {%- elif typ == 'object' -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : ((Map<String, ?>) d{{depth}}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ translate(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), ({{ translate(t[1]) }}) e.getValue()), Map::putAll))
-    {%- elif typ == 'boolean' -%}
-        ({{- 'Boolean' -}}) {{ caller() }}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : (({{ to_java_type(t, True) }}) d{{depth}}).entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call marshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(() -> { {{ to_java_type(t)}} m = new HashMap<>(); return m; }, (m, e) -> m.put(e.getKey(), ({{ to_java_type(t[1]) }}) e.getValue()), Map::putAll))
     {%- elif typ == 'integer' -%}
-        ({{- 'Long' -}}) Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
-    {%- elif typ == 'number' -%}
-        ({{- 'Number' -}}) {{ caller() }}
-    {%- elif typ == 'string' -%}
-        ({{- 'String' -}}) {{ caller() }}
-    {%- elif typ == 'any' -%}
-        ({{- 'Object' -}}) {{ caller() }}
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}} instanceof Integer ? ((Integer) d{{depth}}).longValue() : (Long) d{{depth}})
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
-        Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(typ) }}((Map<String, Object>) d{{ depth }}))
+        Utility_.let({{ caller() }}, d{{ depth }} -> d{{ depth }} == null ? null : new {{ to_java_type(t) }}((Map<String, Object>) d{{ depth }}))
     {%- elif typ.startswith('union') -%}
-        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : {{ to_java_type(typ) }}.fromPseudoJson((Map<String, Object>) d{{depth}}))
+        Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : {{ to_java_type(t) }}.fromPseudoJson((Map<String, Object>) d{{depth}}))
     {%- else -%}
-        {{- ('Unknown type: ' + typ) | raise_error -}}
+        ({{ to_java_type(t) }}) {{ caller() }}
     {%- endif -%}
 {%- endmacro -%}
 
@@ -62,23 +52,23 @@ import java.util.function.Function;
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.stream().map(e{{ depth }} -> {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}).toList())
     {%- elif typ == 'object' -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.entrySet().stream().map(e{{ depth }} -> new AbstractMap.SimpleEntry<>(e{{ depth }}.getKey(), {% call unmarshall_java_type(t[1:][0], depth + 1) %}e{{ depth }}.getValue(){% endcall %})).collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), Map::putAll))
-    {%- elif typ == 'boolean' -%}
-        {{ caller() }}
-    {%- elif typ == 'integer' -%}
-        {{ caller() }}
-    {%- elif typ == 'number' -%}
-        {{ caller() }}
-    {%- elif typ == 'string' -%}
-        {{ caller() }}
-    {%- elif typ == 'any' -%}
-        {{ caller() }}
-    {%- else -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
         Utility_.let({{ caller() }}, d{{depth}} -> d{{depth}} == null ? null : d{{depth}}.toPseudoJson())
+    {%- else -%}
+        {{ caller() }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro to_maybe_opt_java_type(type, field_name) -%}
+    {%- if '!' in field_name -%}
+        Optional_<{{ to_java_type(type) }}>
+    {%- else -%}
+        {{- to_java_type(type) -}}
     {%- endif -%}
 {%- endmacro -%}
 
 {%- macro marshall_java_type_maybe_opt(field_name, field_type) -%}
-    {%- if '!' in field_name %}map.containsKey("{{ field_name }}") ? new Optional_<{{ translate(field_type, False) }}>({% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}) : new Optional_<>(){% else %}{% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}{% endif -%}
+    {%- if '!' in field_name %}map.containsKey("{{ field_name }}") ? new Optional_<{{ to_java_type(field_type) }}>({% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}) : new Optional_<>(){% else %}{% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}{% endif -%}
 {%- endmacro -%}
 
 {%- macro setter_maybe_opt(field_name) -%}
@@ -110,34 +100,13 @@ import java.util.function.Function;
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro translate(type, optional) -%}
-    {%- if optional %}
-        {{- 'Optional_<' -}}
-    {%- endif %}
-    {{- to_java_type(type[0]) -}}
-    {%- set typ = type[0] | replace('?', '') -%}
-    {%- if type | length > 1 -%}
-        {{- '<' -}}
-        {%- if typ == 'object' %}
-            {{- 'String, ' -}}
-        {%- endif %}
-        {%- for t in type[1:] -%}
-            {{- translate(t) -}}{{ ", " if not loop.last -}}
-        {%- endfor -%}
-        {{- '>' -}}
-    {%- endif -%}
-    {%- if optional %}
-        {{- '>' -}}
-    {%- endif %}
-{%- endmacro -%}
-
 {%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, forFn) %}
     {%- set fields = data[schema_key] %}
     {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
     {{ docstring(data) }}
 public {{ modifier }}class {{ java_name }}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
-    public final {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name) }};
+    public final {{ to_maybe_opt_java_type(field_type, field_name) }} {{ sanitize_field_name(field_name) }};
     {%- endfor %}
 
     public {{ java_name }}(Builder b) {
@@ -178,14 +147,14 @@ public {{ modifier }}class {{ java_name }}{% if implements %} implements {{ impl
 
     public static class Builder {
         {%- for field_name, field_type in fields.items() %}
-        private {{ translate(field_type, '!' in field_name) }} {{ sanitize_field_name(field_name) }}{% if '!' in field_name %} = new Optional_<>(){% endif %};
+        private {{ to_maybe_opt_java_type(field_type, field_name) }} {{ sanitize_field_name(field_name) }}{% if '!' in field_name %} = new Optional_<>(){% endif %};
         {%- endfor %}
 
         public Builder() {
         }
 
         {%- for field_name, field_type in fields.items() %}
-        public Builder {{ sanitize_field_name(field_name) }}({{ translate(field_type, false) }} {{ sanitize_field_name(field_name) }}) {
+        public Builder {{ sanitize_field_name(field_name) }}({{ to_java_type(field_type) }} {{ sanitize_field_name(field_name) }}) {
             this.{{ sanitize_field_name(field_name) }} = {% call setter_maybe_opt(field_name) %}{{ sanitize_field_name(field_name) }}{% endcall %};
             return this;
         }

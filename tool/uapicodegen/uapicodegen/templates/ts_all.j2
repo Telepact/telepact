@@ -37,13 +37,13 @@ class Undefined {
     {%- elif typ == 'object' -%}
         utilLet({{ caller() }} as Record<string, any>, d{{depth}} => {% if nullable %}d{{depth}} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{depth}}).map(([k{{depth}}, v{{depth}}]) => [k{{depth}}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))
     {%- elif typ == 'boolean' -%}
-        {{ caller() }} as boolean
+        {{ caller() }} as boolean{% if nullable %} | null{% endif %}
     {%- elif typ == 'integer' or typ == 'number' -%}
-        {{ caller() }} as number
+        {{ caller() }} as number{% if nullable %} | null{% endif %}
     {%- elif typ == 'string' -%}
-        {{ caller() }} as string
+        {{ caller() }} as string{% if nullable %} | null{% endif %}
     {%- elif typ == 'any' -%}
-        {{ caller() }} as any
+        {{ caller() }} as any{% if nullable %} | null{% endif %}
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
         utilLet({{ caller() }}, d{{ depth }} => {% if nullable %}d{{depth}} === null ? null : {% endif %}new {{ to_ts_type(typ) }}().fromPseudoJson(d{{ depth }} as Record<string, any>))
     {%- elif typ.startswith('union') -%}
@@ -55,25 +55,27 @@ class Undefined {
 
 {# Keep going below. Copilot is actually doing alright in chunks. #}
 
-{%- macro unmarshall_py_type(t, depth) -%}
+{%- macro unmarshall_ts_type(t, depth) -%}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
-        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else [{% call unmarshall_py_type(t[1:][0], depth + 1 )%}e{{ depth }}{% endcall %} for e{{depth}} in d{{depth}}])
+        utilLet({{ caller() }}, d{{depth}} => d{{depth}} === null ? null : d{{depth}}.map(e{{ depth }} => {% call unmarshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))
     {%- elif typ == 'object' -%}
-        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else { k{{depth}}: {%- call unmarshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items()})
+        utilLet({{ caller() }}, d{{depth}} => d{{depth}} === null ? null : Object.fromEntries(Object.entries(d{{depth}}).map(([k{{depth}}, v{{depth}}]) => [k{{depth}}, {% call unmarshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))
     {%- elif typ == 'boolean' -%}
-        {{ caller() }}
-    {%- elif typ == 'integer' -%}
-        {{ caller() }}
-    {%- elif typ == 'number' -%}
-        {{ caller() }}
+        {{ caller() }} as boolean
+    {%- elif typ == 'integer' or typ == 'number' -%}
+        {{ caller() }} as number
     {%- elif typ == 'string' -%}
-        {{ caller() }}
+        {{ caller() }} as string
     {%- elif typ == 'any' -%}
-        {{ caller() }}
+        {{ caller() }} as any
+    {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
+        utilLet({{ caller() }}, d{{ depth }} => d{{depth}} === null ? null : new {{ to_ts_type(typ) }}().fromPseudoJson(d{{ depth }} as Record<string, any>))
+    {%- elif typ.startswith('union') -%}
+        utilLet({{ caller() }}, d{{ depth }} => d{{depth}} === null ? null : {{ to_ts_type(typ) }}.fromPseudoJson(d{{depth}} as Record<string, any>))
     {%- else -%}
-        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else d{{depth}}.to_pseudo_json())
-    {%- endif -%}
+        {{- ('Unknown type: ' + typ) | raise_error -}}
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro marshall_py_type_maybe_opt(field_name, field_type) -%}
