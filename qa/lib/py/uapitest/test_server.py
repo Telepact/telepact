@@ -33,6 +33,7 @@ import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from uapitest.code_gen_handler import CodeGenHandler
+from uapitest.gen.all_ import ClientInterface_, test__Input_
 
 
 def on_err(e):
@@ -42,7 +43,8 @@ def on_err(e):
 async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
                                    client_frontdoor_topic: str,
                                    client_backdoor_topic: str,
-                                   default_binary: bool) -> Subscription:
+                                   default_binary: bool,
+                                   use_codegen: bool) -> Subscription:
 
     timers = Summary(client_frontdoor_topic.replace(
         '.', '_').replace('-', '_'), '', registry=metrics)
@@ -77,6 +79,8 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
     options.use_binary = default_binary
     client = Client(adapter, options)
 
+    generated_client = ClientInterface_(client)
+
     async def message_handler(msg: Msg) -> None:
         request_bytes = msg.data
 
@@ -86,9 +90,14 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         request_pseudo_json = json.loads(request_bytes)
         request_headers, request_body = request_pseudo_json
 
+        function_name, argument = next(iter(request_body.items()))
+
         @timers.time()
         async def c() -> 'Message':
-            return await client.request(Message(request_headers, request_body))
+            if use_codegen and function_name == "test":
+                return await generated_client.test(request_headers, test__Input_(argument))
+            else:
+                return await client.request(Message(request_headers, request_body))
 
         response = await c()
 
@@ -384,8 +393,9 @@ async def run_dispatcher_server():
                 client_frontdoor_topic = payload["clientFrontdoorTopic"]
                 client_backdoor_topic = payload["clientBackdoorTopic"]
                 use_binary = payload.get("useBinary", False)
+                use_codegen = payload.get('useCodeGen', False)
                 server = await start_client_test_server(
-                    connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary)
+                    connection, metrics, client_frontdoor_topic, client_backdoor_topic, use_binary, use_codegen)
                 servers[server_id] = server
             elif target == "StartMockServer":
                 server_id = payload["id"]
