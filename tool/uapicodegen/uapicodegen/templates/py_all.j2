@@ -15,52 +15,44 @@ class Undefined:
     pass
 
 
-{%- macro to_py_type(t) %}
-    {%- set typ = t | replace('?', '') %}
-    {%- if typ == 'array' %}
-        {{- 'list' -}}
-    {%- elif typ == 'object' %}
-        {{- 'dict' -}}
-    {%- elif typ == 'boolean' %}
-        {{- 'bool' -}}
-    {%- elif typ == 'integer' %}
-        {{- 'int' -}}
-    {%- elif typ == 'number' %}
-        {{- 'float' -}}
-    {%- elif typ == 'string' %}
-        {{- 'str' -}}
-    {%- elif typ == 'any' %}
-        {{- 'object' -}}
+{%- macro to_py_type(t, append_nullable=True) %}
+    {%- set nullable = '?' in t[0] -%}
+    {%- set typ = t[0] | replace('?', '') -%}
+    {%- if typ == 'array' -%}
+        list[{{ to_py_type(t[1:][0]) }}]
+    {%- elif typ == 'object' -%}
+        dict[str, {{ to_py_type(t[1:][0]) }}]
+    {%- elif typ == 'boolean' -%}
+        bool
+    {%- elif typ == 'integer' -%}
+        int
+    {%- elif typ == 'number' -%}
+        float
+    {%- elif typ == 'string' -%}
+        str
+    {%- elif typ == 'any' -%}
+        object
     {%- elif typ.startswith('fn.') -%}
         {{ typ | regex_replace('^.*\\.', '') -}}__Input_
     {%- else -%}
         {{ typ | regex_replace('^.*\\.', '') -}}
-    {%- endif %}
+    {%- endif -%}
+    {%- if append_nullable and nullable %} | None{%- endif -%}
 {%- endmacro -%}
 
 {%- macro marshall_py_type(t, depth) -%}
     {%- set nullable = '?' in t[0] %}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
-        util_let(cast(list[object], {{ caller() }}), lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}[{% call marshall_py_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %} for e{{depth}} in d{{depth}}])
+        util_let(cast({{ to_py_type(t) }}, {{ caller() }}), lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}[{% call marshall_py_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %} for e{{depth}} in d{{depth}}])
     {%- elif typ == 'object' -%}
-        util_let(cast(dict[str, object], {{ caller() }}), lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}{ k{{depth}}: {%- call marshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items() })
-    {%- elif typ == 'boolean' -%}
-        cast(bool, {{ caller() }})
-    {%- elif typ == 'integer' -%}
-        cast(int, {{ caller()}})
-    {%- elif typ == 'number' -%}
-        cast(float, {{ caller() }})
-    {%- elif typ == 'string' -%}
-        cast(str, {{ caller() }})
-    {%- elif typ == 'any' -%}
-        cast(str, {{ caller() }})
+        util_let(cast({{ to_py_type(t) }}, {{ caller() }}), lambda d{{depth}}: {% if nullable %}None if d{{depth}} is None else {% endif %}{ k{{depth}}: {%- call marshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items() })
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
-        util_let({{ caller() }}, lambda d{{ depth }}: {% if nullable %}None if d{{depth}} is None else {% endif %}{{ to_py_type(typ) }}.from_pseudo_json(cast(dict[str, object], d{{ depth }})))
+        util_let({{ caller() }}, lambda d{{ depth }}: {% if nullable %}None if d{{depth}} is None else {% endif %}{{ to_py_type(t, False) }}.from_pseudo_json(cast(dict[str, object], d{{ depth }})))
     {%- elif typ.startswith('union') -%}
-        util_let({{ caller() }}, lambda d{{ depth }}: {% if nullable %}None if d{{depth}} is None else {% endif %}{{ to_py_type(typ) }}.from_pseudo_json(cast(dict[str, object], d{{depth}})))
+        util_let({{ caller() }}, lambda d{{ depth }}: {% if nullable %}None if d{{depth}} is None else {% endif %}{{ to_py_type(t, False) }}.from_pseudo_json(cast(dict[str, object], d{{depth}})))
     {%- else -%}
-        {{- ('Unknown type: ' + typ) | raise_error -}}
+        cast({{ to_py_type(t) }}, {{ caller() }})
     {%- endif -%}
 {%- endmacro -%}
 
@@ -70,19 +62,19 @@ class Undefined:
         util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else [{% call unmarshall_py_type(t[1:][0], depth + 1 )%}e{{ depth }}{% endcall %} for e{{depth}} in d{{depth}}])
     {%- elif typ == 'object' -%}
         util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else { k{{depth}}: {%- call unmarshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items()})
-    {%- elif typ == 'boolean' -%}
-        {{ caller() }}
-    {%- elif typ == 'integer' -%}
-        {{ caller() }}
-    {%- elif typ == 'number' -%}
-        {{ caller() }}
-    {%- elif typ == 'string' -%}
-        {{ caller() }}
-    {%- elif typ == 'any' -%}
-        {{ caller() }}
-    {%- else -%}
+    {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
         util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else d{{depth}}.to_pseudo_json())
+    {%- else -%}
+        {{ caller() }}
     {%- endif -%}
+{%- endmacro -%}
+
+{%- macro to_maybe_opt_py_type(type, field_name) -%}
+    {%- if '!' in field_name -%}
+        {{- to_py_type(type) }} | Undefined
+    {%- else %}
+        {{- to_py_type(type) }}
+    {%- endif %}
 {%- endmacro -%}
 
 {%- macro marshall_py_type_maybe_opt(field_name, field_type) -%}
@@ -103,12 +95,12 @@ class Undefined:
         {%- set doc = data['///'] -%}
         {%- if doc is iterable and doc is not string -%}
             {%- for line in doc %}
- {{ line }}
+{{ line }}
             {%- endfor %}
         {%- else %}
- {{ doc }}
+{{ doc }}
         {%- endif %}
- '''
+'''
     {%- endif %}
 {%- endmacro -%}
 
@@ -120,24 +112,6 @@ class Undefined:
     {%- else -%}
         {{- sanitized_name -}}
     {%- endif -%}
-{%- endmacro -%}
-
-{%- macro translate(type, optional) -%}
-    {{- to_py_type(type[0]) -}}
-    {%- set nullable = '?' in type[0] %}
-    {%- set typ = type[0] | replace('?', '') -%}
-    {%- if type | length > 1 -%}
-        {{- '[' -}}
-        {%- if typ == 'object' %}
-            {{- 'str, ' -}}
-        {%- endif %}
-        {%- for t in type[1:] -%}
-            {{- translate(t) -}}{{ ", " if not loop.last -}}
-        {%- endfor -%}
-        {{- ']' -}}
-    {%- endif -%}
-    {%- if nullable %} | None{%- endif %}
-    {%- if optional %} | Undefined{%- endif %}
 {%- endmacro -%}
 
 {%- macro case_type_display(type_display, case_key) %}
@@ -153,7 +127,7 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
     {{ docstring(data) | indent }}
 
     {%- for field_name, field_type in fields.items() %}
-    {{ sanitize_field_name(field_name) }}: '{{ translate(field_type, '!' in field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %} # type: ignore
+    {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %} # type: ignore
     {%- endfor %}
 
     @classmethod
