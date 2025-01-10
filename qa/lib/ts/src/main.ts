@@ -16,6 +16,7 @@ import {
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
+import { ClientInterface_, ServerHandler_, test__Input_ } from "./gen/all_";
 
 class Timer {
     public values: number[] = [];
@@ -67,6 +68,7 @@ function startClientTestServer(
     clientFrontdoorTopic: string,
     clientBackdoorTopic: string,
     defaultBinary: boolean,
+    useCodegen: boolean
 ): Subscription {
     const timer = registry.createTimer(clientBackdoorTopic);
 
@@ -102,6 +104,8 @@ function startClientTestServer(
     options.useBinary = defaultBinary;
     const client = new Client(adapter, options);
 
+    const genClient = new ClientInterface_(client); 
+
     const sub: Subscription = connection.subscribe(clientFrontdoorTopic);
 
     (async () => {
@@ -116,10 +120,17 @@ function startClientTestServer(
             const requestBody = requestPseudoJson[1] as Map<string, any>;
             const request = new Message(requestHeaders, requestBody);
 
+            const [functionName, argument] = Object.entries(requestBody)[0] as [string, any];
+
             let response: Message;
             const time = timer.startTimer();
             try {
-                response = await client.request(request);
+                if (useCodegen && functionName === "fn.test") {
+                    const output = await genClient.test(requestHeaders, new test__Input_(argument));
+                    response = new Message({'_codegen': true}, output);
+                } else {
+                    response = await client.request(request);
+                }
             } finally {
                 time();
             }
@@ -282,6 +293,7 @@ function startTestServer(
     frontdoorTopic: string,
     backdoorTopic: string,
     authRequired: boolean,
+    useCodegen: boolean
 ): Subscription {
     const m: Record<string, string> = getSchemaFileMap(apiSchemaPath);
     const alternateMap: Record<string, string> = { ...m };
@@ -299,6 +311,8 @@ function startTestServer(
     const timer = registry.createTimer(frontdoorTopic);
     const serveAlternateServer = { value: false };
 
+    const codeGenHandler = new ServerHandler_();
+
     class ThisError extends Error {}
 
     const handler = async (requestMessage: Message): Promise<Message> => {
@@ -308,25 +322,30 @@ function startTestServer(
         const requestJson = JSON.stringify(requestPseudoJson);
         const requestBytes = new TextEncoder().encode(requestJson);
 
-        console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
-        const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
+        if (useCodegen) {
+            console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
+            return codeGenHandler.handler(requestMessage);
+        } else {
+            console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
+            const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
 
-        console.log(`    ->s ${new TextDecoder().decode(natsResponseMessage.data)}`);
+            console.log(`    ->s ${new TextDecoder().decode(natsResponseMessage.data)}`);
 
-        const responseJson = new TextDecoder().decode(natsResponseMessage.data);
-        const responsePseudoJson = JSON.parse(responseJson);
-        const responseHeaders = responsePseudoJson[0] as { [key: string]: any };
-        const responseBody = responsePseudoJson[1] as { [key: string]: any };
+            const responseJson = new TextDecoder().decode(natsResponseMessage.data);
+            const responsePseudoJson = JSON.parse(responseJson);
+            const responseHeaders = responsePseudoJson[0] as { [key: string]: any };
+            const responseBody = responsePseudoJson[1] as { [key: string]: any };
 
-        if (requestHeaders["_toggleAlternateServer"] === true) {
-            serveAlternateServer.value = !serveAlternateServer.value;
+            if (requestHeaders["_toggleAlternateServer"] === true) {
+                serveAlternateServer.value = !serveAlternateServer.value;
+            }
+
+            if (requestHeaders["_throwError"] === true) {
+                throw new ThisError();
+            }
+
+            return new Message(responseHeaders, responseBody);
         }
-
-        if (requestHeaders["_throwError"] === true) {
-            throw new ThisError();
-        }
-
-        return new Message(responseHeaders, responseBody);
     };
 
     const options: ServerOptions = new ServerOptions();
@@ -440,6 +459,7 @@ async function runDispatcherServer(): Promise<void> {
                         const frontdoorTopic = payload["frontdoorTopic"] as string;
                         const backdoorTopic = payload["backdoorTopic"] as string;
                         const authRequired: boolean = payload["authRequired!"] ?? false;
+                        const useCodegen: boolean = payload["useCodeGen"] ?? false;
 
                         const d = startTestServer(
                             connection,
@@ -458,6 +478,7 @@ async function runDispatcherServer(): Promise<void> {
                         const clientFrontdoorTopic = payload["clientFrontdoorTopic"] as string;
                         const clientBackdoorTopic = payload["clientBackdoorTopic"] as string;
                         const useBinary = (payload["useBinary"] as boolean) ?? false;
+                        const useCodegen = (payload["useCodeGen"] as boolean) ?? false;
 
                         const d = startClientTestServer(
                             connection,
@@ -465,6 +486,7 @@ async function runDispatcherServer(): Promise<void> {
                             clientFrontdoorTopic,
                             clientBackdoorTopic,
                             useBinary,
+                            useCodegen
                         );
 
                         servers[id] = d;

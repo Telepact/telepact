@@ -109,7 +109,7 @@ function utilLet<T, U>(value: T, f: (value: T) => U): U {
     {%- set fields = data[schema_key] %}
     {%- set ts_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
     {%- set type_str = typ_pref + ts_name if typ_pref else ts_name %}
-class {{ type_display }}{% if implements %} implements {{ implements }}{% endif %} {
+export class {{ type_display }}{% if implements %} implements {{ implements }}{% endif %} {
     {{ docstring(data) | indent }}
 
     {%- for field_name, field_type in fields.items() %}
@@ -181,7 +181,7 @@ class {{ type_display }}{% if implements %} implements {{ implements }}{% endif 
     {%- set typ_pref = fn + '__Output__' if fn else ts_name + '__'%}
     {%- set type_str = typ_pref + ts_name %}
 
-abstract class {{ type_display }} {
+export abstract class {{ type_display }} {
     {{ docstring(data) | indent }}
 
     {%- set final_fn = fn + '.' if fn else '' %}
@@ -244,7 +244,7 @@ import {
     Message as uapi__Message
 } from 'uapi';
 
-class ClientInterface_ {
+export class ClientInterface_ {
 
     client: uapi__Client;
 
@@ -261,7 +261,7 @@ class ClientInterface_ {
     {%- endfor %}
 }
 
-class ServerHandler_ {
+export class ServerHandler_ {
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}

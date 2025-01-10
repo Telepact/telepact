@@ -52,6 +52,12 @@ def test_client_server_codegen_case(loop, client_server_codegen_proc, nats_clien
         if 'good_' not in req[0]:
             pytest.skip('Only test good cases for codegen')
 
+        expected_response = dc(res)
+
+        expected_headers = expected_response[0]
+
+        expected_headers['_codegen'] = True
+
         await verify_client_case(nats_client, dc(req), dc(res), *topics)
 
     loop.run_until_complete(t())

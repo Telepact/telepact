@@ -106,9 +106,9 @@ public class Main {
 
                 Message response;
 
-                if (useCodeGen && "test".equals(functionName)) {
+                if (useCodeGen && "fn.test".equals(functionName)) {
                     var output = generatedClient.test(requestHeaders, new test.Input(argument));
-                    response = new Message(new HashMap<>(), output.toPseudoJson());
+                    response = new Message(Map.of("_codegen", true), output.toPseudoJson());
                 } else {
 
                     try (var time = timers.time()) {
