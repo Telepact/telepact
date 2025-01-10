@@ -76,7 +76,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
     template_env.filters['find_case_key'] = _find_case_key
     template_env.filters['raise_error'] = _raise_error
 
-    if "java" == target:
+    if target == "java":
 
         functions = []
 
@@ -222,7 +222,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
         else:
             print(util_output)
 
-    elif 'py':
+    elif target == 'py':
 
         functions = []
 
@@ -253,9 +253,6 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
             # Ensure the directory exists
             output_path.mkdir(parents=True, exist_ok=True)
 
-            # Use the / operator provided by pathlib to concatenate paths
-            file_name = schema_key.split('.')[1]
-
             file_path = output_path / f"all_.py"
 
             # Open the file for writing
@@ -266,6 +263,46 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
             with init_file_path.open("w") as f:
                 f.write('')
+
+        else:
+            print(output)
+
+    elif target == 'ts':
+
+        functions = []
+
+        ts_schema_entries: list[dict[str, object]] = []
+        for schema_entry in schema_data:
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
+                continue
+
+            if schema_key.startswith("fn"):
+                functions.append(schema_key)
+
+            ts_schema_entries.append(schema_entry)
+
+        ts_type_template = template_env.get_template(
+            'ts_all.j2')
+
+        output = ts_type_template.render({
+            'input': ts_schema_entries,
+            'functions': functions
+        })
+
+        # Write the output to a file
+        if output_dir:
+            # Create the Path object for the directory
+            output_path = Path(output_dir)
+
+            # Ensure the directory exists
+            output_path.mkdir(parents=True, exist_ok=True)
+
+            file_path = output_path / f"all_.ts"
+
+            # Open the file for writing
+            with file_path.open("w") as f:
+                f.write(output)
 
         else:
             print(output)
