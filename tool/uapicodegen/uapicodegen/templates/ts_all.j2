@@ -239,20 +239,23 @@ abstract class {{ type_display }} {
     {%- endif %}
 {% endfor %}
 
-import * as uapi from 'uapi';
+import {
+    Client as uapi__Client,
+    Message as uapi__Message
+} from 'uapi';
 
 class ClientInterface_ {
 
-    client: uapi.Client.Client;
+    client: uapi__Client;
 
-    constructor(client: uapi.Client.Client) {
+    constructor(client: uapi__Client) {
         this.client = client;
     }
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): {{ function_name }}__Output_ {
-        const message = this.client.request(new uapi.Message.Message(headers, input.toPseudoJson()));
+    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): Promise<{{ function_name }}__Output_> {
+        const message = await this.client.request(new uapi__Message(headers, input.toPseudoJson()));
         return {{ function_name }}__Output_.fromPseudoJson(message.body);
     }
     {%- endfor %}
@@ -267,22 +270,22 @@ class ServerHandler_ {
     }
     {%- endfor %}
 
-    handler(message: uapi.Message.Message): uapi.Message.Message {
+    handler(message: uapi__Message): uapi__Message {
         const function_name = Object.keys(message.body)[0];
 
         {% for fn in functions %}
-        {%- set function_name = fn | replace('fn.', '') %}
-        {% if loop.first %}
+        {%- set function_name = fn | replace('fn.', '') -%}
+        {%- if loop.first -%}
         if (function_name === "{{ fn }}") {
             const output = this.{{ function_name }}(message.header, {{ function_name }}__Input_.fromPseudoJson(message.body));
-            return new uapi.Message.Message({}, output.toPseudoJson());
+            return new uapi__Message({}, output.toPseudoJson());
         }
-        {% else %}
+        {%- else -%}
         else if (function_name === "{{ fn }}") {
             const output = this.{{ function_name }}(message.header, {{ function_name }}__Input_.fromPseudoJson(message.body));
-            return new uapi.Message.Message({}, output.toPseudoJson());
+            return new uapi__Message({}, output.toPseudoJson());
         }
-        {% endif %}
+        {%- endif -%}
         {% endfor %}
 
         throw new Error("Unknown function: " + function_name);
