@@ -1,24 +1,30 @@
-{%- macro to_ts_type(t, append_nullable=True) %}
+import { ABC, abstractmethod } from 'abc';
+
+type Undefined = undefined;
+
+function utilLet<T, U>(value: T, f: (value: T) => U): U {
+    return f(value);
+}
+
+{%- macro to_ts_type(t, append_nullable=true) -%}
     {%- set nullable = '?' in t[0] -%}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
         Array<{{ to_ts_type(t[1:][0]) }}>
     {%- elif typ == 'object' -%}
-        Record<, {{ to_ts_type(t[1:][0]) }}>
+        Record<string, {{ to_ts_type(t[1:][0]) }}>
     {%- elif typ == 'boolean' -%}
         boolean
-    {%- elif typ == 'integer' -%}
-        number
-    {%- elif typ == 'number' -%}
+    {%- elif typ == 'integer' or typ == 'number' -%}
         number
     {%- elif typ == 'string' -%}
         string
     {%- elif typ == 'any' -%}
         any
     {%- elif typ.startswith('fn.') -%}
-        {{ typ | regex_replace('^.*\\.', '') -}}Input
+        {{ typ | regex_replace('^.*\\.', '') }}__Input_
     {%- else -%}
-        {{ typ | regex_replace('^.*\\.', '') -}}
+        {{ typ | regex_replace('^.*\\.', '') }}
     {%- endif -%}
     {%- if append_nullable and nullable %} | null{%- endif -%}
 {%- endmacro -%}
@@ -27,26 +33,26 @@
     {%- set nullable = '?' in t[0] %}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
-        {{ caller() }}.map((e{{ depth }}: any) => {% call marshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %})
+        utilLet(<{{ to_ts_type(t) }}>{{ caller() }}, d{{depth}} => {% if nullable %}d{{depth}} === null ? null : {% endif %}d{{depth}}.map(e{{depth}} => {% call marshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))
     {%- elif typ == 'object' -%}
-        Object.fromEntries(Object.entries({{ caller() }}).map(([k{{ depth }}, v{{ depth }}]: [string, any]) => [k{{ depth }}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}]))
+        utilLet(<{{ to_ts_type(t) }}>{{ caller() }}, d{{depth}} => {% if nullable %}d{{depth}} === null ? null : {% endif %}Object.fromEntries(Object.entries(d{{depth}}).map(([k{{depth}}, v{{depth}}]) => [k{{depth}}, {% call marshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))
     {%- elif typ.startswith('struct') or typ.startswith('fn') -%}
-        {{ to_ts_type(t, False) }}.fromPseudoJson({{ caller() }})
+        utilLet({{ caller() }}, d{{ depth }} => {% if nullable %}d{{depth}} === null ? null : {% endif %}{{ to_ts_type(t, false) }}.fromPseudoJson(<Record<string, any>>d{{ depth }}))
     {%- elif typ.startswith('union') -%}
-        {{ to_ts_type(t, False) }}.fromPseudoJson({{ caller() }})
+        utilLet({{ caller() }}, d{{ depth }} => {% if nullable %}d{{depth}} === null ? null : {% endif %}{{ to_ts_type(t, false) }}.fromPseudoJson(<Record<string, any>>d{{depth}}))
     {%- else -%}
-        {{ caller() }}
+        <{{ to_ts_type(t) }}>{{ caller() }}
     {%- endif -%}
 {%- endmacro -%}
 
 {%- macro unmarshall_ts_type(t, depth) -%}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
-        {{ caller() }}.map((e{{ depth }}: any) => {% call unmarshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %})
+        utilLet({{ caller() }}, d{{depth}} => d{{depth}} === null ? null : d{{depth}}.map(e{{depth}} => {% call unmarshall_ts_type(t[1:][0], depth + 1) %}e{{ depth }}{% endcall %}))
     {%- elif typ == 'object' -%}
-        Object.fromEntries(Object.entries({{ caller() }}).map(([k{{ depth }}, v{{ depth }}]: [string, any]) => [k{{ depth }}, {% call unmarshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}]))
+        utilLet({{ caller() }}, d{{depth}} => d{{depth}} === null ? null : Object.fromEntries(Object.entries(d{{depth}}).map(([k{{depth}}, v{{depth}}]) => [k{{depth}}, {% call unmarshall_ts_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %}])))
     {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
-        {{ caller() }}.toPseudoJson()
+        utilLet({{ caller() }}, d{{depth}} => d{{depth}} === null ? null : d{{depth}}.toPseudoJson())
     {%- else -%}
         {{ caller() }}
     {%- endif -%}
@@ -54,14 +60,18 @@
 
 {%- macro to_maybe_opt_ts_type(type, field_name) -%}
     {%- if '!' in field_name -%}
-        {{- to_ts_type(type) }} | undefined
-    {%- else %}
+        {{- to_ts_type(type) }} | Undefined
+    {%- else -%}
         {{- to_ts_type(type) }}
-    {%- endif %}
+    {%- endif -%}
 {%- endmacro -%}
 
-{%- macro marshall_py_type_maybe_opt(field_name, field_type) -%}
-    {%- call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
+{%- macro marshall_ts_type_maybe_opt(field_name, field_type) -%}
+    {%- if '!' in field_name -%}
+        map_['{{ field_name }}'] === undefined ? undefined : {% call marshall_ts_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall -%}
+    {%- else -%}
+        {%- call marshall_ts_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall -%}
+    {%- endif -%}
 {%- endmacro -%}
 
 {%- macro setter_maybe_opt(field_name) -%}
@@ -70,22 +80,22 @@
 
 {%- macro docstring(data) -%}
     {%- if '///' in data %}
-/**
+    /**
         {%- set doc = data['///'] -%}
         {%- if doc is iterable and doc is not string -%}
             {%- for line in doc %}
- * {{ line }}
+     * {{ line }}
             {%- endfor %}
         {%- else %}
- * {{ doc }}
+     * {{ doc }}
         {%- endif %}
- */
-    {%- endif %}
+     */
+    {%- endif -%}
 {%- endmacro -%}
 
 {%- macro sanitize_field_name(field_name) -%}
-    {%- set sanitized_name = field_name | replace('!', '') -%}
-    {%- set ts_keywords = ['break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'null', 'return', 'super', 'switch', 'this', 'throw', 'true', 'try', 'typeof', 'var', 'void', 'while', 'with', 'as', 'implements', 'interface', 'let', 'package', 'private', 'protected', 'public', 'static', 'yield', 'any', 'boolean', 'constructor', 'declare', 'get', 'module', 'require', 'number', 'set', 'string', 'symbol', 'type', 'from', 'of'] %}
+    {%- set sanitized_name =  field_name | replace('!', '') -%}
+    {%- set ts_keywords = ['break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'null', 'return', 'super', 'switch', 'this', 'throw', 'true', 'try', 'typeof', 'var', 'void', 'while', 'with', 'yield'] %}
     {%- if sanitized_name in ts_keywords -%}
         {{- sanitized_name + '_' -}}
     {%- else -%}
@@ -93,37 +103,42 @@
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro case_type_display(type_display, case_key) %}
+{%- macro case_type_display(type_display, case_key) -%}
     {{- type_display + ('_' if type_display.endswith('_') else '__') + case_key }}
-{%- endmacro %}
+{%- endmacro -%}
 
-{%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, fn, typ_pref, type_display) %}
+{%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, fn, typ_pref, type_display) -%}
     {%- set fields = data[schema_key] %}
     {%- set ts_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
     {%- set type_str = typ_pref + ts_name if typ_pref else ts_name %}
-export interface {{ type_display }}{% if implements %} extends {{ implements }}{% endif %} {
+class {{ type_display }}{% if implements %} implements {{ implements }}{% endif %} {
     {{ docstring(data) | indent }}
 
     {%- for field_name, field_type in fields.items() %}
-    {{ sanitize_field_name(field_name) }}: {{ to_maybe_opt_ts_type(field_type, field_name) }};
-    {%- endfor %}
-}
-
-export class {{ type_display }}Impl implements {{ type_display }} {
-    {%- for field_name, field_type in fields.items() %}
-    {{ sanitize_field_name(field_name) }}: {{ to_maybe_opt_ts_type(field_type, field_name) }};
+    {{ sanitize_field_name(field_name) }}: {{ to_maybe_opt_ts_type(field_type, field_name) }}{% if '!' in field_name %} = undefined{% endif %};
     {%- endfor %}
 
-    constructor(map_: any) {
+    static fromPseudoJson(map_{% if fn %}init{% endif %}: Record<string, any>): {{ type_display }} {
+        {%- if fn %}
+        const map_ = <Record<string, any>>map_init["{{ unionCase }}"];
+        {%- endif %}
+        const t = new {{ type_display }}();
         {%- for field_name, field_type in fields.items() %}
-        this.{{ sanitize_field_name(field_name) }} = {% call marshall_ts_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %};
+        t.{{ sanitize_field_name(field_name) }} = {{ marshall_ts_type_maybe_opt(field_name, field_type) }};
         {%- endfor %}
+        return t;
     }
 
-    toPseudoJson(): any {
-        const fields: any = {};
+    toPseudoJson(): Record<string, any> {
+        const fields: Record<string, any> = {};
         {%- for field_name, field_type in fields.items() %}
+            {%- if '!' in field_name %}
+        if (this.{{ sanitize_field_name(field_name) }} !== undefined) {
+            fields["{{ field_name }}"] = {% call unmarshall_ts_type(field_type, 0) %}this.{{ sanitize_field_name(field_name) }}{% endcall %};
+        }
+            {%- else %}
         fields["{{ field_name }}"] = {% call unmarshall_ts_type(field_type, 0) %}this.{{ sanitize_field_name(field_name) }}{% endcall %};
+            {%- endif %}
         {%- endfor %}
         {%- if unionCase %}
         return {
@@ -133,14 +148,10 @@ export class {{ type_display }}Impl implements {{ type_display }} {
         return fields;
         {%- endif %}
     }
-
-    static fromPseudoJson(map_: any): {{ type_display }} {
-        return new {{ type_display }}Impl(map_);
-    }
 }
-{%- endmacro %}
+{% endmacro %}
 
-{%- macro union(data, schema_key, fn, type_display) %}
+{% macro union(data, schema_key, fn, type_display) %}
     {%- set cases = data[schema_key] %}
     {%- if schema_key == '->' %}
         {%- set schema_key = 'Output' %}
@@ -150,46 +161,42 @@ export class {{ type_display }}Impl implements {{ type_display }} {
     {%- set typ_pref = fn + '__Output__' if fn else ts_name + '__'%}
     {%- set type_str = typ_pref + ts_name %}
 
-export type {{ type_display }} = 
-    {%- for case_entry in cases %}
-        {%- set case_key = case_entry | find_case_key %}
-        {%- if not loop.first %} | {% endif %}
-        {{ case_type_display(type_display, case_key) }}
-    {%- endfor %};
-
-export class {{ type_display }}Impl {
+abstract class {{ type_display }} {
     {{ docstring(data) | indent }}
 
-    static fromPseudoJson(map_: any): {{ type_display }} {
-        const caseName = Object.keys(map_)[0];
-        const payload = map_[caseName];
-        if (caseName === "NoMatch_") {
-            return {{ case_type_display(type_display, 'NoMatch_') }}Impl.fromPseudoJson(payload);
+    {%- set final_fn = fn + '.' if fn else '' %}
+
+    static fromPseudoJson(map_: Record<string, any>): {{ type_display }} {
+        const entry = Object.entries(map_)[0];
+        const case_name = entry[0];
+        const payload = <Record<string, any>>entry[1];
+        if (case_name === "NoMatch_") {
+            return <{{ type_display }}>{{ case_type_display(type_display, 'NoMatch_') }}.fromPseudoJson(payload);
         }
         {%- for case_entry in cases %}
-            {%- set case_key = case_entry | find_case_key %}
-        else if (caseName === "{{ case_key }}") {
-            return {{ case_type_display(type_display, case_key) }}Impl.fromPseudoJson(payload);
+            {% set case_key = case_entry | find_case_key %}
+        else if (case_name === "{{ case_key }}") {
+            return <{{ type_display }}>{{ case_type_display(type_display, case_key) }}.fromPseudoJson(payload);
         }
         {%- endfor %}
         else {
-            return {{ case_type_display(type_display, 'NoMatch_') }}Impl.fromPseudoJson(payload);
+            return <{{ type_display }}>{{ case_type_display(type_display, 'NoMatch_') }}.fromPseudoJson(payload);
         }
     }
 
-    abstract toPseudoJson(): any;
+    abstract toPseudoJson(): Record<string, any>;
 }
 
 {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', type_display, 'NoMatch_', fn, typ_pref, case_type_display(type_display, 'NoMatch_'))}}
 
 {%- for case_entry in cases %}
-    {%- set case_key = case_entry | find_case_key %}
-    {%- set case_type_display_res = case_type_display(type_display, case_key) %}
+    {% set case_key = case_entry | find_case_key %}
+    {% set case_type_display_res = case_type_display(type_display, case_key) %}
     {{ struct(case_entry, case_key, None, 'final ', type_display, case_key, fn, typ_pref, case_type_display_res) }}
 {%- endfor %}
-{%- endmacro %}
+{% endmacro %}
 
-{%- macro function(data, schema_key, type_display) %}
+{% macro function(data, schema_key, type_display) %}
     {%- set fields = data[schema_key] %}
     {%- set ts_name = schema_key | regex_replace('^.*\\.', '') %}
     {% do data.pop('///', None) %}
@@ -197,9 +204,9 @@ export class {{ type_display }}Impl {
     {{ struct(data, schema_key, 'Input', 'static ', None, schema_key, ts_name, ts_name + '.', type_display + '__Input_') }}
 
     {{ union (data, '->', ts_name, ts_name + '__Output_')}}
-{%- endmacro %}
+{% endmacro %}
 
-{%- for schema_entry in input %}
+{% for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
 
     {% set ts_name = schema_key | regex_replace('^.*\\.', '') %}
@@ -212,52 +219,52 @@ export class {{ type_display }}Impl {
     {%- endif %}
 {% endfor %}
 
-import { Message, Client } from 'uapi';
+import * as uapi from 'uapi';
 
-class ClientInterface {
+class ClientInterface_ {
 
-    client: Client;
+    client: uapi.Client.Client;
 
-    constructor(client: Client) {
+    constructor(client: uapi.Client.Client) {
         this.client = client;
     }
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): {{ function_name }}__Output_ {
-        const message = this.client.request(new Message(headers, input.toPseudoJson()));
+        const message = this.client.request(new uapi.Message.Message(headers, input.toPseudoJson()));
         return {{ function_name }}__Output_.fromPseudoJson(message.body);
     }
     {%- endfor %}
 }
 
-class ServerHandler {
+class ServerHandler_ {
 
-    {%- for fn in functions %}
+    {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
     {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): {{ function_name }}__Output_ {
         throw new Error("Not implemented");
     }
     {%- endfor %}
 
-    handler(message: Message): Message {
-        const functionName = Object.keys(message.body)[0];
+    handler(message: uapi.Message.Message): uapi.Message.Message {
+        const function_name = Object.keys(message.body)[0];
 
-        {%- for fn in functions %}
+        {% for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}
-        if (functionName === "{{ fn }}") {
+        if (function_name === "{{ fn }}") {
             const output = this.{{ function_name }}(message.header, {{ function_name }}__Input_.fromPseudoJson(message.body));
-            return new Message({}, output.toPseudoJson());
+            return new uapi.Message.Message({}, output.toPseudoJson());
         }
         {% else %}
-        else if (functionName === "{{ fn }}") {
+        else if (function_name === "{{ fn }}") {
             const output = this.{{ function_name }}(message.header, {{ function_name }}__Input_.fromPseudoJson(message.body));
-            return new Message({}, output.toPseudoJson());
+            return new uapi.Message.Message({}, output.toPseudoJson());
         }
         {% endif %}
-        {%- endfor %}
+        {% endfor %}
 
-        throw new Error("Unknown function: " + functionName);
+        throw new Error("Unknown function: " + function_name);
     }
 }
