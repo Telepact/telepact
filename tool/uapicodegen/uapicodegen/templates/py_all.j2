@@ -77,14 +77,6 @@ class Undefined:
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro marshall_py_type_maybe_opt(field_name, field_type) -%}
-    {%- if '!' in field_name -%}
-        Undefined() if '{{- field_name }}' not in map_ else {% call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
-    {%- else %}
-        {%- call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %}
-    {%- endif %}
-{%- endmacro -%}
-
 {%- macro setter_maybe_opt(field_name) -%}
     {{ caller() }}
 {%- endmacro -%}
@@ -132,9 +124,11 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
         map_ = cast(dict[str, object], map_init["{{ union_case }}"])
         {%- endif %}
         return cls(
-            {%- for field_name, field_type in fields.items() %}
-            {{ sanitize_field_name(field_name) }} = {{ marshall_py_type_maybe_opt(field_name, field_type) }},
-            {%- endfor %}
+        {%- for field_name, field_type in fields.items() %}
+            {{ sanitize_field_name(field_name) + ' ' -}}
+               = {% if '!' in field_name %}Undefined() if '{{- field_name }}' not in map_ else {% endif -%}
+                 {%- call marshall_py_type(field_type, 0) %}map_["{{ field_name }}"]{% endcall %},
+        {%- endfor %}
         )
 
     def to_pseudo_json(self) -> dict[str, object]:
