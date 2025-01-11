@@ -155,7 +155,7 @@ export class {{ type_display }}{% if implements %} implements {{ implements }}{%
     }
 
     static fromPseudoJson(map_: Record<string, any>): {{ type_display }} {
-        return {{ type_display }}.fromPseudoJson(map_);
+        return new {{ type_display }}(map_);
     }
 
     toPseudoJson(): Record<string, any> {
