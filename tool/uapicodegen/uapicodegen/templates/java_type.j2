@@ -67,18 +67,13 @@ import java.util.HashMap;
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro marshall_java_type_maybe_opt(field_name, field_type) -%}
-    {%- if '!' in field_name %}map.containsKey("{{ field_name }}") ? new Optional_<{{ to_java_type(field_type) }}>({% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}) : new Optional_<>(){% else %}{% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}{% endif -%}
-{%- endmacro -%}
-
 {%- macro setter_maybe_opt(field_name) -%}
     {%- if '!' in field_name %}new Optional_<>({{ caller() }}){% else %}{{ caller ()}}{% endif %}
 {%- endmacro -%}
 
-{%- macro docstring(data) -%}
+{%- macro docstring(doc) -%}
     {%- if '///' in data %}
 /**
-        {%- set doc = data['///'] -%}
         {%- if doc is iterable and doc is not string -%}
             {%- for line in doc %}
  *{{ line }}
@@ -100,28 +95,32 @@ import java.util.HashMap;
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, forFn) %}
-    {%- set fields = data[schema_key] %}
-    {%- set java_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
-    {{ docstring(data) }}
-public {{ modifier }}class {{ java_name }}{% if implements %} implements {{ implements }}{% endif %} {
+{%- macro case_type_display(type_display, case_key) %}
+    {{- type_display + ('_' if type_display.endswith('_') else '__') + case_key }}
+{%- endmacro %}
+
+{%- macro struct(display_name, doc, fields, implements, union_case, modifier) %}
+    {{ docstring(doc) }}
+public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if implements %} implements {{ implements }}{% endif %} {
     {%- for field_name, field_type in fields.items() %}
     public final {{ to_maybe_opt_java_type(field_type, field_name) }} {{ sanitize_field_name(field_name) }};
     {%- endfor %}
 
-    public {{ java_name }}(Builder b) {
+    public {{ display_name }}(Builder b) {
         {%- for field_name, field_type in fields.items() %}
         this.{{ sanitize_field_name(field_name) }} = b.{{ sanitize_field_name(field_name) }};
         {%- endfor %}
     }
 
-    public {{ java_name -}}
-        (Map<String, Object> map{% if forFn %}Init{% endif %}) {
-        {%- if forFn %}
-        var map = (Map<String, Object>) mapInit.get("{{ unionCase }}");
+    public {{ display_name -}}
+        (Map<String, Object> map{% if union_case %}Init{% endif %}) {
+        {%- if union_case %}
+        var map = (Map<String, Object>) mapInit.get("{{ union_case }}");
         {%- endif %}
         {%- for field_name, field_type in fields.items() %}
-        this.{{ sanitize_field_name(field_name) }} = {{ marshall_java_type_maybe_opt(field_name, field_type) }};
+        this.{{ sanitize_field_name(field_name) }} =
+            {%- if '!' in field_name %} map.containsKey("{{ field_name }}") ? new Optional_<{{ to_java_type(field_type) }}>({% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}) : new Optional_<>()
+            {%- else %} {% call marshall_java_type(field_type, 0) %}map.get("{{ field_name }}"){% endcall %}{% endif %};
         {%- endfor %}
     }
 
@@ -136,9 +135,9 @@ public {{ modifier }}class {{ java_name }}{% if implements %} implements {{ impl
         fields.put("{{ field_name }}", {% call unmarshall_java_type(field_type, 0) %}this.{{ sanitize_field_name(field_name) }}{% endcall %});
             {%- endif %}
         {%- endfor %}
-        {%- if unionCase %}
+        {%- if union_case %}
         return Map.ofEntries(
-            Map.entry("{{ unionCase }}", fields)
+            Map.entry("{{ union_case }}", fields)
         );          
         {%- else %}
         return fields;
@@ -160,41 +159,46 @@ public {{ modifier }}class {{ java_name }}{% if implements %} implements {{ impl
         }
         {%- endfor %}
 
-        public {{ java_name }} build() {
-            return new {{ java_name }}(this);
+        public {{ display_name }} build() {
+            return new {{ display_name }}(this);
         }
     }
 }
 {%- endmacro %}
 
-{%- macro union(data, schema_key) %}
-    {%- set cases = data[schema_key] %}
-    {%- if schema_key == '->' %}
-        {%- set schema_key = 'Output' %}
-    {%- endif %}
-    {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
-    {{ docstring(data) }}
-public sealed interface {{ java_name }} {
+{%- macro union(display_name, doc, cases) %}
+    {{ docstring(doc) }}
+public interface {{ display_name }} {
 
-    {{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', java_name, 'NoMatch_') | indent }}
+
+    public static class NoMatch_ implements {{ display_name }} {
+        private final Map<String, Object> payload;
+
+        public NoMatch_(Map<String, Object> payload) {
+            this.payload = payload;
+        }
+
+        public Map<String, Object> toPseudoJson() {
+            return payload;
+        }
+    }
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}
-        {{ struct(case_entry, case_key, None, 'final ', java_name, case_key) | indent }}
+        {{ struct(case_key, case_entry['///'], case_entry[case_key], display_name, case_key, 'static') | indent }}
     {%- endfor %}
 
-    public static {{ java_name }} fromPseudoJson(Map<String, Object> map) {
+    public static {{ display_name }} fromPseudoJson(Map<String, Object> map) {
         var entry = map.entrySet().stream().findAny().get();
         var caseName = entry.getKey();
-        var payload = (Map<String, Object>) entry.getValue();        
         switch (caseName) {
             {%- for case_entry in cases %}
                 {% set case_key = case_entry | find_case_key %}
             case "{{ case_key }}":
-                return new {{ case_entry | find_case_key }}(payload);
+                return new {{ case_entry | find_case_key }}(map);
             {%- endfor %}
             default:
-                return new NoMatch_(payload);
+                return new NoMatch_(map);
         }
     }
 
@@ -203,27 +207,24 @@ public sealed interface {{ java_name }} {
 }
 {%- endmacro %}
 
-{%- macro function(data, schema_key) %}
-    {%- set fields = data[schema_key] %}
-    {%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
-public final class {{ java_name }} {
+{%- macro function(display_name, data, schema_key) %}
+public final class {{ display_name }} {
 
-    {{ struct(data, schema_key, 'Input', 'static ', None, schema_key, True) | indent }}
+    {{ struct('Input', data['///'], data[schema_key], None, schema_key, 'static') | indent }}
 
-    {% do data.pop('///', None) %}
-
-    {{ union (data, '->') | indent }}
+    {{ union ('Output', data['///'], data['->']) | indent }}
 }
 {%- endmacro %}
 
 
 {%- set schema_key = data | find_schema_key %}
+{%- set java_name = schema_key | regex_replace('^.*\\.', '') %}
 
 {%- if schema_key.startswith('struct') %}
-    {{ struct(data, schema_key, None, "", None, None) }}
+    {{ struct(java_name, data['///'], data[schema_key], None, None, None) }}
 {%- elif schema_key.startswith('union') %}
-    {{ union(data, schema_key) }}
+    {{ union(java_name, data['///'], data[schema_key]) }}
 {%- elif schema_key.startswith('fn') %}
-    {{ function(data, schema_key) }}
+    {{ function(java_name, data, schema_key) }}
 {%- endif %}
 

@@ -78,25 +78,12 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
     if target == "java":
 
-        functions = []
+        functions: list[str] = []
 
-        for schema_entry in schema_data:
-            schema_key = _find_schema_key(schema_entry)
-            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
-                continue
+        def _write_java_file(jinja_file: str, input: dict, output_file: str) -> None:
+            template = template_env.get_template(jinja_file)
 
-            if schema_key.startswith("fn"):
-                functions.append(schema_key)
-
-            type_template = template_env.get_template(
-                'java_type.j2')  # Specify your template file name
-
-            translated_entry = {
-                'package': java_package,
-                'data': schema_entry
-            }
-
-            output = type_template.render(translated_entry)
+            output = template.render(input)
 
             # Write the output to a file
             if output_dir:
@@ -106,10 +93,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
                 # Ensure the directory exists
                 output_path.mkdir(parents=True, exist_ok=True)
 
-                # Use the / operator provided by pathlib to concatenate paths
-                file_name = schema_key.split('.')[1]
-
-                file_path = output_path / f"{file_name}.java"
+                file_path = output_path / output_file
 
                 # Open the file for writing
                 with file_path.open("w") as f:
@@ -118,109 +102,31 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
             else:
                 print(output)
 
-        server_template = template_env.get_template(
-            'java_server.j2')
+        for schema_entry in schema_data:
+            schema_key = _find_schema_key(schema_entry)
+            if schema_key.startswith('info') or schema_key.startswith('requestHeader') or schema_key.startswith('responseHeader'):
+                continue
 
-        server_output = server_template.render(
-            {'package': java_package, 'functions': functions})
+            if schema_key.startswith("fn"):
+                functions.append(schema_key)
 
-        # Write the output to a file
-        if output_dir:
-            # Create the Path object for the directory
-            output_path = Path(output_dir)
+            _write_java_file('java_type.j2', {
+                'package': java_package, 'data': schema_entry}, f"{schema_key.split('.')[1]}.java")
 
-            # Ensure the directory exists
-            output_path.mkdir(parents=True, exist_ok=True)
+        _write_java_file('java_server.j2', {
+                         'package': java_package, 'functions': functions}, f"ServerHandler_.java")
 
-            # Use the / operator provided by pathlib to concatenate paths
-            file_name = schema_key.split('.')[1]
+        _write_java_file('java_client.j2', {
+                         'package': java_package, 'functions': functions}, f"ClientInterface_.java")
 
-            file_path = output_path / f"ServerHandler_.java"
+        _write_java_file('java_optional.j2', {
+                         'package': java_package}, f"Optional_.java")
 
-            # Open the file for writing
-            with file_path.open("w") as f:
-                f.write(server_output)
+        _write_java_file('java_utility.j2', {
+                         'package': java_package}, f"Utility_.java")
 
-        else:
-            print(server_output)
-
-        client_template = template_env.get_template(
-            'java_client.j2')
-
-        client_output = client_template.render(
-            {'package': java_package, 'functions': functions})
-
-        # Write the output to a file
-        if output_dir:
-            # Create the Path object for the directory
-            output_path = Path(output_dir)
-
-            # Ensure the directory exists
-            output_path.mkdir(parents=True, exist_ok=True)
-
-            # Use the / operator provided by pathlib to concatenate paths
-            file_name = schema_key.split('.')[1]
-
-            file_path = output_path / f"ClientInterface_.java"
-
-            # Open the file for writing
-            with file_path.open("w") as f:
-                f.write(client_output)
-
-        else:
-            print(client_output)
-
-        opt_template = template_env.get_template(
-            'java_optional.j2')
-
-        opt_output = opt_template.render(
-            {'package': java_package})
-
-        # Write the output to a file
-        if output_dir:
-            # Create the Path object for the directory
-            output_path = Path(output_dir)
-
-            # Ensure the directory exists
-            output_path.mkdir(parents=True, exist_ok=True)
-
-            # Use the / operator provided by pathlib to concatenate paths
-            file_name = schema_key.split('.')[1]
-
-            file_path = output_path / f"Optional_.java"
-
-            # Open the file for writing
-            with file_path.open("w") as f:
-                f.write(opt_output)
-
-        else:
-            print(opt_output)
-
-        util_template = template_env.get_template(
-            'java_utility.j2')
-
-        util_output = util_template.render(
-            {'package': java_package})
-
-        # Write the output to a file
-        if output_dir:
-            # Create the Path object for the directory
-            output_path = Path(output_dir)
-
-            # Ensure the directory exists
-            output_path.mkdir(parents=True, exist_ok=True)
-
-            # Use the / operator provided by pathlib to concatenate paths
-            file_name = schema_key.split('.')[1]
-
-            file_path = output_path / f"Utility_.java"
-
-            # Open the file for writing
-            with file_path.open("w") as f:
-                f.write(util_output)
-
-        else:
-            print(util_output)
+        _write_java_file('typed_message.j2', {
+                         'package': java_package}, f"TypedMessage_.java")
 
     elif target == 'py':
 

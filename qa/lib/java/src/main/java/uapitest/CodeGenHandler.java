@@ -16,13 +16,13 @@ import uapitest.example.Output;
 public class CodeGenHandler extends ServerHandler_ {
 
     @Override
-    public Output example(Map<String, Object> headers, Input input) {
+    public TypedMessage_<Output> example(Map<String, Object> headers, Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'example'");
     }
 
     @Override
-    public uapitest.test.Output test(Map<String, Object> headers, uapitest.test.Input input) {
+    public TypedMessage_<uapitest.test.Output> test(Map<String, Object> headers, uapitest.test.Input input) {
         var outputBuilder = new uapitest.test.Output.Ok_.Builder();
 
         try {
@@ -216,7 +216,7 @@ public class CodeGenHandler extends ServerHandler_ {
             });
         });
 
-        return outputBuilder.build();
+        return new TypedMessage_<test.Output>(new HashMap<>(), outputBuilder.build());
     }
 
     private static ExStruct mapStruct(ExStruct s) {
@@ -235,7 +235,7 @@ public class CodeGenHandler extends ServerHandler_ {
             return null;
         }
         return switch (u) {
-            case ExUnion.NoMatch_ v -> new ExUnion.NoMatch_(new ExUnion.NoMatch_.Builder());
+            case ExUnion.NoMatch_ v -> new ExUnion.NoMatch_(v.toPseudoJson());
             case ExUnion.One v -> new ExUnion.One.Builder().build();
             case ExUnion.Two v -> {
                 var b = new ExUnion.Two.Builder();
@@ -243,6 +243,7 @@ public class CodeGenHandler extends ServerHandler_ {
                 v.optional.ifPresent(b::optional);
                 yield b.build();
             }
+            default -> throw new IllegalArgumentException("Unexpected value: " + u);
         };
     }
 
@@ -274,7 +275,8 @@ public class CodeGenHandler extends ServerHandler_ {
     }
 
     @Override
-    public uapitest.getBigList.Output getBigList(Map<String, Object> headers, uapitest.getBigList.Input input) {
+    public TypedMessage_<uapitest.getBigList.Output> getBigList(Map<String, Object> headers,
+            uapitest.getBigList.Input input) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getBigList'");
     }

@@ -166,9 +166,6 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
 {%- endmacro %}
 
 {%- macro union(doc, cases, type_display) %}
-    {%- if schema_key == '->' %}
-        {%- set schema_key = 'Output' %}
-    {%- endif %}
 
 class {{ type_display }}(ABC):
     {{ docstring(doc) | indent }}
@@ -199,13 +196,11 @@ class {{ type_display }}(ABC):
 {%- endfor %}
 {%- endmacro %}
 
-{%- macro function(data, schema_key, type_display) %}
-    {%- set fields = data[schema_key] %}
-    {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
+{%- macro function(data, type_display, schema_key) %}
 
     {{ struct(data['///'], data[schema_key], None, schema_key, type_display + '__Input_') }}
 
-    {{ union (data['///'], data['->'], py_name + '__Output_')}}
+    {{ union (data['///'], data['->'], type_display + '__Output_')}}
 {%- endmacro %}
 
 {%- for schema_entry in input %}
@@ -217,7 +212,7 @@ class {{ type_display }}(ABC):
     {%- elif schema_key.startswith('union') %}
         {{- union(schema_entry['///'], schema_entry[schema_key], py_name) }}
     {%- elif schema_key.startswith('fn') %}
-        {{ function(schema_entry, schema_key, py_name) }}
+        {{ function(schema_entry, py_name, schema_key) }}
     {%- endif %}
 {% endfor %}
 

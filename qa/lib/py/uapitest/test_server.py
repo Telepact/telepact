@@ -266,7 +266,6 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             print(f"     :H {request_bytes}")
             message = code_gen_handler.handler(request_message)
             message.header['_codegens'] = True
-            return message
         else:
             print(f"    <-s {request_bytes}")
 
@@ -282,16 +281,18 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             response_headers = response_pseudo_json[0]
             response_body = response_pseudo_json[1]
 
-            toggle_alternate_server = request_headers.get(
-                "_toggleAlternateServer")
-            if toggle_alternate_server == True:
-                serve_alternate_server = not serve_alternate_server
+            message = Message(response_headers, response_body)
 
-            throw_error = request_headers.get("_throwError")
-            if throw_error == True:
-                raise ThisError()
+        toggle_alternate_server = request_headers.get(
+            "_toggleAlternateServer")
+        if toggle_alternate_server == True:
+            serve_alternate_server = not serve_alternate_server
 
-            return Message(response_headers, response_body)
+        throw_error = request_headers.get("_throwError")
+        if throw_error == True:
+            raise ThisError()
+
+        return message
 
     options = Server.Options()
 

@@ -102,13 +102,14 @@ public class Main {
 
                 var entry = requestBody.entrySet().stream().findAny().get();
                 var functionName = entry.getKey();
-                var argument = (Map<String, Object>) entry.getValue();
 
                 Message response;
 
                 if (useCodeGen && "fn.test".equals(functionName)) {
-                    var output = generatedClient.test(requestHeaders, new test.Input(argument));
-                    response = new Message(Map.of("_codegen", true), output.toPseudoJson());
+                    var outputMessage = generatedClient.test(requestHeaders, new test.Input(requestBody));
+                    var responseHeaders = outputMessage.headers;
+                    responseHeaders.put("_codegenc", true);
+                    response = new Message(responseHeaders, outputMessage.body.toPseudoJson());
                 } else {
 
                     try (var time = timers.time()) {
@@ -309,6 +310,7 @@ public class Main {
                 if (useCodeGen) {
                     System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
                     message = codeGenHandler.handler(requestMessage);
+                    message.header.put("_codegens", true);
                 } else {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
                     System.out.flush();
