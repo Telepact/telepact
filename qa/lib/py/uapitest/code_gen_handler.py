@@ -1,14 +1,14 @@
 import json
-from typing import Any, Dict, List, Optional, TypeVar, Callable
+from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
 from uapitest.gen.all_ import example__Input_, example__Output_, test__Input_, test__Output_, test__Output__Ok_, Value, ServerHandler_, getBigList__Input_, getBigList__Output_, Undefined, ExUnion__NoMatch_, ExUnion__One, ExUnion__Two, ExUnion, ExStruct
 
 
 class CodeGenHandler(ServerHandler_):
 
-    def example(self, headers: dict[str, object], input: example__Input_) -> example__Output_:
+    def example(self, headers: dict[str, object], input: example__Input_) -> Tuple[dict[str, object], example__Output_]:
         raise NotImplementedError("Unimplemented method 'example'")
 
-    def test(self, headers: dict[str, object], input: test__Input_) -> test__Output_:
+    def test(self, headers: dict[str, object], input: test__Input_) -> Tuple[dict[str, object], test__Output_]:
         output = test__Output__Ok_()
 
         try:
@@ -153,7 +153,7 @@ class CodeGenHandler(ServerHandler_):
                 output.value = Value(objNullFn=self.map_obj(
                     top.objNullFn, self.map_fn))
 
-        return output
+        return {}, output
 
     def map_struct(self, s: ExStruct) -> ExStruct:
         if s is None:

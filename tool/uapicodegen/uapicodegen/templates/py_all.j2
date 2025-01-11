@@ -229,6 +229,7 @@ class {{ type_display }}(ABC):
 
 import uapi.Message
 import uapi.Client
+from typing import Tuple
 
 class ClientInterface_:
 
@@ -239,9 +240,9 @@ class ClientInterface_:
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
+    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> Tuple[dict[str, object], {{ function_name }}__Output_]:
         message = await self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
-        return {{ function_name }}__Output_.from_pseudo_json(message.body)
+        return message.header, {{ function_name }}__Output_.from_pseudo_json(message.body)
     {%- endfor %}
 
 
@@ -249,7 +250,7 @@ class ServerHandler_:
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
+    def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> Tuple[dict[str, object], {{ function_name }}__Output_]:
         raise NotImplementedError()
     {%- endfor %}
 
@@ -258,15 +259,9 @@ class ServerHandler_:
 
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
-        {% if loop.first %}
-        if function_name == "{{ fn }}":
-            output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
-            return uapi.Message.Message({}, output.to_pseudo_json())
-        {% else %}
-        elif function_name == "{{ fn }}":
-            output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
-            return uapi.Message.Message({}, output.to_pseudo_json())
-        {% endif %}
+        {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
+            headers, output = self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
+            return uapi.Message.Message(headers, output.to_pseudo_json())
         {%- endfor %}
 
         raise Exception("Unknown function: " + function_name)
