@@ -89,10 +89,9 @@ class Undefined:
     {{ caller() }}
 {%- endmacro -%}
 
-{%- macro docstring(data) -%}
-    {%- if '///' in data %}
+{%- macro docstring(doc) -%}
+    {%- if doc -%}
 '''
-        {%- set doc = data['///'] -%}
         {%- if doc is iterable and doc is not string -%}
             {%- for line in doc %}
 {{ line }}
@@ -106,7 +105,7 @@ class Undefined:
 
 {%- macro sanitize_field_name(field_name) -%}
     {%- set sanitized_name =  field_name | replace('!', '') -%}
-    {%- set py_keywords = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
+    {%- set py_keywords = ['bool', 'int', 'str', 'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
     {%- if sanitized_name in py_keywords -%}
         {{- sanitized_name + '_' -}}
     {%- else -%}
@@ -118,22 +117,19 @@ class Undefined:
     {{- type_display + ('_' if type_display.endswith('_') else '__') + case_key }}
 {%- endmacro %}
 
-{%- macro struct(data, schema_key, alt_name, modifier, implements, unionCase, fn, typ_pref, type_display) %}
-    {%- set fields = data[schema_key] %}
-    {%- set py_name = alt_name if alt_name else schema_key | regex_replace('^.*\\.', '') %}
-    {%- set type_str = typ_pref + py_name if typ_pref else py_name %}
+{%- macro struct(doc, fields, implements, union_case, type_display) %}
 @dataclass
 class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
-    {{ docstring(data) | indent }}
+    {{ docstring(doc) | indent }}
 
     {%- for field_name, field_type in fields.items() %}
     {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %} # type: ignore
     {%- endfor %}
 
     @classmethod
-    def from_pseudo_json(cls, map_{% if fn %}init{% endif %}: dict[str, object]) -> '{{ type_display }}':
-        {%- if fn %}
-        map_ = cast(dict[str, object], map_init["{{ unionCase }}"])
+    def from_pseudo_json(cls, map_{% if union_case %}init{% endif %}: dict[str, object]) -> '{{ type_display }}':
+        {%- if union_case %}
+        map_ = cast(dict[str, object], map_init["{{ union_case }}"])
         {%- endif %}
         return cls(
             {%- for field_name, field_type in fields.items() %}
@@ -151,66 +147,71 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
         fields["{{ field_name }}"] =  {% call unmarshall_py_type(field_type, 0) %}self.{{ sanitize_field_name(field_name) }}{% endcall %}
             {%- endif %}
         {%- endfor %}
-        {%- if unionCase %}
+        {%- if union_case %}
         return {
-            "{{ unionCase }}": fields
+            "{{ union_case }}": fields
         }
         {%- else %}
         return fields
         {%- endif %}
 {%- endmacro %}
 
-{%- macro union(data, schema_key, fn, type_display) %}
-    {%- set cases = data[schema_key] %}
+{%- macro no_match_struct(type_display, implements) %}
+@dataclass
+class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
+    original: object
+
+    @classmethod
+    def from_pseudo_json(cls, map_: dict[str, object]) -> '{{ type_display }}':
+        return cls(
+            original=map_
+        )
+
+    def to_pseudo_json(self) -> dict[str, object]:
+        return self.original
+{%- endmacro %}
+
+{%- macro union(doc, cases, type_display) %}
     {%- if schema_key == '->' %}
         {%- set schema_key = 'Output' %}
     {%- endif %}
-    {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
-    {%- set super_class = fn + '_output_type_' if fn else py_name + '_type_' %}
-    {%- set typ_pref = fn + '__Output__' if fn else py_name + '__'%}
-    {%- set type_str = typ_pref + py_name %}
 
 class {{ type_display }}(ABC):
-    {{ docstring(data) | indent }}
-
-    {%- set final_fn = fn + '.' if fn else '' %}
+    {{ docstring(doc) | indent }}
 
     @staticmethod
     def from_pseudo_json(map_: dict[str, object]) -> '{{ type_display }}':
         entry = next(iter(map_.items()))
         case_name = entry[0]
         payload = cast(dict[str, object], entry[1])
-        if case_name == "NoMatch_":
-            return cast({{ type_display }}, {{ case_type_display(type_display, 'NoMatch_') }}.from_pseudo_json(payload))
         {%- for case_entry in cases %}
             {% set case_key = case_entry | find_case_key %}
-        elif case_name == "{{ case_key }}":
-            return cast({{ type_display }}, {{ case_type_display(type_display, case_key) }}.from_pseudo_json(payload))
+        {% if loop.first%}if{% else %}elif{% endif %} case_name == "{{ case_key }}":
+            return cast({{ type_display }}, {{ case_type_display(type_display, case_key) }}.from_pseudo_json(map_))
         {%- endfor %}
         else:
-            return cast({{ type_display }}, {{ case_type_display(type_display, 'NoMatch_') }}.from_pseudo_json(payload))
+            return cast({{ type_display }}, {{ case_type_display(type_display, 'NoMatch_') }}.from_pseudo_json(map_))
     
     @abstractmethod
     def to_pseudo_json(self) -> dict[str, object]:
         raise NotImplementedError()
 
-{{ struct({'NoMatch_': {} }, 'NoMatch_', None, 'final ', type_display, 'NoMatch_', fn, typ_pref, case_type_display(type_display, 'NoMatch_'))}}
+{{ no_match_struct(case_type_display(type_display, 'NoMatch_'), type_display)}}
 
 {%- for case_entry in cases %}
     {% set case_key = case_entry | find_case_key %}
     {% set case_type_display_res = case_type_display(type_display, case_key) %}
-    {{ struct(case_entry, case_key, None, 'final ', type_display, case_key, fn, typ_pref, case_type_display_res) }}
+    {{ struct(case_entry['///'], case_entry[case_key], type_display, case_key, case_type_display_res) }}
 {%- endfor %}
 {%- endmacro %}
 
 {%- macro function(data, schema_key, type_display) %}
     {%- set fields = data[schema_key] %}
     {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
-    {% do data.pop('///', None) %}
 
-    {{ struct(data, schema_key, 'Input', 'static ', None, schema_key, py_name, py_name + '.', type_display + '__Input_') }}
+    {{ struct(data['///'], data[schema_key], None, schema_key, type_display + '__Input_') }}
 
-    {{ union (data, '->', py_name, py_name + '__Output_')}}
+    {{ union (data['///'], data['->'], py_name + '__Output_')}}
 {%- endmacro %}
 
 {%- for schema_entry in input %}
@@ -218,9 +219,9 @@ class {{ type_display }}(ABC):
 
     {% set py_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if schema_key.startswith('struct') %}
-        {{- struct(schema_entry, schema_key, None, "", None, None, None, None, py_name) }}
+        {{- struct(schema_entry['///'], schema_entry[schema_key], None, None, py_name) }}
     {%- elif schema_key.startswith('union') %}
-        {{- union(schema_entry, schema_key, None, py_name) }}
+        {{- union(schema_entry['///'], schema_entry[schema_key], py_name) }}
     {%- elif schema_key.startswith('fn') %}
         {{ function(schema_entry, schema_key, py_name) }}
     {%- endif %}
@@ -238,8 +239,8 @@ class ClientInterface_:
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
-        message = self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
+    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> {{ function_name }}__Output_:
+        message = await self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
         return {{ function_name }}__Output_.from_pseudo_json(message.body)
     {%- endfor %}
 

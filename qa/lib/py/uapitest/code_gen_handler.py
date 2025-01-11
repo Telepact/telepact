@@ -18,8 +18,8 @@ class CodeGenHandler(ServerHandler_):
 
         if input.value:
             top = input.value
-            if not isinstance(top.bool, Undefined):
-                output.value = Value(bool=top.bool)
+            if not isinstance(top.bool_, Undefined):
+                output.value = Value(bool_=top.bool_)
             if not isinstance(top.nullBool, Undefined):
                 output.value = Value(nullBool=top.nullBool)
             if not isinstance(top.arrBool, Undefined):
@@ -30,8 +30,8 @@ class CodeGenHandler(ServerHandler_):
                 output.value = Value(objBool=top.objBool)
             if not isinstance(top.objNullBool, Undefined):
                 output.value = Value(objNullBool=top.objNullBool)
-            if not isinstance(top.int, Undefined):
-                output.value = Value(int=top.int)
+            if not isinstance(top.int_, Undefined):
+                output.value = Value(int_=top.int_)
             if not isinstance(top.nullInt, Undefined):
                 output.value = Value(nullInt=top.nullInt)
             if not isinstance(top.arrInt, Undefined):
@@ -54,8 +54,8 @@ class CodeGenHandler(ServerHandler_):
                 output.value = Value(objNum=top.objNum)
             if not isinstance(top.objNullNum, Undefined):
                 output.value = Value(objNullNum=top.objNullNum)
-            if not isinstance(top.str, Undefined):
-                output.value = Value(str=top.str)
+            if not isinstance(top.str_, Undefined):
+                output.value = Value(str_=top.str_)
             if not isinstance(top.nullStr, Undefined):
                 output.value = Value(nullStr=top.nullStr)
             if not isinstance(top.arrStr, Undefined):
