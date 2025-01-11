@@ -109,7 +109,7 @@ class Undefined:
     {{- type_display + ('_' if type_display.endswith('_') else '__') + case_key }}
 {%- endmacro %}
 
-{%- macro struct(doc, fields, implements, union_case, type_display) %}
+{%- macro struct(type_display, doc, fields, implements, union_case) %}
 @dataclass
 class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
     {{ docstring(doc) | indent }}
@@ -153,7 +153,7 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
 {%- macro no_match_struct(type_display, implements) %}
 @dataclass
 class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
-    original: object
+    original: dict[str, object]
 
     @classmethod
     def from_pseudo_json(cls, map_: dict[str, object]) -> '{{ type_display }}':
@@ -165,7 +165,7 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
         return self.original
 {%- endmacro %}
 
-{%- macro union(doc, cases, type_display) %}
+{%- macro union(type_display, doc, cases) %}
 
 class {{ type_display }}(ABC):
     {{ docstring(doc) | indent }}
@@ -192,15 +192,15 @@ class {{ type_display }}(ABC):
 {%- for case_entry in cases %}
     {% set case_key = case_entry | find_case_key %}
     {% set case_type_display_res = case_type_display(type_display, case_key) %}
-    {{ struct(case_entry['///'], case_entry[case_key], type_display, case_key, case_type_display_res) }}
+    {{ struct(case_type_display_res, case_entry['///'], case_entry[case_key], type_display, case_key) }}
 {%- endfor %}
 {%- endmacro %}
 
-{%- macro function(data, type_display, schema_key) %}
+{%- macro function(type_display, data, schema_key) %}
 
-    {{ struct(data['///'], data[schema_key], None, schema_key, type_display + '__Input_') }}
+    {{ struct(type_display + '__Input_', data['///'], data[schema_key], None, schema_key) }}
 
-    {{ union (data['///'], data['->'], type_display + '__Output_')}}
+    {{ union (type_display + '__Output_', data['///'], data['->'])}}
 {%- endmacro %}
 
 {%- for schema_entry in input %}
@@ -208,11 +208,11 @@ class {{ type_display }}(ABC):
 
     {% set py_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if schema_key.startswith('struct') %}
-        {{- struct(schema_entry['///'], schema_entry[schema_key], None, None, py_name) }}
+        {{- struct(py_name, schema_entry['///'], schema_entry[schema_key], None, None) }}
     {%- elif schema_key.startswith('union') %}
-        {{- union(schema_entry['///'], schema_entry[schema_key], py_name) }}
+        {{- union(py_name, schema_entry['///'], schema_entry[schema_key]) }}
     {%- elif schema_key.startswith('fn') %}
-        {{ function(schema_entry, py_name, schema_key) }}
+        {{ function(py_name, schema_entry,schema_key) }}
     {%- endif %}
 {% endfor %}
 
