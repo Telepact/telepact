@@ -14,7 +14,7 @@
     {%- elif typ == 'any' -%}
         any
     {%- elif typ.startswith('fn.') -%}
-        {{ typ | regex_replace('^.*\\.', '') }}Input
+        {{ typ | regex_replace('^.*\\.', '') }}__Input_
     {%- else -%}
         {{ typ | regex_replace('^.*\\.', '') }}
     {%- endif -%}
@@ -150,6 +150,10 @@ export class {{ type_display }}{% if implements %} implements {{ implements }}{%
 export class {{ type_display }}{% if implements %} implements {{ implements }}{% endif %} {
     original: Record<string, any>;
 
+    constructor(original: Record<string, any>) {
+        this.original = original;
+    }
+
     static fromPseudoJson(map_: Record<string, any>): {{ type_display }} {
         return {{ type_display }}.fromPseudoJson(map_);
     }
@@ -165,7 +169,7 @@ export abstract class {{ type_display }} {
     {{ docstring(doc) | indent }}
 
     static fromPseudoJson(map_: Record<string, any>): {{ type_display }} {
-        const [caseName, payload] = Object.entries(map_)[0];
+        const [caseName, payload] = Object.entries(map_)[0]!;
         {%- for case_entry in cases %}
             {% set case_key = case_entry | find_case_key %}
         {% if loop.first%}if{% else %}else if{% endif %} (caseName === "{{ case_key }}") {
@@ -190,8 +194,8 @@ export abstract class {{ type_display }} {
 {%- endmacro %}
 
 {%- macro function(type_display, data, schema_key) %}
-    {{ struct(type_display + 'Input', data['///'], data[schema_key], None, schema_key) }}
-    {{ union(type_display + 'Output', data['///'], data['->']) }}
+    {{ struct(type_display + '__Input_', data['///'], data[schema_key], None, schema_key) }}
+    {{ union(type_display + '__Output_', data['///'], data['->']) }}
 {%- endmacro %}
 
 {%- for schema_entry in input %}
@@ -208,7 +212,7 @@ export abstract class {{ type_display }} {
 
 import { Message, Client } from 'uapi';
 
-export class ClientInterface {
+export class ClientInterface_ {
     client: Client;
 
     constructor(client: Client) {
@@ -217,17 +221,17 @@ export class ClientInterface {
 
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}Input): Promise<[ Record<string, any>, {{ function_name }}Output ]> {
+    async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): Promise<[ Record<string, any>, {{ function_name }}__Output_ ]> {
         const message = await this.client.request(new Message(headers, input.toPseudoJson()));
-        return [message.header, {{ function_name }}Output.fromPseudoJson(message.body)];
+        return [message.header, {{ function_name }}__Output_.fromPseudoJson(message.body)];
     }
     {%- endfor %}
 }
 
-export class ServerHandler {
+export class ServerHandler_ {
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}Input): [ Record<string, any>, {{ function_name }}Output ] {
+    {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): [ Record<string, any>, {{ function_name }}__Output_ ] {
         throw new Error('Not implemented');
     }
     {%- endfor %}
@@ -238,7 +242,7 @@ export class ServerHandler {
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}else if{% endif %} (functionName === "{{ fn }}") {
-            const [headers, output] = this.{{ function_name }}(message.header, {{ function_name }}Input.fromPseudoJson(message.body));
+            const [headers, output] = this.{{ function_name }}(message.header, {{ function_name }}__Input_.fromPseudoJson(message.body));
             return new Message(headers, output.toPseudoJson());
         }
         {%- endfor %}

@@ -126,8 +126,9 @@ function startClientTestServer(
             const time = timer.startTimer();
             try {
                 if (useCodegen && functionName === "fn.test") {
-                    const output = await genClient.test(requestHeaders, new test__Input_(argument));
-                    response = new Message({'_codegen': true}, output);
+                    const [responseHeaders, outputBody] = await genClient.test(requestHeaders, new test__Input_(argument));
+                    responseHeaders["_codegenc"] = true;
+                    response = new Message(responseHeaders, outputBody);
                 } else {
                     response = await client.request(request);
                 }
@@ -322,9 +323,11 @@ function startTestServer(
         const requestJson = JSON.stringify(requestPseudoJson);
         const requestBytes = new TextEncoder().encode(requestJson);
 
+        let message: Message;
         if (useCodegen) {
             console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
-            return codeGenHandler.handler(requestMessage);
+            message = codeGenHandler.handler(requestMessage);
+            message.header["_codegens"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
             const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
@@ -336,16 +339,18 @@ function startTestServer(
             const responseHeaders = responsePseudoJson[0] as { [key: string]: any };
             const responseBody = responsePseudoJson[1] as { [key: string]: any };
 
-            if (requestHeaders["_toggleAlternateServer"] === true) {
-                serveAlternateServer.value = !serveAlternateServer.value;
-            }
-
-            if (requestHeaders["_throwError"] === true) {
-                throw new ThisError();
-            }
-
-            return new Message(responseHeaders, responseBody);
+            message = new Message(responseHeaders, responseBody);
         }
+
+        if (requestHeaders["_toggleAlternateServer"] === true) {
+            serveAlternateServer.value = !serveAlternateServer.value;
+        }
+
+        if (requestHeaders["_throwError"] === true) {
+            throw new ThisError();
+        }
+
+        return message;
     };
 
     const options: ServerOptions = new ServerOptions();
@@ -468,6 +473,7 @@ async function runDispatcherServer(): Promise<void> {
                             frontdoorTopic,
                             backdoorTopic,
                             authRequired,
+                            useCodegen
                         );
 
                         servers[id] = d;
