@@ -117,8 +117,8 @@ function startClientTestServer(
             console.log(`   ->C  ${requestJson}`);
 
             const requestPseudoJson = JSON.parse(requestJson);
-            const requestHeaders = requestPseudoJson[0] as Map<string, any>;
-            const requestBody = requestPseudoJson[1] as Map<string, any>;
+            const requestHeaders = requestPseudoJson[0] as Record<string, any>;
+            const requestBody = requestPseudoJson[1] as Record<string, any>;
             const request = new Message(requestHeaders, requestBody);
 
             const [functionName, argument] = Object.entries(requestBody)[0] as [string, any];
@@ -127,9 +127,9 @@ function startClientTestServer(
             const time = timer.startTimer();
             try {
                 if (useCodegen && functionName === "fn.test") {
-                    const [responseHeaders, outputBody] = await genClient.test(requestHeaders, new test__Input_(argument));
+                    const [responseHeaders, outputBody] = await genClient.test(requestHeaders, test__Input_.fromPseudoJson(requestBody));
                     responseHeaders["_codegenc"] = true;
-                    response = new Message(responseHeaders, outputBody);
+                    response = new Message(responseHeaders, outputBody.toPseudoJson());
                 } else {
                     response = await client.request(request);
                 }
