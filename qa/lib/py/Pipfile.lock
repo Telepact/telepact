@@ -211,13 +211,14 @@
         },
         "uapi": {
             "hashes": [
-                "sha256:1f9855c5984f96b975fa73b14ec7a390e769a9c70eb0d30db6c34648fcf07029"
+                "sha256:c8399e8fd529ab296bf6baabe574c65a7ef24b69f52f417bf2aace8692e8fc71"
             ],
             "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
             "version": "==0.0.1"
         },
         "uapicodegen": {
             "hashes": [
+                "sha256:4d41db6b5210ccafe49b8884ff1057d99283af896acbf31342fbde65d5a7e655",
                 "sha256:c74061f08018433de4ea0f2abc3c4c67690118951c2ab45798f975ddad6fc497"
             ],
             "path": "./../../../tool/uapicodegen/dist/uapicodegen-0.0.1-py3-none-any.whl",

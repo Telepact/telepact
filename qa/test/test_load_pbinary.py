@@ -58,7 +58,7 @@ def test_load_binary_case(loop, load_binary_server_proc, nats_client):
 
     async def t():
         for _ in range(50):
-            req = [{'_pac': True}, {'fn.getData': {}}]
+            req = [{'pac_': True}, {'fn.getData': {}}]
             await verify_client_case(nats_client, req, None, topics[0], None, topics[1], None)
 
     loop.run_until_complete(t())

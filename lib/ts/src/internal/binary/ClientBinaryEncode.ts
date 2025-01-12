@@ -1,8 +1,8 @@
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
-import { BinaryEncoderUnavailableError } from '../../internal/binary/BinaryEncoderUnavailableError';
-import { ClientBinaryStrategy } from '../../ClientBinaryStrategy';
-import { encodeBody } from '../../internal/binary/EncodeBody';
-import { packBody } from '../../internal/binary/PackBody';
+import { BinaryEncoding } from "../../internal/binary/BinaryEncoding";
+import { BinaryEncoderUnavailableError } from "../../internal/binary/BinaryEncoderUnavailableError";
+import { ClientBinaryStrategy } from "../../ClientBinaryStrategy";
+import { encodeBody } from "../../internal/binary/EncodeBody";
+import { packBody } from "../../internal/binary/PackBody";
 
 export function clientBinaryEncode(
     message: any[],
@@ -11,9 +11,9 @@ export function clientBinaryEncode(
 ): any[] {
     const headers = message[0] as Record<string, any>;
     const messageBody = message[1] as Record<string, any>;
-    const forceSendJson = headers['_forceSendJson'];
+    const forceSendJson = headers["_forceSendJson"];
 
-    headers['bin_'] = binaryChecksumStrategy.getCurrentChecksums();
+    headers["bin_"] = binaryChecksumStrategy.getCurrentChecksums();
 
     if (forceSendJson === true) {
         throw new BinaryEncoderUnavailableError();
@@ -32,7 +32,7 @@ export function clientBinaryEncode(
     const encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
     let finalEncodedMessageBody: Map<any, any>;
-    if (headers['_pac'] === true) {
+    if (headers["pac_"] === true) {
         finalEncodedMessageBody = packBody(encodedMessageBody);
     } else {
         finalEncodedMessageBody = encodedMessageBody;

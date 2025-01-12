@@ -32,7 +32,7 @@ def client_binary_decode(message: list[object], recent_binary_encoders: dict[int
     binary_encoder = recent_binary_encoders[binary_checksum]
 
     final_encoded_message_body: dict[object, object]
-    if headers.get("_pac") is True:
+    if headers.get("pac_") is True:
         final_encoded_message_body = unpack_body(encoded_message_body)
     else:
         final_encoded_message_body = encoded_message_body

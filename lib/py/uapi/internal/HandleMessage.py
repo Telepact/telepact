@@ -76,8 +76,8 @@ async def handle_message(
         response_headers["_binary"] = True
         response_headers["_clientKnownBinaryChecksums"] = client_known_binary_checksums
 
-        if "_pac" in request_headers:
-            response_headers["_pac"] = request_headers["_pac"]
+        if "pac_" in request_headers:
+            response_headers["pac_"] = request_headers["pac_"]
 
     select_struct_fields_header: dict[str, object] | None = cast(dict[str, object] | None, request_headers.get(
         "select_"

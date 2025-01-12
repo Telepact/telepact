@@ -19,7 +19,7 @@ def server_binary_decode(message: list[object], binary_encoder: 'BinaryEncoding'
         raise BinaryEncoderUnavailableError()
 
     final_encoded_message_body: dict[object, object]
-    if headers.get("_pac") is True:
+    if headers.get("pac_") is True:
         final_encoded_message_body = unpack_body(encoded_message_body)
     else:
         final_encoded_message_body = encoded_message_body

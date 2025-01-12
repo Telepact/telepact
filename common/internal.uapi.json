@@ -61,6 +61,17 @@
     },
     {
         "///": [
+            " Indicates usage of the \"packed\" binary strategy on the request, if supplied     ",
+            " binary, and on the response from the server.                                    "
+        ],
+        "requestHeader.pac_": ["boolean"]
+    },
+    {
+        "///": " Indicates usage of the \"packed\" binary strategy on the response. ",
+        "responseHeader.pac_": ["boolean"]
+    },
+    {
+        "///": [
             " The binary encoding used by the server, an object of possible keys mapped onto  ",
             " a field id.                                                                     "
         ],

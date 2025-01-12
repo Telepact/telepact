@@ -21,7 +21,7 @@ public class ServerBinaryEncode {
         final var encodedMessageBody = encodeBody(messageBody, binaryEncoder);
 
         final Map<Object, Object> finalEncodedMessageBody;
-        if (Objects.equals(true, headers.get("_pac"))) {
+        if (Objects.equals(true, headers.get("pac_"))) {
             finalEncodedMessageBody = packBody(encodedMessageBody);
         } else {
             finalEncodedMessageBody = encodedMessageBody;

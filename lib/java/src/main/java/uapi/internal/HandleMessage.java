@@ -74,8 +74,8 @@ public class HandleMessage {
             responseHeaders.put("_binary", true);
             responseHeaders.put("_clientKnownBinaryChecksums", clientKnownBinaryChecksums);
 
-            if (requestHeaders.containsKey("_pac")) {
-                responseHeaders.put("_pac", requestHeaders.get("_pac"));
+            if (requestHeaders.containsKey("pac_")) {
+                responseHeaders.put("pac_", requestHeaders.get("pac_"));
             }
         }
 

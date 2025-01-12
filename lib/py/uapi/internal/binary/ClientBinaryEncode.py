@@ -31,6 +31,6 @@ def client_binary_encode(message: list[object], recent_binary_encoders: dict[int
     encoded_message_body = encode_body(message_body, binary_encoder)
 
     final_encoded_message_body = pack_body(encoded_message_body) if headers.get(
-        "_pac") == True else encoded_message_body
+        "pac_") == True else encoded_message_body
 
     return [headers, final_encoded_message_body]
