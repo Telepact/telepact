@@ -17,6 +17,7 @@ import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
 import { ClientInterface_, ServerHandler_, test__Input_ } from "./gen/all_.js";
+import { CodeGenHandler } from "./codeGenHandler.js";
 
 class Timer {
     public values: number[] = [];
@@ -312,7 +313,7 @@ function startTestServer(
     const timer = registry.createTimer(frontdoorTopic);
     const serveAlternateServer = { value: false };
 
-    const codeGenHandler = new ServerHandler_();
+    const codeGenHandler = new CodeGenHandler();
 
     class ThisError extends Error {}
 
