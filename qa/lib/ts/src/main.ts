@@ -16,7 +16,7 @@ import {
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
 import { min, max, mean, median, quantile } from "simple-statistics";
-import { ClientInterface_, ServerHandler_, test__Input_ } from "./gen/all_.js";
+import { ClientInterface_, test__Input_ } from "./gen/all_.js";
 import { CodeGenHandler } from "./codeGenHandler.js";
 
 class Timer {
