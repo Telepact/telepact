@@ -1,47 +1,27 @@
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseTypeDeclaration } from '../../internal/schema/ParseTypeDeclaration';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
-import { UType } from '../../internal/types/UType';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseHeadersType(
-    documentName: string,
     headersDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     headerField: string,
-    index: number,
-    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
-    schemaKeysToDocumentName: { [key: string]: string },
-    schemaKeysToIndex: { [key: string]: number },
-    parsedTypes: { [key: string]: UType },
-    allParseFailures: SchemaParseFailure[],
-    failedTypes: Set<string>,
+    ctx: ParseContext,
 ): UFieldDeclaration {
-    const path = [index, schemaKey];
-
     const typeDeclarationValue = headersDefinitionAsParsedJson[schemaKey];
 
     if (!Array.isArray(typeDeclarationValue)) {
         throw new UApiSchemaParseError(
-            getTypeUnexpectedParseFailure(documentName, path, typeDeclarationValue, 'Array'),
+            getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, 'Array'),
         );
     }
 
     const typeDeclarationArray = typeDeclarationValue;
 
     try {
-        const typeDeclaration = parseTypeDeclaration(
-            documentName,
-            path,
-            typeDeclarationArray,
-            uapiSchemaDocumentNamesToPseudoJson,
-            schemaKeysToDocumentName,
-            schemaKeysToIndex,
-            parsedTypes,
-            allParseFailures,
-            failedTypes,
-        );
+        const typeDeclaration = parseTypeDeclaration(typeDeclarationArray, ctx);
 
         return new UFieldDeclaration(headerField, typeDeclaration, false);
     } catch (e) {

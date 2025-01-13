@@ -14,23 +14,14 @@ import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { USelect } from '../../internal/types/USelect';
 import { UMockCall } from '../../internal/types/UMockCall';
 import { UMockStub } from '../../internal/types/UMockStub';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function getOrParseType(
-    documentName: string,
-    path: any[],
-    typeName: string,
-    uApiSchemaDocumentNameToPseudoJson: { [key: string]: object[] },
-    schemaKeysToDocumentNames: { [key: string]: string },
-    schemaKeysToIndex: { [key: string]: number },
-    parsedTypes: { [key: string]: UType },
-    allParseFailures: SchemaParseFailure[],
-    failedTypes: Set<string>,
-): UType {
-    if (failedTypes.has(typeName)) {
+export function getOrParseType(typeName: string, ctx: ParseContext): UType {
+    if (ctx.failedTypes.has(typeName)) {
         throw new UApiSchemaParseError([]);
     }
 
-    const existingType = parsedTypes[typeName];
+    const existingType = ctx.parsedTypes[typeName];
     if (existingType !== undefined) {
         return existingType;
     }
@@ -41,7 +32,7 @@ export function getOrParseType(
     const matcher = typeName.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(documentName, path, 'StringRegexMatchFailed', { regex: regexString }),
+            new SchemaParseFailure(ctx.documentName, ctx.path, 'StringRegexMatchFailed', { regex: regexString }),
         ]);
     }
 
@@ -60,68 +51,49 @@ export function getOrParseType(
     }
 
     const customTypeName = matcher[2];
-    const thisIndex = schemaKeysToIndex[customTypeName];
-    const thisDocumentName = schemaKeysToDocumentNames[customTypeName];
+    const thisIndex = ctx.schemaKeysToIndex[customTypeName];
+    const thisDocumentName = ctx.schemaKeysToDocumentName[customTypeName];
     if (thisIndex === undefined) {
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(documentName, path, 'TypeUnknown', { name: customTypeName }),
+            new SchemaParseFailure(ctx.documentName, ctx.path, 'TypeUnknown', { name: customTypeName }),
         ]);
     }
-    const definition = uApiSchemaDocumentNameToPseudoJson[thisDocumentName][thisIndex] as { [key: string]: object };
+    const definition = ctx.uapiSchemaDocumentNamesToPseudoJson[thisDocumentName][thisIndex] as {
+        [key: string]: object;
+    };
 
     let type: UType;
     try {
         if (customTypeName.startsWith('struct')) {
             type = parseStructType(
-                thisDocumentName,
-                [thisIndex],
                 definition,
                 customTypeName,
                 [],
-                uApiSchemaDocumentNameToPseudoJson,
-                schemaKeysToDocumentNames,
-                schemaKeysToIndex,
-                parsedTypes,
-                allParseFailures,
-                failedTypes,
+                ctx.copy({ documentName: thisDocumentName, path: [thisIndex] }),
             );
         } else if (customTypeName.startsWith('union')) {
             type = parseUnionType(
-                thisDocumentName,
-                [thisIndex],
                 definition,
                 customTypeName,
                 [],
                 [],
-                uApiSchemaDocumentNameToPseudoJson,
-                schemaKeysToDocumentNames,
-                schemaKeysToIndex,
-                parsedTypes,
-                allParseFailures,
-                failedTypes,
+                ctx.copy({ documentName: thisDocumentName, path: [thisIndex] }),
             );
         } else if (customTypeName.startsWith('fn')) {
             type = parseFunctionType(
-                thisDocumentName,
-                [thisIndex],
                 definition,
                 customTypeName,
-                uApiSchemaDocumentNameToPseudoJson,
-                schemaKeysToDocumentNames,
-                schemaKeysToIndex,
-                parsedTypes,
-                allParseFailures,
-                failedTypes,
+                ctx.copy({ documentName: thisDocumentName, path: [thisIndex] }),
             );
         } else {
             const possibleTypeExtension = {
-                '_ext.Select_': new USelect(parsedTypes),
-                '_ext.Call_': new UMockCall(parsedTypes),
-                '_ext.Stub_': new UMockStub(parsedTypes),
+                '_ext.Select_': new USelect(ctx.parsedTypes),
+                '_ext.Call_': new UMockCall(ctx.parsedTypes),
+                '_ext.Stub_': new UMockStub(ctx.parsedTypes),
             }[customTypeName];
             if (!possibleTypeExtension) {
                 throw new UApiSchemaParseError([
-                    new SchemaParseFailure(documentName, [thisIndex], 'TypeExtensionImplementationMissing', {
+                    new SchemaParseFailure(ctx.documentName, [thisIndex], 'TypeExtensionImplementationMissing', {
                         name: customTypeName,
                     }),
                 ]);
@@ -129,13 +101,13 @@ export function getOrParseType(
             type = possibleTypeExtension;
         }
 
-        parsedTypes[customTypeName] = type;
+        ctx.parsedTypes[customTypeName] = type;
 
         return type;
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
-            allParseFailures.push(...e.schemaParseFailures);
-            failedTypes.add(customTypeName);
+            ctx.allParseFailures.push(...e.schemaParseFailures);
+            ctx.failedTypes.add(customTypeName);
             throw new UApiSchemaParseError([]);
         }
         throw e;

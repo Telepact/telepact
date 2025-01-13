@@ -4,21 +4,14 @@ import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseStructFields } from '../../internal/schema/ParseStructFields';
 import { UStruct } from '../../internal/types/UStruct';
-import { UType } from '../../internal/types/UType';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseUnionType(
-    documentName: string,
-    path: any[],
     unionDefinitionAsPseudoJson: { [key: string]: any },
     schemaKey: string,
     ignoreKeys: string[],
     requiredKeys: string[],
-    uApiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
-    schemaKeysToDocumentName: { [key: string]: string },
-    schemaKeysToIndex: { [key: string]: number },
-    parsedTypes: { [key: string]: UType },
-    allParseFailures: SchemaParseFailure[],
-    failedTypes: Set<string>,
+    ctx: ParseContext,
 ): UUnion {
     const parseFailures: SchemaParseFailure[] = [];
 
@@ -31,16 +24,16 @@ export function parseUnionType(
 
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
-            const loopPath = path.concat(k);
-            parseFailures.push(new SchemaParseFailure(documentName, loopPath, 'ObjectKeyDisallowed', {}));
+            const loopPath = ctx.path.concat(k);
+            parseFailures.push(new SchemaParseFailure(ctx.documentName, loopPath, 'ObjectKeyDisallowed', {}));
         }
     }
 
-    const thisPath = path.concat(schemaKey);
+    const thisPath = ctx.path.concat(schemaKey);
     const defInit = unionDefinitionAsPseudoJson[schemaKey];
 
     if (!Array.isArray(defInit)) {
-        const finalParseFailures = getTypeUnexpectedParseFailure(documentName, thisPath, defInit, 'Array');
+        const finalParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, thisPath, defInit, 'Array');
         parseFailures.push(...finalParseFailures);
         throw new UApiSchemaParseError(parseFailures);
     }
@@ -52,7 +45,7 @@ export function parseUnionType(
         index += 1;
         const loopPath = thisPath.concat(index);
         if (typeof element !== 'object' || Array.isArray(element) || element === null || element === undefined) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(documentName, loopPath, element, 'Object');
+            const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, loopPath, element, 'Object');
             parseFailures.push(...thisParseFailures);
             continue;
         }
@@ -64,7 +57,7 @@ export function parseUnionType(
     }
 
     if (definition.length === 0 && requiredKeys.length === 0) {
-        parseFailures.push(new SchemaParseFailure(documentName, thisPath, 'EmptyArrayDisallowed', {}));
+        parseFailures.push(new SchemaParseFailure(ctx.documentName, thisPath, 'EmptyArrayDisallowed', {}));
     } else {
         for (const requiredKey of requiredKeys) {
             let found = false;
@@ -78,7 +71,9 @@ export function parseUnionType(
             }
             if (!found) {
                 const branchPath = thisPath.concat(0, requiredKey);
-                parseFailures.push(new SchemaParseFailure(documentName, branchPath, 'RequiredObjectKeyMissing', {}));
+                parseFailures.push(
+                    new SchemaParseFailure(ctx.documentName, branchPath, 'RequiredObjectKeyMissing', {}),
+                );
             }
         }
     }
@@ -100,7 +95,7 @@ export function parseUnionType(
         const matches = keys.filter((k) => regex.test(k));
         if (matches.length !== 1) {
             parseFailures.push(
-                new SchemaParseFailure(documentName, loopPath, 'ObjectKeyRegexMatchCountUnexpected', {
+                new SchemaParseFailure(ctx.documentName, loopPath, 'ObjectKeyRegexMatchCountUnexpected', {
                     regex: regexString,
                     actual: matches.length,
                     expected: 1,
@@ -111,7 +106,7 @@ export function parseUnionType(
         }
         if (Object.keys(map).length !== 1) {
             parseFailures.push(
-                new SchemaParseFailure(documentName, loopPath, 'ObjectSizeUnexpected', {
+                new SchemaParseFailure(ctx.documentName, loopPath, 'ObjectSizeUnexpected', {
                     expected: 1,
                     actual: Object.keys(map).length,
                 }),
@@ -124,24 +119,14 @@ export function parseUnionType(
         const unionKeyPath = loopPath.concat(unionCase);
 
         if (typeof entry[1] !== 'object' || Array.isArray(entry[1]) || entry[1] === null || entry[1] === undefined) {
-            const thisParseFailures = getTypeUnexpectedParseFailure(documentName, unionKeyPath, entry[1], 'Object');
+            const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, unionKeyPath, entry[1], 'Object');
             parseFailures.push(...thisParseFailures);
             continue;
         }
         const unionCaseStruct = entry[1];
 
         try {
-            const fields = parseStructFields(
-                unionCaseStruct,
-                documentName,
-                unionKeyPath,
-                uApiSchemaDocumentNamesToPseudoJson,
-                schemaKeysToDocumentName,
-                schemaKeysToIndex,
-                parsedTypes,
-                allParseFailures,
-                failedTypes,
-            );
+            const fields = parseStructFields(unionCaseStruct, ctx.copy({ path: unionKeyPath }));
             const unionStruct = new UStruct(`${schemaKey}.${unionCase}`, fields);
             cases[unionCase] = unionStruct;
             caseIndices[unionCase] = i;

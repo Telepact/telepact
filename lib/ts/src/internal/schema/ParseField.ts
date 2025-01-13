@@ -1,56 +1,35 @@
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
-import { UType } from '../../internal/types/UType';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
-import { getTypeUnexpectedParseFailure } from './GetTypeUnexpectedParseFailure';
+import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
+import { ParseContext } from '../../internal/schema/ParseContext';
 import { parseTypeDeclaration } from './ParseTypeDeclaration';
 
-export function parseField(
-    documentName: string,
-    path: any[],
-    fieldDeclaration: string,
-    typeDeclarationValue: any,
-    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
-    schemaKeysToDocumentName: { [key: string]: string },
-    schemaKeysToIndex: { [key: string]: number },
-    parsedTypes: { [key: string]: UType },
-    allParseFailures: SchemaParseFailure[],
-    failedTypes: Set<string>,
-): UFieldDeclaration {
+export function parseField(fieldDeclaration: string, typeDeclarationValue: any, ctx: ParseContext): UFieldDeclaration {
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regex = new RegExp(regexString);
 
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
-        const finalPath = [...path, fieldDeclaration];
+        const finalPath = [...ctx.path, fieldDeclaration];
         throw new UApiSchemaParseError([
-            new SchemaParseFailure(documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString }),
+            new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString }),
         ]);
     }
 
     const fieldName = matcher[0];
     const optional = Boolean(matcher[2]);
 
-    const thisPath = [...path, fieldName];
+    const thisPath = [...ctx.path, fieldName];
 
     if (!Array.isArray(typeDeclarationValue)) {
         throw new UApiSchemaParseError(
-            getTypeUnexpectedParseFailure(documentName, thisPath, typeDeclarationValue, 'Array'),
+            getTypeUnexpectedParseFailure(ctx.documentName, thisPath, typeDeclarationValue, 'Array'),
         );
     }
     const typeDeclarationArray = typeDeclarationValue;
 
-    const typeDeclaration = parseTypeDeclaration(
-        documentName,
-        thisPath,
-        typeDeclarationArray,
-        uapiSchemaDocumentNamesToPseudoJson,
-        schemaKeysToDocumentName,
-        schemaKeysToIndex,
-        parsedTypes,
-        allParseFailures,
-        failedTypes,
-    );
+    const typeDeclaration = parseTypeDeclaration(typeDeclarationArray, ctx.copy({ path: thisPath }));
 
     return new UFieldDeclaration(fieldName, typeDeclaration, optional);
 }

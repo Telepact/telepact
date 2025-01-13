@@ -1,19 +1,12 @@
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
-import { UType } from '../../internal/types/UType';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { parseField } from '../../internal/schema/ParseField';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseStructFields(
     referenceStruct: { [key: string]: any },
-    documentName: string,
-    path: any[],
-    uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
-    schemaKeysToDocumentName: { [key: string]: string },
-    schemaKeysToIndex: { [key: string]: number },
-    parsedTypes: { [key: string]: UType },
-    allParseFailures: SchemaParseFailure[],
-    failedTypes: Set<string>,
+    ctx: ParseContext,
 ): { [key: string]: UFieldDeclaration } {
     const parseFailures: SchemaParseFailure[] = [];
     const fields: { [key: string]: UFieldDeclaration } = {};
@@ -23,11 +16,11 @@ export function parseStructFields(
             const existingFieldNoOpt = existingField.split('!')[0];
             const fieldNoOpt = fieldDeclaration.split('!')[0];
             if (fieldNoOpt === existingFieldNoOpt) {
-                const finalPath = [...path, fieldDeclaration];
-                const finalOtherPath = [...path, existingField];
+                const finalPath = [...ctx.path, fieldDeclaration];
+                const finalOtherPath = [...ctx.path, existingField];
                 parseFailures.push(
-                    new SchemaParseFailure(documentName, finalPath, 'PathCollision', {
-                        document: documentName,
+                    new SchemaParseFailure(ctx.documentName, finalPath, 'PathCollision', {
+                        document: ctx.documentName,
                         path: finalOtherPath,
                     }),
                 );
@@ -35,18 +28,7 @@ export function parseStructFields(
         }
 
         try {
-            const parsedField = parseField(
-                documentName,
-                path,
-                fieldDeclaration,
-                referenceStruct[fieldDeclaration],
-                uapiSchemaDocumentNamesToPseudoJson,
-                schemaKeysToDocumentName,
-                schemaKeysToIndex,
-                parsedTypes,
-                allParseFailures,
-                failedTypes,
-            );
+            const parsedField = parseField(fieldDeclaration, referenceStruct[fieldDeclaration], ctx);
             const fieldName = parsedField.fieldName;
             fields[fieldName] = parsedField;
         } catch (e) {

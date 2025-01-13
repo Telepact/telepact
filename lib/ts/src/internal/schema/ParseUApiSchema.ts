@@ -11,7 +11,8 @@ import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
-import { UError } from '../types/UError';
+import { UError } from '../../internal/types/UError';
+import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<string, object[]>): UApiSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};
@@ -109,15 +110,17 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
 
         try {
             getOrParseType(
-                thisDocumentName,
-                [thisIndex],
                 schemaKey,
-                uApiSchemaDocumentNamesToPseudoJson,
-                schemaKeysToDocumentName,
-                schemaKeysToIndex,
-                parsedTypes,
-                parseFailures,
-                failedTypes,
+                new ParseContext(
+                    thisDocumentName,
+                    [thisIndex],
+                    uApiSchemaDocumentNamesToPseudoJson,
+                    schemaKeysToDocumentName,
+                    schemaKeysToIndex,
+                    parsedTypes,
+                    parseFailures,
+                    failedTypes,
+                ),
             );
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
@@ -144,15 +147,17 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
             try {
                 const error = parseErrorType(
                     def_,
-                    thisDocumentName,
-                    uApiSchemaDocumentNamesToPseudoJson,
                     thisKey,
-                    thisIndex,
-                    schemaKeysToDocumentName,
-                    schemaKeysToIndex,
-                    parsedTypes,
-                    parseFailures,
-                    failedTypes,
+                    new ParseContext(
+                        thisDocumentName,
+                        [thisIndex],
+                        uApiSchemaDocumentNamesToPseudoJson,
+                        schemaKeysToDocumentName,
+                        schemaKeysToIndex,
+                        parsedTypes,
+                        parseFailures,
+                        failedTypes,
+                    ),
                 );
                 errors.push(error);
             } catch (e) {
@@ -218,17 +223,19 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
 
         try {
             const requestHeaderType = parseHeadersType(
-                thisDocumentName,
                 def_,
                 requestHeaderKey,
                 headerField,
-                thisIndex,
-                uApiSchemaDocumentNamesToPseudoJson,
-                schemaKeysToDocumentName,
-                schemaKeysToIndex,
-                parsedTypes,
-                parseFailures,
-                failedTypes,
+                new ParseContext(
+                    thisDocumentName,
+                    [thisIndex, requestHeaderKey],
+                    uApiSchemaDocumentNamesToPseudoJson,
+                    schemaKeysToDocumentName,
+                    schemaKeysToIndex,
+                    parsedTypes,
+                    parseFailures,
+                    failedTypes,
+                ),
             );
             requestHeaders[requestHeaderType.fieldName] = requestHeaderType;
         } catch (e) {
@@ -249,17 +256,19 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
 
         try {
             const responseHeaderType = parseHeadersType(
-                thisDocumentName,
                 def_,
                 responseHeaderKey,
                 headerField,
-                thisIndex,
-                uApiSchemaDocumentNamesToPseudoJson,
-                schemaKeysToDocumentName,
-                schemaKeysToIndex,
-                parsedTypes,
-                parseFailures,
-                failedTypes,
+                new ParseContext(
+                    thisDocumentName,
+                    [thisIndex, responseHeaderKey],
+                    uApiSchemaDocumentNamesToPseudoJson,
+                    schemaKeysToDocumentName,
+                    schemaKeysToIndex,
+                    parsedTypes,
+                    parseFailures,
+                    failedTypes,
+                ),
             );
             responseHeaders[responseHeaderType.fieldName] = responseHeaderType;
         } catch (e) {
