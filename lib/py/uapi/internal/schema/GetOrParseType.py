@@ -26,7 +26,7 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
     from uapi.internal.schema.ParseUnionType import parse_union_type
 
     if type_name in ctx.failed_types:
-        raise UApiSchemaParseError([])
+        raise UApiSchemaParseError([], ctx.uapi_schema_document_names_to_json)
 
     existing_type = ctx.parsed_types.get(type_name)
     if existing_type is not None:
@@ -38,7 +38,9 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
     matcher = regex.match(type_name)
     if not matcher:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(ctx.document_name, ctx.path, "StringRegexMatchFailed", {"regex": regex_string})])
+            [SchemaParseFailure(ctx.document_name, ctx.path, "StringRegexMatchFailed", {
+                                "regex": regex_string})],
+            ctx.uapi_schema_document_names_to_json)
 
     standard_type_name = matcher.group(1)
     if standard_type_name is not None:
@@ -57,7 +59,9 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
         str, ctx.schema_keys_to_document_name.get(custom_type_name))
     if this_index is None:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(ctx.document_name, ctx.path, "TypeUnknown", {"name": custom_type_name})])
+            [SchemaParseFailure(ctx.document_name, ctx.path, "TypeUnknown", {
+                                "name": custom_type_name})],
+            ctx.uapi_schema_document_names_to_json)
 
     u_api_schema_pseudo_json = cast(
         list[object], ctx.uapi_schema_document_names_to_pseudo_json.get(this_document_name))
@@ -90,7 +94,7 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
                         'TypeExtensionImplementationMissing',
                         {'name': custom_type_name}
                     ),
-                ])
+                ], ctx.uapi_schema_document_names_to_json)
 
             type = possible_type_extension
 
@@ -100,4 +104,4 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
     except UApiSchemaParseError as e:
         ctx.all_parse_failures.extend(e.schema_parse_failures)
         ctx.failed_types.add(custom_type_name)
-        raise UApiSchemaParseError([])
+        raise UApiSchemaParseError([], ctx.uapi_schema_document_names_to_json)

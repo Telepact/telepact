@@ -22,7 +22,7 @@ def parse_field(field_declaration: str, type_declaration_value: object,
         final_path = ctx.path + [field_declaration]
         raise UApiSchemaParseError([SchemaParseFailure(ctx.document_name, final_path,
                                                        "KeyRegexMatchFailed",
-                                                       {"regex": regex_string})])
+                                                       {"regex": regex_string})], ctx.uapi_schema_document_names_to_json)
 
     field_name = matcher.group(0)
     optional = bool(matcher.group(2))
@@ -34,7 +34,7 @@ def parse_field(field_declaration: str, type_declaration_value: object,
             ctx.document_name,
             this_path,
             type_declaration_value,
-            "Array"))
+            "Array"), ctx.uapi_schema_document_names_to_json)
     type_declaration_array = type_declaration_value
 
     type_declaration = parse_type_declaration(

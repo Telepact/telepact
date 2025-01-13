@@ -16,7 +16,7 @@ def parse_type_declaration(type_declaration_array: list[object],
 
     if not type_declaration_array:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(ctx.document_name, ctx.path, "EmptyArrayDisallowed", {})])
+            [SchemaParseFailure(ctx.document_name, ctx.path, "EmptyArrayDisallowed", {})], ctx.uapi_schema_document_names_to_json)
 
     base_path = ctx.path + [0]
     base_type = type_declaration_array[0]
@@ -24,7 +24,8 @@ def parse_type_declaration(type_declaration_array: list[object],
     if not isinstance(base_type, str):
         this_parse_failures = get_type_unexpected_parse_failure(
             ctx.document_name, base_path, base_type, "String")
-        raise UApiSchemaParseError(this_parse_failures)
+        raise UApiSchemaParseError(
+            this_parse_failures, ctx.uapi_schema_document_names_to_json)
 
     root_type_string = base_type
 
@@ -34,7 +35,7 @@ def parse_type_declaration(type_declaration_array: list[object],
     matcher = regex.match(root_type_string)
     if not matcher:
         raise UApiSchemaParseError([SchemaParseFailure(
-            ctx.document_name, base_path, "StringRegexMatchFailed", {"regex": regex_string})])
+            ctx.document_name, base_path, "StringRegexMatchFailed", {"regex": regex_string})], ctx.uapi_schema_document_names_to_json)
 
     type_name = matcher.group(1)
     nullable = bool(matcher.group(2))
@@ -45,7 +46,7 @@ def parse_type_declaration(type_declaration_array: list[object],
     if type_.get_type_parameter_count() != given_type_parameter_count:
         raise UApiSchemaParseError([SchemaParseFailure(ctx.document_name, ctx.path, "ArrayLengthUnexpected",
                                                        {"actual": len(type_declaration_array),
-                                                        "expected": type_.get_type_parameter_count() + 1})])
+                                                        "expected": type_.get_type_parameter_count() + 1})], ctx.uapi_schema_document_names_to_json)
 
     parse_failures = []
     type_parameters = []
@@ -69,6 +70,7 @@ def parse_type_declaration(type_declaration_array: list[object],
             parse_failures.extend(e2.schema_parse_failures)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     return UTypeDeclaration(type_, nullable, type_parameters)

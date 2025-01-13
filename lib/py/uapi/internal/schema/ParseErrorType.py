@@ -25,7 +25,8 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
                 ctx.document_name, cast(list[object], loop_path), "ObjectKeyDisallowed", {}))
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     error = parse_union_type(error_definition_as_parsed_json, schema_key, [], [],
                              ctx)

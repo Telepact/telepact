@@ -1,104 +1,114 @@
-from typing import Tuple, cast
+from typing import Tuple, cast, Generator
+
+
+def string_reader(s: str) -> Generator[Tuple[str, int, int], str, str]:
+    row = 0
+    col = 0
+    for c in s:
+        yield c, row, col
+    return ""
+
+
+def find_coordinates(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object]:
+
+    if len(path) == 0:
+        return {
+            'row': 0,
+            'col': 0
+        }
+
+    for c, row, col in reader:
+        if c == '{':
+            result = find_coordinates_object(path, reader)
+            if result:
+                return result
+        if c == '[':
+            result = find_coordinates_array(path, reader)
+            if result:
+                return result
+
+    raise ValueError("Path not found in document")
+
+
+def find_value(reader: Generator[Tuple[str, int, int], str, str]) -> None:
+    for c, row, col in reader:
+        if c == '{':
+            find_object(reader)
+        elif c == '[':
+            find_array(reader)
+        elif c == '"':
+            find_string(reader)
+        elif c == '}':
+            return
+        elif c == ']':
+            return
+        elif c == ',':
+            return
+
+
+def find_object(reader: Generator[Tuple[str, int, int], str, str]) -> None:
+    working_key = None
+    working_string = None
+    for c, row, col in reader:
+        if c == '}':
+            return
+        elif c == '"':
+            find_string(reader)
+        elif c == ':':
+            find_value(reader)
+
+
+def find_array(reader: Generator[Tuple[str, int, int], str, str]) -> None:
+    find_value(reader)
+
+    working_index = 0
+    for c, row, col in reader:
+        working_index += 1
+        find_value(reader)
+
+
+def find_coordinates_object(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
+    for c, row, col in reader:
+        if c == '}':
+            return None
+        elif c == '"':
+            working_key = find_string(reader)
+        elif c == ':':
+            if working_key == path[0]:
+                return find_coordinates(path[1:], reader)
+            else:
+                find_value(reader)
+
+    raise ValueError("Path not found in document")
+
+
+def find_coordinates_array(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
+    working_index = 0
+    if working_index == path[0]:
+        return find_coordinates(path[1:], reader)
+    else:
+        find_value(reader)
+
+    for c, row, col in reader:
+        working_index += 1
+        if working_index == path[0]:
+            return find_coordinates(path[1:], reader)
+        else:
+            find_value(reader)
+
+    raise ValueError("Path not found in document")
+
+
+def find_string(reader: Generator[(str, int, int), str, str]) -> str:
+    working_string = ""
+    for c in reader:
+        if c == '"':
+            return working_string
+        else:
+            working_string += c
+    raise ValueError("String not closed")
 
 
 def get_path_document_coordinates_pseudo_json(path: list[object], document: str) -> dict[str, object]:
-
-    working_document = document
-    working_path = path.copy()
-
-    stack = [('', 0, 0)]
-
-    row = 0
-    col = 0
-
-    def get_pseudo_json(last: Tuple[str, int, int]) -> dict[str, object]:
-        return {
-            "row": last[1],
-            "col": last[2]
-        }
-
-    print(f"Working path: {working_path}")
-
-    working_s = ""
-    last_s = ""
-    last = ('', 0, 0)
-    working_index = 0
-
-    while working_document:
-        c = working_document[0]
-        working_document = working_document[1:]
-        print(f"Processing character: {c}")
-
-        col += 1
-        print(f"Updated col: {col}")
-
-        if c == '\n':
-            row += 1
-            col = 0
-            print(f"Newline found. Updated row: {row}, reset col: {col}")
-
-        if c == '{':
-            print(f"Found '{{' at row {row}, col {col}")
-            stack.append(('{', row, col))
-            print(f"Updated stack: {stack}")
-        elif c == '"' and stack[-1][0] != '"':
-            print(f"Found '\"' at row {row}, col {col}")
-            stack.append(('"', row, col))
-            print(f"Updated stack: {stack}")
-        elif c != '"' and stack[-1][0] == '"':
-            print(f"Appending to working_s: {c}")
-            working_s += c
-            print(f"Updated working_s: {working_s}")
-        elif c == '"' and stack[-1][0] == '"':
-            print(f"Closing '\"' at row {row}, col {col}")
-            last_s = working_s
-            working_s = ""
-            last = stack.pop()
-            print(
-                f"Updated last_s: {last_s}, reset working_s, updated stack: {stack}")
-        elif c == ':':
-            print(f"Found ':' at row {row}, col {col}")
-            if last_s == working_path[0]:
-                print(f"Matched path segment: {last_s}")
-                working_path = working_path[1:]
-                print(f"Updated working_path: {working_path}")
-                if not working_path:
-                    print("Path fully matched")
-                    return get_pseudo_json(last)
-            stack.append((':', row, col))
-            print(f"Updated stack: {stack}")
-        elif c == ',' and stack[-1][0] == ':':
-            print(f"Found ',' after ':' at row {row}, col {col}")
-            last = stack.pop()
-            print(f"Updated stack: {stack}")
-        elif c == '}' and stack[-1][0] == ':':
-            print(f"Found '}}' after ':' at row {row}, col {col}")
-            last = stack.pop()
-            print(f"Updated stack: {stack}")
-            last = stack.pop()
-            print(f"Updated stack: {stack}")
-        elif c == '}':
-            print(f"Found '}}' at row {row}, col {col}")
-            last = stack.pop()
-            print(f"Updated stack: {stack}")
-        elif c == '[':
-            print(f"Found '[' at row {row}, col {col}")
-            stack.append(('[', row, col))
-            print(f"Updated stack: {stack}")
-        elif c == ',' and stack[-1][0] == '[':
-            print(f"Found ',' in array at row {row}, col {col}")
-            working_index += 1
-            print(f"Updated working_index: {working_index}")
-            if working_index == working_path[0]:
-                print(f"Matched array index: {working_index}")
-                working_path = working_path[1:]
-                print(f"Updated working_path: {working_path}")
-                if not working_path:
-                    print("Path fully matched")
-                    return get_pseudo_json(last)
-        elif c == ']':
-            print(f"Found ']' at row {row}, col {col}")
-            last = stack.pop()
-            print(f"Updated stack: {stack}")
-
-    raise ValueError("Path not found in document")
+    reader = string_reader(document)
+    return find_coordinates(path, reader)

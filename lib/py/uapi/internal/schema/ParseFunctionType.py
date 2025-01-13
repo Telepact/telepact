@@ -66,6 +66,7 @@ def parse_function_type(document_name: str, path: list[object], function_definit
             errors_regex = errors_regex_init
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     return UFn(schema_key, cast(UUnion, call_type), cast(UUnion, result_type), cast(str, errors_regex))

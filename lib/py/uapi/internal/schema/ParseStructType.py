@@ -42,7 +42,8 @@ def parse_struct_type(struct_definition_as_pseudo_json: dict[str, object],
         definition = def_init
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     fields = parse_struct_fields(definition, ctx.copy(path=this_path))
 

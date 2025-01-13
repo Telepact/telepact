@@ -37,7 +37,8 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
         final_parse_failures = get_type_unexpected_parse_failure(
             ctx.document_name, this_path, def_init, "Array")
         parse_failures.extend(final_parse_failures)
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     definition2 = def_init
     definition = []
@@ -53,7 +54,8 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
         definition.append(element)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     if not definition and not required_keys:
         parse_failures.append(SchemaParseFailure(
@@ -118,6 +120,7 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
         case_indices[union_case] = i
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     return UUnion(schema_key, cases, case_indices)

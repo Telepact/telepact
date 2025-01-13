@@ -27,7 +27,10 @@ def parse_struct_fields(reference_struct: dict[str, object], ctx: 'ParseContext'
                 final_other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
                     final_other_path, final_other_document_json)
                 parse_failures.append(SchemaParseFailure(
-                    ctx.document_name, final_path, "PathCollision", {"document": ctx.document_name, "location": final_other_location_pseudo_json}))
+                    ctx.document_name, final_path, "PathCollision", {
+                        "document": ctx.document_name,
+                        "path": final_other_path,
+                        "location": final_other_location_pseudo_json}))
 
         try:
             parsed_field = parse_field(
@@ -38,6 +41,7 @@ def parse_struct_fields(reference_struct: dict[str, object], ctx: 'ParseContext'
             parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, ctx.uapi_schema_document_names_to_json)
 
     return fields

@@ -58,9 +58,11 @@ def apply_error_to_parsed_types(error: 'UError', parsed_types: dict[str, 'UType'
                      error_case_index, new_key],
                     "PathCollision",
                     {"document": other_document_name,
+                     "path": other_final_path,
                         "location": other_location_pseudo_json}
                 ))
             fn_result_cases[new_key] = error_case
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, document_names_to_json)

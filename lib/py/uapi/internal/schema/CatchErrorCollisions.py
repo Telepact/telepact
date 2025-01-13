@@ -58,8 +58,9 @@ def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[obje
                                 this_other_error_def_key],
                             "PathCollision",
                             {"document": document_name,
+                             "path": final_this_path,
                              "location": final_this_location_pseudo_json}
                         ))
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(parse_failures, document_names_to_json)

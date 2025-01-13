@@ -46,7 +46,7 @@ def parse_uapi_schema(
             uapi_schema_pseudo_json_init = json.loads(uapi_schema_json)
         except json.JSONDecodeError as e:
             raise UApiSchemaParseError(
-                [SchemaParseFailure(document_name, [], "JsonInvalid", {})]) from e
+                [SchemaParseFailure(document_name, [], "JsonInvalid", {})], uapi_schema_document_names_to_json) from e
 
         if not isinstance(uapi_schema_pseudo_json_init, list):
             this_parse_failure = get_type_unexpected_parse_failure(
@@ -75,7 +75,8 @@ def parse_uapi_schema(
             def_ = definition
 
             try:
-                schema_key = find_schema_key(document_name, def_, index)
+                schema_key = find_schema_key(
+                    document_name, def_, index, uapi_schema_document_names_to_json)
 
                 matching_schema_key = find_matching_schema_key(
                     schema_keys, schema_key)
@@ -91,7 +92,10 @@ def parse_uapi_schema(
                         SchemaParseFailure(
                             document_name, cast(list[object], final_path),
                             "PathCollision",
-                            {"document": other_document_name, "location": location_pseudo_json})
+                            {
+                                "document": other_document_name,
+                                "path": final_other_path,
+                                "location": location_pseudo_json})
                     )
                     continue
 

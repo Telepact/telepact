@@ -14,7 +14,7 @@ def parse_headers_type(type_declaration_value: object,
 
     if not isinstance(type_declaration_value, list):
         raise UApiSchemaParseError(get_type_unexpected_parse_failure(
-            ctx.document_name, ctx.path, type_declaration_value, "Array"))
+            ctx.document_name, ctx.path, type_declaration_value, "Array"), ctx.uapi_schema_document_names_to_json)
 
     type_declaration_array = type_declaration_value
 
@@ -23,4 +23,5 @@ def parse_headers_type(type_declaration_value: object,
 
         return UFieldDeclaration(header_field, type_declaration, False)
     except UApiSchemaParseError as e:
-        raise UApiSchemaParseError(e.schema_parse_failures)
+        raise UApiSchemaParseError(
+            e.schema_parse_failures, ctx.uapi_schema_document_names_to_json)

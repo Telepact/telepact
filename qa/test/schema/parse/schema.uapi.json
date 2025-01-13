@@ -71,16 +71,24 @@
         }, {
             "PathCollision": {
                 "document": ["string"],
-                "path": ["array", ["any"]]
+                "path": ["array", ["any"]],
+                "location": ["struct.JsonLocation"]
             }
         }, {
             "ObjectKeyDisallowed": {}
         }]
     },
     {
+        "struct.JsonLocation": {
+            "row": ["integer"],
+            "col": ["integer"]
+        }
+    },
+    {
         "struct.ValidationFailure": {
             "document": ["string"],
             "path": ["array", ["any"]],
+            "location": ["struct.JsonLocation"],
             "reason": ["union.ValidationFailureReason"]
         }
     },
