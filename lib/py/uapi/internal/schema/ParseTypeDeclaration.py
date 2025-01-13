@@ -5,27 +5,25 @@ from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
+    from uapi.internal.schema.ParseContext import ParseContext
 
 
-def parse_type_declaration(document_name: str, path: list[object], type_declaration_array: list[object],
-                           uapi_schema_document_name_to_pseudo_json: dict[str, list[object]],
-                           schema_keys_to_document_name: dict[str, str], schema_keys_to_index: dict[str, int], parsed_types: dict[str, 'UType'],
-                           all_parse_failures: list['SchemaParseFailure'],
-                           failed_types: set[str]) -> 'UTypeDeclaration':
+def parse_type_declaration(type_declaration_array: list[object],
+                           ctx: 'ParseContext') -> 'UTypeDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetOrParseType import get_or_parse_type
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
 
     if not type_declaration_array:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(document_name, path, "EmptyArrayDisallowed", {})])
+            [SchemaParseFailure(ctx.document_name, ctx.path, "EmptyArrayDisallowed", {})])
 
-    base_path = path + [0]
+    base_path = ctx.path + [0]
     base_type = type_declaration_array[0]
 
     if not isinstance(base_type, str):
         this_parse_failures = get_type_unexpected_parse_failure(
-            document_name, base_path, base_type, "String")
+            ctx.document_name, base_path, base_type, "String")
         raise UApiSchemaParseError(this_parse_failures)
 
     root_type_string = base_type
@@ -36,17 +34,16 @@ def parse_type_declaration(document_name: str, path: list[object], type_declarat
     matcher = regex.match(root_type_string)
     if not matcher:
         raise UApiSchemaParseError([SchemaParseFailure(
-            document_name, base_path, "StringRegexMatchFailed", {"regex": regex_string})])
+            ctx.document_name, base_path, "StringRegexMatchFailed", {"regex": regex_string})])
 
     type_name = matcher.group(1)
     nullable = bool(matcher.group(2))
 
-    type_ = get_or_parse_type(document_name, base_path, type_name, uapi_schema_document_name_to_pseudo_json,
-                              schema_keys_to_document_name, schema_keys_to_index, parsed_types, all_parse_failures, failed_types)
+    type_ = get_or_parse_type(type_name, ctx.copy(path=base_path))
 
     given_type_parameter_count = len(type_declaration_array) - 1
     if type_.get_type_parameter_count() != given_type_parameter_count:
-        raise UApiSchemaParseError([SchemaParseFailure(document_name, path, "ArrayLengthUnexpected",
+        raise UApiSchemaParseError([SchemaParseFailure(ctx.document_name, ctx.path, "ArrayLengthUnexpected",
                                                        {"actual": len(type_declaration_array),
                                                         "expected": type_.get_type_parameter_count() + 1})])
 
@@ -55,20 +52,17 @@ def parse_type_declaration(document_name: str, path: list[object], type_declarat
     given_type_parameters = type_declaration_array[1:]
 
     for index, e in enumerate(given_type_parameters, start=1):
-        loop_path = path + [index]
+        loop_path = ctx.path + [index]
 
         if not isinstance(e, list):
             this_parse_failures = get_type_unexpected_parse_failure(
-                document_name, loop_path, e, "Array")
+                ctx.document_name, loop_path, e, "Array")
             parse_failures.extend(this_parse_failures)
             continue
 
         try:
-            type_parameter_type_declaration = parse_type_declaration(document_name, loop_path, e,
-                                                                     uapi_schema_document_name_to_pseudo_json,
-                                                                     schema_keys_to_document_name, schema_keys_to_index,
-                                                                     parsed_types, all_parse_failures,
-                                                                     failed_types)
+            type_parameter_type_declaration = parse_type_declaration(
+                e, ctx.copy(path=loop_path))
 
             type_parameters.append(type_parameter_type_declaration)
         except UApiSchemaParseError as e2:

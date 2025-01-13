@@ -23,6 +23,7 @@ def parse_uapi_schema(
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseErrorType import parse_error_type
     from uapi.internal.schema.ParseHeadersType import parse_headers_type
+    from uapi.internal.schema.ParseContext import ParseContext
     from uapi.internal.types.UError import UError
     from collections import OrderedDict
 
@@ -125,15 +126,17 @@ def parse_uapi_schema(
 
         try:
             get_or_parse_type(
-                document_name,
-                [this_index],
                 schema_key,
-                u_api_schema_document_name_to_pseudo_json,
-                schema_keys_to_document_names,
-                schema_keys_to_index,
-                parsed_types,
-                parse_failures,
-                failed_types,
+                ParseContext(
+                    document_name,
+                    [this_index],
+                    u_api_schema_document_name_to_pseudo_json,
+                    schema_keys_to_document_names,
+                    schema_keys_to_index,
+                    parsed_types,
+                    parse_failures,
+                    failed_types
+                )
             )
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
@@ -155,15 +158,18 @@ def parse_uapi_schema(
         try:
             error = parse_error_type(
                 def_,
-                this_document_name,
-                u_api_schema_document_name_to_pseudo_json,
                 this_key,
                 this_index,
-                schema_keys_to_document_names,
-                schema_keys_to_index,
-                parsed_types,
-                parse_failures,
-                failed_types,
+                ParseContext(
+                    this_document_name,
+                    [this_index],
+                    u_api_schema_document_name_to_pseudo_json,
+                    schema_keys_to_document_names,
+                    schema_keys_to_index,
+                    parsed_types,
+                    parse_failures,
+                    failed_types
+                )
             )
             errors.append(error)
         except UApiSchemaParseError as e:
@@ -204,17 +210,18 @@ def parse_uapi_schema(
 
         try:
             request_header_type = parse_headers_type(
-                this_document_name,
-                def_,
-                request_header_key,
+                def_[request_header_key],
                 header_field,
-                this_index,
-                u_api_schema_document_name_to_pseudo_json,
-                schema_keys_to_document_names,
-                schema_keys_to_index,
-                parsed_types,
-                parse_failures,
-                failed_types,
+                ParseContext(
+                    this_document_name,
+                    [this_index, request_header_key],
+                    u_api_schema_document_name_to_pseudo_json,
+                    schema_keys_to_document_names,
+                    schema_keys_to_index,
+                    parsed_types,
+                    parse_failures,
+                    failed_types
+                )
             )
             request_headers[request_header_type.field_name] = request_header_type
         except UApiSchemaParseError as e:
@@ -231,17 +238,18 @@ def parse_uapi_schema(
 
         try:
             response_header_type = parse_headers_type(
-                this_document_name,
-                def_,
-                response_header_key,
+                def_[response_header_key],
                 header_field,
-                this_index,
-                u_api_schema_document_name_to_pseudo_json,
-                schema_keys_to_document_names,
-                schema_keys_to_index,
-                parsed_types,
-                parse_failures,
-                failed_types,
+                ParseContext(
+                    this_document_name,
+                    [this_index, response_header_key],
+                    u_api_schema_document_name_to_pseudo_json,
+                    schema_keys_to_document_names,
+                    schema_keys_to_index,
+                    parsed_types,
+                    parse_failures,
+                    failed_types,
+                )
             )
             response_headers[response_header_type.field_name] = response_header_type
         except UApiSchemaParseError as e:

@@ -4,15 +4,13 @@ from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 from uapi.internal.types.UUnion import UUnion
 
 if TYPE_CHECKING:
+    from uapi.internal.schema.ParseContext import ParseContext
     from uapi.internal.types.UType import UType
 
 
-def parse_union_type(document_name: str, path: list[object], union_definition_as_pseudo_json: dict[str, object], schema_key: str,
+def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_key: str,
                      ignore_keys: list[str], required_keys: list[str],
-                     u_api_schema_document_name_to_pseudo_json: dict[str, list[object]],
-                     schema_keys_to_document_name: dict[str, str], schema_keys_to_index: dict[str, int],
-                     parsed_types: dict[str, 'UType'],
-                     all_parse_failures: list['SchemaParseFailure'], failed_types: set[str]) -> 'UUnion':
+                     ctx: 'ParseContext') -> 'UUnion':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructFields import parse_struct_fields
@@ -28,16 +26,16 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
 
     if other_keys:
         for k in other_keys:
-            loop_path = path + [k]
+            loop_path = ctx.path + [k]
             parse_failures.append(SchemaParseFailure(
-                document_name, loop_path, "ObjectKeyDisallowed", {}))
+                ctx.document_name, loop_path, "ObjectKeyDisallowed", {}))
 
-    this_path = path + [schema_key]
+    this_path = ctx.path + [schema_key]
     def_init = union_definition_as_pseudo_json[schema_key]
 
     if not isinstance(def_init, list):
         final_parse_failures = get_type_unexpected_parse_failure(
-            document_name, this_path, def_init, "Array")
+            ctx.document_name, this_path, def_init, "Array")
         parse_failures.extend(final_parse_failures)
         raise UApiSchemaParseError(parse_failures)
 
@@ -49,7 +47,7 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
         loop_path = this_path + [index]
         if not isinstance(element, dict):
             this_parse_failures = get_type_unexpected_parse_failure(
-                document_name, loop_path, element, "Object")
+                ctx.document_name, loop_path, element, "Object")
             parse_failures.extend(this_parse_failures)
             continue
         definition.append(element)
@@ -59,7 +57,7 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
 
     if not definition and not required_keys:
         parse_failures.append(SchemaParseFailure(
-            document_name, this_path, "EmptyArrayDisallowed", {}))
+            ctx.document_name, this_path, "EmptyArrayDisallowed", {}))
     else:
         for required_key in required_keys:
             for element in definition:
@@ -70,7 +68,7 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
             else:
                 branch_path = this_path + [0, required_key]
                 parse_failures.append(SchemaParseFailure(
-                    document_name, branch_path, "RequiredObjectKeyMissing", {}))
+                    ctx.document_name, branch_path, "RequiredObjectKeyMissing", {}))
 
     cases = {}
     case_indices = {}
@@ -86,12 +84,12 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
 
         matches = [k for k in keys if re.match(regex_string, k)]
         if len(matches) != 1:
-            parse_failures.append(SchemaParseFailure(document_name, loop_path, "ObjectKeyRegexMatchCountUnexpected",
+            parse_failures.append(SchemaParseFailure(ctx.document_name, loop_path, "ObjectKeyRegexMatchCountUnexpected",
                                                      {"regex": regex_string, "actual": len(matches),
                                                       "expected": 1, "keys": keys}))
             continue
         if len(map) != 1:
-            parse_failures.append(SchemaParseFailure(document_name, loop_path, "ObjectSizeUnexpected",
+            parse_failures.append(SchemaParseFailure(ctx.document_name, loop_path, "ObjectSizeUnexpected",
                                                      {"expected": 1, "actual": len(map)}))
             continue
 
@@ -101,15 +99,14 @@ def parse_union_type(document_name: str, path: list[object], union_definition_as
 
         if not isinstance(entry[1], dict):
             this_parse_failures = get_type_unexpected_parse_failure(
-                document_name, union_key_path, entry[1], "Object")
+                ctx.document_name, union_key_path, entry[1], "Object")
             parse_failures.extend(this_parse_failures)
             continue
         union_case_struct = entry[1]
 
         try:
-            fields = parse_struct_fields(union_case_struct, document_name, union_key_path,
-                                         u_api_schema_document_name_to_pseudo_json, schema_keys_to_document_name, schema_keys_to_index, parsed_types,
-                                         all_parse_failures, failed_types)
+            fields = parse_struct_fields(
+                union_case_struct, ctx.copy(path=union_key_path))
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue
