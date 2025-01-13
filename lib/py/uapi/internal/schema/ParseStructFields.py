@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 def parse_struct_fields(reference_struct: dict[str, object], ctx: 'ParseContext') -> dict[str, 'UFieldDeclaration']:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ParseField import parse_field
+    from uapi.internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
 
     parse_failures = []
     fields: dict[str, 'UFieldDeclaration'] = {}
@@ -21,8 +22,12 @@ def parse_struct_fields(reference_struct: dict[str, object], ctx: 'ParseContext'
             if field_no_opt == existing_field_no_opt:
                 final_path = ctx.path + [field_declaration]
                 final_other_path = ctx.path + [existing_field]
+                final_other_document_json = ctx.uapi_schema_document_names_to_json[
+                    ctx.document_name]
+                final_other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
+                    final_other_path, final_other_document_json)
                 parse_failures.append(SchemaParseFailure(
-                    ctx.document_name, final_path, "PathCollision", {"document": ctx.document_name, "path": final_other_path}))
+                    ctx.document_name, final_path, "PathCollision", {"document": ctx.document_name, "location": final_other_location_pseudo_json}))
 
         try:
             parsed_field = parse_field(

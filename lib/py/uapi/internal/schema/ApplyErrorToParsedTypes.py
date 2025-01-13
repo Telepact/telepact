@@ -9,9 +9,10 @@ if TYPE_CHECKING:
     from uapi.internal.types.UUnion import UUnion
 
 
-def apply_error_to_parsed_types(error: 'UError', parsed_types: dict[str, 'UType'], schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int]) -> None:
+def apply_error_to_parsed_types(error: 'UError', parsed_types: dict[str, 'UType'], schema_keys_to_document_names: dict[str, str], schema_keys_to_index: dict[str, int], document_names_to_json: dict[str, str]) -> None:
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
     from uapi.UApiSchemaParseError import UApiSchemaParseError
+    from uapi.internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
     from uapi.internal.types.UFn import UFn
 
     parse_failures = []
@@ -46,13 +47,18 @@ def apply_error_to_parsed_types(error: 'UError', parsed_types: dict[str, 'UType'
                 error_case_index = error.errors.case_indices[new_key]
                 other_document_name = schema_keys_to_document_names[fn_name]
                 fn_error_case_index = f.result.case_indices[new_key]
+                other_final_path = [other_path_index,
+                                    "->", fn_error_case_index, new_key]
+                other_document_json = document_names_to_json[other_document_name]
+                other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
+                    other_final_path, other_document_json)
                 parse_failures.append(SchemaParseFailure(
                     document_name,
                     [error_index, error_key,
                      error_case_index, new_key],
                     "PathCollision",
-                    {"document": other_document_name, "path": [other_path_index, "->",
-                                                               fn_error_case_index, new_key]}
+                    {"document": other_document_name,
+                        "location": other_location_pseudo_json}
                 ))
             fn_result_cases[new_key] = error_case
 

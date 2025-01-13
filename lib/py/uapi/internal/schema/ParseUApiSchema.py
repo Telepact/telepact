@@ -24,6 +24,7 @@ def parse_uapi_schema(
     from uapi.internal.schema.ParseErrorType import parse_error_type
     from uapi.internal.schema.ParseHeadersType import parse_headers_type
     from uapi.internal.schema.ParseContext import ParseContext
+    from uapi.internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
     from uapi.internal.types.UError import UError
     from collections import OrderedDict
 
@@ -82,11 +83,15 @@ def parse_uapi_schema(
                     other_path_index = schema_keys_to_index[matching_schema_key]
                     other_document_name = schema_keys_to_document_names[matching_schema_key]
                     final_path = loop_path + [schema_key]
+                    final_other_path = [other_path_index, matching_schema_key]
+                    document_json = uapi_schema_document_names_to_json[document_name]
+                    location_pseudo_json = get_path_document_coordinates_pseudo_json(
+                        final_other_path, document_json)
                     parse_failures.append(
                         SchemaParseFailure(
                             document_name, cast(list[object], final_path),
                             "PathCollision",
-                            {"document": other_document_name, "path": [other_path_index, matching_schema_key]})
+                            {"document": other_document_name, "location": location_pseudo_json})
                     )
                     continue
 
@@ -131,6 +136,7 @@ def parse_uapi_schema(
                     document_name,
                     [this_index],
                     u_api_schema_document_name_to_pseudo_json,
+                    uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,
@@ -163,6 +169,7 @@ def parse_uapi_schema(
                     this_document_name,
                     [this_index],
                     u_api_schema_document_name_to_pseudo_json,
+                    uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,
@@ -180,7 +187,7 @@ def parse_uapi_schema(
 
     try:
         catch_error_collisions(u_api_schema_document_name_to_pseudo_json,
-                               error_keys, schema_keys_to_index, schema_keys_to_document_names)
+                               error_keys, schema_keys_to_index, schema_keys_to_document_names, uapi_schema_document_names_to_json)
     except UApiSchemaParseError as e:
         parse_failures.extend(e.schema_parse_failures)
 
@@ -191,7 +198,7 @@ def parse_uapi_schema(
     for error in errors:
         try:
             apply_error_to_parsed_types(
-                error, parsed_types, schema_keys_to_document_names, schema_keys_to_index)
+                error, parsed_types, schema_keys_to_document_names, schema_keys_to_index, uapi_schema_document_names_to_json)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
 
@@ -215,6 +222,7 @@ def parse_uapi_schema(
                     this_document_name,
                     [this_index, request_header_key],
                     u_api_schema_document_name_to_pseudo_json,
+                    uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,
@@ -243,6 +251,7 @@ def parse_uapi_schema(
                     this_document_name,
                     [this_index, response_header_key],
                     u_api_schema_document_name_to_pseudo_json,
+                    uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
                     schema_keys_to_index,
                     parsed_types,

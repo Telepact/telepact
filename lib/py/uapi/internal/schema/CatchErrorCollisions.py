@@ -1,9 +1,10 @@
 from typing import cast
 
 
-def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[object]], error_keys: set[str], keys_to_index: dict[str, int], schema_keys_to_document_name: dict[str, str]) -> None:
+def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[object]], error_keys: set[str], keys_to_index: dict[str, int], schema_keys_to_document_name: dict[str, str], document_names_to_json: dict[str, str]) -> None:
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+    from uapi.internal.schema.GetPathDocumentCoordinatesPseudoJson import get_path_document_coordinates_pseudo_json
 
     parse_failures = []
     error_keys_list = list(error_keys)
@@ -46,13 +47,18 @@ def catch_error_collisions(u_api_schema_name_to_pseudo_json: dict[str, list[obje
                         this_error_def_key = next(iter(this_err_def_keys))
                         this_other_error_def_key = next(
                             iter(this_other_err_def_keys))
+                        final_this_path = [
+                            index, def_key, k, this_error_def_key]
+                        final_this_document_json = document_names_to_json[document_name]
+                        final_this_location_pseudo_json = get_path_document_coordinates_pseudo_json(
+                            final_this_path, final_this_document_json)
                         parse_failures.append(SchemaParseFailure(
                             other_document_name,
                             [other_index, other_def_key, l,
                                 this_other_error_def_key],
                             "PathCollision",
                             {"document": document_name,
-                             "path": [index, def_key, k, this_error_def_key]}
+                             "location": final_this_location_pseudo_json}
                         ))
 
     if parse_failures:
