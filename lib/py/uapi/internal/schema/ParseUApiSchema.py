@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING, cast
 from uapi.UApiSchema import UApiSchema
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
 
+import json
+
 
 if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
 
 
 def parse_uapi_schema(
-    u_api_schema_document_name_to_pseudo_json: dict[str, list[object]]
+    uapi_schema_document_names_to_json: dict[str, str],
 ) -> 'UApiSchema':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.ApplyErrorToParsedTypes import apply_error_to_parsed_types
@@ -33,7 +35,25 @@ def parse_uapi_schema(
     schema_keys: set[str] = set()
 
     ordered_document_names = sorted(
-        list(u_api_schema_document_name_to_pseudo_json.keys()))
+        list(uapi_schema_document_names_to_json.keys()))
+
+    u_api_schema_document_name_to_pseudo_json: dict[str, list[object]] = {}
+
+    for document_name, uapi_schema_json in uapi_schema_document_names_to_json.items():
+        try:
+            uapi_schema_pseudo_json_init = json.loads(uapi_schema_json)
+        except json.JSONDecodeError as e:
+            raise UApiSchemaParseError(
+                [SchemaParseFailure(document_name, [], "JsonInvalid", {})]) from e
+
+        if not isinstance(uapi_schema_pseudo_json_init, list):
+            this_parse_failure = get_type_unexpected_parse_failure(
+                document_name, [], uapi_schema_pseudo_json_init, "Array"
+            )
+            raise UApiSchemaParseError(
+                this_parse_failure, uapi_schema_document_names_to_json)
+
+        u_api_schema_document_name_to_pseudo_json[document_name] = uapi_schema_pseudo_json_init
 
     for document_name in ordered_document_names:
         u_api_schema_pseudo_json = u_api_schema_document_name_to_pseudo_json[document_name]
@@ -80,7 +100,8 @@ def parse_uapi_schema(
                 continue
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, uapi_schema_document_names_to_json)
 
     request_header_keys: set[str] = set()
     response_header_keys: set[str] = set()
@@ -118,7 +139,8 @@ def parse_uapi_schema(
             parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, uapi_schema_document_names_to_json)
 
     errors: list[UError] = []
 
@@ -148,7 +170,8 @@ def parse_uapi_schema(
             parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, uapi_schema_document_names_to_json)
 
     try:
         catch_error_collisions(u_api_schema_document_name_to_pseudo_json,
@@ -157,7 +180,8 @@ def parse_uapi_schema(
         parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, uapi_schema_document_names_to_json)
 
     for error in errors:
         try:
@@ -224,7 +248,8 @@ def parse_uapi_schema(
             parse_failures.extend(e.schema_parse_failures)
 
     if parse_failures:
-        raise UApiSchemaParseError(parse_failures)
+        raise UApiSchemaParseError(
+            parse_failures, uapi_schema_document_names_to_json)
 
     final_original_schema = [original_schema[k]
                              for k in sorted(original_schema.keys(), key=lambda k: (not k.startswith("info."), k))]
