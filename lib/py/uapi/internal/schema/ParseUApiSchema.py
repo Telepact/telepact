@@ -159,7 +159,6 @@ def parse_uapi_schema(
             error = parse_error_type(
                 def_,
                 this_key,
-                this_index,
                 ParseContext(
                     this_document_name,
                     [this_index],

@@ -143,10 +143,9 @@ public class ParseUApiSchema {
                 var error = parseErrorType(
                         def,
                         thisKey,
-                        thisIndex,
                         new ParseContext(
                                 thisDocumentName,
-                                List.of(),
+                                List.of(thisIndex),
                                 uApiSchemaNameToPseudoJson,
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
