@@ -14,25 +14,21 @@ import uapi.internal.types.UType;
 import uapi.internal.types.UTypeDeclaration;
 
 public class ParseTypeDeclaration {
-    static UTypeDeclaration parseTypeDeclaration(String documentName, List<Object> path,
+    static UTypeDeclaration parseTypeDeclaration(
             List<Object> typeDeclarationArray,
-            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
-            Map<String, String> schemaKeysToDocumentNames,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            ParseContext ctx) {
         if (typeDeclarationArray.isEmpty()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
                     "EmptyArrayDisallowed", Map.of())));
         }
 
-        final List<Object> basePath = new ArrayList<>(path);
+        final List<Object> basePath = new ArrayList<>(ctx.path);
         basePath.add(0);
 
         final var baseType = typeDeclarationArray.get(0);
 
         if (!(baseType instanceof String)) {
-            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(documentName, basePath,
+            final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, basePath,
                     baseType, "String");
             throw new UApiSchemaParseError(thisParseFailures);
         }
@@ -43,20 +39,19 @@ public class ParseTypeDeclaration {
 
         final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, basePath,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, basePath,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final UType type = getOrParseType(documentName, basePath, typeName,
-                uApiSchemaDocumentNamesToPseudoJson,
-                schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
+        final UType type = getOrParseType(typeName,
+                ctx.copyWithNewPath(basePath));
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
                     "ArrayLengthUnexpected",
                     Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
         }
@@ -69,11 +64,12 @@ public class ParseTypeDeclaration {
         for (final var e : givenTypeParameters) {
             index += 1;
 
-            final List<Object> loopPath = new ArrayList<>(path);
+            final List<Object> loopPath = new ArrayList<>(ctx.path);
             loopPath.add(index);
 
             if (!(e instanceof List)) {
-                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(documentName, loopPath,
+                final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName,
+                        loopPath,
                         e,
                         "Array");
 
@@ -83,10 +79,7 @@ public class ParseTypeDeclaration {
 
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {
-                typeParameterTypeDeclaration = parseTypeDeclaration(documentName, loopPath, (List<Object>) e,
-                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentNames, schemaKeysToIndex, parsedTypes,
-                        allParseFailures,
-                        failedTypes);
+                typeParameterTypeDeclaration = parseTypeDeclaration((List<Object>) e, ctx.copyWithNewPath(loopPath));
 
                 typeParameters.add(typeParameterTypeDeclaration);
             } catch (UApiSchemaParseError e2) {

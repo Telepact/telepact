@@ -14,12 +14,10 @@ import uapi.internal.types.UStruct;
 import uapi.internal.types.UType;
 
 public class ParseStructType {
-    static UStruct parseStructType(String documentName, List<Object> path,
+    static UStruct parseStructType(
             Map<String, Object> structDefinitionAsPseudoJson,
             String schemaKey, List<String> ignoreKeys,
-            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
-            Map<String, Integer> schemaKeysToIndex, Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var otherKeys = new HashSet<>(structDefinitionAsPseudoJson.keySet());
 
@@ -32,21 +30,22 @@ public class ParseStructType {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = new ArrayList<>(path);
+                final List<Object> loopPath = new ArrayList<>(ctx.path);
                 loopPath.add(k);
 
-                parseFailures.add(new SchemaParseFailure(documentName, loopPath, "ObjectKeyDisallowed", Map.of()));
+                parseFailures.add(new SchemaParseFailure(ctx.documentName, loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
-        final List<Object> thisPath = new ArrayList<>(path);
+        final List<Object> thisPath = new ArrayList<>(ctx.path);
         thisPath.add(schemaKey);
 
         final Object defInit = structDefinitionAsPseudoJson.get(schemaKey);
 
         Map<String, Object> definition = null;
         if (!(defInit instanceof Map)) {
-            final List<SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(documentName, thisPath,
+            final List<SchemaParseFailure> branchParseFailures = getTypeUnexpectedParseFailure(ctx.documentName,
+                    thisPath,
                     defInit, "Object");
 
             parseFailures.addAll(branchParseFailures);
@@ -58,10 +57,8 @@ public class ParseStructType {
             throw new UApiSchemaParseError(parseFailures);
         }
 
-        final var fields = parseStructFields(definition, documentName, thisPath,
-                uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
-                allParseFailures,
-                failedTypes);
+        final var fields = parseStructFields(definition,
+                ctx.copyWithNewPath(thisPath));
 
         return new UStruct(schemaKey, fields);
     }

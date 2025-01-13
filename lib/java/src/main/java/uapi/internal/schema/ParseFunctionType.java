@@ -17,23 +17,16 @@ import uapi.internal.types.UUnion;
 
 public class ParseFunctionType {
 
-    static UFn parseFunctionType(String documentName, List<Object> path,
+    static UFn parseFunctionType(
             Map<String, Object> functionDefinitionAsParsedJson,
-            String schemaKey, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
-            Map<String, String> schemaKeysToDocumentName,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+            String schemaKey,
+            ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
 
         UUnion callType = null;
         try {
-            final UStruct argType = parseStructType(documentName, path, functionDefinitionAsParsedJson,
-                    schemaKey, List.of("->", "_errors"), uApiSchemaDocumentNamesToPseudoJson,
-                    schemaKeysToDocumentName,
-                    schemaKeysToIndex,
-                    parsedTypes,
-                    allParseFailures, failedTypes);
+            final UStruct argType = parseStructType(functionDefinitionAsParsedJson,
+                    schemaKey, List.of("->", "_errors"), ctx);
             callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0));
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
@@ -41,18 +34,17 @@ public class ParseFunctionType {
 
         final var resultSchemaKey = "->";
 
-        final List<Object> resPath = new ArrayList<>(path);
+        final List<Object> resPath = new ArrayList<>(ctx.path);
         resPath.add(resultSchemaKey);
 
         UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new SchemaParseFailure(documentName, resPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new SchemaParseFailure(ctx.documentName, resPath, "RequiredObjectKeyMissing", Map.of()));
         } else {
             try {
-                resultType = parseUnionType(documentName, path, functionDefinitionAsParsedJson,
+                resultType = parseUnionType(functionDefinitionAsParsedJson,
                         resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
-                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
-                        schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
+                        ctx);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -60,19 +52,19 @@ public class ParseFunctionType {
 
         final var errorsRegexKey = "_errors";
 
-        final var regexPath = new ArrayList<>(path);
+        final var regexPath = new ArrayList<>(ctx.path);
         regexPath.add(errorsRegexKey);
 
         String errorsRegex = null;
         if (functionDefinitionAsParsedJson.containsKey(errorsRegexKey) && !schemaKey.endsWith("_")) {
-            parseFailures.add(new SchemaParseFailure(documentName, regexPath, "ObjectKeyDisallowed", Map.of()));
+            parseFailures.add(new SchemaParseFailure(ctx.documentName, regexPath, "ObjectKeyDisallowed", Map.of()));
         } else {
             final Object errorsRegexInit = functionDefinitionAsParsedJson.getOrDefault(errorsRegexKey,
                     "^errors\\..*$");
 
             if (!(errorsRegexInit instanceof String)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(
-                        documentName, regexPath, errorsRegexInit, "String");
+                        ctx.documentName, regexPath, errorsRegexInit, "String");
 
                 parseFailures
                         .addAll(thisParseFailures);

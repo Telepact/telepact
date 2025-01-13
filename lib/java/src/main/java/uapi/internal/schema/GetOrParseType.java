@@ -25,17 +25,13 @@ import uapi.internal.types.UString;
 import uapi.internal.types.UType;
 
 public class GetOrParseType {
-    static UType getOrParseType(String documentName, List<Object> path, String typeName,
-            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson, Map<String, String> schemaKeysToDocumentName,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
-        if (failedTypes.contains(typeName)) {
+    static UType getOrParseType(String typeName,
+            ParseContext ctx) {
+        if (ctx.failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of());
         }
 
-        final var existingType = parsedTypes.get(typeName);
+        final var existingType = ctx.parsedTypes.get(typeName);
         if (existingType != null) {
             return existingType;
         }
@@ -46,7 +42,7 @@ public class GetOrParseType {
 
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
                     "StringRegexMatchFailed", Map.of("regex", regexString))));
         }
 
@@ -64,46 +60,38 @@ public class GetOrParseType {
         }
 
         final var customTypeName = matcher.group(2);
-        final var thisIndex = schemaKeysToIndex.get(customTypeName);
-        final var thisDocumentName = schemaKeysToDocumentName.get(customTypeName);
+        final var thisIndex = ctx.schemaKeysToIndex.get(customTypeName);
+        final var thisDocumentName = ctx.schemaKeysToDocumentName.get(customTypeName);
         if (thisIndex == null) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(documentName, path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
                     "TypeUnknown", Map.of("name", customTypeName))));
         }
-        final var definition = (Map<String, Object>) uApiSchemaDocumentNamesToPseudoJson.get(thisDocumentName)
+        final var definition = (Map<String, Object>) ctx.uApiSchemaDocumentsToPseudoJson.get(thisDocumentName)
                 .get(thisIndex);
 
         try {
             final UType type;
             if (customTypeName.startsWith("struct")) {
-                type = parseStructType(thisDocumentName, List.of(thisIndex), definition, customTypeName, List.of(),
-                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        allParseFailures, failedTypes);
+                type = parseStructType(definition, customTypeName, List.of(),
+                        ctx.copyWithNewDocumentNameAndPath(thisDocumentName, List.of(thisIndex)));
             } else if (customTypeName.startsWith("union")) {
-                type = parseUnionType(thisDocumentName, List.of(thisIndex), definition, customTypeName, List.of(),
+                type = parseUnionType(definition, customTypeName, List.of(),
                         List.of(),
-                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        allParseFailures, failedTypes);
+                        ctx.copyWithNewDocumentNameAndPath(thisDocumentName, List.of(thisIndex)));
             } else if (customTypeName.startsWith("fn")) {
-                type = parseFunctionType(thisDocumentName, List.of(thisIndex), definition, customTypeName,
-                        uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName, schemaKeysToIndex, parsedTypes,
-                        allParseFailures,
-                        failedTypes);
+                type = parseFunctionType(definition, customTypeName,
+                        ctx.copyWithNewDocumentNameAndPath(thisDocumentName, List.of(thisIndex)));
             } else {
                 UType possibleTypeExtension;
                 switch (customTypeName) {
                     case "_ext.Select_":
-                        possibleTypeExtension = new USelect(parsedTypes);
+                        possibleTypeExtension = new USelect(ctx.parsedTypes);
                         break;
                     case "_ext.Call_":
-                        possibleTypeExtension = new UMockCall(parsedTypes);
+                        possibleTypeExtension = new UMockCall(ctx.parsedTypes);
                         break;
                     case "_ext.Stub_":
-                        possibleTypeExtension = new UMockStub(parsedTypes);
+                        possibleTypeExtension = new UMockStub(ctx.parsedTypes);
                         break;
                     default:
                         possibleTypeExtension = null;
@@ -112,7 +100,7 @@ public class GetOrParseType {
                 if (possibleTypeExtension == null) {
                     throw new UApiSchemaParseError(Arrays.asList(
                             new SchemaParseFailure(
-                                    documentName,
+                                    ctx.documentName,
                                     Collections.singletonList(thisIndex),
                                     "TypeExtensionImplementationMissing",
                                     Collections.singletonMap("name", customTypeName))));
@@ -121,12 +109,12 @@ public class GetOrParseType {
                 type = possibleTypeExtension;
             }
 
-            parsedTypes.put(customTypeName, type);
+            ctx.parsedTypes.put(customTypeName, type);
 
             return type;
         } catch (UApiSchemaParseError e) {
-            allParseFailures.addAll(e.schemaParseFailures);
-            failedTypes.add(customTypeName);
+            ctx.allParseFailures.addAll(e.schemaParseFailures);
+            ctx.failedTypes.add(customTypeName);
             throw new UApiSchemaParseError(List.of());
         }
     }

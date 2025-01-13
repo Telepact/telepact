@@ -11,19 +11,13 @@ import java.util.Set;
 
 import uapi.UApiSchemaParseError;
 import uapi.internal.types.UError;
-import uapi.internal.types.UType;
 import uapi.internal.types.UUnion;
 
 public class ParseErrorType {
-    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson, String documentName,
-            Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
+    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
             String schemaKey,
             int index,
-            Map<String, String> schemaKeysToDocumentName,
-            Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures,
-            Set<String> failedTypes) {
+            ParseContext ctx) {
         List<Object> basePath = new ArrayList<>();
         basePath.add(index);
 
@@ -38,7 +32,8 @@ public class ParseErrorType {
                 List<Object> loopPath = new ArrayList<>(basePath);
                 loopPath.add(k);
                 parseFailures
-                        .add(new SchemaParseFailure(documentName, loopPath, "ObjectKeyDisallowed", new HashMap<>()));
+                        .add(new SchemaParseFailure(ctx.documentName, loopPath, "ObjectKeyDisallowed",
+                                new HashMap<>()));
             }
         }
 
@@ -48,11 +43,9 @@ public class ParseErrorType {
 
         // Assuming parseUnionType is adapted to Java and returns UError or its
 
-        UUnion error = parseUnionType(documentName, basePath, errorDefinitionAsParsedJson, schemaKey,
+        UUnion error = parseUnionType(errorDefinitionAsParsedJson, schemaKey,
                 new ArrayList<>(),
-                new ArrayList<>(), uApiSchemaDocumentNamesToPseudoJson, schemaKeysToDocumentName,
-                schemaKeysToIndex, parsedTypes,
-                allParseFailures, failedTypes);
+                new ArrayList<>(), ctx.copyWithNewPath(basePath));
 
         return new UError(schemaKey, error);
     }

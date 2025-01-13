@@ -13,12 +13,7 @@ import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UType;
 
 public class ParseStructFields {
-    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, String documentName,
-            List<Object> path,
-            Map<String, List<Object>> uApiSchemaDocumentsToPseudoJson,
-            Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
+    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, UFieldDeclaration>();
 
@@ -29,15 +24,15 @@ public class ParseStructFields {
                 final var existingFieldNoOpt = existingField.split("!")[0];
                 final var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
-                    final List<Object> finalPath = new ArrayList<>(path);
+                    final List<Object> finalPath = new ArrayList<>(ctx.path);
                     finalPath.add(fieldDeclaration);
 
-                    final List<Object> finalOtherPath = new ArrayList<>(path);
+                    final List<Object> finalOtherPath = new ArrayList<>(ctx.path);
                     finalOtherPath.add(existingField);
 
                     parseFailures
-                            .add(new SchemaParseFailure(documentName, finalPath, "PathCollision",
-                                    Map.of("document", documentName, "path", finalOtherPath)));
+                            .add(new SchemaParseFailure(ctx.documentName, finalPath, "PathCollision",
+                                    Map.of("document", ctx.documentName, "path", finalOtherPath)));
                 }
             }
 
@@ -45,11 +40,8 @@ public class ParseStructFields {
 
             final UFieldDeclaration parsedField;
             try {
-                parsedField = parseField(documentName, path, fieldDeclaration,
-                        typeDeclarationValue, uApiSchemaDocumentsToPseudoJson,
-                        schemaKeysToDocumentName, schemaKeysToIndex,
-                        parsedTypes,
-                        allParseFailures, failedTypes);
+                parsedField = parseField(fieldDeclaration,
+                        typeDeclarationValue, ctx);
                 final String fieldName = parsedField.fieldName;
 
                 fields.put(fieldName, parsedField);

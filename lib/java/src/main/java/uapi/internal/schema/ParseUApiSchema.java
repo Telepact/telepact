@@ -112,15 +112,16 @@ public class ParseUApiSchema {
 
             try {
                 getOrParseType(
-                        thisDocumentName,
-                        Collections.singletonList(thisIndex),
                         schemaKey,
-                        uApiSchemaNameToPseudoJson,
-                        schemaKeysToDocumentName,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        parseFailures,
-                        failedTypes);
+                        new ParseContext(
+                                thisDocumentName,
+                                List.of(thisIndex),
+                                uApiSchemaNameToPseudoJson,
+                                schemaKeysToDocumentName,
+                                schemaKeysToIndex,
+                                parsedTypes,
+                                parseFailures,
+                                failedTypes));
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -141,15 +142,17 @@ public class ParseUApiSchema {
             try {
                 var error = parseErrorType(
                         def,
-                        thisDocumentName,
-                        uApiSchemaNameToPseudoJson,
                         thisKey,
                         thisIndex,
-                        schemaKeysToDocumentName,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        parseFailures,
-                        failedTypes);
+                        new ParseContext(
+                                thisDocumentName,
+                                List.of(),
+                                uApiSchemaNameToPseudoJson,
+                                schemaKeysToDocumentName,
+                                schemaKeysToIndex,
+                                parsedTypes,
+                                parseFailures,
+                                failedTypes));
                 errors.add(error);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -190,17 +193,18 @@ public class ParseUApiSchema {
 
             try {
                 var requestHeaderType = parseHeadersType(
-                        thisDocumentName,
                         def,
                         requestHeaderKey,
                         headerField,
-                        thisIndex,
-                        uApiSchemaNameToPseudoJson,
-                        schemaKeysToDocumentName,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        parseFailures,
-                        failedTypes);
+                        new ParseContext(
+                                thisDocumentName,
+                                List.of(thisIndex, requestHeaderKey),
+                                uApiSchemaNameToPseudoJson,
+                                schemaKeysToDocumentName,
+                                schemaKeysToIndex,
+                                parsedTypes,
+                                parseFailures,
+                                failedTypes));
                 requestHeaders.put(requestHeaderType.fieldName, requestHeaderType);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
@@ -216,17 +220,18 @@ public class ParseUApiSchema {
 
             try {
                 var responseHeaderType = parseHeadersType(
-                        thisDocumentName,
                         def,
                         responseHeaderKey,
                         headerField,
-                        thisIndex,
-                        uApiSchemaNameToPseudoJson,
-                        schemaKeysToDocumentName,
-                        schemaKeysToIndex,
-                        parsedTypes,
-                        parseFailures,
-                        failedTypes);
+                        new ParseContext(
+                                thisDocumentName,
+                                List.of(thisIndex, responseHeaderKey),
+                                uApiSchemaNameToPseudoJson,
+                                schemaKeysToDocumentName,
+                                schemaKeysToIndex,
+                                parsedTypes,
+                                parseFailures,
+                                failedTypes));
                 responseHeaders.put(responseHeaderType.fieldName, responseHeaderType);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);

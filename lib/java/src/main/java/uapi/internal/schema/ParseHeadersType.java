@@ -5,38 +5,26 @@ import static uapi.internal.schema.ParseTypeDeclaration.parseTypeDeclaration;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import uapi.UApiSchemaParseError;
 import uapi.internal.types.UFieldDeclaration;
-import uapi.internal.types.UType;
 
 public class ParseHeadersType {
-    static UFieldDeclaration parseHeadersType(String documentName, Map<String, Object> headersDefinitionAsParsedJson,
+    static UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson,
             String schemaKey,
             String headerField,
-            int index, Map<String, List<Object>> uApiSchemaDocumentNamesToPseudoJson,
-            Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
-            Map<String, UType> parsedTypes,
-            List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
-        final List<Object> path = List.of(index, schemaKey);
-
+            ParseContext ctx) {
         var typeDeclarationValue = headersDefinitionAsParsedJson.get(schemaKey);
 
         if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(
-                    getTypeUnexpectedParseFailure(documentName, path, typeDeclarationValue, "Array"));
+                    getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, "Array"));
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
         try {
-            final var typeDeclaration = parseTypeDeclaration(documentName, path,
-                    typeDeclarationArray,
-                    uApiSchemaDocumentNamesToPseudoJson,
-                    schemaKeysToDocumentName,
-                    schemaKeysToIndex,
-                    parsedTypes,
-                    allParseFailures, failedTypes);
+            final var typeDeclaration = parseTypeDeclaration(
+                    typeDeclarationArray, ctx);
 
             return new UFieldDeclaration(headerField, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {
