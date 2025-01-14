@@ -169,18 +169,10 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
         try:
             if input_tag == 'PseudoJson':
                 union_value = input[input_tag]
-                schema_pseudo_json = union_value.get("schema")
-                extend_schema_json = union_value.get("extend!")
+                schema_json = union_value.get("schema")
+                extend_json = union_value.get("extend!")
 
-                schema_json_bytes = json.dumps(
-                    schema_pseudo_json).encode('utf-8')
-                schema_json = schema_json_bytes.decode('utf-8')
-
-                if extend_schema_json:
-                    extend_json_bytes = json.dumps(
-                        extend_schema_json).encode('utf-8')
-                    extend_json = extend_json_bytes.decode('utf-8')
-
+                if extend_json:
                     UApiSchema.from_file_json_map(
                         {'default': schema_json, 'extend': extend_json})
                 else:

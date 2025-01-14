@@ -42,6 +42,16 @@ def test_schema_case(loop, schema_server_proc, nats_client, name, req, res):
     topics = schema_server_proc
 
     async def t():
-        await verify_flat_case(nats_client, dc(req), dc(res), *topics)
+        dreq = dc(req)
+        print(dreq)
+        if 'PseudoJson' in dreq[1]['fn.validateSchema']['input']:
+            dreq[1]['fn.validateSchema']['input']['PseudoJson']['schema'] = json.dumps(
+                dreq[1]['fn.validateSchema']['input']['PseudoJson']['schema'])
+            print(dreq)
+            if 'extend!' in dreq[1]['fn.validateSchema']['input']['PseudoJson']:
+                dreq[1]['fn.validateSchema']['input']['PseudoJson']['extend!'] = json.dumps(
+                    dreq[1]['fn.validateSchema']['input']['PseudoJson']['extend!'])
+                print(dreq)
+        await verify_flat_case(nats_client, dreq, dc(res), *topics)
 
     loop.run_until_complete(t())
