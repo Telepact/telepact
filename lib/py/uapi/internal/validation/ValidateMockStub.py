@@ -61,7 +61,7 @@ def validate_mock_stub(given_obj: object, select: dict[str, object] | None, fn: 
 
     if result_def_key not in given_map:
         validation_failures.append(ValidationFailure(
-            [result_def_key], "RequiredObjectKeyMissing", {}))
+            [], "RequiredObjectKeyMissing", {'key': result_def_key}))
     else:
         output = given_map[result_def_key]
         output_failures = function_def.result.validate(

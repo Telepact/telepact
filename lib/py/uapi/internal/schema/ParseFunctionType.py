@@ -31,12 +31,10 @@ def parse_function_type(document_name: str, path: list[object], function_definit
 
     result_schema_key = "->"
 
-    res_path = path + [result_schema_key]
-
     result_type = None
     if result_schema_key not in function_definition_as_parsed_json:
         parse_failures.append(SchemaParseFailure(
-            document_name, res_path, "RequiredObjectKeyMissing", {}))
+            document_name, path, "RequiredObjectKeyMissing", {'key': result_schema_key}))
     else:
         try:
             result_type = parse_union_type(function_definition_as_parsed_json,

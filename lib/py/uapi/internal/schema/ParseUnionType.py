@@ -68,9 +68,9 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
                 if required_key in case_keys:
                     break
             else:
-                branch_path = this_path + [0, required_key]
+                branch_path = this_path + [0]
                 parse_failures.append(SchemaParseFailure(
-                    ctx.document_name, branch_path, "RequiredObjectKeyMissing", {}))
+                    ctx.document_name, branch_path, "RequiredObjectKeyMissing", {'key': required_key}))
 
     cases = {}
     case_indices = {}

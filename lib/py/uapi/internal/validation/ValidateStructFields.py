@@ -23,7 +23,7 @@ def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
 
     for missing_field in missing_fields:
         validation_failure = ValidationFailure(
-            [missing_field], "RequiredObjectKeyMissing", {})
+            [], "RequiredObjectKeyMissing", {'key': missing_field})
 
         validation_failures.append(validation_failure)
 
