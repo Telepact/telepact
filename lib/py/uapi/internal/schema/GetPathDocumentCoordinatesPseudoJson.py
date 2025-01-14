@@ -5,7 +5,6 @@ def string_reader(s: str) -> Generator[Tuple[str, int, int], str, str]:
     row = 0
     col = 0
     for c in s:
-        print(f"string_reader: char={c}, row={row}, col={col}")
         if c == '\n':
             row += 1
             col = 0
@@ -38,22 +37,25 @@ def find_coordinates(path: list[object], reader: Generator[Tuple[str, int, int],
     raise ValueError("Path not found in document")
 
 
-def find_value(reader: Generator[Tuple[str, int, int], str, str]) -> None:
+def find_value(reader: Generator[Tuple[str, int, int], str, str]) -> bool:
     for c, row, col in reader:
         print(f"find_value: char={c}, row={row}, col={col}")
         if c == '{':
-            return find_object(reader)
+            find_object(reader)
+            return False
         elif c == '[':
-            return find_array(reader)
+            find_array(reader)
+            return False
         elif c == '"':
             find_string(reader)
-            return
+            return False
         elif c == '}':
-            return
+            return True
         elif c == ']':
-            return
+            return True
         elif c == ',':
-            return
+            return False
+    raise ValueError("Value not found in document")
 
 
 def find_object(reader: Generator[Tuple[str, int, int], str, str]) -> None:
@@ -64,18 +66,23 @@ def find_object(reader: Generator[Tuple[str, int, int], str, str]) -> None:
         elif c == '"':
             find_string(reader)
         elif c == ':':
-            find_value(reader)
+            if find_value(reader):
+                return
 
 
 def find_array(reader: Generator[Tuple[str, int, int], str, str]) -> None:
-    for c, row, col in reader:
-        print(f"find_array: char={c}, row={row}, col={col}")
-        find_value(reader)
+    print('find_array')
+    if find_value(reader):
+        return
 
     working_index = 0
     for c, row, col in reader:
+        print(f"find_array: char={c}, row={row}, col={col}")
+        if c == ']':
+            return
         working_index += 1
-        find_value(reader)
+        if find_value(reader):
+            return
 
 
 def find_coordinates_object(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
