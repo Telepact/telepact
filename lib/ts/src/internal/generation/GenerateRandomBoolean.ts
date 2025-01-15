@@ -1,13 +1,9 @@
-import { RandomGenerator } from '../../RandomGenerator';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
-export function generateRandomBoolean(
-    blueprintValue: any,
-    useBlueprintValue: boolean,
-    randomGenerator: RandomGenerator,
-): any {
-    if (useBlueprintValue) {
-        return blueprintValue;
+export function generateRandomBoolean(ctx: GenerateContext): any {
+    if (ctx.useBlueprintValue) {
+        return ctx.blueprintValue;
     } else {
-        return randomGenerator.nextBoolean();
+        return ctx.randomGenerator.nextBoolean();
     }
 }

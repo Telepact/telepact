@@ -1,25 +1,24 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UStruct } from '../../internal/types/UStruct';
-import { constructRandomUnion } from '../../internal/generation/ConstructRandomUnion';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
 
-export function generateRandomUnion(
-    blueprintValue: any,
-    useBlueprintValue: boolean,
-    includeOptionalFields: boolean,
-    randomizeOptionalFields: boolean,
-    randomGenerator: RandomGenerator,
-    cases: { [key: string]: UStruct },
-): any {
-    if (useBlueprintValue) {
-        const startingUnionCase = blueprintValue as { [key: string]: any };
-        return constructRandomUnion(
-            cases,
-            startingUnionCase,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            randomGenerator,
-        );
+export function generateRandomUnion(unionCasesReference: { [key: string]: UStruct }, ctx: GenerateContext): any {
+    if (!ctx.useBlueprintValue) {
+        const sortedUnionCasesReference = Object.entries(unionCasesReference).sort((a, b) => a[0].localeCompare(b[0]));
+        const randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.length - 1);
+        const [unionCase, unionData] = sortedUnionCasesReference[randomIndex];
+        return {
+            [unionCase]: generateRandomStruct(unionData.fields, ctx),
+        };
     } else {
-        return constructRandomUnion(cases, {}, includeOptionalFields, randomizeOptionalFields, randomGenerator);
+        const startingUnion: Record<string, any> = ctx.blueprintValue;
+        const [unionCase, unionStartingStruct] = Object.entries(startingUnion)[0];
+        const unionStructType = unionCasesReference[unionCase];
+        return {
+            [unionCase]: generateRandomStruct(
+                unionStructType.fields,
+                ctx.copy({ blueprintValue: unionStartingStruct }),
+            ),
+        };
     }
 }

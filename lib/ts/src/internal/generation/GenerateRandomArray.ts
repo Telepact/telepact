@@ -1,45 +1,25 @@
-import { RandomGenerator } from '../../RandomGenerator';
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
-export function generateRandomArray(
-    blueprintValue: any,
-    useBlueprintValue: boolean,
-    includeOptionalFields: boolean,
-    randomizeOptionalFields: boolean,
-    typeParameters: UTypeDeclaration[],
-    randomGenerator: RandomGenerator,
-): any[] {
-    const nestedTypeDeclaration = typeParameters[0];
+export function generateRandomArray(ctx: GenerateContext): any[] {
+    const nestedTypeDeclaration = ctx.typeParameters[0];
 
-    if (useBlueprintValue) {
-        const startingArray = blueprintValue as any[];
+    if (ctx.useBlueprintValue) {
+        const startingArray = ctx.blueprintValue as any[];
 
         const array: any[] = [];
         for (const startingArrayValue of startingArray) {
-            const value = nestedTypeDeclaration.generateRandomValue(
-                startingArrayValue,
-                true,
-                includeOptionalFields,
-                randomizeOptionalFields,
-                randomGenerator,
-            );
+            const value = nestedTypeDeclaration.generateRandomValue(ctx.copy({ blueprintValue: startingArrayValue }));
 
             array.push(value);
         }
 
         return array;
     } else {
-        const length = randomGenerator.nextCollectionLength();
+        const length = ctx.randomGenerator.nextCollectionLength();
 
         const array: any[] = [];
         for (let i = 0; i < length; i++) {
-            const value = nestedTypeDeclaration.generateRandomValue(
-                null,
-                false,
-                includeOptionalFields,
-                randomizeOptionalFields,
-                randomGenerator,
-            );
+            const value = nestedTypeDeclaration.generateRandomValue(ctx);
 
             array.push(value);
         }

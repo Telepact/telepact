@@ -1,8 +1,8 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { validateMockCall } from '../../internal/validation/ValidateMockCall';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const mockCallName: string = '_ext.Call_';
 
@@ -27,14 +27,7 @@ export class UMockCall extends UType {
         return validateMockCall(givenObj, select, fn, this.types);
     }
 
-    public generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
+    public generateRandomValue(ctx: GenerateContext): any {
         throw new Error('Not implemented');
     }
 

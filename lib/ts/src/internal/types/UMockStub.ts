@@ -1,8 +1,8 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { validateMockStub } from '../../internal/validation/ValidateMockStub';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const mockStubName: string = '_ext.Stub_';
 
@@ -27,14 +27,7 @@ export class UMockStub extends UType {
         return validateMockStub(givenObj, select, fn, this.types);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
+    generateRandomValue(ctx: GenerateContext): any {
         throw new Error('Not implemented');
     }
 

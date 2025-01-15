@@ -1,9 +1,9 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UType } from '../../internal/types/UType';
 import { validateArray } from '../../internal/validation/ValidateArray';
 import { generateRandomArray } from '../../internal/generation/GenerateRandomArray';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const arrayName = 'Array';
 
@@ -21,22 +21,8 @@ export class UArray extends UType {
         return validateArray(value, select, fn, typeParameters);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
-        return generateRandomArray(
-            blueprintValue,
-            useBlueprintValue,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            typeParameters,
-            randomGenerator,
-        );
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomArray(ctx);
     }
 
     getName(): string {

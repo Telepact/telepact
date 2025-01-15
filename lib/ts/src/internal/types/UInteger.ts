@@ -1,9 +1,9 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UType } from '../../internal/types/UType';
 import { validateInteger } from '../../internal/validation/ValidateInteger';
 import { generateRandomInteger } from '../../internal/generation/GenerateRandomInteger';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const integerName: string = 'Integer';
 
@@ -21,15 +21,8 @@ export class UInteger extends UType {
         return validateInteger(value);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
-        return generateRandomInteger(blueprintValue, useBlueprintValue, randomGenerator);
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomInteger(ctx);
     }
 
     getName(): string {

@@ -1,12 +1,12 @@
-import { RandomGenerator } from '../../RandomGenerator';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
-export function generateRandomAny(randomGenerator: RandomGenerator): any {
-    const selectType = randomGenerator.nextIntWithCeiling(3);
+export function generateRandomAny(ctx: GenerateContext): any {
+    const selectType = ctx.randomGenerator.nextIntWithCeiling(3);
     if (selectType === 0) {
-        return randomGenerator.nextBoolean();
+        return ctx.randomGenerator.nextBoolean();
     } else if (selectType === 1) {
-        return randomGenerator.nextInt();
+        return ctx.randomGenerator.nextInt();
     } else {
-        return randomGenerator.nextString();
+        return ctx.randomGenerator.nextString();
     }
 }

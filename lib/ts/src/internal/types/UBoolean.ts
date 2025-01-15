@@ -1,9 +1,9 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UType } from '../../internal/types/UType';
 import { validateBoolean } from '../../internal/validation/ValidateBoolean';
 import { generateRandomBoolean } from '../../internal/generation/GenerateRandomBoolean';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const booleanName: string = 'Boolean';
 
@@ -21,15 +21,8 @@ export class UBoolean extends UType {
         return validateBoolean(value);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
-        return generateRandomBoolean(blueprintValue, useBlueprintValue, randomGenerator);
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomBoolean(ctx);
     }
 
     getName(): string {

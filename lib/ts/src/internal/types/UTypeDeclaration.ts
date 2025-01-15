@@ -1,8 +1,8 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UType } from '../../internal/types/UType';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { validateValueOfType } from '../../internal/validation/ValidateValueOfType';
 import { generateRandomValueOfType } from '../../internal/generation/GenerateRandomValueOfType';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export class UTypeDeclaration {
     type: UType;
@@ -19,22 +19,7 @@ export class UTypeDeclaration {
         return validateValueOfType(value, select, fn, this.type, this.nullable, this.typeParameters);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        randomGenerator: RandomGenerator,
-    ): any {
-        return generateRandomValueOfType(
-            blueprintValue,
-            useBlueprintValue,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            randomGenerator,
-            this.type,
-            this.nullable,
-            this.typeParameters,
-        );
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomValueOfType(this.type, this.nullable, this.typeParameters, ctx);
     }
 }

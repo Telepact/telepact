@@ -1,10 +1,10 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UType } from '../../internal/types/UType';
 import { validateStruct } from '../../internal/validation/ValidateStruct';
 import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const structName: string = 'Object';
 
@@ -30,22 +30,8 @@ export class UStruct implements UType {
         return validateStruct(value, select, fn, this.name, this.fields);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        random: RandomGenerator,
-    ): any {
-        return generateRandomStruct(
-            blueprintValue,
-            useBlueprintValue,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            random,
-            this.fields,
-        );
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomStruct(this.fields, ctx);
     }
 
     getName(): string {

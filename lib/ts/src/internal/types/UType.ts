@@ -1,6 +1,6 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export abstract class UType {
     abstract getTypeParameterCount(): number;
@@ -12,14 +12,7 @@ export abstract class UType {
         typeParameters: UTypeDeclaration[],
     ): ValidationFailure[];
 
-    abstract generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any;
+    abstract generateRandomValue(ctx: GenerateContext): any;
 
     abstract getName(): string;
 }

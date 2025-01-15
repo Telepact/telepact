@@ -1,9 +1,9 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { validateObject } from '../../internal/validation/ValidateObject';
 import { generateRandomObject } from '../../internal/generation/GenerateRandomObject';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const objectName: string = 'Object';
 
@@ -21,22 +21,8 @@ export class UObject implements UType {
         return validateObject(value, select, fn, typeParameters);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
-        return generateRandomObject(
-            blueprintValue,
-            useBlueprintValue,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            typeParameters,
-            randomGenerator,
-        );
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomObject(ctx);
     }
 
     getName(): string {

@@ -1,9 +1,9 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { UUnion } from '../../internal/types/UUnion';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
-import { generateRandomFn } from '../../internal/generation/GenerateRandomFn';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { generateRandomUnion } from '../../internal/generation/GenerateRandomUnion';
 
 const FN_NAME = 'Object';
 
@@ -35,22 +35,8 @@ export class UFn extends UType {
         return this.call.validate(value, select, fn, typeParameters);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
-        return generateRandomFn(
-            blueprintValue,
-            useBlueprintValue,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            randomGenerator,
-            this.call.cases,
-        );
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomUnion(this.call.cases, ctx);
     }
 
     getName(): string {

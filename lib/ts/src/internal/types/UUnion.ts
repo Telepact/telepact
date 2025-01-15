@@ -1,10 +1,10 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UStruct } from '../../internal/types/UStruct';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { validateUnion } from '../../internal/validation/ValidateUnion';
 import { generateRandomUnion } from '../../internal/generation/GenerateRandomUnion';
 import { UType } from '../../internal/types/UType';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export const unionName: string = 'Object';
 
@@ -32,22 +32,8 @@ export class UUnion implements UType {
         return validateUnion(value, select, fn, this.name, this.cases);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        random: RandomGenerator,
-    ): any {
-        return generateRandomUnion(
-            blueprintValue,
-            useBlueprintValue,
-            includeOptionalFields,
-            randomizeOptionalFields,
-            random,
-            this.cases,
-        );
+    generateRandomValue(ctx: GenerateContext): any {
+        return generateRandomUnion(this.cases, ctx);
     }
 
     getName(): string {

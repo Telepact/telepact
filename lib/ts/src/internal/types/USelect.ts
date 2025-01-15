@@ -1,8 +1,8 @@
-import { RandomGenerator } from '../../RandomGenerator';
 import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { validateSelect } from '../../internal/validation/ValidateSelect';
+import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export type USelectTypes = Record<string, UType>;
 
@@ -28,14 +28,7 @@ export class USelect implements UType {
         return validateSelect(givenObj, select, fn, this.types);
     }
 
-    generateRandomValue(
-        blueprintValue: any,
-        useBlueprintValue: boolean,
-        includeOptionalFields: boolean,
-        randomizeOptionalFields: boolean,
-        typeParameters: UTypeDeclaration[],
-        randomGenerator: RandomGenerator,
-    ): any {
+    generateRandomValue(ctx: GenerateContext): any {
         throw new Error('Not implemented');
     }
 
