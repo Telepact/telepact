@@ -1,16 +1,14 @@
 package uapi.internal.generation;
 
-import uapi.RandomGenerator;
-
 public class GenerateRandomAny {
-    public static Object generateRandomAny(RandomGenerator randomGenerator) {
-        final var selectType = randomGenerator.nextIntWithCeiling(3);
+    public static Object generateRandomAny(GenerateContext ctx) {
+        final var selectType = ctx.randomGenerator.nextIntWithCeiling(3);
         if (selectType == 0) {
-            return randomGenerator.nextBoolean();
+            return ctx.randomGenerator.nextBoolean();
         } else if (selectType == 1) {
-            return randomGenerator.nextInt();
+            return ctx.randomGenerator.nextInt();
         } else {
-            return randomGenerator.nextString();
+            return ctx.randomGenerator.nextString();
         }
     }
 }

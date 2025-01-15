@@ -1,14 +1,11 @@
 package uapi.internal.generation;
 
-import uapi.RandomGenerator;
-
 public class GenerateRandomInteger {
-    public static Object generateRandomInteger(Object blueprintValue, boolean useBlueprintValue,
-            RandomGenerator randomGenerator) {
-        if (useBlueprintValue) {
-            return blueprintValue;
+    public static Object generateRandomInteger(GenerateContext ctx) {
+        if (ctx.useBlueprintValue) {
+            return ctx.blueprintValue;
         } else {
-            return randomGenerator.nextInt();
+            return ctx.randomGenerator.nextInt();
         }
     }
 }

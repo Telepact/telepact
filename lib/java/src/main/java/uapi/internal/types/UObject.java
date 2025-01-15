@@ -6,7 +6,7 @@ import static uapi.internal.validation.ValidateObject.validateObject;
 import java.util.List;
 import java.util.Map;
 
-import uapi.RandomGenerator;
+import uapi.internal.generation.GenerateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UObject implements UType {
@@ -25,12 +25,8 @@ public class UObject implements UType {
     }
 
     @Override
-    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            RandomGenerator randomGenerator) {
-        return generateRandomObject(blueprintValue, useBlueprintValue, includeOptionalFields,
-                randomizeOptionalFields,
-                typeParameters, randomGenerator);
+    public Object generateRandomValue(GenerateContext ctx) {
+        return generateRandomObject(ctx);
     }
 
     @Override

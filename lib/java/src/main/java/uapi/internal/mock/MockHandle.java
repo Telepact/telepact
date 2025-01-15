@@ -14,6 +14,7 @@ import uapi.Message;
 import uapi.RandomGenerator;
 import uapi.UApiError;
 import uapi.UApiSchema;
+import uapi.internal.generation.GenerateContext;
 import uapi.internal.types.UFn;
 import uapi.internal.types.UUnion;
 
@@ -94,9 +95,9 @@ public class MockHandle {
                                 final var useBlueprintValue = true;
                                 final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
-                                        stub.thenResult, useBlueprintValue,
-                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
-                                        random);
+                                        new GenerateContext(stub.thenResult, useBlueprintValue,
+                                                includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
+                                                random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
@@ -107,9 +108,10 @@ public class MockHandle {
                                 final var useBlueprintValue = true;
                                 final var includeOptionalFields = false;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
-                                        stub.thenResult, useBlueprintValue,
-                                        includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
-                                        random);
+                                        new GenerateContext(
+                                                stub.thenResult, useBlueprintValue,
+                                                includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
+                                                random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
                                 }
@@ -128,8 +130,9 @@ public class MockHandle {
                     final var okStructRef = resultUnion.cases.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;
-                    final var randomOkStruct = okStructRef.generateRandomValue(new HashMap<>(), useBlueprintValue,
-                            includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), random);
+                    final var randomOkStruct = okStructRef
+                            .generateRandomValue(new GenerateContext(new HashMap<>(), useBlueprintValue,
+                                    includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), random));
                     return new Message(Map.of(), Map.of("Ok_", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));

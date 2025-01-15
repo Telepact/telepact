@@ -6,7 +6,7 @@ import static uapi.internal.validation.ValidateUnion.validateUnion;
 import java.util.List;
 import java.util.Map;
 
-import uapi.RandomGenerator;
+import uapi.internal.generation.GenerateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UUnion implements UType {
@@ -35,11 +35,8 @@ public class UUnion implements UType {
     }
 
     @Override
-    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            RandomGenerator random) {
-        return generateRandomUnion(blueprintValue, useBlueprintValue, includeOptionalFields,
-                randomizeOptionalFields, random, this.cases);
+    public Object generateRandomValue(GenerateContext ctx) {
+        return generateRandomUnion(this.cases, ctx);
     }
 
     @Override

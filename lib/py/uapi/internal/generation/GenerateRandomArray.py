@@ -26,8 +26,7 @@ def generate_random_array(ctx: 'GenerateContext') -> list[object]:
 
         array = []
         for i in range(length):
-            value = nested_type_declaration.generate_random_value(
-                ctx.copy(blueprint_value=None))
+            value = nested_type_declaration.generate_random_value(ctx)
 
             array.append(value)
 

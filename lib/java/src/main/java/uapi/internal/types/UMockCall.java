@@ -5,7 +5,7 @@ import static uapi.internal.validation.ValidateMockCall.validateMockCall;
 import java.util.List;
 import java.util.Map;
 
-import uapi.RandomGenerator;
+import uapi.internal.generation.GenerateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UMockCall implements UType {
@@ -30,9 +30,7 @@ public class UMockCall implements UType {
     }
 
     @Override
-    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            RandomGenerator randomGenerator) {
+    public Object generateRandomValue(GenerateContext ctx) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

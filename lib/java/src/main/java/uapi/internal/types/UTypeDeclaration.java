@@ -6,7 +6,7 @@ import static uapi.internal.validation.ValidateValueOfType.validateValueOfType;
 import java.util.List;
 import java.util.Map;
 
-import uapi.RandomGenerator;
+import uapi.internal.generation.GenerateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UTypeDeclaration {
@@ -26,10 +26,7 @@ public class UTypeDeclaration {
         return validateValueOfType(value, select, fn, this.type, this.nullable, this.typeParameters);
     }
 
-    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, RandomGenerator randomGenerator) {
-        return generateRandomValueOfType(blueprintValue, useBlueprintValue,
-                includeOptionalFields, randomizeOptionalFields,
-                randomGenerator, this.type, this.nullable, this.typeParameters);
+    public Object generateRandomValue(GenerateContext ctx) {
+        return generateRandomValueOfType(this.type, this.nullable, this.typeParameters, ctx);
     }
 }

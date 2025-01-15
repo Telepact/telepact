@@ -1,11 +1,11 @@
 package uapi.internal.types;
 
-import static uapi.internal.generation.GenerateRandomFn.generateRandomFn;
+import static uapi.internal.generation.GenerateRandomUnion.generateRandomUnion;
 
 import java.util.List;
 import java.util.Map;
 
-import uapi.RandomGenerator;
+import uapi.internal.generation.GenerateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UFn implements UType {
@@ -36,11 +36,8 @@ public class UFn implements UType {
     }
 
     @Override
-    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
-            boolean includeOptionalFields, boolean randomizeOptionalFields, List<UTypeDeclaration> typeParameters,
-            RandomGenerator randomGenerator) {
-        return generateRandomFn(blueprintValue, useBlueprintValue, includeOptionalFields, randomizeOptionalFields,
-                typeParameters, randomGenerator, this.call.cases);
+    public Object generateRandomValue(GenerateContext ctx) {
+        return generateRandomUnion(this.call.cases, ctx);
     }
 
     @Override
