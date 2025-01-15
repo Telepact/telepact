@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 
 def create_uapi_schema_from_file_json_map(json_documents: dict[str, str]) -> 'UApiSchema':
-    from uapi.internal.schema.NewUApiSchema import new_uapi_schema
+    from uapi.internal.schema.ParseUApiSchema import parse_uapi_schema
     from uapi.internal.schema.GetInternalUApiJson import get_internal_uapi_json
     from uapi.internal.schema.GetAuthUApiJson import get_auth_uapi_json
 
@@ -21,4 +21,4 @@ def create_uapi_schema_from_file_json_map(json_documents: dict[str, str]) -> 'UA
             final_json_documents["auth_"] = get_auth_uapi_json()
             break
 
-    return new_uapi_schema(final_json_documents)
+    return parse_uapi_schema(final_json_documents)

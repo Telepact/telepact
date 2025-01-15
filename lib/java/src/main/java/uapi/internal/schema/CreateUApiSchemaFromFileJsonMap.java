@@ -1,7 +1,7 @@
 package uapi.internal.schema;
 
 import static uapi.internal.schema.GetInternalUApiJson.getInternalUApiJson;
-import static uapi.internal.schema.NewUApiSchema.newUApiSchema;
+import static uapi.internal.schema.ParseUApiSchema.parseUApiSchema;
 import static uapi.internal.schema.GetAuthUApiJson.getAuthUApiJson;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class CreateUApiSchemaFromFileJsonMap {
             }
         }
 
-        var uApiSchema = newUApiSchema(finalJsonDocuments);
+        var uApiSchema = parseUApiSchema(finalJsonDocuments);
 
         return uApiSchema;
     }

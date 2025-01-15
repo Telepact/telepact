@@ -1,7 +1,7 @@
 import { getInternalUApiJson } from '../../internal/schema/GetInternalUApiJson';
 import { getAuthUApiJson } from '../../internal/schema/GetAuthUApiJson';
 import { UApiSchema } from '../../UApiSchema';
-import { newUapiSchema } from '../../internal/schema/NewUApiSchema';
+import { parseUapiSchema } from '../../internal/schema/ParseUApiSchema';
 
 export function createUApiSchemaFromFileJsonMap(jsonDocuments: Record<string, string>): UApiSchema {
     const finalJsonDocuments = { ...jsonDocuments };
@@ -16,7 +16,7 @@ export function createUApiSchemaFromFileJsonMap(jsonDocuments: Record<string, st
         }
     }
 
-    const uApiSchema = newUapiSchema(finalJsonDocuments);
+    const uApiSchema = parseUapiSchema(finalJsonDocuments);
 
     return uApiSchema;
 }
