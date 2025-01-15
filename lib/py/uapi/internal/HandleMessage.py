@@ -148,7 +148,8 @@ async def handle_message(
                 result_union_type,
                 response_headers,
             )
-            on_error(Exception(f"{res.body}. Actual: {result_union}"))
+            on_error(Exception(
+                f"Response validation failed: {result_validation_failures}. Actual response: {result_union}"))
             return res
         response_header_validation_failures: list[ValidationFailure] = validate_headers(
             final_response_headers, u_api_schema.parsed_response_headers, function_type
