@@ -11,7 +11,7 @@ import {
     MockServerOptions,
     UApiSchema,
     MockUApiSchema,
-    getSchemaFileMap,
+    UApiSchemaFiles
 } from "uapi";
 import { NatsConnection, connect, Subscription } from "nats";
 import fs from "fs";
@@ -294,8 +294,8 @@ function startTestServer(
     authRequired: boolean,
     useCodegen: boolean
 ): Subscription {
-    const m: Record<string, string> = getSchemaFileMap(apiSchemaPath);
-    const alternateMap: Record<string, string> = { ...m };
+    const files = new UApiSchemaFiles(apiSchemaPath);
+    const alternateMap: Record<string, string> = { ...files.filenamesToJson };
     alternateMap['backwardsCompatibleChange'] = `
         [
             {
@@ -304,7 +304,7 @@ function startTestServer(
         ]
     `;
 
-    const uApi: UApiSchema = UApiSchema.fromFileJsonMap(m);
+    const uApi: UApiSchema = UApiSchema.fromFileJsonMap(files.filenamesToJson);
     const alternateUApi: UApiSchema = UApiSchema.fromFileJsonMap(alternateMap);
 
     const timer = registry.createTimer(frontdoorTopic);

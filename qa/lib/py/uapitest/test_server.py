@@ -27,8 +27,8 @@ from uapi.Server import Server
 from uapi.UApiSchema import UApiSchema
 from uapi.MockUApiSchema import MockUApiSchema
 from uapi.MockServer import MockServer
+from uapi.UApiSchemaFiles import UApiSchemaFiles
 from uapi.UApiSchemaParseError import UApiSchemaParseError
-from uapi.internal.schema.GetSchemaFileMap import get_schema_file_map
 import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -220,8 +220,8 @@ async def start_schema_test_server(connection: NatsClient, metrics: CollectorReg
 
 
 async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, api_schema_path: str, frontdoor_topic: str, backdoor_topic: str, auth_required: bool, use_codegen: bool) -> Subscription:
-    m = get_schema_file_map(api_schema_path)
-    alternate_map = m.copy()
+    files = UApiSchemaFiles(api_schema_path)
+    alternate_map = files.filenames_to_json.copy()
     alternate_map["backwardsCompatibleChange"] = """
             [
                 {
@@ -230,7 +230,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
             ]
             """
 
-    u_api = UApiSchema.from_file_json_map(m)
+    u_api = UApiSchema.from_file_json_map(files.filenames_to_json)
     alternate_u_api = UApiSchema.from_file_json_map(alternate_map)
 
     timers = Summary(frontdoor_topic.replace(

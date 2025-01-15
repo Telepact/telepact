@@ -30,7 +30,7 @@ import uapi.Serializer;
 import uapi.Server;
 import uapi.UApiSchema;
 import uapi.UApiSchemaParseError;
-import uapi.internal.schema.GetSchemaFileMap;
+import uapi.UApiSchemaFiles;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
@@ -260,8 +260,8 @@ public class Main {
             String frontdoorTopic,
             String backdoorTopic, boolean authRequired, boolean useCodeGen)
             throws IOException, InterruptedException {
-        var map = GetSchemaFileMap.getSchemaFileMap(apiSchemaPath);
-        var alternateMap = new HashMap<>(map);
+        var files = new UApiSchemaFiles(apiSchemaPath);
+        var alternateMap = new HashMap<>(files.filenamesToJson);
         alternateMap.put("backwardsCompatibleChange", """
                 [
                     {
@@ -270,7 +270,7 @@ public class Main {
                 ]
                 """);
 
-        var uApi = UApiSchema.fromFileJsonMap(map);
+        var uApi = UApiSchema.fromFileJsonMap(files.filenamesToJson);
         var alternateUApi = UApiSchema.fromFileJsonMap(alternateMap);
 
         var objectMapper = new ObjectMapper();
