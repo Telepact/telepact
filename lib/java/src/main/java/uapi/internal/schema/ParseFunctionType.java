@@ -35,11 +35,11 @@ public class ParseFunctionType {
         final var resultSchemaKey = "->";
 
         final List<Object> resPath = new ArrayList<>(ctx.path);
-        resPath.add(resultSchemaKey);
 
         UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
-            parseFailures.add(new SchemaParseFailure(ctx.documentName, resPath, "RequiredObjectKeyMissing", Map.of()));
+            parseFailures.add(new SchemaParseFailure(ctx.documentName, resPath, "RequiredObjectKeyMissing",
+                    Map.of("key", resultSchemaKey)));
         } else {
             try {
                 resultType = parseUnionType(functionDefinitionAsParsedJson,
@@ -74,7 +74,7 @@ public class ParseFunctionType {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
         return new UFn(schemaKey, callType, resultType, errorsRegex);

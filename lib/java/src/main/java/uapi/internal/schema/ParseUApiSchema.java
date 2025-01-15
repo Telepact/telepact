@@ -14,11 +14,16 @@ import uapi.UApiSchemaParseError;
 import uapi.internal.types.UError;
 import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UType;
+
+import java.io.IOException;
 import java.util.*;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ParseUApiSchema {
 
-    public static UApiSchema parseUApiSchema(Map<String, List<Object>> uApiSchemaNameToPseudoJson) {
+    public static UApiSchema parseUApiSchema(Map<String, String> uApiSchemaNameToJson) {
         final var originalSchema = new TreeMap<String, Object>((k1, k2) -> {
             if (k1.equals(k2)) {
                 return 0;
@@ -37,7 +42,35 @@ public class ParseUApiSchema {
         final var schemaKeysToDocumentName = new HashMap<String, String>();
         final var schemaKeys = new HashSet<String>();
 
-        final var orderedDocuments = new TreeSet<>(uApiSchemaNameToPseudoJson.keySet());
+        final var orderedDocuments = new TreeSet<>(uApiSchemaNameToJson.keySet());
+
+        final var objectMapper = new ObjectMapper();
+        final var uApiSchemaNameToPseudoJson = new HashMap<String, List<Object>>();
+
+        for (var uApiSchemaJson : uApiSchemaNameToJson.entrySet()) {
+            var documentName = uApiSchemaJson.getKey();
+
+            final Object uApiSchemaPseudoJsonInit;
+            try {
+                uApiSchemaPseudoJsonInit = objectMapper.readValue(uApiSchemaJson.getValue(),
+                        new TypeReference<>() {
+                        });
+            } catch (IOException e) {
+                throw new UApiSchemaParseError(
+                        List.of(new SchemaParseFailure(documentName, List.of(), "JsonInvalid", Map.of())),
+                        uApiSchemaNameToJson,
+                        e);
+            }
+
+            if (!(uApiSchemaPseudoJsonInit instanceof List)) {
+                final List<SchemaParseFailure> thisParseFailure = getTypeUnexpectedParseFailure(documentName, List.of(),
+                        uApiSchemaPseudoJsonInit, "Array");
+                throw new UApiSchemaParseError(thisParseFailure, uApiSchemaNameToJson);
+            }
+            final List<Object> uApiSchemaPseudoJson = (List<Object>) uApiSchemaPseudoJsonInit;
+
+            uApiSchemaNameToPseudoJson.put(documentName, uApiSchemaPseudoJson);
+        }
 
         for (var documentName : orderedDocuments) {
             var uApiSchemaPseudoJson = uApiSchemaNameToPseudoJson.get(documentName);
@@ -57,19 +90,24 @@ public class ParseUApiSchema {
                 var def = (Map<String, Object>) definition;
 
                 try {
-                    var schemaKey = findSchemaKey(documentName, def, index);
+                    var schemaKey = findSchemaKey(documentName, def, index, uApiSchemaNameToJson);
                     var matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
                     if (matchingSchemaKey != null) {
                         var otherPathIndex = schemaKeysToIndex.get(matchingSchemaKey);
                         var otherDocumentName = schemaKeysToDocumentName.get(matchingSchemaKey);
                         var finalPath = new ArrayList<>(loopPath);
                         finalPath.add(schemaKey);
+                        List<Object> finalOtherPath = new ArrayList<>(List.of(otherPathIndex, matchingSchemaKey));
+                        var finalOtherDocumentJson = uApiSchemaNameToJson.get(otherDocumentName);
+                        var finalOtherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
+                                .getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
+
                         parseFailures.add(new SchemaParseFailure(
                                 documentName,
                                 finalPath,
                                 "PathCollision",
-                                Map.of("document", otherDocumentName, "path",
-                                        List.of(otherPathIndex, matchingSchemaKey))));
+                                Map.of("document", otherDocumentName, "path", finalOtherPath,
+                                        "location", finalOtherLocationPseudoJson)));
                         continue;
                     }
 
@@ -86,7 +124,7 @@ public class ParseUApiSchema {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, uApiSchemaNameToJson);
         }
 
         var requestHeaderKeys = new HashSet<String>();
@@ -117,6 +155,7 @@ public class ParseUApiSchema {
                                 thisDocumentName,
                                 List.of(thisIndex),
                                 uApiSchemaNameToPseudoJson,
+                                uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
@@ -128,7 +167,7 @@ public class ParseUApiSchema {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, uApiSchemaNameToJson);
         }
 
         var errors = new ArrayList<UError>();
@@ -147,6 +186,7 @@ public class ParseUApiSchema {
                                 thisDocumentName,
                                 List.of(thisIndex),
                                 uApiSchemaNameToPseudoJson,
+                                uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
@@ -159,22 +199,24 @@ public class ParseUApiSchema {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, uApiSchemaNameToJson);
         }
 
         try {
-            catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName);
+            catchErrorCollisions(uApiSchemaNameToPseudoJson, errorKeys, schemaKeysToIndex, schemaKeysToDocumentName,
+                    uApiSchemaNameToJson);
         } catch (UApiSchemaParseError e) {
             parseFailures.addAll(e.schemaParseFailures);
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, uApiSchemaNameToJson);
         }
 
         for (var error : errors) {
             try {
-                applyErrorToParsedTypes(error, parsedTypes, schemaKeysToDocumentName, schemaKeysToIndex);
+                applyErrorToParsedTypes(error, parsedTypes, schemaKeysToDocumentName, schemaKeysToIndex,
+                        uApiSchemaNameToJson);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
             }
@@ -199,6 +241,7 @@ public class ParseUApiSchema {
                                 thisDocumentName,
                                 List.of(thisIndex, requestHeaderKey),
                                 uApiSchemaNameToPseudoJson,
+                                uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
@@ -226,6 +269,7 @@ public class ParseUApiSchema {
                                 thisDocumentName,
                                 List.of(thisIndex, responseHeaderKey),
                                 uApiSchemaNameToPseudoJson,
+                                uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
                                 schemaKeysToIndex,
                                 parsedTypes,
@@ -238,7 +282,7 @@ public class ParseUApiSchema {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, uApiSchemaNameToJson);
         }
 
         final var finalOriginalSchema = new ArrayList<>(originalSchema.values());

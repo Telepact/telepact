@@ -12,7 +12,7 @@ import uapi.UApiSchemaParseError;
 public class ApplyErrorToParsedTypes {
     public static void applyErrorToParsedTypes(UError error,
             Map<String, UType> parsedTypes, Map<String, String> schemaKeysToDocumentNames,
-            Map<String, Integer> schemaKeysToIndex) {
+            Map<String, Integer> schemaKeysToIndex, Map<String, String> documentNamesToJson) {
         var parseFailures = new ArrayList<SchemaParseFailure>();
 
         var errorKey = error.name;
@@ -50,18 +50,23 @@ public class ApplyErrorToParsedTypes {
                     var errorCaseIndex = error.errors.caseIndices.get(newKey);
                     var otherDocumentName = schemaKeysToDocumentNames.get(fnName);
                     var fnErrorCaseIndex = f.result.caseIndices.get(newKey);
+                    List<Object> otherFinalPath = List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey);
+                    var otherDocumentJson = documentNamesToJson.get(otherDocumentName);
+                    var otherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
+                            .getPathDocumentCoordinatesPseudoJson(
+                                    otherFinalPath, otherDocumentJson);
                     parseFailures.add(new SchemaParseFailure(documentName,
                             List.of(errorIndex, errorKey, errorCaseIndex, newKey),
                             "PathCollision",
                             Map.of("document", otherDocumentName, "path",
-                                    List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey))));
+                                    otherFinalPath, "location", otherLocationPseudoJson)));
                 }
                 fnResultCases.put(newKey, errorCase);
             }
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, documentNamesToJson);
         }
     }
 }

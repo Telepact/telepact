@@ -19,7 +19,7 @@ public class ParseTypeDeclaration {
             ParseContext ctx) {
         if (typeDeclarationArray.isEmpty()) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
-                    "EmptyArrayDisallowed", Map.of())));
+                    "EmptyArrayDisallowed", Map.of())), ctx.uApiSchemaDocumentNamesToJson);
         }
 
         final List<Object> basePath = new ArrayList<>(ctx.path);
@@ -30,7 +30,7 @@ public class ParseTypeDeclaration {
         if (!(baseType instanceof String)) {
             final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, basePath,
                     baseType, "String");
-            throw new UApiSchemaParseError(thisParseFailures);
+            throw new UApiSchemaParseError(thisParseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
         final String rootTypeString = (String) baseType;
 
@@ -40,7 +40,7 @@ public class ParseTypeDeclaration {
         final var matcher = regex.matcher(rootTypeString);
         if (!matcher.find()) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, basePath,
-                    "StringRegexMatchFailed", Map.of("regex", regexString))));
+                    "StringRegexMatchFailed", Map.of("regex", regexString))), ctx.uApiSchemaDocumentNamesToJson);
         }
 
         final var typeName = matcher.group(1);
@@ -53,7 +53,8 @@ public class ParseTypeDeclaration {
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
                     "ArrayLengthUnexpected",
-                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))));
+                    Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))),
+                    ctx.uApiSchemaDocumentNamesToJson);
         }
 
         final var parseFailures = new ArrayList<SchemaParseFailure>();
@@ -88,7 +89,7 @@ public class ParseTypeDeclaration {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
         return new UTypeDeclaration(type, nullable, typeParameters);

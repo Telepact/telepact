@@ -51,7 +51,7 @@ public class ParseUnionType {
                     defInit, "Array");
 
             parseFailures.addAll(finalParseFailures);
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
         final List<Object> definition2 = (List<Object>) defInit;
 
@@ -76,10 +76,10 @@ public class ParseUnionType {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
-        if (definition.isEmpty() && requiredKeys.isEmpty()) {
+        if (definition.isEmpty()) {
             parseFailures.add(new SchemaParseFailure(ctx.documentName, thisPath, "EmptyArrayDisallowed", Map.of()));
         } else {
             outerLoop: for (final var requiredKey : requiredKeys) {
@@ -94,11 +94,10 @@ public class ParseUnionType {
 
                 final List<Object> branchPath = new ArrayList<>(thisPath);
                 branchPath.add(0);
-                branchPath.add(requiredKey);
 
                 parseFailures
                         .add(new SchemaParseFailure(ctx.documentName, branchPath, "RequiredObjectKeyMissing",
-                                Map.of()));
+                                Map.of("key", requiredKey)));
             }
         }
 
@@ -165,7 +164,7 @@ public class ParseUnionType {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
         return new UUnion(schemaKey, cases, caseIndices);

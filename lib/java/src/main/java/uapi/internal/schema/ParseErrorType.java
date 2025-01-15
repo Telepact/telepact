@@ -35,7 +35,7 @@ public class ParseErrorType {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
         // Assuming parseUnionType is adapted to Java and returns UError or its

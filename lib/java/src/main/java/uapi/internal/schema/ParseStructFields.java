@@ -30,9 +30,14 @@ public class ParseStructFields {
                     final List<Object> finalOtherPath = new ArrayList<>(ctx.path);
                     finalOtherPath.add(existingField);
 
+                    final var finalOtherDocumentJson = ctx.uApiSchemaDocumentNamesToJson.get(ctx.documentName);
+                    final var finalOtherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
+                            .getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
+
                     parseFailures
                             .add(new SchemaParseFailure(ctx.documentName, finalPath, "PathCollision",
-                                    Map.of("document", ctx.documentName, "path", finalOtherPath)));
+                                    Map.of("document", ctx.documentName, "path", finalOtherPath, "location",
+                                            finalOtherLocationPseudoJson)));
                 }
             }
 
@@ -51,7 +56,7 @@ public class ParseStructFields {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
         return fields;

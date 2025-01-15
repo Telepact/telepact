@@ -1,6 +1,13 @@
 from typing import Tuple, cast, Generator
 
 
+def get_path_document_coordinates_pseudo_json(path: list[object], document: str) -> dict[str, object]:
+    print(
+        f"get_path_document_coordinates_pseudo_json: path={path}, document={document}")
+    reader = string_reader(document)
+    return find_coordinates(path, reader)
+
+
 def string_reader(s: str) -> Generator[Tuple[str, int, int], str, str]:
     row = 1
     col = 0
@@ -33,6 +40,47 @@ def find_coordinates(path: list[object], reader: Generator[Tuple[str, int, int],
             result = find_coordinates_array(path, reader)
             if result:
                 return result
+
+    raise ValueError("Path not found in document")
+
+
+def find_coordinates_object(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
+    print(f"find_coordinates_object: path={path}")
+    working_key_row_start = None
+    working_key_col_start = None
+    for c, row, col in reader:
+        print(f"find_coordinates_object: char={c}, row={row}, col={col}")
+        if c == '}':
+            return None
+        elif c == '"':
+            working_key_row_start = row
+            working_key_col_start = col
+            working_key = find_string(reader)
+        elif c == ':':
+            if working_key == path[0]:
+                return find_coordinates(path[1:], reader, working_key_row_start, working_key_col_start)
+            else:
+                find_value(reader)
+
+    raise ValueError("Path not found in document")
+
+
+def find_coordinates_array(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
+    print(f"find_coordinates_array: path={path}")
+    working_index = 0
+    if working_index == path[0]:
+        return find_coordinates(path[1:], reader)
+    else:
+        find_value(reader)
+
+    for c, row, col in reader:
+        print(f"find_coordinates_array: char={c}, row={row}, col={col}")
+        working_index += 1
+        print(f"find_coordinates_array: working_index={working_index}")
+        if working_index == path[0]:
+            return find_coordinates(path[1:], reader)
+        else:
+            find_value(reader)
 
     raise ValueError("Path not found in document")
 
@@ -85,47 +133,6 @@ def find_array(reader: Generator[Tuple[str, int, int], str, str]) -> None:
             return
 
 
-def find_coordinates_object(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
-    print(f"find_coordinates_object: path={path}")
-    working_key_row_start = None
-    working_key_col_start = None
-    for c, row, col in reader:
-        print(f"find_coordinates_object: char={c}, row={row}, col={col}")
-        if c == '}':
-            return None
-        elif c == '"':
-            working_key_row_start = row
-            working_key_col_start = col
-            working_key = find_string(reader)
-        elif c == ':':
-            if working_key == path[0]:
-                return find_coordinates(path[1:], reader, working_key_row_start, working_key_col_start)
-            else:
-                find_value(reader)
-
-    raise ValueError("Path not found in document")
-
-
-def find_coordinates_array(path: list[object], reader: Generator[Tuple[str, int, int], str, str]) -> dict[str, object] | None:
-    print(f"find_coordinates_array: path={path}")
-    working_index = 0
-    if working_index == path[0]:
-        return find_coordinates(path[1:], reader)
-    else:
-        find_value(reader)
-
-    for c, row, col in reader:
-        print(f"find_coordinates_array: char={c}, row={row}, col={col}")
-        working_index += 1
-        print(f"find_coordinates_array: working_index={working_index}")
-        if working_index == path[0]:
-            return find_coordinates(path[1:], reader)
-        else:
-            find_value(reader)
-
-    raise ValueError("Path not found in document")
-
-
 def find_string(reader: Generator[Tuple[str, int, int], str, str]) -> str:
     working_string = ""
     for c, row, col in reader:
@@ -135,10 +142,3 @@ def find_string(reader: Generator[Tuple[str, int, int], str, str]) -> str:
         else:
             working_string += c
     raise ValueError("String not closed")
-
-
-def get_path_document_coordinates_pseudo_json(path: list[object], document: str) -> dict[str, object]:
-    print(
-        f"get_path_document_coordinates_pseudo_json: path={path}, document={document}")
-    reader = string_reader(document)
-    return find_coordinates(path, reader)

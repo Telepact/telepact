@@ -11,6 +11,7 @@ public class ParseContext {
     public final String documentName;
     public final List<Object> path;
     public final Map<String, List<Object>> uApiSchemaDocumentsToPseudoJson;
+    public final Map<String, String> uApiSchemaDocumentNamesToJson;
     public final Map<String, String> schemaKeysToDocumentName;
     public final Map<String, Integer> schemaKeysToIndex;
     public final Map<String, UType> parsedTypes;
@@ -20,12 +21,14 @@ public class ParseContext {
     public ParseContext(String documentName,
             List<Object> path,
             Map<String, List<Object>> uApiSchemaDocumentsToPseudoJson,
+            Map<String, String> uApiSchemaDocumentNamesToJson,
             Map<String, String> schemaKeysToDocumentName, Map<String, Integer> schemaKeysToIndex,
             Map<String, UType> parsedTypes,
             List<SchemaParseFailure> allParseFailures, Set<String> failedTypes) {
         this.documentName = documentName;
         this.path = path;
         this.uApiSchemaDocumentsToPseudoJson = uApiSchemaDocumentsToPseudoJson;
+        this.uApiSchemaDocumentNamesToJson = uApiSchemaDocumentNamesToJson;
         this.schemaKeysToDocumentName = schemaKeysToDocumentName;
         this.schemaKeysToIndex = schemaKeysToIndex;
         this.parsedTypes = parsedTypes;
@@ -34,17 +37,20 @@ public class ParseContext {
     }
 
     public ParseContext copyWithNewDocumentName(String documentName) {
-        return new ParseContext(documentName, path, uApiSchemaDocumentsToPseudoJson, schemaKeysToDocumentName,
+        return new ParseContext(documentName, path, uApiSchemaDocumentsToPseudoJson, uApiSchemaDocumentNamesToJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
     }
 
     public ParseContext copyWithNewPath(List<Object> path) {
-        return new ParseContext(documentName, path, uApiSchemaDocumentsToPseudoJson, schemaKeysToDocumentName,
+        return new ParseContext(documentName, path, uApiSchemaDocumentsToPseudoJson, uApiSchemaDocumentNamesToJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
     }
 
     public ParseContext copyWithNewDocumentNameAndPath(String documentName, List<Object> path) {
-        return new ParseContext(documentName, path, uApiSchemaDocumentsToPseudoJson, schemaKeysToDocumentName,
+        return new ParseContext(documentName, path, uApiSchemaDocumentsToPseudoJson, uApiSchemaDocumentNamesToJson,
+                schemaKeysToDocumentName,
                 schemaKeysToIndex, parsedTypes, allParseFailures, failedTypes);
     }
 }

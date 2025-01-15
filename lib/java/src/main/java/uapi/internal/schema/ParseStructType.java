@@ -54,7 +54,7 @@ public class ParseStructType {
         }
 
         if (parseFailures.size() > 0) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
         final var fields = parseStructFields(definition,

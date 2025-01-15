@@ -18,7 +18,8 @@ public class ParseHeadersType {
 
         if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(
-                    getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, "Array"));
+                    getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, "Array"),
+                    ctx.uApiSchemaDocumentNamesToJson);
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
@@ -28,7 +29,7 @@ public class ParseHeadersType {
 
             return new UFieldDeclaration(headerField, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {
-            throw new UApiSchemaParseError(e.schemaParseFailures);
+            throw new UApiSchemaParseError(e.schemaParseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
     }
 }

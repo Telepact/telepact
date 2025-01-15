@@ -26,9 +26,9 @@ public class ValidateStructFields {
         }
 
         for (final var missingField : missingFields) {
-            final var validationFailure = new ValidationFailure(List.of(missingField),
+            final var validationFailure = new ValidationFailure(List.of(),
                     "RequiredObjectKeyMissing",
-                    Map.of());
+                    Map.of("key", missingField));
 
             validationFailures.add(validationFailure);
         }

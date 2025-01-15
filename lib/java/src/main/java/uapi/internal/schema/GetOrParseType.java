@@ -28,7 +28,7 @@ public class GetOrParseType {
     static UType getOrParseType(String typeName,
             ParseContext ctx) {
         if (ctx.failedTypes.contains(typeName)) {
-            throw new UApiSchemaParseError(List.of());
+            throw new UApiSchemaParseError(List.of(), ctx.uApiSchemaDocumentNamesToJson);
         }
 
         final var existingType = ctx.parsedTypes.get(typeName);
@@ -43,7 +43,7 @@ public class GetOrParseType {
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
-                    "StringRegexMatchFailed", Map.of("regex", regexString))));
+                    "StringRegexMatchFailed", Map.of("regex", regexString))), ctx.uApiSchemaDocumentNamesToJson);
         }
 
         final var standardTypeName = matcher.group(1);
@@ -64,7 +64,7 @@ public class GetOrParseType {
         final var thisDocumentName = ctx.schemaKeysToDocumentName.get(customTypeName);
         if (thisIndex == null) {
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
-                    "TypeUnknown", Map.of("name", customTypeName))));
+                    "TypeUnknown", Map.of("name", customTypeName))), ctx.uApiSchemaDocumentNamesToJson);
         }
         final var definition = (Map<String, Object>) ctx.uApiSchemaDocumentsToPseudoJson.get(thisDocumentName)
                 .get(thisIndex);
@@ -103,7 +103,8 @@ public class GetOrParseType {
                                     ctx.documentName,
                                     Collections.singletonList(thisIndex),
                                     "TypeExtensionImplementationMissing",
-                                    Collections.singletonMap("name", customTypeName))));
+                                    Collections.singletonMap("name", customTypeName))),
+                            ctx.uApiSchemaDocumentNamesToJson);
                 }
 
                 type = possibleTypeExtension;
@@ -115,7 +116,7 @@ public class GetOrParseType {
         } catch (UApiSchemaParseError e) {
             ctx.allParseFailures.addAll(e.schemaParseFailures);
             ctx.failedTypes.add(customTypeName);
-            throw new UApiSchemaParseError(List.of());
+            throw new UApiSchemaParseError(List.of(), ctx.uApiSchemaDocumentNamesToJson);
         }
     }
 }

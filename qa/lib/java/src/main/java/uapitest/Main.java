@@ -197,25 +197,10 @@ public class Main {
             try {
                 if (inputTag.equals("PseudoJson")) {
                     var unionValue = (Map<String, Object>) input.get(inputTag);
-                    var schemaPseudoJson = unionValue.get("schema");
-                    var extendPseudoJson = unionValue.get("extend!");
+                    var schemaJson = (String) unionValue.get("schema");
+                    var extendJson = (String) unionValue.get("extend!");
 
-                    String schemaJson;
-                    try {
-                        var schemaJsonBytes = objectMapper.writeValueAsBytes(schemaPseudoJson);
-                        schemaJson = new String(schemaJsonBytes);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if (extendPseudoJson != null) {
-                        String extendJson;
-                        try {
-                            var extendJsonBytes = objectMapper.writeValueAsBytes(extendPseudoJson);
-                            extendJson = new String(extendJsonBytes);
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
+                    if (extendJson != null) {
                         UApiSchema.fromFileJsonMap(Map.of("default", schemaJson, "extend", extendJson));
                     } else {
                         UApiSchema.fromJson(schemaJson);

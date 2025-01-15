@@ -9,7 +9,8 @@ import uapi.UApiSchemaParseError;
 
 public class CatchErrorCollisions {
     public static void catchErrorCollisions(Map<String, List<Object>> uApiSchemaNameToPseudoJson, Set<String> errorKeys,
-            Map<String, Integer> keysToIndex, Map<String, String> schemaKeysToDocumentName) {
+            Map<String, Integer> keysToIndex, Map<String, String> schemaKeysToDocumentName,
+            Map<String, String> documentNamesToJson) {
         List<SchemaParseFailure> parseFailures = new ArrayList<>();
 
         var errorKeysList = new ArrayList<>(errorKeys);
@@ -59,12 +60,16 @@ public class CatchErrorCollisions {
                         if (thisErrDefKeys.equals(thisOtherErrDefKeys)) {
                             String thisErrorDefKey = thisErrDefKeys.iterator().next();
                             String thisOtherErrorDefKey = thisOtherErrDefKeys.iterator().next();
+                            List<Object> finalThisPath = List.of(index, defKey, k, thisErrorDefKey);
+                            var finalThisDocument = documentNamesToJson.get(documentName);
+                            var finalThisLocation = GetPathDocumentCoordinatesPseudoJson
+                                    .getPathDocumentCoordinatesPseudoJson(finalThisPath, finalThisDocument);
                             parseFailures.add(new SchemaParseFailure(
                                     otherDocumentName,
                                     List.of(otherIndex, otherDefKey, l, thisOtherErrorDefKey),
                                     "PathCollision",
                                     Map.of("document", documentName, "path",
-                                            List.of(index, defKey, k, thisErrorDefKey))));
+                                            finalThisPath, "location", finalThisLocation)));
                         }
                     }
                 }
@@ -72,7 +77,7 @@ public class CatchErrorCollisions {
         }
 
         if (!parseFailures.isEmpty()) {
-            throw new UApiSchemaParseError(parseFailures);
+            throw new UApiSchemaParseError(parseFailures, documentNamesToJson);
         }
     }
 }

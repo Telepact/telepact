@@ -62,9 +62,9 @@ public class ValidateMockStub {
         final var resultDefKey = "->";
 
         if (!givenMap.containsKey(resultDefKey)) {
-            validationFailures.add(new ValidationFailure(List.of(resultDefKey),
+            validationFailures.add(new ValidationFailure(List.of(),
                     "RequiredObjectKeyMissing",
-                    Map.of()));
+                    Map.of("key", resultDefKey)));
         } else {
             final var output = givenMap.get(resultDefKey);
             final var outputFailures = functionDef.result.validate(output, select, fn, List.of());
