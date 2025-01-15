@@ -65,7 +65,9 @@
                 "name": ["string"]
             }
         }, {
-            "RequiredObjectKeyMissing": {}
+            "RequiredObjectKeyMissing": {
+                "key": ["string"]
+            }
         }, {
             "JsonInvalid": {}
         }, {

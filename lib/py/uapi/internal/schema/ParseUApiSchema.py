@@ -85,8 +85,8 @@ def parse_uapi_schema(
                     other_document_name = schema_keys_to_document_names[matching_schema_key]
                     final_path = loop_path + [schema_key]
                     final_other_path = [other_path_index, matching_schema_key]
-                    document_json = uapi_schema_document_names_to_json[document_name]
-                    location_pseudo_json = get_path_document_coordinates_pseudo_json(
+                    document_json = uapi_schema_document_names_to_json[other_document_name]
+                    other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
                         final_other_path, document_json)
                     parse_failures.append(
                         SchemaParseFailure(
@@ -95,7 +95,7 @@ def parse_uapi_schema(
                             {
                                 "document": other_document_name,
                                 "path": final_other_path,
-                                "location": location_pseudo_json})
+                                "location": other_location_pseudo_json})
                     )
                     continue
 

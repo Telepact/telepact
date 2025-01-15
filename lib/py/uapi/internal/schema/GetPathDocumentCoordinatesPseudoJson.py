@@ -2,7 +2,7 @@ from typing import Tuple, cast, Generator
 
 
 def string_reader(s: str) -> Generator[Tuple[str, int, int], str, str]:
-    row = 0
+    row = 1
     col = 0
     for c in s:
         if c == '\n':

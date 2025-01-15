@@ -57,7 +57,7 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
         raise UApiSchemaParseError(
             parse_failures, ctx.uapi_schema_document_names_to_json)
 
-    if not definition and not required_keys:
+    if len(definition) == 0:
         parse_failures.append(SchemaParseFailure(
             ctx.document_name, this_path, "EmptyArrayDisallowed", {}))
     else:
