@@ -25,7 +25,7 @@ class GenerateContext:
 
     def copy(self, blueprint_value: object | None = None, use_blueprint_value: bool | None = None, include_optional_fields: bool | None = None,
              randomize_optional_fields: bool | None = None, type_parameters: list['UTypeDeclaration'] | None = None,
-             random_generator: 'RandomGenerator' | None = None) -> 'GenerateContext':
+             random_generator: 'RandomGenerator | None' = None) -> 'GenerateContext':
         return GenerateContext(blueprint_value if blueprint_value is not None else self.blueprint_value,
                                use_blueprint_value if use_blueprint_value is not None else self.use_blueprint_value,
                                include_optional_fields if include_optional_fields is not None else self.include_optional_fields,

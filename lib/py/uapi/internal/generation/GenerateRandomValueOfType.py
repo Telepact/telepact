@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from uapi.internal.generation.GenerateContext import GenerateContext
 
 
-def generate_random_value_of_type(ctx: 'GenerateContext',
-                                  this_type: 'UType', nullable: bool,
-                                  type_parameters: list['UTypeDeclaration']) -> object:
+def generate_random_value_of_type(
+        this_type: 'UType', nullable: bool,
+        type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
     if nullable and not ctx.use_blueprint_value and ctx.random_generator.next_boolean():
         return None
     else:

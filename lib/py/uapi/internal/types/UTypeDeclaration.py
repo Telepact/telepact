@@ -20,4 +20,4 @@ class UTypeDeclaration:
 
     def generate_random_value(self, ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomValueOfType import generate_random_value_of_type
-        return generate_random_value_of_type(ctx, self.type, self.nullable, self.type_parameters)
+        return generate_random_value_of_type(self.type, self.nullable, self.type_parameters, ctx)

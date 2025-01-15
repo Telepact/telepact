@@ -20,7 +20,7 @@ class UType(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def generate_random_value(self, ctx: GenerateContext) -> object:
+    def generate_random_value(self, ctx: 'GenerateContext') -> object:
         pass
 
     @abstractmethod
