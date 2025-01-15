@@ -9,9 +9,14 @@ export class UApiSchemaParseError extends Error {
     public schemaParseFailures: SchemaParseFailure[];
     public schemaParseFailuresPseudoJson: any;
 
-    constructor(schemaParseFailures: SchemaParseFailure[], cause?: Error) {
-        super(JSON.stringify(mapSchemaParseFailuresToPseudoJson(schemaParseFailures), null, 2), { cause: cause });
+    constructor(schemaParseFailures: SchemaParseFailure[], documentNamesToJson: Record<string, string>, cause?: Error) {
+        super(JSON.stringify(mapSchemaParseFailuresToPseudoJson(schemaParseFailures, documentNamesToJson), null, 2), {
+            cause: cause,
+        });
         this.schemaParseFailures = schemaParseFailures;
-        this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(schemaParseFailures);
+        this.schemaParseFailuresPseudoJson = mapSchemaParseFailuresToPseudoJson(
+            schemaParseFailures,
+            documentNamesToJson,
+        );
     }
 }

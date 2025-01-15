@@ -13,8 +13,9 @@ import { parseErrorType } from '../../internal/schema/ParseErrorType';
 import { parseHeadersType } from '../../internal/schema/ParseHeadersType';
 import { UError } from '../../internal/types/UError';
 import { ParseContext } from '../../internal/schema/ParseContext';
+import { getPathDocumentCoordinatesPseudoJson } from './GetPathDocumentCoordinatesPseudoJson';
 
-export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<string, object[]>): UApiSchema {
+export function parseUapiSchema(uApiSchemaDocumentNamesToJson: Record<string, string>): UApiSchema {
     const originalSchema: { [key: string]: Record<string, object> } = {};
     const parsedTypes: { [key: string]: UType } = {};
     const parseFailures: SchemaParseFailure[] = [];
@@ -23,7 +24,30 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     const schemaKeysToDocumentName: { [key: string]: string } = {};
     const schemaKeys: Set<string> = new Set();
 
-    const orderedDocumentNames = Object.keys(uApiSchemaDocumentNamesToPseudoJson).sort();
+    const orderedDocumentNames = Object.keys(uApiSchemaDocumentNamesToJson).sort();
+
+    const uApiSchemaDocumentNamesToPseudoJson: Record<string, any[]> = {};
+
+    for (const [documentName, jsonValue] of Object.entries(uApiSchemaDocumentNamesToJson)) {
+        let uApiSchemaPseudoJsonInit: any;
+        try {
+            uApiSchemaPseudoJsonInit = JSON.parse(jsonValue);
+        } catch (e) {
+            throw new UApiSchemaParseError(
+                [new SchemaParseFailure(documentName, [], 'JsonInvalid', {})],
+                uApiSchemaDocumentNamesToJson,
+                e as Error,
+            );
+        }
+
+        if (!Array.isArray(uApiSchemaPseudoJsonInit)) {
+            const thisParseFailure = getTypeUnexpectedParseFailure(documentName, [], uApiSchemaPseudoJsonInit, 'Array');
+            throw new UApiSchemaParseError(thisParseFailure, uApiSchemaDocumentNamesToJson);
+        }
+        const uApiSchemaPseudoJson: any[] = uApiSchemaPseudoJsonInit;
+
+        uApiSchemaDocumentNamesToPseudoJson[documentName] = uApiSchemaPseudoJson;
+    }
 
     for (const documentName of orderedDocumentNames) {
         const uApiSchemaPseudoJson = uApiSchemaDocumentNamesToPseudoJson[documentName];
@@ -52,15 +76,22 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
             const def_: Record<string, object> = definition as Record<string, object>;
 
             try {
-                const schemaKey = findSchemaKey(documentName, def_, index);
+                const schemaKey = findSchemaKey(documentName, def_, index, uApiSchemaDocumentNamesToJson);
                 const matchingSchemaKey = findMatchingSchemaKey(schemaKeys, schemaKey);
                 if (matchingSchemaKey !== null) {
                     const otherPathIndex = schemaKeysToIndex[matchingSchemaKey];
                     const otherDocumentName = schemaKeysToDocumentName[matchingSchemaKey];
                     const finalPath = [...loopPath, schemaKey];
+                    const otherFinalPath = [otherPathIndex, matchingSchemaKey];
+                    const otherDocumentJson = uApiSchemaDocumentNamesToJson[otherDocumentName];
+                    const otherLocationPseudoJson = getPathDocumentCoordinatesPseudoJson(
+                        otherFinalPath,
+                        otherDocumentJson,
+                    );
                     parseFailures.push(
                         new SchemaParseFailure(documentName, finalPath as any[], 'PathCollision', {
                             document: otherDocumentName,
+                            location: otherLocationPseudoJson,
                             path: [otherPathIndex, matchingSchemaKey],
                         }),
                     );
@@ -84,7 +115,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
     const requestHeaderKeys: Set<string> = new Set();
@@ -115,6 +146,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                     thisDocumentName,
                     [thisIndex],
                     uApiSchemaDocumentNamesToPseudoJson,
+                    uApiSchemaDocumentNamesToJson,
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
@@ -132,7 +164,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
     const errors: UError[] = [];
@@ -152,6 +184,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                         thisDocumentName,
                         [thisIndex],
                         uApiSchemaDocumentNamesToPseudoJson,
+                        uApiSchemaDocumentNamesToJson,
                         schemaKeysToDocumentName,
                         schemaKeysToIndex,
                         parsedTypes,
@@ -177,7 +210,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
     try {
@@ -186,6 +219,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
             errorKeys,
             schemaKeysToIndex,
             schemaKeysToDocumentName,
+            uApiSchemaDocumentNamesToJson,
         );
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
@@ -196,12 +230,18 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
     for (const error of errors) {
         try {
-            applyErrorToParsedTypes(error, parsedTypes, schemaKeysToDocumentName, schemaKeysToIndex);
+            applyErrorToParsedTypes(
+                error,
+                parsedTypes,
+                schemaKeysToDocumentName,
+                schemaKeysToIndex,
+                uApiSchemaDocumentNamesToJson,
+            );
         } catch (e) {
             if (e instanceof UApiSchemaParseError) {
                 parseFailures.push(...e.schemaParseFailures);
@@ -230,6 +270,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                     thisDocumentName,
                     [thisIndex, requestHeaderKey],
                     uApiSchemaDocumentNamesToPseudoJson,
+                    uApiSchemaDocumentNamesToJson,
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
@@ -263,6 +304,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
                     thisDocumentName,
                     [thisIndex, responseHeaderKey],
                     uApiSchemaDocumentNamesToPseudoJson,
+                    uApiSchemaDocumentNamesToJson,
                     schemaKeysToDocumentName,
                     schemaKeysToIndex,
                     parsedTypes,
@@ -281,7 +323,7 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToPseudoJson: Record<stri
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, uApiSchemaDocumentNamesToJson);
     }
 
     const sortedSchemaKeys = Object.keys(originalSchema).sort((a, b) => {

@@ -15,6 +15,7 @@ export function parseHeadersType(
     if (!Array.isArray(typeDeclarationValue)) {
         throw new UApiSchemaParseError(
             getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, 'Array'),
+            ctx.uapiSchemaDocumentNamesToJson,
         );
     }
 
@@ -25,6 +26,6 @@ export function parseHeadersType(
 
         return new UFieldDeclaration(headerField, typeDeclaration, false);
     } catch (e) {
-        throw new UApiSchemaParseError(e.schema_parse_failures);
+        throw new UApiSchemaParseError(e.schema_parse_failures, ctx.uapiSchemaDocumentNamesToJson);
     }
 }

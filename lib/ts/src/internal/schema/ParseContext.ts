@@ -5,6 +5,7 @@ export class ParseContext {
     public readonly documentName: string;
     public readonly path: any[];
     public readonly uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] };
+    public readonly uapiSchemaDocumentNamesToJson: { [key: string]: string };
     public readonly schemaKeysToDocumentName: { [key: string]: string };
     public readonly schemaKeysToIndex: { [key: string]: number };
     public readonly parsedTypes: { [key: string]: UType };
@@ -15,6 +16,7 @@ export class ParseContext {
         documentName: string,
         path: any[],
         uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
+        uapiSchemaDocumentNamesToJson: { [key: string]: string },
         schemaKeysToDocumentName: { [key: string]: string },
         schemaKeysToIndex: { [key: string]: number },
         parsedTypes: { [key: string]: UType },
@@ -24,6 +26,7 @@ export class ParseContext {
         this.documentName = documentName;
         this.path = path;
         this.uapiSchemaDocumentNamesToPseudoJson = uapiSchemaDocumentNamesToPseudoJson;
+        this.uapiSchemaDocumentNamesToJson = uapiSchemaDocumentNamesToJson;
         this.schemaKeysToDocumentName = schemaKeysToDocumentName;
         this.schemaKeysToIndex = schemaKeysToIndex;
         this.parsedTypes = parsedTypes;
@@ -36,6 +39,7 @@ export class ParseContext {
             documentName ?? this.documentName,
             path ?? this.path,
             this.uapiSchemaDocumentNamesToPseudoJson,
+            this.uapiSchemaDocumentNamesToJson,
             this.schemaKeysToDocumentName,
             this.schemaKeysToIndex,
             this.parsedTypes,

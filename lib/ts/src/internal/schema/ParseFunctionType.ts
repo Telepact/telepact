@@ -78,7 +78,7 @@ export function parseFunctionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     return new UFn(schemaKey, callType as UUnion, resultType as UUnion, errorsRegex as string);

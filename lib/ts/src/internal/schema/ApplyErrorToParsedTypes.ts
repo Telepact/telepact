@@ -3,12 +3,14 @@ import { UType } from '../../internal/types/UType';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { UFn } from '../../internal/types/UFn';
+import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function applyErrorToParsedTypes(
     error: UError,
     parsedTypes: { [key: string]: UType },
     schemaKeysToDocumentNames: { [key: string]: string },
     schemaKeysToIndex: { [key: string]: number },
+    documentNamesToJson: { [key: string]: string },
 ): void {
     const parseFailures: SchemaParseFailure[] = [];
 
@@ -46,12 +48,15 @@ export function applyErrorToParsedTypes(
                 const errorCaseIndex = error.errors.caseIndices[newKey];
                 const otherDocumentName = schemaKeysToDocumentNames[fnName];
                 const fnErrorCaseIndex = f.result.caseIndices[newKey];
+                const otherPath = [otherPathIndex, '->', fnErrorCaseIndex, newKey];
+                const otherDocumentJson = documentNamesToJson[otherDocumentName];
+                const otherLocation = getPathDocumentCoordinatesPseudoJson(otherPath, otherDocumentJson);
                 parseFailures.push(
                     new SchemaParseFailure(
                         documentName,
                         [errorIndex, errorKey, errorCaseIndex, newKey],
                         'PathCollision',
-                        { document: otherDocumentName, path: [otherPathIndex, '->', fnErrorCaseIndex, newKey] },
+                        { document: otherDocumentName, path: otherPath, location: otherLocation },
                     ),
                 );
             }
@@ -61,6 +66,6 @@ export function applyErrorToParsedTypes(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, documentNamesToJson);
     }
 }

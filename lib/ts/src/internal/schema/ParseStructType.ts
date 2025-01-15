@@ -40,7 +40,7 @@ export function parseStructType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     const fields = parseStructFields(definition, ctx.copy({ path: thisPath }));

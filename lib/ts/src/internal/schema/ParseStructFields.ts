@@ -3,6 +3,7 @@ import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { parseField } from '../../internal/schema/ParseField';
 import { ParseContext } from '../../internal/schema/ParseContext';
+import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function parseStructFields(
     referenceStruct: { [key: string]: any },
@@ -18,9 +19,12 @@ export function parseStructFields(
             if (fieldNoOpt === existingFieldNoOpt) {
                 const finalPath = [...ctx.path, fieldDeclaration];
                 const finalOtherPath = [...ctx.path, existingField];
+                const finalOtherDocumentJson = ctx.uapiSchemaDocumentNamesToJson[ctx.documentName];
+                const finalOtherLocation = getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
                 parseFailures.push(
                     new SchemaParseFailure(ctx.documentName, finalPath, 'PathCollision', {
                         document: ctx.documentName,
+                        location: finalOtherLocation,
                         path: finalOtherPath,
                     }),
                 );
@@ -41,7 +45,7 @@ export function parseStructFields(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     return fields;

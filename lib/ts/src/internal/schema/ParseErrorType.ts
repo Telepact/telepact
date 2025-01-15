@@ -21,7 +21,7 @@ export function parseErrorType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     const error = parseUnionType(errorDefinitionAsParsedJson, schemaKey, [], [], ctx);

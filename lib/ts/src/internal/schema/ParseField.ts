@@ -12,9 +12,10 @@ export function parseField(fieldDeclaration: string, typeDeclarationValue: any, 
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
         const finalPath = [...ctx.path, fieldDeclaration];
-        throw new UApiSchemaParseError([
-            new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString }),
-        ]);
+        throw new UApiSchemaParseError(
+            [new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString })],
+            ctx.uapiSchemaDocumentNamesToJson,
+        );
     }
 
     const fieldName = matcher[0];
@@ -25,6 +26,7 @@ export function parseField(fieldDeclaration: string, typeDeclarationValue: any, 
     if (!Array.isArray(typeDeclarationValue)) {
         throw new UApiSchemaParseError(
             getTypeUnexpectedParseFailure(ctx.documentName, thisPath, typeDeclarationValue, 'Array'),
+            ctx.uapiSchemaDocumentNamesToJson,
         );
     }
     const typeDeclarationArray = typeDeclarationValue;

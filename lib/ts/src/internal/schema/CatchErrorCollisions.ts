@@ -1,11 +1,13 @@
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
+import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function catchErrorCollisions(
     uApiSchemaNameToPseudoJson: Record<string, any[]>,
     errorKeys: Set<string>,
     keysToIndex: Record<string, number>,
     schemaKeysToDocumentNames: Record<string, string>,
+    documentNamesToJson: Record<string, string>,
 ): void {
     const parseFailures: SchemaParseFailure[] = [];
 
@@ -59,12 +61,15 @@ export function catchErrorCollisions(
                     ) {
                         const thisErrorDefKey = thisErrDefKeys.values().next().value as string;
                         const thisOtherErrorDefKey = thisOtherErrDefKeys.values().next().value as string;
+                        const thisPath = [index, defKey, k, thisErrorDefKey];
+                        const thisDocumentJson = documentNamesToJson[documentName];
+                        const thisLocation = getPathDocumentCoordinatesPseudoJson(thisPath, thisDocumentJson);
                         parseFailures.push(
                             new SchemaParseFailure(
                                 otherDocumentName,
                                 [otherIndex, otherDefKey, l, thisOtherErrorDefKey],
                                 'PathCollision',
-                                { document: documentName, path: [index, defKey, k, thisErrorDefKey] },
+                                { document: documentName, path: thisPath, location: thisLocation },
                             ),
                         );
                     }
@@ -74,6 +79,6 @@ export function catchErrorCollisions(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, documentNamesToJson);
     }
 }

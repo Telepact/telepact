@@ -35,7 +35,7 @@ export function parseUnionType(
     if (!Array.isArray(defInit)) {
         const finalParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, thisPath, defInit, 'Array');
         parseFailures.push(...finalParseFailures);
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     const definition2 = defInit;
@@ -53,7 +53,7 @@ export function parseUnionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     if (definition.length === 0 && requiredKeys.length === 0) {
@@ -140,7 +140,7 @@ export function parseUnionType(
     }
 
     if (parseFailures.length > 0) {
-        throw new UApiSchemaParseError(parseFailures);
+        throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
     return new UUnion(schemaKey, cases, caseIndices);

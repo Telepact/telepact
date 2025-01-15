@@ -18,7 +18,7 @@ import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function getOrParseType(typeName: string, ctx: ParseContext): UType {
     if (ctx.failedTypes.has(typeName)) {
-        throw new UApiSchemaParseError([]);
+        throw new UApiSchemaParseError([], ctx.uapiSchemaDocumentNamesToJson);
     }
 
     const existingType = ctx.parsedTypes[typeName];
@@ -31,9 +31,10 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
 
     const matcher = typeName.match(regex);
     if (!matcher) {
-        throw new UApiSchemaParseError([
-            new SchemaParseFailure(ctx.documentName, ctx.path, 'StringRegexMatchFailed', { regex: regexString }),
-        ]);
+        throw new UApiSchemaParseError(
+            [new SchemaParseFailure(ctx.documentName, ctx.path, 'StringRegexMatchFailed', { regex: regexString })],
+            ctx.uapiSchemaDocumentNamesToJson,
+        );
     }
 
     const standardTypeName = matcher[1];
@@ -54,9 +55,10 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
     const thisIndex = ctx.schemaKeysToIndex[customTypeName];
     const thisDocumentName = ctx.schemaKeysToDocumentName[customTypeName];
     if (thisIndex === undefined) {
-        throw new UApiSchemaParseError([
-            new SchemaParseFailure(ctx.documentName, ctx.path, 'TypeUnknown', { name: customTypeName }),
-        ]);
+        throw new UApiSchemaParseError(
+            [new SchemaParseFailure(ctx.documentName, ctx.path, 'TypeUnknown', { name: customTypeName })],
+            ctx.uapiSchemaDocumentNamesToJson,
+        );
     }
     const definition = ctx.uapiSchemaDocumentNamesToPseudoJson[thisDocumentName][thisIndex] as {
         [key: string]: object;
@@ -92,11 +94,14 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
                 '_ext.Stub_': new UMockStub(ctx.parsedTypes),
             }[customTypeName];
             if (!possibleTypeExtension) {
-                throw new UApiSchemaParseError([
-                    new SchemaParseFailure(ctx.documentName, [thisIndex], 'TypeExtensionImplementationMissing', {
-                        name: customTypeName,
-                    }),
-                ]);
+                throw new UApiSchemaParseError(
+                    [
+                        new SchemaParseFailure(ctx.documentName, [thisIndex], 'TypeExtensionImplementationMissing', {
+                            name: customTypeName,
+                        }),
+                    ],
+                    ctx.uapiSchemaDocumentNamesToJson,
+                );
             }
             type = possibleTypeExtension;
         }
@@ -108,7 +113,7 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
         if (e instanceof UApiSchemaParseError) {
             ctx.allParseFailures.push(...e.schemaParseFailures);
             ctx.failedTypes.add(customTypeName);
-            throw new UApiSchemaParseError([]);
+            throw new UApiSchemaParseError([], ctx.uapiSchemaDocumentNamesToJson);
         }
         throw e;
     }

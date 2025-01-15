@@ -1,7 +1,12 @@
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
 
-export function findSchemaKey(documentName: string, definition: Record<string, any>, index: number): string {
+export function findSchemaKey(
+    documentName: string,
+    definition: Record<string, any>,
+    index: number,
+    documentNamesToJson: Record<string, string>,
+): string {
     const regex = /^(((fn|errors|requestHeader|responseHeader|info)|((struct|union|_ext)(<[0-2]>)?))\..*)/;
     const matches: string[] = [];
 
@@ -22,6 +27,6 @@ export function findSchemaKey(documentName: string, definition: Record<string, a
             expected: 1,
             keys: keys,
         });
-        throw new UApiSchemaParseError([parseFailure]);
+        throw new UApiSchemaParseError([parseFailure], documentNamesToJson);
     }
 }

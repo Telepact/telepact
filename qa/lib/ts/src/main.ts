@@ -221,13 +221,10 @@ function startSchemaTestServer(
         try {
             if (inputTag === "PseudoJson") {
                 const unionValue: { [key: string]: any } = input[inputTag];
-                const schemaPseudoJson = unionValue["schema"];
-                const extendSchemaJson = unionValue["extend!"];
+                const schemaJson = unionValue["schema"];
+                const extendJson = unionValue["extend!"];
 
-                let schemaJson = JSON.stringify(schemaPseudoJson);
-
-                if (extendSchemaJson != null) {
-                    let extendJson = JSON.stringify(extendSchemaJson);
+                if (extendJson != null) {
                     UApiSchema.fromFileJsonMap({'default': schemaJson, 'extend': extendJson});
                 } else {
                     UApiSchema.fromJson(schemaJson);
