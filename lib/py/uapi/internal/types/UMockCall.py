@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
     from uapi.internal.validation.ValidationFailure import ValidationFailure
+    from uapi.internal.generation.GenerateContext import GenerateContext
 
 from uapi.internal.types.UType import UType
 
@@ -22,10 +23,7 @@ class UMockCall(UType):
         from uapi.internal.validation.ValidateMockCall import validate_mock_call
         return validate_mock_call(given_obj, select, fn, type_parameters, self.types)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
-                              include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'],
-                              random_generator: 'RandomGenerator') -> object:
+    def generate_random_value(self, ctx: 'GenerateContext') -> object:
         raise NotImplementedError("Not implemented")
 
     def get_name(self) -> str:

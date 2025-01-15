@@ -1,10 +1,12 @@
 from typing import TYPE_CHECKING
 from abc import ABCMeta, abstractmethod
 
+
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
     from uapi.internal.validation.ValidationFailure import ValidationFailure
+    from uapi.internal.generation.GenerateContext import GenerateContext
 
 
 class UType(metaclass=ABCMeta):
@@ -18,10 +20,7 @@ class UType(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
-                              include_optional_fields: bool, randomize_optional_fields: bool,
-                              type_parameters: list['UTypeDeclaration'],
-                              random_generator: 'RandomGenerator') -> object:
+    def generate_random_value(self, ctx: GenerateContext) -> object:
         pass
 
     @abstractmethod

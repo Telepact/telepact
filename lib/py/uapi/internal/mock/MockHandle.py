@@ -17,6 +17,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     from uapi.internal.mock.VerifyNoMoreInteractions import verify_no_more_interactions
     from uapi.UApiError import UApiError
     from uapi.internal.types.UFn import UFn
+    from uapi.internal.generation.GenerateContext import GenerateContext
 
     header: dict[str, object] = request_message.header
 
@@ -82,10 +83,10 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                     if is_sub_map(stub.when_argument, argument):
                         use_blueprint_value = True
                         include_optional_fields = False
-                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
+                        result_init = definition.result.generate_random_value(GenerateContext(stub.then_result, use_blueprint_value,
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
-                                                                              [], random)
+                                                                              [], random))
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
@@ -94,10 +95,10 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                     if stub.when_argument == argument:
                         use_blueprint_value = True
                         include_optional_fields = False
-                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value,
+                        result_init = definition.result.generate_random_value(GenerateContext(stub.then_result, use_blueprint_value,
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
-                                                                              [], random)
+                                                                              [], random))
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
@@ -111,10 +112,10 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
             ok_struct_ref = result_union.cases["Ok_"]
             use_blueprint_value = True
             include_optional_fields = True
-            random_ok_struct_init = ok_struct_ref.generate_random_value({}, use_blueprint_value,
+            random_ok_struct_init = ok_struct_ref.generate_random_value(GenerateContext({}, use_blueprint_value,
                                                                         include_optional_fields,
                                                                         randomize_optional_field_generation,
-                                                                        [], random)
+                                                                        [], random))
             random_ok_struct = cast(dict[str, object], random_ok_struct_init)
             return Message({}, {"Ok_": random_ok_struct})
         else:

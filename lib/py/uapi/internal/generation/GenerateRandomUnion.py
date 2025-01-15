@@ -1,20 +1,27 @@
 from typing import TYPE_CHECKING, cast
 
+
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UStruct import UStruct
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.generation.GenerateContext import GenerateContext
 
 
-def generate_random_union(blueprint_value: object, use_blueprint_value: bool, include_optional_fields: bool,
-                          randomize_optional_fields: bool, random_generator: 'RandomGenerator',
-                          cases: dict[str, 'UStruct']) -> object:
-    from uapi.internal.generation.ConstructRandomUnion import construct_random_union
+def generate_random_union(
+        union_cases_reference: dict[str, 'UStruct'], ctx: 'GenerateContext') -> object:
+    from uapi.internal.generation.GenerateRandomStruct import generate_random_struct
 
-    if use_blueprint_value:
-        starting_union_case = cast(dict[str, object], blueprint_value)
-        return construct_random_union(cases, starting_union_case, include_optional_fields,
-                                      randomize_optional_fields, random_generator)
+    if not ctx.use_blueprint_value:
+        sorted_union_cases_reference = sorted(
+            union_cases_reference.items(), key=lambda x: x[0])
+        random_index = ctx.random_generator.next_int_with_ceiling(
+            len(sorted_union_cases_reference) - 1)
+        union_case, union_data = sorted_union_cases_reference[random_index]
+        return {union_case: generate_random_struct(union_data.fields, ctx)}
     else:
-        return construct_random_union(cases, {}, include_optional_fields, randomize_optional_fields,
-                                      random_generator)
+        starting_union = cast(dict[str, object], ctx.blueprint_value)
+        union_case, union_starting_struct = cast(
+            tuple[str, dict[str, object]], next(iter(starting_union.items())))
+        union_struct_type = union_cases_reference[union_case]
+        return {union_case: generate_random_struct(union_struct_type.fields, ctx.copy(blueprint_value=union_starting_struct))}

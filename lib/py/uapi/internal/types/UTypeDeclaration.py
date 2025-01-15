@@ -1,9 +1,11 @@
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UType import UType
     from uapi.internal.validation.ValidationFailure import ValidationFailure
+    from uapi.internal.generation.GenerateContext import GenerateContext
 
 
 class UTypeDeclaration:
@@ -16,10 +18,6 @@ class UTypeDeclaration:
         from uapi.internal.validation.ValidateValueOfType import validate_value_of_type
         return validate_value_of_type(value, select, fn, self.type, self.nullable, self.type_parameters)
 
-    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool,
-                              include_optional_fields: bool, randomize_optional_fields: bool,
-                              random_generator: 'RandomGenerator') -> object:
+    def generate_random_value(self, ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomValueOfType import generate_random_value_of_type
-        return generate_random_value_of_type(blueprint_value, use_blueprint_value,
-                                             include_optional_fields, randomize_optional_fields,
-                                             random_generator, self.type, self.nullable, self.type_parameters)
+        return generate_random_value_of_type(ctx, self.type, self.nullable, self.type_parameters)

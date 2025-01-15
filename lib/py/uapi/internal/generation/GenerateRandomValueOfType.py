@@ -4,15 +4,13 @@ if TYPE_CHECKING:
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UType import UType
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
+    from uapi.internal.generation.GenerateContext import GenerateContext
 
 
-def generate_random_value_of_type(blueprint_value: object, use_blueprint_value: bool,
-                                  include_optional_fields: bool, randomize_optional_fields: bool,
-                                  random_generator: 'RandomGenerator',
+def generate_random_value_of_type(ctx: 'GenerateContext',
                                   this_type: 'UType', nullable: bool,
                                   type_parameters: list['UTypeDeclaration']) -> object:
-    if nullable and not use_blueprint_value and random_generator.next_boolean():
+    if nullable and not ctx.use_blueprint_value and ctx.random_generator.next_boolean():
         return None
     else:
-        return this_type.generate_random_value(blueprint_value, use_blueprint_value, include_optional_fields,
-                                               randomize_optional_fields, type_parameters, random_generator)
+        return this_type.generate_random_value(ctx.copy(type_parameters=type_parameters))
