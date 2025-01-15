@@ -20,7 +20,9 @@ export function validateStructFields(
     }
 
     for (const missingField of missingFields) {
-        const validationFailure = new ValidationFailure([missingField], 'RequiredObjectKeyMissing', {});
+        const validationFailure = new ValidationFailure([], 'RequiredObjectKeyMissing', {
+            key: missingField,
+        });
 
         validationFailures.push(validationFailure);
     }

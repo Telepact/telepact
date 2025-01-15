@@ -28,11 +28,11 @@ export function parseFunctionType(
 
     const resultSchemaKey = '->';
 
-    const resPath = [...ctx.path, resultSchemaKey];
-
     let resultType: UUnion | null = null;
     if (!(resultSchemaKey in functionDefinitionAsParsedJson)) {
-        parseFailures.push(new SchemaParseFailure(ctx.documentName, resPath, 'RequiredObjectKeyMissing', {}));
+        parseFailures.push(
+            new SchemaParseFailure(ctx.documentName, ctx.path, 'RequiredObjectKeyMissing', { key: resultSchemaKey }),
+        );
     } else {
         try {
             resultType = parseUnionType(

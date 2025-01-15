@@ -134,14 +134,14 @@ additional_number_cases = [
     (-9223372036854775809, [({'NumberOutOfRange': {}}, [])])
 ]
 additional_struct_cases = [
-    ({}, [({'RequiredObjectKeyMissing': {}}, ['required'])]),
+    ({}, [({'RequiredObjectKeyMissing': {'key': 'required'}}, [])]),
     ({'required': False, 'a': False}, [({'ObjectKeyDisallowed': {}}, ['a'])])
 ]
 additional_union_cases = [
     ({}, [({'ObjectSizeUnexpected': {'actual': 0, 'expected': 1}}, [])]),
     ({'One': {}, 'Two': {'optional!': False, 'required': False}}, [({'ObjectSizeUnexpected': {'actual': 2, 'expected': 1}}, [])]),
     ({'a': {}}, [({'ObjectKeyDisallowed': {}}, ['a'])]),
-    ({'Two': {}}, [({'RequiredObjectKeyMissing': {}}, ['Two', 'required'])]),
+    ({'Two': {}}, [({'RequiredObjectKeyMissing': {'key': 'required'}}, ['Two'])]),
     ({'One': False}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['One'])]),
     ({'One': 0}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['One'])]),
     ({'One': 0.1}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['One'])]),
@@ -151,7 +151,7 @@ additional_union_cases = [
 additional_fn_cases = [
     ({}, [({'ObjectSizeUnexpected': {'actual': 0, 'expected': 1}}, [])]),
     ({'a': {}}, [({'ObjectKeyDisallowed': {}}, ['a'])]),
-    ({'fn.example': {}}, [({'RequiredObjectKeyMissing': {}}, ['fn.example', 'required'])]),
+    ({'fn.example': {}}, [({'RequiredObjectKeyMissing': {'key': 'required'}}, ['fn.example'])]),
     ({'fn.example': {'required': False, 'a': False}}, [({'ObjectKeyDisallowed': {}}, ['fn.example', 'a'])]),
     ({'fn.example': False}, [({'TypeUnexpected': {'actual': {'Boolean': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
     ({'fn.example': 0}, [({'TypeUnexpected': {'actual': {'Number': {}}, 'expected': {'Object': {}}}}, ['fn.example'])]),
@@ -207,7 +207,7 @@ cases = {
     ],
     'testErrors': [
         [[{'result': {'ErrorExample': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorExample': {'property': 'a'}}]],
-        [[{'result': {'ErrorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorInvalidResponseBody_': {'cases': [{'path': ['ErrorExample', 'property'], 'reason': {'RequiredObjectKeyMissing': {}}}, {'path': ['ErrorExample', 'wrong'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
+        [[{'result': {'ErrorExample': {'wrong': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorInvalidResponseBody_': {'cases': [{'path': ['ErrorExample'], 'reason': {'RequiredObjectKeyMissing': {'key': 'property'}}}, {'path': ['ErrorExample', 'wrong'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
         [[{'result': {'errorUnknown': {'property': 'a'}}}, {'fn.test': {}}], [{}, {'ErrorInvalidResponseBody_': {'cases': [{'path': ['errorUnknown'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],
     'testSelectFields': [
@@ -288,7 +288,7 @@ cases = {
         [[{'throw': True}, {'fn.test': {}}], [{}, {'ErrorUnknown_': {}}]],
     ],
     'multipleFailures': [
-        [[{}, {'fn.test': {'value!': {'struct!': {'optional!': 'wrong', 'a': False}}}}], [{'_assert': {'setCompare': True}}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.test', 'value!', 'struct!', 'optional!'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}, {'path': ['fn.test', 'value!', 'struct!', 'required'], 'reason': {'RequiredObjectKeyMissing': {}}}, {'path': ['fn.test', 'value!', 'struct!', 'a'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
+        [[{}, {'fn.test': {'value!': {'struct!': {'optional!': 'wrong', 'a': False}}}}], [{'_assert': {'setCompare': True}}, {'ErrorInvalidRequestBody_': {'cases': [{'path': ['fn.test', 'value!', 'struct!', 'optional!'], 'reason': {'TypeUnexpected': {'actual': {'String': {}}, 'expected': {'Boolean': {}}}}}, {'path': ['fn.test', 'value!', 'struct!'], 'reason': {'RequiredObjectKeyMissing': {'key': 'required'}}}, {'path': ['fn.test', 'value!', 'struct!', 'a'], 'reason': {'ObjectKeyDisallowed': {}}}]}}]],
     ],
     'api': [
         [[{}, {'fn.api_': {}}], [{}, {'Ok_': {'api': [{'///': [' This is the example schema. It is focussed on outlining type edge cases for     ', ' use in tests.                                                                   ', '                                                                                 ', ' As a reminder:                                                                  ', '                                                                                 ', ' - ! means optional field                                                        ', ' - ? means nullable type                                                         '], 'info.Example': {}}, {'///': ' An example function. ', 'fn.example': {'required': ['boolean'], 'optional!': ['boolean']}, '->': [{'Ok_': {'required': ['boolean'], 'optional!': ['boolean']}}]}, {'fn.getBigList': {}, '->': [{'Ok_': {'items': ['array', ['struct.Big']]}}]}, {'fn.test': {'value!': ['struct.Value']}, '->': [{'Ok_': {'value!': ['struct.Value']}}, {'ErrorExample': {'property': ['string']}}]}, {'requestHeader.in': ['boolean']}, {'responseHeader.out': ['boolean']}, {'struct.Big': {'aF': ['boolean'], 'cF': ['boolean'], 'bF': ['boolean'], 'dF': ['boolean']}}, {'///': [' The main struct example.                                                        ', '                                                                                 ', ' The [required] field must be supplied. The optional field does not need to be   ', ' supplied.                                                                       '], 'struct.ExStruct': {'required': ['boolean'], 'optional!': ['boolean'], 'optional2!': ['integer']}}, {'///': ' A struct value demonstrating all common type permutations. ', 'struct.Value': {'bool!': ['boolean'], 'nullBool!': ['boolean?'], 'arrBool!': ['array', ['boolean']], 'arrNullBool!': ['array', ['boolean?']], 'objBool!': ['object', ['boolean']], 'objNullBool!': ['object', ['boolean?']], 'int!': ['integer'], 'nullInt!': ['integer?'], 'arrInt!': ['array', ['integer']], 'arrNullInt!': ['array', ['integer?']], 'objInt!': ['object', ['integer']], 'objNullInt!': ['object', ['integer?']], 'num!': ['number'], 'nullNum!': ['number?'], 'arrNum!': ['array', ['number']], 'arrNullNum!': ['array', ['number?']], 'objNum!': ['object', ['number']], 'objNullNum!': ['object', ['number?']], 'str!': ['string'], 'nullStr!': ['string?'], 'arrStr!': ['array', ['string']], 'arrNullStr!': ['array', ['string?']], 'objStr!': ['object', ['string']], 'objNullStr!': ['object', ['string?']], 'arr!': ['array', ['any']], 'nullArr!': ['array?', ['any']], 'arrArr!': ['array', ['array', ['any']]], 'arrNullArr!': ['array', ['array?', ['any']]], 'objArr!': ['object', ['array', ['any']]], 'objNullArr!': ['object', ['array?', ['any']]], 'obj!': ['object', ['any']], 'nullObj!': ['object?', ['any']], 'arrObj!': ['array', ['object', ['any']]], 'arrNullObj!': ['array', ['object?', ['any']]], 'objObj!': ['object', ['object', ['any']]], 'objNullObj!': ['object', ['object?', ['any']]], 'any!': ['any'], 'nullAny!': ['any?'], 'arrAny!': ['array', ['any']], 'arrNullAny!': ['array', ['any?']], 'objAny!': ['object', ['any']], 'objNullAny!': ['object', ['any?']], 'struct!': ['struct.ExStruct'], 'nullStruct!': ['struct.ExStruct?'], 'arrStruct!': ['array', ['struct.ExStruct']], 'arrNullStruct!': ['array', ['struct.ExStruct?']], 'objStruct!': ['object', ['struct.ExStruct']], 'objNullStruct!': ['object', ['struct.ExStruct?']], 'union!': ['union.ExUnion'], 'nullUnion!': ['union.ExUnion?'], 'arrUnion!': ['array', ['union.ExUnion']], 'arrNullUnion!': ['array', ['union.ExUnion?']], 'objUnion!': ['object', ['union.ExUnion']], 'objNullUnion!': ['object', ['union.ExUnion?']], 'fn!': ['fn.example'], 'nullFn!': ['fn.example?'], 'arrFn!': ['array', ['fn.example']], 'arrNullFn!': ['array', ['fn.example?']], 'objFn!': ['object', ['fn.example']], 'objNullFn!': ['object', ['fn.example?']]}}, {'union.ExUnion': [{'One': {}}, {'Two': {'required': ['boolean'], 'optional!': ['boolean']}}]}]}}]],

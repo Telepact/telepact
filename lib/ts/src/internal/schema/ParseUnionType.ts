@@ -56,7 +56,7 @@ export function parseUnionType(
         throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
-    if (definition.length === 0 && requiredKeys.length === 0) {
+    if (definition.length === 0) {
         parseFailures.push(new SchemaParseFailure(ctx.documentName, thisPath, 'EmptyArrayDisallowed', {}));
     } else {
         for (const requiredKey of requiredKeys) {
@@ -70,9 +70,10 @@ export function parseUnionType(
                 }
             }
             if (!found) {
-                const branchPath = thisPath.concat(0, requiredKey);
                 parseFailures.push(
-                    new SchemaParseFailure(ctx.documentName, branchPath, 'RequiredObjectKeyMissing', {}),
+                    new SchemaParseFailure(ctx.documentName, thisPath, 'RequiredObjectKeyMissing', {
+                        key: requiredKey,
+                    }),
                 );
             }
         }

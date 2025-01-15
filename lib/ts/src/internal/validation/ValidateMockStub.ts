@@ -60,7 +60,7 @@ export function validateMockStub(
     const resultDefKey = '->';
 
     if (!(resultDefKey in givenMap)) {
-        validationFailures.push(new ValidationFailure([resultDefKey], 'RequiredObjectKeyMissing', {}));
+        validationFailures.push(new ValidationFailure([], 'RequiredObjectKeyMissing', { key: resultDefKey }));
     } else {
         const output = givenMap[resultDefKey];
         const outputFailures = functionDef.result.validate(output, select, fn, []);

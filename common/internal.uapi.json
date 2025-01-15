@@ -138,7 +138,9 @@
                 "keys": ["array", ["string"]]
             }
         }, {
-            "RequiredObjectKeyMissing": {}
+            "RequiredObjectKeyMissing": {
+                "key": ["string"]
+            }
         }, {
             "FunctionUnknown": {}
         }]

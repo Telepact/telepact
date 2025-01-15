@@ -12,7 +12,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         return findCoordinates(path, reader, null, null);
     }
 
-    public static Iterator<CharacterPosition> stringReader(String s) {
+    private static Iterator<CharacterPosition> stringReader(String s) {
         return new Iterator<CharacterPosition>() {
             private int row = 1;
             private int col = 0;
@@ -37,7 +37,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         };
     }
 
-    public static Map<String, Object> findCoordinates(List<Object> path, Iterator<CharacterPosition> reader,
+    private static Map<String, Object> findCoordinates(List<Object> path, Iterator<CharacterPosition> reader,
             Integer ovRow, Integer ovCol) {
         System.out.println("findCoordinates: path=" + path);
 
@@ -71,7 +71,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         throw new IllegalArgumentException("Path not found in document");
     }
 
-    public static Map<String, Object> findCoordinatesObject(List<Object> path, Iterator<CharacterPosition> reader) {
+    private static Map<String, Object> findCoordinatesObject(List<Object> path, Iterator<CharacterPosition> reader) {
         System.out.println("findCoordinatesObject: path=" + path);
         Integer workingKeyRowStart = null;
         Integer workingKeyColStart = null;
@@ -103,7 +103,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         throw new IllegalArgumentException("Path not found in document");
     }
 
-    public static Map<String, Object> findCoordinatesArray(List<Object> path, Iterator<CharacterPosition> reader) {
+    private static Map<String, Object> findCoordinatesArray(List<Object> path, Iterator<CharacterPosition> reader) {
         System.out.println("findCoordinatesArray: path=" + path);
         int workingIndex = 0;
 
@@ -132,7 +132,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         throw new IllegalArgumentException("Path not found in document");
     }
 
-    public static boolean findValue(Iterator<CharacterPosition> reader) {
+    private static boolean findValue(Iterator<CharacterPosition> reader) {
         while (reader.hasNext()) {
             CharacterPosition cp = reader.next();
             char c = cp.character;
@@ -161,7 +161,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         throw new IllegalArgumentException("Value not found in document");
     }
 
-    public static void findObject(Iterator<CharacterPosition> reader) {
+    private static void findObject(Iterator<CharacterPosition> reader) {
         while (reader.hasNext()) {
             CharacterPosition cp = reader.next();
             char c = cp.character;
@@ -181,7 +181,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         }
     }
 
-    public static void findArray(Iterator<CharacterPosition> reader) {
+    private static void findArray(Iterator<CharacterPosition> reader) {
         System.out.println("findArray");
         if (findValue(reader)) {
             return;
@@ -205,7 +205,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         }
     }
 
-    public static String findString(Iterator<CharacterPosition> reader) {
+    private static String findString(Iterator<CharacterPosition> reader) {
         StringBuilder workingString = new StringBuilder();
         while (reader.hasNext()) {
             CharacterPosition cp = reader.next();
@@ -222,7 +222,7 @@ public class GetPathDocumentCoordinatesPseudoJson {
         throw new IllegalArgumentException("String not closed");
     }
 
-    public static class CharacterPosition {
+    private static class CharacterPosition {
         public final char character;
         public final int row;
         public final int col;
