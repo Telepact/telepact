@@ -18,20 +18,23 @@ def generate_random_struct(
 
     obj = {}
     for field_name, field_declaration in sorted_reference_struct:
-        blueprint_value = starting_struct.get(field_name)
         use_blueprint_value = field_name in starting_struct
         type_declaration = field_declaration.type_declaration
 
         if use_blueprint_value:
+            blueprint_value = starting_struct.get(field_name)
             value = type_declaration.generate_random_value(ctx.copy(
                 blueprint_value=blueprint_value, use_blueprint_value=use_blueprint_value))
         else:
             if not field_declaration.optional:
-                value = type_declaration.generate_random_value(ctx)
+                value = type_declaration.generate_random_value(ctx.copy(
+                    blueprint_value=None, use_blueprint_value=False))
             else:
                 if not ctx.include_optional_fields or (ctx.randomize_optional_fields and ctx.random_generator.next_boolean()):
                     continue
-                value = type_declaration.generate_random_value(ctx)
+                value = type_declaration.generate_random_value(ctx.copy(
+                    blueprint_value=None, use_blueprint_value=False
+                ))
 
         obj[field_name] = value
 

@@ -142,12 +142,14 @@ async def handle_message(
             result_union, select_struct_fields_header, None, []
         )
         if result_validation_failures:
-            return get_invalid_error_message(
+            res = get_invalid_error_message(
                 "ErrorInvalidResponseBody_",
                 result_validation_failures,
                 result_union_type,
                 response_headers,
             )
+            on_error(Exception(f"{res.body}. Actual: {result_union}"))
+            return res
         response_header_validation_failures: list[ValidationFailure] = validate_headers(
             final_response_headers, u_api_schema.parsed_response_headers, function_type
         )
