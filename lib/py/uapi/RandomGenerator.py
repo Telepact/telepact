@@ -20,18 +20,18 @@ class RandomGenerator:
         self.count = 0
 
     def set_seed(self, seed: int) -> None:
-        self.seed = c_int32((seed & 0x7ffffffe) + 1)
+        self.seed = c_int32(1) if seed == 0 else c_int32(seed)
 
     def next_int(self) -> int:
         x: c_int32 = c_int32(self.seed.value)
-        x = c_int32(x.value ^ (x.value << 13))
-        x = c_int32(x.value ^ (x.value >> 17))
+        x = c_int32(x.value ^ (x.value << 16))
+        x = c_int32(x.value ^ (x.value >> 11))
         x = c_int32(x.value ^ (x.value << 5))
-        self.seed = c_int32((x.value & 0x7ffffffe) + 1)
+        self.seed = c_int32(1) if x.value == 0 else c_int32(x.value)
         self.count += 1
-        result = self.seed.value
+        result = c_int32(self.seed.value & 0x7fffffff)
         # print(f'{self.count} {result} {_find_stack()}')
-        return result
+        return result.value
 
     def next_int_with_ceiling(self, ceiling: int) -> int:
         if ceiling == 0:

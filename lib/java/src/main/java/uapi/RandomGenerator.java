@@ -16,7 +16,7 @@ public class RandomGenerator {
     }
 
     public void setSeed(int seed) {
-        this.seed = (seed & 0x7ffffffe) + 1;
+        this.seed = seed == 0 ? 1 : seed;
     }
 
     private static String findStack() {
@@ -36,14 +36,14 @@ public class RandomGenerator {
 
     public int nextInt() {
         var x = this.seed;
-        x ^= x << 13;
-        x ^= x >> 17;
+        x ^= x << 16;
+        x ^= x >> 11;
         x ^= x << 5;
-        this.seed = (x & 0x7ffffffe) + 1;
+        this.seed = seed == 0 ? 1 : x;
         this.count += 1;
         var result = this.seed;
         // System.out.println("%d %d %s".formatted(count, result, findStack()));
-        return result;
+        return result & 0x7fffffff;
     }
 
     public int nextIntWithCeiling(int ceiling) {
