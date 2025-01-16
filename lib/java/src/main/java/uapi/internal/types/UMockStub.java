@@ -1,6 +1,7 @@
 package uapi.internal.types;
 
 import static uapi.internal.validation.ValidateMockStub.validateMockStub;
+import static uapi.internal.generation.GenerateRandomUMockStub.generateRandomUMockStub;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class UMockStub implements UType {
 
     @Override
     public Object generateRandomValue(GenerateContext ctx) {
-        throw new UnsupportedOperationException("Not implemented");
+        return generateRandomUMockStub(this.types, ctx);
     }
 
     @Override

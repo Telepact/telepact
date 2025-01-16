@@ -25,7 +25,8 @@ class UMockStub(UType):
         return validate_mock_stub(given_obj, select, fn, type_parameters, self.types)
 
     def generate_random_value(self, ctx: 'GenerateContext') -> object:
-        raise NotImplementedError("Not implemented")
+        from uapi.internal.generation.GenerateRandomUMockStub import generate_random_u_mock_stub
+        return generate_random_u_mock_stub(self.types, ctx)
 
     def get_name(self) -> str:
         return _MOCK_STUB_NAME

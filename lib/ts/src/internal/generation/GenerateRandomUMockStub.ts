@@ -3,7 +3,7 @@ import { UFn } from '../types/UFn';
 import { UType } from '../types/UType';
 import { generateRandomStruct } from './GenerateRandomStruct';
 
-export function generateRandomUMockStub(types: { [key: string]: UType }, ctx: GenerateContext) {
+export function generateRandomUMockStub(types: { [key: string]: UType }, ctx: GenerateContext): object {
     const functions: Array<UFn> = Object.entries(types)
         .filter(([key, value]) => value instanceof UFn)
         .filter(([key, value]) => !key.endsWith('_'))

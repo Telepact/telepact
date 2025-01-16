@@ -94,9 +94,11 @@ public class MockHandle {
                             if (isSubMap(stub.whenArgument, argument)) {
                                 final var useBlueprintValue = true;
                                 final var includeOptionalFields = false;
+                                final var alwaysIncludeRequiredFields = true;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         new GenerateContext(stub.thenResult, useBlueprintValue,
-                                                includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
+                                                includeOptionalFields, randomizeOptionalFieldGeneration,
+                                                alwaysIncludeRequiredFields, List.of(),
                                                 random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -107,10 +109,12 @@ public class MockHandle {
                             if (Objects.equals(stub.whenArgument, argument)) {
                                 final var useBlueprintValue = true;
                                 final var includeOptionalFields = false;
+                                final var alwaysIncludeRequiredFields = true;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         new GenerateContext(
                                                 stub.thenResult, useBlueprintValue,
-                                                includeOptionalFields, randomizeOptionalFieldGeneration, List.of(),
+                                                includeOptionalFields, randomizeOptionalFieldGeneration,
+                                                alwaysIncludeRequiredFields, List.of(),
                                                 random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -130,9 +134,11 @@ public class MockHandle {
                     final var okStructRef = resultUnion.cases.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;
+                    final var alwaysIncludeRequiredFields = true;
                     final var randomOkStruct = okStructRef
                             .generateRandomValue(new GenerateContext(new HashMap<>(), useBlueprintValue,
-                                    includeOptionalFields, randomizeOptionalFieldGeneration, List.of(), random));
+                                    includeOptionalFields, randomizeOptionalFieldGeneration,
+                                    alwaysIncludeRequiredFields, List.of(), random));
                     return new Message(Map.of(), Map.of("Ok_", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));

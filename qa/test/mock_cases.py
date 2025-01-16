@@ -416,7 +416,7 @@ cases = {
         [[{}, {'fn.clearCalls_': {}}], [{}, {'Ok_': {}}]],
         [[{}, {'fn.test': {}}], [{}, {'ErrorNoMatchingStub_': {}}]],
         [[{}, {'fn.createStub_': {'stub': {'fn.test': {}, '->': {'Ok_': {'value!': {'bool!': True, 'struct!': {'optional!': True}}}}}}}], [{}, {'Ok_': {}}]],
-        [[{}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'bool!': True, 'struct!': {'optional!': True, 'required': True}}}}]],
+        [[{}, {'fn.test': {}}], [{}, {'Ok_': {'value!': {'bool!': True, 'struct!': {'optional!': True, 'required': False}}}}]],
     ],
     'resultWithStartingValue': [
         [[{}, {'fn.clearStubs_': {}}], [{}, {'Ok_': {}}]],

@@ -9,6 +9,8 @@ export function generateRandomUMockCall(types: { [key: string]: UType }, ctx: Ge
         .filter(([key, value]) => !key.endsWith('_'))
         .map(([key, value]) => value as UFn);
 
+    functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
+
     const selectedFn = functions[Math.floor(ctx.randomGenerator.nextIntWithCeiling(functions.length))];
 
     return generateRandomUnion(selectedFn.call.cases, ctx.copy({ alwaysIncludeRequiredFields: false }));

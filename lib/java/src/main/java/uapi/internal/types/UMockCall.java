@@ -1,6 +1,7 @@
 package uapi.internal.types;
 
 import static uapi.internal.validation.ValidateMockCall.validateMockCall;
+import static uapi.internal.generation.GenerateRandomUMockCall.generateRandomUMockCall;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class UMockCall implements UType {
 
     @Override
     public Object generateRandomValue(GenerateContext ctx) {
-        throw new UnsupportedOperationException("Not implemented");
+        return generateRandomUMockCall(this.types, ctx);
     }
 
     @Override

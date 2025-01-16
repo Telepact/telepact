@@ -24,7 +24,8 @@ class UMockCall(UType):
         return validate_mock_call(given_obj, select, fn, type_parameters, self.types)
 
     def generate_random_value(self, ctx: 'GenerateContext') -> object:
-        raise NotImplementedError("Not implemented")
+        from uapi.internal.generation.GenerateRandomUMockCall import generate_random_u_mock_call
+        return generate_random_u_mock_call(self.types, ctx)
 
     def get_name(self) -> str:
         return self._MOCK_CALL_NAME

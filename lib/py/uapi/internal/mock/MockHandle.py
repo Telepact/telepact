@@ -83,9 +83,11 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                     if is_sub_map(stub.when_argument, argument):
                         use_blueprint_value = True
                         include_optional_fields = False
+                        always_include_required_fields = True
                         result_init = definition.result.generate_random_value(GenerateContext(stub.then_result, use_blueprint_value,
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
+                                                                              always_include_required_fields,
                                                                               [], random))
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
@@ -95,9 +97,11 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                     if stub.when_argument == argument:
                         use_blueprint_value = True
                         include_optional_fields = False
+                        always_include_required_fields = True
                         result_init = definition.result.generate_random_value(GenerateContext(stub.then_result, use_blueprint_value,
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
+                                                                              always_include_required_fields,
                                                                               [], random))
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
@@ -112,9 +116,11 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
             ok_struct_ref = result_union.cases["Ok_"]
             use_blueprint_value = True
             include_optional_fields = True
+            always_include_required_fields = True
             random_ok_struct_init = ok_struct_ref.generate_random_value(GenerateContext({}, use_blueprint_value,
                                                                         include_optional_fields,
                                                                         randomize_optional_field_generation,
+                                                                        always_include_required_fields,
                                                                         [], random))
             random_ok_struct = cast(dict[str, object], random_ok_struct_init)
             return Message({}, {"Ok_": random_ok_struct})
