@@ -6,6 +6,7 @@ export class GenerateContext {
     useBlueprintValue: boolean;
     includeOptionalFields: boolean;
     randomizeOptionalFields: boolean;
+    alwaysIncludeRequiredFields: boolean;
     typeParameters: UTypeDeclaration[];
     randomGenerator: RandomGenerator;
 
@@ -14,6 +15,7 @@ export class GenerateContext {
         useBlueprintValue: boolean,
         includeOptionalFields: boolean,
         randomizeOptionalFields: boolean,
+        alwaysIncludeRequiredFields: boolean,
         typeParameters: UTypeDeclaration[],
         randomGenerator: RandomGenerator,
     ) {
@@ -29,16 +31,19 @@ export class GenerateContext {
         blueprintValue,
         useBlueprintValue,
         typeParameters,
+        alwaysIncludeRequiredFields,
     }: {
         blueprintValue?: any;
         useBlueprintValue?: boolean;
         typeParameters?: UTypeDeclaration[];
+        alwaysIncludeRequiredFields?: boolean;
     }): GenerateContext {
         return new GenerateContext(
             blueprintValue ?? this.blueprintValue,
             useBlueprintValue ?? this.useBlueprintValue,
             this.includeOptionalFields,
             this.randomizeOptionalFields,
+            alwaysIncludeRequiredFields ?? this.alwaysIncludeRequiredFields,
             typeParameters ?? this.typeParameters,
             this.randomGenerator,
         );

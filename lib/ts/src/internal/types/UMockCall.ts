@@ -3,6 +3,7 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { validateMockCall } from '../../internal/validation/ValidateMockCall';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { generateRandomUMockCall } from '../../internal/generation/GenerateRandomUMockCall';
 
 export const mockCallName: string = '_ext.Call_';
 
@@ -28,7 +29,7 @@ export class UMockCall extends UType {
     }
 
     public generateRandomValue(ctx: GenerateContext): any {
-        throw new Error('Not implemented');
+        return generateRandomUMockCall(this.types, ctx);
     }
 
     public getName(): string {

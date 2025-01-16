@@ -20,6 +20,7 @@ class Constants:
     schema_api_path = '../../test/schema/parse'
     load_api_path = '../../test/schema/load'
     auth_api_path = '../../test/schema/auth'
+    mockgen_api_path = '../../test/schema/mockgen'
     calculator_api_path = '../../test/schema/calculator'
     nats_url = 'nats://127.0.0.1:4222'
     frontdoor_topic = 'frontdoor'

@@ -1,0 +1,32 @@
+[
+    {
+        "info.MockGen": {}
+    },
+    {
+        "struct.Data": {
+            "field1": ["any"],
+            "field2": ["integer"]
+        }
+    },
+    {
+        "fn.example": {
+            "arg1": ["string"],
+            "arg2!": ["boolean"]
+        },
+        "->": [{
+            "Ok_": {
+                "result": ["array", ["integer"]],
+                "extra!": ["struct.Data"]
+            }
+        }]
+    },
+    {
+        "fn.test": {},
+        "->": [{
+            "Ok_": {
+                "createStub": ["fn.createStub_"],
+                "verify": ["fn.verify_"]
+            }
+        }]
+    }
+]

@@ -3,6 +3,7 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { validateMockStub } from '../../internal/validation/ValidateMockStub';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { generateRandomUMockStub } from '../../internal/generation/GenerateRandomUMockStub';
 
 export const mockStubName: string = '_ext.Stub_';
 
@@ -28,7 +29,7 @@ export class UMockStub extends UType {
     }
 
     generateRandomValue(ctx: GenerateContext): any {
-        throw new Error('Not implemented');
+        return generateRandomUMockStub(this.types, ctx);
     }
 
     getName(): string {

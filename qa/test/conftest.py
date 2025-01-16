@@ -6,6 +6,7 @@ from qa.test.binary_cases import cases as binary_cases
 from qa.test.binary_cases import binary_client_rotation_cases
 from qa.test.mock_cases import cases as mock_cases
 from qa.test.mock_cases import invalid_cases as mock_invalid_cases
+from qa.test.mockgen_cases import cases as mockgen_cases
 from qa.test.parse_cases import cases as parse_cases
 from qa.test.garbage_cases import cases as garbage_cases
 from qa.test.auth_cases import cases as auth_cases
@@ -128,6 +129,9 @@ def pytest_generate_tests(metafunc: pytest.Metafunc):
     elif 'test_mock_multi_case' == metafunc.function.__name__:
         metafunc.parametrize('name,statements', [
                              (k, [[rq, rs] for rq, rs in mock_cases[k]]) for k in mock_cases])
+    elif 'test_mockgen_multi_case' == metafunc.function.__name__:
+        metafunc.parametrize('name,statements', [
+                             (k, [[rq, rs] for rq, rs in mockgen_cases[k]]) for k in mockgen_cases])
     elif 'test_mock_case' == metafunc.function.__name__:
         metafunc.parametrize('name,req,res', [(
             k, rq, rs) for k in mock_invalid_cases for rq, rs in mock_invalid_cases[k]], ids=increment())

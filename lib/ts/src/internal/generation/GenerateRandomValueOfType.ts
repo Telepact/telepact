@@ -11,6 +11,6 @@ export function generateRandomValueOfType(
     if (nullable && !ctx.useBlueprintValue && ctx.randomGenerator.nextBoolean()) {
         return null;
     } else {
-        return thisType.generateRandomValue(ctx);
+        return thisType.generateRandomValue(ctx.copy({ typeParameters }));
     }
 }

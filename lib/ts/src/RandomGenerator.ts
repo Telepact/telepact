@@ -26,15 +26,16 @@ export class RandomGenerator {
     }
 
     setSeed(seed: number): void {
-        this.seed = (seed & 0x7ffffffe) + 1;
+        this.seed = seed === 0 ? 1 : seed;
     }
 
     nextInt(): number {
         let x = this.seed;
-        x ^= x << 13;
-        x ^= x >> 17;
+        x ^= x << 16;
+        x ^= x >> 11;
         x ^= x << 5;
-        this.seed = (x & 0x7ffffffe) + 1;
+        const y = x & 0x7fffffff;
+        this.seed = y === 0 ? 1 : y;
         this.count += 1;
         const result = this.seed;
         // console.log(`${this.count} ${result} ${findStack()}`);

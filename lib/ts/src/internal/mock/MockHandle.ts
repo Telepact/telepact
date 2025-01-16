@@ -9,6 +9,7 @@ import { verifyNoMoreInteractions } from '../../internal/mock/VerifyNoMoreIntera
 import { UApiError } from '../../UApiError';
 import { UFn } from '../../internal/types/UFn';
 import { objectsAreEqual } from '../../internal/ObjectsAreEqual';
+import { GenerateContext } from '../generation/GenerateContext';
 
 export async function mockHandle(
     requestMessage: Message,
@@ -77,13 +78,17 @@ export async function mockHandle(
                     if (isSubMap(stub.whenArgument, argument)) {
                         const useBlueprintValue = true;
                         const includeOptionalFields = false;
+                        const alwaysIncludeRequiredFields = true;
                         const resultInit = definition.result.generateRandomValue(
-                            stub.thenResult,
-                            useBlueprintValue,
-                            includeOptionalFields,
-                            randomizeOptionalFieldGeneration,
-                            [],
-                            random,
+                            new GenerateContext(
+                                stub.thenResult,
+                                useBlueprintValue,
+                                includeOptionalFields,
+                                randomizeOptionalFieldGeneration,
+                                alwaysIncludeRequiredFields,
+                                [],
+                                random,
+                            ),
                         );
                         const result = resultInit as Record<string, any>;
                         if (stub.count > 0) {
@@ -95,13 +100,17 @@ export async function mockHandle(
                     if (objectsAreEqual(stub.whenArgument, argument)) {
                         const useBlueprintValue = true;
                         const includeOptionalFields = false;
+                        const alwaysIncludeRequiredFields = true;
                         const resultInit = definition.result.generateRandomValue(
-                            stub.thenResult,
-                            useBlueprintValue,
-                            includeOptionalFields,
-                            randomizeOptionalFieldGeneration,
-                            [],
-                            random,
+                            new GenerateContext(
+                                stub.thenResult,
+                                useBlueprintValue,
+                                includeOptionalFields,
+                                randomizeOptionalFieldGeneration,
+                                alwaysIncludeRequiredFields,
+                                [],
+                                random,
+                            ),
                         );
                         const result = resultInit as Record<string, any>;
                         if (stub.count > 0) {
@@ -122,13 +131,17 @@ export async function mockHandle(
             const okStructRef = resultUnion.cases['Ok_'];
             const useBlueprintValue = true;
             const includeOptionalFields = true;
+            const alwaysIncludeRequiredFields = true;
             const randomOkStructInit = okStructRef.generateRandomValue(
-                {},
-                useBlueprintValue,
-                includeOptionalFields,
-                randomizeOptionalFieldGeneration,
-                [],
-                random,
+                new GenerateContext(
+                    {},
+                    useBlueprintValue,
+                    includeOptionalFields,
+                    randomizeOptionalFieldGeneration,
+                    alwaysIncludeRequiredFields,
+                    [],
+                    random,
+                ),
             );
             const randomOkStruct = randomOkStructInit as Record<string, any>;
             return new Message({}, { Ok_: randomOkStruct });
