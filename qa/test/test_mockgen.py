@@ -9,9 +9,10 @@ def mockgen_server_proc(loop, nats_client, dispatcher_server):
     lib_name = dispatcher_server
 
     init_topics = ['frontdoor']
-    topics = tuple('{}.{}.{}'.format(lib_name, 'mock', t) for t in init_topics)
+    topics = tuple('{}.{}.{}'.format(lib_name, 'mockgen', t)
+                   for t in init_topics)
 
-    server_id = '{}.{}'.format(lib_name, 'mock')
+    server_id = '{}.{}'.format(lib_name, 'mockgen')
 
     async def t():
         req = json.dumps([{}, {'StartMockServer': {

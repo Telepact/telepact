@@ -2,7 +2,6 @@ package uapi.internal.generation;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import uapi.internal.generation.GenerateContext;
 import uapi.internal.types.UFn;
 import uapi.internal.types.UType;
 
@@ -34,12 +33,8 @@ public class GenerateRandomUMockStub {
         var okResult = generateRandomStruct(okFields,
                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
 
-        Map<String, Object> result = new HashMap<>();
-        result.put(selectedFn.getName(), arg);
-        Map<String, Object> okMap = new HashMap<>();
-        okMap.put("Ok_", okResult);
-        result.put("->", okMap);
-
-        return result;
+        return Map.ofEntries(
+                Map.entry(selectedFn.name, arg),
+                Map.entry("->", Map.of("Ok_", okResult)));
     }
 }

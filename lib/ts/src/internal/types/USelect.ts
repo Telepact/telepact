@@ -4,14 +4,12 @@ import { UType } from '../../internal/types/UType';
 import { validateSelect } from '../../internal/validation/ValidateSelect';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
-export type USelectTypes = Record<string, UType>;
-
 export const select: string = 'Object';
 
 export class USelect implements UType {
-    types: USelectTypes;
+    types: Record<string, UType>;
 
-    constructor(types: USelectTypes) {
+    constructor(types: Record<string, UType>) {
         this.types = types;
     }
 
