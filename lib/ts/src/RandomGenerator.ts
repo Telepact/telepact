@@ -34,12 +34,11 @@ export class RandomGenerator {
         x ^= x << 16;
         x ^= x >> 11;
         x ^= x << 5;
-        const y = x & 0x7fffffff;
-        this.seed = y === 0 ? 1 : y;
+        this.seed = x === 0 ? 1 : x;
         this.count += 1;
         const result = this.seed;
         // console.log(`${this.count} ${result} ${findStack()}`);
-        return result;
+        return result & 0x7fffffff;
     }
 
     nextIntWithCeiling(ceiling: number): number {
