@@ -5,6 +5,7 @@ import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseErrorType(
+    path: any[],
     errorDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
@@ -15,7 +16,7 @@ export function parseErrorType(
 
     if (otherKeys.length > 0) {
         for (const k of otherKeys) {
-            const loopPath = ctx.path.concat(k);
+            const loopPath = path.concat(k);
             parseFailures.push(new SchemaParseFailure(ctx.documentName, loopPath as any[], 'ObjectKeyDisallowed', {}));
         }
     }
@@ -24,7 +25,7 @@ export function parseErrorType(
         throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
-    const error = parseUnionType(errorDefinitionAsParsedJson, schemaKey, [], [], ctx);
+    const error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey, [], [], ctx);
 
     return new UError(schemaKey, error);
 }

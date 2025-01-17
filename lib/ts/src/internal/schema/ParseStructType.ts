@@ -6,6 +6,7 @@ import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseStructType(
+    path: any[],
     structDefinitionAsPseudoJson: { [key: string]: any },
     schemaKey: string,
     ignoreKeys: string[],
@@ -23,12 +24,12 @@ export function parseStructType(
 
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
-            const loopPath = [...ctx.path, k];
+            const loopPath = [...path, k];
             parseFailures.push(new SchemaParseFailure(ctx.documentName, loopPath, 'ObjectKeyDisallowed', {}));
         }
     }
 
-    const thisPath = [...ctx.path, schemaKey];
+    const thisPath = [...path, schemaKey];
     const defInit = structDefinitionAsPseudoJson[schemaKey];
 
     let definition: { [key: string]: any } | null = null;
@@ -43,7 +44,7 @@ export function parseStructType(
         throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
 
-    const fields = parseStructFields(definition, ctx.copy({ path: thisPath }));
+    const fields = parseStructFields(thisPath, definition, ctx);
 
     return new UStruct(schemaKey, fields);
 }

@@ -141,10 +141,10 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
 
         try {
             getOrParseType(
+                [thisIndex],
                 schemaKey,
                 new ParseContext(
                     thisDocumentName,
-                    [thisIndex],
                     uApiSchemaDocumentNamesToPseudoJson,
                     uApiSchemaDocumentNamesToJson,
                     schemaKeysToDocumentName,
@@ -178,11 +178,11 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
 
             try {
                 const error = parseErrorType(
+                    [thisIndex],
                     def_,
                     thisKey,
                     new ParseContext(
                         thisDocumentName,
-                        [thisIndex],
                         uApiSchemaDocumentNamesToPseudoJson,
                         uApiSchemaDocumentNamesToJson,
                         schemaKeysToDocumentName,
@@ -263,12 +263,12 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
 
         try {
             const requestHeaderType = parseHeadersType(
+                [thisIndex, requestHeaderKey],
                 def_,
                 requestHeaderKey,
                 headerField,
                 new ParseContext(
                     thisDocumentName,
-                    [thisIndex, requestHeaderKey],
                     uApiSchemaDocumentNamesToPseudoJson,
                     uApiSchemaDocumentNamesToJson,
                     schemaKeysToDocumentName,
@@ -297,12 +297,12 @@ export function parseUapiSchema(uApiSchemaDocumentNamesToJson: Record<string, st
 
         try {
             const responseHeaderType = parseHeadersType(
+                [thisIndex, responseHeaderKey],
                 def_,
                 responseHeaderKey,
                 headerField,
                 new ParseContext(
                     thisDocumentName,
-                    [thisIndex, responseHeaderKey],
                     uApiSchemaDocumentNamesToPseudoJson,
                     uApiSchemaDocumentNamesToJson,
                     schemaKeysToDocumentName,

@@ -6,6 +6,7 @@ import { ParseContext } from '../../internal/schema/ParseContext';
 import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
 
 export function parseStructFields(
+    path: any[],
     referenceStruct: { [key: string]: any },
     ctx: ParseContext,
 ): { [key: string]: UFieldDeclaration } {
@@ -17,8 +18,8 @@ export function parseStructFields(
             const existingFieldNoOpt = existingField.split('!')[0];
             const fieldNoOpt = fieldDeclaration.split('!')[0];
             if (fieldNoOpt === existingFieldNoOpt) {
-                const finalPath = [...ctx.path, fieldDeclaration];
-                const finalOtherPath = [...ctx.path, existingField];
+                const finalPath = [...path, fieldDeclaration];
+                const finalOtherPath = [...path, existingField];
                 const finalOtherDocumentJson = ctx.uapiSchemaDocumentNamesToJson[ctx.documentName];
                 const finalOtherLocation = getPathDocumentCoordinatesPseudoJson(finalOtherPath, finalOtherDocumentJson);
                 parseFailures.push(

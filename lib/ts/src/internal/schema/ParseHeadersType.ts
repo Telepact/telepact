@@ -5,6 +5,7 @@ import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseHeadersType(
+    path: any[],
     headersDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     headerField: string,
@@ -14,7 +15,7 @@ export function parseHeadersType(
 
     if (!Array.isArray(typeDeclarationValue)) {
         throw new UApiSchemaParseError(
-            getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, 'Array'),
+            getTypeUnexpectedParseFailure(ctx.documentName, path, typeDeclarationValue, 'Array'),
             ctx.uapiSchemaDocumentNamesToJson,
         );
     }

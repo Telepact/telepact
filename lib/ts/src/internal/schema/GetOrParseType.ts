@@ -16,7 +16,7 @@ import { UMockCall } from '../../internal/types/UMockCall';
 import { UMockStub } from '../../internal/types/UMockStub';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function getOrParseType(typeName: string, ctx: ParseContext): UType {
+export function getOrParseType(path: any[], typeName: string, ctx: ParseContext): UType {
     if (ctx.failedTypes.has(typeName)) {
         throw new UApiSchemaParseError([], ctx.uapiSchemaDocumentNamesToJson);
     }
@@ -32,7 +32,7 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
     const matcher = typeName.match(regex);
     if (!matcher) {
         throw new UApiSchemaParseError(
-            [new SchemaParseFailure(ctx.documentName, ctx.path, 'StringRegexMatchFailed', { regex: regexString })],
+            [new SchemaParseFailure(ctx.documentName, path, 'StringRegexMatchFailed', { regex: regexString })],
             ctx.uapiSchemaDocumentNamesToJson,
         );
     }
@@ -56,7 +56,7 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
     const thisDocumentName = ctx.schemaKeysToDocumentName[customTypeName];
     if (thisIndex === undefined) {
         throw new UApiSchemaParseError(
-            [new SchemaParseFailure(ctx.documentName, ctx.path, 'TypeUnknown', { name: customTypeName })],
+            [new SchemaParseFailure(ctx.documentName, path, 'TypeUnknown', { name: customTypeName })],
             ctx.uapiSchemaDocumentNamesToJson,
         );
     }
@@ -68,24 +68,27 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
     try {
         if (customTypeName.startsWith('struct')) {
             type = parseStructType(
+                [thisIndex],
                 definition,
                 customTypeName,
                 [],
-                ctx.copy({ documentName: thisDocumentName, path: [thisIndex] }),
+                ctx.copy({ documentName: thisDocumentName }),
             );
         } else if (customTypeName.startsWith('union')) {
             type = parseUnionType(
+                [thisIndex],
                 definition,
                 customTypeName,
                 [],
                 [],
-                ctx.copy({ documentName: thisDocumentName, path: [thisIndex] }),
+                ctx.copy({ documentName: thisDocumentName }),
             );
         } else if (customTypeName.startsWith('fn')) {
             type = parseFunctionType(
+                [thisIndex],
                 definition,
                 customTypeName,
-                ctx.copy({ documentName: thisDocumentName, path: [thisIndex] }),
+                ctx.copy({ documentName: thisDocumentName }),
             );
         } else {
             const possibleTypeExtension = {

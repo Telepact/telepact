@@ -3,7 +3,6 @@ import { UType } from '../../internal/types/UType';
 
 export class ParseContext {
     public readonly documentName: string;
-    public readonly path: any[];
     public readonly uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] };
     public readonly uapiSchemaDocumentNamesToJson: { [key: string]: string };
     public readonly schemaKeysToDocumentName: { [key: string]: string };
@@ -14,7 +13,6 @@ export class ParseContext {
 
     constructor(
         documentName: string,
-        path: any[],
         uapiSchemaDocumentNamesToPseudoJson: { [key: string]: any[] },
         uapiSchemaDocumentNamesToJson: { [key: string]: string },
         schemaKeysToDocumentName: { [key: string]: string },
@@ -24,7 +22,6 @@ export class ParseContext {
         failedTypes: Set<string>,
     ) {
         this.documentName = documentName;
-        this.path = path;
         this.uapiSchemaDocumentNamesToPseudoJson = uapiSchemaDocumentNamesToPseudoJson;
         this.uapiSchemaDocumentNamesToJson = uapiSchemaDocumentNamesToJson;
         this.schemaKeysToDocumentName = schemaKeysToDocumentName;
@@ -34,10 +31,9 @@ export class ParseContext {
         this.failedTypes = failedTypes;
     }
 
-    public copy({ documentName, path }: { documentName?: string; path?: any[] }): ParseContext {
+    public copy({ documentName }: { documentName?: string }): ParseContext {
         return new ParseContext(
             documentName ?? this.documentName,
-            path ?? this.path,
             this.uapiSchemaDocumentNamesToPseudoJson,
             this.uapiSchemaDocumentNamesToJson,
             this.schemaKeysToDocumentName,

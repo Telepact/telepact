@@ -7,6 +7,7 @@ import { UStruct } from '../../internal/types/UStruct';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
 export function parseUnionType(
+    path: any[],
     unionDefinitionAsPseudoJson: { [key: string]: any },
     schemaKey: string,
     ignoreKeys: string[],
@@ -24,12 +25,12 @@ export function parseUnionType(
 
     if (otherKeys.size > 0) {
         for (const k of otherKeys) {
-            const loopPath = ctx.path.concat(k);
+            const loopPath = path.concat(k);
             parseFailures.push(new SchemaParseFailure(ctx.documentName, loopPath, 'ObjectKeyDisallowed', {}));
         }
     }
 
-    const thisPath = ctx.path.concat(schemaKey);
+    const thisPath = path.concat(schemaKey);
     const defInit = unionDefinitionAsPseudoJson[schemaKey];
 
     if (!Array.isArray(defInit)) {
@@ -127,7 +128,7 @@ export function parseUnionType(
         const unionCaseStruct = entry[1];
 
         try {
-            const fields = parseStructFields(unionCaseStruct, ctx.copy({ path: unionKeyPath }));
+            const fields = parseStructFields(path, unionCaseStruct, ctx);
             const unionStruct = new UStruct(`${schemaKey}.${unionCase}`, fields);
             cases[unionCase] = unionStruct;
             caseIndices[unionCase] = i;

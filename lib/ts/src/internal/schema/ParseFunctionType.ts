@@ -11,6 +11,7 @@ import { derivePossibleSelect } from './DerivePossibleSelect';
 import { USelect } from '../types/USelect';
 
 export function parseFunctionType(
+    path: any[],
     functionDefinitionAsParsedJson: { [key: string]: any },
     schemaKey: string,
     ctx: ParseContext,
@@ -19,7 +20,7 @@ export function parseFunctionType(
 
     let callType: UUnion | null = null;
     try {
-        const argType = parseStructType(functionDefinitionAsParsedJson, schemaKey, ['->', '_errors'], ctx);
+        const argType = parseStructType(path, functionDefinitionAsParsedJson, schemaKey, ['->', '_errors'], ctx);
         callType = new UUnion(schemaKey, { [schemaKey]: argType }, { [schemaKey]: 0 });
     } catch (e) {
         if (e instanceof UApiSchemaParseError) {
@@ -34,11 +35,12 @@ export function parseFunctionType(
     let resultType: UUnion | null = null;
     if (!(resultSchemaKey in functionDefinitionAsParsedJson)) {
         parseFailures.push(
-            new SchemaParseFailure(ctx.documentName, ctx.path, 'RequiredObjectKeyMissing', { key: resultSchemaKey }),
+            new SchemaParseFailure(ctx.documentName, path, 'RequiredObjectKeyMissing', { key: resultSchemaKey }),
         );
     } else {
         try {
             resultType = parseUnionType(
+                path,
                 functionDefinitionAsParsedJson,
                 resultSchemaKey,
                 Object.keys(functionDefinitionAsParsedJson),
@@ -56,7 +58,7 @@ export function parseFunctionType(
 
     const errorsRegexKey = '_errors';
 
-    const regexPath = [...ctx.path, errorsRegexKey];
+    const regexPath = [...path, errorsRegexKey];
 
     let errorsRegex: string | null = null;
     if (errorsRegexKey in functionDefinitionAsParsedJson && !schemaKey.endsWith('_')) {
@@ -85,7 +87,7 @@ export function parseFunctionType(
     }
 
     const fnSelectType = derivePossibleSelect(schemaKey, resultType as UUnion);
-    const selectType = getOrParseType('_ext.Select_', ctx) as USelect;
+    const selectType = getOrParseType(path, '_ext.Select_', ctx) as USelect;
     selectType.possibleSelects[schemaKey] = fnSelectType;
 
     return new UFn(schemaKey, callType as UUnion, resultType as UUnion, errorsRegex as string);
