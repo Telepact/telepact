@@ -8,13 +8,7 @@ import { generateRandomSelect } from '../generation/GenerateRandomSelect';
 export const select: string = 'Object';
 
 export class USelect implements UType {
-    types: Record<string, UType>;
-    possibleSelects: Record<string, any>;
-
-    constructor(types: Record<string, UType>, possibleSelects: Record<string, any>) {
-        this.types = types;
-        this.possibleSelects = possibleSelects;
-    }
+    possibleSelects: Record<string, any> = {};
 
     getTypeParameterCount(): number {
         return 0;

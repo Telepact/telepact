@@ -85,7 +85,7 @@ public class GetOrParseType {
                 UType possibleTypeExtension;
                 switch (customTypeName) {
                     case "_ext.Select_":
-                        possibleTypeExtension = new USelect(ctx.parsedTypes);
+                        possibleTypeExtension = new USelect();
                         break;
                     case "_ext.Call_":
                         possibleTypeExtension = new UMockCall(ctx.parsedTypes);

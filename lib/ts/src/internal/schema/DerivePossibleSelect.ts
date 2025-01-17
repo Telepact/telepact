@@ -15,11 +15,6 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
 
     const possibleSelect: Record<string, object> = {};
 
-    const okSelectedFieldNames = [];
-    for (const fieldName of okFieldNames) {
-        okSelectedFieldNames.push(fieldName);
-    }
-
     possibleSelect['->'] = {
         Ok_: okFieldNames,
     };

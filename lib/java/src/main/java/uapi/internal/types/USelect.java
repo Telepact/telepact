@@ -1,7 +1,9 @@
 package uapi.internal.types;
 
 import static uapi.internal.validation.ValidateSelect.validateSelect;
+import static uapi.internal.generation.GenerateRandomSelect.generateRandomSelect;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,11 +14,7 @@ public class USelect implements UType {
 
     public static final String _SELECT = "Object";
 
-    public final Map<String, UType> types;
-
-    public USelect(Map<String, UType> types) {
-        this.types = types;
-    }
+    public final Map<String, Object> possibleSelects = new HashMap<>();
 
     @Override
     public int getTypeParameterCount() {
@@ -26,12 +24,12 @@ public class USelect implements UType {
     @Override
     public List<ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
             List<UTypeDeclaration> typeParameters) {
-        return validateSelect(givenObj, select, fn, typeParameters, this.types);
+        return validateSelect(givenObj, fn, this.possibleSelects);
     }
 
     @Override
     public Object generateRandomValue(GenerateContext ctx) {
-        throw new UnsupportedOperationException("Not implemented");
+        return generateRandomSelect(this.possibleSelects, ctx);
     }
 
     @Override

@@ -3,16 +3,17 @@ package uapi.internal.schema;
 import static uapi.internal.schema.GetTypeUnexpectedParseFailure.getTypeUnexpectedParseFailure;
 import static uapi.internal.schema.ParseStructType.parseStructType;
 import static uapi.internal.schema.ParseUnionType.parseUnionType;
+import static uapi.internal.schema.GetOrParseType.getOrParseType;
+import static uapi.internal.schema.DerivePossibleSelects.derivePossibleSelect;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import uapi.UApiSchemaParseError;
 import uapi.internal.types.UFn;
+import uapi.internal.types.USelect;
 import uapi.internal.types.UStruct;
-import uapi.internal.types.UType;
 import uapi.internal.types.UUnion;
 
 public class ParseFunctionType {
@@ -76,6 +77,10 @@ public class ParseFunctionType {
         if (!parseFailures.isEmpty()) {
             throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
+
+        var fnSelectType = derivePossibleSelect(schemaKey, resultType);
+        var selectType = (USelect) getOrParseType("_ext.Select_", ctx);
+        selectType.possibleSelects.put(schemaKey, fnSelectType);
 
         return new UFn(schemaKey, callType, resultType, errorsRegex);
     }

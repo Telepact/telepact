@@ -98,7 +98,7 @@ public class MockHandle {
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
                                         new GenerateContext(stub.thenResult, useBlueprintValue,
                                                 includeOptionalFields, randomizeOptionalFieldGeneration,
-                                                alwaysIncludeRequiredFields, List.of(),
+                                                alwaysIncludeRequiredFields, List.of(), functionName,
                                                 random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -114,7 +114,7 @@ public class MockHandle {
                                         new GenerateContext(
                                                 stub.thenResult, useBlueprintValue,
                                                 includeOptionalFields, randomizeOptionalFieldGeneration,
-                                                alwaysIncludeRequiredFields, List.of(),
+                                                alwaysIncludeRequiredFields, List.of(), functionName,
                                                 random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -138,7 +138,7 @@ public class MockHandle {
                     final var randomOkStruct = okStructRef
                             .generateRandomValue(new GenerateContext(new HashMap<>(), useBlueprintValue,
                                     includeOptionalFields, randomizeOptionalFieldGeneration,
-                                    alwaysIncludeRequiredFields, List.of(), random));
+                                    alwaysIncludeRequiredFields, List.of(), functionName, random));
                     return new Message(Map.of(), Map.of("Ok_", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));

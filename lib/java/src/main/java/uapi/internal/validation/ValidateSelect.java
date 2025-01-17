@@ -1,95 +1,76 @@
 package uapi.internal.validation;
 
-import static uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
-import static uapi.internal.validation.ValidateSelectStruct.validateSelectStruct;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import uapi.internal.types.UFn;
-import uapi.internal.types.UStruct;
-import uapi.internal.types.UType;
-import uapi.internal.types.UTypeDeclaration;
-import uapi.internal.types.UUnion;
-
 public class ValidateSelect {
-    public static List<ValidationFailure> validateSelect(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters, Map<String, UType> types) {
 
-        if (!(givenObj instanceof Map)) {
-            return getTypeUnexpectedValidationFailure(List.of(), givenObj, "Object");
-        }
-        final Map<String, Object> selectStructFieldsHeader = (Map<String, Object>) givenObj;
-
-        final var validationFailures = new ArrayList<ValidationFailure>();
-        final var functionType = (UFn) types.get(fn);
-
-        for (final var entry : selectStructFieldsHeader.entrySet()) {
-            final var typeName = entry.getKey();
-            final var selectValue = entry.getValue();
-
-            final UType typeReference;
-            if (typeName.equals("->")) {
-                typeReference = functionType.result;
-            } else {
-                var possibleTypeReference = types.get(typeName);
-                if (possibleTypeReference == null) {
-                    validationFailures.add(new ValidationFailure(List.of(typeName),
-                            "ObjectKeyDisallowed", Map.of()));
-                    continue;
-                }
-                typeReference = possibleTypeReference;
-            }
-
-            if (typeReference instanceof final UUnion u) {
-                if (!(selectValue instanceof Map)) {
-                    validationFailures.addAll(
-                            getTypeUnexpectedValidationFailure(List.of(typeName), selectValue, "Object"));
-                    continue;
-                }
-                final Map<String, Object> unionCases = (Map<String, Object>) selectValue;
-
-                for (final var unionCaseEntry : unionCases.entrySet()) {
-                    final var unionCase = unionCaseEntry.getKey();
-                    final var selectedCaseStructFields = unionCaseEntry.getValue();
-                    final var structRef = u.cases.get(unionCase);
-
-                    final List<Object> loopPath = List.of(typeName, unionCase);
-
-                    if (structRef == null) {
-                        validationFailures.add(new ValidationFailure(
-                                loopPath,
-                                "ObjectKeyDisallowed", Map.of()));
-                        continue;
-                    }
-
-                    final var nestedValidationFailures = validateSelectStruct(structRef, loopPath,
-                            selectedCaseStructFields);
-
-                    validationFailures.addAll(nestedValidationFailures);
-                }
-            } else if (typeReference instanceof final UFn f) {
-                final UUnion fnCall = f.call;
-                final Map<String, UStruct> fnCallCases = fnCall.cases;
-                final String fnName = f.name;
-                final var argStruct = fnCallCases.get(fnName);
-                final var nestedValidationFailures = validateSelectStruct(argStruct, List.of(typeName),
-                        selectValue);
-
-                validationFailures.addAll(nestedValidationFailures);
-            } else if (typeReference instanceof final UStruct s) {
-                final var structRef = s;
-                final var nestedValidationFailures = validateSelectStruct(structRef, List.of(typeName),
-                        selectValue);
-
-                validationFailures.addAll(nestedValidationFailures);
-            } else {
-                validationFailures.add(new ValidationFailure(List.of(typeName),
-                        "ObjectKeyDisallowed", Map.of()));
-            }
+    public static List<ValidationFailure> validateSelect(Object givenObj, String fn,
+            Map<String, Object> possibleFnSelects) {
+        if (!(givenObj instanceof Map) || givenObj == null) {
+            return GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure(new ArrayList<>(), givenObj,
+                    "Object");
         }
 
-        return validationFailures;
+        Map<String, Object> possibleSelect = (Map<String, Object>) possibleFnSelects.get(fn);
+
+        return isSubSelect(new ArrayList<>(), givenObj, possibleSelect);
+    }
+
+    private static List<ValidationFailure> isSubSelect(List<Object> path, Object givenObj,
+            Object possibleSelectSection) {
+
+        if (possibleSelectSection instanceof List) {
+            if (!(givenObj instanceof List)) {
+                return GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure(path, givenObj, "Array");
+            }
+
+            List<ValidationFailure> validationFailures = new ArrayList<>();
+
+            List<?> givenObjList = (List<?>) givenObj;
+            List<?> possibleSelectList = (List<?>) possibleSelectSection;
+
+            for (int index = 0; index < givenObjList.size(); index++) {
+                Object element = givenObjList.get(index);
+                if (!possibleSelectList.contains(element)) {
+                    var loopPath = new ArrayList<>(path);
+                    loopPath.add(index);
+                    validationFailures.add(new ValidationFailure(loopPath, "ArrayElementDisallowed", Map.of()));
+                }
+            }
+
+            return validationFailures;
+        } else if (possibleSelectSection instanceof Map) {
+            if (!(givenObj instanceof Map) || givenObj == null) {
+                return GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure(path, givenObj, "Object");
+            }
+
+            List<ValidationFailure> validationFailures = new ArrayList<>();
+
+            Map<String, Object> givenObjMap = (Map<String, Object>) givenObj;
+            Map<String, Object> possibleSelectMap = (Map<String, Object>) possibleSelectSection;
+
+            for (Map.Entry<String, Object> entry : givenObjMap.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (possibleSelectMap.containsKey(key)) {
+                    var loopPath = new ArrayList<>(path);
+                    loopPath.add(key);
+                    List<ValidationFailure> innerFailures = isSubSelect(loopPath, value, possibleSelectMap.get(key));
+                    validationFailures.addAll(innerFailures);
+                } else {
+                    validationFailures.add(new ValidationFailure(new ArrayList<>(path) {
+                        {
+                            add(key);
+                        }
+                    }, "ObjectKeyDisallowed", Map.of()));
+                }
+            }
+
+            return validationFailures;
+        }
+
+        return new ArrayList<>();
     }
 }

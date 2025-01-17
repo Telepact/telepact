@@ -6,5 +6,30 @@
                 "Unknown": {}
             }
         }
+    },
+    {
+        "struct.Example": {
+            "field1": ["any"]
+        }
+    },
+    {
+        "struct.Another": {
+            "big": [["type.Ex2"]]
+        }
+    },
+    {
+        "union.Ex2": ["type.Another", "type.Example"]
+    },
+    {
+        "fn.goForth": {
+            "arg1": ["string"],
+            "arg2": ["integer"]
+        },
+        "->": {
+            "data": ["type.Example"]
+        },
+        "error.ProcessFailure": {
+            "cause": ["string"]
+        }
     }
 ]
