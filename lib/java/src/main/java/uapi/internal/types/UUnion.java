@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.generation.GenerateContext;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UUnion implements UType {
@@ -29,9 +30,8 @@ public class UUnion implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
-        return validateUnion(value, select, fn, this.name, this.cases);
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters, ValidateContext ctx) {
+        return validateUnion(value, this.name, this.cases, ctx);
     }
 
     @Override

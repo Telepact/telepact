@@ -4,9 +4,9 @@ import static uapi.internal.generation.GenerateRandomArray.generateRandomArray;
 import static uapi.internal.validation.ValidateArray.validateArray;
 
 import java.util.List;
-import java.util.Map;
 
 import uapi.internal.generation.GenerateContext;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UArray implements UType {
@@ -19,9 +19,8 @@ public class UArray implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
-        return validateArray(value, select, fn, typeParameters);
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters, ValidateContext ctx) {
+        return validateArray(value, typeParameters, ctx);
     }
 
     @Override

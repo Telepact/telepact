@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.generation.GenerateContext;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UTypeDeclaration {
@@ -22,8 +23,8 @@ public class UTypeDeclaration {
         this.typeParameters = typeParameters;
     }
 
-    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn) {
-        return validateValueOfType(value, select, fn, this.type, this.nullable, this.typeParameters);
+    public List<ValidationFailure> validate(Object value, ValidateContext ctx) {
+        return validateValueOfType(value, this.type, this.nullable, this.typeParameters, ctx);
     }
 
     public Object generateRandomValue(GenerateContext ctx) {

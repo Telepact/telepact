@@ -11,11 +11,11 @@ import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UTypeDeclaration;
 
 public class ValidateStruct {
-    public static List<ValidationFailure> validateStruct(Object value, Map<String, Object> select, String fn,
-            String name, Map<String, UFieldDeclaration> fields) {
+    public static List<ValidationFailure> validateStruct(Object value,
+            String name, Map<String, UFieldDeclaration> fields, ValidateContext ctx) {
         if (value instanceof Map<?, ?> m) {
-            final var selectedFields = select == null ? null : (List<String>) select.get(name);
-            return validateStructFields(fields, selectedFields, (Map<String, Object>) m, select, fn);
+            final var selectedFields = ctx.select == null ? null : (List<String>) ctx.select.get(name);
+            return validateStructFields(fields, selectedFields, (Map<String, Object>) m, ctx);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _STRUCT_NAME);
         }

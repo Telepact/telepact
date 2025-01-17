@@ -13,8 +13,8 @@ import uapi.internal.types.UTypeDeclaration;
 import uapi.internal.types.UUnion;
 
 public class ValidateMockCall {
-    public static List<ValidationFailure> validateMockCall(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters, Map<String, UType> types) {
+    public static List<ValidationFailure> validateMockCall(Object givenObj,
+            List<UTypeDeclaration> typeParameters, Map<String, UType> types, ValidateContext ctx) {
         if (!(givenObj instanceof Map)) {
             return getTypeUnexpectedValidationFailure(new ArrayList<Object>(), givenObj, "Object");
         }
@@ -38,7 +38,7 @@ public class ValidateMockCall {
         final String functionDefName = functionDef.name;
         final Map<String, UStruct> functionDefCallCases = functionDefCall.cases;
 
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, select, fn, List.of());
+        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), ctx);
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (var f : inputFailures) {

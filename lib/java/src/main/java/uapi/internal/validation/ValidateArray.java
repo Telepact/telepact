@@ -10,15 +10,15 @@ import java.util.Map;
 import uapi.internal.types.UTypeDeclaration;
 
 public class ValidateArray {
-    public static List<ValidationFailure> validateArray(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
+    public static List<ValidationFailure> validateArray(Object value, List<UTypeDeclaration> typeParameters,
+            ValidateContext ctx) {
         if (value instanceof final List l) {
             final var nestedTypeDeclaration = typeParameters.get(0);
 
             final var validationFailures = new ArrayList<ValidationFailure>();
             for (var i = 0; i < l.size(); i += 1) {
                 final var element = l.get(i);
-                final var nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn);
+                final var nestedValidationFailures = nestedTypeDeclaration.validate(element, ctx);
                 final var index = i;
 
                 final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();

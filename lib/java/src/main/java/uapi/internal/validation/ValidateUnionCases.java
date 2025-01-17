@@ -13,7 +13,7 @@ import uapi.internal.types.UStruct;
 public class ValidateUnionCases {
     static List<ValidationFailure> validateUnionCases(
             Map<String, UStruct> referenceCases, Map<String, Object> selectedCases,
-            Map<?, ?> actual, Map<String, Object> select, String fn) {
+            Map<?, ?> actual, ValidateContext ctx) {
         if (actual.size() != 1) {
             return List.of(
                     new ValidationFailure(new ArrayList<Object>(),
@@ -33,7 +33,7 @@ public class ValidateUnionCases {
 
         if (unionPayload instanceof Map<?, ?> m2) {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
-                    (Map<String, Object>) m2, selectedCases, select, fn);
+                    (Map<String, Object>) m2, selectedCases, ctx);
 
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {

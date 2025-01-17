@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.generation.GenerateContext;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UMockStub implements UType {
@@ -25,9 +26,9 @@ public class UMockStub implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
-        return validateMockStub(givenObj, select, fn, typeParameters, this.types);
+    public List<ValidationFailure> validate(Object givenObj,
+            List<UTypeDeclaration> typeParameters, ValidateContext ctx) {
+        return validateMockStub(givenObj, typeParameters, this.types, ctx);
     }
 
     @Override

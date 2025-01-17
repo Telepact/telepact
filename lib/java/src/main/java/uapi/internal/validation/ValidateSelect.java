@@ -6,14 +6,14 @@ import java.util.Map;
 
 public class ValidateSelect {
 
-    public static List<ValidationFailure> validateSelect(Object givenObj, String fn,
-            Map<String, Object> possibleFnSelects) {
+    public static List<ValidationFailure> validateSelect(Object givenObj,
+            Map<String, Object> possibleFnSelects, ValidateContext ctx) {
         if (!(givenObj instanceof Map) || givenObj == null) {
             return GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure(new ArrayList<>(), givenObj,
                     "Object");
         }
 
-        Map<String, Object> possibleSelect = (Map<String, Object>) possibleFnSelects.get(fn);
+        Map<String, Object> possibleSelect = (Map<String, Object>) possibleFnSelects.get(ctx.fn);
 
         return isSubSelect(new ArrayList<>(), givenObj, possibleSelect);
     }

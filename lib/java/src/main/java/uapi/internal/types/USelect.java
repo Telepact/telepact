@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.generation.GenerateContext;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class USelect implements UType {
@@ -22,9 +23,9 @@ public class USelect implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object givenObj, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
-        return validateSelect(givenObj, fn, this.possibleSelects);
+    public List<ValidationFailure> validate(Object givenObj,
+            List<UTypeDeclaration> typeParameters, ValidateContext ctx) {
+        return validateSelect(givenObj, this.possibleSelects, ctx);
     }
 
     @Override

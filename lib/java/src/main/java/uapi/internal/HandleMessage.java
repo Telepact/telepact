@@ -18,6 +18,7 @@ import uapi.internal.types.UFn;
 import uapi.internal.types.UType;
 import uapi.internal.types.UTypeDeclaration;
 import uapi.internal.types.UUnion;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class HandleMessage {
@@ -93,7 +94,8 @@ public class HandleMessage {
 
         final UUnion functionTypeCall = functionType.call;
 
-        final var callValidationFailures = functionTypeCall.validate(requestBody, null, null, List.of());
+        final var callValidationFailures = functionTypeCall.validate(requestBody, List.of(),
+                new ValidateContext(null, null));
         if (!callValidationFailures.isEmpty()) {
             return getInvalidErrorMessage("ErrorInvalidRequestBody_", callValidationFailures, resultUnionType,
                     responseHeaders);
@@ -129,7 +131,7 @@ public class HandleMessage {
         final var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {
             final var resultValidationFailures = resultUnionType.validate(
-                    resultUnion, selectStructFieldsHeader, null, List.of());
+                    resultUnion, List.of(), new ValidateContext(selectStructFieldsHeader, null));
             if (!resultValidationFailures.isEmpty()) {
                 return getInvalidErrorMessage("ErrorInvalidResponseBody_", resultValidationFailures, resultUnionType,
                         responseHeaders);

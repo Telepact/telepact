@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import uapi.internal.generation.GenerateContext;
+import uapi.internal.validation.ValidateContext;
 import uapi.internal.validation.ValidationFailure;
 
 public class UFn implements UType {
@@ -30,9 +31,8 @@ public class UFn implements UType {
     }
 
     @Override
-    public List<ValidationFailure> validate(Object value, Map<String, Object> select, String fn,
-            List<UTypeDeclaration> typeParameters) {
-        return this.call.validate(value, select, fn, typeParameters);
+    public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters, ValidateContext ctx) {
+        return this.call.validate(value, typeParameters, ctx);
     }
 
     @Override
