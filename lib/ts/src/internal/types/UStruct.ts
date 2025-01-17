@@ -26,8 +26,13 @@ export class UStruct implements UType {
         return validateStruct(value, this.name, this.fields, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
-        return generateRandomStruct(this.fields, ctx);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
+        return generateRandomStruct(blueprintValue, useBlueprintValue, this.fields, ctx);
     }
 
     getName(): string {

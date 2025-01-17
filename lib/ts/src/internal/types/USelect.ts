@@ -19,7 +19,12 @@ export class USelect implements UType {
         return validateSelect(givenObj, this.possibleSelects, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
         return generateRandomSelect(this.possibleSelects, ctx);
     }
 

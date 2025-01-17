@@ -28,7 +28,12 @@ export class UUnion implements UType {
         return validateUnion(value, this.name, this.cases, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
         return generateRandomUnion(this.cases, ctx);
     }
 

@@ -17,8 +17,13 @@ export class UArray extends UType {
         return validateArray(value, typeParameters, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
-        return generateRandomArray(ctx);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
+        return generateRandomArray(blueprintValue, useBlueprintValue, typeParameters, ctx);
     }
 
     getName(): string {

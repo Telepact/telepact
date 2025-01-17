@@ -8,7 +8,12 @@ export abstract class UType {
 
     abstract validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[];
 
-    abstract generateRandomValue(ctx: GenerateContext): any;
+    abstract generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any;
 
     abstract getName(): string;
 }

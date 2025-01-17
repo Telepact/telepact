@@ -31,7 +31,12 @@ export class UFn extends UType {
         return this.call.validate(value, [], ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
         return generateRandomUnion(this.call.cases, ctx);
     }
 

@@ -16,7 +16,12 @@ export class UAny extends UType {
         return [];
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
         return generateRandomAny(ctx);
     }
 

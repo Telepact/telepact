@@ -1,8 +1,13 @@
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
-export function generateRandomStruct(referenceStruct: { [key: string]: UFieldDeclaration }, ctx: GenerateContext): any {
-    const startingStruct = ctx.useBlueprintValue ? ctx.blueprintValue : {};
+export function generateRandomStruct(
+    blueprintValue: any,
+    useBlueprintValue: boolean,
+    referenceStruct: { [key: string]: UFieldDeclaration },
+    ctx: GenerateContext,
+): any {
+    const startingStruct = useBlueprintValue ? blueprintValue : {};
 
     const sortedReferenceStruct = Array.from(Object.entries(referenceStruct)).sort((e1, e2) => {
         const a = e1[0];
@@ -22,27 +27,21 @@ export function generateRandomStruct(referenceStruct: { [key: string]: UFieldDec
 
     const obj: Record<string, any> = {};
     for (const [fieldName, fieldDeclaration] of sortedReferenceStruct) {
-        const blueprintValue = startingStruct[fieldName];
-        const useBlueprintValue = fieldName in startingStruct;
+        const thisBlueprintValue = startingStruct[fieldName];
+        const thisUseBlueprintValue = fieldName in startingStruct;
         const typeDeclaration = fieldDeclaration.typeDeclaration;
 
         let value: any;
-        if (useBlueprintValue) {
-            value = typeDeclaration.generateRandomValue(
-                ctx.copy({ blueprintValue: blueprintValue, useBlueprintValue: useBlueprintValue }),
-            );
+        if (thisUseBlueprintValue) {
+            value = typeDeclaration.generateRandomValue(thisBlueprintValue, thisUseBlueprintValue, ctx);
         } else {
             if (!fieldDeclaration.optional) {
-                value = typeDeclaration.generateRandomValue(
-                    ctx.copy({ blueprintValue: null, useBlueprintValue: false }),
-                );
+                value = typeDeclaration.generateRandomValue(null, false, ctx);
             } else {
                 if (!ctx.includeOptionalFields || (ctx.randomizeOptionalFields && ctx.randomGenerator.nextBoolean())) {
                     continue;
                 }
-                value = typeDeclaration.generateRandomValue(
-                    ctx.copy({ blueprintValue: null, useBlueprintValue: false }),
-                );
+                value = typeDeclaration.generateRandomValue(null, false, ctx);
             }
         }
 

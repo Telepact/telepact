@@ -24,7 +24,12 @@ export class UMockCall extends UType {
         return validateMockCall(givenObj, this.types, ctx);
     }
 
-    public generateRandomValue(ctx: GenerateContext): any {
+    public generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
         return generateRandomUMockCall(this.types, ctx);
     }
 

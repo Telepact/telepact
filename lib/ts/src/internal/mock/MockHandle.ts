@@ -80,13 +80,13 @@ export async function mockHandle(
                         const includeOptionalFields = false;
                         const alwaysIncludeRequiredFields = true;
                         const resultInit = definition.result.generateRandomValue(
+                            stub.thenResult,
+                            useBlueprintValue,
+                            [],
                             new GenerateContext(
-                                stub.thenResult,
-                                useBlueprintValue,
                                 includeOptionalFields,
                                 randomizeOptionalFieldGeneration,
                                 alwaysIncludeRequiredFields,
-                                [],
                                 functionName,
                                 random,
                             ),
@@ -103,13 +103,13 @@ export async function mockHandle(
                         const includeOptionalFields = false;
                         const alwaysIncludeRequiredFields = true;
                         const resultInit = definition.result.generateRandomValue(
+                            stub.thenResult,
+                            useBlueprintValue,
+                            [],
                             new GenerateContext(
-                                stub.thenResult,
-                                useBlueprintValue,
                                 includeOptionalFields,
                                 randomizeOptionalFieldGeneration,
                                 alwaysIncludeRequiredFields,
-                                [],
                                 functionName,
                                 random,
                             ),
@@ -135,13 +135,13 @@ export async function mockHandle(
             const includeOptionalFields = true;
             const alwaysIncludeRequiredFields = true;
             const randomOkStructInit = okStructRef.generateRandomValue(
+                {},
+                useBlueprintValue,
+                [],
                 new GenerateContext(
-                    {},
-                    useBlueprintValue,
                     includeOptionalFields,
                     randomizeOptionalFieldGeneration,
                     alwaysIncludeRequiredFields,
-                    [],
                     functionName,
                     random,
                 ),

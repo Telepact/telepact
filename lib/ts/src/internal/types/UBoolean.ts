@@ -17,8 +17,13 @@ export class UBoolean extends UType {
         return validateBoolean(value);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
-        return generateRandomBoolean(ctx);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
+        return generateRandomBoolean(blueprintValue, useBlueprintValue, ctx);
     }
 
     getName(): string {

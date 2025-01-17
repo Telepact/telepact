@@ -20,7 +20,14 @@ export class UTypeDeclaration {
         return validateValueOfType(value, this.type, this.nullable, this.typeParameters, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
-        return generateRandomValueOfType(this.type, this.nullable, this.typeParameters, ctx);
+    generateRandomValue(blueprintValue: any, useBlueprintValue: boolean, ctx: GenerateContext): any {
+        return generateRandomValueOfType(
+            blueprintValue,
+            useBlueprintValue,
+            this.type,
+            this.nullable,
+            this.typeParameters,
+            ctx,
+        );
     }
 }

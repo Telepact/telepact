@@ -3,14 +3,16 @@ import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 
 export function generateRandomValueOfType(
+    blueprintValue: any,
+    useBlueprintValue: boolean,
     thisType: UType,
     nullable: boolean,
     typeParameters: UTypeDeclaration[],
     ctx: GenerateContext,
 ): any {
-    if (nullable && !ctx.useBlueprintValue && ctx.randomGenerator.nextBoolean()) {
+    if (nullable && !useBlueprintValue && ctx.randomGenerator.nextBoolean()) {
         return null;
     } else {
-        return thisType.generateRandomValue(ctx.copy({ typeParameters }));
+        return thisType.generateRandomValue(blueprintValue, useBlueprintValue, typeParameters, ctx);
     }
 }

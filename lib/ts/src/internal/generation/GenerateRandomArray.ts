@@ -1,14 +1,20 @@
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { UTypeDeclaration } from '../types/UTypeDeclaration';
 
-export function generateRandomArray(ctx: GenerateContext): any[] {
-    const nestedTypeDeclaration = ctx.typeParameters[0];
+export function generateRandomArray(
+    blueprintValue: any,
+    useBlueprintValue: boolean,
+    typeParameters: UTypeDeclaration[],
+    ctx: GenerateContext,
+): any[] {
+    const nestedTypeDeclaration = typeParameters[0];
 
-    if (ctx.useBlueprintValue) {
-        const startingArray = ctx.blueprintValue as any[];
+    if (useBlueprintValue) {
+        const startingArray = blueprintValue as any[];
 
         const array: any[] = [];
         for (const startingArrayValue of startingArray) {
-            const value = nestedTypeDeclaration.generateRandomValue(ctx.copy({ blueprintValue: startingArrayValue }));
+            const value = nestedTypeDeclaration.generateRandomValue(startingArrayValue, useBlueprintValue, ctx);
 
             array.push(value);
         }
@@ -19,7 +25,7 @@ export function generateRandomArray(ctx: GenerateContext): any[] {
 
         const array: any[] = [];
         for (let i = 0; i < length; i++) {
-            const value = nestedTypeDeclaration.generateRandomValue(ctx);
+            const value = nestedTypeDeclaration.generateRandomValue(null, false, ctx);
 
             array.push(value);
         }

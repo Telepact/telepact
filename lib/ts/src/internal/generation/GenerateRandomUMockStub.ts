@@ -25,8 +25,8 @@ export function generateRandomUMockStub(types: { [key: string]: UType }, ctx: Ge
     const argFields = selectedFn.call.cases[selectedFn.name].fields;
     const okFields = selectedFn.result.cases['Ok_'].fields;
 
-    const arg = generateRandomStruct(argFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
-    const okResult = generateRandomStruct(okFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
+    const arg = generateRandomStruct(null, false, argFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
+    const okResult = generateRandomStruct(null, false, okFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
 
     return {
         [selectedFn.name]: arg,

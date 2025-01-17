@@ -17,8 +17,13 @@ export class UString extends UType {
         return validateString(value);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
-        return generateRandomString(ctx);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
+        return generateRandomString(blueprintValue, useBlueprintValue, ctx);
     }
 
     getName(): string {

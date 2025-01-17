@@ -17,8 +17,13 @@ export class UObject implements UType {
         return validateObject(value, typeParameters, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
-        return generateRandomObject(ctx);
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
+        return generateRandomObject(blueprintValue, useBlueprintValue, typeParameters, ctx);
     }
 
     getName(): string {

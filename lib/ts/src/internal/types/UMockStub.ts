@@ -24,7 +24,12 @@ export class UMockStub extends UType {
         return validateMockStub(givenObj, this.types, ctx);
     }
 
-    generateRandomValue(ctx: GenerateContext): any {
+    generateRandomValue(
+        blueprintValue: any,
+        useBlueprintValue: boolean,
+        typeParameters: UTypeDeclaration[],
+        ctx: GenerateContext,
+    ): any {
         return generateRandomUMockStub(this.types, ctx);
     }
 
