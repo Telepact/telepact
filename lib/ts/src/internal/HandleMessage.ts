@@ -1,15 +1,16 @@
-import { Message } from "../Message";
-import { UTypeDeclaration } from "../internal/types/UTypeDeclaration";
-import { UUnion } from "../internal/types/UUnion";
-import { ValidationFailure } from "../internal/validation/ValidationFailure";
-import { UType } from "../internal/types/UType";
-import { UApiSchema } from "../UApiSchema";
-import { selectStructFields } from "../internal/SelectStructFields";
-import { getInvalidErrorMessage } from "../internal/validation/GetInvalidErrorMessage";
-import { validateHeaders } from "../internal/validation/ValidateHeaders";
-import { validateResult } from "../internal/validation/ValidateResult";
-import { UFn } from "../internal/types/UFn";
-import { mapValidationFailuresToInvalidFieldCases } from "./validation/MapValidationFailuresToInvalidFieldCases";
+import { Message } from '../Message';
+import { UTypeDeclaration } from '../internal/types/UTypeDeclaration';
+import { UUnion } from '../internal/types/UUnion';
+import { ValidationFailure } from '../internal/validation/ValidationFailure';
+import { UType } from '../internal/types/UType';
+import { UApiSchema } from '../UApiSchema';
+import { selectStructFields } from '../internal/SelectStructFields';
+import { getInvalidErrorMessage } from '../internal/validation/GetInvalidErrorMessage';
+import { validateHeaders } from '../internal/validation/ValidateHeaders';
+import { validateResult } from '../internal/validation/ValidateResult';
+import { UFn } from '../internal/types/UFn';
+import { mapValidationFailuresToInvalidFieldCases } from './validation/MapValidationFailuresToInvalidFieldCases';
+import { ValidateContext } from './validation/ValidateContext';
 
 export async function handleMessage(
     requestMessage: Message,
@@ -30,7 +31,7 @@ export async function handleMessage(
     let requestTarget: string;
     if (!(requestTargetInit in parsedUApiSchema)) {
         unknownTarget = requestTargetInit;
-        requestTarget = "fn.ping_";
+        requestTarget = 'fn.ping_';
     } else {
         unknownTarget = null;
         requestTarget = requestTargetInit;
@@ -39,13 +40,13 @@ export async function handleMessage(
     const functionType = parsedUApiSchema[requestTarget] as UFn;
     const resultUnionType: UUnion = functionType.result;
 
-    const callId = requestHeaders["id_"];
+    const callId = requestHeaders['id_'];
     if (callId !== undefined) {
-        responseHeaders["id_"] = callId;
+        responseHeaders['id_'] = callId;
     }
 
-    if ("_parseFailures" in requestHeaders) {
-        const parseFailures = requestHeaders["_parseFailures"] as any[];
+    if ('_parseFailures' in requestHeaders) {
+        const parseFailures = requestHeaders['_parseFailures'] as any[];
         const newErrorResult: Record<string, any> = {
             ErrorParseFailure_: { reasons: parseFailures },
         };
@@ -62,25 +63,25 @@ export async function handleMessage(
     );
     if (requestHeaderValidationFailures.length > 0) {
         return getInvalidErrorMessage(
-            "ErrorInvalidRequestHeaders_",
+            'ErrorInvalidRequestHeaders_',
             requestHeaderValidationFailures,
             resultUnionType,
             responseHeaders,
         );
     }
 
-    if ("bin_" in requestHeaders) {
-        const clientKnownBinaryChecksums = requestHeaders["bin_"] as any[];
+    if ('bin_' in requestHeaders) {
+        const clientKnownBinaryChecksums = requestHeaders['bin_'] as any[];
 
-        responseHeaders["_binary"] = true;
-        responseHeaders["_clientKnownBinaryChecksums"] = clientKnownBinaryChecksums;
+        responseHeaders['_binary'] = true;
+        responseHeaders['_clientKnownBinaryChecksums'] = clientKnownBinaryChecksums;
 
-        if ("pac_" in requestHeaders) {
-            responseHeaders["pac_"] = requestHeaders["pac_"];
+        if ('pac_' in requestHeaders) {
+            responseHeaders['pac_'] = requestHeaders['pac_'];
         }
     }
 
-    const selectStructFieldsHeader: Record<string, any> | null = requestHeaders["select_"] || null;
+    const selectStructFieldsHeader: Record<string, any> | null = requestHeaders['select_'] || null;
 
     if (unknownTarget !== null) {
         const newErrorResult: Record<string, any> = {
@@ -102,7 +103,7 @@ export async function handleMessage(
 
     const warnings: ValidationFailure[] = [];
     const filterOutWarnings = (e: ValidationFailure) => {
-        const r = e.reason == "NumberTruncated";
+        const r = e.reason == 'NumberTruncated';
         if (r) {
             warnings.push(e);
         }
@@ -110,29 +111,29 @@ export async function handleMessage(
     };
 
     const callValidationFailures: ValidationFailure[] = functionTypeCall
-        .validate(requestBody, null, null, [])
+        .validate(requestBody, [], new ValidateContext(null, functionType.name))
         .filter(filterOutWarnings);
     if (callValidationFailures.length > 0) {
         if (warnings.length > 0) {
-            responseHeaders["_warnings"] = mapValidationFailuresToInvalidFieldCases(warnings);
+            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
         }
 
         return getInvalidErrorMessage(
-            "ErrorInvalidRequestBody_",
+            'ErrorInvalidRequestBody_',
             callValidationFailures,
             resultUnionType,
             responseHeaders,
         );
     }
 
-    const unsafeResponseEnabled = requestHeaders["unsafe_"] || false;
+    const unsafeResponseEnabled = requestHeaders['unsafe_'] || false;
 
     const callMessage: Message = new Message(requestHeaders, { [requestTarget]: requestPayload });
 
     let resultMessage: Message;
-    if (requestTarget === "fn.ping_") {
+    if (requestTarget === 'fn.ping_') {
         resultMessage = new Message({}, { Ok_: {} });
-    } else if (requestTarget === "fn.api_") {
+    } else if (requestTarget === 'fn.api_') {
         resultMessage = new Message({}, { Ok_: { api: uApiSchema.original } });
     } else {
         try {
@@ -155,16 +156,16 @@ export async function handleMessage(
     const skipResultValidation: boolean = unsafeResponseEnabled;
     if (!skipResultValidation) {
         const resultValidationFailures: ValidationFailure[] = resultUnionType
-            .validate(resultUnion, selectStructFieldsHeader, null, [])
+            .validate(resultUnion, [], new ValidateContext(selectStructFieldsHeader, functionType.name))
             .filter(filterOutWarnings);
 
         if (warnings.length > 0) {
-            responseHeaders["_warnings"] = mapValidationFailuresToInvalidFieldCases(warnings);
+            responseHeaders['_warnings'] = mapValidationFailuresToInvalidFieldCases(warnings);
         }
 
         if (resultValidationFailures.length > 0) {
             return getInvalidErrorMessage(
-                "ErrorInvalidResponseBody_",
+                'ErrorInvalidResponseBody_',
                 resultValidationFailures,
                 resultUnionType,
                 responseHeaders,
@@ -177,7 +178,7 @@ export async function handleMessage(
         );
         if (responseHeaderValidationFailures.length > 0) {
             return getInvalidErrorMessage(
-                "ErrorInvalidResponseHeaders_",
+                'ErrorInvalidResponseHeaders_',
                 responseHeaderValidationFailures,
                 resultUnionType,
                 responseHeaders,

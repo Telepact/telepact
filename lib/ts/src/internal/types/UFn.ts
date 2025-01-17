@@ -4,6 +4,7 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 import { generateRandomUnion } from '../../internal/generation/GenerateRandomUnion';
+import { ValidateContext } from '../validation/ValidateContext';
 
 const FN_NAME = 'Object';
 
@@ -26,13 +27,8 @@ export class UFn extends UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return this.call.validate(value, select, fn, typeParameters);
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return this.call.validate(value, [], ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {

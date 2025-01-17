@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateMockStub } from '../../internal/validation/ValidateMockStub';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 import { generateRandomUMockStub } from '../../internal/generation/GenerateRandomUMockStub';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const mockStubName: string = '_ext.Stub_';
 
@@ -19,13 +20,8 @@ export class UMockStub extends UType {
         return 0;
     }
 
-    validate(
-        givenObj: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateMockStub(givenObj, select, fn, this.types);
+    validate(givenObj: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return validateMockStub(givenObj, this.types, ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {

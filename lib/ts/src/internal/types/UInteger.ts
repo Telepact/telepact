@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateInteger } from '../../internal/validation/ValidateInteger';
 import { generateRandomInteger } from '../../internal/generation/GenerateRandomInteger';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const integerName: string = 'Integer';
 
@@ -12,12 +13,7 @@ export class UInteger extends UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
         return validateInteger(value);
     }
 

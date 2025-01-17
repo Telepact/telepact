@@ -29,10 +29,8 @@
         "->": {
             "data": ["type.Example"]
         },
-        "throws": {
-            "error.ProcessFailure": {
-                "cause": ["string"]
-            }
+        "error.ProcessFailure": {
+            "cause": ["string"]
         }
     }
 ]

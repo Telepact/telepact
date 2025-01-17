@@ -5,6 +5,7 @@ import { validateUnion } from '../../internal/validation/ValidateUnion';
 import { generateRandomUnion } from '../../internal/generation/GenerateRandomUnion';
 import { UType } from '../../internal/types/UType';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const unionName: string = 'Object';
 
@@ -23,13 +24,8 @@ export class UUnion implements UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateUnion(value, select, fn, this.name, this.cases);
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return validateUnion(value, this.name, this.cases, ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {

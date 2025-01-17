@@ -1,12 +1,12 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { ValidateContext } from './ValidateContext';
 
 export function validateStructFields(
     fields: Record<string, UFieldDeclaration>,
     selectedFields: string[] | null,
     actualStruct: Record<string, any>,
-    select: Record<string, any> | null,
-    fn: string | null,
+    ctx: ValidateContext,
 ): ValidationFailure[] {
     const validationFailures: ValidationFailure[] = [];
 
@@ -38,7 +38,7 @@ export function validateStructFields(
 
         const refFieldTypeDeclaration = referenceField.typeDeclaration;
 
-        const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, select, fn);
+        const nestedValidationFailures = refFieldTypeDeclaration.validate(fieldValue, ctx);
 
         const nestedValidationFailuresWithPath: ValidationFailure[] = [];
         for (const failure of nestedValidationFailures) {

@@ -3,22 +3,22 @@ import { getTypeUnexpectedValidationFailure } from '../../internal/validation/Ge
 import { validateUnionCases } from '../../internal/validation/ValidateUnionCases';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { unionName } from '../types/UUnion';
+import { ValidateContext } from './ValidateContext';
 
 export function validateUnion(
     value: any,
-    select: Record<string, any> | null,
-    fn: string | null,
     name: string,
     cases: Record<string, UStruct>,
+    ctx: ValidateContext,
 ): ValidationFailure[] {
     if (typeof value === 'object' && !Array.isArray(value)) {
         let selectedCases: Record<string, any>;
         if (name.startsWith('fn.')) {
-            selectedCases = { [name]: select?.[name] ?? null };
+            selectedCases = { [name]: ctx.select?.[name] ?? null };
         } else {
-            selectedCases = select?.[name] ?? null;
+            selectedCases = ctx.select?.[name] ?? null;
         }
-        return validateUnionCases(cases, selectedCases, value, select, fn);
+        return validateUnionCases(cases, selectedCases, value, ctx);
     } else {
         return getTypeUnexpectedValidationFailure([], value, unionName);
     }

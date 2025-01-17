@@ -3,6 +3,7 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UType } from '../../internal/types/UType';
 import { generateRandomAny } from '../../internal/generation/GenerateRandomAny';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 const anyName = 'Any';
 
@@ -11,12 +12,7 @@ export class UAny extends UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
         return [];
     }
 

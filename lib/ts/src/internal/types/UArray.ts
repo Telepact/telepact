@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateArray } from '../../internal/validation/ValidateArray';
 import { generateRandomArray } from '../../internal/generation/GenerateRandomArray';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const arrayName = 'Array';
 
@@ -12,13 +13,8 @@ export class UArray extends UType {
         return 1;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateArray(value, select, fn, typeParameters);
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return validateArray(value, typeParameters, ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {

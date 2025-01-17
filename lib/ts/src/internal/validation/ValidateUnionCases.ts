@@ -2,13 +2,13 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { UStruct } from '../../internal/types/UStruct';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { validateUnionStruct } from '../../internal/validation/ValidateUnionStruct';
+import { ValidateContext } from './ValidateContext';
 
 export function validateUnionCases(
     referenceCases: Record<string, UStruct>,
     selectedCases: Record<string, any>,
     actual: Record<any, any>,
-    select: Record<string, any> | null,
-    fn: string | null,
+    ctx: ValidateContext,
 ): ValidationFailure[] {
     if (Object.keys(actual).length !== 1) {
         return [
@@ -32,8 +32,7 @@ export function validateUnionCases(
             unionTarget,
             unionPayload,
             selectedCases,
-            select,
-            fn,
+            ctx,
         );
 
         const nestedValidationFailuresWithPath: ValidationFailure[] = [];

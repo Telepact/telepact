@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateMockCall } from '../../internal/validation/ValidateMockCall';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 import { generateRandomUMockCall } from '../../internal/generation/GenerateRandomUMockCall';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const mockCallName: string = '_ext.Call_';
 
@@ -19,13 +20,8 @@ export class UMockCall extends UType {
         return 0;
     }
 
-    public validate(
-        givenObj: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateMockCall(givenObj, select, fn, this.types);
+    public validate(givenObj: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return validateMockCall(givenObj, this.types, ctx);
     }
 
     public generateRandomValue(ctx: GenerateContext): any {

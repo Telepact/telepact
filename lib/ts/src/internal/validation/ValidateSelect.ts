@@ -1,12 +1,17 @@
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
+import { ValidateContext } from './ValidateContext';
 
-export function validateSelect(givenObj: any, fn: string, possibleFnSelects: Record<string, any>): ValidationFailure[] {
+export function validateSelect(
+    givenObj: any,
+    possibleFnSelects: Record<string, any>,
+    ctx: ValidateContext,
+): ValidationFailure[] {
     if (typeof givenObj !== 'object' || Array.isArray(givenObj) || givenObj === null || givenObj === undefined) {
         return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
-    const possibleSelect = possibleFnSelects[fn] as Record<string, any>;
+    const possibleSelect = possibleFnSelects[ctx.fn] as Record<string, any>;
 
     return isSubSelect([], givenObj, possibleSelect);
 }

@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateString } from '../../internal/validation/ValidateString';
 import { generateRandomString } from '../../internal/generation/GenerateRandomString';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const stringName: string = 'String';
 
@@ -12,12 +13,7 @@ export class UString extends UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
         return validateString(value);
     }
 

@@ -3,6 +3,7 @@ import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { validateValueOfType } from '../../internal/validation/ValidateValueOfType';
 import { generateRandomValueOfType } from '../../internal/generation/GenerateRandomValueOfType';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export class UTypeDeclaration {
     type: UType;
@@ -15,8 +16,8 @@ export class UTypeDeclaration {
         this.typeParameters = typeParameters;
     }
 
-    validate(value: any, select: { [key: string]: any } | null, fn: string | null): ValidationFailure[] {
-        return validateValueOfType(value, select, fn, this.type, this.nullable, this.typeParameters);
+    validate(value: any, ctx: ValidateContext): ValidationFailure[] {
+        return validateValueOfType(value, this.type, this.nullable, this.typeParameters, ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {

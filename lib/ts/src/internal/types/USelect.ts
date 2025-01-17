@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateSelect } from '../../internal/validation/ValidateSelect';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
 import { generateRandomSelect } from '../generation/GenerateRandomSelect';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const select: string = 'Object';
 
@@ -14,13 +15,8 @@ export class USelect implements UType {
         return 0;
     }
 
-    validate(
-        givenObj: any,
-        select: Record<string, any> | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateSelect(givenObj, fn, this.possibleSelects);
+    validate(givenObj: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return validateSelect(givenObj, this.possibleSelects, ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {

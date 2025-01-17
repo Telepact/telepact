@@ -2,12 +2,12 @@ import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
 import { arrayName } from '../types/UArray';
+import { ValidateContext } from './ValidateContext';
 
 export function validateArray(
     value: any,
-    select: Record<string, any> | null,
-    fn: string | null,
     typeParameters: UTypeDeclaration[],
+    ctx: ValidateContext,
 ): ValidationFailure[] {
     if (Array.isArray(value)) {
         const nestedTypeDeclaration = typeParameters[0];
@@ -15,7 +15,7 @@ export function validateArray(
         const validationFailures: ValidationFailure[] = [];
         for (let i = 0; i < value.length; i++) {
             const element = value[i];
-            const nestedValidationFailures = nestedTypeDeclaration.validate(element, select, fn);
+            const nestedValidationFailures = nestedTypeDeclaration.validate(element, ctx);
             const index = i;
 
             const nestedValidationFailuresWithPath: ValidationFailure[] = [];

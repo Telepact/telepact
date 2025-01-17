@@ -4,6 +4,7 @@ import { UType } from '../../internal/types/UType';
 import { validateBoolean } from '../../internal/validation/ValidateBoolean';
 import { generateRandomBoolean } from '../../internal/generation/GenerateRandomBoolean';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const booleanName: string = 'Boolean';
 
@@ -12,12 +13,7 @@ export class UBoolean extends UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
         return validateBoolean(value);
     }
 

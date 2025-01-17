@@ -25,6 +25,7 @@ export class GenerateContext {
         this.useBlueprintValue = useBlueprintValue;
         this.includeOptionalFields = includeOptionalFields;
         this.randomizeOptionalFields = randomizeOptionalFields;
+        this.alwaysIncludeRequiredFields = alwaysIncludeRequiredFields;
         this.typeParameters = typeParameters;
         this.fnScope = fnScope;
         this.randomGenerator = randomGenerator;

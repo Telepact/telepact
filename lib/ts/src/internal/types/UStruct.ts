@@ -5,6 +5,7 @@ import { UType } from '../../internal/types/UType';
 import { validateStruct } from '../../internal/validation/ValidateStruct';
 import { generateRandomStruct } from '../../internal/generation/GenerateRandomStruct';
 import { GenerateContext } from '../../internal/generation/GenerateContext';
+import { ValidateContext } from '../validation/ValidateContext';
 
 export const structName: string = 'Object';
 
@@ -21,13 +22,8 @@ export class UStruct implements UType {
         return 0;
     }
 
-    validate(
-        value: any,
-        select: { [key: string]: any } | null,
-        fn: string | null,
-        typeParameters: UTypeDeclaration[],
-    ): ValidationFailure[] {
-        return validateStruct(value, select, fn, this.name, this.fields);
+    validate(value: any, typeParameters: UTypeDeclaration[], ctx: ValidateContext): ValidationFailure[] {
+        return validateStruct(value, this.name, this.fields, ctx);
     }
 
     generateRandomValue(ctx: GenerateContext): any {
