@@ -1,5 +1,8 @@
 from typing import TYPE_CHECKING, cast
+from uapi.internal.schema.DerivePossibleSelects import derive_possible_select
+from uapi.internal.schema.GetOrParseType import get_or_parse_type
 from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
+from uapi.internal.types.USelect import USelect
 from uapi.internal.types.UFn import UFn
 
 if TYPE_CHECKING:
@@ -12,6 +15,7 @@ def parse_function_type(document_name: str, path: list[object], function_definit
                         ctx: 'ParseContext') -> 'UFn':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
     from uapi.internal.schema.ParseStructType import parse_struct_type
+    from uapi.internal.schema.ParseUnionType import parse_union_type
     from uapi.internal.schema.ParseUnionType import parse_union_type
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.SchemaParseFailure import SchemaParseFailure
@@ -66,5 +70,10 @@ def parse_function_type(document_name: str, path: list[object], function_definit
     if parse_failures:
         raise UApiSchemaParseError(
             parse_failures, ctx.uapi_schema_document_names_to_json)
+
+    fn_select_type = derive_possible_select(
+        schema_key, cast(UUnion, result_type))
+    select_type = cast(USelect, get_or_parse_type('_ext.Select_', ctx))
+    select_type.possible_selects[schema_key] = fn_select_type
 
     return UFn(schema_key, cast(UUnion, call_type), cast(UUnion, result_type), cast(str, errors_regex))

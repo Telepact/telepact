@@ -32,6 +32,9 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
     if existing_type is not None:
         return existing_type
 
+    if 'Select' in type_name:
+        print(f'WARNING! Creating new type_name: {type_name}')
+
     regex_string = r"^(boolean|integer|number|string|any|array|object)|((fn|(union|struct|_ext))\.([a-zA-Z_]\w*))$"
     regex = re.compile(regex_string)
 
@@ -81,7 +84,7 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
                                        ctx.copy(document_name=this_document_name, path=[this_index]))
         else:
             possible_type_extension = {
-                '_ext.Select_': USelect(ctx.parsed_types),
+                '_ext.Select_': USelect(),
                 '_ext.Call_': UMockCall(ctx.parsed_types),
                 '_ext.Stub_': UMockStub(ctx.parsed_types),
             }.get(custom_type_name)

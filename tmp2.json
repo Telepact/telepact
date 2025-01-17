@@ -21,6 +21,7 @@
         "union.Ex2": ["type.Another", "type.Example"]
     },
     {
+        "///": [" A function. "],
         "fn.goForth": {
             "arg1": ["string"],
             "arg2": ["integer"]
@@ -28,8 +29,10 @@
         "->": {
             "data": ["type.Example"]
         },
-        "error.ProcessFailure": {
-            "cause": ["string"]
+        "throws": {
+            "error.ProcessFailure": {
+                "cause": ["string"]
+            }
         }
     }
 ]

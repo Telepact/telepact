@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 
 if TYPE_CHECKING:
@@ -14,8 +14,7 @@ _SELECT: str = "Object"
 
 class USelect(UType):
 
-    def __init__(self, types: dict[str, 'UType']) -> None:
-        self.types = types
+    possible_selects: dict[str, object] = {}
 
     def get_type_parameter_count(self) -> int:
         return 0
@@ -23,10 +22,11 @@ class USelect(UType):
     def validate(self, given_obj: object, select: dict[str, object] | None, fn: str | None,
                  type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateSelect import validate_select
-        return validate_select(given_obj, select, fn, type_parameters, self.types)
+        return validate_select(given_obj, cast(str, fn), self.possible_selects)
 
     def generate_random_value(self, ctx: 'GenerateContext') -> object:
-        raise NotImplementedError("Not implemented")
+        from uapi.internal.generation.GenerateRandomSelect import generate_random_select
+        return generate_random_select(self.possible_selects, ctx)
 
     def get_name(self) -> str:
         return _SELECT
