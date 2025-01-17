@@ -9,6 +9,19 @@
         }
     },
     {
+        "union.GenericData": [{
+            "One": {
+                "field1A": ["any"],
+                "field1B": ["integer"]
+            }
+        }, {
+            "Two": {
+                "field2A": ["string"],
+                "field2B": ["boolean"]
+            }
+        }]
+    },
+    {
         "fn.example": {
             "arg1": ["string"],
             "arg2!": ["boolean"]
@@ -25,7 +38,10 @@
         "->": [{
             "Ok_": {
                 "createStub": ["fn.createStub_"],
-                "verify": ["fn.verify_"]
+                "verify": ["fn.verify_"],
+                "select": ["_ext.Select_"],
+                "data": ["struct.Data"],
+                "genericData": ["union.GenericData"]
             }
         }]
     }

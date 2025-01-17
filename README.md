@@ -275,6 +275,21 @@ backwards compatible change, on the basis of the following:
     patterns in unions or neglect default branch logic in `switch` or `match`
     statements.
 
+### Why can I not omit fn.\* fields using the `"select_"` header?
+
+The `"select_"` header is used to omit fields from structs, which includes
+union structs, but not the argument struct included with function definitions.
+
+The function type exists to allow API providers to design "links" into their
+API design, such that the appearance of a function type payload can simply
+be copied and pasted verbatim into the body a new message. Tooling like the
+uAPI console specifically utilizes this technique to allow end-users to
+"click through" graphs designed by the API provider.
+
+Omitting fields in the argument struct disrupts the API provider's ability
+to established well-defined links, and consequently, the `"select_"` header is
+disallowed from omitting fields in function argument structs.
+
 ## Glossary
 
 -   **Body** - A structured JSON object containing the primary data payload of the

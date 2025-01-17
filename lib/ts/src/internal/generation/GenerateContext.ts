@@ -8,6 +8,7 @@ export class GenerateContext {
     randomizeOptionalFields: boolean;
     alwaysIncludeRequiredFields: boolean;
     typeParameters: UTypeDeclaration[];
+    fnScope: string;
     randomGenerator: RandomGenerator;
 
     constructor(
@@ -17,6 +18,7 @@ export class GenerateContext {
         randomizeOptionalFields: boolean,
         alwaysIncludeRequiredFields: boolean,
         typeParameters: UTypeDeclaration[],
+        fnScope: string,
         randomGenerator: RandomGenerator,
     ) {
         this.blueprintValue = blueprintValue;
@@ -24,6 +26,7 @@ export class GenerateContext {
         this.includeOptionalFields = includeOptionalFields;
         this.randomizeOptionalFields = randomizeOptionalFields;
         this.typeParameters = typeParameters;
+        this.fnScope = fnScope;
         this.randomGenerator = randomGenerator;
     }
 
@@ -45,6 +48,7 @@ export class GenerateContext {
             this.randomizeOptionalFields,
             alwaysIncludeRequiredFields ?? this.alwaysIncludeRequiredFields,
             typeParameters ?? this.typeParameters,
+            this.fnScope,
             this.randomGenerator,
         );
     }

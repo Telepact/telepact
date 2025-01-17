@@ -6,6 +6,9 @@ import { parseStructType } from '../../internal/schema/ParseStructType';
 import { parseUnionType } from '../../internal/schema/ParseUnionType';
 import { UApiSchemaParseError } from '../../UApiSchemaParseError';
 import { ParseContext } from '../../internal/schema/ParseContext';
+import { getOrParseType } from './GetOrParseType';
+import { derivePossibleSelect } from './DerivePossibleSelect';
+import { USelect } from '../types/USelect';
 
 export function parseFunctionType(
     functionDefinitionAsParsedJson: { [key: string]: any },
@@ -80,6 +83,10 @@ export function parseFunctionType(
     if (parseFailures.length > 0) {
         throw new UApiSchemaParseError(parseFailures, ctx.uapiSchemaDocumentNamesToJson);
     }
+
+    const fnSelectType = derivePossibleSelect(schemaKey, resultType as UUnion);
+    const selectType = getOrParseType('_ext.Select_', ctx) as USelect;
+    selectType.possibleSelects[schemaKey] = fnSelectType;
 
     return new UFn(schemaKey, callType as UUnion, resultType as UUnion, errorsRegex as string);
 }

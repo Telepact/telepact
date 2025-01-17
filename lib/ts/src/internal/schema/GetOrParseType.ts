@@ -89,7 +89,7 @@ export function getOrParseType(typeName: string, ctx: ParseContext): UType {
             );
         } else {
             const possibleTypeExtension = {
-                '_ext.Select_': new USelect(ctx.parsedTypes),
+                '_ext.Select_': new USelect(ctx.parsedTypes, {}),
                 '_ext.Call_': new UMockCall(ctx.parsedTypes),
                 '_ext.Stub_': new UMockStub(ctx.parsedTypes),
             }[customTypeName];

@@ -1,86 +1,52 @@
-import { UType } from '../../internal/types/UType';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
 import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { validateSelectStruct } from '../../internal/validation/ValidateSelectStruct';
-import { UUnion } from '../../internal/types/UUnion';
-import { UFn } from '../../internal/types/UFn';
-import { UStruct } from '../../internal/types/UStruct';
 
-export function validateSelect(
-    givenObj: any,
-    select: Record<string, any> | null,
-    fn: string | null,
-    types: Record<string, UType>,
-): ValidationFailure[] {
+export function validateSelect(givenObj: any, fn: string, possibleFnSelects: Record<string, any>): ValidationFailure[] {
     if (typeof givenObj !== 'object' || Array.isArray(givenObj) || givenObj === null || givenObj === undefined) {
         return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
     }
 
-    const selectStructFieldsHeader = givenObj;
+    const possibleSelect = possibleFnSelects[fn] as Record<string, any>;
 
-    const validationFailures: ValidationFailure[] = [];
-    const functionType = types[fn as string] as UFn;
+    return isSubSelect([], givenObj, possibleSelect);
+}
 
-    for (const [type, selectValue] of Object.entries(selectStructFieldsHeader)) {
-        let typeReference: UType;
-        if (type === '->') {
-            typeReference = functionType.result;
-        } else {
-            const possibleTypeReference = types[type];
-            if (possibleTypeReference === undefined) {
-                validationFailures.push(new ValidationFailure([type], 'ObjectKeyDisallowed', {}));
-                continue;
-            }
-
-            typeReference = possibleTypeReference;
+function isSubSelect(path: any[], givenObj: any, possibleSelectSection: any): ValidationFailure[] {
+    console.log(
+        `validating ${path.join('.')} with givenObject: ${JSON.stringify(givenObj)} and possibleSelectSection: ${JSON.stringify(possibleSelectSection)}`,
+    );
+    if (Array.isArray(possibleSelectSection)) {
+        if (!Array.isArray(givenObj)) {
+            return getTypeUnexpectedValidationFailure(path, givenObj, 'Array');
         }
 
-        if (typeReference instanceof UUnion) {
-            const u = typeReference;
-            if (
-                typeof selectValue !== 'object' ||
-                Array.isArray(selectValue) ||
-                selectValue === null ||
-                selectValue === undefined
-            ) {
-                validationFailures.push(...getTypeUnexpectedValidationFailure([type], selectValue, 'Object'));
-                continue;
+        const validationFailures: ValidationFailure[] = [];
+
+        for (const [index, element] of givenObj.entries()) {
+            if (!possibleSelectSection.includes(element)) {
+                validationFailures.push(new ValidationFailure([...path, index], 'ArrayElementDisallowed', {}));
             }
-
-            const unionCases = selectValue;
-
-            for (const [unionCase, selectedCaseStructFields] of Object.entries(unionCases)) {
-                const structRef = u.cases[unionCase];
-
-                const loopPath = [type, unionCase];
-
-                if (structRef === undefined) {
-                    validationFailures.push(new ValidationFailure(loopPath, 'ObjectKeyDisallowed', {}));
-                    continue;
-                }
-
-                const nestedValidationFailures = validateSelectStruct(structRef, loopPath, selectedCaseStructFields);
-
-                validationFailures.push(...nestedValidationFailures);
-            }
-        } else if (typeReference instanceof UFn) {
-            const f = typeReference;
-            const fnCall = f.call;
-            const fnCallCases = fnCall.cases;
-            const fnName = f.name;
-            const argStruct = fnCallCases[fnName];
-            const nestedValidationFailures = validateSelectStruct(argStruct, [type], selectValue);
-
-            validationFailures.push(...nestedValidationFailures);
-        } else if (typeReference instanceof UStruct) {
-            const structRef = typeReference;
-            const nestedValidationFailures = validateSelectStruct(structRef, [type], selectValue);
-
-            validationFailures.push(...nestedValidationFailures);
-        } else {
-            validationFailures.push(new ValidationFailure([type], 'ObjectKeyDisallowed', {}));
         }
+
+        return validationFailures;
+    } else if (typeof possibleSelectSection === 'object' && !Array.isArray(possibleSelectSection)) {
+        if (typeof givenObj !== 'object' || Array.isArray(givenObj) || givenObj === null) {
+            return getTypeUnexpectedValidationFailure(path, givenObj, 'Object');
+        }
+
+        const validationFailures: ValidationFailure[] = [];
+
+        for (const [key, value] of Object.entries(givenObj)) {
+            if (key in possibleSelectSection) {
+                const innerFailures = isSubSelect([...path, key], value, possibleSelectSection[key]);
+                validationFailures.push(...innerFailures);
+            } else {
+                validationFailures.push(new ValidationFailure([...path, key], 'ObjectKeyDisallowed', {}));
+            }
+        }
+
+        return validationFailures;
     }
 
-    return validationFailures;
+    return [];
 }
