@@ -14,7 +14,9 @@ import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UType;
 
 public class ParseField {
-    static UFieldDeclaration parseField(String fieldDeclaration,
+    static UFieldDeclaration parseField(
+            List<Object> path,
+            String fieldDeclaration,
             Object typeDeclarationValue,
             ParseContext ctx) {
         final var regexString = "^([a-z][a-zA-Z0-9_]*)(!)?$";
@@ -22,7 +24,7 @@ public class ParseField {
 
         final var matcher = regex.matcher(fieldDeclaration);
         if (!matcher.find()) {
-            final List<Object> finalPath = new ArrayList<>(ctx.path);
+            final List<Object> finalPath = new ArrayList<>(path);
             finalPath.add(fieldDeclaration);
 
             throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, finalPath,
@@ -32,7 +34,7 @@ public class ParseField {
         final var fieldName = matcher.group(0);
         final var optional = matcher.group(2) != null;
 
-        final List<Object> thisPath = new ArrayList<>(ctx.path);
+        final List<Object> thisPath = new ArrayList<>(path);
         thisPath.add(fieldName);
 
         if (!(typeDeclarationValue instanceof List)) {
@@ -43,8 +45,9 @@ public class ParseField {
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
         final var typeDeclaration = parseTypeDeclaration(
+                thisPath,
                 typeDeclarationArray,
-                ctx.copyWithNewPath(thisPath));
+                ctx);
 
         return new UFieldDeclaration(fieldName, typeDeclaration, optional);
     }

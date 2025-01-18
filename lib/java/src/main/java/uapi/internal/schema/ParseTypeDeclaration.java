@@ -15,14 +15,15 @@ import uapi.internal.types.UTypeDeclaration;
 
 public class ParseTypeDeclaration {
     static UTypeDeclaration parseTypeDeclaration(
+            List<Object> path,
             List<Object> typeDeclarationArray,
             ParseContext ctx) {
         if (typeDeclarationArray.isEmpty()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
                     "EmptyArrayDisallowed", Map.of())), ctx.uApiSchemaDocumentNamesToJson);
         }
 
-        final List<Object> basePath = new ArrayList<>(ctx.path);
+        final List<Object> basePath = new ArrayList<>(path);
         basePath.add(0);
 
         final var baseType = typeDeclarationArray.get(0);
@@ -46,12 +47,11 @@ public class ParseTypeDeclaration {
         final var typeName = matcher.group(1);
         final var nullable = matcher.group(2) != null;
 
-        final UType type = getOrParseType(typeName,
-                ctx.copyWithNewPath(basePath));
+        final UType type = getOrParseType(basePath, typeName, ctx);
 
         final var givenTypeParameterCount = typeDeclarationArray.size() - 1;
         if (type.getTypeParameterCount() != givenTypeParameterCount) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
                     "ArrayLengthUnexpected",
                     Map.of("actual", typeDeclarationArray.size(), "expected", type.getTypeParameterCount() + 1))),
                     ctx.uApiSchemaDocumentNamesToJson);
@@ -65,7 +65,7 @@ public class ParseTypeDeclaration {
         for (final var e : givenTypeParameters) {
             index += 1;
 
-            final List<Object> loopPath = new ArrayList<>(ctx.path);
+            final List<Object> loopPath = new ArrayList<>(path);
             loopPath.add(index);
 
             if (!(e instanceof List)) {
@@ -80,7 +80,7 @@ public class ParseTypeDeclaration {
 
             final UTypeDeclaration typeParameterTypeDeclaration;
             try {
-                typeParameterTypeDeclaration = parseTypeDeclaration((List<Object>) e, ctx.copyWithNewPath(loopPath));
+                typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, (List<Object>) e, ctx);
 
                 typeParameters.add(typeParameterTypeDeclaration);
             } catch (UApiSchemaParseError e2) {

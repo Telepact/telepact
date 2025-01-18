@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import uapi.UApiSchemaParseError;
 import uapi.internal.types.UFieldDeclaration;
-import uapi.internal.types.UType;
 
 public class ParseStructFields {
-    static Map<String, UFieldDeclaration> parseStructFields(Map<String, Object> referenceStruct, ParseContext ctx) {
+    static Map<String, UFieldDeclaration> parseStructFields(
+            List<Object> path,
+            Map<String, Object> referenceStruct, ParseContext ctx) {
         final var parseFailures = new ArrayList<SchemaParseFailure>();
         final var fields = new HashMap<String, UFieldDeclaration>();
 
@@ -24,10 +24,10 @@ public class ParseStructFields {
                 final var existingFieldNoOpt = existingField.split("!")[0];
                 final var fieldNoOpt = fieldDeclaration.split("!")[0];
                 if (fieldNoOpt.equals(existingFieldNoOpt)) {
-                    final List<Object> finalPath = new ArrayList<>(ctx.path);
+                    final List<Object> finalPath = new ArrayList<>(path);
                     finalPath.add(fieldDeclaration);
 
-                    final List<Object> finalOtherPath = new ArrayList<>(ctx.path);
+                    final List<Object> finalOtherPath = new ArrayList<>(path);
                     finalOtherPath.add(existingField);
 
                     final var finalOtherDocumentJson = ctx.uApiSchemaDocumentNamesToJson.get(ctx.documentName);
@@ -45,7 +45,7 @@ public class ParseStructFields {
 
             final UFieldDeclaration parsedField;
             try {
-                parsedField = parseField(fieldDeclaration,
+                parsedField = parseField(path, fieldDeclaration,
                         typeDeclarationValue, ctx);
                 final String fieldName = parsedField.fieldName;
 

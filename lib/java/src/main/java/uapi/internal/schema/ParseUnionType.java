@@ -8,16 +8,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import uapi.UApiSchemaParseError;
 import uapi.internal.types.UFieldDeclaration;
 import uapi.internal.types.UStruct;
-import uapi.internal.types.UType;
 import uapi.internal.types.UUnion;
 
 public class ParseUnionType {
     static UUnion parseUnionType(
+            List<Object> path,
             Map<String, Object> unionDefinitionAsPseudoJson, String schemaKey,
             List<String> ignoreKeys, List<String> requiredKeys,
             ParseContext ctx) {
@@ -33,14 +32,14 @@ public class ParseUnionType {
 
         if (otherKeys.size() > 0) {
             for (final var k : otherKeys) {
-                final List<Object> loopPath = new ArrayList<>(ctx.path);
+                final List<Object> loopPath = new ArrayList<>(path);
                 loopPath.add(k);
 
                 parseFailures.add(new SchemaParseFailure(ctx.documentName, loopPath, "ObjectKeyDisallowed", Map.of()));
             }
         }
 
-        final List<Object> thisPath = new ArrayList<>(ctx.path);
+        final List<Object> thisPath = new ArrayList<>(path);
         thisPath.add(schemaKey);
 
         final Object defInit = unionDefinitionAsPseudoJson.get(schemaKey);
@@ -150,8 +149,7 @@ public class ParseUnionType {
 
             final Map<String, UFieldDeclaration> fields;
             try {
-                fields = parseStructFields(unionCaseStruct,
-                        ctx.copyWithNewPath(unionKeyPath));
+                fields = parseStructFields(unionKeyPath, unionCaseStruct, ctx);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
                 continue;

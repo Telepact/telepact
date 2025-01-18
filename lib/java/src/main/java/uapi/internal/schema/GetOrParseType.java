@@ -25,7 +25,9 @@ import uapi.internal.types.UString;
 import uapi.internal.types.UType;
 
 public class GetOrParseType {
-    static UType getOrParseType(String typeName,
+    static UType getOrParseType(
+            List<Object> path,
+            String typeName,
             ParseContext ctx) {
         if (ctx.failedTypes.contains(typeName)) {
             throw new UApiSchemaParseError(List.of(), ctx.uApiSchemaDocumentNamesToJson);
@@ -42,7 +44,7 @@ public class GetOrParseType {
 
         final var matcher = regex.matcher(typeName);
         if (!matcher.find()) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
                     "StringRegexMatchFailed", Map.of("regex", regexString))), ctx.uApiSchemaDocumentNamesToJson);
         }
 
@@ -63,24 +65,25 @@ public class GetOrParseType {
         final var thisIndex = ctx.schemaKeysToIndex.get(customTypeName);
         final var thisDocumentName = ctx.schemaKeysToDocumentName.get(customTypeName);
         if (thisIndex == null) {
-            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, ctx.path,
+            throw new UApiSchemaParseError(List.of(new SchemaParseFailure(ctx.documentName, path,
                     "TypeUnknown", Map.of("name", customTypeName))), ctx.uApiSchemaDocumentNamesToJson);
         }
         final var definition = (Map<String, Object>) ctx.uApiSchemaDocumentsToPseudoJson.get(thisDocumentName)
                 .get(thisIndex);
 
         try {
+            final List<Object> thisPath = List.of(thisIndex);
             final UType type;
             if (customTypeName.startsWith("struct")) {
-                type = parseStructType(definition, customTypeName, List.of(),
-                        ctx.copyWithNewDocumentNameAndPath(thisDocumentName, List.of(thisIndex)));
+                type = parseStructType(thisPath, definition, customTypeName, List.of(),
+                        ctx.copyWithNewDocumentName(thisDocumentName));
             } else if (customTypeName.startsWith("union")) {
-                type = parseUnionType(definition, customTypeName, List.of(),
+                type = parseUnionType(thisPath, definition, customTypeName, List.of(),
                         List.of(),
-                        ctx.copyWithNewDocumentNameAndPath(thisDocumentName, List.of(thisIndex)));
+                        ctx.copyWithNewDocumentName(thisDocumentName));
             } else if (customTypeName.startsWith("fn")) {
-                type = parseFunctionType(definition, customTypeName,
-                        ctx.copyWithNewDocumentNameAndPath(thisDocumentName, List.of(thisIndex)));
+                type = parseFunctionType(thisPath, definition, customTypeName,
+                        ctx.copyWithNewDocumentName(thisDocumentName));
             } else {
                 UType possibleTypeExtension;
                 switch (customTypeName) {

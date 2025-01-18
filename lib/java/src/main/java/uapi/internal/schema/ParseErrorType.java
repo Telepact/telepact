@@ -14,7 +14,9 @@ import uapi.internal.types.UError;
 import uapi.internal.types.UUnion;
 
 public class ParseErrorType {
-    public static UError parseErrorType(Map<String, Object> errorDefinitionAsParsedJson,
+    public static UError parseErrorType(
+            List<Object> path,
+            Map<String, Object> errorDefinitionAsParsedJson,
             String schemaKey,
             ParseContext ctx) {
 
@@ -26,7 +28,7 @@ public class ParseErrorType {
 
         if (!otherKeys.isEmpty()) {
             for (String k : otherKeys) {
-                List<Object> loopPath = new ArrayList<>(ctx.path);
+                List<Object> loopPath = new ArrayList<>(path);
                 loopPath.add(k);
                 parseFailures
                         .add(new SchemaParseFailure(ctx.documentName, loopPath, "ObjectKeyDisallowed",
@@ -40,7 +42,7 @@ public class ParseErrorType {
 
         // Assuming parseUnionType is adapted to Java and returns UError or its
 
-        UUnion error = parseUnionType(errorDefinitionAsParsedJson, schemaKey,
+        UUnion error = parseUnionType(path, errorDefinitionAsParsedJson, schemaKey,
                 new ArrayList<>(),
                 new ArrayList<>(), ctx);
 

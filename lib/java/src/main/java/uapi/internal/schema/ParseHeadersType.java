@@ -10,7 +10,9 @@ import uapi.UApiSchemaParseError;
 import uapi.internal.types.UFieldDeclaration;
 
 public class ParseHeadersType {
-    static UFieldDeclaration parseHeadersType(Map<String, Object> headersDefinitionAsParsedJson,
+    static UFieldDeclaration parseHeadersType(
+            List<Object> path,
+            Map<String, Object> headersDefinitionAsParsedJson,
             String schemaKey,
             String headerField,
             ParseContext ctx) {
@@ -18,14 +20,14 @@ public class ParseHeadersType {
 
         if (!(typeDeclarationValue instanceof List)) {
             throw new UApiSchemaParseError(
-                    getTypeUnexpectedParseFailure(ctx.documentName, ctx.path, typeDeclarationValue, "Array"),
+                    getTypeUnexpectedParseFailure(ctx.documentName, path, typeDeclarationValue, "Array"),
                     ctx.uApiSchemaDocumentNamesToJson);
         }
         final List<Object> typeDeclarationArray = (List<Object>) typeDeclarationValue;
 
         try {
             final var typeDeclaration = parseTypeDeclaration(
-                    typeDeclarationArray, ctx);
+                    path, typeDeclarationArray, ctx);
 
             return new UFieldDeclaration(headerField, typeDeclaration, false);
         } catch (UApiSchemaParseError e) {

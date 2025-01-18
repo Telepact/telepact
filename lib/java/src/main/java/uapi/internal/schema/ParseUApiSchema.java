@@ -150,10 +150,10 @@ public class ParseUApiSchema {
 
             try {
                 getOrParseType(
+                        List.of(thisIndex),
                         schemaKey,
                         new ParseContext(
                                 thisDocumentName,
-                                List.of(thisIndex),
                                 uApiSchemaNameToPseudoJson,
                                 uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
@@ -180,11 +180,11 @@ public class ParseUApiSchema {
 
             try {
                 var error = parseErrorType(
+                        List.of(thisIndex),
                         def,
                         thisKey,
                         new ParseContext(
                                 thisDocumentName,
-                                List.of(thisIndex),
                                 uApiSchemaNameToPseudoJson,
                                 uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
@@ -234,12 +234,12 @@ public class ParseUApiSchema {
 
             try {
                 var requestHeaderType = parseHeadersType(
+                        List.of(thisIndex, requestHeaderKey),
                         def,
                         requestHeaderKey,
                         headerField,
                         new ParseContext(
                                 thisDocumentName,
-                                List.of(thisIndex, requestHeaderKey),
                                 uApiSchemaNameToPseudoJson,
                                 uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,
@@ -262,12 +262,12 @@ public class ParseUApiSchema {
 
             try {
                 var responseHeaderType = parseHeadersType(
+                        List.of(thisIndex, responseHeaderKey),
                         def,
                         responseHeaderKey,
                         headerField,
                         new ParseContext(
                                 thisDocumentName,
-                                List.of(thisIndex, responseHeaderKey),
                                 uApiSchemaNameToPseudoJson,
                                 uApiSchemaNameToJson,
                                 schemaKeysToDocumentName,

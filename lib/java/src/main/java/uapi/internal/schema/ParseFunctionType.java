@@ -19,6 +19,7 @@ import uapi.internal.types.UUnion;
 public class ParseFunctionType {
 
     static UFn parseFunctionType(
+            List<Object> path,
             Map<String, Object> functionDefinitionAsParsedJson,
             String schemaKey,
             ParseContext ctx) {
@@ -26,7 +27,7 @@ public class ParseFunctionType {
 
         UUnion callType = null;
         try {
-            final UStruct argType = parseStructType(functionDefinitionAsParsedJson,
+            final UStruct argType = parseStructType(path, functionDefinitionAsParsedJson,
                     schemaKey, List.of("->", "_errors"), ctx);
             callType = new UUnion(schemaKey, Map.of(schemaKey, argType), Map.of(schemaKey, 0));
         } catch (UApiSchemaParseError e) {
@@ -35,7 +36,7 @@ public class ParseFunctionType {
 
         final var resultSchemaKey = "->";
 
-        final List<Object> resPath = new ArrayList<>(ctx.path);
+        final List<Object> resPath = new ArrayList<>(path);
 
         UUnion resultType = null;
         if (!functionDefinitionAsParsedJson.containsKey(resultSchemaKey)) {
@@ -43,7 +44,7 @@ public class ParseFunctionType {
                     Map.of("key", resultSchemaKey)));
         } else {
             try {
-                resultType = parseUnionType(functionDefinitionAsParsedJson,
+                resultType = parseUnionType(path, functionDefinitionAsParsedJson,
                         resultSchemaKey, functionDefinitionAsParsedJson.keySet().stream().toList(), List.of("Ok_"),
                         ctx);
             } catch (UApiSchemaParseError e) {
@@ -53,7 +54,7 @@ public class ParseFunctionType {
 
         final var errorsRegexKey = "_errors";
 
-        final var regexPath = new ArrayList<>(ctx.path);
+        final var regexPath = new ArrayList<>(path);
         regexPath.add(errorsRegexKey);
 
         String errorsRegex = null;
@@ -79,7 +80,7 @@ public class ParseFunctionType {
         }
 
         var fnSelectType = derivePossibleSelect(schemaKey, resultType);
-        var selectType = (USelect) getOrParseType("_ext.Select_", ctx);
+        var selectType = (USelect) getOrParseType(path, "_ext.Select_", ctx);
         selectType.possibleSelects.put(schemaKey, fnSelectType);
 
         return new UFn(schemaKey, callType, resultType, errorsRegex);
