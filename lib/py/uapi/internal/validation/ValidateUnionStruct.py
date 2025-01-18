@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, cast
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.internal.types.UStruct import UStruct
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
@@ -11,8 +12,7 @@ def validate_union_struct(
     union_case: str,
     actual: dict[str, object],
     selected_cases: dict[str, object],
-    select: dict[str, object] | None,
-    fn: str | None
+    ctx: 'ValidateContext'
 ) -> list['ValidationFailure']:
     selected_fields = cast(list[str], selected_cases.get(
         union_case)) if selected_cases else None
@@ -22,6 +22,5 @@ def validate_union_struct(
         union_struct.fields,
         selected_fields,
         actual,
-        select,
-        fn
+        ctx
     )

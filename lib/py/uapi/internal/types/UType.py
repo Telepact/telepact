@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
     from uapi.internal.validation.ValidationFailure import ValidationFailure
@@ -15,8 +16,8 @@ class UType(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def validate(self, value: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+    def validate(self, value: object,
+                 type_parameters: list['UTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
         pass
 
     @abstractmethod

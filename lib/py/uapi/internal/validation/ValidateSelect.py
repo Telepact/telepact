@@ -1,21 +1,26 @@
-from typing import Dict, List
+from typing import TYPE_CHECKING, cast
 
-from uapi.internal.validation.ValidationFailure import ValidationFailure
+if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 
-def validate_select(given_obj: object, fn: str, possible_fn_selects: dict[str, object]) -> list[ValidationFailure]:
+def validate_select(given_obj: object, possible_fn_selects: dict[str, object], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if not isinstance(given_obj, dict):
         return get_type_unexpected_validation_failure([], given_obj, 'Object')
 
-    possible_select = possible_fn_selects[fn]
+    fn_scope = cast(str, ctx.fn)
+
+    possible_select = possible_fn_selects[fn_scope]
 
     return is_sub_select([], given_obj, possible_select)
 
 
-def is_sub_select(path: list[object], given_obj: object, possible_select_section: object) -> list[ValidationFailure]:
+def is_sub_select(path: list[object], given_obj: object, possible_select_section: object) -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
+    from uapi.internal.validation.ValidationFailure import ValidationFailure
 
     if isinstance(possible_select_section, list):
         if not isinstance(given_obj, list):

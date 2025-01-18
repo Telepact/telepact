@@ -4,11 +4,12 @@ from uapi.internal.types.UObject import _OBJECT_NAME
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def validate_object(value: object, select: dict[str, object] | None, fn: str | None,
-                    type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+def validate_object(value: object,
+                    type_parameters: list['UTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if isinstance(value, dict):
@@ -17,7 +18,7 @@ def validate_object(value: object, select: dict[str, object] | None, fn: str | N
         validation_failures = []
         for k, v in value.items():
             nested_validation_failures = nested_type_declaration.validate(
-                v, select, fn)
+                v, ctx)
 
             nested_validation_failures_with_path = []
             for f in nested_validation_failures:

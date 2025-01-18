@@ -3,11 +3,12 @@ from uapi.internal.types.UArray import _ARRAY_NAME
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
 
-def validate_array(value: object, select: dict[str, object] | None, fn: str | None,
-                   type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+def validate_array(value: object,
+                   type_parameters: list['UTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
     from uapi.internal.validation.GetTypeUnexpectedValidationFailure import get_type_unexpected_validation_failure
 
     if isinstance(value, list):
@@ -16,7 +17,7 @@ def validate_array(value: object, select: dict[str, object] | None, fn: str | No
         validation_failures = []
         for i, element in enumerate(value):
             nested_validation_failures = nested_type_declaration.validate(
-                element, select, fn)
+                element, ctx)
             index = i
 
             nested_validation_failures_with_path = []

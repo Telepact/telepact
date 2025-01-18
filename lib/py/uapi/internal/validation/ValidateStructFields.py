@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from uapi.internal.validation.ValidationFailure import ValidationFailure
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.internal.types.UFieldDeclaration import UFieldDeclaration
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
 
@@ -10,8 +11,7 @@ if TYPE_CHECKING:
 def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
                            selected_fields: list[str] | None,
                            actual_struct: dict[str, object],
-                           select: dict[str, object] | None,
-                           fn: str | None) -> list['ValidationFailure']:
+                           ctx: 'ValidateContext') -> list['ValidationFailure']:
     validation_failures = []
 
     missing_fields = []
@@ -39,7 +39,7 @@ def validate_struct_fields(fields: dict[str, 'UFieldDeclaration'],
         ref_field_type_declaration = reference_field.type_declaration
 
         nested_validation_failures = ref_field_type_declaration.validate(
-            field_value, select, fn)
+            field_value, ctx)
 
         nested_validation_failures_with_path = []
         for failure in nested_validation_failures:

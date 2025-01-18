@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from uapi.internal.types.UType import UType
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.internal.generation.GenerateContext import GenerateContext
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.validation.ValidationFailure import ValidationFailure
@@ -21,9 +22,9 @@ class UUnion(UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, value: object, select: dict[str, object] | None, fn: str | None, type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+    def validate(self, value: object, type_parameters: list['UTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateUnion import validate_union
-        return validate_union(value, select, fn, self.name, self.cases)
+        return validate_union(value, self.name, self.cases, ctx)
 
     def generate_random_value(self, ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomUnion import generate_random_union

@@ -21,6 +21,7 @@ async def handle_message(
     from uapi.internal.validation.ValidateHeaders import validate_headers
     from uapi.internal.validation.ValidateResult import validate_result
     from uapi.internal.types.UFn import UFn
+    from uapi.internal.validation.ValidateContext import ValidateContext
 
     response_headers: dict[str, object] = {}
     request_headers: dict[str, object] = request_message.header
@@ -101,7 +102,7 @@ async def handle_message(
     function_type_call: UUnion = function_type.call
 
     call_validation_failures: list[ValidationFailure] = function_type_call.validate(
-        request_body, None, None, []
+        request_body, [], ValidateContext(None, None)
     )
     if call_validation_failures:
         return get_invalid_error_message(
@@ -139,7 +140,8 @@ async def handle_message(
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:
         result_validation_failures: list[ValidationFailure] = result_union_type.validate(
-            result_union, select_struct_fields_header, function_type.name, []
+            result_union, [], ValidateContext(
+                select_struct_fields_header, function_type.name)
         )
         if result_validation_failures:
             res = get_invalid_error_message(

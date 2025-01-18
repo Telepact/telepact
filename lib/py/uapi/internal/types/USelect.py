@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, cast
 
 
 if TYPE_CHECKING:
+    from uapi.internal.validation.ValidateContext import ValidateContext
     from uapi.RandomGenerator import RandomGenerator
     from uapi.internal.types.UTypeDeclaration import UTypeDeclaration
     from uapi.internal.validation.ValidationFailure import ValidationFailure
@@ -19,10 +20,10 @@ class USelect(UType):
     def get_type_parameter_count(self) -> int:
         return 0
 
-    def validate(self, given_obj: object, select: dict[str, object] | None, fn: str | None,
-                 type_parameters: list['UTypeDeclaration']) -> list['ValidationFailure']:
+    def validate(self, given_obj: object,
+                 type_parameters: list['UTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
         from uapi.internal.validation.ValidateSelect import validate_select
-        return validate_select(given_obj, cast(str, fn), self.possible_selects)
+        return validate_select(given_obj, self.possible_selects, ctx)
 
     def generate_random_value(self, ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomSelect import generate_random_select
