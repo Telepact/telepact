@@ -27,6 +27,8 @@ def generate_random_struct(blueprint_value: object, use_blueprint_value: bool,
                 this_blueprint_value, this_use_blueprint_value, ctx)
         else:
             if not field_declaration.optional:
+                if not ctx.always_include_required_fields and ctx.random_generator.next_boolean():
+                    continue
                 value = type_declaration.generate_random_value(
                     None, False, ctx)
             else:
