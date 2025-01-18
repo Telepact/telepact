@@ -1,10 +1,2 @@
 uAPI
-Copyright 2022-2023 Brendan Bartels
-
-This project includes modified files originally developed by MessagePack (https://github.com/msgpack/msgpack-java):
-
-  - lib/java/src/main/java/org/msgpack/jackson/dataformat/MessagePackParser.java
-    - Added new function "isCurrentFieldId"
-
-  - lib/java/src/main/java/org/msgpack/jackson/dataformat/MessagePackGenerator.java
-    - Added new function "writeFieldId"
+Copyright 2022-2025 Brendan Bartels
