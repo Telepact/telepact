@@ -36,6 +36,9 @@ export function generateRandomStruct(
             value = typeDeclaration.generateRandomValue(thisBlueprintValue, thisUseBlueprintValue, ctx);
         } else {
             if (!fieldDeclaration.optional) {
+                if (!ctx.alwaysIncludeRequiredFields && ctx.randomGenerator.nextBoolean()) {
+                    continue;
+                }
                 value = typeDeclaration.generateRandomValue(null, false, ctx);
             } else {
                 if (!ctx.includeOptionalFields || (ctx.randomizeOptionalFields && ctx.randomGenerator.nextBoolean())) {

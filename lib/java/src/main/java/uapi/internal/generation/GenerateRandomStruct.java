@@ -33,6 +33,9 @@ public class GenerateRandomStruct {
                         thisBlueprintValue, thisUseBlueprintValue, ctx);
             } else {
                 if (!fieldDeclaration.optional) {
+                    if (!ctx.alwaysIncludeRequiredFields && ctx.randomGenerator.nextBoolean()) {
+                        continue;
+                    }
                     value = typeDeclaration
                             .generateRandomValue(null, false, ctx);
                 } else {
