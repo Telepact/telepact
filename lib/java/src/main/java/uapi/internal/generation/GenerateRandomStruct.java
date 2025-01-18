@@ -11,8 +11,10 @@ import uapi.internal.types.UTypeDeclaration;
 
 public class GenerateRandomStruct {
     public static Object generateRandomStruct(
-            Map<String, UFieldDeclaration> referenceStruct, GenerateContext ctx) {
-        final var startingStruct = ctx.useBlueprintValue ? (Map<String, Object>) ctx.blueprintValue : new HashMap<>();
+            Object blueprintValue, boolean useBlueprintValue,
+            Map<String, UFieldDeclaration> referenceStruct,
+            GenerateContext ctx) {
+        final var startingStruct = useBlueprintValue ? (Map<String, Object>) blueprintValue : new HashMap<>();
 
         final var sortedReferenceStruct = new ArrayList<>(referenceStruct.entrySet());
         Collections.sort(sortedReferenceStruct, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
@@ -21,25 +23,25 @@ public class GenerateRandomStruct {
         for (final var field : sortedReferenceStruct) {
             final var fieldName = field.getKey();
             final var fieldDeclaration = field.getValue();
-            final var blueprintValue = startingStruct.get(fieldName);
-            final var useBlueprintValue = startingStruct.containsKey(fieldName);
+            final var thisBlueprintValue = startingStruct.get(fieldName);
+            final var thisUseBlueprintValue = startingStruct.containsKey(fieldName);
             final UTypeDeclaration typeDeclaration = fieldDeclaration.typeDeclaration;
 
             final Object value;
-            if (useBlueprintValue) {
+            if (thisUseBlueprintValue) {
                 value = typeDeclaration.generateRandomValue(
-                        ctx.copyWithNewBlueprintValueAndUseBlueprintValue(blueprintValue, useBlueprintValue));
+                        thisBlueprintValue, thisUseBlueprintValue, ctx);
             } else {
                 if (!fieldDeclaration.optional) {
                     value = typeDeclaration
-                            .generateRandomValue(ctx.copyWithNewBlueprintValueAndUseBlueprintValue(null, false));
+                            .generateRandomValue(null, false, ctx);
                 } else {
                     if (!ctx.includeOptionalFields
                             || (ctx.randomizeOptionalFields && ctx.randomGenerator.nextBoolean())) {
                         continue;
                     }
                     value = typeDeclaration
-                            .generateRandomValue(ctx.copyWithNewBlueprintValueAndUseBlueprintValue(null, false));
+                            .generateRandomValue(null, false, ctx);
                 }
             }
 

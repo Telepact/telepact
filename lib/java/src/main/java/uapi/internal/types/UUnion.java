@@ -35,8 +35,9 @@ public class UUnion implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomUnion(this.cases, ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomUnion(blueprintValue, useBlueprintValue, this.cases, ctx);
     }
 
     @Override

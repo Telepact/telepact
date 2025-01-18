@@ -1,6 +1,7 @@
 import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
 import { UFn } from '../../internal/types/UFn';
 import { ValidationFailure } from '../../internal/validation/ValidationFailure';
+import { ValidateContext } from './ValidateContext';
 
 export function validateHeaders(
     headers: Record<string, any>,
@@ -13,7 +14,10 @@ export function validateHeaders(
         const headerValue = headers[header];
         const field = parsedRequestHeaders[header];
         if (field) {
-            const thisValidationFailures = field.typeDeclaration.validate(headerValue, null, functionType.name);
+            const thisValidationFailures = field.typeDeclaration.validate(
+                headerValue,
+                new ValidateContext(null, functionType.name),
+            );
             const thisValidationFailuresPath = thisValidationFailures.map(
                 (e) => new ValidationFailure([header, ...e.path], e.reason, e.data),
             );

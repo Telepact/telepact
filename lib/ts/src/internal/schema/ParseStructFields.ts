@@ -33,7 +33,7 @@ export function parseStructFields(
         }
 
         try {
-            const parsedField = parseField(fieldDeclaration, referenceStruct[fieldDeclaration], ctx);
+            const parsedField = parseField(path, fieldDeclaration, referenceStruct[fieldDeclaration], ctx);
             const fieldName = parsedField.fieldName;
             fields[fieldName] = parsedField;
         } catch (e) {

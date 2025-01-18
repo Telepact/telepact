@@ -209,13 +209,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==1.2.0"
         },
-        "uapi": {
-            "hashes": [
-                "sha256:208b42a6bff6562804f017a652cab4a0a5c47b657e61a41a12013e6d02787758"
-            ],
-            "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
-            "version": "==0.0.1"
-        },
         "uapicodegen": {
             "hashes": [
                 "sha256:4d41db6b5210ccafe49b8884ff1057d99283af896acbf31342fbde65d5a7e655",

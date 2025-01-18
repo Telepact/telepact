@@ -5,13 +5,18 @@ import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnex
 import { ParseContext } from '../../internal/schema/ParseContext';
 import { parseTypeDeclaration } from './ParseTypeDeclaration';
 
-export function parseField(fieldDeclaration: string, typeDeclarationValue: any, ctx: ParseContext): UFieldDeclaration {
+export function parseField(
+    path: any[],
+    fieldDeclaration: string,
+    typeDeclarationValue: any,
+    ctx: ParseContext,
+): UFieldDeclaration {
     const regexString = '^([a-z][a-zA-Z0-9_]*)(!)?$';
     const regex = new RegExp(regexString);
 
     const matcher = fieldDeclaration.match(regex);
     if (!matcher) {
-        const finalPath = [...ctx.path, fieldDeclaration];
+        const finalPath = [...path, fieldDeclaration];
         throw new UApiSchemaParseError(
             [new SchemaParseFailure(ctx.documentName, finalPath, 'KeyRegexMatchFailed', { regex: regexString })],
             ctx.uapiSchemaDocumentNamesToJson,
@@ -21,7 +26,7 @@ export function parseField(fieldDeclaration: string, typeDeclarationValue: any, 
     const fieldName = matcher[0];
     const optional = Boolean(matcher[2]);
 
-    const thisPath = [...ctx.path, fieldName];
+    const thisPath = [...path, fieldName];
 
     if (!Array.isArray(typeDeclarationValue)) {
         throw new UApiSchemaParseError(
@@ -31,7 +36,7 @@ export function parseField(fieldDeclaration: string, typeDeclarationValue: any, 
     }
     const typeDeclarationArray = typeDeclarationValue;
 
-    const typeDeclaration = parseTypeDeclaration(typeDeclarationArray, ctx.copy({ path: thisPath }));
+    const typeDeclaration = parseTypeDeclaration(thisPath, typeDeclarationArray, ctx);
 
     return new UFieldDeclaration(fieldName, typeDeclaration, optional);
 }

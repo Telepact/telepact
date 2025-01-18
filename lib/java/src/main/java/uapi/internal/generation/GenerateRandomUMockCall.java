@@ -1,6 +1,5 @@
 package uapi.internal.generation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public class GenerateRandomUMockCall {
 
         UFn selectedFn = functions.get(ctx.randomGenerator.nextIntWithCeiling(functions.size()));
 
-        return GenerateRandomUnion.generateRandomUnion(selectedFn.call.cases,
+        return GenerateRandomUnion.generateRandomUnion(null, false, selectedFn.call.cases,
                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
     }
 }

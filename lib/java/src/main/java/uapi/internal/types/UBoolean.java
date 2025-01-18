@@ -24,8 +24,9 @@ public class UBoolean implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomBoolean(ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomBoolean(blueprintValue, useBlueprintValue, ctx);
     }
 
     @Override

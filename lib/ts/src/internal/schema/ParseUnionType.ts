@@ -128,7 +128,7 @@ export function parseUnionType(
         const unionCaseStruct = entry[1];
 
         try {
-            const fields = parseStructFields(path, unionCaseStruct, ctx);
+            const fields = parseStructFields(unionKeyPath, unionCaseStruct, ctx);
             const unionStruct = new UStruct(`${schemaKey}.${unionCase}`, fields);
             cases[unionCase] = unionStruct;
             caseIndices[unionCase] = i;

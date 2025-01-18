@@ -87,7 +87,7 @@ export function parseFunctionType(
     }
 
     const fnSelectType = derivePossibleSelect(schemaKey, resultType as UUnion);
-    const selectType = getOrParseType(path, '_ext.Select_', ctx) as USelect;
+    const selectType = getOrParseType([], '_ext.Select_', ctx) as USelect;
     selectType.possibleSelects[schemaKey] = fnSelectType;
 
     return new UFn(schemaKey, callType as UUnion, resultType as UUnion, errorsRegex as string);

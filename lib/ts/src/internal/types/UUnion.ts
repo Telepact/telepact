@@ -34,7 +34,7 @@ export class UUnion implements UType {
         typeParameters: UTypeDeclaration[],
         ctx: GenerateContext,
     ): any {
-        return generateRandomUnion(this.cases, ctx);
+        return generateRandomUnion(blueprintValue, useBlueprintValue, this.cases, ctx);
     }
 
     getName(): string {

@@ -23,7 +23,7 @@ export function parseHeadersType(
     const typeDeclarationArray = typeDeclarationValue;
 
     try {
-        const typeDeclaration = parseTypeDeclaration(typeDeclarationArray, ctx);
+        const typeDeclaration = parseTypeDeclaration(path, typeDeclarationArray, ctx);
 
         return new UFieldDeclaration(headerField, typeDeclaration, false);
     } catch (e) {

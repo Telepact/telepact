@@ -1,5 +1,3 @@
-import { UTypeDeclaration } from '../types/UTypeDeclaration';
-
 export class ValidateContext {
     select: { [key: string]: any } | null;
     fn: string | null;

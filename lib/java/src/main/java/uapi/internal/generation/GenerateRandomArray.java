@@ -3,17 +3,20 @@ package uapi.internal.generation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenerateRandomArray {
-    public static Object generateRandomArray(GenerateContext ctx) {
-        final var nestedTypeDeclaration = ctx.typeParameters.get(0);
+import uapi.internal.types.UTypeDeclaration;
 
-        if (ctx.useBlueprintValue) {
-            final var startingArray = (List<Object>) ctx.blueprintValue;
+public class GenerateRandomArray {
+    public static Object generateRandomArray(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        final var nestedTypeDeclaration = typeParameters.get(0);
+
+        if (useBlueprintValue) {
+            final var startingArray = (List<Object>) blueprintValue;
 
             final var array = new ArrayList<Object>();
             for (final var startingArrayValue : startingArray) {
                 final var value = nestedTypeDeclaration
-                        .generateRandomValue(ctx.copyWithNewBlueprintValue(startingArrayValue));
+                        .generateRandomValue(startingArrayValue, true, ctx);
 
                 array.add(value);
             }
@@ -24,7 +27,7 @@ public class GenerateRandomArray {
 
             final var array = new ArrayList<Object>();
             for (int i = 0; i < length; i += 1) {
-                final var value = nestedTypeDeclaration.generateRandomValue(ctx);
+                final var value = nestedTypeDeclaration.generateRandomValue(null, false, ctx);
 
                 array.add(value);
             }

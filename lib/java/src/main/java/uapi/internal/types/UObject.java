@@ -24,8 +24,9 @@ public class UObject implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomObject(ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomObject(blueprintValue, useBlueprintValue, typeParameters, ctx);
     }
 
     @Override

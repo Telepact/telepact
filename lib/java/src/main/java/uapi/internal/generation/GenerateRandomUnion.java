@@ -4,21 +4,25 @@ import static uapi.internal.generation.GenerateRandomStruct.generateRandomStruct
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import uapi.internal.types.UStruct;
+import uapi.internal.types.UTypeDeclaration;
 
 public class GenerateRandomUnion {
-    public static Object generateRandomUnion(Map<String, UStruct> unionCasesReference, GenerateContext ctx) {
-        if (ctx.useBlueprintValue) {
-            final var startingUnion = (Map<String, Object>) ctx.blueprintValue;
+    public static Object generateRandomUnion(Object blueprintValue,
+            boolean useBlueprintValue, Map<String, UStruct> unionCasesReference,
+            GenerateContext ctx) {
+        if (useBlueprintValue) {
+            final var startingUnion = (Map<String, Object>) blueprintValue;
             final var entry = startingUnion.entrySet().stream().findAny().get();
             final var unionCase = entry.getKey();
             final var unionStructType = unionCasesReference.get(unionCase);
             final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
 
             return Map.of(unionCase,
-                    generateRandomStruct(unionStructType.fields, ctx.copyWithNewBlueprintValue(unionStartingStruct)));
+                    generateRandomStruct(unionStartingStruct, true, unionStructType.fields, ctx));
         } else {
             final var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
 
@@ -30,7 +34,7 @@ public class GenerateRandomUnion {
             final var unionData = unionEntry.getValue();
 
             return Map.of(unionCase,
-                    generateRandomStruct(unionData.fields, ctx));
+                    generateRandomStruct(null, false, unionData.fields, ctx));
         }
     }
 }

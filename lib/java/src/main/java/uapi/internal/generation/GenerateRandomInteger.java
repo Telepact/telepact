@@ -1,9 +1,9 @@
 package uapi.internal.generation;
 
 public class GenerateRandomInteger {
-    public static Object generateRandomInteger(GenerateContext ctx) {
-        if (ctx.useBlueprintValue) {
-            return ctx.blueprintValue;
+    public static Object generateRandomInteger(Object blueprintValue, boolean useBlueprintValue, GenerateContext ctx) {
+        if (useBlueprintValue) {
+            return blueprintValue;
         } else {
             return ctx.randomGenerator.nextInt();
         }

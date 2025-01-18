@@ -96,9 +96,10 @@ public class MockHandle {
                                 final var includeOptionalFields = false;
                                 final var alwaysIncludeRequiredFields = true;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
-                                        new GenerateContext(stub.thenResult, useBlueprintValue,
+                                        stub.thenResult, useBlueprintValue, List.of(),
+                                        new GenerateContext(
                                                 includeOptionalFields, randomizeOptionalFieldGeneration,
-                                                alwaysIncludeRequiredFields, List.of(), functionName,
+                                                alwaysIncludeRequiredFields, functionName,
                                                 random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -111,10 +112,10 @@ public class MockHandle {
                                 final var includeOptionalFields = false;
                                 final var alwaysIncludeRequiredFields = true;
                                 final var result = (Map<String, Object>) definition.result.generateRandomValue(
+                                        stub.thenResult, useBlueprintValue, List.of(),
                                         new GenerateContext(
-                                                stub.thenResult, useBlueprintValue,
                                                 includeOptionalFields, randomizeOptionalFieldGeneration,
-                                                alwaysIncludeRequiredFields, List.of(), functionName,
+                                                alwaysIncludeRequiredFields, functionName,
                                                 random));
                                 if (stub.count > 0) {
                                     stub.count -= 1;
@@ -136,9 +137,10 @@ public class MockHandle {
                     final var includeOptionalFields = true;
                     final var alwaysIncludeRequiredFields = true;
                     final var randomOkStruct = okStructRef
-                            .generateRandomValue(new GenerateContext(new HashMap<>(), useBlueprintValue,
-                                    includeOptionalFields, randomizeOptionalFieldGeneration,
-                                    alwaysIncludeRequiredFields, List.of(), functionName, random));
+                            .generateRandomValue(new HashMap<>(), useBlueprintValue, List.of(),
+                                    new GenerateContext(
+                                            includeOptionalFields, randomizeOptionalFieldGeneration,
+                                            alwaysIncludeRequiredFields, functionName, random));
                     return new Message(Map.of(), Map.of("Ok_", randomOkStruct));
                 } else {
                     throw new UApiError("Unexpected unknown function: %s".formatted(functionName));

@@ -37,7 +37,7 @@ export class UFn extends UType {
         typeParameters: UTypeDeclaration[],
         ctx: GenerateContext,
     ): any {
-        return generateRandomUnion(this.call.cases, ctx);
+        return generateRandomUnion(blueprintValue, useBlueprintValue, this.call.cases, ctx);
     }
 
     getName(): string {

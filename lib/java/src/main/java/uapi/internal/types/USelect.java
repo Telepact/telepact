@@ -29,7 +29,8 @@ public class USelect implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
         return generateRandomSelect(this.possibleSelects, ctx);
     }
 

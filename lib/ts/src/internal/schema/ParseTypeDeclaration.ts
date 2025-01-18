@@ -5,15 +5,15 @@ import { getOrParseType } from '../../internal/schema/GetOrParseType';
 import { getTypeUnexpectedParseFailure } from '../../internal/schema/GetTypeUnexpectedParseFailure';
 import { ParseContext } from '../../internal/schema/ParseContext';
 
-export function parseTypeDeclaration(typeDeclarationArray: any[], ctx: ParseContext): UTypeDeclaration {
+export function parseTypeDeclaration(path: any[], typeDeclarationArray: any[], ctx: ParseContext): UTypeDeclaration {
     if (!typeDeclarationArray.length) {
         throw new UApiSchemaParseError(
-            [new SchemaParseFailure(ctx.documentName, ctx.path, 'EmptyArrayDisallowed', {})],
+            [new SchemaParseFailure(ctx.documentName, path, 'EmptyArrayDisallowed', {})],
             ctx.uapiSchemaDocumentNamesToJson,
         );
     }
 
-    const basePath = ctx.path.concat([0]);
+    const basePath = path.concat([0]);
     const baseType = typeDeclarationArray[0];
 
     if (typeof baseType !== 'string') {
@@ -41,13 +41,13 @@ export function parseTypeDeclaration(typeDeclarationArray: any[], ctx: ParseCont
     const typeName = matcher[1];
     const nullable = !!matcher[2];
 
-    const type_ = getOrParseType(typeName, ctx.copy({ path: basePath }));
+    const type_ = getOrParseType(basePath, typeName, ctx);
 
     const givenTypeParameterCount = typeDeclarationArray.length - 1;
     if (type_.getTypeParameterCount() !== givenTypeParameterCount) {
         throw new UApiSchemaParseError(
             [
-                new SchemaParseFailure(ctx.documentName, ctx.path, 'ArrayLengthUnexpected', {
+                new SchemaParseFailure(ctx.documentName, path, 'ArrayLengthUnexpected', {
                     actual: typeDeclarationArray.length,
                     expected: type_.getTypeParameterCount() + 1,
                 }),
@@ -62,7 +62,7 @@ export function parseTypeDeclaration(typeDeclarationArray: any[], ctx: ParseCont
 
     for (let index = 1; index <= givenTypeParameters.length; index++) {
         const e = givenTypeParameters[index - 1];
-        const loopPath = ctx.path.concat([index]);
+        const loopPath = path.concat([index]);
 
         if (!Array.isArray(e)) {
             const thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName, loopPath, e, 'Array');
@@ -71,7 +71,7 @@ export function parseTypeDeclaration(typeDeclarationArray: any[], ctx: ParseCont
         }
 
         try {
-            const typeParameterTypeDeclaration = parseTypeDeclaration(e, ctx.copy({ path: loopPath }));
+            const typeParameterTypeDeclaration = parseTypeDeclaration(loopPath, e, ctx);
 
             typeParameters.push(typeParameterTypeDeclaration);
         } catch (e2) {

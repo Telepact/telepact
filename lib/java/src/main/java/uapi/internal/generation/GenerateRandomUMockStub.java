@@ -28,9 +28,9 @@ public class GenerateRandomUMockStub {
         var argFields = selectedFn.call.cases.get(selectedFn.name).fields;
         var okFields = selectedFn.result.cases.get("Ok_").fields;
 
-        var arg = generateRandomStruct(argFields,
+        var arg = generateRandomStruct(null, false, argFields,
                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
-        var okResult = generateRandomStruct(okFields,
+        var okResult = generateRandomStruct(null, false, okFields,
                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
 
         return Map.ofEntries(

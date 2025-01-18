@@ -27,7 +27,9 @@ public class UTypeDeclaration {
         return validateValueOfType(value, this.type, this.nullable, this.typeParameters, ctx);
     }
 
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomValueOfType(this.type, this.nullable, this.typeParameters, ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            GenerateContext ctx) {
+        return generateRandomValueOfType(blueprintValue, useBlueprintValue, this.type, this.nullable,
+                this.typeParameters, ctx);
     }
 }

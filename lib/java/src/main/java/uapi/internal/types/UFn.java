@@ -36,8 +36,9 @@ public class UFn implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomUnion(this.call.cases, ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomUnion(blueprintValue, useBlueprintValue, this.call.cases, ctx);
     }
 
     @Override

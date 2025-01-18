@@ -13,5 +13,5 @@ export function generateRandomUMockCall(types: { [key: string]: UType }, ctx: Ge
 
     const selectedFn = functions[Math.floor(ctx.randomGenerator.nextIntWithCeiling(functions.length))];
 
-    return generateRandomUnion(selectedFn.call.cases, ctx.copy({ alwaysIncludeRequiredFields: false }));
+    return generateRandomUnion(null, false, selectedFn.call.cases, ctx.copy({ alwaysIncludeRequiredFields: false }));
 }

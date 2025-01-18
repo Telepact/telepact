@@ -23,8 +23,9 @@ public class UString implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomString(ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomString(blueprintValue, useBlueprintValue, ctx);
     }
 
     @Override

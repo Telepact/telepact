@@ -24,8 +24,9 @@ public class UArray implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomArray(ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomArray(blueprintValue, useBlueprintValue, typeParameters, ctx);
     }
 
     @Override

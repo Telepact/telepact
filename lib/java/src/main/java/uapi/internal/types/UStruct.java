@@ -33,8 +33,9 @@ public class UStruct implements UType {
     }
 
     @Override
-    public Object generateRandomValue(GenerateContext ctx) {
-        return generateRandomStruct(this.fields, ctx);
+    public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        return generateRandomStruct(blueprintValue, useBlueprintValue, this.fields, ctx);
     }
 
     @Override

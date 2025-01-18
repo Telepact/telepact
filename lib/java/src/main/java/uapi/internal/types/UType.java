@@ -12,7 +12,8 @@ public interface UType {
         public List<ValidationFailure> validate(Object value,
                         List<UTypeDeclaration> typeParameters, ValidateContext ctx);
 
-        public Object generateRandomValue(GenerateContext ctx);
+        public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
+                        List<UTypeDeclaration> typeParameters, GenerateContext ctx);
 
         public String getName();
 }

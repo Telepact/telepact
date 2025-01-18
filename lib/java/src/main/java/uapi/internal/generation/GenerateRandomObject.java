@@ -1,21 +1,25 @@
 package uapi.internal.generation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class GenerateRandomObject {
-    public static Object generateRandomObject(GenerateContext ctx) {
-        final var nestedTypeDeclaration = ctx.typeParameters.get(0);
+import uapi.internal.types.UTypeDeclaration;
 
-        if (ctx.useBlueprintValue) {
-            final var startingObj = (Map<String, Object>) ctx.blueprintValue;
+public class GenerateRandomObject {
+    public static Object generateRandomObject(Object blueprintValue, boolean useBlueprintValue,
+            List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
+        final var nestedTypeDeclaration = typeParameters.get(0);
+
+        if (useBlueprintValue) {
+            final var startingObj = (Map<String, Object>) blueprintValue;
 
             final var obj = new TreeMap<String, Object>();
             for (final var startingObjEntry : startingObj.entrySet()) {
                 final var key = startingObjEntry.getKey();
                 final var startingObjValue = startingObjEntry.getValue();
                 final var value = nestedTypeDeclaration
-                        .generateRandomValue(ctx.copyWithNewBlueprintValue(startingObjValue));
+                        .generateRandomValue(startingObjValue, useBlueprintValue, ctx);
                 obj.put(key, value);
             }
 
@@ -26,7 +30,7 @@ public class GenerateRandomObject {
             final var obj = new TreeMap<String, Object>();
             for (int i = 0; i < length; i += 1) {
                 final var key = ctx.randomGenerator.nextString();
-                final var value = nestedTypeDeclaration.generateRandomValue(ctx);
+                final var value = nestedTypeDeclaration.generateRandomValue(null, false, ctx);
                 obj.put(key, value);
             }
 
