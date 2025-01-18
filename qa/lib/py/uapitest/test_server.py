@@ -256,7 +256,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
 
         if use_codegen:
             print(f"     :H {request_bytes}")
-            message = code_gen_handler.handler(request_message)
+            message = await code_gen_handler.handler(request_message)
             message.header['_codegens'] = True
         else:
             print(f"    <-s {request_bytes}")

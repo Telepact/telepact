@@ -5,10 +5,10 @@ from uapitest.gen.all_ import example__Input_, example__Output_, test__Input_, t
 
 class CodeGenHandler(ServerHandler_):
 
-    def example(self, headers: dict[str, object], input: example__Input_) -> Tuple[dict[str, object], example__Output_]:
+    async def example(self, headers: dict[str, object], input: example__Input_) -> Tuple[dict[str, object], example__Output_]:
         raise NotImplementedError("Unimplemented method 'example'")
 
-    def test(self, headers: dict[str, object], input: test__Input_) -> Tuple[dict[str, object], test__Output_]:
+    async def test(self, headers: dict[str, object], input: test__Input_) -> Tuple[dict[str, object], test__Output_]:
         output = test__Output__Ok_()
 
         try:
