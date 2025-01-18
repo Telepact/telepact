@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_key: str,
+def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[str, object], schema_key: str,
                      ignore_keys: list[str], required_keys: list[str],
                      ctx: 'ParseContext') -> 'UUnion':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -26,11 +26,11 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
 
     if other_keys:
         for k in other_keys:
-            loop_path = ctx.path + [k]
+            loop_path = path + [k]
             parse_failures.append(SchemaParseFailure(
                 ctx.document_name, loop_path, "ObjectKeyDisallowed", {}))
 
-    this_path = ctx.path + [schema_key]
+    this_path = path + [schema_key]
     def_init = union_definition_as_pseudo_json[schema_key]
 
     if not isinstance(def_init, list):
@@ -107,8 +107,8 @@ def parse_union_type(union_definition_as_pseudo_json: dict[str, object], schema_
         union_case_struct = entry[1]
 
         try:
-            fields = parse_struct_fields(
-                union_case_struct, ctx.copy(path=union_key_path))
+            fields = parse_struct_fields(union_key_path,
+                                         union_case_struct, ctx)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue

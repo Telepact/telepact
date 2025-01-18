@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def parse_struct_type(struct_definition_as_pseudo_json: dict[str, object],
+def parse_struct_type(path: list[object], struct_definition_as_pseudo_json: dict[str, object],
                       schema_key: str, ignore_keys: list[str],
                       ctx: 'ParseContext') -> 'UStruct':
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
@@ -25,11 +25,11 @@ def parse_struct_type(struct_definition_as_pseudo_json: dict[str, object],
 
     if other_keys:
         for k in other_keys:
-            loop_path = ctx.path + [k]
+            loop_path = path + [k]
             parse_failures.append(SchemaParseFailure(
                 ctx.document_name, loop_path, "ObjectKeyDisallowed", {}))
 
-    this_path = ctx.path + [schema_key]
+    this_path = path + [schema_key]
     def_init = cast(dict[str, object],
                     struct_definition_as_pseudo_json.get(schema_key))
 
@@ -45,6 +45,6 @@ def parse_struct_type(struct_definition_as_pseudo_json: dict[str, object],
         raise UApiSchemaParseError(
             parse_failures, ctx.uapi_schema_document_names_to_json)
 
-    fields = parse_struct_fields(definition, ctx.copy(path=this_path))
+    fields = parse_struct_fields(this_path, definition, ctx)
 
     return UStruct(schema_key, fields)

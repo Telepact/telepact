@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from uapi.internal.schema.ParseContext import ParseContext
 
 
-def parse_field(field_declaration: str, type_declaration_value: object,
+def parse_field(path: list[object], field_declaration: str, type_declaration_value: object,
                 ctx: 'ParseContext') -> 'UFieldDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetTypeUnexpectedParseFailure import get_type_unexpected_parse_failure
@@ -19,7 +19,7 @@ def parse_field(field_declaration: str, type_declaration_value: object,
 
     matcher = regex.match(field_declaration)
     if not matcher:
-        final_path = ctx.path + [field_declaration]
+        final_path = path + [field_declaration]
         raise UApiSchemaParseError([SchemaParseFailure(ctx.document_name, final_path,
                                                        "KeyRegexMatchFailed",
                                                        {"regex": regex_string})], ctx.uapi_schema_document_names_to_json)
@@ -27,7 +27,7 @@ def parse_field(field_declaration: str, type_declaration_value: object,
     field_name = matcher.group(0)
     optional = bool(matcher.group(2))
 
-    this_path = ctx.path + [field_name]
+    this_path = path + [field_name]
 
     if not isinstance(type_declaration_value, list):
         raise UApiSchemaParseError(get_type_unexpected_parse_failure(
@@ -37,7 +37,7 @@ def parse_field(field_declaration: str, type_declaration_value: object,
             "Array"), ctx.uapi_schema_document_names_to_json)
     type_declaration_array = type_declaration_value
 
-    type_declaration = parse_type_declaration(
-        type_declaration_array, ctx.copy(path=this_path))
+    type_declaration = parse_type_declaration(this_path,
+                                              type_declaration_array, ctx)
 
     return UFieldDeclaration(field_name, type_declaration, optional)

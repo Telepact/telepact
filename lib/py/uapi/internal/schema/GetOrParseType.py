@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from uapi.internal.types.UType import UType
 
 
-def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
+def get_or_parse_type(path: list[object], type_name: str, ctx: 'ParseContext') -> 'UType':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.types.UObject import UObject
     from uapi.internal.types.UArray import UArray
@@ -41,7 +41,7 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
     matcher = regex.match(type_name)
     if not matcher:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(ctx.document_name, ctx.path, "StringRegexMatchFailed", {
+            [SchemaParseFailure(ctx.document_name, path, "StringRegexMatchFailed", {
                                 "regex": regex_string})],
             ctx.uapi_schema_document_names_to_json)
 
@@ -62,7 +62,7 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
         str, ctx.schema_keys_to_document_name.get(custom_type_name))
     if this_index is None:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(ctx.document_name, ctx.path, "TypeUnknown", {
+            [SchemaParseFailure(ctx.document_name, path, "TypeUnknown", {
                                 "name": custom_type_name})],
             ctx.uapi_schema_document_names_to_json)
 
@@ -73,15 +73,16 @@ def get_or_parse_type(type_name: str, ctx: 'ParseContext') -> 'UType':
 
     type: 'UType'
     try:
+        this_path: list[object] = [this_index]
         if custom_type_name.startswith("struct"):
-            type = parse_struct_type(definition, custom_type_name, [],
-                                     ctx.copy(document_name=this_document_name, path=[this_index]))
+            type = parse_struct_type(this_path, definition, custom_type_name, [],
+                                     ctx.copy(document_name=this_document_name))
         elif custom_type_name.startswith("union"):
-            type = parse_union_type(definition, custom_type_name, [], [],
-                                    ctx.copy(document_name=this_document_name, path=[this_index]))
+            type = parse_union_type(this_path, definition, custom_type_name, [], [],
+                                    ctx.copy(document_name=this_document_name))
         elif custom_type_name.startswith("fn"):
-            type = parse_function_type(this_document_name, [this_index], definition, custom_type_name,
-                                       ctx.copy(document_name=this_document_name, path=[this_index]))
+            type = parse_function_type(this_path, definition, custom_type_name,
+                                       ctx.copy(document_name=this_document_name))
         else:
             possible_type_extension = {
                 '_ext.Select_': USelect(),

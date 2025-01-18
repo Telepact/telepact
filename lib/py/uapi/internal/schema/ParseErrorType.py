@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from uapi.internal.schema.ParseContext import ParseContext
 
 
-def parse_error_type(error_definition_as_parsed_json: dict[str, object],
+def parse_error_type(path: list[object], error_definition_as_parsed_json: dict[str, object],
                      schema_key: str,
                      ctx: 'ParseContext') -> 'UError':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
@@ -20,7 +20,7 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
 
     if other_keys:
         for k in other_keys:
-            loop_path = ctx.path + [k]
+            loop_path = path + [k]
             parse_failures.append(SchemaParseFailure(
                 ctx.document_name, cast(list[object], loop_path), "ObjectKeyDisallowed", {}))
 
@@ -28,7 +28,7 @@ def parse_error_type(error_definition_as_parsed_json: dict[str, object],
         raise UApiSchemaParseError(
             parse_failures, ctx.uapi_schema_document_names_to_json)
 
-    error = parse_union_type(error_definition_as_parsed_json, schema_key, [], [],
+    error = parse_union_type(path, error_definition_as_parsed_json, schema_key, [], [],
                              ctx)
 
     return UError(schema_key, error)

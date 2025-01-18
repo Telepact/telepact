@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from uapi.internal.schema.ParseContext import ParseContext
 
 
-def parse_type_declaration(type_declaration_array: list[object],
+def parse_type_declaration(path: list[object], type_declaration_array: list[object],
                            ctx: 'ParseContext') -> 'UTypeDeclaration':
     from uapi.UApiSchemaParseError import UApiSchemaParseError
     from uapi.internal.schema.GetOrParseType import get_or_parse_type
@@ -16,9 +16,9 @@ def parse_type_declaration(type_declaration_array: list[object],
 
     if not type_declaration_array:
         raise UApiSchemaParseError(
-            [SchemaParseFailure(ctx.document_name, ctx.path, "EmptyArrayDisallowed", {})], ctx.uapi_schema_document_names_to_json)
+            [SchemaParseFailure(ctx.document_name, path, "EmptyArrayDisallowed", {})], ctx.uapi_schema_document_names_to_json)
 
-    base_path = ctx.path + [0]
+    base_path = path + [0]
     base_type = type_declaration_array[0]
 
     if not isinstance(base_type, str):
@@ -40,11 +40,11 @@ def parse_type_declaration(type_declaration_array: list[object],
     type_name = matcher.group(1)
     nullable = bool(matcher.group(2))
 
-    type_ = get_or_parse_type(type_name, ctx.copy(path=base_path))
+    type_ = get_or_parse_type(base_path, type_name, ctx)
 
     given_type_parameter_count = len(type_declaration_array) - 1
     if type_.get_type_parameter_count() != given_type_parameter_count:
-        raise UApiSchemaParseError([SchemaParseFailure(ctx.document_name, ctx.path, "ArrayLengthUnexpected",
+        raise UApiSchemaParseError([SchemaParseFailure(ctx.document_name, path, "ArrayLengthUnexpected",
                                                        {"actual": len(type_declaration_array),
                                                         "expected": type_.get_type_parameter_count() + 1})], ctx.uapi_schema_document_names_to_json)
 
@@ -53,7 +53,7 @@ def parse_type_declaration(type_declaration_array: list[object],
     given_type_parameters = type_declaration_array[1:]
 
     for index, e in enumerate(given_type_parameters, start=1):
-        loop_path = ctx.path + [index]
+        loop_path = path + [index]
 
         if not isinstance(e, list):
             this_parse_failures = get_type_unexpected_parse_failure(
@@ -63,7 +63,7 @@ def parse_type_declaration(type_declaration_array: list[object],
 
         try:
             type_parameter_type_declaration = parse_type_declaration(
-                e, ctx.copy(path=loop_path))
+                loop_path, e, ctx)
 
             type_parameters.append(type_parameter_type_declaration)
         except UApiSchemaParseError as e2:

@@ -135,10 +135,10 @@ def parse_uapi_schema(
 
         try:
             get_or_parse_type(
+                [this_index],
                 schema_key,
                 ParseContext(
                     document_name,
-                    [this_index],
                     u_api_schema_document_name_to_pseudo_json,
                     uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
@@ -167,11 +167,11 @@ def parse_uapi_schema(
 
         try:
             error = parse_error_type(
+                [this_index],
                 def_,
                 this_key,
                 ParseContext(
                     this_document_name,
-                    [this_index],
                     u_api_schema_document_name_to_pseudo_json,
                     uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
@@ -220,11 +220,11 @@ def parse_uapi_schema(
 
         try:
             request_header_type = parse_headers_type(
+                [this_index, request_header_key],
                 def_[request_header_key],
                 header_field,
                 ParseContext(
                     this_document_name,
-                    [this_index, request_header_key],
                     u_api_schema_document_name_to_pseudo_json,
                     uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
@@ -249,11 +249,11 @@ def parse_uapi_schema(
 
         try:
             response_header_type = parse_headers_type(
+                [this_index, response_header_key],
                 def_[response_header_key],
                 header_field,
                 ParseContext(
                     this_document_name,
-                    [this_index, response_header_key],
                     u_api_schema_document_name_to_pseudo_json,
                     uapi_schema_document_names_to_json,
                     schema_keys_to_document_names,
