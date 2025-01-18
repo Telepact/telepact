@@ -168,10 +168,10 @@ public {% if modifier %}{{ modifier }} {% endif %}class {{ display_name }}{% if 
 
 {%- macro union(display_name, doc, cases) %}
     {{ docstring(doc) }}
-public interface {{ display_name }} {
+public sealed interface {{ display_name }} {
 
 
-    public static class NoMatch_ implements {{ display_name }} {
+    public static final class NoMatch_ implements {{ display_name }} {
         private final Map<String, Object> payload;
 
         public NoMatch_(Map<String, Object> payload) {
@@ -185,7 +185,7 @@ public interface {{ display_name }} {
 
     {%- for case_entry in cases %}
         {% set case_key = case_entry | find_case_key %}
-        {{ struct(case_key, case_entry['///'], case_entry[case_key], display_name, case_key, 'static') | indent }}
+        {{ struct(case_key, case_entry['///'], case_entry[case_key], display_name, case_key, 'static final') | indent }}
     {%- endfor %}
 
     public static {{ display_name }} fromPseudoJson(Map<String, Object> map) {
