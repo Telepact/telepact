@@ -19,6 +19,6 @@ class UTypeDeclaration:
         from uapi.internal.validation.ValidateValueOfType import validate_value_of_type
         return validate_value_of_type(value, self.type, self.nullable, self.type_parameters, ctx)
 
-    def generate_random_value(self, ctx: 'GenerateContext') -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomValueOfType import generate_random_value_of_type
-        return generate_random_value_of_type(self.type, self.nullable, self.type_parameters, ctx)
+        return generate_random_value_of_type(blueprint_value, use_blueprint_value, self.type, self.nullable, self.type_parameters, ctx)

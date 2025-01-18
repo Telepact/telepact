@@ -28,9 +28,9 @@ class UStruct(UType):
         from uapi.internal.validation.ValidateStruct import validate_struct
         return validate_struct(value, self.name, self.fields, ctx)
 
-    def generate_random_value(self, ctx: 'GenerateContext') -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomStruct import generate_random_struct
-        return generate_random_struct(self.fields, ctx)
+        return generate_random_struct(blueprint_value, use_blueprint_value, self.fields, ctx)
 
     def get_name(self) -> str:
         return _STRUCT_NAME

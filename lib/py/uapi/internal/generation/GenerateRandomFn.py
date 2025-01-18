@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from uapi.internal.generation.GenerateContext import GenerateContext
 
 
-def generate_random_fn(call_cases: dict[str, 'UStruct'], ctx: 'GenerateContext') -> object:
+def generate_random_fn(blueprint_value: object, use_blueprint_value: bool, call_cases: dict[str, 'UStruct'], ctx: 'GenerateContext') -> object:
     from uapi.internal.generation.GenerateRandomUnion import generate_random_union
 
-    return generate_random_union(call_cases, ctx)
+    return generate_random_union(blueprint_value, use_blueprint_value, call_cases, ctx)

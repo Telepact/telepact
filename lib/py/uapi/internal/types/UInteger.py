@@ -23,9 +23,9 @@ class UInteger(UType):
         from uapi.internal.validation.ValidateInteger import validate_integer
         return validate_integer(value)
 
-    def generate_random_value(self, ctx: 'GenerateContext') -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomInteger import generate_random_integer
-        return generate_random_integer(ctx)
+        return generate_random_integer(blueprint_value, use_blueprint_value, ctx)
 
     def get_name(self) -> str:
         return _INTEGER_NAME

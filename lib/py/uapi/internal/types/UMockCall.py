@@ -25,7 +25,7 @@ class UMockCall(UType):
         from uapi.internal.validation.ValidateMockCall import validate_mock_call
         return validate_mock_call(given_obj, self.types, ctx)
 
-    def generate_random_value(self, ctx: 'GenerateContext') -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomUMockCall import generate_random_u_mock_call
         return generate_random_u_mock_call(self.types, ctx)
 

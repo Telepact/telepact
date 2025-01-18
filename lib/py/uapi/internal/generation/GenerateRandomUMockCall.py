@@ -15,4 +15,4 @@ def generate_random_u_mock_call(types: dict[str, UType], ctx: GenerateContext) -
     selected_fn = functions[ctx.random_generator.next_int_with_ceiling(
         len(functions))]
 
-    return generate_random_union(selected_fn.call.cases, ctx.copy(always_include_required_fields=False))
+    return generate_random_union(None, False, selected_fn.call.cases, ctx.copy(always_include_required_fields=False))

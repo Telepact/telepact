@@ -84,11 +84,12 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         use_blueprint_value = True
                         include_optional_fields = False
                         always_include_required_fields = True
-                        result_init = definition.result.generate_random_value(GenerateContext(stub.then_result, use_blueprint_value,
+                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value, [],
+                                                                              GenerateContext(
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
                                                                               always_include_required_fields,
-                                                                              [], function_name, random))
+                                                                              function_name, random))
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
@@ -98,11 +99,12 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
                         use_blueprint_value = True
                         include_optional_fields = False
                         always_include_required_fields = True
-                        result_init = definition.result.generate_random_value(GenerateContext(stub.then_result, use_blueprint_value,
+                        result_init = definition.result.generate_random_value(stub.then_result, use_blueprint_value, [],
+                                                                              GenerateContext(
                                                                               include_optional_fields,
                                                                               randomize_optional_field_generation,
                                                                               always_include_required_fields,
-                                                                              [], function_name, random))
+                                                                              function_name, random))
                         result = cast(dict[str, object], result_init)
                         if stub.count > 0:
                             stub.count -= 1
@@ -117,11 +119,12 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
             use_blueprint_value = True
             include_optional_fields = True
             always_include_required_fields = True
-            random_ok_struct_init = ok_struct_ref.generate_random_value(GenerateContext({}, use_blueprint_value,
+            random_ok_struct_init = ok_struct_ref.generate_random_value({}, use_blueprint_value, [],
+                                                                        GenerateContext(
                                                                         include_optional_fields,
                                                                         randomize_optional_field_generation,
                                                                         always_include_required_fields,
-                                                                        [], function_name, random))
+                                                                        function_name, random))
             random_ok_struct = cast(dict[str, object], random_ok_struct_init)
             return Message({}, {"Ok_": random_ok_struct})
         else:

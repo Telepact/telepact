@@ -22,9 +22,9 @@ class UAny(UType):
                  type_parameters: list['UTypeDeclaration'], ctx: 'ValidateContext') -> list['ValidationFailure']:
         return []
 
-    def generate_random_value(self, ctx: 'GenerateContext') -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomAny import generate_random_any
-        return generate_random_any(ctx.random_generator)
+        return generate_random_any(ctx)
 
     def get_name(self) -> str:
         return _ANY_NAME

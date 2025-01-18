@@ -21,7 +21,7 @@ class UType(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def generate_random_value(self, ctx: 'GenerateContext') -> object:
+    def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
         pass
 
     @abstractmethod

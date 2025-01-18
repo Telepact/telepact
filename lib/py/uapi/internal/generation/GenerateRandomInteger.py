@@ -6,8 +6,8 @@ if TYPE_CHECKING:
     from uapi.internal.generation.GenerateContext import GenerateContext
 
 
-def generate_random_integer(ctx: 'GenerateContext') -> object:
-    if ctx.use_blueprint_value:
-        return ctx.blueprint_value
+def generate_random_integer(blueprint_value: object, use_blueprint_value: bool, ctx: 'GenerateContext') -> object:
+    if use_blueprint_value:
+        return blueprint_value
     else:
         return ctx.random_generator.next_int()

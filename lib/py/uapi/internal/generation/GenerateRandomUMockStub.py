@@ -24,10 +24,10 @@ def generate_random_u_mock_stub(types: dict[str, UType], ctx: GenerateContext) -
     arg_fields = selected_fn.call.cases[selected_fn.name].fields
     ok_fields = selected_fn.result.cases['Ok_'].fields
 
-    arg = generate_random_struct(arg_fields, ctx.copy(
+    arg = generate_random_struct(None, False, arg_fields, ctx.copy(
         always_include_required_fields=False))
-    ok_result = generate_random_struct(
-        ok_fields, ctx.copy(always_include_required_fields=False))
+    ok_result = generate_random_struct(None, False,
+                                       ok_fields, ctx.copy(always_include_required_fields=False))
 
     return {
         selected_fn.name: arg,
