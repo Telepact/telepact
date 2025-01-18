@@ -79,8 +79,9 @@ function printJsonAst(path, options, print) {
         const parent = path.getParentNode();
         const isRoot = parent.type === "JsonRoot";
         const isComment = parent && parent.type === "ObjectProperty" && parent.key.value === "///";
+        const isUnion = parent && parent.type === "ObjectProperty" && (parent.key.value.includes("union.") || parent.key.value.includes("errors.") || parent.key.value === "->");
 
-        if (isRoot || isComment) {
+        if (isRoot || isComment || isUnion) {
             return [
                 "[",
                 indent(concat([softline, join(concat([",", softline]), path.map(print, "elements"))])),

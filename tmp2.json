@@ -1,12 +1,4 @@
 [
-    {},
-    {
-        "err.ProcessFailure": {
-            "cause": {
-                "Unknown": {}
-            }
-        }
-    },
     {
         "struct.Example": {
             "field1": ["any"]
@@ -18,7 +10,15 @@
         }
     },
     {
-        "union.Ex2": ["type.Another", "type.Example"]
+        "union.Ex2": {
+            "struct.Example": "...",
+            "struct.Another": "..."
+        }
+    },
+    {
+        "err.ProcessFailure": {
+            "cause": ["string"]
+        }
     },
     {
         "///": [" A function. "],
@@ -27,10 +27,10 @@
             "arg2": ["integer"]
         },
         "->": {
-            "data": ["type.Example"]
-        },
-        "error.ProcessFailure": {
-            "cause": ["string"]
+            "ok": {
+                "data": ["type.Example"]
+            },
+            "err.ProcessFailure": "..."
         }
     }
 ]

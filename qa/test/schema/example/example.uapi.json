@@ -90,14 +90,17 @@
         }
     },
     {
-        "union.ExUnion": [{
-            "One": {}
-        }, {
-            "Two": {
-                "required": ["boolean"],
-                "optional!": ["boolean"]
+        "union.ExUnion": [
+            {
+                "One": {}
+            },
+            {
+                "Two": {
+                    "required": ["boolean"],
+                    "optional!": ["boolean"]
+                }
             }
-        }]
+        ]
     },
     {
         "struct.Big": {
@@ -113,34 +116,41 @@
             "required": ["boolean"],
             "optional!": ["boolean"]
         },
-        "->": [{
-            "Ok_": {
-                "required": ["boolean"],
-                "optional!": ["boolean"]
+        "->": [
+            {
+                "Ok_": {
+                    "required": ["boolean"],
+                    "optional!": ["boolean"]
+                }
             }
-        }]
+        ]
     },
     {
         "fn.test": {
             "value!": ["struct.Value"]
         },
-        "->": [{
-            "Ok_": {
-                "value!": ["struct.Value"]
+        "->": [
+            {
+                "Ok_": {
+                    "value!": ["struct.Value"]
+                }
+            },
+            {
+                "ErrorExample": {
+                    "property": ["string"]
+                }
             }
-        }, {
-            "ErrorExample": {
-                "property": ["string"]
-            }
-        }]
+        ]
     },
     {
         "fn.getBigList": {},
-        "->": [{
-            "Ok_": {
-                "items": ["array", ["struct.Big"]]
+        "->": [
+            {
+                "Ok_": {
+                    "items": ["array", ["struct.Big"]]
+                }
             }
-        }]
+        ]
     },
     {
         "requestHeader.in": ["boolean"]

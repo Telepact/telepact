@@ -2,19 +2,23 @@
     {
         "///": " Ping the server. ",
         "fn.ping_": {},
-        "->": [{
-            "Ok_": {}
-        }],
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
         "///": " Get the uAPI `schema` of this server. ",
         "fn.api_": {},
-        "->": [{
-            "Ok_": {
-                "api": ["array", ["object", ["any"]]]
+        "->": [
+            {
+                "Ok_": {
+                    "api": ["array", ["object", ["any"]]]
+                }
             }
-        }],
+        ],
         "_errors": "^errors\\.Validation_$"
     },
     {
@@ -87,80 +91,107 @@
     },
     {
         "///": " A type. ",
-        "union.Type_": [{
-            "Null": {}
-        }, {
-            "Boolean": {}
-        }, {
-            "Integer": {}
-        }, {
-            "Number": {}
-        }, {
-            "String": {}
-        }, {
-            "Array": {}
-        }, {
-            "Object": {}
-        }, {
-            "Any": {}
-        }, {
-            "Unknown": {}
-        }]
+        "union.Type_": [
+            {
+                "Null": {}
+            },
+            {
+                "Boolean": {}
+            },
+            {
+                "Integer": {}
+            },
+            {
+                "Number": {}
+            },
+            {
+                "String": {}
+            },
+            {
+                "Array": {}
+            },
+            {
+                "Object": {}
+            },
+            {
+                "Any": {}
+            },
+            {
+                "Unknown": {}
+            }
+        ]
     },
     {
         "///": " A reason for the validation failure in the body. ",
-        "union.ValidationFailureReason_": [{
-            "TypeUnexpected": {
-                "expected": ["union.Type_"],
-                "actual": ["union.Type_"]
+        "union.ValidationFailureReason_": [
+            {
+                "TypeUnexpected": {
+                    "expected": ["union.Type_"],
+                    "actual": ["union.Type_"]
+                }
+            },
+            {
+                "NullDisallowed": {}
+            },
+            {
+                "ObjectKeyDisallowed": {}
+            },
+            {
+                "ArrayElementDisallowed": {}
+            },
+            {
+                "NumberOutOfRange": {}
+            },
+            {
+                "ObjectSizeUnexpected": {
+                    "expected": ["integer"],
+                    "actual": ["integer"]
+                }
+            },
+            {
+                "ExtensionValidationFailed": {
+                    "reason": ["string"],
+                    "data!": ["object", ["any"]]
+                }
+            },
+            {
+                "ObjectKeyRegexMatchCountUnexpected": {
+                    "regex": ["string"],
+                    "expected": ["integer"],
+                    "actual": ["integer"],
+                    "keys": ["array", ["string"]]
+                }
+            },
+            {
+                "RequiredObjectKeyMissing": {
+                    "key": ["string"]
+                }
+            },
+            {
+                "FunctionUnknown": {}
             }
-        }, {
-            "NullDisallowed": {}
-        }, {
-            "ObjectKeyDisallowed": {}
-        }, {
-            "ArrayElementDisallowed": {}
-        }, {
-            "NumberOutOfRange": {}
-        }, {
-            "ObjectSizeUnexpected": {
-                "expected": ["integer"],
-                "actual": ["integer"]
-            }
-        }, {
-            "ExtensionValidationFailed": {
-                "reason": ["string"],
-                "data!": ["object", ["any"]]
-            }
-        }, {
-            "ObjectKeyRegexMatchCountUnexpected": {
-                "regex": ["string"],
-                "expected": ["integer"],
-                "actual": ["integer"],
-                "keys": ["array", ["string"]]
-            }
-        }, {
-            "RequiredObjectKeyMissing": {
-                "key": ["string"]
-            }
-        }, {
-            "FunctionUnknown": {}
-        }]
+        ]
     },
     {
         "///": " A parse failure. ",
-        "union.ParseFailure_": [{
-            "IncompatibleBinaryEncoding": {}
-        }, {
-            "///": " The binary decoder encountered a field id that could not be mapped to a key. ",
-            "BinaryDecodeFailure": {}
-        }, {
-            "JsonInvalid": {}
-        }, {
-            "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
-        }, {
-            "ExpectedJsonArrayOfTwoObjects": {}
-        }]
+        "union.ParseFailure_": [
+            {
+                "IncompatibleBinaryEncoding": {}
+            },
+            {
+                "///": " The binary decoder encountered a field id that could not be mapped to a key. ",
+                "BinaryDecodeFailure": {}
+            },
+            {
+                "JsonInvalid": {}
+            },
+            {
+                "ExpectedJsonArrayOfAnObjectAndAnObjectOfOneObject": {}
+            },
+            {
+                "ExpectedJsonArrayOfTwoObjects": {}
+            }
+        ]
     },
     {
         "///": " A validation failure located at a `path` explained by a `reason`. ",
@@ -171,34 +202,41 @@
     },
     {
         "///": " A standard error. ",
-        "errors.Validation_": [{
-            "///": " The server implementation raised an unknown error. ",
-            "ErrorUnknown_": {}
-        }, {
-            "///": " The headers on the request are invalid. ",
-            "ErrorInvalidRequestHeaders_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
+        "errors.Validation_": [
+            {
+                "///": " The server implementation raised an unknown error. ",
+                "ErrorUnknown_": {}
+            },
+            {
+                "///": " The headers on the request are invalid. ",
+                "ErrorInvalidRequestHeaders_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The body on the request is invalid. ",
+                "ErrorInvalidRequestBody_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The headers on the response are invalid. ",
+                "ErrorInvalidResponseHeaders_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The body that the server attempted to put on the response is invalid. ",
+                "ErrorInvalidResponseBody_": {
+                    "cases": ["array", ["struct.ValidationFailure_"]]
+                }
+            },
+            {
+                "///": " The request could not be parsed as a uAPI Message. ",
+                "ErrorParseFailure_": {
+                    "reasons": ["array", ["union.ParseFailure_"]]
+                }
             }
-        }, {
-            "///": " The body on the request is invalid. ",
-            "ErrorInvalidRequestBody_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            }
-        }, {
-            "///": " The headers on the response are invalid. ",
-            "ErrorInvalidResponseHeaders_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            }
-        }, {
-            "///": " The body that the server attempted to put on the response is invalid. ",
-            "ErrorInvalidResponseBody_": {
-                "cases": ["array", ["struct.ValidationFailure_"]]
-            }
-        }, {
-            "///": " The request could not be parsed as a uAPI Message. ",
-            "ErrorParseFailure_": {
-                "reasons": ["array", ["union.ParseFailure_"]]
-            }
-        }]
+        ]
     }
 ]
