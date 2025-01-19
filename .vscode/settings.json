@@ -9,7 +9,7 @@
     "python.testing.pytestEnabled": true,
     "python.testing.unittestEnabled": false,
     "python.testing.pytestArgs": ["."],
-    "autopep8.args": ["--exclude=**/*tags.py"],
+    "autopep8.args": ["--exclude=**/*cases.py"],
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
