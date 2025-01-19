@@ -19,7 +19,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
     from uapi.internal.types.UFn import UFn
     from uapi.internal.generation.GenerateContext import GenerateContext
 
-    header: dict[str, object] = request_message.header
+    header: dict[str, object] = request_message.headers
 
     enable_generation_stub = header.get("_gen", False)
     function_name = request_message.get_body_target()

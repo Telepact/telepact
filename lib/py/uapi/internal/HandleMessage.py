@@ -24,7 +24,7 @@ async def handle_message(
     from uapi.internal.validation.ValidateContext import ValidateContext
 
     response_headers: dict[str, object] = {}
-    request_headers: dict[str, object] = request_message.header
+    request_headers: dict[str, object] = request_message.headers
     request_body: dict[str, object] = request_message.body
     parsed_u_api_schema: dict[str, UType] = u_api_schema.parsed
     request_entry: tuple[str, object] = next(iter(request_body.items()))
@@ -134,8 +134,8 @@ async def handle_message(
 
     result_union: dict[str, object] = result_message.body
 
-    result_message.header.update(response_headers)
-    final_response_headers: dict[str, object] = result_message.header
+    result_message.headers.update(response_headers)
+    final_response_headers: dict[str, object] = result_message.headers
 
     skip_result_validation: bool = unsafe_response_enabled
     if not skip_result_validation:

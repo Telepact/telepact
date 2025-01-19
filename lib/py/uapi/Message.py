@@ -2,8 +2,8 @@ from typing import cast
 
 
 class Message:
-    def __init__(self, header: dict[str, object], body: dict[str, object]):
-        self.header = header.copy()
+    def __init__(self, headers: dict[str, object], body: dict[str, object]):
+        self.headers = headers.copy()
         self.body = body
 
     def get_body_target(self) -> str:

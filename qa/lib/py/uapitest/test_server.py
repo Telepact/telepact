@@ -103,7 +103,7 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
 
         response = await c()
 
-        response_pseudo_json = [response.header, response.body]
+        response_pseudo_json = [response.headers, response.body]
 
         response_bytes = json.dumps(response_pseudo_json).encode()
 
@@ -249,7 +249,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         nonlocal serve_alternate_server
         nonlocal executor
 
-        request_headers = request_message.header
+        request_headers = request_message.headers
         request_body = request_message.body
         request_pseudo_json = [request_headers, request_body]
         request_bytes = json.dumps(request_pseudo_json).encode('utf-8')
@@ -257,7 +257,7 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
         if use_codegen:
             print(f"     :H {request_bytes}")
             message = await code_gen_handler.handler(request_message)
-            message.header['_codegens'] = True
+            message.headers['_codegens'] = True
         else:
             print(f"    <-s {request_bytes}")
 

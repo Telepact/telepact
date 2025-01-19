@@ -231,7 +231,7 @@ class ClientInterface_:
     {%- set function_name = fn | replace('fn.', '') %}
     async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> Tuple[dict[str, object], {{ function_name }}__Output_]:
         message = await self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
-        return message.header, {{ function_name }}__Output_.from_pseudo_json(message.body)
+        return message.headers, {{ function_name }}__Output_.from_pseudo_json(message.body)
     {%- endfor %}
 
 
@@ -249,7 +249,7 @@ class ServerHandler_:
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
-            headers, output = await self.{{ function_name }}(message.header, {{ function_name }}__Input_.from_pseudo_json(message.body))
+            headers, output = await self.{{ function_name }}(message.headers, {{ function_name }}__Input_.from_pseudo_json(message.body))
             return uapi.Message.Message(headers, output.to_pseudo_json())
         {%- endfor %}
 

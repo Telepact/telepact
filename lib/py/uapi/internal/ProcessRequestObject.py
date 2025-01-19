@@ -13,7 +13,7 @@ async def process_request_object(request_message: 'Message',
                                  use_binary_default: bool) -> 'Message':
     from uapi.UApiError import UApiError
 
-    header: dict[str, object] = request_message.header
+    header: dict[str, object] = request_message.headers
 
     try:
         if "tim_" not in header:

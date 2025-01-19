@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
                        serializer: 'Serialization') -> bytes:
-    headers: dict[str, object] = message.header
+    headers: dict[str, object] = message.headers
 
     serialize_as_binary: bool
     if "_binary" in headers:
@@ -20,7 +20,7 @@ def serialize_internal(message: 'Message', binary_encoder: 'BinaryEncoder',
         serialize_as_binary = False
 
     message_as_pseudo_json: list[object] = [
-        message.header, message.body]
+        message.headers, message.body]
 
     try:
         if serialize_as_binary:
