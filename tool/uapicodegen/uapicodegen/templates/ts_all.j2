@@ -219,7 +219,7 @@ export class ClientInterface_ {
     {%- set function_name = fn | replace('fn.', '') %}
     async {{ function_name }}(headers: Record<string, any>, input: {{ function_name }}__Input_): Promise<[ Record<string, any>, {{ function_name }}__Output_ ]> {
         const message = await this.client.request(new Message(headers, input.toPseudoJson()));
-        return [message.header, {{ function_name }}__Output_.fromPseudoJson(message.body)];
+        return [message.headers, {{ function_name }}__Output_.fromPseudoJson(message.body)];
     }
     {%- endfor %}
 }
@@ -238,7 +238,7 @@ export class ServerHandler_ {
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}else if{% endif %} (functionName === "{{ fn }}") {
-            const [headers, output] = this.{{ function_name }}(message.header, {{ function_name }}__Input_.fromPseudoJson(message.body));
+            const [headers, output] = this.{{ function_name }}(message.headers, {{ function_name }}__Input_.fromPseudoJson(message.body));
             return new Message(headers, output.toPseudoJson());
         }
         {%- endfor %}

@@ -1,6 +1,6 @@
 export class Message {
     constructor(
-        public header: Record<string, any>,
+        public headers: Record<string, any>,
         public body: Record<string, any>,
     ) {}
 

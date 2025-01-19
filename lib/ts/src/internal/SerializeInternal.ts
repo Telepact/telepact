@@ -8,7 +8,7 @@ export function serializeInternal(
     binaryEncoder: BinaryEncoder,
     serializer: Serialization,
 ): Uint8Array {
-    const headers: Record<string, any> = message.header;
+    const headers: Record<string, any> = message.headers;
 
     let serializeAsBinary: boolean;
     if ('_binary' in headers) {
@@ -18,7 +18,7 @@ export function serializeInternal(
         serializeAsBinary = false;
     }
 
-    const messageAsPseudoJson: any[] = [message.header, message.body];
+    const messageAsPseudoJson: any[] = [message.headers, message.body];
 
     try {
         if (serializeAsBinary) {

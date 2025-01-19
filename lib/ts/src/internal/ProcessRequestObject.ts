@@ -18,7 +18,7 @@ export async function processRequestObject(
     timeoutMsDefault: number,
     useBinaryDefault: boolean,
 ): Promise<Message> {
-    const header: Record<string, any> = requestMessage.header;
+    const header: Record<string, any> = requestMessage.headers;
 
     try {
         if (!header.hasOwnProperty('tim_')) {

@@ -19,7 +19,7 @@ export async function handleMessage(
     onError: (error: Error) => void,
 ): Promise<Message> {
     const responseHeaders: Record<string, any> = {};
-    const requestHeaders: Record<string, any> = requestMessage.header;
+    const requestHeaders: Record<string, any> = requestMessage.headers;
     const requestBody: Record<string, any> = requestMessage.body;
     const parsedUApiSchema: Record<string, UType> = uApiSchema.parsed;
     const requestEntry: [string, any] = Object.entries(requestBody)[0];
@@ -150,8 +150,8 @@ export async function handleMessage(
 
     const resultUnion: Record<string, any> = resultMessage.body;
 
-    resultMessage.header = { ...resultMessage.header, ...responseHeaders };
-    const finalResponseHeaders: Record<string, any> = resultMessage.header;
+    resultMessage.headers = { ...resultMessage.headers, ...responseHeaders };
+    const finalResponseHeaders: Record<string, any> = resultMessage.headers;
 
     const skipResultValidation: boolean = unsafeResponseEnabled;
     if (!skipResultValidation) {

@@ -137,7 +137,7 @@ function startClientTestServer(
                 time();
             }
 
-            const responsePseudoJson = [response.header, response.body];
+            const responsePseudoJson = [response.headers, response.body];
 
             const responseJson = JSON.stringify(responsePseudoJson);
 
@@ -315,7 +315,7 @@ function startTestServer(
     class ThisError extends Error {}
 
     const handler = async (requestMessage: Message): Promise<Message> => {
-        const requestHeaders = requestMessage.header;
+        const requestHeaders = requestMessage.headers;
         const requestBody = requestMessage.body;
         const requestPseudoJson = [requestHeaders, requestBody];
         const requestJson = JSON.stringify(requestPseudoJson);
@@ -325,7 +325,7 @@ function startTestServer(
         if (useCodegen) {
             console.log(`     :H ${new TextDecoder().decode(requestBytes)}`);
             message = codeGenHandler.handler(requestMessage);
-            message.header["_codegens"] = true;
+            message.headers["_codegens"] = true;
         } else {
             console.log(`    <-s ${new TextDecoder().decode(requestBytes)}`);
             const natsResponseMessage = await connection.request(backdoorTopic, requestBytes, { timeout: 5000 });
@@ -359,12 +359,12 @@ function startTestServer(
         }
     };
     options.onRequest = (m: Message) => {
-        if (m.header["_onRequestError"] === true) {
+        if (m.headers["_onRequestError"] === true) {
             throw new Error();
         }
     };
     options.onResponse = (m: Message) => {
-        if (m.header["_onResponseError"] === true) {
+        if (m.headers["_onResponseError"] === true) {
             throw new Error();
         }
     };
