@@ -7,11 +7,11 @@ import java.util.Map;
  * A uAPI Message.
  */
 public class Message {
-    public final Map<String, Object> header;
+    public final Map<String, Object> headers;
     public final Map<String, Object> body;
 
     public Message(Map<String, Object> header, Map<String, Object> body) {
-        this.header = new HashMap<>(header);
+        this.headers = new HashMap<>(header);
         this.body = body;
     }
 

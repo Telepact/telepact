@@ -22,7 +22,7 @@ public class MockHandle {
     public static Message mockHandle(Message requestMessage, List<MockStub> stubs, List<MockInvocation> invocations,
             RandomGenerator random, UApiSchema uApiSchema, boolean enableGeneratedDefaultStub,
             boolean enableOptionalFieldGeneration, boolean randomizeOptionalFieldGeneration) {
-        final Map<String, Object> header = requestMessage.header;
+        final Map<String, Object> header = requestMessage.headers;
 
         final var enableGenerationStub = (Boolean) header.getOrDefault("_gen", false);
         final String functionName = requestMessage.getBodyTarget();

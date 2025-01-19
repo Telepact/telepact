@@ -16,7 +16,7 @@ public class ClientInterface_ {
     {%- set function_name = fn | replace('fn.', '') %}
     public TypedMessage_<{{ function_name }}.Output> {{ function_name }}(Map<String, Object> headers, {{ function_name }}.Input input) {
         var message = this.client.request(new Message(headers, input.toPseudoJson()));
-        return new TypedMessage_<>(message.header, {{ function_name }}.Output.fromPseudoJson(message.body));
+        return new TypedMessage_<>(message.headers, {{ function_name }}.Output.fromPseudoJson(message.body));
     }
     {%- endfor %}
 

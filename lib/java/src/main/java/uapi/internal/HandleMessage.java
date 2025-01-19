@@ -25,7 +25,7 @@ public class HandleMessage {
     static Message handleMessage(Message requestMessage, UApiSchema uApiSchema, Function<Message, Message> handler,
             Consumer<Throwable> onError) {
         final var responseHeaders = (Map<String, Object>) new HashMap<String, Object>();
-        final Map<String, Object> requestHeaders = requestMessage.header;
+        final Map<String, Object> requestHeaders = requestMessage.headers;
         final Map<String, Object> requestBody = requestMessage.body;
         final Map<String, UType> parsedUApiSchema = uApiSchema.parsed;
         final Map.Entry<String, Object> requestEntry = requestBody.entrySet().stream().findAny().get();
@@ -125,8 +125,8 @@ public class HandleMessage {
 
         final Map<String, Object> resultUnion = resultMessage.body;
 
-        resultMessage.header.putAll(responseHeaders);
-        final Map<String, Object> finalResponseHeaders = resultMessage.header;
+        resultMessage.headers.putAll(responseHeaders);
+        final Map<String, Object> finalResponseHeaders = resultMessage.headers;
 
         final var skipResultValidation = unsafeResponseEnabled;
         if (!skipResultValidation) {

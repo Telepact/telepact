@@ -12,7 +12,7 @@ import uapi.internal.binary.BinaryEncoderUnavailableError;
 public class SerializeInternal {
     public static byte[] serializeInternal(Message message, BinaryEncoder binaryEncoder,
             Serialization serializer) {
-        final var headers = message.header;
+        final var headers = message.headers;
 
         final boolean serializeAsBinary;
         if (headers.containsKey("_binary")) {
@@ -21,7 +21,7 @@ public class SerializeInternal {
             serializeAsBinary = false;
         }
 
-        final List<Object> messageAsPseudoJson = List.of(message.header, message.body);
+        final List<Object> messageAsPseudoJson = List.of(message.headers, message.body);
 
         try {
             if (serializeAsBinary) {

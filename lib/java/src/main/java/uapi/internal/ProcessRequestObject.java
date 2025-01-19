@@ -15,7 +15,7 @@ public class ProcessRequestObject {
     public static Message processRequestObject(Message requestMessage,
             BiFunction<Message, Serializer, Future<Message>> adapter, Serializer serializer, long timeoutMsDefault,
             boolean useBinaryDefault) {
-        final Map<String, Object> header = requestMessage.header;
+        final Map<String, Object> header = requestMessage.headers;
 
         try {
             if (!header.containsKey("tim_")) {

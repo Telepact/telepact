@@ -115,7 +115,7 @@ public class Main {
                     }
                 }
 
-                var responsePseudoJson = List.of(response.header, response.body);
+                var responsePseudoJson = List.of(response.headers, response.body);
 
                 var responseBytes = objectMapper.writeValueAsBytes(responsePseudoJson);
 
@@ -284,7 +284,7 @@ public class Main {
 
         Function<Message, Message> handler = (requestMessage) -> {
             try {
-                var requestHeaders = requestMessage.header;
+                var requestHeaders = requestMessage.headers;
                 var requestBody = requestMessage.body;
                 var requestPseudoJson = List.of(requestHeaders, requestBody);
                 var requestBytes = objectMapper.writeValueAsBytes(requestPseudoJson);
@@ -293,7 +293,7 @@ public class Main {
                 if (useCodeGen) {
                     System.out.println("     :H %s".formatted(objectMapper.writeValueAsString(requestPseudoJson)));
                     message = codeGenHandler.handler(requestMessage);
-                    message.header.put("_codegens", true);
+                    message.headers.put("_codegens", true);
                 } else {
                     System.out.println("    <-s %s".formatted(new String(requestBytes)));
                     System.out.flush();
@@ -342,12 +342,12 @@ public class Main {
             }
         };
         options.onRequest = m -> {
-            if ((Boolean) m.header.getOrDefault("_onRequestError", false)) {
+            if ((Boolean) m.headers.getOrDefault("_onRequestError", false)) {
                 throw new RuntimeException();
             }
         };
         options.onResponse = m -> {
-            if ((Boolean) m.header.getOrDefault("_onResponseError", false)) {
+            if ((Boolean) m.headers.getOrDefault("_onResponseError", false)) {
                 throw new RuntimeException();
             }
         };
