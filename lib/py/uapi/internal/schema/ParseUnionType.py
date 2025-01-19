@@ -63,17 +63,17 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
     else:
         for required_key in required_keys:
             for element in definition:
-                case_keys = set(element.keys())
-                case_keys.discard("///")
-                if required_key in case_keys:
+                tag_keys = set(element.keys())
+                tag_keys.discard("///")
+                if required_key in tag_keys:
                     break
             else:
                 branch_path = this_path + [0]
                 parse_failures.append(SchemaParseFailure(
                     ctx.document_name, branch_path, "RequiredObjectKeyMissing", {'key': required_key}))
 
-    cases = {}
-    case_indices = {}
+    tags = {}
+    tag_indices = {}
 
     for i, element in enumerate(definition):
         loop_path = this_path + [i]
@@ -96,31 +96,31 @@ def parse_union_type(path: list[object], union_definition_as_pseudo_json: dict[s
             continue
 
         entry = next(iter(map.items()))
-        union_case = entry[0]
-        union_key_path = loop_path + [union_case]
+        union_tag = entry[0]
+        union_key_path = loop_path + [union_tag]
 
         if not isinstance(entry[1], dict):
             this_parse_failures = get_type_unexpected_parse_failure(
                 ctx.document_name, union_key_path, entry[1], "Object")
             parse_failures.extend(this_parse_failures)
             continue
-        union_case_struct = entry[1]
+        union_tag_struct = entry[1]
 
         try:
             fields = parse_struct_fields(union_key_path,
-                                         union_case_struct, ctx)
+                                         union_tag_struct, ctx)
         except UApiSchemaParseError as e:
             parse_failures.extend(e.schema_parse_failures)
             continue
 
         union_struct = UStruct(
-            f"{schema_key}.{union_case}", fields)
+            f"{schema_key}.{union_tag}", fields)
 
-        cases[union_case] = union_struct
-        case_indices[union_case] = i
+        tags[union_tag] = union_struct
+        tag_indices[union_tag] = i
 
     if parse_failures:
         raise UApiSchemaParseError(
             parse_failures, ctx.uapi_schema_document_names_to_json)
 
-    return UUnion(schema_key, cases, case_indices)
+    return UUnion(schema_key, tags, tag_indices)

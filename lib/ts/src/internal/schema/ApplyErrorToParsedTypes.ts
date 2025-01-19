@@ -1,9 +1,9 @@
-import { UError } from '../../internal/types/UError';
-import { UType } from '../../internal/types/UType';
-import { SchemaParseFailure } from '../../internal/schema/SchemaParseFailure';
-import { UApiSchemaParseError } from '../../UApiSchemaParseError';
-import { UFn } from '../../internal/types/UFn';
-import { getPathDocumentCoordinatesPseudoJson } from '../../internal/schema/GetPathDocumentCoordinatesPseudoJson';
+import { UError } from "../../internal/types/UError";
+import { UType } from "../../internal/types/UType";
+import { SchemaParseFailure } from "../../internal/schema/SchemaParseFailure";
+import { UApiSchemaParseError } from "../../UApiSchemaParseError";
+import { UFn } from "../../internal/types/UFn";
+import { getPathDocumentCoordinatesPseudoJson } from "../../internal/schema/GetPathDocumentCoordinatesPseudoJson";
 
 export function applyErrorToParsedTypes(
     error: UError,
@@ -29,9 +29,9 @@ export function applyErrorToParsedTypes(
         const fnName = f.name;
         const regex = new RegExp(f.errorsRegex);
         const fnResult = f.result;
-        const fnResultCases = fnResult.cases;
+        const fnResultTags = fnResult.tags;
         const errorErrors = error.errors;
-        const errorCases = errorErrors.cases;
+        const errorTags = errorErrors.tags;
 
         const matcher = regex.exec(errorKey);
 
@@ -39,29 +39,29 @@ export function applyErrorToParsedTypes(
             continue;
         }
 
-        for (const errorCaseName in errorCases) {
-            const errorCase = errorCases[errorCaseName];
-            const newKey = errorCaseName;
+        for (const errorTagName in errorTags) {
+            const errorTag = errorTags[errorTagName];
+            const newKey = errorTagName;
 
-            if (newKey in fnResultCases) {
+            if (newKey in fnResultTags) {
                 const otherPathIndex = schemaKeysToIndex[fnName];
-                const errorCaseIndex = error.errors.caseIndices[newKey];
+                const errorTagIndex = error.errors.tagIndices[newKey];
                 const otherDocumentName = schemaKeysToDocumentNames[fnName];
-                const fnErrorCaseIndex = f.result.caseIndices[newKey];
-                const otherPath = [otherPathIndex, '->', fnErrorCaseIndex, newKey];
+                const fnErrorTagIndex = f.result.tagIndices[newKey];
+                const otherPath = [otherPathIndex, "->", fnErrorTagIndex, newKey];
                 const otherDocumentJson = documentNamesToJson[otherDocumentName];
                 const otherLocation = getPathDocumentCoordinatesPseudoJson(otherPath, otherDocumentJson);
                 parseFailures.push(
                     new SchemaParseFailure(
                         documentName,
-                        [errorIndex, errorKey, errorCaseIndex, newKey],
-                        'PathCollision',
+                        [errorIndex, errorKey, errorTagIndex, newKey],
+                        "PathCollision",
                         { document: otherDocumentName, path: otherPath, location: otherLocation },
                     ),
                 );
             }
 
-            fnResultCases[newKey] = errorCase;
+            fnResultTags[newKey] = errorTag;
         }
     }
 

@@ -21,8 +21,8 @@ def generate_random_u_mock_stub(types: dict[str, UType], ctx: GenerateContext) -
 
     print(f"selectedFn: {selected_fn.name}")
 
-    arg_fields = selected_fn.call.cases[selected_fn.name].fields
-    ok_fields = selected_fn.result.cases['Ok_'].fields
+    arg_fields = selected_fn.call.tags[selected_fn.name].fields
+    ok_fields = selected_fn.result.tags['Ok_'].fields
 
     arg = generate_random_struct(None, False, arg_fields, ctx.copy(
         always_include_required_fields=False))

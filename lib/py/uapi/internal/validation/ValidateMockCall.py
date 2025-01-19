@@ -32,9 +32,9 @@ def validate_mock_call(given_obj: object, types: dict[str, 'UType'], ctx: 'Valid
 
     function_def_call = function_def.call
     function_def_name = function_def.name
-    function_def_call_cases = function_def_call.cases
+    function_def_call_tags = function_def_call.tags
 
-    input_failures = function_def_call_cases[function_def_name].validate(
+    input_failures = function_def_call_tags[function_def_name].validate(
         input, [], ctx)
 
     input_failures_with_path = []

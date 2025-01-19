@@ -1,10 +1,10 @@
-import { UApiSchema } from '../../UApiSchema';
-import { BinaryEncoding } from '../../internal/binary/BinaryEncoding';
-import { createChecksum } from '../../internal/binary/CreateChecksum';
-import { UUnion } from '../../internal/types/UUnion';
-import { UStruct } from '../../internal/types/UStruct';
-import { UFn } from '../../internal/types/UFn';
-import { UFieldDeclaration } from '../../internal/types/UFieldDeclaration';
+import { UApiSchema } from "../../UApiSchema";
+import { BinaryEncoding } from "../../internal/binary/BinaryEncoding";
+import { createChecksum } from "../../internal/binary/CreateChecksum";
+import { UUnion } from "../../internal/types/UUnion";
+import { UStruct } from "../../internal/types/UStruct";
+import { UFn } from "../../internal/types/UFn";
+import { UFieldDeclaration } from "../../internal/types/UFieldDeclaration";
 
 export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding {
     const allKeys: Set<string> = new Set();
@@ -18,29 +18,29 @@ export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding 
                 allKeys.add(structFieldKey);
             }
         } else if (value instanceof UUnion) {
-            const unionCases: Record<string, UStruct> = value.cases;
-            for (const [caseKey, caseValue] of Object.entries(unionCases)) {
-                allKeys.add(caseKey);
-                const structFields = caseValue.fields;
+            const unionTags: Record<string, UStruct> = value.tags;
+            for (const [tagKey, tagValue] of Object.entries(unionTags)) {
+                allKeys.add(tagKey);
+                const structFields = tagValue.fields;
                 for (const structFieldKey of Object.keys(structFields)) {
                     allKeys.add(structFieldKey);
                 }
             }
         } else if (value instanceof UFn) {
-            const fnCallCases: Record<string, UStruct> = value.call.cases;
-            const fnResultCases: Record<string, UStruct> = value.result.cases;
+            const fnCallTags: Record<string, UStruct> = value.call.tags;
+            const fnResultTags: Record<string, UStruct> = value.result.tags;
 
-            for (const [caseKey, caseValue] of Object.entries(fnCallCases)) {
-                allKeys.add(caseKey);
-                const structFields = caseValue.fields;
+            for (const [tagKey, tagValue] of Object.entries(fnCallTags)) {
+                allKeys.add(tagKey);
+                const structFields = tagValue.fields;
                 for (const structFieldKey of Object.keys(structFields)) {
                     allKeys.add(structFieldKey);
                 }
             }
 
-            for (const [caseKey, caseValue] of Object.entries(fnResultCases)) {
-                allKeys.add(caseKey);
-                const structFields = caseValue.fields;
+            for (const [tagKey, tagValue] of Object.entries(fnResultTags)) {
+                allKeys.add(tagKey);
+                const structFields = tagValue.fields;
                 for (const structFieldKey of Object.keys(structFields)) {
                     allKeys.add(structFieldKey);
                 }
@@ -54,7 +54,7 @@ export function constructBinaryEncoding(uApiSchema: UApiSchema): BinaryEncoding 
         binaryEncoding.set(key, index);
     });
 
-    const finalString = sortedAllKeys.join('\n');
+    const finalString = sortedAllKeys.join("\n");
     const checksum = createChecksum(finalString);
 
     return new BinaryEncoding(binaryEncoding, checksum);

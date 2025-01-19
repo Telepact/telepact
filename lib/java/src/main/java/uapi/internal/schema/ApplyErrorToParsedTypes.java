@@ -31,37 +31,37 @@ public class ApplyErrorToParsedTypes {
             var fnName = f.name;
             var regex = Pattern.compile(f.errorsRegex);
             var fnResult = f.result;
-            var fnResultCases = fnResult.cases;
+            var fnResultTags = fnResult.tags;
             var errorErrors = error.errors;
-            var errorCases = errorErrors.cases;
+            var errorTags = errorErrors.tags;
 
             var matcher = regex.matcher(errorKey);
             if (!matcher.matches()) {
                 continue;
             }
 
-            for (var errorCaseEntry : errorCases.entrySet()) {
-                var errorCaseName = errorCaseEntry.getKey();
-                var errorCase = errorCaseEntry.getValue();
-                var newKey = errorCaseName;
+            for (var errorTagEntry : errorTags.entrySet()) {
+                var errorTagName = errorTagEntry.getKey();
+                var errorTag = errorTagEntry.getValue();
+                var newKey = errorTagName;
 
-                if (fnResultCases.containsKey(newKey)) {
+                if (fnResultTags.containsKey(newKey)) {
                     var otherPathIndex = schemaKeysToIndex.get(fnName);
-                    var errorCaseIndex = error.errors.caseIndices.get(newKey);
+                    var errorTagIndex = error.errors.tagIndices.get(newKey);
                     var otherDocumentName = schemaKeysToDocumentNames.get(fnName);
-                    var fnErrorCaseIndex = f.result.caseIndices.get(newKey);
-                    List<Object> otherFinalPath = List.of(otherPathIndex, "->", fnErrorCaseIndex, newKey);
+                    var fnErrorTagIndex = f.result.tagIndices.get(newKey);
+                    List<Object> otherFinalPath = List.of(otherPathIndex, "->", fnErrorTagIndex, newKey);
                     var otherDocumentJson = documentNamesToJson.get(otherDocumentName);
                     var otherLocationPseudoJson = GetPathDocumentCoordinatesPseudoJson
                             .getPathDocumentCoordinatesPseudoJson(
                                     otherFinalPath, otherDocumentJson);
                     parseFailures.add(new SchemaParseFailure(documentName,
-                            List.of(errorIndex, errorKey, errorCaseIndex, newKey),
+                            List.of(errorIndex, errorKey, errorTagIndex, newKey),
                             "PathCollision",
                             Map.of("document", otherDocumentName, "path",
                                     otherFinalPath, "location", otherLocationPseudoJson)));
                 }
-                fnResultCases.put(newKey, errorCase);
+                fnResultTags.put(newKey, errorTag);
             }
         }
 

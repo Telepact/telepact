@@ -22,8 +22,8 @@ public class ConstructBinaryEncoding {
                 final Map<String, UFieldDeclaration> structFields = s.fields;
                 allKeys.addAll(structFields.keySet());
             } else if (entry.getValue() instanceof final UUnion u) {
-                final Map<String, UStruct> unionCases = u.cases;
-                for (final var entry2 : unionCases.entrySet()) {
+                final Map<String, UStruct> unionTags = u.tags;
+                for (final var entry2 : unionTags.entrySet()) {
                     allKeys.add(entry2.getKey());
                     final var struct = entry2.getValue();
                     final var structFields = struct.fields;
@@ -31,18 +31,18 @@ public class ConstructBinaryEncoding {
                 }
             } else if (entry.getValue() instanceof final UFn f) {
                 final UUnion fnCall = f.call;
-                final Map<String, UStruct> fnCallCases = fnCall.cases;
+                final Map<String, UStruct> fnCallTags = fnCall.tags;
                 final UUnion fnResult = f.result;
-                final Map<String, UStruct> fnResultCases = fnResult.cases;
+                final Map<String, UStruct> fnResultTags = fnResult.tags;
 
-                for (final var e2 : fnCallCases.entrySet()) {
+                for (final var e2 : fnCallTags.entrySet()) {
                     allKeys.add(e2.getKey());
                     final var struct = e2.getValue();
                     final Map<String, UFieldDeclaration> structFields = struct.fields;
                     allKeys.addAll(structFields.keySet());
                 }
 
-                for (var e2 : fnResultCases.entrySet()) {
+                for (var e2 : fnResultTags.entrySet()) {
                     allKeys.add(e2.getKey());
                     var struct = e2.getValue();
                     final Map<String, UFieldDeclaration> structFields = struct.fields;

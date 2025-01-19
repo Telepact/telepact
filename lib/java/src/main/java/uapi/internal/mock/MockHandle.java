@@ -132,7 +132,7 @@ public class MockHandle {
 
                 if (definition != null) {
                     final var resultUnion = (UUnion) definition.result;
-                    final var okStructRef = resultUnion.cases.get("Ok_");
+                    final var okStructRef = resultUnion.tags.get("Ok_");
                     final var useBlueprintValue = true;
                     final var includeOptionalFields = true;
                     final var alwaysIncludeRequiredFields = true;

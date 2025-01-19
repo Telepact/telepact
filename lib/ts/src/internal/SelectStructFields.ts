@@ -1,9 +1,9 @@
-import { UArray } from '../internal/types/UArray';
-import { UFn } from '../internal/types/UFn';
-import { UObject } from '../internal/types/UObject';
-import { UStruct } from '../internal/types/UStruct';
-import { UUnion } from '../internal/types/UUnion';
-import { UTypeDeclaration } from '../internal/types/UTypeDeclaration';
+import { UArray } from "../internal/types/UArray";
+import { UFn } from "../internal/types/UFn";
+import { UObject } from "../internal/types/UObject";
+import { UStruct } from "../internal/types/UStruct";
+import { UUnion } from "../internal/types/UUnion";
+import { UTypeDeclaration } from "../internal/types/UTypeDeclaration";
 
 export function selectStructFields(
     typeDeclaration: UTypeDeclaration,
@@ -37,12 +37,12 @@ export function selectStructFields(
         return finalMap;
     } else if (typeDeclarationType instanceof UFn) {
         const valueAsMap = value as { [key: string]: any };
-        const [unionCase, unionData] = Object.entries(valueAsMap)[0];
+        const [unionTag, unionData] = Object.entries(valueAsMap)[0];
         const fnName = typeDeclarationType.name;
         const fnCall = typeDeclarationType.call;
-        const fnCallCases = fnCall.cases;
+        const fnCallTags = fnCall.tags;
 
-        const argStructReference = fnCallCases[unionCase];
+        const argStructReference = fnCallTags[unionTag];
         const selectedFields = selectedStructFields[fnName] as string[] | undefined;
         const finalMap: { [key: string]: any } = {};
 
@@ -59,26 +59,26 @@ export function selectStructFields(
             }
         }
 
-        return { [unionCase]: finalMap };
+        return { [unionTag]: finalMap };
     } else if (typeDeclarationType instanceof UUnion) {
         const valueAsMap = value as { [key: string]: any };
-        const [unionCase, unionData] = Object.entries(valueAsMap)[0];
+        const [unionTag, unionData] = Object.entries(valueAsMap)[0];
 
-        const unionCases = typeDeclarationType.cases;
-        const unionStructReference = unionCases[unionCase];
+        const unionTags = typeDeclarationType.tags;
+        const unionStructReference = unionTags[unionTag];
         const unionStructRefFields = unionStructReference.fields;
-        const defaultCasesToFields: { [key: string]: string[] } = {};
+        const defaultTagsToFields: { [key: string]: string[] } = {};
 
-        for (const [caseName, unionStruct] of Object.entries(unionCases)) {
+        for (const [tagName, unionStruct] of Object.entries(unionTags)) {
             const fieldNames = Object.keys(unionStruct.fields);
-            defaultCasesToFields[caseName] = fieldNames;
+            defaultTagsToFields[tagName] = fieldNames;
         }
 
         const unionSelectedFields = selectedStructFields[typeDeclarationType.name] as
             | { [key: string]: any }
             | undefined;
-        const thisUnionCaseSelectedFieldsDefault = defaultCasesToFields[unionCase];
-        const selectedFields = unionSelectedFields?.[unionCase] || thisUnionCaseSelectedFieldsDefault;
+        const thisUnionTagSelectedFieldsDefault = defaultTagsToFields[unionTag];
+        const selectedFields = unionSelectedFields?.[unionTag] || thisUnionTagSelectedFieldsDefault;
 
         const finalMap: { [key: string]: any } = {};
         for (const [fieldName, fieldValue] of Object.entries(unionData)) {
@@ -94,7 +94,7 @@ export function selectStructFields(
             }
         }
 
-        return { [unionCase]: finalMap };
+        return { [unionTag]: finalMap };
     } else if (typeDeclarationType instanceof UObject) {
         const nestedTypeDeclaration = typeDeclarationTypeParams[0];
         const valueAsMap = value as { [key: string]: any };

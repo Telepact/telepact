@@ -1,16 +1,16 @@
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { UType } from '../../internal/types/UType';
-import { getTypeUnexpectedValidationFailure } from '../../internal/validation/GetTypeUnexpectedValidationFailure';
-import { UFn } from '../../internal/types/UFn';
-import { ValidateContext } from './ValidateContext';
+import { ValidationFailure } from "../../internal/validation/ValidationFailure";
+import { UType } from "../../internal/types/UType";
+import { getTypeUnexpectedValidationFailure } from "../../internal/validation/GetTypeUnexpectedValidationFailure";
+import { UFn } from "../../internal/types/UFn";
+import { ValidateContext } from "./ValidateContext";
 
 export function validateMockCall(
     givenObj: any,
     types: Record<string, UType>,
     ctx: ValidateContext,
 ): ValidationFailure[] {
-    if (!(typeof givenObj === 'object' && !Array.isArray(givenObj))) {
-        return getTypeUnexpectedValidationFailure([], givenObj, 'Object');
+    if (!(typeof givenObj === "object" && !Array.isArray(givenObj))) {
+        return getTypeUnexpectedValidationFailure([], givenObj, "Object");
     }
 
     const givenMap = givenObj;
@@ -22,7 +22,7 @@ export function validateMockCall(
     const matches = keys.filter((k) => regexString.test(k));
     if (matches.length !== 1) {
         return [
-            new ValidationFailure([], 'ObjectKeyRegexMatchCountUnexpected', {
+            new ValidationFailure([], "ObjectKeyRegexMatchCountUnexpected", {
                 regex: regexString.toString().slice(1, -1),
                 actual: matches.length,
                 expected: 1,
@@ -37,9 +37,9 @@ export function validateMockCall(
 
     const functionDefCall = functionDef.call;
     const functionDefName = functionDef.name;
-    const functionDefCallCases = functionDefCall.cases;
+    const functionDefCallTags = functionDefCall.tags;
 
-    const inputFailures = functionDefCallCases[functionDefName].validate(input, [], ctx);
+    const inputFailures = functionDefCallTags[functionDefName].validate(input, [], ctx);
 
     const inputFailuresWithPath: ValidationFailure[] = [];
     for (const failure of inputFailures) {
@@ -48,5 +48,5 @@ export function validateMockCall(
         inputFailuresWithPath.push(new ValidationFailure(newPath, failure.reason, failure.data));
     }
 
-    return inputFailuresWithPath.filter((failure) => failure.reason !== 'RequiredObjectKeyMissing');
+    return inputFailuresWithPath.filter((failure) => failure.reason !== "RequiredObjectKeyMissing");
 }

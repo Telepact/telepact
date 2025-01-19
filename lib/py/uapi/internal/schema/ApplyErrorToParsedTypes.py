@@ -31,37 +31,37 @@ def apply_error_to_parsed_types(error: 'UError', parsed_types: dict[str, 'UType'
         regex = re.compile(f.errors_regex)
 
         fn_result = f.result
-        fn_result_cases = fn_result.cases
+        fn_result_tags = fn_result.tags
         error_errors = error.errors
-        error_cases = error_errors.cases
+        error_tags = error_errors.tags
 
         matcher = regex.match(error_key)
         if not matcher:
             continue
 
-        for error_case_name, error_case in error_cases.items():
-            new_key = error_case_name
+        for error_tag_name, error_tag in error_tags.items():
+            new_key = error_tag_name
 
-            if new_key in fn_result_cases:
+            if new_key in fn_result_tags:
                 other_path_index = schema_keys_to_index[fn_name]
-                error_case_index = error.errors.case_indices[new_key]
+                error_tag_index = error.errors.tag_indices[new_key]
                 other_document_name = schema_keys_to_document_names[fn_name]
-                fn_error_case_index = f.result.case_indices[new_key]
+                fn_error_tag_index = f.result.tag_indices[new_key]
                 other_final_path = [other_path_index,
-                                    "->", fn_error_case_index, new_key]
+                                    "->", fn_error_tag_index, new_key]
                 other_document_json = document_names_to_json[other_document_name]
                 other_location_pseudo_json = get_path_document_coordinates_pseudo_json(
                     other_final_path, other_document_json)
                 parse_failures.append(SchemaParseFailure(
                     document_name,
                     [error_index, error_key,
-                     error_case_index, new_key],
+                     error_tag_index, new_key],
                     "PathCollision",
                     {"document": other_document_name,
                      "path": other_final_path,
                         "location": other_location_pseudo_json}
                 ))
-            fn_result_cases[new_key] = error_case
+            fn_result_tags[new_key] = error_tag
 
     if parse_failures:
         raise UApiSchemaParseError(

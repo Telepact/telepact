@@ -30,7 +30,7 @@ class UFn(UType):
 
     def generate_random_value(self, blueprint_value: object, use_blueprint_value: bool, type_parameters: list['UTypeDeclaration'], ctx: 'GenerateContext') -> object:
         from uapi.internal.generation.GenerateRandomUnion import generate_random_union
-        return generate_random_union(blueprint_value, use_blueprint_value, self.call.cases, ctx)
+        return generate_random_union(blueprint_value, use_blueprint_value, self.call.tags, ctx)
 
     def get_name(self) -> str:
         return _FN_NAME

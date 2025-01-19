@@ -15,13 +15,13 @@ public class UUnion implements UType {
     public static final String _UNION_NAME = "Object";
 
     public final String name;
-    public final Map<String, UStruct> cases;
-    public final Map<String, Integer> caseIndices;
+    public final Map<String, UStruct> tags;
+    public final Map<String, Integer> tagIndices;
 
-    public UUnion(String name, Map<String, UStruct> cases, Map<String, Integer> caseIndices) {
+    public UUnion(String name, Map<String, UStruct> tags, Map<String, Integer> tagIndices) {
         this.name = name;
-        this.cases = cases;
-        this.caseIndices = caseIndices;
+        this.tags = tags;
+        this.tagIndices = tagIndices;
     }
 
     @Override
@@ -31,13 +31,13 @@ public class UUnion implements UType {
 
     @Override
     public List<ValidationFailure> validate(Object value, List<UTypeDeclaration> typeParameters, ValidateContext ctx) {
-        return validateUnion(value, this.name, this.cases, ctx);
+        return validateUnion(value, this.name, this.tags, ctx);
     }
 
     @Override
     public Object generateRandomValue(Object blueprintValue, boolean useBlueprintValue,
             List<UTypeDeclaration> typeParameters, GenerateContext ctx) {
-        return generateRandomUnion(blueprintValue, useBlueprintValue, this.cases, ctx);
+        return generateRandomUnion(blueprintValue, useBlueprintValue, this.tags, ctx);
     }
 
     @Override

@@ -24,10 +24,10 @@
         "///": [" A function. "],
         "fn.goForth": {
             "arg1": ["string"],
-            "arg2": ["integer"]
+            "arg2": ["array", ["string"]]
         },
         "->": {
-            "ok": {
+            "ok.": {
                 "data": ["type.Example"]
             },
             "err.ProcessFailure": "..."

@@ -115,7 +115,7 @@ async def mock_handle(request_message: 'Message', stubs: list['MockStub'], invoc
 
         if definition is not None:
             result_union = definition.result
-            ok_struct_ref = result_union.cases["Ok_"]
+            ok_struct_ref = result_union.tags["Ok_"]
             use_blueprint_value = True
             include_optional_fields = True
             always_include_required_fields = True

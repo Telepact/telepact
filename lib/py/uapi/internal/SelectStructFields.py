@@ -35,14 +35,14 @@ def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
         return final_map
     elif isinstance(type_declaration_type, UFn):
         value_as_map = cast(dict[str, object], value)
-        union_case, union_data = cast(
+        union_tag, union_data = cast(
             tuple[str, dict[str, object]], next(iter(value_as_map.items())))
 
         fn_name = type_declaration_type.name
         fn_call = type_declaration_type.call
-        fn_call_cases = fn_call.cases
+        fn_call_tags = fn_call.tags
 
-        arg_struct_reference = fn_call_cases[union_case]
+        arg_struct_reference = fn_call_tags[union_tag]
         selected_fields = cast(
             list[str] | None, selected_struct_fields.get(fn_name))
         final_map = {}
@@ -55,27 +55,27 @@ def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
 
                 final_map[field_name] = value_with_selected_fields
 
-        return {union_case: final_map}
+        return {union_tag: final_map}
     elif isinstance(type_declaration_type, UUnion):
         value_as_map = cast(dict[str, object], value)
-        union_case, union_data = cast(
+        union_tag, union_data = cast(
             tuple[str, dict[str, object]], next(iter(value_as_map.items())))
 
-        union_cases = type_declaration_type.cases
-        union_struct_reference = union_cases[union_case]
+        union_tags = type_declaration_type.tags
+        union_struct_reference = union_tags[union_tag]
         union_struct_ref_fields = union_struct_reference.fields
-        default_cases_to_fields = {}
+        default_tags_to_fields = {}
 
-        for case, union_struct in union_cases.items():
+        for tag, union_struct in union_tags.items():
             field_names = list(union_struct.fields.keys())
-            default_cases_to_fields[case] = field_names
+            default_tags_to_fields[tag] = field_names
 
         union_selected_fields = cast(dict[str, object], selected_struct_fields.get(
-            type_declaration_type.name, default_cases_to_fields))
-        this_union_case_selected_fields_default = default_cases_to_fields.get(
-            union_case)
+            type_declaration_type.name, default_tags_to_fields))
+        this_union_tag_selected_fields_default = default_tags_to_fields.get(
+            union_tag)
         selected_fields = cast(list[str] | None, union_selected_fields.get(
-            union_case, this_union_case_selected_fields_default))
+            union_tag, this_union_tag_selected_fields_default))
 
         final_map = {}
         for field_name, field_value in union_data.items():
@@ -86,7 +86,7 @@ def select_struct_fields(type_declaration: 'UTypeDeclaration', value: object,
 
                 final_map[field_name] = value_with_selected_fields
 
-        return {union_case: final_map}
+        return {union_tag: final_map}
     elif isinstance(type_declaration_type, UObject):
         nested_type_declaration = type_declaration_type_params[0]
         value_as_map = cast(dict[str, object], value)

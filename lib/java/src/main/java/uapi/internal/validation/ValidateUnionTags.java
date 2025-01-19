@@ -10,9 +10,9 @@ import java.util.Map;
 
 import uapi.internal.types.UStruct;
 
-public class ValidateUnionCases {
-    static List<ValidationFailure> validateUnionCases(
-            Map<String, UStruct> referenceCases, Map<String, Object> selectedCases,
+public class ValidateUnionTags {
+    static List<ValidationFailure> validateUnionTags(
+            Map<String, UStruct> referenceTags, Map<String, Object> selectedTags,
             Map<?, ?> actual, ValidateContext ctx) {
         if (actual.size() != 1) {
             return List.of(
@@ -24,7 +24,7 @@ public class ValidateUnionCases {
         final var unionTarget = (String) entry.getKey();
         final var unionPayload = entry.getValue();
 
-        final var referenceStruct = referenceCases.get(unionTarget);
+        final var referenceStruct = referenceTags.get(unionTarget);
         if (referenceStruct == null) {
             return Collections
                     .singletonList(new ValidationFailure(List.of(unionTarget),
@@ -33,7 +33,7 @@ public class ValidateUnionCases {
 
         if (unionPayload instanceof Map<?, ?> m2) {
             final var nestedValidationFailures = validateUnionStruct(referenceStruct, unionTarget,
-                    (Map<String, Object>) m2, selectedCases, ctx);
+                    (Map<String, Object>) m2, selectedTags, ctx);
 
             final var nestedValidationFailuresWithPath = new ArrayList<ValidationFailure>();
             for (final var f : nestedValidationFailures) {

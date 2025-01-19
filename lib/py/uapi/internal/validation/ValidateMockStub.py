@@ -40,8 +40,8 @@ def validate_mock_stub(given_obj: object,
 
     function_def_call: UUnion = function_def.call
     function_def_name: str = function_def.name
-    function_def_call_cases: dict[str, UStruct] = function_def_call.cases
-    input_failures = function_def_call_cases[function_def_name].validate(
+    function_def_call_tags: dict[str, UStruct] = function_def_call.tags
+    input_failures = function_def_call_tags[function_def_name].validate(
         input, [], ctx)
 
     input_failures_with_path = []

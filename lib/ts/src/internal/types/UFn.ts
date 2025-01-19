@@ -1,12 +1,12 @@
-import { UTypeDeclaration } from '../../internal/types/UTypeDeclaration';
-import { UUnion } from '../../internal/types/UUnion';
-import { ValidationFailure } from '../../internal/validation/ValidationFailure';
-import { UType } from '../../internal/types/UType';
-import { GenerateContext } from '../../internal/generation/GenerateContext';
-import { generateRandomUnion } from '../../internal/generation/GenerateRandomUnion';
-import { ValidateContext } from '../validation/ValidateContext';
+import { UTypeDeclaration } from "../../internal/types/UTypeDeclaration";
+import { UUnion } from "../../internal/types/UUnion";
+import { ValidationFailure } from "../../internal/validation/ValidationFailure";
+import { UType } from "../../internal/types/UType";
+import { GenerateContext } from "../../internal/generation/GenerateContext";
+import { generateRandomUnion } from "../../internal/generation/GenerateRandomUnion";
+import { ValidateContext } from "../validation/ValidateContext";
 
-const FN_NAME = 'Object';
+const FN_NAME = "Object";
 
 export class UFn extends UType {
     name: string;
@@ -37,7 +37,7 @@ export class UFn extends UType {
         typeParameters: UTypeDeclaration[],
         ctx: GenerateContext,
     ): any {
-        return generateRandomUnion(blueprintValue, useBlueprintValue, this.call.cases, ctx);
+        return generateRandomUnion(blueprintValue, useBlueprintValue, this.call.tags, ctx);
     }
 
     getName(): string {

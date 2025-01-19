@@ -36,9 +36,9 @@ public class ValidateMockCall {
 
         final UUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
-        final Map<String, UStruct> functionDefCallCases = functionDefCall.cases;
+        final Map<String, UStruct> functionDefCallTags = functionDefCall.tags;
 
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), ctx);
+        final var inputFailures = functionDefCallTags.get(functionDefName).validate(input, List.of(), ctx);
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (var f : inputFailures) {

@@ -23,23 +23,23 @@ def construct_binary_encoding(u_api_schema: 'UApiSchema') -> BinaryEncoding:
             struct_fields: dict[str, UFieldDeclaration] = value.fields
             all_keys.update(struct_fields.keys())
         elif isinstance(value, UUnion):
-            union_cases: dict[str, UStruct] = value.cases
-            for case_key, case_value in union_cases.items():
-                all_keys.add(case_key)
-                struct_fields = case_value.fields
+            union_tags: dict[str, UStruct] = value.tags
+            for tag_key, tag_value in union_tags.items():
+                all_keys.add(tag_key)
+                struct_fields = tag_value.fields
                 all_keys.update(struct_fields.keys())
         elif isinstance(value, UFn):
-            fn_call_cases: dict[str, UStruct] = value.call.cases
-            fn_result_cases: dict[str, UStruct] = value.result.cases
+            fn_call_tags: dict[str, UStruct] = value.call.tags
+            fn_result_tags: dict[str, UStruct] = value.result.tags
 
-            for case_key, case_value in fn_call_cases.items():
-                all_keys.add(case_key)
-                struct_fields = case_value.fields
+            for tag_key, tag_value in fn_call_tags.items():
+                all_keys.add(tag_key)
+                struct_fields = tag_value.fields
                 all_keys.update(struct_fields.keys())
 
-            for case_key, case_value in fn_result_cases.items():
-                all_keys.add(case_key)
-                struct_fields = case_value.fields
+            for tag_key, tag_value in fn_result_tags.items():
+                all_keys.add(tag_key)
+                struct_fields = tag_value.fields
                 all_keys.update(struct_fields.keys())
 
     sorted_all_keys = sorted(all_keys)

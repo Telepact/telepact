@@ -43,8 +43,8 @@ public class ValidateMockStub {
 
         final UUnion functionDefCall = functionDef.call;
         final String functionDefName = functionDef.name;
-        final Map<String, UStruct> functionDefCallCases = functionDefCall.cases;
-        final var inputFailures = functionDefCallCases.get(functionDefName).validate(input, List.of(), ctx);
+        final Map<String, UStruct> functionDefCallTags = functionDefCall.tags;
+        final var inputFailures = functionDefCallTags.get(functionDefName).validate(input, List.of(), ctx);
 
         final var inputFailuresWithPath = new ArrayList<ValidationFailure>();
         for (final var f : inputFailures) {

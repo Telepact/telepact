@@ -2,7 +2,7 @@ package uapi.internal.validation;
 
 import static uapi.internal.types.UUnion._UNION_NAME;
 import static uapi.internal.validation.GetTypeUnexpectedValidationFailure.getTypeUnexpectedValidationFailure;
-import static uapi.internal.validation.ValidateUnionCases.validateUnionCases;
+import static uapi.internal.validation.ValidateUnionTags.validateUnionTags;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,16 +12,16 @@ import uapi.internal.types.UStruct;
 
 public class ValidateUnion {
     public static List<ValidationFailure> validateUnion(Object value,
-            String name, Map<String, UStruct> cases, ValidateContext ctx) {
+            String name, Map<String, UStruct> tags, ValidateContext ctx) {
         if (value instanceof Map<?, ?> m) {
-            Map<String, Object> selectedCases;
+            Map<String, Object> selectedTags;
             if (name.startsWith("fn.")) {
-                selectedCases = new HashMap<>();
-                selectedCases.put(name, ctx.select == null ? null : ctx.select.get(name));
+                selectedTags = new HashMap<>();
+                selectedTags.put(name, ctx.select == null ? null : ctx.select.get(name));
             } else {
-                selectedCases = ctx.select == null ? null : (Map<String, Object>) ctx.select.get(name);
+                selectedTags = ctx.select == null ? null : (Map<String, Object>) ctx.select.get(name);
             }
-            return validateUnionCases(cases, selectedCases, m, ctx);
+            return validateUnionTags(tags, selectedTags, m, ctx);
         } else {
             return getTypeUnexpectedValidationFailure(List.of(), value, _UNION_NAME);
         }

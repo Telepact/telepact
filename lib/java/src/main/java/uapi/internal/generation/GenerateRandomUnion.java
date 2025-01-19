@@ -12,28 +12,28 @@ import uapi.internal.types.UTypeDeclaration;
 
 public class GenerateRandomUnion {
     public static Object generateRandomUnion(Object blueprintValue,
-            boolean useBlueprintValue, Map<String, UStruct> unionCasesReference,
+            boolean useBlueprintValue, Map<String, UStruct> unionTagsReference,
             GenerateContext ctx) {
         if (useBlueprintValue) {
             final var startingUnion = (Map<String, Object>) blueprintValue;
             final var entry = startingUnion.entrySet().stream().findAny().get();
-            final var unionCase = entry.getKey();
-            final var unionStructType = unionCasesReference.get(unionCase);
-            final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionCase);
+            final var unionTag = entry.getKey();
+            final var unionStructType = unionTagsReference.get(unionTag);
+            final var unionStartingStruct = (Map<String, Object>) startingUnion.get(unionTag);
 
-            return Map.of(unionCase,
+            return Map.of(unionTag,
                     generateRandomStruct(unionStartingStruct, true, unionStructType.fields, ctx));
         } else {
-            final var sortedUnionCasesReference = new ArrayList<>(unionCasesReference.entrySet());
+            final var sortedUnionTagsReference = new ArrayList<>(unionTagsReference.entrySet());
 
-            Collections.sort(sortedUnionCasesReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
+            Collections.sort(sortedUnionTagsReference, (e1, e2) -> e1.getKey().compareTo(e2.getKey()));
 
-            final var randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionCasesReference.size() - 1);
-            final var unionEntry = sortedUnionCasesReference.get(randomIndex);
-            final var unionCase = unionEntry.getKey();
+            final var randomIndex = ctx.randomGenerator.nextIntWithCeiling(sortedUnionTagsReference.size() - 1);
+            final var unionEntry = sortedUnionTagsReference.get(randomIndex);
+            final var unionTag = unionEntry.getKey();
             final var unionData = unionEntry.getValue();
 
-            return Map.of(unionCase,
+            return Map.of(unionTag,
                     generateRandomStruct(null, false, unionData.fields, ctx));
         }
     }

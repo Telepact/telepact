@@ -19,7 +19,7 @@ public class GenerateRandomUMockCall {
 
         UFn selectedFn = functions.get(ctx.randomGenerator.nextIntWithCeiling(functions.size()));
 
-        return GenerateRandomUnion.generateRandomUnion(null, false, selectedFn.call.cases,
+        return GenerateRandomUnion.generateRandomUnion(null, false, selectedFn.call.tags,
                 ctx.copyWithNewAlwaysIncludeRequiredFields(false));
     }
 }

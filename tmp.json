@@ -20,10 +20,10 @@
         ],
         "union.ExUnion": [
             {
-                "case.One": {}
+                "tag.One": {}
             },
             {
-                "case.Two": {
+                "tag.Two": {
                     "required": ["boolean"],
                     "optional!": ["boolean"]
                 }
@@ -125,28 +125,28 @@
         "union.ProcessFailureCause": {
             "Unknown": {},
             "InvalidRequestBody": {
-                "cases": [
+                "tags": [
                     {
                         "required": ["string"]
                     }
                 ]
             },
             "InvalidRequestHeader": {
-                "cases": [
+                "tags": [
                     {
                         "required": ["string"]
                     }
                 ]
             },
             "InvalidResponseHeader": {
-                "cases": [
+                "tags": [
                     {
                         "required": ["string"]
                     }
                 ]
             },
             "InvalidResponseBody": {
-                "cases": [
+                "tags": [
                     {
                         "required": ["string"]
                     }

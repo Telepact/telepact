@@ -84,9 +84,9 @@ public class ParseUnionType {
             outerLoop: for (final var requiredKey : requiredKeys) {
                 for (final var element : definition) {
                     final var map = (Map<String, Object>) element;
-                    final var caseKeys = new HashSet<>(map.keySet());
-                    caseKeys.remove("///");
-                    if (caseKeys.contains(requiredKey)) {
+                    final var tagKeys = new HashSet<>(map.keySet());
+                    tagKeys.remove("///");
+                    if (tagKeys.contains(requiredKey)) {
                         continue outerLoop;
                     }
                 }
@@ -100,8 +100,8 @@ public class ParseUnionType {
             }
         }
 
-        final var cases = new HashMap<String, UStruct>();
-        final var caseIndices = new HashMap<String, Integer>();
+        final var tags = new HashMap<String, UStruct>();
+        final var tagIndices = new HashMap<String, Integer>();
 
         for (int i = 0; i < definition.size(); i++) {
             final var element = definition.get(i);
@@ -132,10 +132,10 @@ public class ParseUnionType {
             }
 
             final var entry = map.entrySet().stream().findAny().get();
-            final var unionCase = entry.getKey();
+            final var unionTag = entry.getKey();
 
             final List<Object> unionKeyPath = new ArrayList<>(loopPath);
-            unionKeyPath.add(unionCase);
+            unionKeyPath.add(unionTag);
 
             if (!(entry.getValue() instanceof Map)) {
                 final List<SchemaParseFailure> thisParseFailures = getTypeUnexpectedParseFailure(ctx.documentName,
@@ -145,26 +145,26 @@ public class ParseUnionType {
                 parseFailures.addAll(thisParseFailures);
                 continue;
             }
-            final Map<String, Object> unionCaseStruct = (Map<String, Object>) entry.getValue();
+            final Map<String, Object> unionTagStruct = (Map<String, Object>) entry.getValue();
 
             final Map<String, UFieldDeclaration> fields;
             try {
-                fields = parseStructFields(unionKeyPath, unionCaseStruct, ctx);
+                fields = parseStructFields(unionKeyPath, unionTagStruct, ctx);
             } catch (UApiSchemaParseError e) {
                 parseFailures.addAll(e.schemaParseFailures);
                 continue;
             }
 
-            final var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionCase), fields);
+            final var unionStruct = new UStruct("%s.%s".formatted(schemaKey, unionTag), fields);
 
-            cases.put(unionCase, unionStruct);
-            caseIndices.put(unionCase, i);
+            tags.put(unionTag, unionStruct);
+            tagIndices.put(unionTag, i);
         }
 
         if (!parseFailures.isEmpty()) {
             throw new UApiSchemaParseError(parseFailures, ctx.uApiSchemaDocumentNamesToJson);
         }
 
-        return new UUnion(schemaKey, cases, caseIndices);
+        return new UUnion(schemaKey, tags, tagIndices);
     }
 }

@@ -9,13 +9,13 @@ if TYPE_CHECKING:
 
 def validate_union_struct(
     union_struct: 'UStruct',
-    union_case: str,
+    union_tag: str,
     actual: dict[str, object],
-    selected_cases: dict[str, object],
+    selected_tags: dict[str, object],
     ctx: 'ValidateContext'
 ) -> list['ValidationFailure']:
-    selected_fields = cast(list[str], selected_cases.get(
-        union_case)) if selected_cases else None
+    selected_fields = cast(list[str], selected_tags.get(
+        union_tag)) if selected_tags else None
     from uapi.internal.validation.ValidateStructFields import validate_struct_fields
 
     return validate_struct_fields(

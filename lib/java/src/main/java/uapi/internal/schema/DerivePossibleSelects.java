@@ -11,7 +11,7 @@ public class DerivePossibleSelects {
 
     public static Map<String, Object> derivePossibleSelect(String fnName, UUnion result) {
         final var nestedTypes = new HashMap<String, UType>();
-        final var okFields = result.cases.get("Ok_").fields;
+        final var okFields = result.tags.get("Ok_").fields;
 
         final var okFieldNames = new ArrayList<>(okFields.keySet());
         Collections.sort(okFieldNames);
@@ -29,10 +29,10 @@ public class DerivePossibleSelects {
             final var v = nestedTypes.get(k);
             if (v instanceof UUnion u) {
                 final var unionSelect = new HashMap<String, List<String>>();
-                final var sortedCaseKeys = new ArrayList<>(u.cases.keySet());
-                Collections.sort(sortedCaseKeys);
-                for (final var c : sortedCaseKeys) {
-                    final var typ = u.cases.get(c);
+                final var sortedTagKeys = new ArrayList<>(u.tags.keySet());
+                Collections.sort(sortedTagKeys);
+                for (final var c : sortedTagKeys) {
+                    final var typ = u.tags.get(c);
                     final var selectedFieldNames = new ArrayList<String>();
                     final var sortedFieldNames = new ArrayList<>(typ.fields.keySet());
                     Collections.sort(sortedFieldNames);
@@ -60,7 +60,7 @@ public class DerivePossibleSelects {
             final var typ = field.typeDeclaration.type;
             if (typ instanceof UUnion u) {
                 nestedTypes.put(u.name, typ);
-                for (final var c : u.cases.values()) {
+                for (final var c : u.tags.values()) {
                     findNestedTypes(c.fields, nestedTypes);
                 }
             } else if (typ instanceof UStruct s) {

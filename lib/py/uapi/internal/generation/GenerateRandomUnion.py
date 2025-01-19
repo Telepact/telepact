@@ -9,19 +9,19 @@ if TYPE_CHECKING:
 
 
 def generate_random_union(blueprint_value: object, use_blueprint_value: bool,
-                          union_cases_reference: dict[str, 'UStruct'], ctx: 'GenerateContext') -> object:
+                          union_tags_reference: dict[str, 'UStruct'], ctx: 'GenerateContext') -> object:
     from uapi.internal.generation.GenerateRandomStruct import generate_random_struct
 
     if not use_blueprint_value:
-        sorted_union_cases_reference = sorted(
-            union_cases_reference.items(), key=lambda x: x[0])
+        sorted_union_tags_reference = sorted(
+            union_tags_reference.items(), key=lambda x: x[0])
         random_index = ctx.random_generator.next_int_with_ceiling(
-            len(sorted_union_cases_reference) - 1)
-        union_case, union_data = sorted_union_cases_reference[random_index]
-        return {union_case: generate_random_struct(None, False, union_data.fields, ctx)}
+            len(sorted_union_tags_reference) - 1)
+        union_tag, union_data = sorted_union_tags_reference[random_index]
+        return {union_tag: generate_random_struct(None, False, union_data.fields, ctx)}
     else:
         starting_union = cast(dict[str, object], blueprint_value)
-        union_case, union_starting_struct = cast(
+        union_tag, union_starting_struct = cast(
             tuple[str, dict[str, object]], next(iter(starting_union.items())))
-        union_struct_type = union_cases_reference[union_case]
-        return {union_case: generate_random_struct(union_starting_struct, True, union_struct_type.fields, ctx)}
+        union_struct_type = union_tags_reference[union_tag]
+        return {union_tag: generate_random_struct(union_starting_struct, True, union_struct_type.fields, ctx)}

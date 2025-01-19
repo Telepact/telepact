@@ -43,14 +43,14 @@ public class SelectStructFields {
         } else if (typeDeclarationType instanceof final UFn f) {
             final var valueAsMap = (Map<String, Object>) value;
             final Map.Entry<String, Object> uEntry = valueAsMap.entrySet().stream().findAny().get();
-            final var unionCase = uEntry.getKey();
+            final var unionTag = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
             final String fnName = f.name;
             final UUnion fnCall = f.call;
-            final Map<String, UStruct> fnCallCases = fnCall.cases;
+            final Map<String, UStruct> fnCallTags = fnCall.tags;
 
-            final var argStructReference = fnCallCases.get(unionCase);
+            final var argStructReference = fnCallTags.get(unionTag);
             final var selectedFields = (List<String>) selectedStructFields.get(fnName);
             final var finalMap = new HashMap<>();
 
@@ -69,26 +69,26 @@ public class SelectStructFields {
         } else if (typeDeclarationType instanceof final UUnion u) {
             final var valueAsMap = (Map<String, Object>) value;
             final var uEntry = valueAsMap.entrySet().stream().findAny().get();
-            final var unionCase = uEntry.getKey();
+            final var unionTag = uEntry.getKey();
             final var unionData = (Map<String, Object>) uEntry.getValue();
 
-            final Map<String, UStruct> unionCases = u.cases;
-            final var unionStructReference = unionCases.get(unionCase);
+            final Map<String, UStruct> unionTags = u.tags;
+            final var unionStructReference = unionTags.get(unionTag);
             final var unionStructRefFields = unionStructReference.fields;
-            final var defaultCasesToFields = new HashMap<String, List<String>>();
+            final var defaultTagsToFields = new HashMap<String, List<String>>();
 
-            for (final var entry : unionCases.entrySet()) {
+            for (final var entry : unionTags.entrySet()) {
                 final var unionStruct = entry.getValue();
                 final var unionStructFields = unionStruct.fields;
                 final var fieldNames = unionStructFields.keySet().stream().toList();
-                defaultCasesToFields.put(entry.getKey(), fieldNames);
+                defaultTagsToFields.put(entry.getKey(), fieldNames);
             }
 
             final var unionSelectedFields = (Map<String, Object>) selectedStructFields.getOrDefault(u.name,
-                    defaultCasesToFields);
-            final var thisUnionCaseSelectedFieldsDefault = defaultCasesToFields.get(unionCase);
-            final var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionCase,
-                    thisUnionCaseSelectedFieldsDefault);
+                    defaultTagsToFields);
+            final var thisUnionTagSelectedFieldsDefault = defaultTagsToFields.get(unionTag);
+            final var selectedFields = (List<String>) unionSelectedFields.getOrDefault(unionTag,
+                    thisUnionTagSelectedFieldsDefault);
 
             final var finalMap = new HashMap<>();
             for (final var entry : unionData.entrySet()) {

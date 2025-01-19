@@ -51,11 +51,11 @@ def _find_schema_key(schema_data: dict[str, object]) -> str:
     raise Exception("No schema key found for " + str(schema_data.keys()))
 
 
-def _find_case_key(case_data: dict[str, object]) -> str:
-    for key in case_data:
+def _find_tag_key(tag_data: dict[str, object]) -> str:
+    for key in tag_data:
         if key != '///':
             return key
-    raise Exception("No case key found")
+    raise Exception("No tag key found")
 
 
 def _raise_error(message: str) -> None:
@@ -73,7 +73,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
 
     template_env.filters['regex_replace'] = _regex_replace
     template_env.filters['find_schema_key'] = _find_schema_key
-    template_env.filters['find_case_key'] = _find_case_key
+    template_env.filters['find_tag_key'] = _find_tag_key
     template_env.filters['raise_error'] = _raise_error
 
     if target == "java":

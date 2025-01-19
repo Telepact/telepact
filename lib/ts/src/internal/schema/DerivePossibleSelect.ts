@@ -1,12 +1,12 @@
-import { UType } from '../types/UType';
-import { UUnion } from '../types/UUnion';
-import { UFn } from '../types/UFn';
-import { UStruct } from '../types/UStruct';
-import { UFieldDeclaration } from '../types/UFieldDeclaration';
+import { UType } from "../types/UType";
+import { UUnion } from "../types/UUnion";
+import { UFn } from "../types/UFn";
+import { UStruct } from "../types/UStruct";
+import { UFieldDeclaration } from "../types/UFieldDeclaration";
 
 export function derivePossibleSelect(fnName: string, result: UUnion): Record<string, any> {
     const nestedTypes: Record<string, UType> = {};
-    const okFields: Record<string, UFieldDeclaration> = result.cases['Ok_'].fields;
+    const okFields: Record<string, UFieldDeclaration> = result.tags["Ok_"].fields;
 
     const okFieldNames = Object.keys(okFields);
     okFieldNames.sort();
@@ -15,7 +15,7 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
 
     const possibleSelect: Record<string, object> = {};
 
-    possibleSelect['->'] = {
+    possibleSelect["->"] = {
         Ok_: okFieldNames,
     };
 
@@ -25,9 +25,9 @@ export function derivePossibleSelect(fnName: string, result: UUnion): Record<str
         const v = nestedTypes[k];
         if (v instanceof UUnion) {
             const unionSelect: Record<string, object> = {};
-            const sortedCaseKeys = Object.keys(v.cases).sort();
-            for (const c of sortedCaseKeys) {
-                const typ = v.cases[c];
+            const sortedTagKeys = Object.keys(v.tags).sort();
+            for (const c of sortedTagKeys) {
+                const typ = v.tags[c];
                 const selectedFieldNames: Array<string> = [];
                 const sortedFieldNames = Object.keys(typ.fields).sort();
                 for (const fieldName of sortedFieldNames) {
@@ -57,7 +57,7 @@ function findNestedTypes(fields: Record<string, UFieldDeclaration>, nestedTypes:
         const typ = field.typeDeclaration.type;
         if (typ instanceof UUnion) {
             nestedTypes[typ.name] = typ;
-            for (const c of Object.values(typ.cases)) {
+            for (const c of Object.values(typ.tags)) {
                 findNestedTypes(c.fields, nestedTypes);
             }
         } else if (typ instanceof UStruct) {

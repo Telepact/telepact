@@ -1,12 +1,12 @@
-import { GenerateContext } from './GenerateContext';
-import { UFn } from '../types/UFn';
-import { UType } from '../types/UType';
-import { generateRandomStruct } from './GenerateRandomStruct';
+import { GenerateContext } from "./GenerateContext";
+import { UFn } from "../types/UFn";
+import { UType } from "../types/UType";
+import { generateRandomStruct } from "./GenerateRandomStruct";
 
 export function generateRandomUMockStub(types: { [key: string]: UType }, ctx: GenerateContext): object {
     const functions: Array<UFn> = Object.entries(types)
         .filter(([key, value]) => value instanceof UFn)
-        .filter(([key, value]) => !key.endsWith('_'))
+        .filter(([key, value]) => !key.endsWith("_"))
         .map(([key, value]) => value as UFn);
 
     functions.sort((fn1, fn2) => fn1.name.localeCompare(fn2.name));
@@ -22,15 +22,15 @@ export function generateRandomUMockStub(types: { [key: string]: UType }, ctx: Ge
 
     console.log(`selectedFn: ${selectedFn.name}`);
 
-    const argFields = selectedFn.call.cases[selectedFn.name].fields;
-    const okFields = selectedFn.result.cases['Ok_'].fields;
+    const argFields = selectedFn.call.tags[selectedFn.name].fields;
+    const okFields = selectedFn.result.tags["Ok_"].fields;
 
     const arg = generateRandomStruct(null, false, argFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
     const okResult = generateRandomStruct(null, false, okFields, ctx.copy({ alwaysIncludeRequiredFields: false }));
 
     return {
         [selectedFn.name]: arg,
-        '->': {
+        "->": {
             Ok_: okResult,
         },
     };
