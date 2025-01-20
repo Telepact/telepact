@@ -20,12 +20,14 @@ build-backend = "hatchling.build"
 ignore-vcs = true
 include = [
   "uapi",
-  "*.json"
+  "*.json",
+  "uapi/py.typed"
 ]
 
 [tool.hatch.build.targets.wheel]
 ignore-vcs = true
 include = [
   "uapi",
-  "*.json"
+  "*.json",
+  "uapi/py.typed"
 ]
