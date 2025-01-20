@@ -18,15 +18,15 @@ public class ProcessRequestObject {
         final Map<String, Object> header = requestMessage.headers;
 
         try {
-            if (!header.containsKey("tim_")) {
-                header.put("tim_", timeoutMsDefault);
+            if (!header.containsKey("time_")) {
+                header.put("time_", timeoutMsDefault);
             }
 
             if (useBinaryDefault) {
                 header.put("_binary", true);
             }
 
-            final var timeoutMs = ((Number) header.get("tim_")).longValue();
+            final var timeoutMs = ((Number) header.get("time_")).longValue();
 
             final var responseMessage = adapter.apply(requestMessage, serializer).get(timeoutMs, TimeUnit.MILLISECONDS);
 

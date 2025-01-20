@@ -16,13 +16,13 @@ async def process_request_object(request_message: 'Message',
     header: dict[str, object] = request_message.headers
 
     try:
-        if "tim_" not in header:
-            header["tim_"] = timeout_ms_default
+        if "time_" not in header:
+            header["time_"] = timeout_ms_default
 
         if use_binary_default:
             header["_binary"] = True
 
-        timeout_ms = cast(int, header.get("tim_"))
+        timeout_ms = cast(int, header.get("time_"))
 
         async with asyncio.timeout(timeout_ms / 1000):
             response_message = await adapter(request_message, serializer)

@@ -293,7 +293,7 @@ cases = {
         [[{'Ok_': {}, '_throwError': True}, {'fn.test': {}}], [{}, {'ErrorUnknown_': {}}]],
     ],
     'clientHeaders': [
-        [[{'tim_': 6000}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],
+        [[{'time_': 6000}, {'fn.ping_': {}}], [{}, {'Ok_': {}}]],
     ],
     'big': [
         [[{'Ok_': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}, {'fn.getBigList': {}}], [{}, {'Ok_': {'items': [{'aF': True, 'bF': False, 'cF': True, 'dF': False}, {'aF': True, 'dF': False, 'cF': False, 'bF': True}, {'cF': False, 'bF': True, 'aF': True, 'dF': False}]}}]]
