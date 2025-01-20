@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
+fastapi = "*"
+uvicorn = "*"
 mypy = "*"
-uapi = {path = "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl"}
+requests = "*"
+uapi = {path = "./../../lib/py/dist/uapi-0.0.1-py3-none-any.whl"}
 
 [requires]
 python_version = "3.11"

@@ -5,23 +5,35 @@
     },
     {
         "///": " A value for computation that can take either a constant or variable form. ",
-        "union.Value": {
-            "Constant": {
-                "value": ["number"]
+        "union.Value": [
+            {
+                "Constant": {
+                    "value": ["number"]
+                }
             },
-            "Variable": {
-                "name": ["string"]
+            {
+                "Variable": {
+                    "name": ["string"]
+                }
             }
-        }
+        ]
     },
     {
         "///": " A basic mathematical operation. ",
-        "union.Operation": {
-            "Add": {},
-            "Sub": {},
-            "Mul": {},
-            "Div": {}
-        }
+        "union.Operation": [
+            {
+                "Add": {}
+            },
+            {
+                "Sub": {}
+            },
+            {
+                "Mul": {}
+            },
+            {
+                "Div": {}
+            }
+        ]
     },
     {
         "///": " A mathematical variable represented by a `name` that holds a certain `value`. ",
@@ -35,9 +47,11 @@
         "fn.saveVariables": {
             "variables": ["object", ["number"]]
         },
-        "->": {
-            "Ok_": {}
-        }
+        "->": [
+            {
+                "Ok_": {}
+            }
+        ]
     },
     {
         "///": " Compute the `result` of the given `x` and `y` values. ",
@@ -46,32 +60,40 @@
             "y": ["union.Value"],
             "op": ["union.Operation"]
         },
-        "->": {
-            "Ok_": {
-                "result": ["number"]
+        "->": [
+            {
+                "Ok_": {
+                    "result": ["number"]
+                }
             },
-            "ErrorCannotDivideByZero": {}
-        }
+            {
+                "ErrorCannotDivideByZero": {}
+            }
+        ]
     },
     {
         "///": " Export all saved variables, up to an optional `limit`. ",
         "fn.exportVariables": {
             "limit!": ["integer"]
         },
-        "->": {
-            "Ok_": {
-                "variables": ["array", ["struct.Variable"]]
+        "->": [
+            {
+                "Ok_": {
+                    "variables": ["array", ["struct.Variable"]]
+                }
             }
-        }
+        ]
     },
     {
         "///": " A function template. ",
         "fn.getPaperTape": {},
-        "->": {
-            "Ok_": {
-                "tape": ["array", ["struct.Computation"]]
+        "->": [
+            {
+                "Ok_": {
+                    "tape": ["array", ["struct.Computation"]]
+                }
             }
-        }
+        ]
     },
     {
         "///": " A computation. ",
@@ -84,10 +106,12 @@
         }
     },
     {
-        "errors.Authenticated": {
-            "->": {
-                "ErrorInvalidToken": {}
+        "errors.Authenticated": [
+            {
+                "->": {
+                    "ErrorInvalidToken": {}
+                }
             }
-        }
+        ]
     }
 ]
