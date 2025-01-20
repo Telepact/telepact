@@ -40,6 +40,16 @@ def on_err(e):
     print("".join(traceback.format_exception(e.__class__, e, e.__traceback__)))
 
 
+def on_request_err(m):
+    if m.headers.get("_onRequestError", False):
+        raise RuntimeError()
+
+
+def on_response_err(m):
+    if m.headers.get("_onResponseError", False):
+        raise RuntimeError()
+
+
 async def start_client_test_server(connection: NatsClient, metrics: CollectorRegistry,
                                    client_frontdoor_topic: str,
                                    client_backdoor_topic: str,
@@ -289,8 +299,8 @@ async def start_test_server(connection: NatsClient, metrics: CollectorRegistry, 
     options = Server.Options()
 
     options.on_error = on_err
-    options.on_request = lambda m: None  # onRequest handling
-    options.on_response = lambda m: None  # onResponse handling
+    options.on_request = on_request_err
+    options.on_response = on_response_err
     options.auth_required = auth_required
 
     server = Server(u_api, handler, options)
