@@ -144,7 +144,7 @@ def _generate_internal(schema_data: list[dict[str, object]], target: str, output
             schema_entries.append(schema_entry)
 
         type_template = template_env.get_template(
-            'py_all.j2')  # Specify your template file name
+            'py_all_2.j2')  # Specify your template file name
 
         output = type_template.render({
             'input': schema_entries,
