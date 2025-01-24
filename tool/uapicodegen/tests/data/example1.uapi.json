@@ -98,5 +98,15 @@
                 "error": ["string"]
             }
         }]
+    },
+    {
+        "fn.another": {},
+        "->": [
+            {
+                "Ok_": {
+                    "field1": ["integer"]
+                }
+            }
+        ]
     } 
 ]

@@ -2,24 +2,32 @@ import keyword
 from typing import Callable, TypeVar, Union, Literal, Generic, NoReturn, Never
 from dataclasses import dataclass
 from typing import cast, ForwardRef
-from abc import ABC, abstractmethod
+import uapi.Message
+import uapi.Client
+from typing import Tuple
 
 
 T = TypeVar('T')
 U = TypeVar('U')
 
+
 def util_let(value: T, f: Callable[[T], U]) -> U:
     return f(value)
 
+
 class Undefined:
     pass
+
 
 class UnionValue_(Generic[T, U]):
     tag_: T
     value_: U
 
+    def __init__(self, tag: T, value: U) -> None:
+        self.tag_ = tag
+        self.value_ = value
 
-{%- macro to_py_type(t, append_nullable=True) %}
+{% macro to_py_type(t, append_nullable=True) %}
     {%- set nullable = '?' in t[0] -%}
     {%- set typ = t[0] | replace('?', '') -%}
     {%- if typ == 'array' -%}
@@ -37,7 +45,7 @@ class UnionValue_(Generic[T, U]):
     {%- elif typ == 'any' -%}
         object
     {%- elif typ.startswith('fn.') -%}
-        {{ typ | regex_replace('^.*\\.', '') -}}__Input_
+        {{ typ | regex_replace('^.*\\.', '') -}}.Input
     {%- else -%}
         {{ typ | regex_replace('^.*\\.', '') -}}
     {%- endif -%}
@@ -67,7 +75,7 @@ class UnionValue_(Generic[T, U]):
     {%- elif typ == 'object' -%}
         util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else { k{{depth}}: {%- call unmarshall_py_type(t[1:][0], depth + 1) %}v{{ depth }}{% endcall %} for k{{depth}}, v{{depth}} in d{{depth}}.items()})
     {%- elif typ.startswith('struct') or typ.startswith('fn') or typ.startswith('union') -%}
-        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else d{{depth}}.to_pseudo_json())
+        util_let({{ caller() }}, lambda d{{depth}}: None if d{{depth}} is None else d{{depth}}.pseudo_json)
     {%- else -%}
         {{ caller() }}
     {%- endif -%}
@@ -101,7 +109,7 @@ class UnionValue_(Generic[T, U]):
 
 {%- macro sanitize_field_name(field_name) -%}
     {%- set sanitized_name =  field_name | replace('!', '') -%}
-    {%- set py_keywords = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
+    {%- set py_keywords = ['bool', 'int', 'str', 'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
     {%- if sanitized_name in py_keywords -%}
         {{- sanitized_name + '_' -}}
     {%- else -%}
@@ -109,25 +117,16 @@ class UnionValue_(Generic[T, U]):
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro tag_type_display(type_display, tag_key) %}
-    {{- type_display + ('_' if type_display.endswith('_') else '__') + tag_key }}
-{%- endmacro %}
-
-{%- macro struct(type_display, doc, fields, implements, union_tag) %}
-@dataclass
-class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
+{%- macro struct(type_display, doc, fields, type_prefix) %}
+class {{ type_display }}:
     {{ docstring(doc) | indent }}
-
     pseudo_json: dict[str, object]
 
     def __init__(self, pseudo_json: dict[str, object]) -> None:
         self.pseudo_json = pseudo_json
 
-    def to_pseudo_json(self) -> dict[str, object]:
-        return self.pseudo_json
-
     @staticmethod
-    def from_typed(cls,
+    def from_typed(
         {%- for field_name, field_type in fields.items() %}
             {%- if '!' not in field_name %}
         {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %},
@@ -138,122 +137,100 @@ class {{ type_display }}{% if implements %}({{ implements }}){% endif %}:
         {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %},
             {%- endif %}
         {%- endfor %}
-    ) -> '{{ type_display }}':
-        return cls({
+    ) -> '{{ type_prefix + type_display }}':
+        return {{ type_prefix + type_display }}({
             {%- for field_name, field_type in fields.items() %}
             "{{ field_name }}": {{ sanitize_field_name(field_name) }},
             {%- endfor %}
         })
-
     {% for field_name, field_type in fields.items() %}
     def {{ sanitize_field_name(field_name) }}(self) -> '{{ to_maybe_opt_py_type(field_type, field_name) }}':
         return {% call marshall_py_type(field_type, 0) %}self.pseudo_json["{{ field_name }}"]{% endcall %}
-    {% endfor %}
+    {% endfor -%}
+{%- endmacro -%}
 
-{%- endmacro %}
-
-{%- macro union(type_display, doc, tags) %}
-
+{%- macro union(type_display, doc, tags, type_prefix) %}
+    {%- set tag_prefix = type_prefix + type_display + '.' %}
 class {{ type_display }}:
     {{ docstring(doc) | indent }}
-
     pseudo_json: dict[str, object]
 
     def __init__(self, pseudo_json: dict[str, object]) -> None:
         self.pseudo_json = pseudo_json
-
-    def to_pseudo_json(self) -> dict[str, object]:
-        return self.pseudo_json
-
     {% for tag_entry in tags %}
         {%- set tag_key = tag_entry | find_tag_key %}
-        {% set tag_type_display_res = tag_type_display(type_display, tag_key) %}
     @staticmethod
-    def from_{{ tag_key }}(cls, payload: '{{ tag_type_display_res }}') -> '{{ type_display }}':
-        return cls({
+    def from_{{ tag_key }}(payload: '{{ tag_prefix + tag_key }}') -> '{{ type_prefix + type_display }}':
+        return {{ type_prefix + type_display }}({
             "{{ tag_key }}": payload
         })
     {% endfor %}
-
     def get_value(self) -> Union[
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
-            {%- set tag_type_display_res = tag_type_display(type_display, tag_key) -%}
-            UnionValue_[Literal["{{ tag_key }}"], '{{ tag_type_display_res }}'], 
-        {%- endfor -%}
-        UnionValue_[Literal["Unknown_"], dict[str, object]]]:
+            UnionValue_[Literal["{{ tag_key }}"], '{{ tag_prefix + tag_key }}'], 
+        {%- endfor %}
+            UnionValue_[Literal["Unknown_"], dict[str, object]]]:
         
-        tag = next(self.pseudo_json.keys())
+        tag = next(iter(self.pseudo_json.keys()))
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
         {% if loop.first %}if{% else %}elif{% endif %} tag == "{{ tag_key }}":
-            return UnionEntry_("{{ tag_key }}", {{ tag_type_display(type_display, tag_key) }}(cast(dict[str, object], self.pseudo_json["{{ tag_key }}"])))
+            return UnionValue_(cast(Literal["{{ tag_key }}"], "{{ tag_key }}"), {{ tag_prefix + tag_key }}(cast(dict[str, object], self.pseudo_json["{{ tag_key }}"])))
             {%- endfor %}
         else:
-            return UnionEntry_("Unknown_", cast(dict[str, object], self.pseudo_json["{{ tag_key }}"]))
-
-{%- for tag_entry in tags %}
-    {% set tag_key = tag_entry | find_tag_key %}
-    {% set tag_type_display_res = tag_type_display(type_display, tag_key) %}
-    {{ struct(tag_type_display_res, tag_entry['///'], tag_entry[tag_key], type_display, tag_key) }}
+            return UnionValue_(cast(Literal["Unknown_"], "Unknown_"), cast(dict[str, object], self.pseudo_json["{{ tag_key }}"]))
+{% for tag_entry in tags %}
+    {%- set tag_key = tag_entry | find_tag_key %}
+    {{- struct(tag_key, tag_entry['///'], tag_entry[tag_key], tag_prefix) | indent }}
 {%- endfor %}
 {%- endmacro %}
 
 {%- macro function(type_display, data, schema_key) %}
-
-    {{ struct(type_display + '__Input_', data['///'], data[schema_key], None, schema_key) }}
-
-    {{ union (type_display + '__Output_', data['///'], data['->'])}}
+class {{ type_display }}:
+    {{- struct('Input', data['///'], data[schema_key], type_display + '.') | indent }}
+    {{- union ('Output', data['///'], data['->'], type_display + '.') | indent }}
 {%- endmacro %}
 
 {%- for schema_entry in input %}
     {%- set schema_key = schema_entry | find_schema_key %}
 
-    {% set py_name = schema_key | regex_replace('^.*\\.', '') %}
+    {%- set py_name = schema_key | regex_replace('^.*\\.', '') %}
     {%- if schema_key.startswith('struct') %}
-        {{- struct(py_name, schema_entry['///'], schema_entry[schema_key], None, None) }}
+        {{- struct(py_name, schema_entry['///'], schema_entry[schema_key], '') }}
     {%- elif schema_key.startswith('union') %}
-        {{- union(py_name, schema_entry['///'], schema_entry[schema_key]) }}
+        {{- union(py_name, schema_entry['///'], schema_entry[schema_key], '') }}
     {%- elif schema_key.startswith('fn') %}
-        {{ function(py_name, schema_entry,schema_key) }}
+        {{- function(py_name, schema_entry,schema_key) }}
     {%- endif %}
 {% endfor %}
-
-import uapi.Message
-import uapi.Client
-from typing import Tuple
-
 class ClientInterface_:
 
     client: uapi.Client.Client
 
     def __init__(self, client: uapi.Client.Client):
         self.client = client
-
     {% for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> Tuple[dict[str, object], {{ function_name }}__Output_]:
-        message = await self.client.request(uapi.Message.Message(headers, input.to_pseudo_json()))
-        return message.headers, {{ function_name }}__Output_.from_pseudo_json(message.body)
-    {%- endfor %}
-
+    async def {{ function_name }}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> Tuple[dict[str, object], {{ function_name }}.Output]:
+        message = await self.client.request(uapi.Message.Message(headers, input.pseudo_json))
+        return message.headers, {{ function_name }}.Output(message.body)
+    {% endfor %}
 
 class ServerHandler_:
 
     {%- for fn in functions %}
     {%- set function_name = fn | replace('fn.', '') %}
-    async def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}__Input_) -> Tuple[dict[str, object], {{ function_name }}__Output_]:
+    async def {{function_name}}(self, headers: dict[str, object], input: {{ function_name }}.Input) -> Tuple[dict[str, object], {{ function_name }}.Output]:
         raise NotImplementedError()
-    {%- endfor %}
-
+    {% endfor %}
     async def handler(self, message: uapi.Message.Message) -> uapi.Message.Message:
         function_name = next(iter(message.body.keys()))
 
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
-            headers, output = await self.{{ function_name }}(message.headers, {{ function_name }}__Input_.from_pseudo_json(message.body))
-            return uapi.Message.Message(headers, output.to_pseudo_json())
-        {%- endfor %}
-
+            headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(message.body))
+            return uapi.Message.Message(headers, {{ function_name }}_output.pseudo_json)
+        {% endfor %}
         raise Exception("Unknown function: " + function_name)
