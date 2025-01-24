@@ -211,6 +211,7 @@
         },
         "uapi": {
             "hashes": [
+                "sha256:02df06e04f2f8229e33ae5152e0aa3e76228e9e7bb720b36f39257ad45bf1ff7",
                 "sha256:3ce5a59992031864bca4210850e537c2cdd6643fcc7ba35434ef3a9f46d699bc"
             ],
             "path": "./../../../lib/py/dist/uapi-0.0.1-py3-none-any.whl",
@@ -218,8 +219,7 @@
         },
         "uapicodegen": {
             "hashes": [
-                "sha256:43e978b06c577900ba7fb3387eb554cbbfbd788fad723bb1da55d4ba6a00a1ec",
-                "sha256:91e6d83dbf3b617e4adacd572910dfe929c088f3e7d2f0c8f9f64b61c78d4cc2"
+                "sha256:c6cc6765db403421bcbe05cdf8c2cb35785bcaf88a42c2fced60ec4bf5076774"
             ],
             "path": "./../../../tool/uapicodegen/dist/uapicodegen-0.0.1-py3-none-any.whl",
             "version": "==0.0.1"

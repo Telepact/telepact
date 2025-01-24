@@ -101,7 +101,7 @@ class UnionValue_(Generic[T, U]):
 
 {%- macro sanitize_field_name(field_name) -%}
     {%- set sanitized_name =  field_name | replace('!', '') -%}
-    {%- set py_keywords = ['bool', 'int', 'str', 'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
+    {%- set py_keywords = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'] %}
     {%- if sanitized_name in py_keywords -%}
         {{- sanitized_name + '_' -}}
     {%- else -%}
