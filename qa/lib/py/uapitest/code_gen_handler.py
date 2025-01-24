@@ -1,15 +1,15 @@
 import json
 from typing import Any, Dict, List, Optional, TypeVar, Callable, Tuple
-from uapitest.gen.all_ import example__Input_, example__Output_, test__Input_, test__Output_, test__Output__Ok_, Value, ServerHandler_, getBigList__Input_, getBigList__Output_, Undefined, ExUnion__NoMatch_, ExUnion__One, ExUnion__Two, ExUnion, ExStruct
+from uapitest.gen.all_ import test, Value, ServerHandler_, example as fnexample, getBigList, Undefined, ExUnion, ExStruct
 
 
 class CodeGenHandler(ServerHandler_):
 
-    async def example(self, headers: dict[str, object], input: example__Input_) -> Tuple[dict[str, object], example__Output_]:
+    async def example(self, headers: dict[str, object], input: fnexample.Input) -> Tuple[dict[str, object], example.Output]:
         raise NotImplementedError("Unimplemented method 'example'")
 
-    async def test(self, headers: dict[str, object], input: test__Input_) -> Tuple[dict[str, object], test__Output_]:
-        output = test__Output__Ok_()
+    async def test(self, headers: dict[str, object], input: test.Input) -> Tuple[dict[str, object], test.Output]:
+        output = test.Output.Ok_()
 
         try:
             print("input: " + json.dumps(input.to_pseudo_json()))
@@ -18,142 +18,156 @@ class CodeGenHandler(ServerHandler_):
 
         if input.value():
             top = input.value()
-            if not isinstance(top.bool(), Undefined):
-                output.value = Value.from_typed(bool=top.bool())
+            if not isinstance(top.bool_(), Undefined):
+                output = test.Output.Ok_.from_typed(value=top.bool_())
             if not isinstance(top.nullBool(), Undefined):
-                output.value = Value.from_typed(nullBool=top.nullBool())
+                output = test.Output.Ok_.from_typed(nullBool=top.nullBool())
             if not isinstance(top.arrBool(), Undefined):
-                output.value = Value.from_typed(arrBool=top.arrBool())
+                output = test.Output.Ok_.from_typed(arrBool=top.arrBool())
             if not isinstance(top.arrNullBool(), Undefined):
-                output.value = Value.from_typed(arrNullBool=top.arrNullBool())
+                output = test.Output.Ok_.from_typed(
+                    arrNullBool=top.arrNullBool())
             if not isinstance(top.objBool(), Undefined):
-                output.value = Value.from_typed(objBool=top.objBool())
+                output = test.Output.Ok_.from_typed(objBool=top.objBool())
             if not isinstance(top.objNullBool(), Undefined):
-                output.value = Value.from_typed(objNullBool=top.objNullBool())
+                output = test.Output.Ok_.from_typed(
+                    objNullBool=top.objNullBool())
             if not isinstance(top.int_(), Undefined):
-                output.value = Value.from_typed(int_=top.int_())
+                output = test.Output.Ok_.from_typed(int_=top.int_())
             if not isinstance(top.nullInt(), Undefined):
-                output.value = Value.from_typed(nullInt=top.nullInt())
+                output = test.Output.Ok_.from_typed(nullInt=top.nullInt())
             if not isinstance(top.arrInt(), Undefined):
-                output.value = Value.from_typed(arrInt=top.arrInt())
+                output = test.Output.Ok_.from_typed(arrInt=top.arrInt())
             if not isinstance(top.arrNullInt(), Undefined):
-                output.value = Value.from_typed(arrNullInt=top.arrNullInt())
+                output = test.Output.Ok_.from_typed(
+                    arrNullInt=top.arrNullInt())
             if not isinstance(top.objInt(), Undefined):
-                output.value = Value.from_typed(objInt=top.objInt())
+                output = test.Output.Ok_.from_typed(objInt=top.objInt())
             if not isinstance(top.objNullInt(), Undefined):
-                output.value = Value.from_typed(objNullInt=top.objNullInt())
+                output = test.Output.Ok_.from_typed(
+                    objNullInt=top.objNullInt())
             if not isinstance(top.num(), Undefined):
-                output.value = Value.from_typed(num=top.num())
+                output = test.Output.Ok_.from_typed(num=top.num())
             if not isinstance(top.nullNum(), Undefined):
-                output.value = Value.from_typed(nullNum=top.nullNum())
+                output = test.Output.Ok_.from_typed(nullNum=top.nullNum())
             if not isinstance(top.arrNum(), Undefined):
-                output.value = Value.from_typed(arrNum=top.arrNum())
+                output = test.Output.Ok_.from_typed(arrNum=top.arrNum())
             if not isinstance(top.arrNullNum(), Undefined):
-                output.value = Value.from_typed(arrNullNum=top.arrNullNum())
+                output = test.Output.Ok_.from_typed(
+                    arrNullNum=top.arrNullNum())
             if not isinstance(top.objNum(), Undefined):
-                output.value = Value.from_typed(objNum=top.objNum())
+                output = test.Output.Ok_.from_typed(objNum=top.objNum())
             if not isinstance(top.objNullNum(), Undefined):
-                output.value = Value.from_typed(objNullNum=top.objNullNum())
+                output = test.Output.Ok_.from_typed(
+                    objNullNum=top.objNullNum())
             if not isinstance(top.str_(), Undefined):
-                output.value = Value.from_typed(str_=top.str_())
+                output = test.Output.Ok_.from_typed(str_=top.str_())
             if not isinstance(top.nullStr(), Undefined):
-                output.value = Value.from_typed(nullStr=top.nullStr())
+                output = test.Output.Ok_.from_typed(nullStr=top.nullStr())
             if not isinstance(top.arrStr(), Undefined):
-                output.value = Value.from_typed(arrStr=top.arrStr())
+                output = test.Output.Ok_.from_typed(arrStr=top.arrStr())
             if not isinstance(top.arrNullStr(), Undefined):
-                output.value = Value.from_typed(arrNullStr=top.arrNullStr())
+                output = test.Output.Ok_.from_typed(
+                    arrNullStr=top.arrNullStr())
             if not isinstance(top.objStr(), Undefined):
-                output.value = Value.from_typed(objStr=top.objStr())
+                output = test.Output.Ok_.from_typed(objStr=top.objStr())
             if not isinstance(top.objNullStr(), Undefined):
-                output.value = Value.from_typed(objNullStr=top.objNullStr())
+                output = test.Output.Ok_.from_typed(
+                    objNullStr=top.objNullStr())
             if not isinstance(top.arr(), Undefined):
-                output.value = Value.from_typed(arr=top.arr())
+                output = test.Output.Ok_.from_typed(arr=top.arr())
             if not isinstance(top.nullArr(), Undefined):
-                output.value = Value.from_typed(nullArr=top.nullArr())
+                output = test.Output.Ok_.from_typed(nullArr=top.nullArr())
             if not isinstance(top.arrArr(), Undefined):
-                output.value = Value.from_typed(arrArr=top.arrArr())
+                output = test.Output.Ok_.from_typed(arrArr=top.arrArr())
             if not isinstance(top.arrNullArr(), Undefined):
-                output.value = Value.from_typed(arrNullArr=top.arrNullArr())
+                output = test.Output.Ok_.from_typed(
+                    arrNullArr=top.arrNullArr())
             if not isinstance(top.objArr(), Undefined):
-                output.value = Value.from_typed(objArr=top.objArr())
+                output = test.Output.Ok_.from_typed(objArr=top.objArr())
             if not isinstance(top.objNullArr(), Undefined):
-                output.value = Value.from_typed(objNullArr=top.objNullArr())
+                output = test.Output.Ok_.from_typed(
+                    objNullArr=top.objNullArr())
             if not isinstance(top.obj(), Undefined):
-                output.value = Value.from_typed(obj=top.obj())
+                output = test.Output.Ok_.from_typed(obj=top.obj())
             if not isinstance(top.nullObj(), Undefined):
-                output.value = Value.from_typed(nullObj=top.nullObj())
+                output = test.Output.Ok_.from_typed(nullObj=top.nullObj())
             if not isinstance(top.arrObj(), Undefined):
-                output.value = Value.from_typed(arrObj=top.arrObj())
+                output = test.Output.Ok_.from_typed(arrObj=top.arrObj())
             if not isinstance(top.arrNullObj(), Undefined):
-                output.value = Value.from_typed(arrNullObj=top.arrNullObj())
+                output = test.Output.Ok_.from_typed(
+                    arrNullObj=top.arrNullObj())
             if not isinstance(top.objObj(), Undefined):
-                output.value = Value.from_typed(objObj=top.objObj())
+                output = test.Output.Ok_.from_typed(objObj=top.objObj())
             if not isinstance(top.objNullObj(), Undefined):
-                output.value = Value.from_typed(objNullObj=top.objNullObj())
+                output = test.Output.Ok_.from_typed(
+                    objNullObj=top.objNullObj())
             if not isinstance(top.any(), Undefined):
-                output.value = Value.from_typed(any=top.any())
+                output = test.Output.Ok_.from_typed(any=top.any())
             if not isinstance(top.nullAny(), Undefined):
-                output.value = Value.from_typed(nullAny=top.nullAny())
+                output = test.Output.Ok_.from_typed(nullAny=top.nullAny())
             if not isinstance(top.arrAny(), Undefined):
-                output.value = Value.from_typed(arrAny=top.arrAny())
+                output = test.Output.Ok_.from_typed(arrAny=top.arrAny())
             if not isinstance(top.arrNullAny(), Undefined):
-                output.value = Value.from_typed(arrNullAny=top.arrNullAny())
+                output = test.Output.Ok_.from_typed(
+                    arrNullAny=top.arrNullAny())
             if not isinstance(top.objAny(), Undefined):
-                output.value = Value.from_typed(objAny=top.objAny())
+                output = test.Output.Ok_.from_typed(objAny=top.objAny())
             if not isinstance(top.objNullAny(), Undefined):
-                output.value = Value.from_typed(objNullAny=top.objNullAny())
+                output = test.Output.Ok_.from_typed(
+                    objNullAny=top.objNullAny())
             if not isinstance(top.struct(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     struct=self.map_struct(top.struct()))
             if not isinstance(top.nullStruct(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     nullStruct=self.map_struct(top.nullStruct()))
             if not isinstance(top.arrStruct(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     arrStruct=self.map_arr(top.arrStruct(), self.map_struct))
             if not isinstance(top.arrNullStruct(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     arrNullStruct=self.map_arr(top.arrNullStruct(), self.map_struct))
             if not isinstance(top.objStruct(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     objStruct=self.map_obj(top.objStruct(), self.map_struct))
             if not isinstance(top.objNullStruct(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     objNullStruct=self.map_obj(top.objNullStruct(), self.map_struct))
             if not isinstance(top.union(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     union=self.map_union(top.union()))
             if not isinstance(top.nullUnion(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     nullUnion=self.map_union(top.nullUnion()))
             if not isinstance(top.arrUnion(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     arrUnion=self.map_arr(top.arrUnion(), self.map_union))
             if not isinstance(top.arrNullUnion(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     arrNullUnion=self.map_arr(top.arrNullUnion(), self.map_union))
             if not isinstance(top.objUnion(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     objUnion=self.map_obj(top.objUnion(), self.map_union))
             if not isinstance(top.objNullUnion(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     objNullUnion=self.map_obj(top.objNullUnion(), self.map_union))
             if not isinstance(top.fn(), Undefined):
-                output.value = Value.from_typed(fn=self.map_fn(top.fn()))
+                output = test.Output.Ok_.from_typed(fn=self.map_fn(top.fn()))
             if not isinstance(top.nullFn(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     nullFn=self.map_fn(top.nullFn()))
             if not isinstance(top.arrFn(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     arrFn=self.map_arr(top.arrFn(), self.map_fn))
             if not isinstance(top.arrNullFn(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     arrNullFn=self.map_arr(top.arrNullFn(), self.map_fn))
             if not isinstance(top.objFn(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     objFn=self.map_obj(top.objFn(), self.map_fn))
             if not isinstance(top.objNullFn(), Undefined):
-                output.value = Value.from_typed(
+                output = test.Output.Ok_.from_typed(
                     objNullFn=self.map_obj(top.objNullFn(), self.map_fn))
 
         return {}, output
@@ -161,37 +175,35 @@ class CodeGenHandler(ServerHandler_):
     def map_struct(self, s: ExStruct) -> ExStruct:
         if s is None:
             return None
-        b = ExStruct(
-            required=s.required
-        )
-        if not isinstance(s.optional, Undefined):
-            b.optional = s.optional
-        if not isinstance(s.optional2, Undefined):
-            b.optional2 = s.optional2
-        return b
+        if isinstance(s.optional(), Undefined):
+            return ExStruct(required=s.required())
+        else:
+            return ExStruct(required=s.required(), optional=s.optional())
 
     def map_union(self, u: ExUnion) -> ExUnion:
         if u is None:
             return None
-        if isinstance(u, ExUnion__NoMatch_):
-            return ExUnion__NoMatch_()
-        elif isinstance(u, ExUnion__One):
-            return ExUnion__One()
-        elif isinstance(u, ExUnion__Two):
-            b = ExUnion__Two(
-                required=u.required
-            )
-            if not isinstance(u.optional, Undefined):
-                b.optional = u.optional
-            return b
+        tv = u.get_tagged_value()
+        if tv.tag == "One":
+            return ExUnion.One.from_typed()
+        elif tv.tag == "Two":
+            if isinstance(tv.value, Undefined):
+                return ExUnion.Two.from_typed(
+                    required=tv.value.required()
+                )
+            else:
+                return ExUnion.Two.from_typed(
+                    required=tv.value.required(),
+                    optional=tv.value.optional()
+                )
 
-    def map_fn(self, f: example__Input_) -> example__Input_:
+    def map_fn(self, f: fnexample.Input) -> fnexample.Input:
         if f is None:
             return None
-        b = example__Input_(required=f.required)
-        if not isinstance(f.optional, Undefined):
-            b.optional = f.optional
-        return b
+        if isinstance(f.optional(), Undefined):
+            return fnexample.Input.from_typed(required=f.required())
+        else:
+            return fnexample.Input.from_typed(required=f.required(), optional=f.optional())
 
     T = TypeVar('T')
 
@@ -204,6 +216,3 @@ class CodeGenHandler(ServerHandler_):
         if m is None:
             return None
         return {k: mapper(v) for k, v in m.items()}
-
-    def get_big_list(self, headers: dict[str, object], input: getBigList__Input_) -> getBigList__Output_:
-        raise NotImplementedError("Unimplemented method 'getBigList'")

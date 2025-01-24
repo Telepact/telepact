@@ -19,9 +19,9 @@ class Undefined:
     pass
 
 
-class UnionValue_(Generic[T, U]):
-    tag_: T
-    value_: U
+class TaggedValue_(Generic[T, U]):
+    tag: T
+    value: U
 
     def __init__(self, tag: T, value: U) -> None:
         self.tag_ = tag
@@ -165,21 +165,21 @@ class {{ type_display }}:
             "{{ tag_key }}": payload
         })
     {% endfor %}
-    def get_value(self) -> Union[
+    def get_tagged_value(self) -> Union[
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
-            UnionValue_[Literal["{{ tag_key }}"], '{{ tag_prefix + tag_key }}'], 
+            TaggedValue_[Literal["{{ tag_key }}"], '{{ tag_prefix + tag_key }}'], 
         {%- endfor %}
-            UnionValue_[Literal["Unknown_"], dict[str, object]]]:
+            TaggedValue_[Literal["Unknown_"], dict[str, object]]]:
         
         tag = next(iter(self.pseudo_json.keys()))
         {%- for tag_entry in tags %}
             {%- set tag_key = tag_entry | find_tag_key %}
         {% if loop.first %}if{% else %}elif{% endif %} tag == "{{ tag_key }}":
-            return UnionValue_(cast(Literal["{{ tag_key }}"], "{{ tag_key }}"), {{ tag_prefix + tag_key }}(cast(dict[str, object], self.pseudo_json["{{ tag_key }}"])))
+            return TaggedValue_(cast(Literal["{{ tag_key }}"], "{{ tag_key }}"), {{ tag_prefix + tag_key }}(cast(dict[str, object], self.pseudo_json["{{ tag_key }}"])))
             {%- endfor %}
         else:
-            return UnionValue_(cast(Literal["Unknown_"], "Unknown_"), cast(dict[str, object], self.pseudo_json["{{ tag_key }}"]))
+            return TaggedValue_(cast(Literal["Unknown_"], "Unknown_"), cast(dict[str, object], self.pseudo_json["{{ tag_key }}"]))
 {% for tag_entry in tags %}
     {%- set tag_key = tag_entry | find_tag_key %}
     {{- struct(tag_key, tag_entry['///'], tag_entry[tag_key], tag_prefix) | indent }}
