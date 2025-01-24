@@ -33,7 +33,7 @@ import traceback
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from uapitest.code_gen_handler import CodeGenHandler
-from uapitest.gen.all_ import ClientInterface_, test__Input_
+from uapitest.gen.all_ import ClientInterface_, test as fntest
 
 
 def on_err(e):
@@ -105,9 +105,9 @@ async def start_client_test_server(connection: NatsClient, metrics: CollectorReg
         @timers.time()
         async def c() -> 'Message':
             if use_codegen and function_name == "fn.test":
-                headers, output = await generated_client.test(request_headers, test__Input_.from_pseudo_json(request_body))
+                headers, output = await generated_client.test(request_headers, fntest.Input(request_body))
                 headers['_codegenc'] = True
-                return Message(headers, output.to_pseudo_json())
+                return Message(headers, output.pseudo_json)
             else:
                 return await client.request(Message(request_headers, request_body))
 

@@ -5,7 +5,7 @@ from typing import cast, ForwardRef
 import uapi.Message
 import uapi.Client
 from typing import Tuple
-
+from enum import Enum
 
 T = TypeVar('T')
 U = TypeVar('U')
@@ -15,9 +15,8 @@ def util_let(value: T, f: Callable[[T], U]) -> U:
     return f(value)
 
 
-class Undefined:
-    pass
-
+class Undefined(Enum):
+    Inst = "undefined"
 
 class TaggedValue_(Generic[T, U]):
     tag: T
@@ -83,7 +82,7 @@ class TaggedValue_(Generic[T, U]):
 
 {%- macro to_maybe_opt_py_type(type, field_name) -%}
     {%- if '!' in field_name -%}
-        {{- to_py_type(type) }} | Undefined
+        {{- to_py_type(type) }} | Literal[Undefined.Inst]
     {%- else %}
         {{- to_py_type(type) }}
     {%- endif %}
@@ -129,12 +128,12 @@ class {{ type_display }}:
     def from_typed(
         {%- for field_name, field_type in fields.items() %}
             {%- if '!' not in field_name %}
-        {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %},
+        {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined.Inst{% endif %},
             {%- endif %}
         {%- endfor %}
         {%- for field_name, field_type in fields.items() %}
             {%- if '!' in field_name %}
-        {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined(){% endif %},
+        {{ sanitize_field_name(field_name) }}: '{{ to_maybe_opt_py_type(field_type, field_name) }}'{% if '!' in field_name %} = Undefined.Inst{% endif %},
             {%- endif %}
         {%- endfor %}
     ) -> '{{ type_prefix + type_display }}':
@@ -145,7 +144,8 @@ class {{ type_display }}:
         })
     {% for field_name, field_type in fields.items() %}
     def {{ sanitize_field_name(field_name) }}(self) -> '{{ to_maybe_opt_py_type(field_type, field_name) }}':
-        return {% call marshall_py_type(field_type, 0) %}self.pseudo_json["{{ field_name }}"]{% endcall %}
+        return {% if '!' in field_name %}Undefined.Inst if '{{- field_name }}' not in self.pseudo_json else {% endif -%}
+        {% call marshall_py_type(field_type, 0) %}self.pseudo_json["{{ field_name }}"]{% endcall %}
     {% endfor -%}
 {%- endmacro -%}
 
@@ -230,7 +230,7 @@ class ServerHandler_:
         {%- for fn in functions %}
         {%- set function_name = fn | replace('fn.', '') %}
         {% if loop.first %}if{% else %}elif{% endif %} function_name == "{{ fn }}":
-            headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(message.body))
+            headers, {{ function_name }}_output = await self.{{ function_name }}(message.headers, {{ function_name }}.Input(cast(dict[str, object], message.body["{{ fn }}"])))
             return uapi.Message.Message(headers, {{ function_name }}_output.pseudo_json)
         {% endfor %}
         raise Exception("Unknown function: " + function_name)
